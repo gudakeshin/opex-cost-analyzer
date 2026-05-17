@@ -1,0 +1,42 @@
+{
+  "description": "Simple 3-sheet planning model",
+  "skill": "model-contextualizer",
+  "input_lines": [],
+  "extra_kwargs": {
+    "structural_summary": {
+      "workbook_name": "RE_Simple_Planning.xlsx",
+      "sheet_order": ["Assumptions", "OpEx Build", "Summary P&L"],
+      "sheets": [
+        {
+          "sheet_name": "Assumptions",
+          "row_count": 40,
+          "first_rows": [["Parameter", "Value"], ["Headcount Growth Rate", "0.05"]],
+          "first_col_values": ["Headcount Growth Rate", "Cost Escalation Rate", "WACC"],
+          "formula_refs": []
+        },
+        {
+          "sheet_name": "OpEx Build",
+          "row_count": 120,
+          "first_rows": [["Category", "Jan-24", "Feb-24", "Mar-24"], ["IT Costs", "1200", "1300", "1250"]],
+          "first_col_values": ["IT & Technology", "Facilities", "HR & Recruitment"],
+          "formula_refs": ["=Assumptions!B2*1.1"]
+        },
+        {
+          "sheet_name": "Summary P&L",
+          "row_count": 28,
+          "first_rows": [["Metric", "FY24", "FY25"], ["Total OpEx", "100000", "110000"]],
+          "first_col_values": ["Total OpEx", "EBITDA", "Net Savings"],
+          "formula_refs": ["=SUM('OpEx Build'!B2:B20)"]
+        }
+      ]
+    }
+  },
+  "assertions": {
+    "required_keys": ["model_type", "planning_horizon", "sheet_graph", "ingestion_strategy", "confidence"],
+    "model_type": "planning",
+    "ingestion_strategy": "hybrid",
+    "min_sheet_graph": 3,
+    "min_key_driver_variables": 1,
+    "min_spend_category_coverage": 1
+  }
+}

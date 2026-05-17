@@ -1,0 +1,324 @@
+{
+  "pack_id": "insurance_general",
+  "sector": "Insurance (General / Life / Health)",
+  "version": "1.0",
+  "applicable_entity_types": [
+    "general_insurance",
+    "life_insurance",
+    "health_insurance",
+    "reinsurance",
+    "insurance_broker"
+  ],
+  "industry_signals": [
+    "insurance_keywords_high",
+    "claims_keywords_detected",
+    "bfsi_regulatory_context"
+  ],
+  "universal_levers": [
+    "contract_renegotiation",
+    "process_standardization",
+    "demand_management",
+    "supplier_consolidation",
+    "automation",
+    "payment_terms",
+    "maverick_compliance",
+    "outsourcing",
+    "internal_best_practice",
+    "tail_spend_automation",
+    "should_cost_modeling",
+    "zero_based_rebaseline",
+    "shared_services_consolidation",
+    "geographic_arbitrage",
+    "rebate_pricing_recovery",
+    "benefits_cost_optimization",
+    "contingent_workforce_optimization",
+    "consulting_spend_governance",
+    "legal_spend_optimization",
+    "ld_rationalization",
+    "space_utilization_optimization",
+    "lease_restructuring",
+    "cost_governance",
+    "insurance_premium_optimization"
+  ],
+  "sector_specific_levers": [
+    {
+      "lever_id": "claims_automation",
+      "lever_name": "Claims Processing Automation (AI Triage & Settlement)",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 18,
+        "p50": 26,
+        "p90": 34
+      },
+      "cta_rate": 0.11,
+      "phasing_curve": [
+        0.1,
+        0.4,
+        0.5
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.88,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Claims data quality validated (> 90% structured fields, < 5% exception rate)",
+        "AI triage model trained and back-tested on ≥ 2 years of historical claims",
+        "IRDAI / regulatory approval obtained for automated settlement thresholds"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 40,
+        "p90": 64
+      },
+      "applicable_if": [
+        "claims_keywords detected",
+        "category:OUTSOURCED or PROF_SVCS present"
+      ]
+    },
+    {
+      "lever_id": "underwriting_automation",
+      "lever_name": "Underwriting Straight-Through Processing",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 20,
+        "p90": 28
+      },
+      "cta_rate": 0.1,
+      "phasing_curve": [
+        0.1,
+        0.4,
+        0.5
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.85,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Underwriting rules engine updated and tested for STP eligibility thresholds",
+        "Actuarial sign-off on automated risk scoring models",
+        "Regulatory compliance review for algorithmic underwriting decisions completed"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.62,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 44,
+        "p90": 72
+      },
+      "applicable_if": [
+        "insurance_keywords detected",
+        "category:IT or OUTSOURCED present"
+      ]
+    },
+    {
+      "lever_id": "policy_admin_digitization",
+      "lever_name": "Policy Administration Digitisation (Paperless Ops)",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 15,
+        "p50": 26,
+        "p90": 36
+      },
+      "cta_rate": 0.09,
+      "phasing_curve": [
+        0.2,
+        0.45,
+        0.35
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.85,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Core policy admin system (PAS) supports digital workflows",
+        "e-signature capability enabled and legally validated",
+        "Customer communication migrated to digital channels (> 70% penetration target set)"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 28,
+        "p90": 48
+      },
+      "applicable_if": [
+        "insurance_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "fraud_detection_ai",
+      "lever_name": "AI-Driven Fraud Detection (Loss Ratio Improvement)",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 4,
+        "p50": 9,
+        "p90": 16
+      },
+      "cta_rate": 0.09,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.85,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Historical fraud case data labelled and validated (> 3 years, minimum 1,000 confirmed fraud cases)",
+        "ML fraud scoring integrated into claims intake workflow",
+        "Special Investigations Unit (SIU) capacity scaled to handle referrals"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 18,
+        "p50": 36,
+        "p90": 60
+      },
+      "applicable_if": [
+        "claims_keywords detected",
+        "annual_revenue > 500M"
+      ]
+    },
+    {
+      "lever_id": "channel_mix_optimization",
+      "lever_name": "Distribution Channel Mix Optimisation",
+      "lever_family": "structure",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 15,
+        "p90": 22
+      },
+      "cta_rate": 0.07,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Channel cost and profitability analysis completed per product line",
+        "Digital direct and bancassurance channel capability built or contracted",
+        "Agent / broker rationalisation plan agreed with sales leadership"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.62,
+      "implementation_weeks": {
+        "p10": 18,
+        "p50": 36,
+        "p90": 60
+      },
+      "applicable_if": [
+        "insurance_keywords detected",
+        "category:PROF_SVCS or MARKETING present"
+      ]
+    },
+    {
+      "lever_id": "reinsurance_optimization",
+      "lever_name": "Reinsurance Treaty Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 3,
+        "p50": 6,
+        "p90": 10
+      },
+      "cta_rate": 0.04,
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Actuarial review of optimal retention levels completed",
+        "Treaty renewal strategy agreed with reinsurance broker",
+        "Risk appetite board approval obtained for changed retention"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 28,
+        "p90": 48
+      },
+      "applicable_if": [
+        "insurance_keywords detected",
+        "annual_revenue > 200M"
+      ]
+    },
+    {
+      "lever_id": "investment_ops_efficiency",
+      "lever_name": "Investment Operations Cost Efficiency",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 12
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.75,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Investment management fee benchmark against peers completed",
+        "In-house vs. external fund management TCO analysis done",
+        "Investment committee approval for mandate changes"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.68,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 26,
+        "p90": 44
+      },
+      "applicable_if": [
+        "insurance_keywords detected",
+        "category:FIN_SVCS present"
+      ]
+    },
+    {
+      "lever_id": "actuarial_automation",
+      "lever_name": "Actuarial Reserving & Pricing Automation",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 20,
+        "p90": 28
+      },
+      "cta_rate": 0.09,
+      "phasing_curve": [
+        0.1,
+        0.4,
+        0.5
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.85,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Actuarial modelling platform (Prophet, Moses, R/Python) upgraded",
+        "Model risk management framework updated for automated outputs",
+        "Regulator / auditor acceptance of automated reserve computation confirmed"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.62,
+      "implementation_weeks": {
+        "p10": 18,
+        "p50": 38,
+        "p90": 60
+      },
+      "applicable_if": [
+        "insurance_keywords detected",
+        "category:PROF_SVCS or IT present"
+      ]
+    }
+  ]
+}

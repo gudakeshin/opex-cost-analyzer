@@ -1,0 +1,38 @@
+sector: bfsi_banks
+
+free_sources:
+  - id: rbi_annual_report
+    name: RBI Annual Report — Scheduled Commercial Banks Statistical Tables
+    url_pattern: "https://www.rbi.org.in/Scripts/AnnualReportPublications.aspx"
+    data_available: [cost_to_income, staff_costs, total_opex, npa_provisions]
+    refresh_frequency: annual
+    parser: rbi_annual_tables
+  - id: bse_annual_reports
+    name: BSE Annual Report Filings
+    url_pattern: "https://www.bseindia.com/stock-share-price/{ticker}/financials-annual-reports"
+    data_available: [segment_opex, it_spend, branch_count]
+    refresh_frequency: annual
+    parser: bse_pdf_parser
+  - id: iba_benchmarking
+    name: IBA Banking Technology Survey (public summary)
+    url_pattern: "https://www.iba.org.in/publications"
+    data_available: [it_to_opex_ratio, digital_transactions_pct]
+    refresh_frequency: annual
+    parser: iba_pdf_parser
+  - id: brsr_disclosures
+    name: BRSR Core Disclosures on BSE/NSE
+    data_available: [scope2_emissions, water_intensity, energy_intensity]
+    refresh_frequency: annual
+    parser: brsr_xml_parser
+
+licensed_sources_stubs:
+  - id: cmie_prowess_iq
+    name: CMIE Prowess IQ
+    credential_env: CMIE_API_KEY
+    data_available: [detailed_opex_breakdowns, time_series_10yr]
+    adapter_class: app.services.benchmarks_india.CmieAdapter
+  - id: capitaline_plus
+    name: Capitaline Plus
+    credential_env: CAPITALINE_API_KEY
+    data_available: [segment_wise_costs, peer_comparisons]
+    adapter_class: app.services.benchmarks_india.CapitalineAdapter

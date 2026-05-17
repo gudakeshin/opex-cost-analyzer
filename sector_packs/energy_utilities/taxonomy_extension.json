@@ -1,0 +1,11 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "fuel_cost", "category_name": "Fuel Cost (Coal, Gas, Naptha)", "gl_prefix": "FUL"},
+    {"category_id": "grid_wheeling_charges", "category_name": "Transmission, Wheeling & Open Access Charges", "gl_prefix": "GRD"},
+    {"category_id": "o_and_m_plant", "category_name": "Plant O&M, Overhaul & Spares", "gl_prefix": "OMP"},
+    {"category_id": "carbon_compliance", "category_name": "Carbon Credit, REC & Compliance", "gl_prefix": "CAR"},
+    {"category_id": "at_and_c_losses", "category_name": "AT&C Loss Reduction Programme Costs", "gl_prefix": "ATC"}
+  ],
+  "overrides": []
+}

@@ -1,0 +1,124 @@
+{
+  "pack_id": "hospitality_travel",
+  "sector": "Hospitality, Hotels & Travel Management",
+  "version": "1.0",
+  "applicable_entity_types": ["hotel_chain", "resort_operator", "restaurant_chain", "travel_management_company", "airline_ground_ops", "qsr_chain"],
+  "industry_signals": ["revpar_keywords", "adr_keywords", "ota_commission_keywords", "fnb_keywords"],
+  "universal_levers": [
+    "contract_renegotiation", "process_standardization", "demand_management",
+    "supplier_consolidation", "automation", "payment_terms", "maverick_compliance",
+    "outsourcing", "internal_best_practice", "tail_spend_automation",
+    "should_cost_modeling", "zero_based_rebaseline", "rebate_pricing_recovery",
+    "geographic_arbitrage",
+    "benefits_cost_optimization", "contingent_workforce_optimization",
+    "consulting_spend_governance", "legal_spend_optimization", "ld_rationalization",
+    "space_utilization_optimization", "lease_restructuring", "cost_governance"
+  ],
+  "sector_specific_levers": [
+    {
+      "lever_id": "ota_commission_reduction",
+      "lever_name": "OTA Commission Reduction (Direct Booking Channel Mix Shift)",
+      "lever_family": "supply",
+      "savings_range_pct": {"p10": 12, "p50": 22, "p90": 35},
+      "cta_rate": 0.06,
+      "phasing_curve": [0.20, 0.50, 0.30],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "OTA channel mix analysed — commission rate by OTA and booking type quantified",
+        "Direct booking capability enhanced (website UX, loyalty programme, rate parity enforcement)",
+        "Revenue management strategy updated: direct-channel rate advantage validated"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.70,
+      "implementation_weeks": {"p10": 10, "p50": 22, "p90": 38},
+      "applicable_if": ["ota_commission_keywords detected", "category:MARKETING present"]
+    },
+    {
+      "lever_id": "fnb_procurement_optimization",
+      "lever_name": "Food & Beverage Procurement Optimisation (Menu Engineering & Waste Reduction)",
+      "lever_family": "supply",
+      "savings_range_pct": {"p10": 8, "p50": 14, "p90": 22},
+      "cta_rate": 0.05,
+      "phasing_curve": [0.30, 0.45, 0.25],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.68,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Menu engineering analysis completed (contribution margin by item; star/plow/dog/puzzle matrix)",
+        "Food cost percentage benchmarked vs. peer set (target < 28-32% of F&B revenue)",
+        "Supplier consolidation for top 10 ingredients/categories completed"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {"p10": 8, "p50": 18, "p90": 30},
+      "applicable_if": ["fnb_keywords detected", "category:LOGISTICS or OFFICE present"]
+    },
+    {
+      "lever_id": "energy_per_key_reduction",
+      "lever_name": "Energy Cost per Key Reduction (Smart Room Energy Management & HVAC Optimisation)",
+      "lever_family": "technology",
+      "savings_range_pct": {"p10": 12, "p50": 20, "p90": 30},
+      "cta_rate": 0.08,
+      "phasing_curve": [0.20, 0.50, 0.30],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.82,
+      "bounce_back_risk": "low",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Energy consumption per key benchmarked (kWh/occupied room night vs. comparable hotels)",
+        "Smart room energy management system (HVAC occupancy sensors, keycard-linked control) evaluated",
+        "Utility contract renegotiated — renewable energy tariff or fixed-rate contract secured"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {"p10": 10, "p50": 22, "p90": 36},
+      "applicable_if": ["category:POWER_ENERGY or FACILITIES present", "revpar_keywords detected"]
+    },
+    {
+      "lever_id": "housekeeping_optimization",
+      "lever_name": "Housekeeping Labour & Chemical Cost Optimisation",
+      "lever_family": "structure",
+      "savings_range_pct": {"p10": 8, "p50": 15, "p90": 22},
+      "cta_rate": 0.05,
+      "phasing_curve": [0.30, 0.45, 0.25],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.65,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "high",
+      "condition_precedents": [
+        "Occupancy-based scheduling model implemented (labour hours per occupied room benchmarked)",
+        "Guest opt-out programme for daily room cleaning rolled out (reduced departure cleans)",
+        "Housekeeping chemical and linen supplier consolidation completed with volume pricing"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.70,
+      "implementation_weeks": {"p10": 8, "p50": 18, "p90": 30},
+      "applicable_if": ["adr_keywords detected", "category:HR or CONTINGENT present"]
+    },
+    {
+      "lever_id": "revenue_management_optimization",
+      "lever_name": "Revenue Management & Dynamic Pricing Optimisation",
+      "lever_family": "technology",
+      "savings_range_pct": {"p10": 4, "p50": 9, "p90": 15},
+      "cta_rate": 0.07,
+      "phasing_curve": [0.25, 0.50, 0.25],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.80,
+      "bounce_back_risk": "low",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Revenue management system (IDeaS, Duetto, or Opera RMS) deployed and configured",
+        "Competitive rate intelligence tool integrated (OTA Insight or equivalent)",
+        "Revenue manager trained and empowered to override pricing decisions with RMS-backed logic"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {"p10": 8, "p50": 18, "p90": 30},
+      "applicable_if": ["revpar_keywords detected", "category:IT present"]
+    }
+  ]
+}

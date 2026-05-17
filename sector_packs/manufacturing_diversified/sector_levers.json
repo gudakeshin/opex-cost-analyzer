@@ -1,0 +1,65 @@
+{
+  "sector": "manufacturing_diversified",
+  "levers": [
+    {
+      "lever_id": "energy_efficiency_program",
+      "lever_name": "Plant Energy Efficiency Programme",
+      "description": "ISO 50001 audit + variable speed drives + waste heat recovery. Typical 12–22% energy bill reduction.",
+      "category_ids": ["energy_utilities_plant", "energy"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 22.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate"
+    },
+    {
+      "lever_id": "logistics_network_redesign",
+      "lever_name": "Outbound Logistics Network Redesign",
+      "description": "Hub-and-spoke model; milk-run consolidation; 3PL contract renegotiation.",
+      "category_ids": ["outbound_logistics", "logistics"],
+      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate"
+    },
+    {
+      "lever_id": "gst_itc_recovery",
+      "lever_name": "GST ITC Leakage Recovery",
+      "description": "Reconcile GSTR-2B vs purchase register; recover blocked credits under Sec 17(5) exclusions.",
+      "category_ids": ["raw_material_procurement", "energy_utilities_plant"],
+      "p10_pct": 2.0, "p50_pct": 4.0, "p90_pct": 8.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P1",
+      "savings_type": "one_time"
+    },
+    {
+      "lever_id": "mro_vendor_consolidation",
+      "lever_name": "MRO Vendor Consolidation",
+      "description": "Reduce MRO vendors 40%; framework contracts with quarterly rebates; VMI for top-20 SKUs.",
+      "category_ids": ["maintenance_spares"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate"
+    },
+    {
+      "lever_id": "contract_manufacturing_optimise",
+      "lever_name": "Job Work & Contract Mfg Optimisation",
+      "description": "Insource sub-optimal job-work where BEP positive; renegotiate utilisation-based contracts.",
+      "category_ids": ["contract_manufacturing"],
+      "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate"
+    },
+    {
+      "lever_id": "ind_as116_lease_reclassify",
+      "lever_name": "Ind AS 116 Lease Reclassification",
+      "description": "Identify short-term/low-value leases mis-classified as ROU; correct to P&L; recover cash flow.",
+      "category_ids": ["facilities", "inbound_logistics"],
+      "p10_pct": 1.0, "p50_pct": 3.0, "p90_pct": 6.0,
+      "implementation_weeks": 6,
+      "brsr_principle": "P1",
+      "savings_type": "one_time"
+    }
+  ]
+}

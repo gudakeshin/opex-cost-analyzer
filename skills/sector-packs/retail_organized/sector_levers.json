@@ -1,0 +1,360 @@
+{
+  "pack_id": "retail_organized",
+  "sector": "Organised Retail",
+  "version": "1.0",
+  "applicable_entity_types": [
+    "supermarket",
+    "hypermarket",
+    "fashion_retail",
+    "specialty_retail",
+    "ecommerce_retail",
+    "quick_commerce"
+  ],
+  "industry_signals": [
+    "retail_keywords_detected",
+    "store_ops_keywords",
+    "high_logistics_spend"
+  ],
+  "universal_levers": [
+    "contract_renegotiation",
+    "process_standardization",
+    "demand_management",
+    "supplier_consolidation",
+    "automation",
+    "payment_terms",
+    "maverick_compliance",
+    "outsourcing",
+    "internal_best_practice",
+    "tail_spend_automation",
+    "should_cost_modeling",
+    "zero_based_rebaseline",
+    "rebate_pricing_recovery",
+    "specification_optimization",
+    "geographic_arbitrage",
+    "benefits_cost_optimization",
+    "contingent_workforce_optimization",
+    "consulting_spend_governance",
+    "legal_spend_optimization",
+    "ld_rationalization",
+    "space_utilization_optimization",
+    "lease_restructuring",
+    "cost_governance",
+    "agency_fee_optimization",
+    "martech_rationalization"
+  ],
+  "sector_specific_levers": [
+    {
+      "lever_id": "store_labor_optimization",
+      "lever_name": "Store Labour & Scheduling Optimisation",
+      "lever_family": "structure",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 14,
+        "p90": 22
+      },
+      "cta_rate": 0.07,
+      "phasing_curve": [
+        0.25,
+        0.45,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Demand-based scheduling system (e.g. Kronos, NICE WFM) deployed",
+        "Labour standards (tasks per hour) established and validated",
+        "Store manager training on scheduling optimisation completed"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.73,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:HR or FACILITIES present",
+        "retail_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "category_management",
+      "lever_name": "Category Management & Vendor Funding Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4,
+        "p50": 9,
+        "p90": 16
+      },
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.68,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Category profitability analysis completed (GMROI per category)",
+        "Joint business planning (JBP) framework established with top 20 vendors",
+        "Vendor trade funding terms benchmarked and renegotiated"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 36
+      },
+      "applicable_if": [
+        "retail_keywords detected",
+        "supplier_count > 20"
+      ]
+    },
+    {
+      "lever_id": "shrinkage_reduction",
+      "lever_name": "Shrinkage & Loss Prevention Reduction",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 20,
+        "p50": 36,
+        "p90": 52
+      },
+      "cta_rate": 0.08,
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.8,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Shrinkage audit completed by store / category / shift",
+        "AI-powered CCTV or EAS (electronic article surveillance) deployed",
+        "Loss prevention team KPIs linked to shrinkage targets"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 20,
+        "p90": 36
+      },
+      "applicable_if": [
+        "retail_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "private_label",
+      "lever_name": "Private Label / Own-Brand Development",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 14,
+        "p90": 22
+      },
+      "cta_rate": 0.09,
+      "phasing_curve": [
+        0.1,
+        0.35,
+        0.55
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.8,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Consumer acceptance testing completed for own-brand alternatives",
+        "Contract manufacturing partner qualified with quality audit",
+        "Shelf placement strategy agreed with commercial team"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.62,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 40,
+        "p90": 64
+      },
+      "applicable_if": [
+        "retail_keywords detected",
+        "annual_revenue > 200M"
+      ]
+    },
+    {
+      "lever_id": "omnichannel_fulfillment",
+      "lever_name": "Omnichannel Fulfilment Cost Optimisation",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 16,
+        "p90": 26
+      },
+      "cta_rate": 0.1,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.82,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Order management system (OMS) upgraded to support multi-node fulfilment",
+        "Click-and-collect and dark store economics validated",
+        "Last-mile cost per delivery benchmarked and optimised"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 36,
+        "p90": 60
+      },
+      "applicable_if": [
+        "category:LOGISTICS > 3% revenue",
+        "retail_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "markdown_optimization",
+      "lever_name": "Markdown & Clearance Optimisation",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 2,
+        "p50": 5,
+        "p90": 9
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Demand forecasting integrated with markdown trigger rules",
+        "AI-driven markdown recommendation tool piloted on key categories",
+        "Buying team trained on inventory-optimised ordering"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 38
+      },
+      "applicable_if": [
+        "retail_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "loyalty_program_efficiency",
+      "lever_name": "Loyalty Programme Cost Efficiency",
+      "lever_family": "demand",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 22,
+        "p90": 32
+      },
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Points liability and redemption cost modelled by member cohort",
+        "Programme mechanics redesigned for lower cost-per-engagement",
+        "Incremental revenue attributable to loyalty validated by finance"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.68,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 38
+      },
+      "applicable_if": [
+        "category:MARKETING or IT present",
+        "retail_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "supply_chain_direct_sourcing",
+      "lever_name": "Direct Sourcing (Bypassing Intermediaries)",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4,
+        "p50": 9,
+        "p90": 16
+      },
+      "cta_rate": 0.07,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Category where direct sourcing is feasible (non-complex, non-regulated goods)",
+        "Supplier qualification completed (factory audit, quality certification)",
+        "Import / customs expertise available internally or contracted"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 36,
+        "p90": 60
+      },
+      "applicable_if": [
+        "supplier_count > 20",
+        "retail_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "store_network_optimization",
+      "lever_name": "Store Network Rationalisation",
+      "lever_family": "structure",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 22,
+        "p90": 32
+      },
+      "cta_rate": 0.08,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.85,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Store-level P&L and footfall data available for at least 24 months",
+        "Catchment area and trade-zone analysis completed",
+        "Lease break or non-renewal strategy agreed for underperforming stores"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 30,
+        "p90": 52
+      },
+      "applicable_if": [
+        "category:FACILITIES > 4% revenue",
+        "retail_keywords detected"
+      ]
+    }
+  ]
+}

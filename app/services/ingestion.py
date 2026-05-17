@@ -1,0 +1,832 @@
+from __future__ import annotations
+
+import hashlib
+import io
+import re
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
+import pandas as pd
+from docx import Document
+from openpyxl import load_workbook
+from pypdf import PdfReader
+
+from app.config import logger
+from app.models import NormalizedSpendLine
+
+# Row-count guardrails — enforced in parse_spend_file before any processing.
+_ROW_WARN = 100_000
+_ROW_CHUNK = 200_000
+_ROW_MAX = 500_000
+
+# ---------------------------------------------------------------------------
+# Optional: regional language OCR (pytesseract + Tesseract system binary)
+# Falls back gracefully if pytesseract is not installed or Tesseract is absent.
+# Supported lang codes: hin (Hindi), tam (Tamil), tel (Telugu), kan (Kannada),
+# mar (Marathi), ben (Bengali), guj (Gujarati), pan (Punjabi).
+# ---------------------------------------------------------------------------
+try:
+    import pytesseract as _pytesseract
+    from PIL import Image as _PILImage
+    _OCR_AVAILABLE = True
+except ImportError:
+    _OCR_AVAILABLE = False
+
+# Optional: indic-transliteration for script-agnostic text normalisation.
+# Used by vendor name dedup to convert Devanagari/Tamil/Telugu → Latin.
+try:
+    from indic_transliteration import sanscript as _sanscript
+    from indic_transliteration.sanscript import transliterate as _transliterate
+    _TRANSLITERATION_AVAILABLE = True
+except ImportError:
+    _TRANSLITERATION_AVAILABLE = False
+
+# Tesseract language pack → ISO script mapping
+_LANG_SCRIPTS = {
+    "hin": "DEVANAGARI",
+    "mar": "DEVANAGARI",
+    "tam": "TAMIL",
+    "tel": "TELUGU",
+    "kan": "KANNADA",
+    "ben": "BENGALI",
+    "guj": "GUJARATI",
+    "pan": "GURMUKHI",
+}
+
+
+def _read_tabular(file_path: Path) -> pd.DataFrame:
+    suffix = file_path.suffix.lower()
+    if suffix == ".csv":
+        return pd.read_csv(file_path)
+    return pd.read_excel(file_path)
+
+
+def _best_column_match(columns: List[str], candidates: List[str], default: str = "") -> str:
+    lowered = {c.lower(): c for c in columns}
+    for candidate in candidates:
+        if candidate in lowered:
+            return lowered[candidate]
+    for c in columns:
+        for candidate in candidates:
+            if candidate in c.lower():
+                return c
+    return default
+
+
+def _classify(description: str, supplier: str, taxonomy: Dict) -> Tuple[str, str]:
+    content = f"{description} {supplier}".lower()
+    best = ("OTHER", "Other / Unclassified", 0)
+    for cat in taxonomy.get("categories", []):
+        hits = sum(1 for kw in cat.get("keywords", []) if kw.lower() in content)
+        if hits > best[2]:
+            best = (cat.get("id", "OTHER"), cat.get("name", "Other / Unclassified"), hits)
+    return best[0], best[1]
+
+
+def _classify_by_gl(gl_code: str, taxonomy: Dict) -> Tuple[str, str] | None:
+    """Map a GL code to a taxonomy category using gl_code_ranges in taxonomy."""
+    if not gl_code:
+        return None
+    gl_ranges = taxonomy.get("gl_code_ranges", {})
+    stripped = re.sub(r"\D", "", gl_code)
+    if not stripped:
+        logger.warning("gl_code_no_digits gl_code=%r; skipping GL classification", gl_code)
+        return None
+    try:
+        code_int = int(stripped)
+    except (ValueError, TypeError):
+        return None
+    for range_key, mapping in gl_ranges.items():
+        try:
+            lo, hi = range_key.split("-")
+            if int(lo) <= code_int <= int(hi):
+                return mapping.get("category_id", "OTHER"), mapping.get("category_name", "Other / Unclassified")
+        except Exception:
+            continue
+    return None
+
+
+def _derive_fiscal_period(date_str: str) -> Tuple[int | None, str | None]:
+    """Return (fiscal_year, fiscal_period) from a date string.
+
+    fiscal_period format: "YYYY-Qn" for quarterly or "YYYY-MM" for monthly.
+    We prefer monthly precision when available.
+    """
+    if not date_str or date_str in ("", "nan", "NaT", "None"):
+        return None, None
+    for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%d/%m/%Y", "%m/%d/%Y", "%Y-%m", "%m/%Y", "%b %Y", "%B %Y"):
+        try:
+            dt = datetime.strptime(str(date_str).strip()[:10], fmt)
+            fy = dt.year
+            fp = f"{dt.year}-{dt.month:02d}"
+            return fy, fp
+        except ValueError:
+            continue
+    # Try pandas as fallback for exotic formats
+    try:
+        dt = pd.to_datetime(date_str)
+        fy = dt.year
+        fp = f"{dt.year}-{dt.month:02d}"
+        return fy, fp
+    except Exception:
+        return None, None
+
+
+def _detect_amount_type(value: str) -> str:
+    """Infer amount_type from a column name or cell value."""
+    low = str(value).lower()
+    if any(k in low for k in ("budget", "plan", "planned")):
+        return "budget"
+    if any(k in low for k in ("forecast", "fcast", "fcst", "projection")):
+        return "forecast"
+    if "accrual" in low:
+        return "accrual"
+    return "actual"
+
+
+def _parse_fx_rate(value: Any) -> float:
+    try:
+        v = float(value)
+        if v > 0:
+            return v
+        logger.warning("fx_rate_invalid value=%r; defaulting to 1.0", value)
+        return 1.0
+    except (TypeError, ValueError):
+        logger.warning("fx_rate_parse_failed value=%r; defaulting to 1.0", value)
+        return 1.0
+
+
+def _parse_gst_treatment(value: Any) -> str | None:
+    """Normalise a raw GST treatment cell to canonical tag."""
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return None
+    s = str(value).strip().lower()
+    if not s:
+        return None
+    if any(k in s for k in ("ineligible", "blocked", "exempt", "nil rated", "non-itc")):
+        return "ineligible"
+    if any(k in s for k in ("rcm", "reverse charge")):
+        return "rcm"
+    if any(k in s for k in ("inverted", "refund")):
+        return "inverted_duty"
+    if any(k in s for k in ("eligible", "itc", "input tax")):
+        return "itc_eligible"
+    return None
+
+
+def _parse_related_party(value: Any) -> bool:
+    """Return True when the cell indicates a related-party / intercompany transaction."""
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return False
+    s = str(value).strip().lower()
+    return s in {"yes", "y", "true", "1", "intercompany", "related", "intragroup", "intra-group"}
+
+
+def _parse_lease_treatment(value: Any) -> str | None:
+    """Normalise a raw lease treatment cell."""
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return None
+    s = str(value).strip().lower()
+    if not s:
+        return None
+    if any(k in s for k in ("operating", "op lease", "ind as 116")):
+        return "operating_ind_as_116"
+    if any(k in s for k in ("finance", "financial", "capital")):
+        return "finance"
+    if any(k in s for k in ("short", "low value")):
+        return "short_term"
+    return None
+
+
+def _parse_payment_terms(value: Any) -> int | None:
+    """Extract numeric days from values like 'Net 30', '45', 'Net-60'."""
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return None
+    s = str(value).lower().strip()
+    m = re.search(r"\d+", s)
+    if m:
+        days = int(m.group())
+        return days if 0 < days <= 365 else None
+    return None
+
+
+_GSTIN_RE = re.compile(r"\b[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]\b")
+_PAN_RE = re.compile(r"\b[A-Z]{5}[0-9]{4}[A-Z]\b")
+
+_CAPEX_KW = ("capital", "capex", "equipment", "machinery", "plant", "property", "construction",
+              "building", "vehicle", "computer hardware", "server", "fixed asset", "asset purchase")
+_LEASE_KW = ("rent", "lease", "operating lease", "ind as 116", "licence fee", "licensing fee",
+              "leasehold")
+_STATUTORY_KW = ("gst", "tds", "customs duty", "excise", "cess", " pf ", "esic", "epf",
+                 "provident fund", "professional tax", "stamp duty", "court fee",
+                 "penalty", "fine", "statutory levy", "import duty")
+
+
+def _extract_gstin(text: str) -> Optional[str]:
+    """Extract the first valid-format GSTIN from a text string."""
+    if not text:
+        return None
+    m = _GSTIN_RE.search(str(text).upper().strip())
+    return m.group(0) if m else None
+
+
+def _extract_pan(text: str) -> Optional[str]:
+    """Extract the first valid-format PAN from a text string."""
+    if not text:
+        return None
+    m = _PAN_RE.search(str(text).upper().strip())
+    return m.group(0) if m else None
+
+
+def _classify_spend_type(
+    description: str,
+    supplier: str,
+    gl_code: Optional[str],
+    related_party: bool,
+    lease_treatment: Optional[str],
+) -> str:
+    """Classify a spend line into opex / capex / lease / statutory / intercompany."""
+    if related_party:
+        return "intercompany"
+    if lease_treatment in ("operating_ind_as_116", "finance", "short_term"):
+        return "lease"
+    if gl_code:
+        _stripped = re.sub(r"\D", "", gl_code)
+        if _stripped:
+            try:
+                code_int = int(_stripped)
+                # Capital/fixed-asset GL range (typical Indian SAP COA)
+                if 1000 <= code_int <= 1999 or 10000 <= code_int <= 19999:
+                    return "capex"
+                # Statutory/tax payable GL range
+                if 2300 <= code_int <= 2699 or 23000 <= code_int <= 26999:
+                    return "statutory"
+            except (ValueError, TypeError):
+                pass
+    content = f"{description} {supplier}".lower()
+    if any(kw in content for kw in _LEASE_KW):
+        return "lease"
+    if any(kw in content for kw in _CAPEX_KW):
+        return "capex"
+    if any(kw in content for kw in _STATUTORY_KW):
+        return "statutory"
+    return "opex"
+
+
+def _compute_addressable(spend_type: str, related_party: bool) -> bool:
+    """Statutory spend and intercompany eliminations are never addressable."""
+    if related_party or spend_type == "intercompany":
+        return False
+    if spend_type == "statutory":
+        return False
+    return True  # opex / capex / lease all carry addressability levers
+
+
+def _parse_vendor_category(value: Any) -> Optional[str]:
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return None
+    s = str(value).strip().lower()
+    if any(k in s for k in ("msme", "sme", "small", "micro", "medium enterprise")):
+        return "msme"
+    if any(k in s for k in ("startup", "start-up", "start up")):
+        return "startup"
+    if any(k in s for k in ("foreign", "overseas", "international", "mnc", "global")):
+        return "foreign"
+    if any(k in s for k in ("large", "enterprise", "corporate")):
+        return "large"
+    return None
+
+
+def _parse_msme_flag(value: Any) -> Optional[bool]:
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return None
+    s = str(value).strip().lower()
+    if s in {"yes", "y", "true", "1", "msme", "sme"}:
+        return True
+    if s in {"no", "n", "false", "0", "large", "non-msme"}:
+        return False
+    return None
+
+
+def _compute_file_hash(file_path: Path) -> str:
+    """SHA-256 of the file bytes — used for source dedup."""
+    h = hashlib.sha256()
+    with open(file_path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(65_536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def infer_tabular_schema(file_path: Path) -> Dict[str, Any]:
+    frame = _read_tabular(file_path)
+    columns = [str(c) for c in frame.columns]
+    role_map = {
+        "amount": _best_column_match(columns, ["amount", "spend", "total", "cost"]),
+        "supplier": _best_column_match(columns, ["supplier", "vendor", "payee"]),
+        "description": _best_column_match(columns, ["description", "memo", "line item", "item"]),
+        "business_unit": _best_column_match(columns, ["bu", "business unit", "department"]),
+        "geo": _best_column_match(columns, ["country", "geo", "region", "location"]),
+        "date": _best_column_match(columns, ["date", "invoice date", "month"]),
+        # FP&A additions
+        "gl_code": _best_column_match(columns, ["gl code", "gl_code", "account", "account code", "gl account"]),
+        "cost_center": _best_column_match(columns, ["cost center", "cost_center", "cc", "cost centre"]),
+        "currency": _best_column_match(columns, ["currency", "ccy", "curr"]),
+        "fx_rate": _best_column_match(columns, ["fx rate", "fx_rate", "exchange rate", "rate"]),
+        "amount_type": _best_column_match(columns, ["type", "amount type", "data type", "scenario"]),
+        "payment_terms": _best_column_match(columns, ["payment terms", "payment_terms", "terms", "net days", "dpo"]),
+        # India additions (v2.0)
+        "gst_treatment": _best_column_match(columns, ["gst treatment", "gst_treatment", "itc", "gst type", "tax treatment"]),
+        "gstin": _best_column_match(columns, ["gstin", "gst number", "gst no", "vendor gstin", "supplier gstin"]),
+        "lease_treatment": _best_column_match(columns, ["lease treatment", "lease_treatment", "lease type", "ind as 116"]),
+        "related_party": _best_column_match(columns, ["related party", "related_party", "intercompany", "intra group", "intragroup"]),
+        "legal_entity": _best_column_match(columns, ["legal entity", "legal_entity", "entity", "company code", "co code"]),
+        # Source lineage (v2.2)
+        "source_system": _best_column_match(columns, ["source system", "source_system", "source", "erp", "system name"]),
+        "source_record_id": _best_column_match(columns, ["source record", "source record id", "record id", "source id", "pk", "primary key"]),
+        # Vendor master (v2.2)
+        "vendor_pan": _best_column_match(columns, ["vendor pan", "pan", "pan number", "pan no", "supplier pan"]),
+        "vendor_msme": _best_column_match(columns, ["msme", "msme flag", "vendor msme", "sme", "is msme"]),
+        "vendor_category": _best_column_match(columns, ["vendor category", "vendor_category", "supplier category", "vendor type", "supplier type"]),
+        # Spend classification (v2.2)
+        "spend_type": _best_column_match(columns, ["spend type", "spend_type", "cost type", "opex capex", "asset type", "expenditure type"]),
+    }
+    inferred = []
+    for column in columns:
+        series = frame[column]
+        sample_values = [str(x) for x in series.dropna().head(3).tolist()]
+        dtype = str(series.dtype)
+        semantic_role = ""
+        for role, matched_col in role_map.items():
+            if matched_col == column:
+                semantic_role = role
+                break
+        inferred.append(
+            {
+                "name": column,
+                "dtype": dtype,
+                "semantic_role": semantic_role or "other",
+                "sample_values": sample_values,
+                "null_ratio": float(series.isna().mean()) if len(series) else 0.0,
+            }
+        )
+
+    result = {
+        "file_name": file_path.name,
+        "rows": int(len(frame)),
+        "columns": inferred,
+        "semantic_map": role_map,
+    }
+    if file_path.suffix.lower() in (".xlsx", ".xls"):
+        result["workbook"] = _infer_workbook_summary(file_path)
+    return result
+
+
+def _infer_workbook_summary(file_path: Path) -> Dict[str, Any]:
+    try:
+        wb = load_workbook(file_path, data_only=False, read_only=True)
+    except Exception:
+        return {"sheet_count": 0, "sheet_names": [], "planning_signal_confidence": 0.0, "role_hints": []}
+
+    sheet_names = [ws.title for ws in wb.worksheets]
+    role_hints: List[str] = []
+    confidence = 0.0
+    planning_name_tokens = (
+        "assumption",
+        "input",
+        "driver",
+        "summary",
+        "scenario",
+        "plan",
+        "forecast",
+        "budget",
+        "p&l",
+    )
+    for name in sheet_names:
+        low = name.lower()
+        if any(tok in low for tok in planning_name_tokens):
+            role_hints.append(name)
+    if len(sheet_names) > 1:
+        confidence += 0.35
+    if role_hints:
+        confidence += min(0.4, 0.08 * len(role_hints))
+    # quick period-header scan on first two rows
+    period_hits = 0
+    for ws in wb.worksheets[:5]:
+        for r in (1, 2):
+            row_values = [str(ws.cell(row=r, column=c).value or "") for c in range(1, min(ws.max_column, 15) + 1)]
+            hits = sum(1 for val in row_values if _looks_like_period_header(val))
+            if hits >= 3:
+                period_hits += 1
+                break
+    if period_hits:
+        confidence += min(0.25, 0.08 * period_hits)
+
+    return {
+        "sheet_count": len(sheet_names),
+        "sheet_names": sheet_names,
+        "planning_signal_confidence": max(0.0, min(1.0, confidence)),
+        "role_hints": role_hints[:10],
+    }
+
+
+def _looks_like_period_header(value: str) -> bool:
+    s = (value or "").strip().lower()
+    if not s:
+        return False
+    patterns = (
+        r"^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[\s\-_/]?\d{2,4}$",
+        r"^q[1-4][\s\-_/]?\d{2,4}$",
+        r"^fy\d{2,4}$",
+        r"^\d{4}[\-_/]\d{1,2}$",
+        r"^\d{4}$",
+    )
+    return any(re.match(p, s) for p in patterns)
+
+
+def _to_float(value: Any) -> float | None:
+    if value is None:
+        return None
+    try:
+        if isinstance(value, str):
+            cleaned = value.replace(",", "").strip()
+            if cleaned in ("", "-", "na", "n/a"):
+                return None
+            return float(cleaned)
+        return float(value)
+    except Exception:
+        return None
+
+
+def _parse_planning_workbook(
+    file_path: Path,
+    taxonomy: Dict,
+    workbook_manifest: Dict[str, Any],
+    reporting_currency: str,
+) -> List[NormalizedSpendLine]:
+    out: List[NormalizedSpendLine] = []
+    try:
+        wb = load_workbook(file_path, data_only=True, read_only=True)
+    except Exception:
+        return out
+
+    row_id = 1
+    nodes = workbook_manifest.get("sheet_graph", []) if isinstance(workbook_manifest, dict) else []
+    for node in nodes:
+        role = str(node.get("role") or "unknown")
+        if role not in {"timeseries", "scenarios"}:
+            continue
+        sheet_name = str(node.get("sheet_name") or "")
+        if sheet_name not in wb.sheetnames:
+            continue
+        ws = wb[sheet_name]
+        axis = node.get("period_axis") or {}
+        if str(axis.get("orientation") or "") != "column":
+            continue
+        first_period_col = int(axis.get("first_period_col") or 2)
+        periods = list(axis.get("periods") or [])
+        if not periods:
+            # fallback: detect from first row
+            periods = [
+                str(ws.cell(row=1, column=c).value or "").strip()
+                for c in range(first_period_col, min(ws.max_column, first_period_col + 36) + 1)
+                if _looks_like_period_header(str(ws.cell(row=1, column=c).value or ""))
+            ]
+        if not periods:
+            continue
+        for r in range(2, min(ws.max_row, 2000) + 1):
+            label = str(ws.cell(row=r, column=1).value or "").strip()
+            if not label:
+                continue
+            category_id, category_name = _classify(label, "", taxonomy)
+            for idx, period in enumerate(periods):
+                col = first_period_col + idx
+                if col > ws.max_column:
+                    break
+                amount = _to_float(ws.cell(row=r, column=col).value)
+                if amount is None:
+                    continue
+                amount_type = _detect_amount_type(period)
+                fiscal_year, fiscal_period = _derive_fiscal_period(str(period))
+                out.append(
+                    NormalizedSpendLine(
+                        row_id=row_id,
+                        supplier="Model",
+                        description=label,
+                        amount=amount,
+                        category_id=category_id,
+                        category_name=category_name,
+                        business_unit=sheet_name,
+                        geo=None,
+                        spend_date=None,
+                        gl_code=None,
+                        cost_center_id=None,
+                        currency=reporting_currency,
+                        fx_rate_to_reporting=1.0,
+                        amount_reporting=amount,
+                        amount_type=amount_type,
+                        fiscal_year=fiscal_year,
+                        fiscal_period=fiscal_period or str(period),
+                        payment_terms_days=None,
+                    )
+                )
+                row_id += 1
+    return out
+
+
+def parse_spend_file(
+    file_path: Path,
+    taxonomy: Dict,
+    default_amount_type: str = "actual",
+    reporting_currency: str = "INR",
+    workbook_manifest: Dict[str, Any] | None = None,
+    source_system_id: Optional[str] = None,
+) -> List[NormalizedSpendLine]:
+    strategy = str((workbook_manifest or {}).get("ingestion_strategy") or "standard")
+    if file_path.suffix.lower() in (".xlsx", ".xls") and strategy in {
+        "timeseries_flatten",
+        "scenario_pivot",
+        "hybrid",
+        "assumptions_extract",
+    }:
+        planning_lines = _parse_planning_workbook(
+            file_path=file_path,
+            taxonomy=taxonomy,
+            workbook_manifest=workbook_manifest or {},
+            reporting_currency=reporting_currency,
+        )
+        if planning_lines:
+            return planning_lines
+
+    file_hash = _compute_file_hash(file_path)
+    frame = _read_tabular(file_path)
+
+    # --- Row-count guardrails ---
+    n_rows = len(frame)
+    if n_rows > _ROW_MAX:
+        raise ValueError(
+            f"{file_path.name} has {n_rows:,} rows (limit: {_ROW_MAX:,}). "
+            "Split by entity or fiscal year and upload each part separately."
+        )
+    if n_rows > _ROW_CHUNK:
+        logger.warning(
+            '"large_file_perf_warning rows=%d file=%s — consider splitting for faster processing"',
+            n_rows,
+            file_path.name,
+        )
+    elif n_rows > _ROW_WARN:
+        logger.warning('"large_file rows=%d file=%s"', n_rows, file_path.name)
+
+    cols = [str(c) for c in frame.columns]
+    amount_col = _best_column_match(cols, ["amount", "spend", "total", "cost"], cols[0] if cols else "")
+    supplier_col = _best_column_match(cols, ["supplier", "vendor", "payee"], "")
+    desc_col = _best_column_match(cols, ["description", "memo", "line item", "item"], "")
+    bu_col = _best_column_match(cols, ["bu", "business unit", "department"], "")
+    geo_col = _best_column_match(cols, ["country", "geo", "region", "location"], "")
+    date_col = _best_column_match(cols, ["date", "invoice date", "month"], "")
+    # FP&A columns
+    gl_col = _best_column_match(cols, ["gl code", "gl_code", "account", "account code", "gl account"], "")
+    cc_col = _best_column_match(cols, ["cost center", "cost_center", "cc", "cost centre"], "")
+    currency_col = _best_column_match(cols, ["currency", "ccy", "curr"], "")
+    fx_col = _best_column_match(cols, ["fx rate", "fx_rate", "exchange rate"], "")
+    type_col = _best_column_match(cols, ["type", "amount type", "data type", "scenario"], "")
+    terms_col = _best_column_match(cols, ["payment terms", "payment_terms", "terms", "net days", "dpo"], "")
+    # India columns (v2.0)
+    gst_col = _best_column_match(cols, ["gst treatment", "gst_treatment", "itc", "gst type", "tax treatment"], "")
+    gstin_col = _best_column_match(cols, ["gstin", "gst number", "gst no", "vendor gstin", "supplier gstin"], "")
+    lease_col = _best_column_match(cols, ["lease treatment", "lease_treatment", "lease type", "ind as 116"], "")
+    rp_col = _best_column_match(cols, ["related party", "related_party", "intercompany", "intra group", "intragroup"], "")
+    entity_col = _best_column_match(cols, ["legal entity", "legal_entity", "entity", "company code", "co code"], "")
+    # Source lineage columns (v2.2)
+    src_sys_col = _best_column_match(cols, ["source system", "source_system", "source", "erp", "system name"], "")
+    src_rec_col = _best_column_match(cols, ["source record id", "source record", "record id", "source id", "pk"], "")
+    # Vendor master columns (v2.2)
+    pan_col = _best_column_match(cols, ["vendor pan", "pan", "pan number", "pan no", "supplier pan"], "")
+    msme_col = _best_column_match(cols, ["msme", "msme flag", "vendor msme", "sme", "is msme"], "")
+    vcat_col = _best_column_match(cols, ["vendor category", "vendor_category", "supplier category", "vendor type"], "")
+    # Spend classification column (v2.2)
+    stype_col = _best_column_match(cols, ["spend type", "spend_type", "cost type", "opex capex", "expenditure type"], "")
+
+    def _col(name: str, fill: str = "") -> "pd.Series":
+        return frame[name].fillna(fill) if name else pd.Series([""] * len(frame))
+
+    amount_s = frame[amount_col] if amount_col else pd.Series([0] * len(frame))
+    supplier_s = _col(supplier_col)
+    desc_s = _col(desc_col)
+    bu_s = _col(bu_col)
+    geo_s = _col(geo_col)
+    date_s = _col(date_col)
+    gl_s = _col(gl_col)
+    cc_s = _col(cc_col)
+    currency_s = _col(currency_col, reporting_currency)
+    fx_s = _col(fx_col, "1.0")
+    type_s = _col(type_col, default_amount_type)
+    terms_s = _col(terms_col)
+    # India series (v2.0)
+    gst_s = _col(gst_col)
+    gstin_s = _col(gstin_col)
+    lease_s = _col(lease_col)
+    rp_s = _col(rp_col)
+    entity_s = _col(entity_col)
+    # Source lineage + vendor master series (v2.2)
+    src_sys_s = _col(src_sys_col)
+    src_rec_s = _col(src_rec_col)
+    pan_s = _col(pan_col)
+    msme_s = _col(msme_col)
+    vcat_s = _col(vcat_col)
+    stype_s = _col(stype_col)
+
+    # --- Vectorized pre-computation (avoids per-row Python overhead on hot paths) ---
+    # Amount: pandas coerce-to-numeric is ~10x faster than per-row float() in a loop.
+    _amount_numeric = pd.to_numeric(
+        amount_s.astype(str).str.replace(",", "", regex=False), errors="coerce"
+    ).fillna(0.0)
+
+    out: List[NormalizedSpendLine] = []
+    for i in range(len(frame)):
+        amount = float(_amount_numeric.iloc[i])
+
+        supplier = str(supplier_s.iloc[i]).strip()
+        description = str(desc_s.iloc[i]).strip()
+        date_raw = str(date_s.iloc[i]).strip()
+        gl_code = str(gl_s.iloc[i]).strip() or None
+        cost_center = str(cc_s.iloc[i]).strip() or None
+        currency = str(currency_s.iloc[i]).strip() or reporting_currency
+        fx_rate = _parse_fx_rate(fx_s.iloc[i])
+        amount_type = _detect_amount_type(str(type_s.iloc[i]).strip()) if type_col else default_amount_type
+        payment_terms = _parse_payment_terms(terms_s.iloc[i])
+
+        # GL code is primary classifier; fall back to keyword match
+        if gl_code:
+            gl_result = _classify_by_gl(gl_code, taxonomy)
+        else:
+            gl_result = None
+        if gl_result:
+            category_id, category_name = gl_result
+        else:
+            category_id, category_name = _classify(description, supplier, taxonomy)
+
+        fiscal_year, fiscal_period = _derive_fiscal_period(date_raw)
+
+        # Compute reporting amount (apply FX only when currency differs)
+        if currency.upper() != reporting_currency.upper():
+            amount_reporting = amount * fx_rate
+        else:
+            amount_reporting = amount
+
+        gst_treatment = _parse_gst_treatment(gst_s.iloc[i]) if gst_col else None
+        gstin_raw = str(gstin_s.iloc[i]).strip() if gstin_col else ""
+        gstin = gstin_raw or None
+        # GSTIN extraction: prefer explicit column; fall back to supplier/description text
+        vendor_gstin = _extract_gstin(gstin_raw) or _extract_gstin(supplier) or _extract_gstin(description)
+        lease_treatment = _parse_lease_treatment(lease_s.iloc[i]) if lease_col else None
+        related_party_flag = _parse_related_party(rp_s.iloc[i]) if rp_col else False
+        legal_entity_id = str(entity_s.iloc[i]).strip() or None if entity_col else None
+        # Source lineage (v2.2)
+        row_source_system = str(src_sys_s.iloc[i]).strip() or None if src_sys_col else None
+        effective_source_system = row_source_system or source_system_id
+        source_record_id = str(src_rec_s.iloc[i]).strip() or None if src_rec_col else None
+        # Vendor master enrichment (v2.2)
+        vendor_pan = _extract_pan(str(pan_s.iloc[i]).strip()) if pan_col else None
+        vendor_msme_flag = _parse_msme_flag(msme_s.iloc[i]) if msme_col else None
+        vendor_category = _parse_vendor_category(vcat_s.iloc[i]) if vcat_col else None
+        # Spend type: prefer explicit column; compute if absent
+        if stype_col and str(stype_s.iloc[i]).strip().lower() in ("opex", "capex", "lease", "statutory", "intercompany"):
+            spend_type = str(stype_s.iloc[i]).strip().lower()
+        else:
+            spend_type = _classify_spend_type(description, supplier, gl_code, related_party_flag, lease_treatment)
+        is_addressable = _compute_addressable(spend_type, related_party_flag)
+        is_intercompany = True if related_party_flag or spend_type == "intercompany" else None
+
+        out.append(
+            NormalizedSpendLine(
+                row_id=i + 1,
+                supplier=supplier or "Unknown",
+                description=description or "N/A",
+                amount=amount,
+                category_id=category_id,
+                category_name=category_name,
+                business_unit=str(bu_s.iloc[i]).strip() or None,
+                geo=str(geo_s.iloc[i]).strip() or None,
+                spend_date=date_raw or None,
+                gl_code=gl_code,
+                cost_center_id=cost_center,
+                currency=currency,
+                fx_rate_to_reporting=fx_rate,
+                amount_reporting=amount_reporting,
+                amount_type=amount_type,
+                fiscal_year=fiscal_year,
+                fiscal_period=fiscal_period,
+                payment_terms_days=payment_terms,
+                gst_treatment=gst_treatment,
+                gstin=gstin,
+                vendor_gstin=vendor_gstin,
+                lease_treatment=lease_treatment,
+                related_party_flag=related_party_flag,
+                legal_entity_id=legal_entity_id,
+                # Source lineage
+                source_system_id=effective_source_system,
+                source_record_id=source_record_id,
+                source_file_hash=file_hash,
+                is_intercompany=is_intercompany,
+                # Vendor master
+                vendor_pan=vendor_pan,
+                vendor_msme_flag=vendor_msme_flag,
+                vendor_category=vendor_category,
+                # Classification
+                spend_type=spend_type,
+                is_addressable=is_addressable,
+            )
+        )
+    return out
+
+
+def _ocr_image(file_path: Path, lang: str = "eng") -> str:
+    """OCR a single image file. Returns extracted text."""
+    try:
+        img = _PILImage.open(file_path)
+        return _pytesseract.image_to_string(img, lang=lang) or ""
+    except Exception as exc:
+        logger.warning("OCR failed for %s: %s", file_path.name, exc)
+        return ""
+
+
+def _ocr_pdf(file_path: Path, lang: str = "eng") -> str:
+    """OCR an image-only PDF by converting pages to images then running Tesseract.
+
+    Requires pdf2image (pip install pdf2image) and poppler system library.
+    Falls back to empty string if pdf2image is not available.
+    """
+    try:
+        from pdf2image import convert_from_path  # type: ignore[import]
+    except ImportError:
+        logger.warning("pdf2image not installed — cannot OCR image-only PDF %s", file_path.name)
+        return ""
+    try:
+        images = convert_from_path(str(file_path), dpi=200)
+        parts = [_pytesseract.image_to_string(img, lang=lang) or "" for img in images]
+        return "\n".join(parts)
+    except Exception as exc:
+        logger.warning("PDF OCR failed for %s: %s", file_path.name, exc)
+        return ""
+
+
+def transliterate_to_latin(text: str, source_script: str = "DEVANAGARI") -> str:
+    """Transliterate Indian-script text to Latin (ITRANS scheme) for script-agnostic matching.
+
+    Returns original text unchanged when indic-transliteration is not installed.
+    """
+    if not _TRANSLITERATION_AVAILABLE or not text:
+        return text
+    try:
+        script_map = {
+            "DEVANAGARI": _sanscript.DEVANAGARI,
+            "TAMIL": _sanscript.TAMIL,
+            "TELUGU": _sanscript.TELUGU,
+            "KANNADA": _sanscript.KANNADA,
+            "BENGALI": _sanscript.BENGALI,
+            "GUJARATI": _sanscript.GUJARATI,
+            "GURMUKHI": _sanscript.GURMUKHI,
+        }
+        src = script_map.get(source_script.upper(), _sanscript.DEVANAGARI)
+        return _transliterate(text, src, _sanscript.ITRANS)
+    except Exception:
+        return text
+
+
+def parse_document(file_path: Path, ocr_lang: str = "eng") -> str:
+    """Parse a document file and return its text content.
+
+    ocr_lang — Tesseract language code(s) for image-based PDFs and images.
+    Supports multi-language strings, e.g. 'eng+hin' for Hindi invoices.
+    Common codes: hin, tam, tel, kan, mar, ben, guj, pan.
+    Falls back to text extraction (no OCR) when pytesseract is not installed.
+    """
+    suffix = file_path.suffix.lower()
+    if suffix == ".txt":
+        return file_path.read_text(encoding="utf-8", errors="ignore")
+    if suffix == ".docx":
+        doc = Document(file_path)
+        return "\n".join([p.text for p in doc.paragraphs if p.text.strip()])
+    if suffix == ".pdf":
+        reader = PdfReader(str(file_path))
+        pages = []
+        for page in reader.pages:
+            pages.append(page.extract_text() or "")
+        text = "\n".join(pages).strip()
+        # If pypdf extracted <20 chars (image-only PDF), try OCR fallback.
+        if len(text) < 20 and _OCR_AVAILABLE:
+            text = _ocr_pdf(file_path, lang=ocr_lang)
+        return text
+    if suffix in (".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".webp"):
+        if _OCR_AVAILABLE:
+            return _ocr_image(file_path, lang=ocr_lang)
+        logger.warning("OCR requested for image file but pytesseract is not installed: %s", file_path.name)
+        return ""
+    if suffix in (".csv", ".xlsx", ".xls"):
+        if suffix == ".csv":
+            frame = pd.read_csv(file_path)
+        else:
+            frame = pd.read_excel(file_path)
+        return frame.head(10).to_csv(index=False)
+    return ""

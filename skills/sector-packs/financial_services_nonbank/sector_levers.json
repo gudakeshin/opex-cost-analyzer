@@ -1,0 +1,125 @@
+{
+  "pack_id": "financial_services_nonbank",
+  "sector": "Financial Services (Non-Bank) — Asset Management, FinTech & Fund Operations",
+  "version": "1.0",
+  "applicable_entity_types": ["asset_manager", "mutual_fund_amc", "fintech", "pe_vc_firm", "investment_management", "wealth_management", "stock_broker"],
+  "industry_signals": ["aum_keywords", "fintech_keywords", "fund_management_keywords", "sebi_mifid_keywords"],
+  "universal_levers": [
+    "contract_renegotiation", "process_standardization", "demand_management",
+    "supplier_consolidation", "automation", "payment_terms", "maverick_compliance",
+    "outsourcing", "internal_best_practice", "tail_spend_automation",
+    "should_cost_modeling", "zero_based_rebaseline", "rebate_pricing_recovery",
+    "license_rightsizing", "cloud_finops",
+    "benefits_cost_optimization", "contingent_workforce_optimization",
+    "consulting_spend_governance", "legal_spend_optimization", "ld_rationalization",
+    "space_utilization_optimization", "lease_restructuring", "cost_governance",
+    "bank_fee_optimization", "p2p_o2c_automation"
+  ],
+  "sector_specific_levers": [
+    {
+      "lever_id": "fund_administration_consolidation",
+      "lever_name": "Fund Administration & Custody Fee Consolidation",
+      "lever_family": "supply",
+      "savings_range_pct": {"p10": 12, "p50": 20, "p90": 30},
+      "cta_rate": 0.05,
+      "phasing_curve": [0.25, 0.50, 0.25],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Fund administration fee benchmarked by AUM tier and fund type (equity, debt, hybrid, AIF)",
+        "Custodian / sub-custodian fee schedule reviewed and RFP issued to 3+ providers",
+        "Transfer agent costs benchmarked vs. AMC peer group (AMFI/SEBI regulatory context)"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {"p10": 10, "p50": 22, "p90": 36},
+      "applicable_if": ["aum_keywords detected", "fund_management_keywords detected"]
+    },
+    {
+      "lever_id": "trading_technology_optimization",
+      "lever_name": "Trading Technology & Market Data Cost Optimisation (OMS/EMS & Data Feeds)",
+      "lever_family": "technology",
+      "savings_range_pct": {"p10": 15, "p50": 25, "p90": 38},
+      "cta_rate": 0.08,
+      "phasing_curve": [0.30, 0.45, 0.25],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.80,
+      "bounce_back_risk": "low",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "OMS/EMS license utilisation audit completed (user seats vs. active traders benchmarked)",
+        "Market data cost analysis by provider and consumption (Bloomberg, Refinitiv, ICE, MSCI, etc.)",
+        "Data usage governance policy implemented — tier-down unused terminals; negotiate enterprise caps"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {"p10": 8, "p50": 18, "p90": 32},
+      "applicable_if": ["category:IT > 5% spend", "aum_keywords detected"]
+    },
+    {
+      "lever_id": "compliance_automation",
+      "lever_name": "Regulatory Compliance Operations Automation (SEBI / MiFID II / AML Reporting)",
+      "lever_family": "technology",
+      "savings_range_pct": {"p10": 20, "p50": 32, "p90": 45},
+      "cta_rate": 0.09,
+      "phasing_curve": [0.15, 0.45, 0.40],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.88,
+      "bounce_back_risk": "low",
+      "org_change_risk": "medium",
+      "condition_precedents": [
+        "Compliance operations process map completed — regulatory reporting cost per report quantified",
+        "RegTech platform evaluated (Behavox, Axiom SL, or equivalent for SEBI/MiFID coverage)",
+        "Parallel run validation completed before sunsetting manual compliance reporting workflows"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {"p10": 18, "p50": 36, "p90": 60},
+      "applicable_if": ["sebi_mifid_keywords detected", "category:PROF_SVCS or OUTSOURCED present"]
+    },
+    {
+      "lever_id": "performance_attribution_tech",
+      "lever_name": "Performance Attribution & Risk Platform Consolidation (Bloomberg/MSCI/FactSet Overlap)",
+      "lever_family": "technology",
+      "savings_range_pct": {"p10": 15, "p50": 25, "p90": 35},
+      "cta_rate": 0.07,
+      "phasing_curve": [0.35, 0.45, 0.20],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "low",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Performance attribution and risk platform inventory completed (Bloomberg PORT, MSCI RiskMetrics, FactSet, Axioma, etc.)",
+        "Functional overlap matrix produced — capabilities covered by multiple vendors identified",
+        "Investment committee approval for platform consolidation roadmap (18-month decommission plan)"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.70,
+      "implementation_weeks": {"p10": 10, "p50": 22, "p90": 38},
+      "applicable_if": ["category:IT > 5% spend", "fund_management_keywords detected"]
+    },
+    {
+      "lever_id": "research_cost_management",
+      "lever_name": "Investment Research Cost Management (MiFID II Unbundling & Broker Vote Optimisation)",
+      "lever_family": "finance",
+      "savings_range_pct": {"p10": 10, "p50": 18, "p90": 28},
+      "cta_rate": 0.04,
+      "phasing_curve": [0.40, 0.40, 0.20],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.75,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Research budget and broker vote allocation reviewed against actual consumption",
+        "Research provider panel rationalised — tier 1/2/3 classification with spend caps by tier",
+        "Internal research capability assessed vs. external cost (in-house vs. outsourced decision)"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {"p10": 6, "p50": 16, "p90": 28},
+      "applicable_if": ["aum_keywords detected", "category:PROF_SVCS present"]
+    }
+  ]
+}

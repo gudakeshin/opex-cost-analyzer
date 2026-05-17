@@ -1,0 +1,20 @@
+Northstar Retail Group - Contract and Policy Context (Q1 2026)
+
+1) Contractual commitments:
+- Microsoft enterprise agreement has a committed baseline through 2027-09.
+- AWS committed spend program remains active through 2026-12.
+- Regus lease lock-in for London and Manchester offices through 2028-03.
+- Core legal retainer with DLA Piper reviewed annually; next break clause in 2027.
+
+2) Procurement controls:
+- Policy requires competitive bidding for commitments above USD 100,000 equivalent.
+- Emergency purchases are allowed but must be regularized with procurement in 30 days.
+- Off-PO spend has increased in digital marketing and selected IT categories during launch windows.
+
+3) Compliance and risk:
+- Security tooling vendors in regulated workloads require legal and CISO sign-off before supplier switch.
+- Any change to payroll/HR platforms requires a 2-quarter transition plan.
+
+4) Commercial posture:
+- CFO target: EBITDA improvement and cash discipline in FY2026.
+- CPO target: reduce unmanaged spend while maintaining service continuity for stores and e-commerce operations.

@@ -1,0 +1,19 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "raw_material_procurement", "category_name": "Raw Material & Input Procurement", "gl_prefix": "RMP", "cost_nature": "cogs"},
+    {"category_id": "energy_utilities_plant", "category_name": "Plant Energy, Utilities & Steam", "gl_prefix": "EUP", "cost_nature": "operations"},
+    {"category_id": "maintenance_spares", "category_name": "Maintenance, Repair & Spares", "gl_prefix": "MRO", "cost_nature": "operations"},
+    {"category_id": "quality_testing", "category_name": "Quality Control & Testing", "gl_prefix": "QCT", "cost_nature": "operations"},
+    {"category_id": "pli_scheme_costs", "category_name": "PLI Scheme Compliance & Capex", "gl_prefix": "PLI", "cost_nature": "regulatory"},
+    {"category_id": "ehs_environment", "category_name": "EHS, Environment & Safety", "gl_prefix": "EHS", "cost_nature": "compliance"},
+    {"category_id": "inbound_logistics", "category_name": "Inbound Freight & Customs", "gl_prefix": "ILG", "cost_nature": "logistics"},
+    {"category_id": "outbound_logistics", "category_name": "Outbound Distribution & Warehousing", "gl_prefix": "OLG", "cost_nature": "logistics"},
+    {"category_id": "contract_manufacturing", "category_name": "Job Work & Contract Manufacturing", "gl_prefix": "JWK", "cost_nature": "operations"},
+    {"category_id": "r_and_d_expense", "category_name": "R&D & Product Development", "gl_prefix": "RND", "cost_nature": "innovation"}
+  ],
+  "overrides": [
+    {"category_id": "logistics", "category_name": "Logistics & Supply Chain (Total)"},
+    {"category_id": "facilities", "category_name": "Plant Facilities & Factory Overhead"}
+  ]
+}

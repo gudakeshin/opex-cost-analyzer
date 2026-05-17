@@ -1,0 +1,18 @@
+{
+  "sector": "telecom_infra",
+  "currency": "INR",
+  "peers": [
+    {"name": "Reliance Jio (proxy: Reliance Industries)", "ticker": "RELIANCE.NS", "exchange": "NSE", "revenue_cr": 120000},
+    {"name": "Bharti Airtel", "ticker": "BHARTIARTL.NS", "exchange": "NSE", "revenue_cr": 150000},
+    {"name": "Vodafone Idea", "ticker": "IDEA.NS", "exchange": "NSE", "revenue_cr": 42000},
+    {"name": "Indus Towers", "ticker": "INDUSTOWER.NS", "exchange": "NSE", "revenue_cr": 28000},
+    {"name": "BSNL (unlisted, govt)", "ticker": null, "exchange": null, "revenue_cr": 22000}
+  ],
+  "benchmark_metrics": {
+    "ebitda_margin_pct": {"p25": 28.0, "p50": 38.0, "p75": 47.0},
+    "network_opex_to_revenue_pct": {"p25": 22.0, "p50": 30.0, "p75": 38.0},
+    "energy_to_revenue_pct": {"p25": 5.0, "p50": 9.0, "p75": 14.0}
+  },
+  "data_source": "BSE/NSE annual reports FY25 + TRAI reports",
+  "refresh_date": "2026-04-01"
+}

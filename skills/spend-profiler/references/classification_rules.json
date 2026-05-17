@@ -1,0 +1,35 @@
+{
+  "version": "1.1",
+  "cost_behaviour": {
+    "fixed_keywords": ["rent", "lease", "license", "subscription annual", "ea"],
+    "semi_variable_keywords": ["cloud", "utility", "support", "maintenance"],
+    "addressability_pct": {
+      "fixed": 0.0,
+      "semi_variable": 0.6,
+      "variable": 1.0
+    }
+  },
+  "discretionary": {
+    "include_keywords": ["travel", "entertainment", "training", "marketing", "event"],
+    "exclude_keywords": ["audit", "tax", "compliance", "rent", "lease", "core license"],
+    "default_non_discretionary_if_contains": ["technology"]
+  },
+  "spend_quadrant": {
+    "essential": {
+      "description": "Mandatory, non-discretionary spend — cannot be cut without regulatory or operational breach",
+      "keywords": ["audit", "tax", "compliance", "statutory", "regulatory", "insurance", "rent", "lease", "rates", "tds", "gst", "pf", "esic", "gratuity", "provident fund", "licence fee", "legal", "court", "arbitration"]
+    },
+    "strategic": {
+      "description": "Core to delivering the company's products or services — reducing threatens revenue or competitive position",
+      "keywords": ["cloud", "saas", "platform", "r&d", "research", "product development", "technology", "software", "data center", "manufacturing", "raw material", "direct material", "it infrastructure", "core banking", "erp", "crm"]
+    },
+    "supportive": {
+      "description": "Enables operations but is not core to revenue generation — optimization improves margins",
+      "keywords": ["hr", "human resources", "payroll", "facilities", "fm ", "office supplies", "stationery", "admin", "administration", "finance ops", "accounts payable", "accounts receivable", "secretarial", "security", "housekeeping", "canteen", "cafeteria", "fleet", "logistics", "courier"]
+    },
+    "discretionary": {
+      "description": "Can be reduced or eliminated short-term without immediate operational impact",
+      "keywords": ["travel", "entertainment", "hospitality", "gifts", "sponsorship", "conference", "event", "training", "l&d", "marketing", "advertising", "pr ", "public relations", "branding", "offsite", "team building", "subscription", "magazine", "newspaper", "club membership", "recreational"]
+    }
+  }
+}

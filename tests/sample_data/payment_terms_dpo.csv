@@ -1,0 +1,21 @@
+supplier,description,amount,category,gl_code,payment_terms,business_unit,spend_date
+AWS,Cloud infrastructure annual,3840000,IT,6100,Net 30,Engineering,2025-01-01
+Microsoft,M365 & Azure annual,1020000,IT,6110,Net 30,Engineering,2025-01-01
+Salesforce,CRM enterprise license,864000,IT,6120,Net 30,Sales,2025-01-01
+ServiceNow,ITSM platform,480000,IT,6130,Net 45,Engineering,2025-01-01
+McKinsey,Strategy transformation,2520000,PROFESSIONAL_SERVICES,7200,Net 30,Strategy,2025-01-01
+Deloitte,Audit & tax,1140000,PROFESSIONAL_SERVICES,7210,Net 30,Finance,2025-01-01
+EY,Risk advisory,720000,PROFESSIONAL_SERVICES,7220,Net 30,Finance,2025-01-01
+CBRE,Office lease portfolio,2160000,FACILITIES,8100,Net 30,Admin,2025-01-01
+Sodexo,Facilities & catering,540000,FACILITIES,8110,Net 30,Admin,2025-01-01
+JLL,Property management,360000,FACILITIES,8120,Net 30,Admin,2025-01-01
+WPP,Agency retainer,1500000,MARKETING,9100,Net 30,Marketing,2025-01-01
+Publicis,Media buying,900000,MARKETING,9110,Net 30,Marketing,2025-01-01
+Randstad,Contract staff,1176000,CONTINGENT_WORKFORCE,7500,Net 21,HR,2025-01-01
+Heidrick & Struggles,Executive search,480000,HR,7300,Net 30,HR,2025-01-01
+Cornerstone OnDemand,LMS platform,240000,HR,7310,Net 30,HR,2025-01-01
+DHL,Freight & logistics,720000,LOGISTICS,5100,Net 30,Operations,2025-01-01
+FedEx,Express shipping,300000,LOGISTICS,5110,Net 14,Operations,2025-01-01
+AT&T,Enterprise telecom,360000,TELECOMMUNICATIONS,6200,Net 30,IT,2025-01-01
+United Airlines,Corporate travel,408000,TRAVEL,9200,Net 14,Admin,2025-01-01
+Staples,Office supplies,120000,OFFICE_SUPPLIES,8200,Net 30,Admin,2025-01-01

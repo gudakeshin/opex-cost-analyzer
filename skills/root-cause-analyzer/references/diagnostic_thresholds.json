@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "thresholds": {
+    "peer_percentile_include": ["P50-P75", "P75-P90", "P90+"],
+    "supplier_fragmentation_hhi_max": 0.15,
+    "supplier_fragmentation_min_suppliers": 5,
+    "maverick_spend_ratio_min": 0.2,
+    "cost_per_transaction_max": 1000.0
+  },
+  "addressable_rates": {
+    "supplier_consolidation": 0.2,
+    "maverick_compliance": 0.1,
+    "demand_management": 0.08,
+    "baseline_optimization": 0.05
+  }
+}

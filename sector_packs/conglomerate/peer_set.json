@@ -1,0 +1,17 @@
+{
+  "sector": "conglomerate",
+  "currency": "INR",
+  "peers": [
+    {"name": "Tata Group (consolidated, proxy: TCS revenue)", "ticker": "TCS.NS", "exchange": "NSE", "group_revenue_cr": 1400000},
+    {"name": "Reliance Industries", "ticker": "RELIANCE.NS", "exchange": "NSE", "group_revenue_cr": 900000},
+    {"name": "Adani Group (proxy: Adani Enterprises)", "ticker": "ADANIENT.NS", "exchange": "NSE", "group_revenue_cr": 300000},
+    {"name": "Mahindra Group (proxy: M&M)", "ticker": "M&M.NS", "exchange": "NSE", "group_revenue_cr": 200000},
+    {"name": "Aditya Birla Group (proxy: Hindalco)", "ticker": "HINDALCO.NS", "exchange": "NSE", "group_revenue_cr": 250000}
+  ],
+  "benchmark_metrics": {
+    "shared_services_to_group_opex_pct": {"p25": 3.0, "p50": 5.5, "p75": 9.0},
+    "holding_overhead_to_group_revenue_pct": {"p25": 0.3, "p50": 0.6, "p75": 1.2}
+  },
+  "data_source": "BSE annual reports FY25 (group consolidated)",
+  "refresh_date": "2026-04-01"
+}

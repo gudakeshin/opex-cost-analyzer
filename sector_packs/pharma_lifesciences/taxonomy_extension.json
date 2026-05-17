@@ -1,0 +1,11 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "regulatory_filing_costs", "category_name": "Regulatory Filings, ANDA & NDA Costs", "gl_prefix": "REG"},
+    {"category_id": "gmp_validation_costs", "category_name": "GMP Validation & Quality Compliance", "gl_prefix": "GMP"},
+    {"category_id": "clinical_trials", "category_name": "Clinical Trial & R&D Outsourcing", "gl_prefix": "CTR"},
+    {"category_id": "cold_chain_logistics", "category_name": "Cold Chain & Temperature-Controlled Logistics", "gl_prefix": "CCL"},
+    {"category_id": "pharmacovigilance", "category_name": "Pharmacovigilance & ADR Reporting", "gl_prefix": "PVG"}
+  ],
+  "overrides": []
+}

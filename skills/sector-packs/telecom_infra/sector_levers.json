@@ -1,0 +1,360 @@
+{
+  "pack_id": "telecom_infra",
+  "sector": "Telecommunications & Infrastructure",
+  "version": "1.0",
+  "applicable_entity_types": [
+    "mobile_operator",
+    "fixed_line_operator",
+    "tower_company",
+    "cable_operator",
+    "isp",
+    "satellite"
+  ],
+  "industry_signals": [
+    "telecom_gt_5pct_spend",
+    "network_keywords_detected",
+    "tower_keywords_detected"
+  ],
+  "universal_levers": [
+    "contract_renegotiation",
+    "process_standardization",
+    "demand_management",
+    "supplier_consolidation",
+    "automation",
+    "payment_terms",
+    "maverick_compliance",
+    "outsourcing",
+    "internal_best_practice",
+    "tail_spend_automation",
+    "should_cost_modeling",
+    "zero_based_rebaseline",
+    "shared_services_consolidation",
+    "geographic_arbitrage",
+    "rebate_pricing_recovery",
+    "benefits_cost_optimization",
+    "contingent_workforce_optimization",
+    "consulting_spend_governance",
+    "legal_spend_optimization",
+    "ld_rationalization",
+    "space_utilization_optimization",
+    "lease_restructuring",
+    "cost_governance"
+  ],
+  "sector_specific_levers": [
+    {
+      "lever_id": "network_opex_optimization",
+      "lever_name": "Network OPEX Optimisation (Maintenance / Energy / Field Ops)",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 15,
+        "p50": 24,
+        "p90": 34
+      },
+      "cta_rate": 0.09,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Network inventory accurately mapped in OSS / NMS with asset utilisation data",
+        "Vendor managed services contracts reviewed for performance SLAs and penalties",
+        "Energy management and free-cooling programme initiated for passive infrastructure"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 18,
+        "p50": 36,
+        "p90": 56
+      },
+      "applicable_if": [
+        "category:TELECOM > 3% spend",
+        "network_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "tower_sharing",
+      "lever_name": "Passive Infrastructure Sharing / Tower Co Model",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 20,
+        "p90": 28
+      },
+      "cta_rate": 0.08,
+      "phasing_curve": [
+        0.1,
+        0.4,
+        0.5
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.88,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Tower asset inventory and ownership structure validated",
+        "Tower sharing agreement (TSA) negotiated with preferred InfraCo partners",
+        "Regulatory clearance obtained for passive sharing under TRAI guidelines"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.62,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 44,
+        "p90": 72
+      },
+      "applicable_if": [
+        "tower_keywords detected",
+        "category:FACILITIES or TELECOM present"
+      ]
+    },
+    {
+      "lever_id": "spectrum_efficiency",
+      "lever_name": "Spectrum Utilisation & Dynamic Allocation Optimisation",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 14,
+        "p90": 22
+      },
+      "cta_rate": 0.09,
+      "phasing_curve": [
+        0.1,
+        0.4,
+        0.5
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.82,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Radio access network (RAN) capacity analytics deployed",
+        "Carrier aggregation and spectrum re-farming plan approved by network team",
+        "TRAI / DOT regulatory clearance for spectrum re-farming obtained"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.6,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 44,
+        "p90": 72
+      },
+      "applicable_if": [
+        "telecom_keywords detected",
+        "annual_revenue > 500M"
+      ]
+    },
+    {
+      "lever_id": "customer_service_automation",
+      "lever_name": "Customer Service Automation (IVR / Chatbot / Digital Deflection)",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 18,
+        "p50": 28,
+        "p90": 38
+      },
+      "cta_rate": 0.09,
+      "phasing_curve": [
+        0.2,
+        0.45,
+        0.35
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.85,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Contact centre call driver analysis completed (top 10 reasons cover > 70% volume)",
+        "Conversational AI / chatbot platform selected and integrated with CRM",
+        "Self-service portal completion rate KPI set at > 60%"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 24,
+        "p90": 40
+      },
+      "applicable_if": [
+        "category:OUTSOURCED or TELECOM present",
+        "headcount > 100"
+      ]
+    },
+    {
+      "lever_id": "churn_reduction",
+      "lever_name": "High-Value Customer Churn Reduction",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 2,
+        "p50": 5,
+        "p90": 9
+      },
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Customer lifetime value (CLV) model built by segment",
+        "Predictive churn model achieving > 70% recall deployed",
+        "Retention offer catalogue and approval workflow established"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.68,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 38
+      },
+      "applicable_if": [
+        "telecom_keywords detected",
+        "category:IT or OUTSOURCED present"
+      ]
+    },
+    {
+      "lever_id": "roaming_cost_optimization",
+      "lever_name": "International Roaming Cost Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 15,
+        "p90": 22
+      },
+      "cta_rate": 0.04,
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.75,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "IOT (International Outpayment Traffic) analysis completed by partner network",
+        "Bilateral IOT rates renegotiated with high-volume roaming partners",
+        "Discount roaming product launched for high-frequency travellers"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 30
+      },
+      "applicable_if": [
+        "telecom_keywords detected",
+        "international_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "it_bss_oss_modernization",
+      "lever_name": "IT / BSS / OSS Modernisation (Cloud-Native)",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 18,
+        "p50": 28,
+        "p90": 38
+      },
+      "cta_rate": 0.13,
+      "phasing_curve": [
+        0.05,
+        0.3,
+        0.65
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.88,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Legacy BSS / OSS system landscape mapped with total cost of ownership",
+        "Cloud-native target architecture approved by CTO and CFO",
+        "Vendor selection for SaaS BSS / OSS completed (e.g. Amdocs, Ericsson BSCS)"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.55,
+      "implementation_weeks": {
+        "p10": 36,
+        "p50": 72,
+        "p90": 120
+      },
+      "applicable_if": [
+        "category:IT > 4% revenue",
+        "telecom_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "energy_management",
+      "lever_name": "Network Site Energy Management",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 20,
+        "p90": 28
+      },
+      "cta_rate": 0.08,
+      "phasing_curve": [
+        0.2,
+        0.45,
+        0.35
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.85,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Per-site energy consumption data available for > 80% of sites",
+        "Free-cooling and smart HVAC controls deployed at high-power sites",
+        "Renewable energy or DG-to-solar transition plan approved"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 24,
+        "p90": 40
+      },
+      "applicable_if": [
+        "category:POWER_ENERGY or TELECOM present",
+        "network_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "workforce_productivity",
+      "lever_name": "Field Workforce Productivity (IoT-Enabled Dispatch)",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 10,
+        "p50": 16,
+        "p90": 24
+      },
+      "cta_rate": 0.07,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.8,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Field service management (FSM) platform deployed with real-time GPS tracking",
+        "Job categorisation and average handling time standards established",
+        "Predictive fault analytics integrated with dispatch system"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 38
+      },
+      "applicable_if": [
+        "headcount > 100",
+        "telecom_keywords detected"
+      ]
+    }
+  ]
+}

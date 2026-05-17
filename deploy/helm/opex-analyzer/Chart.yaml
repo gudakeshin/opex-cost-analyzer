@@ -1,0 +1,14 @@
+apiVersion: v2
+name: opex-analyzer
+description: OpEx Intelligence Platform — Kubernetes Helm Chart
+type: application
+version: 1.0.0
+appVersion: "2.1.0"
+keywords:
+  - opex
+  - cost-analytics
+  - fpna
+  - india-enterprise
+maintainers:
+  - name: OpEx Engineering
+    email: platform@opex.internal

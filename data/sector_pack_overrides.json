@@ -1,0 +1,14 @@
+{
+  "it_ites": {
+    "pack_id": "it_ites",
+    "engagement_id": null,
+    "disabled_levers": [
+      "offshore_arbitrage"
+    ],
+    "lever_overrides": {
+      "software_license_optimisation": {
+        "p50_pct": 12
+      }
+    }
+  }
+}

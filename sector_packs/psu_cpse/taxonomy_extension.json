@@ -1,0 +1,11 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "csr_mandatory_spend", "category_name": "CSR Mandatory Spend (Sec 135 Companies Act)", "gl_prefix": "CSR"},
+    {"category_id": "govt_levy_dividends", "category_name": "Government Levies, Cess & Mandatory Dividends", "gl_prefix": "GLD"},
+    {"category_id": "dpe_hr_perquisites", "category_name": "DPE-Mandated HR Perquisites & Allowances", "gl_prefix": "DPE"},
+    {"category_id": "cag_audit_costs", "category_name": "CAG Audit & Statutory Compliance", "gl_prefix": "CAG"},
+    {"category_id": "township_welfare_ops", "category_name": "Township, Welfare & Social Infrastructure", "gl_prefix": "TWF"}
+  ],
+  "overrides": []
+}

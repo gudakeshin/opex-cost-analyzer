@@ -1,0 +1,18 @@
+{
+  "sector": "retail_organized",
+  "currency": "INR",
+  "peers": [
+    {"name": "Avenue Supermarts (DMart)", "ticker": "DMART.NS", "exchange": "NSE", "revenue_cr": 48000},
+    {"name": "Trent (Tata Retail)", "ticker": "TRENT.NS", "exchange": "NSE", "revenue_cr": 12000},
+    {"name": "V-Mart Retail", "ticker": "VMART.NS", "exchange": "NSE", "revenue_cr": 2400},
+    {"name": "Shoppers Stop", "ticker": "SHOPERSTOP.NS", "exchange": "NSE", "revenue_cr": 4200},
+    {"name": "Reliance Retail (unlisted proxy: RELIANCE)", "ticker": "RELIANCE.NS", "exchange": "NSE", "revenue_cr": 300000}
+  ],
+  "benchmark_metrics": {
+    "ebitda_margin_pct": {"p25": 6.0, "p50": 9.0, "p75": 14.0},
+    "sssg_pct": {"p25": 3.0, "p50": 8.0, "p75": 14.0},
+    "store_opex_to_revenue_pct": {"p25": 12.0, "p50": 18.0, "p75": 26.0}
+  },
+  "data_source": "BSE/NSE annual reports FY25",
+  "refresh_date": "2026-04-01"
+}

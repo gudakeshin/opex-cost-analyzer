@@ -1,0 +1,33 @@
+# Secrets — NEVER commit
+.env
+*.env.local
+
+# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.pytest_cache/
+
+# Data — session uploads and outputs contain client data
+data/uploads/
+data/outputs/
+data/memory/
+
+# Claude Code session state
+.claude/
+
+# Frontend build artifacts
+frontend/node_modules/
+frontend/dist/
+node_modules/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp

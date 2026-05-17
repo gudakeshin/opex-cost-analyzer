@@ -1,0 +1,25 @@
+{
+  "description": "Temporal TTM: 12 consecutive months — arr_basis must be TTM and annualized_run_rate = sum of last 12 periods",
+  "skill": "temporal-analyzer",
+  "input_lines": [
+    {"row_id": 501, "supplier": "Cloud", "description": "Infra Jan", "category_id": "cloud", "category_name": "Cloud", "amount": 100000.0, "spend_date": "2024-01-15", "fiscal_period": "2024-01", "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 100000.0},
+    {"row_id": 502, "supplier": "Cloud", "description": "Infra Feb", "category_id": "cloud", "category_name": "Cloud", "amount": 102000.0, "spend_date": "2024-02-15", "fiscal_period": "2024-02", "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 102000.0},
+    {"row_id": 503, "supplier": "Cloud", "description": "Infra Mar", "category_id": "cloud", "category_name": "Cloud", "amount": 104000.0, "spend_date": "2024-03-15", "fiscal_period": "2024-03", "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 104000.0},
+    {"row_id": 504, "supplier": "Cloud", "description": "Infra Apr", "category_id": "cloud", "category_name": "Cloud", "amount": 106000.0, "spend_date": "2024-04-15", "fiscal_period": "2024-04", "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 106000.0},
+    {"row_id": 505, "supplier": "Cloud", "description": "Infra May", "category_id": "cloud", "category_name": "Cloud", "amount": 108000.0, "spend_date": "2024-05-15", "fiscal_period": "2024-05", "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 108000.0},
+    {"row_id": 506, "supplier": "Cloud", "description": "Infra Jun", "category_id": "cloud", "category_name": "Cloud", "amount": 110000.0, "spend_date": "2024-06-15", "fiscal_period": "2024-06", "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 110000.0},
+    {"row_id": 507, "supplier": "Cloud", "description": "Infra Jul", "category_id": "cloud", "category_name": "Cloud", "amount": 112000.0, "spend_date": "2024-07-15", "fiscal_period": "2024-07", "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 112000.0},
+    {"row_id": 508, "supplier": "Cloud", "description": "Infra Aug", "category_id": "cloud", "category_name": "Cloud", "amount": 114000.0, "spend_date": "2024-08-15", "fiscal_period": "2024-08", "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 114000.0},
+    {"row_id": 509, "supplier": "Cloud", "description": "Infra Sep", "category_id": "cloud", "category_name": "Cloud", "amount": 116000.0, "spend_date": "2024-09-15", "fiscal_period": "2024-09", "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 116000.0},
+    {"row_id": 510, "supplier": "Cloud", "description": "Infra Oct", "category_id": "cloud", "category_name": "Cloud", "amount": 118000.0, "spend_date": "2024-10-15", "fiscal_period": "2024-10", "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 118000.0},
+    {"row_id": 511, "supplier": "Cloud", "description": "Infra Nov", "category_id": "cloud", "category_name": "Cloud", "amount": 120000.0, "spend_date": "2024-11-15", "fiscal_period": "2024-11", "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 120000.0},
+    {"row_id": 512, "supplier": "Cloud", "description": "Infra Dec", "category_id": "cloud", "category_name": "Cloud", "amount": 122000.0, "spend_date": "2024-12-15", "fiscal_period": "2024-12", "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 122000.0}
+  ],
+  "extra_kwargs": {},
+  "assertions": {
+    "required_keys": ["temporal_available", "period_count", "arr_basis", "annualized_run_rate", "cagr_pct"],
+    "temporal_available": true,
+    "min_period_count": 12,
+    "arr_basis": "TTM"
+  }
+}

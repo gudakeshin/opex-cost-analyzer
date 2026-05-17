@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.9.2
+    container_name: opex-qdrant
+    ports:
+      - "6333:6333"   # HTTP REST API
+      - "6334:6334"   # gRPC
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__HTTP_PORT=6333
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  opex-api:
+    build: .
+    image: opex-intelligence:latest
+    container_name: opex-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - LOG_LEVEL=INFO
+      - SESSION_TTL_DAYS=30
+      - CLEANUP_INTERVAL_HOURS=24
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - QDRANT_ENABLED=true
+    volumes:
+      # Persist uploads, outputs, and session memory across restarts
+      - opex_data:/app/data
+    depends_on:
+      qdrant:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+
+volumes:
+  opex_data:
+    driver: local
+  qdrant_data:
+    driver: local

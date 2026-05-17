@@ -1,0 +1,26 @@
+{
+  "version": "1.2",
+  "targets_pct": {
+    "IT": 6.0,
+    "PROF_SVCS": 2.5,
+    "FACILITIES": 4.0,
+    "TRAVEL": 1.0,
+    "MARKETING": 6.0,
+    "HR": 2.0,
+    "TELECOM": 1.0,
+    "LOGISTICS": 6.0,
+    "INSURANCE": 0.8,
+    "CONTINGENT": 8.0,
+    "OUTSOURCED": 12.0,
+    "FIN_SVCS": 0.5,
+    "OFFICE": 0.5
+  },
+  "per_employee_targets": {
+    "HR": 2500,
+    "IT": 5000,
+    "FACILITIES": 3000,
+    "MARKETING": 8000,
+    "TRAVEL": 2000,
+    "OFFICE": 500
+  }
+}

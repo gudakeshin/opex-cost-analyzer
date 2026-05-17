@@ -1,0 +1,33 @@
+{
+  "description": "Ambiguous workbook with weak structural signals",
+  "skill": "model-contextualizer",
+  "input_lines": [],
+  "extra_kwargs": {
+    "structural_summary": {
+      "workbook_name": "Unknown_Model.xlsx",
+      "sheet_order": ["Sheet1", "Sheet2"],
+      "sheets": [
+        {
+          "sheet_name": "Sheet1",
+          "row_count": 12,
+          "first_rows": [["A", "B", "C"], ["x", "y", "z"]],
+          "first_col_values": ["x", "y", "z"],
+          "formula_refs": []
+        },
+        {
+          "sheet_name": "Sheet2",
+          "row_count": 10,
+          "first_rows": [["foo", "bar"], ["one", "two"]],
+          "first_col_values": ["foo", "bar"],
+          "formula_refs": []
+        }
+      ]
+    }
+  },
+  "assertions": {
+    "required_keys": ["confidence", "sheet_graph", "ingestion_notes"],
+    "ingestion_strategy": "standard",
+    "contains_ingestion_notes": "could not be confidently classified",
+    "min_sheet_graph": 2
+  }
+}

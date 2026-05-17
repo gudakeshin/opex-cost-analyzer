@@ -1,0 +1,10 @@
+[
+  {"kpi_id": "ebitda_margin", "kpi_name": "EBITDA Margin", "unit": "pct", "formula": "ebitda / revenue * 100", "target_direction": "higher", "p50_benchmark_pct": 14.0},
+  {"kpi_id": "material_cost_pct", "kpi_name": "Material Cost % of Revenue", "unit": "pct", "formula": "material_cost / revenue * 100", "target_direction": "lower", "p50_benchmark_pct": 52.0},
+  {"kpi_id": "energy_intensity", "kpi_name": "Energy Cost % of Revenue", "unit": "pct", "formula": "energy_cost / revenue * 100", "target_direction": "lower", "p50_benchmark_pct": 4.2},
+  {"kpi_id": "logistics_cost_pct", "kpi_name": "Logistics Cost % of Revenue", "unit": "pct", "formula": "logistics_cost / revenue * 100", "target_direction": "lower", "p50_benchmark_pct": 6.5},
+  {"kpi_id": "mro_cost_pct", "kpi_name": "MRO Cost % of Revenue", "unit": "pct", "formula": "mro_cost / revenue * 100", "target_direction": "lower", "p50_benchmark_pct": 2.0},
+  {"kpi_id": "oee_pct", "kpi_name": "Overall Equipment Effectiveness (OEE)", "unit": "pct", "formula": "availability * performance * quality", "target_direction": "higher", "p50_benchmark_pct": 72.0},
+  {"kpi_id": "scope2_intensity", "kpi_name": "Scope-2 Intensity (tCO₂e/₹Cr revenue)", "unit": "tco2e_per_cr", "formula": "scope2_tco2e / revenue_cr", "target_direction": "lower", "p50_benchmark": 4.5},
+  {"kpi_id": "inventory_days", "kpi_name": "Inventory Days (Raw Material)", "unit": "days", "formula": "raw_material_inventory / daily_material_consumption", "target_direction": "lower", "p50_benchmark_days": 45}
+]

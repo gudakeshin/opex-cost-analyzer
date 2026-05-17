@@ -1,0 +1,15 @@
+pack_id: energy_utilities
+sector: Energy & Utilities (India)
+version: "0.1"
+schema_version: "1"
+status: scaffold
+description: Scaffold for Indian power generators, transmission, distribution, and oil & gas companies. Full content deferred.
+applicable_entity_types: [power_generator, transmission_company, distribution_company, oil_gas_e_and_p, refinery]
+regulatory_bodies: [CERC, SERC, MoPNG, PNGRB, SEBI, MoP]
+fiscal_year_end: "March 31"
+reporting_currency: INR
+default_wacc_pct: 12.0
+default_tax_rate_pct: 25.17
+created_at: "2026-05-01"
+effective_from: "2026-05-01"
+maintained_by: opex_platform_core

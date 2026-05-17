@@ -1,0 +1,11 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "store_occupancy", "category_name": "Store Rent, CAM & Occupancy Costs", "gl_prefix": "OCC"},
+    {"category_id": "last_mile_delivery", "category_name": "Last-Mile Delivery & Fulfilment", "gl_prefix": "LMD"},
+    {"category_id": "merchandising_ops", "category_name": "Merchandising & Category Ops", "gl_prefix": "MDZ"},
+    {"category_id": "loyalty_retention", "category_name": "Loyalty Programme & Customer Retention", "gl_prefix": "LOY"},
+    {"category_id": "shrinkage_loss", "category_name": "Shrinkage, Wastage & Markdown Losses", "gl_prefix": "SHR"}
+  ],
+  "overrides": []
+}

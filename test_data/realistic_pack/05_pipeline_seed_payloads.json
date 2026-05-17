@@ -1,0 +1,62 @@
+{
+  "initiatives": [
+    {
+      "category": "IT & Technology",
+      "lever": "supplier_consolidation",
+      "root_cause": "Supplier fragmentation and unmanaged add-on subscriptions",
+      "gross_savings_y1": 420000,
+      "gross_savings_y2": 980000,
+      "gross_savings_y3": 640000,
+      "cost_to_achieve": 260000,
+      "net_npv": 1280000,
+      "committed_savings": 700000,
+      "stage": "committed",
+      "owner_name": "Director Procurement",
+      "owner_email": "director.procurement@northstar.example",
+      "target_realization_date": "2026-10-31"
+    },
+    {
+      "category": "Professional Services",
+      "lever": "demand_management",
+      "root_cause": "Unscoped advisory extension work outside approved charters",
+      "gross_savings_y1": 260000,
+      "gross_savings_y2": 410000,
+      "gross_savings_y3": 220000,
+      "cost_to_achieve": 90000,
+      "net_npv": 590000,
+      "committed_savings": 300000,
+      "stage": "in_flight",
+      "owner_name": "VP Finance Transformation",
+      "owner_email": "vp.finance@northstar.example",
+      "target_realization_date": "2026-08-31"
+    }
+  ],
+  "milestones": [
+    {
+      "description": "Finalize vendor rationalization shortlist",
+      "due_date": "2026-04-15",
+      "status": "pending"
+    },
+    {
+      "description": "Complete consulting demand intake gate rollout",
+      "due_date": "2026-03-31",
+      "status": "at_risk"
+    }
+  ],
+  "actuals_examples": [
+    {
+      "period": "2026-03",
+      "actual_savings": 120000,
+      "committed_savings": 180000,
+      "gl_reference": "SGA-IT-4410",
+      "notes": "Transition costs higher than expected in month 1"
+    },
+    {
+      "period": "2026-04",
+      "actual_savings": 210000,
+      "committed_savings": 200000,
+      "gl_reference": "SGA-PROF-4550",
+      "notes": "Consulting intake controls started to stabilize run-rate"
+    }
+  ]
+}

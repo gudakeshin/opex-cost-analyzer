@@ -1,0 +1,359 @@
+{
+  "pack_id": "fmcg_consumer",
+  "sector": "FMCG / Consumer Goods",
+  "version": "1.0",
+  "applicable_entity_types": [
+    "fmcg",
+    "consumer_goods",
+    "beverages",
+    "personal_care",
+    "household_products",
+    "packaged_foods"
+  ],
+  "industry_signals": [
+    "logistics_plus_packaging_gt_15pct",
+    "marketing_gt_6pct_revenue",
+    "high_sku_count"
+  ],
+  "universal_levers": [
+    "contract_renegotiation",
+    "process_standardization",
+    "demand_management",
+    "supplier_consolidation",
+    "automation",
+    "payment_terms",
+    "maverick_compliance",
+    "outsourcing",
+    "internal_best_practice",
+    "tail_spend_automation",
+    "should_cost_modeling",
+    "zero_based_rebaseline",
+    "rebate_pricing_recovery",
+    "specification_optimization",
+    "geographic_arbitrage",
+    "benefits_cost_optimization",
+    "contingent_workforce_optimization",
+    "consulting_spend_governance",
+    "legal_spend_optimization",
+    "ld_rationalization",
+    "space_utilization_optimization",
+    "lease_restructuring",
+    "cost_governance",
+    "agency_fee_optimization",
+    "martech_rationalization"
+  ],
+  "sector_specific_levers": [
+    {
+      "lever_id": "cogs_direct_materials",
+      "lever_name": "Direct Materials COGS Reduction",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 2,
+        "p50": 3.5,
+        "p90": 6
+      },
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.75,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Should-cost model built for top 5 raw material categories",
+        "Alternative supplier/specification qualified by R&D",
+        "Procurement and supply-chain risk assessment signed off"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 24,
+        "p90": 40
+      },
+      "applicable_if": [
+        "category:LOGISTICS_INDIA or PACKAGING present",
+        "cogs_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "sku_rationalization",
+      "lever_name": "SKU Rationalisation",
+      "lever_family": "demand",
+      "savings_range_pct": {
+        "p10": 4,
+        "p50": 9,
+        "p90": 16
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "SKU profitability analysis completed (net margin per SKU)",
+        "Commercial / marketing approval for tail SKU discontinuation",
+        "Production planning updated to reflect simplified range"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 36
+      },
+      "applicable_if": [
+        "category:PACKAGING or LOGISTICS present",
+        "supplier_count > 20"
+      ]
+    },
+    {
+      "lever_id": "pricing_architecture",
+      "lever_name": "Price-Pack Architecture Optimisation",
+      "lever_family": "demand",
+      "savings_range_pct": {
+        "p10": 1.5,
+        "p50": 3,
+        "p90": 5
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.68,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Consumer research on pack-size price sensitivity completed",
+        "Revenue management team capability in place",
+        "Trade terms aligned with new architecture"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.68,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 24,
+        "p90": 40
+      },
+      "applicable_if": [
+        "category:MARKETING > 5% revenue"
+      ]
+    },
+    {
+      "lever_id": "trade_terms_optimization",
+      "lever_name": "Trade Terms & Route-to-Market Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 2,
+        "p50": 4,
+        "p90": 7
+      },
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.65,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Distributor profitability analysis completed by channel / region",
+        "Trade promotion ROI measured and low-ROI programmes identified",
+        "Sales force restructured per new RTM design"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 32,
+        "p90": 52
+      },
+      "applicable_if": [
+        "category:LOGISTICS or MARKETING > 3% revenue"
+      ]
+    },
+    {
+      "lever_id": "warehouse_automation",
+      "lever_name": "Warehouse & Distribution Centre Automation",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 20,
+        "p90": 28
+      },
+      "cta_rate": 0.14,
+      "phasing_curve": [
+        0.05,
+        0.3,
+        0.65
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.9,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Volume throughput exceeds automation break-even (> 500 picks/hr typical)",
+        "WMS system upgrade completed to support automation integration",
+        "Capex approval obtained (typically > 18-month payback)"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.58,
+      "implementation_weeks": {
+        "p10": 36,
+        "p50": 60,
+        "p90": 96
+      },
+      "applicable_if": [
+        "category:LOGISTICS > 5% revenue",
+        "headcount > 200"
+      ]
+    },
+    {
+      "lever_id": "mode_shift_logistics",
+      "lever_name": "Logistics Mode Shift (Air → Road / Rail / Ocean)",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10,
+        "p50": 20,
+        "p90": 32
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.75,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Lead time analysis confirms alternative mode feasible for customer SLA",
+        "Inventory buffer stock adjusted to accommodate longer lead times",
+        "Carrier contracts updated for new modes at agreed rates"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 30
+      },
+      "applicable_if": [
+        "express_like_pct > 0.10",
+        "category:LOGISTICS present"
+      ]
+    },
+    {
+      "lever_id": "private_label_expansion",
+      "lever_name": "Private Label / Own-Brand Portfolio Expansion",
+      "lever_family": "demand",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 14,
+        "p90": 22
+      },
+      "cta_rate": 0.09,
+      "phasing_curve": [
+        0.1,
+        0.35,
+        0.55
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.8,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Consumer acceptance testing completed for private label alternatives",
+        "Contract manufacturing partner qualified and audited",
+        "Shelf placement and channel strategy agreed with commercial team"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.62,
+      "implementation_weeks": {
+        "p10": 24,
+        "p50": 44,
+        "p90": 68
+      },
+      "applicable_if": [
+        "category:PACKAGING or LOGISTICS present",
+        "annual_revenue > 500M"
+      ]
+    },
+    {
+      "lever_id": "demand_planning_accuracy",
+      "lever_name": "Demand Planning & Inventory Optimisation",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 4,
+        "p50": 9,
+        "p90": 16
+      },
+      "cta_rate": 0.07,
+      "phasing_curve": [
+        0.2,
+        0.45,
+        0.35
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.8,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Demand planning tool (S&OP / IBP) implemented or upgraded",
+        "Forecast accuracy KPI established and tracked at SKU/DC level",
+        "Safety stock policy revised to statistical model (not rule-of-thumb)"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 24,
+        "p90": 40
+      },
+      "applicable_if": [
+        "category:LOGISTICS or PACKAGING > 3% revenue"
+      ]
+    },
+    {
+      "lever_id": "assortment_optimization",
+      "lever_name": "Assortment Optimisation (Tail Elimination)",
+      "lever_family": "demand",
+      "savings_range_pct": {
+        "p10": 6,
+        "p50": 11,
+        "p90": 17
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "SKU velocity and margin analysis completed by channel",
+        "De-listing plan approved by commercial, supply chain and finance",
+        "Customer communication plan executed for discontinued SKUs"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 20,
+        "p90": 34
+      },
+      "applicable_if": [
+        "supplier_count > 10",
+        "category:PACKAGING or LOGISTICS present"
+      ]
+    }
+  ]
+}

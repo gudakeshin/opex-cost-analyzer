@@ -1,0 +1,23 @@
+pack_id: bfsi_banks
+sector: Banking & Financial Services (India)
+version: "1.0"
+schema_version: "1"
+status: full
+description: >
+  Full sector pack for Indian scheduled commercial banks, NBFCs, and HFCs.
+  Covers RBI-mandated cost disclosures, SLR/CRR compliance costs, Basel-III
+  capital costs, and NPA provisioning impact on OpEx.
+applicable_entity_types:
+  - scheduled_commercial_bank
+  - nbfc_systemically_important
+  - housing_finance_company
+  - small_finance_bank
+regulatory_bodies: [RBI, SEBI, IRDAI, NHB, IBA]
+fiscal_year_end: "March 31"
+reporting_currency: INR
+default_wacc_pct: 14.5
+default_tax_rate_pct: 25.17
+cost_to_income_kpi: true
+created_at: "2026-05-01"
+effective_from: "2026-05-01"
+maintained_by: opex_platform_core

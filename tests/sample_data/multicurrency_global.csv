@@ -1,0 +1,19 @@
+supplier,description,amount,currency,fx_rate,category,gl_code,business_unit,spend_date
+AWS US,Cloud infrastructure - Americas,320000,USD,1.00,IT,6100,Engineering AMER,2025-01-01
+Microsoft UK,M365 licenses - EMEA,185000,GBP,1.27,IT,6110,Engineering EMEA,2025-01-01
+SAP Germany,ERP licenses - EMEA,210000,EUR,1.09,IT,6130,Engineering EMEA,2025-01-01
+Infosys India,Offshore development,45000000,INR,0.012,IT,6140,Engineering APAC,2025-01-01
+McKinsey US,Strategy consulting - global,210000,USD,1.00,PROFESSIONAL_SERVICES,7200,Strategy AMER,2025-01-01
+Roland Berger,Management consulting - EU,140000,EUR,1.09,PROFESSIONAL_SERVICES,7205,Strategy EMEA,2025-01-01
+PwC Singapore,Audit APAC,280000,SGD,0.74,PROFESSIONAL_SERVICES,7210,Finance APAC,2025-01-01
+CBRE US,HQ office lease - NYC,2200000,USD,1.00,FACILITIES,8100,Admin AMER,2025-01-01
+Land Securities,London office lease,1600000,GBP,1.27,FACILITIES,8100,Admin EMEA,2025-01-01
+JLL Singapore,APAC offices,1800000,SGD,0.74,FACILITIES,8100,Admin APAC,2025-01-01
+WPP UK,Global media buying,800000,GBP,1.27,MARKETING,9100,Marketing Global,2025-01-01
+Havas France,EMEA digital campaigns,600000,EUR,1.09,MARKETING,9110,Marketing EMEA,2025-01-01
+Randstad Netherlands,Contract staff EU,1200000,EUR,1.09,CONTINGENT_WORKFORCE,7500,HR EMEA,2025-01-01
+Adecco US,Contract staff Americas,880000,USD,1.00,CONTINGENT_WORKFORCE,7500,HR AMER,2025-01-01
+DHL Germany,European logistics,450000,EUR,1.09,LOGISTICS,5100,Operations EMEA,2025-01-01
+Nippon Express,APAC freight,52000000,JPY,0.0067,LOGISTICS,5110,Operations APAC,2025-01-01
+British Airways,EMEA business travel,320000,GBP,1.27,TRAVEL,9200,Admin EMEA,2025-01-01
+Singapore Airlines,APAC business travel,420000,SGD,0.74,TRAVEL,9200,Admin APAC,2025-01-01

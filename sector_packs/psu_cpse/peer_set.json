@@ -1,0 +1,19 @@
+{
+  "sector": "psu_cpse",
+  "currency": "INR",
+  "peers": [
+    {"name": "ONGC", "ticker": "ONGC.NS", "exchange": "NSE", "entity_type": "maharatna", "revenue_cr": 600000},
+    {"name": "Coal India", "ticker": "COALINDIA.NS", "exchange": "NSE", "entity_type": "maharatna", "revenue_cr": 140000},
+    {"name": "BHEL", "ticker": "BHEL.NS", "exchange": "NSE", "entity_type": "navratna", "revenue_cr": 25000},
+    {"name": "HPCL", "ticker": "HINDPETRO.NS", "exchange": "NSE", "entity_type": "maharatna", "revenue_cr": 480000},
+    {"name": "BPCL", "ticker": "BPCL.NS", "exchange": "NSE", "entity_type": "maharatna", "revenue_cr": 500000},
+    {"name": "GAIL India", "ticker": "GAIL.NS", "exchange": "NSE", "entity_type": "navratna", "revenue_cr": 130000}
+  ],
+  "benchmark_metrics": {
+    "ebitda_margin_pct": {"p25": 8.0, "p50": 14.0, "p75": 22.0},
+    "opex_to_revenue_pct": {"p25": 70.0, "p50": 80.0, "p75": 88.0},
+    "csr_to_pbt_pct": {"p25": 2.0, "p50": 2.0, "p75": 2.0}
+  },
+  "data_source": "BSE/NSE annual reports FY25 + DPE annual survey",
+  "refresh_date": "2026-04-01"
+}

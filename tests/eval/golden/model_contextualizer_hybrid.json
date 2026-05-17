@@ -1,0 +1,48 @@
+{
+  "description": "Workbook mixes timeseries and scenario structures",
+  "skill": "model-contextualizer",
+  "input_lines": [],
+  "extra_kwargs": {
+    "structural_summary": {
+      "workbook_name": "Hybrid_Model.xlsx",
+      "sheet_order": ["Inputs", "Forecast", "Scenarios", "Summary"],
+      "sheets": [
+        {
+          "sheet_name": "Inputs",
+          "row_count": 30,
+          "first_rows": [["Driver", "Value"], ["Revenue Growth", "0.08"]],
+          "first_col_values": ["Revenue Growth", "WACC", "Execution Rate"],
+          "formula_refs": []
+        },
+        {
+          "sheet_name": "Forecast",
+          "row_count": 140,
+          "first_rows": [["Category", "Jan-24", "Feb-24", "Mar-24"], ["Facilities", "900", "920", "940"]],
+          "first_col_values": ["Facilities", "IT & Technology", "Professional Services"],
+          "formula_refs": []
+        },
+        {
+          "sheet_name": "Scenarios",
+          "row_count": 40,
+          "first_rows": [["Scenario", "Base", "Upside", "Downside"], ["Total OpEx", "100", "108", "95"]],
+          "first_col_values": ["Base", "Upside", "Downside"],
+          "formula_refs": []
+        },
+        {
+          "sheet_name": "Summary",
+          "row_count": 35,
+          "first_rows": [["Metric", "FY24", "FY25"], ["EBITDA", "10", "12"]],
+          "first_col_values": ["Total OpEx", "EBITDA", "Payback"],
+          "formula_refs": []
+        }
+      ]
+    }
+  },
+  "assertions": {
+    "required_keys": ["ingestion_strategy", "sheet_graph", "planning_horizon"],
+    "ingestion_strategy": "hybrid",
+    "min_sheet_graph": 4,
+    "min_scenarios": 2,
+    "model_type": "scenario"
+  }
+}

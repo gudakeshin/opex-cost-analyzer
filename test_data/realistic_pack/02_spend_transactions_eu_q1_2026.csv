@@ -1,0 +1,29 @@
+supplier,description,amount,business unit,country,date
+Amazon Web Services,cloud hosting PO 77102 eu marketplace,154000,Engineering,DE,2026-01-04
+Microsoft,enterprise license PO 77115 emea scope,143000,Engineering,DE,2026-01-08
+OVHcloud,regional cloud burst capacity no PO urgent demand,46000,Engineering,FR,2026-01-12
+Atlassian,jira and confluence renewal no PO true-up,27000,Engineering,DE,2026-01-14
+Capgemini,it support managed services PO 77201,97000,IT,FR,2026-01-16
+Accenture,cybersecurity advisory no PO extension,51000,IT,UK,2026-01-22
+EY,statutory audit PO 77177,64000,Finance,UK,2026-01-09
+PwC,tax advisory and transfer pricing no PO,43000,Finance,NL,2026-01-19
+BCG,commercial acceleration workshop no PO,58000,Commercial,DE,2026-01-24
+DLA Piper,legal support PO 77154,36000,Legal,UK,2026-01-26
+Regus,workspace lease PO 77022,87000,Facilities,UK,2026-01-07
+Sodexo,facility management no PO overtime staffing,28000,Facilities,FR,2026-01-18
+EDF,utilities electric PO 77131,34000,Facilities,FR,2026-01-27
+Lufthansa,air travel no PO customer meetings,24000,Sales,DE,2026-01-11
+Accor,hotel lodging no PO trade fair,19000,Sales,DE,2026-01-13
+Bolt,ground transport no PO local travel,7000,Sales,UK,2026-01-17
+Google Ads,digital ads PO 77240,62000,Marketing,UK,2026-01-10
+TikTok Ads,social campaign no PO launch burst,29000,Marketing,DE,2026-01-20
+LinkedIn,recruitment no PO specialized sourcing,21000,HR,UK,2026-01-21
+Workday,hr platform allocation PO 77111,39000,HR,UK,2026-01-25
+Vodafone,telecom and mobile PO 77188,33000,IT,UK,2026-01-06
+Orange,wan circuits no PO temporary bandwidth,18000,IT,FR,2026-01-30
+DHL,logistics and freight PO 77203,42000,Supply Chain,DE,2026-01-15
+Maersk,ocean freight no PO surcharge adjustment,37000,Supply Chain,NL,2026-01-28
+AXA,insurance premium PO 77095,41000,Legal,FR,2026-01-31
+Adyen,payment processing no PO transaction fees,32000,Finance,NL,2026-02-04
+ServiceNow,itsm licenses PO 77250,28000,IT,UK,2026-02-07
+Infosys,application maintenance no PO incident recovery,49000,IT,DE,2026-02-09

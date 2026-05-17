@@ -1,0 +1,11 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "claims_processing", "category_name": "Claims Processing & Settlement", "gl_prefix": "CLM"},
+    {"category_id": "actuarial_services", "category_name": "Actuarial & Risk Modelling", "gl_prefix": "ACT"},
+    {"category_id": "distribution_agency", "category_name": "Agency Network & Distribution", "gl_prefix": "DST"},
+    {"category_id": "reinsurance_costs", "category_name": "Reinsurance Premium & Costs", "gl_prefix": "REI"},
+    {"category_id": "irdai_compliance", "category_name": "IRDAI Compliance & Reporting", "gl_prefix": "IRD"}
+  ],
+  "overrides": []
+}

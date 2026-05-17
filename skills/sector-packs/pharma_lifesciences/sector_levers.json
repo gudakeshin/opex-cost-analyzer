@@ -1,0 +1,358 @@
+{
+  "pack_id": "pharma_lifesciences",
+  "sector": "Pharmaceuticals & Life Sciences",
+  "version": "1.0",
+  "applicable_entity_types": [
+    "pharmaceutical",
+    "biotech",
+    "medtech",
+    "cro",
+    "generics",
+    "formulations"
+  ],
+  "industry_signals": [
+    "rnd_gt_8pct_revenue",
+    "plant_maintenance_gt_3pct",
+    "regulatory_keywords_high"
+  ],
+  "universal_levers": [
+    "contract_renegotiation",
+    "process_standardization",
+    "demand_management",
+    "supplier_consolidation",
+    "automation",
+    "payment_terms",
+    "maverick_compliance",
+    "outsourcing",
+    "internal_best_practice",
+    "tail_spend_automation",
+    "should_cost_modeling",
+    "zero_based_rebaseline",
+    "shared_services_consolidation",
+    "geographic_arbitrage",
+    "rebate_pricing_recovery",
+    "benefits_cost_optimization",
+    "contingent_workforce_optimization",
+    "consulting_spend_governance",
+    "legal_spend_optimization",
+    "ld_rationalization",
+    "space_utilization_optimization",
+    "lease_restructuring",
+    "cost_governance"
+  ],
+  "sector_specific_levers": [
+    {
+      "lever_id": "clinical_trial_efficiency",
+      "lever_name": "Clinical Trial Efficiency & CRO Optimisation",
+      "lever_family": "demand",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 20,
+        "p90": 28
+      },
+      "cta_rate": 0.1,
+      "phasing_curve": [
+        0.1,
+        0.4,
+        0.5
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.75,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Protocol complexity and amendment frequency reviewed",
+        "Site selection model updated for enrolment velocity",
+        "CRO performance-based contract negotiated (milestone / enrolment basis)"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.6,
+      "implementation_weeks": {
+        "p10": 24,
+        "p50": 52,
+        "p90": 80
+      },
+      "applicable_if": [
+        "category:RND > 5% revenue",
+        "cro_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "manufacturing_cogs",
+      "lever_name": "Pharma Manufacturing COGS Reduction",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 15,
+        "p90": 22
+      },
+      "cta_rate": 0.09,
+      "phasing_curve": [
+        0.1,
+        0.4,
+        0.5
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.8,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "API and excipient should-cost models completed",
+        "Alternate source qualification (ASQ) approved by QA",
+        "Batch size / yield optimisation validated by manufacturing"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.62,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 44,
+        "p90": 72
+      },
+      "applicable_if": [
+        "category:PLANT_MAINTENANCE or PACKAGING present",
+        "manufacturing_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "sales_force_sizing",
+      "lever_name": "Sales Force Sizing & Territory Optimisation",
+      "lever_family": "structure",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 13,
+        "p90": 18
+      },
+      "cta_rate": 0.08,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Physician call frequency analysis and prescriber segmentation completed",
+        "Territory redesign approved by commercial leadership",
+        "HR / severance plan for displaced reps prepared"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.62,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 32,
+        "p90": 52
+      },
+      "applicable_if": [
+        "category:HR or PROF_SVCS > 2% revenue",
+        "headcount > 100"
+      ]
+    },
+    {
+      "lever_id": "digital_rep_model",
+      "lever_name": "Digital Medical Rep / e-Detailing Model",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 20,
+        "p90": 28
+      },
+      "cta_rate": 0.09,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.75,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Physician digital engagement platform selected and piloted",
+        "Medical affairs approval for e-promotion content",
+        "Sales force training on digital engagement completed"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.6,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 36,
+        "p90": 56
+      },
+      "applicable_if": [
+        "category:MARKETING or HR present",
+        "headcount > 100"
+      ]
+    },
+    {
+      "lever_id": "market_access_rebate_mgmt",
+      "lever_name": "Market Access & Gross-to-Net Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 14
+      },
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Payer mix and rebate liability analysis completed per tender/formulary",
+        "Contract management system updated with all rebate obligations",
+        "Value-based evidence package developed for key formulary negotiations"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.62,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 36,
+        "p90": 56
+      },
+      "applicable_if": [
+        "annual_revenue > 100M",
+        "pharma_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "tech_platform_consolidation",
+      "lever_name": "IT Platform Consolidation (ERP / CRM / CTMS)",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 20,
+        "p90": 28
+      },
+      "cta_rate": 0.12,
+      "phasing_curve": [
+        0.1,
+        0.35,
+        0.55
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.85,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Application landscape review and redundancy map completed",
+        "Data migration and validation plan approved by IT and compliance",
+        "GxP validation completed for decommissioned systems"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.58,
+      "implementation_weeks": {
+        "p10": 24,
+        "p50": 52,
+        "p90": 84
+      },
+      "applicable_if": [
+        "category:IT > 4% revenue"
+      ]
+    },
+    {
+      "lever_id": "expiry_risk_reduction",
+      "lever_name": "Inventory Expiry & Write-Off Reduction",
+      "lever_family": "demand",
+      "savings_range_pct": {
+        "p10": 3,
+        "p50": 6,
+        "p90": 10
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Expiry monitoring system deployed (real-time shelf-life tracking)",
+        "Demand-driven production scheduling implemented (MTO for slow movers)",
+        "Returns management and donations policy updated"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 36
+      },
+      "applicable_if": [
+        "category:PACKAGING or PLANT_MAINTENANCE present"
+      ]
+    },
+    {
+      "lever_id": "regulatory_submission_efficiency",
+      "lever_name": "Regulatory Affairs Efficiency",
+      "lever_family": "process",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 15,
+        "p90": 22
+      },
+      "cta_rate": 0.07,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Common technical document (CTD) templates standardised",
+        "Regulatory information management system (RIMS) deployed",
+        "Rolling submission strategy agreed with regulatory bodies where applicable"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 28,
+        "p90": 48
+      },
+      "applicable_if": [
+        "category:PROF_SVCS or RND present",
+        "regulatory_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "pharmacovigilance_automation",
+      "lever_name": "Pharmacovigilance (PV) Process Automation",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 15,
+        "p50": 24,
+        "p90": 32
+      },
+      "cta_rate": 0.1,
+      "phasing_curve": [
+        0.1,
+        0.4,
+        0.5
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.88,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Adverse event case processing volume benchmarked (> 5,000 cases/year for viability)",
+        "AI-assisted intake and triage tool validated for regulatory compliance",
+        "Regulatory authority acceptance confirmed for AI-aided ICSR processing"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.6,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 42,
+        "p90": 68
+      },
+      "applicable_if": [
+        "category:PROF_SVCS or OUTSOURCED present",
+        "pharma_keywords detected"
+      ]
+    }
+  ]
+}

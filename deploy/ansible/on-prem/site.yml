@@ -1,0 +1,29 @@
+---
+# OpEx Intelligence Platform — On-Premises Deployment
+# Targets: Ubuntu 22.04 LTS / RHEL 9 hosts in client data centre.
+# Run: ansible-playbook -i inventory.ini site.yml --ask-vault-pass
+
+- name: OpEx Intelligence Platform — on-prem deployment
+  hosts: opex_servers
+  become: true
+  vars_files:
+    - vars/secrets.yml   # ansible-vault encrypted: api_keys, db_pass, etc.
+    - vars/config.yml
+
+  roles:
+    - role: opex_app
+      tags: [app, deploy]
+
+  post_tasks:
+    - name: Verify API health
+      uri:
+        url: "http://localhost:{{ opex_port }}/health"
+        return_content: yes
+        status_code: 200
+      retries: 5
+      delay: 5
+      register: health_check
+
+    - name: Print health status
+      debug:
+        msg: "OpEx API healthy: {{ health_check.json }}"

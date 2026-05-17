@@ -1,0 +1,53 @@
+{
+  "version": "1.0",
+  "description": "Per-skill LLM capability levels for each operating mode (M1/M2/M3).",
+  "modes": {
+    "M1": {
+      "label": "Deterministic-only",
+      "llm_available": false,
+      "description": "No LLM calls. All skills run on deterministic algorithms. Narrative synthesis and peer disclosure mining are unavailable."
+    },
+    "M2": {
+      "label": "Regional Managed LLM",
+      "llm_available": true,
+      "description": "Anthropic Claude via Bedrock-Mumbai / Azure-India / Anthropic-India. Zero-retention API endpoints required."
+    },
+    "M3": {
+      "label": "On-prem LLM (Ollama)",
+      "llm_available": true,
+      "description": "Local Llama 3 / Mistral via Ollama. Data never leaves the client VPC. Quality is lower than M2 for complex reasoning tasks."
+    }
+  },
+  "capability_levels": {
+    "full": "Skill output is unaffected by LLM quality — deterministic algorithms cover 100% of signal.",
+    "partial": "LLM contributes narrative or classification; deterministic fallback covers >60% of signal.",
+    "degraded": "LLM is the primary signal source; deterministic fallback returns skeletal output with degradation banner."
+  },
+  "skills": {
+    "spend-profiler":            { "M1": "full",     "M2": "full",     "M3": "full" },
+    "peer-benchmarker":          { "M1": "full",     "M2": "full",     "M3": "full" },
+    "internal-benchmarker":      { "M1": "full",     "M2": "full",     "M3": "full" },
+    "payment-terms-optimizer":   { "M1": "full",     "M2": "full",     "M3": "full" },
+    "bva-analyzer":              { "M1": "full",     "M2": "full",     "M3": "full" },
+    "temporal-analyzer":         { "M1": "full",     "M2": "full",     "M3": "full" },
+    "heuristic-analyzer":        { "M1": "full",     "M2": "full",     "M3": "full" },
+    "root-cause-analyzer":       { "M1": "full",     "M2": "full",     "M3": "full" },
+    "savings-modeler":           { "M1": "full",     "M2": "full",     "M3": "full" },
+    "value-bridge-calculator":   { "M1": "full",     "M2": "full",     "M3": "full" },
+    "data-validator":            { "M1": "full",     "M2": "full",     "M3": "full" },
+    "indian-tax-optimizer":      { "M1": "full",     "M2": "full",     "M3": "full" },
+    "pii-stripper":              { "M1": "full",     "M2": "full",     "M3": "full" },
+    "data-classifier":           { "M1": "full",     "M2": "full",     "M3": "full" },
+    "chart-builder":             { "M1": "full",     "M2": "full",     "M3": "full" },
+    "llm-context-builder":       { "M1": "full",     "M2": "full",     "M3": "full" },
+    "document-contextualizer":   { "M1": "partial",  "M2": "full",     "M3": "partial" },
+    "business-case-builder":     { "M1": "partial",  "M2": "full",     "M3": "partial" },
+    "analysis-synthesizer":      { "M1": "degraded", "M2": "full",     "M3": "partial" },
+    "executive-communication":   { "M1": "degraded", "M2": "full",     "M3": "partial" },
+    "peer-disclosure-miner":     { "M1": "degraded", "M2": "full",     "M3": "partial" },
+    "brsr-cobenefit-calculator": { "M1": "full",     "M2": "full",     "M3": "full" },
+    "assumption-register":       { "M1": "full",     "M2": "full",     "M3": "full" },
+    "scenario-modeler":          { "M1": "full",     "M2": "full",     "M3": "full" },
+    "value-to-shareholder-bridge": { "M1": "full",  "M2": "full",     "M3": "full" }
+  }
+}

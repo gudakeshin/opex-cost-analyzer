@@ -1,0 +1,15 @@
+pack_id: psu_cpse
+sector: Public Sector Undertakings & CPSEs (India)
+version: "0.1"
+schema_version: "1"
+status: scaffold
+description: Scaffold for Central and State PSUs / CPSEs. Covers DPE guidelines, CAG audit, and DIPAM performance metrics. Full content deferred.
+applicable_entity_types: [cpse_navratna, cpse_maharatna, cpse_miniratna, state_psu]
+regulatory_bodies: [DPE, CAG, DIPAM, sectoral_ministry, CVC]
+fiscal_year_end: "March 31"
+reporting_currency: INR
+default_wacc_pct: 11.0
+default_tax_rate_pct: 25.17
+created_at: "2026-05-01"
+effective_from: "2026-05-01"
+maintained_by: opex_platform_core

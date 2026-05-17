@@ -1,0 +1,19 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "npa_provisioning_cost", "category_name": "NPA Provisioning & Write-offs", "gl_prefix": "NPA", "cost_nature": "regulatory"},
+    {"category_id": "cre_credit_risk_infra", "category_name": "Credit Risk Infrastructure", "gl_prefix": "CRI", "cost_nature": "compliance"},
+    {"category_id": "core_banking_platform", "category_name": "Core Banking System & CBS Licensing", "gl_prefix": "CBS", "cost_nature": "technology"},
+    {"category_id": "rbi_audit_compliance", "category_name": "RBI Audit & Regulatory Compliance", "gl_prefix": "RAC", "cost_nature": "regulatory"},
+    {"category_id": "kyc_aml_ops", "category_name": "KYC / AML Operations", "gl_prefix": "KYC", "cost_nature": "compliance"},
+    {"category_id": "treasury_ops", "category_name": "Treasury & ALM Operations", "gl_prefix": "TRY", "cost_nature": "operations"},
+    {"category_id": "branch_network_ops", "category_name": "Branch Network & Last-Mile Operations", "gl_prefix": "BRN", "cost_nature": "distribution"},
+    {"category_id": "digital_banking_infra", "category_name": "Digital Banking & Mobile Platform", "gl_prefix": "DIG", "cost_nature": "technology"},
+    {"category_id": "atm_cash_mgmt", "category_name": "ATM Network & Cash Management", "gl_prefix": "ATM", "cost_nature": "operations"},
+    {"category_id": "loan_processing_ops", "category_name": "Loan Processing & Collections", "gl_prefix": "LPO", "cost_nature": "operations"}
+  ],
+  "overrides": [
+    {"category_id": "it_software", "category_name": "IT Software & Fintech Licensing", "brsr_principle": "P6"},
+    {"category_id": "professional_services", "category_name": "Advisory, Legal & Rating Fees"}
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "version": "1.0",
+  "description": "GST treatment rules, RCM categories, inverted-duty sectors, and TDS rates for Indian enterprise spend analysis",
+  "gst_rate_bands": [0, 5, 12, 18, 28],
+
+  "itc_ineligible_categories": [
+    {
+      "category": "Motor vehicles (personal use)",
+      "section": "Section 17(5)(a)",
+      "note": "ITC blocked on cars and personal-use vehicles; allowed for goods transport, passenger transport businesses"
+    },
+    {
+      "category": "Food and beverages",
+      "section": "Section 17(5)(b)(i)",
+      "note": "Canteen, corporate cafeteria spend; ITC blocked unless in specified hospitality business"
+    },
+    {
+      "category": "Club membership",
+      "section": "Section 17(5)(b)(ii)",
+      "note": "Corporate club memberships are ITC-blocked"
+    },
+    {
+      "category": "Works contract for immovable property",
+      "section": "Section 17(5)(c)",
+      "note": "Construction or renovation of immovable property; ITC blocked"
+    },
+    {
+      "category": "Employee benefits (non-statutory)",
+      "section": "Section 17(5)(b)",
+      "note": "Free perquisites to employees; ITC blocked unless obligatory under law"
+    },
+    {
+      "category": "Health and life insurance (non-statutory)",
+      "section": "Section 17(5)",
+      "note": "Insurance on lives of employees (non-statutory); ITC generally blocked"
+    }
+  ],
+
+  "rcm_categories": [
+    {
+      "service": "Goods Transport Agency (GTA)",
+      "gst_rate_pct": 5,
+      "note": "Receiver of GTA service liable to pay GST under RCM; ITC available if transport used for business"
+    },
+    {
+      "service": "Legal services from individual advocate",
+      "gst_rate_pct": 18,
+      "note": "Business entity receiving legal services from individual advocate pays GST under RCM"
+    },
+    {
+      "service": "Director services (non-employee)",
+      "gst_rate_pct": 18,
+      "note": "Fees paid to directors who are not employees attract RCM"
+    },
+    {
+      "service": "Security personnel from unregistered supplier",
+      "gst_rate_pct": 18,
+      "note": "Man-power supply for security from unregistered vendors falls under RCM"
+    },
+    {
+      "service": "Renting of motor vehicle",
+      "gst_rate_pct": 5,
+      "note": "Cab or vehicle hire from non-corporate suppliers; RCM applicable"
+    },
+    {
+      "service": "Import of services",
+      "gst_rate_pct": 18,
+      "note": "IGST on import of services under RCM; relevant for cross-border software subscriptions, consulting"
+    },
+    {
+      "service": "Sponsorship services",
+      "gst_rate_pct": 18,
+      "note": "Services by way of sponsorship to any body corporate or partnership firm"
+    }
+  ],
+
+  "inverted_duty_sectors": [
+    "Textiles and garments",
+    "Fertilizers",
+    "Footwear (below ₹1000 MRP)",
+    "Mobile handsets",
+    "Solar panels and photovoltaic modules",
+    "Railway wagons"
+  ],
+
+  "tds_rates": {
+    "professional_services_194J": 10.0,
+    "contractor_194C_individual": 1.0,
+    "contractor_194C_company": 2.0,
+    "rent_194I_plant_machinery": 2.0,
+    "rent_194I_land_building": 10.0,
+    "commission_194H": 5.0,
+    "interest_194A": 10.0,
+    "royalty_194J": 10.0
+  },
+
+  "section_115BAA": {
+    "concessional_rate_pct": 22.0,
+    "surcharge_pct": 10.0,
+    "effective_rate_pct": 25.17,
+    "note": "Optional concessional tax regime; company forfeits certain deductions. Adjust after-tax NPV when client is on 115BAA."
+  },
+
+  "itc_eligible_keywords": [
+    "software", "saas", "cloud", "aws", "azure", "gcp", "consulting", "professional services",
+    "advertising", "marketing", "freight", "logistics", "courier", "raw material",
+    "capital goods", "plant", "machinery", "equipment", "telecom", "internet"
+  ],
+
+  "itc_ineligible_keywords": [
+    "canteen", "food", "beverages", "club", "membership", "accommodation personal",
+    "motor vehicle", "car hire personal", "construction", "renovation", "life insurance",
+    "health insurance personal"
+  ],
+
+  "rcm_keywords": [
+    "transport", "gta", "goods transport", "legal", "advocate", "lawyer",
+    "director fee", "security guard", "cab", "vehicle hire", "sponsorship",
+    "import of services", "cross-border", "offshore subscription"
+  ]
+}

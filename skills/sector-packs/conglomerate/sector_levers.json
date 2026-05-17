@@ -1,0 +1,325 @@
+{
+  "pack_id": "conglomerate",
+  "sector": "Diversified Conglomerate",
+  "version": "1.0",
+  "applicable_entity_types": [
+    "diversified_conglomerate",
+    "holding_company",
+    "family_business_group",
+    "multi_sector_corporate"
+  ],
+  "industry_signals": [
+    "multi_bu_structure",
+    "related_party_flag_high",
+    "high_corporate_overhead"
+  ],
+  "universal_levers": [
+    "contract_renegotiation",
+    "process_standardization",
+    "demand_management",
+    "supplier_consolidation",
+    "automation",
+    "payment_terms",
+    "maverick_compliance",
+    "outsourcing",
+    "internal_best_practice",
+    "tail_spend_automation",
+    "should_cost_modeling",
+    "zero_based_rebaseline",
+    "rebate_pricing_recovery",
+    "specification_optimization",
+    "geographic_arbitrage",
+    "benefits_cost_optimization",
+    "contingent_workforce_optimization",
+    "consulting_spend_governance",
+    "legal_spend_optimization",
+    "ld_rationalization",
+    "space_utilization_optimization",
+    "lease_restructuring",
+    "cost_governance",
+    "bank_fee_optimization",
+    "p2p_o2c_automation"
+  ],
+  "sector_specific_levers": [
+    {
+      "lever_id": "shared_services_center",
+      "lever_name": "Group Shared Services Centre (Finance / HR / IT / Procurement)",
+      "lever_family": "structure",
+      "savings_range_pct": {
+        "p10": 25,
+        "p50": 38,
+        "p90": 52
+      },
+      "cta_rate": 0.13,
+      "phasing_curve": [
+        0.05,
+        0.35,
+        0.6
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.9,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Group-level SSC mandate approved by Group CEO / Board",
+        "Service charter, SLA framework and chargeback model agreed with all BUs",
+        "HR / IR clearance for role transitions and union consultation completed"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.55,
+      "implementation_weeks": {
+        "p10": 36,
+        "p50": 60,
+        "p90": 96
+      },
+      "applicable_if": [
+        "headcount > 500",
+        "multi_bu_structure detected"
+      ]
+    },
+    {
+      "lever_id": "group_procurement",
+      "lever_name": "Group Procurement Aggregation & Preferred Supplier Panels",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5,
+        "p50": 10,
+        "p90": 17
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.75,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Spend aggregation across BUs completed for common categories (IT, travel, MRO, facilities)",
+        "Group preferred supplier panel approved with volume rebate structure",
+        "BU compliance to preferred supplier mandated via policy (with derogation process)"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 26,
+        "p90": 44
+      },
+      "applicable_if": [
+        "multi_bu_structure detected",
+        "supplier_count > 30"
+      ]
+    },
+    {
+      "lever_id": "corporate_overhead_right_size",
+      "lever_name": "Corporate Centre Right-Sizing (Lean HQ Model)",
+      "lever_family": "structure",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 22,
+        "p90": 32
+      },
+      "cta_rate": 0.09,
+      "phasing_curve": [
+        0.25,
+        0.45,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.75,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Span-and-layer analysis completed for corporate centre",
+        "Role redesign and delayering plan approved by CHRO and Group CEO",
+        "Remaining corporate roles clearly delineated from BU roles to prevent drift"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.62,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 32,
+        "p90": 52
+      },
+      "applicable_if": [
+        "annual_revenue > 500M",
+        "multi_bu_structure detected"
+      ]
+    },
+    {
+      "lever_id": "portfolio_rationalization",
+      "lever_name": "Portfolio Rationalisation (Non-Core Divestiture)",
+      "lever_family": "structure",
+      "savings_range_pct": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 34
+      },
+      "cta_rate": 0.08,
+      "phasing_curve": [
+        0.15,
+        0.5,
+        0.35
+      ],
+      "savings_type": "mixed",
+      "sustainability_score": 0.88,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Portfolio strategy review completed (core / adjacent / non-core classification)",
+        "Non-core business units identified with divestiture rationale approved by Board",
+        "Investment banker / M&A adviser engaged for carve-out or sale process"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.55,
+      "implementation_weeks": {
+        "p10": 24,
+        "p50": 60,
+        "p90": 104
+      },
+      "applicable_if": [
+        "multi_bu_structure detected",
+        "annual_revenue > 1000M"
+      ]
+    },
+    {
+      "lever_id": "group_insurance_pooling",
+      "lever_name": "Group Insurance Pooling & Captive Programme",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 15,
+        "p90": 22
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.8,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Group insurance inventory completed across all BUs and geographies",
+        "Risk aggregation analysis confirming captive viability (premium > ₹50 Cr typical)",
+        "Insurance broker with group programme expertise engaged"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 38
+      },
+      "applicable_if": [
+        "category:INSURANCE present",
+        "multi_bu_structure detected"
+      ]
+    },
+    {
+      "lever_id": "intercompany_pricing_optimization",
+      "lever_name": "Intercompany Transfer Pricing & Shared Cost Optimisation",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 1,
+        "p50": 3,
+        "p90": 6
+      },
+      "cta_rate": 0.04,
+      "phasing_curve": [
+        0.4,
+        0.4,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Transfer pricing documentation updated and benchmarked to arm's-length standards",
+        "Shared cost allocation methodology reviewed and aligned with OECD / Indian TP rules",
+        "Tax adviser sign-off on revised intercompany pricing structure obtained"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 38
+      },
+      "applicable_if": [
+        "related_party_flag_high",
+        "multi_bu_structure detected"
+      ]
+    },
+    {
+      "lever_id": "real_estate_portfolio_mgmt",
+      "lever_name": "Group Real Estate Portfolio Rationalisation",
+      "lever_family": "structure",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 22,
+        "p90": 32
+      },
+      "cta_rate": 0.07,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.85,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Group RE inventory mapped with utilisation, lease terms and market value",
+        "Sale-leaseback opportunities identified and appraised",
+        "Hybrid / remote work policy formalised to validate consolidation quantum"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 14,
+        "p50": 32,
+        "p90": 56
+      },
+      "applicable_if": [
+        "category:FACILITIES > 3% revenue",
+        "multi_bu_structure detected"
+      ]
+    },
+    {
+      "lever_id": "group_treasury_netting",
+      "lever_name": "Group Treasury Cash Pooling & Netting",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 0.8,
+        "p50": 2,
+        "p90": 4
+      },
+      "cta_rate": 0.03,
+      "phasing_curve": [
+        0.5,
+        0.35,
+        0.15
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.85,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Legal and regulatory feasibility of cash pooling confirmed per entity jurisdiction",
+        "In-house bank structure designed and approved by board",
+        "ERP / treasury management system configured for netting transactions"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 20,
+        "p90": 36
+      },
+      "applicable_if": [
+        "category:FIN_SVCS or BANKING_TREASURY present",
+        "multi_bu_structure detected"
+      ]
+    }
+  ]
+}

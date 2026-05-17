@@ -1,0 +1,31 @@
+supplier,description,amount,business unit,country,date
+Amazon Web Services,cloud hosting PO 45012 core platform,215000,Engineering,US,2026-01-05
+Microsoft,enterprise E5 license renewal PO 45031,182000,Engineering,US,2026-01-09
+Google Workspace,workspace license expansion no PO emergency seats,47000,Engineering,US,2026-01-12
+Snowflake,data warehouse compute overage no PO,86000,Data,US,2026-01-14
+Datadog,observability subscription no PO add-on modules,34000,Engineering,US,2026-01-16
+Okta,identity platform annual subscription PO 45102,29000,IT,US,2026-01-18
+Zoom,video conferencing annual true-up no PO,18000,IT,US,2026-01-21
+Deloitte,finance transformation consulting PO 44980,164000,Finance,US,2026-01-08
+McKinsey,strategy and operating model advisory no PO extension,132000,Finance,US,2026-01-20
+KPMG,internal audit and SOX support PO 45078,76000,Finance,US,2026-01-24
+Latham Watkins,legal counsel retainer no PO matter-based,58000,Legal,US,2026-01-26
+CBRE,office lease and maintenance PO 44811,124000,Facilities,US,2026-01-07
+JLL,facilities repairs and HVAC no PO urgent ticket,39000,Facilities,US,2026-01-19
+ConEdison,utilities electric and gas PO 45055,51000,Facilities,US,2026-01-29
+Hilton,business travel lodging no PO conference week,27000,Sales,US,2026-01-11
+American Airlines,flight bookings no PO sales kickoff,33000,Sales,US,2026-01-13
+Uber,ground transport no PO field visits,11000,Sales,US,2026-01-17
+Google Ads,digital ads campaign PO 45144,98000,Marketing,US,2026-01-10
+Meta Platforms,social media advertising no PO performance burst,72000,Marketing,US,2026-01-23
+HubSpot,marketing automation platform PO 45110,36000,Marketing,US,2026-01-27
+LinkedIn,recruitment and employer branding no PO,41000,HR,US,2026-01-22
+Workday,hr platform annual subscription PO 45020,68000,HR,US,2026-01-25
+AT&T,mobile and data circuits PO 45096,43000,IT,US,2026-01-06
+Verizon,backup network services no PO add circuit,21000,IT,US,2026-01-30
+FedEx,freight and courier PO 45108,59000,Supply Chain,US,2026-01-15
+UPS,parcel distribution no PO peak surcharge,47000,Supply Chain,US,2026-01-28
+Zurich,insurance premium renewal PO 44970,64000,Legal,US,2026-01-31
+Stripe,payment processing fees no PO variable volume,53000,Finance,US,2026-02-03
+ServiceNow,it service management license PO 45166,45000,IT,US,2026-02-06
+Accenture,managed services no PO backlog support,89000,IT,US,2026-02-08

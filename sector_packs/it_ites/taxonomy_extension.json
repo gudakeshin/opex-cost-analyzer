@@ -1,0 +1,14 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "offshore_delivery_infra", "category_name": "Offshore Delivery Centre & Infrastructure", "gl_prefix": "ODC"},
+    {"category_id": "subcontracting_associates", "category_name": "Subcontracting & Associate Costs", "gl_prefix": "SUB"},
+    {"category_id": "visa_immigration", "category_name": "Visa, Immigration & Expat Costs", "gl_prefix": "VIS"},
+    {"category_id": "stpi_see_compliance", "category_name": "STPI / SEZ Compliance Costs", "gl_prefix": "SEZ"},
+    {"category_id": "cloud_saas_infra", "category_name": "Cloud Infrastructure & SaaS Tools", "gl_prefix": "CLD"}
+  ],
+  "overrides": [
+    {"category_id": "hr", "category_name": "Employee Costs (incl. offshore bench)"},
+    {"category_id": "travel", "category_name": "Travel, Visa & Client Engagement"}
+  ]
+}

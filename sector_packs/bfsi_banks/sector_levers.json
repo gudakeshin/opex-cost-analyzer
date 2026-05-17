@@ -1,0 +1,65 @@
+{
+  "sector": "bfsi_banks",
+  "levers": [
+    {
+      "lever_id": "branch_rationalisation",
+      "lever_name": "Branch Network Rationalisation",
+      "description": "Consolidate sub-optimal branches; migrate footfall to digital + BC network.",
+      "category_ids": ["branch_network_ops", "facilities"],
+      "p10_pct": 3.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "implementation_weeks": 26,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate"
+    },
+    {
+      "lever_id": "kyc_aml_automation",
+      "lever_name": "KYC/AML Process Automation (RPA + AI)",
+      "description": "Automate customer due-diligence and transaction monitoring using RPA + ML models.",
+      "category_ids": ["kyc_aml_ops", "professional_services"],
+      "p10_pct": 12.0, "p50_pct": 22.0, "p90_pct": 35.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate"
+    },
+    {
+      "lever_id": "core_banking_consolidation",
+      "lever_name": "Core Banking Platform Consolidation",
+      "description": "Eliminate legacy CBS instances; migrate to single-instance cloud CBS.",
+      "category_ids": ["core_banking_platform", "it_software"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "implementation_weeks": 52,
+      "brsr_principle": "P6",
+      "savings_type": "mixed"
+    },
+    {
+      "lever_id": "vendor_renegotiation_fintech",
+      "lever_name": "Fintech & Software Vendor Renegotiation",
+      "description": "Consolidate overlapping fintech contracts; renegotiate multi-year terms.",
+      "category_ids": ["it_software", "digital_banking_infra"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 18.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate"
+    },
+    {
+      "lever_id": "atm_managed_services",
+      "lever_name": "ATM Managed Services Outsourcing",
+      "description": "Shift ATM ops to managed-service model; eliminate in-house cash replenishment.",
+      "category_ids": ["atm_cash_mgmt"],
+      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate"
+    },
+    {
+      "lever_id": "regulatory_reporting_automation",
+      "lever_name": "Regulatory Reporting Automation",
+      "description": "Automate RBI/SEBI statutory returns; reduce manual effort in compliance teams.",
+      "category_ids": ["rbi_audit_compliance"],
+      "p10_pct": 15.0, "p50_pct": 25.0, "p90_pct": 40.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate"
+    }
+  ]
+}

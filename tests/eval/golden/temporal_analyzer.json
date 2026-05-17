@@ -1,0 +1,37 @@
+{
+  "description": "Temporal analyzer: 4 consecutive months, fiscal_period set — monotonically increasing spend",
+  "skill": "temporal-analyzer",
+  "input_lines": [
+    {
+      "row_id": 201, "supplier": "SaaS Co", "description": "Subscription Oct",
+      "category_id": "software", "category_name": "Software",
+      "amount": 50000.0, "spend_date": "2024-10-15", "fiscal_period": "2024-10",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 50000.0
+    },
+    {
+      "row_id": 202, "supplier": "SaaS Co", "description": "Subscription Nov",
+      "category_id": "software", "category_name": "Software",
+      "amount": 60000.0, "spend_date": "2024-11-15", "fiscal_period": "2024-11",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 60000.0
+    },
+    {
+      "row_id": 203, "supplier": "SaaS Co", "description": "Subscription Dec",
+      "category_id": "software", "category_name": "Software",
+      "amount": 70000.0, "spend_date": "2024-12-15", "fiscal_period": "2024-12",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 70000.0
+    },
+    {
+      "row_id": 204, "supplier": "SaaS Co", "description": "Subscription Jan",
+      "category_id": "software", "category_name": "Software",
+      "amount": 85000.0, "spend_date": "2025-01-15", "fiscal_period": "2025-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 85000.0
+    }
+  ],
+  "extra_kwargs": {},
+  "assertions": {
+    "required_keys": ["temporal_available", "period_count", "category_trends"],
+    "temporal_available": true,
+    "min_period_count": 4,
+    "min_category_trends": 1
+  }
+}

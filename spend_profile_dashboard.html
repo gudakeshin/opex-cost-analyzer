@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Spend Profile — CFO Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --bg-primary: #f0f2f5;
+            --bg-card: #ffffff;
+            --bg-header: #0f1f3d;
+            --bg-subheader: #1a3560;
+            --text-primary: #1a1a2e;
+            --text-secondary: #64748b;
+            --text-on-dark: #ffffff;
+            --color-1: #2563eb;
+            --color-2: #f59e0b;
+            --color-3: #10b981;
+            --color-4: #ef4444;
+            --color-5: #8b5cf6;
+            --color-6: #06b6d4;
+            --color-7: #f97316;
+            --color-8: #84cc16;
+            --color-9: #ec4899;
+            --color-10: #6366f1;
+            --positive: #10b981;
+            --negative: #ef4444;
+            --warning: #f59e0b;
+            --gap: 16px;
+            --radius: 10px;
+            --shadow: 0 1px 4px rgba(0,0,0,0.08), 0 2px 12px rgba(0,0,0,0.04);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .dashboard-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: var(--gap);
+        }
+
+        /* ── HEADER ── */
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--bg-header) 0%, var(--bg-subheader) 100%);
+            color: var(--text-on-dark);
+            padding: 22px 28px;
+            border-radius: var(--radius);
+            margin-bottom: var(--gap);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-left h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 4px;
+        }
+
+        .header-left .subtitle {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-group label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-group select {
+            padding: 6px 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.1);
+            color: var(--text-on-dark);
+            font-size: 12px;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .filter-group select:hover { border-color: rgba(255,255,255,0.4); }
+        .filter-group select option { background: #1a3560; color: white; }
+
+        /* ── KPI ROW ── */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: var(--gap);
+            margin-bottom: var(--gap);
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card.blue  { border-left-color: var(--color-1); }
+        .kpi-card.amber { border-left-color: var(--color-2); }
+        .kpi-card.green { border-left-color: var(--color-3); }
+        .kpi-card.red   { border-left-color: var(--color-4); }
+        .kpi-card.purple{ border-left-color: var(--color-5); }
+
+        .kpi-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .kpi-value {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .kpi-change {
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .kpi-change.positive { color: var(--positive); }
+        .kpi-change.negative { color: var(--negative); }
+        .kpi-change.neutral  { color: var(--text-secondary); }
+
+        /* ── CHART ROWS ── */
+        .chart-row {
+            display: grid;
+            gap: var(--gap);
+            margin-bottom: var(--gap);
+        }
+
+        .chart-row.two-col   { grid-template-columns: 1fr 1fr; }
+        .chart-row.three-col { grid-template-columns: 1fr 1fr 1fr; }
+        .chart-row.wide-narrow { grid-template-columns: 2fr 1fr; }
+        .chart-row.narrow-wide { grid-template-columns: 1fr 2fr; }
+
+        .chart-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-card h3 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .chart-card .chart-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .chart-card canvas {
+            max-height: 260px;
+        }
+
+        /* Variance table inside chart card */
+        .variance-mini-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        .variance-mini-table th {
+            text-align: left;
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 4px 6px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .variance-mini-table td {
+            padding: 6px 6px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .variance-mini-table tr:last-child td { border-bottom: none; }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge.over  { background: #fef2f2; color: #dc2626; }
+        .badge.under { background: #f0fdf4; color: #16a34a; }
+        .badge.on    { background: #eff6ff; color: #2563eb; }
+
+        /* ── SUPPLIER TABLE ── */
+        .table-section {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: var(--gap);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .table-header h3 {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table-count {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .table-wrapper { overflow-x: auto; }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table thead th {
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 2px solid #e5e7eb;
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .data-table thead th:hover { color: var(--text-primary); background: #f9fafb; }
+
+        .data-table tbody td {
+            padding: 9px 12px;
+            border-bottom: 1px solid #f3f4f6;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr:hover { background: #f9fafb; }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .tag.green  { background: #f0fdf4; color: #15803d; }
+        .tag.orange { background: #fff7ed; color: #c2410c; }
+        .tag.purple { background: #faf5ff; color: #7c3aed; }
+        .tag.teal   { background: #f0fdfa; color: #0f766e; }
+        .tag.pink   { background: #fdf2f8; color: #be185d; }
+        .tag.gray   { background: #f9fafb; color: #4b5563; }
+
+        .spend-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .spend-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: var(--color-1);
+            min-width: 2px;
+        }
+
+        /* ── FOOTER ── */
+        .dashboard-footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 11px;
+            padding: 12px 0;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1100px) {
+            .kpi-row { grid-template-columns: repeat(3, 1fr); }
+            .chart-row.three-col { grid-template-columns: 1fr 1fr; }
+            .chart-row.wide-narrow { grid-template-columns: 1fr; }
+            .chart-row.narrow-wide { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .kpi-row { grid-template-columns: repeat(2, 1fr); }
+            .chart-row.two-col { grid-template-columns: 1fr; }
+        }
+
+        @media print {
+            body { background: white; }
+            .dashboard-container { max-width: none; padding: 8px; }
+            .filters { display: none; }
+            .chart-card, .kpi-card, .table-section { break-inside: avoid; box-shadow: none; border: 1px solid #e5e7eb; }
+        }
+        /* ── Deloitte brand nav ── */
+        .deloitte-nav {
+            background: #1b1b1b;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .deloitte-wordmark {
+            font-family: 'Calibri', 'Segoe UI', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+        .deloitte-wordmark span { color: #86BC25; }
+        .deloitte-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .deloitte-nav-tag {
+            font-family: 'Calibri', 'Segoe UI', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        .deloitte-back-link {
+            font-family: 'Calibri', 'Segoe UI', sans-serif;
+            font-size: 13px;
+            color: #86BC25;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .deloitte-back-link:hover { color: #9fce49; }
+    </style>
+</head>
+<body>
+<nav class="deloitte-nav" aria-label="Deloitte platform navigation">
+    <span class="deloitte-wordmark">Deloitte<span>.</span></span>
+    <div class="deloitte-nav-right">
+        <span class="deloitte-nav-tag">OpEx Intelligence Platform</span>
+        <a class="deloitte-back-link" href="/ui">&#8592; Back to Platform</a>
+    </div>
+</nav>
+
+<div class="dashboard-container">
+
+    <!-- HEADER -->
+    <header class="dashboard-header">
+        <div class="header-left">
+            <h1>Enterprise Spend Profile</h1>
+            <div class="subtitle">Executive Overview · Data as of March 2025 · All figures in USD</div>
+        </div>
+        <div class="filters">
+            <div class="filter-group">
+                <label>Category</label>
+                <select id="filter-category" onchange="applyFilters()">
+                    <option value="all">All Categories</option>
+                    <option value="IT">IT</option>
+                    <option value="PROFESSIONAL_SERVICES">Professional Services</option>
+                    <option value="FACILITIES">Facilities</option>
+                    <option value="MARKETING">Marketing</option>
+                    <option value="CONTINGENT_WORKFORCE">Contingent Workforce</option>
+                    <option value="HR">HR</option>
+                    <option value="LOGISTICS">Logistics</option>
+                    <option value="TRAVEL">Travel</option>
+                    <option value="TELECOMMUNICATIONS">Telecom</option>
+                    <option value="OFFICE_SUPPLIES">Office Supplies</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Region</label>
+                <select id="filter-region" onchange="applyFilters()">
+                    <option value="all">All Regions</option>
+                    <option value="AMER">Americas</option>
+                    <option value="EMEA">EMEA</option>
+                    <option value="APAC">APAC</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- KPI ROW -->
+    <section class="kpi-row">
+        <div class="kpi-card blue">
+            <div class="kpi-label">Annual Spend (FY2025)</div>
+            <div class="kpi-value" id="kpi-annual">$19.8M</div>
+            <div class="kpi-change neutral" id="kpi-annual-sub">20 suppliers · 10 categories</div>
+        </div>
+        <div class="kpi-card amber">
+            <div class="kpi-label">Jan 2025 Actuals</div>
+            <div class="kpi-value" id="kpi-jan-actual">$1.26M</div>
+            <div class="kpi-change negative" id="kpi-jan-var">▲ +$86K vs budget (+7.3%)</div>
+        </div>
+        <div class="kpi-card green">
+            <div class="kpi-label">MoM Spend Change</div>
+            <div class="kpi-value" id="kpi-mom">+$14.1%</div>
+            <div class="kpi-change positive">▲ Oct 2024 → Jan 2025</div>
+        </div>
+        <div class="kpi-card red">
+            <div class="kpi-label">Largest Budget Overrun</div>
+            <div class="kpi-value">McKinsey</div>
+            <div class="kpi-change negative">+$60K (+40%) over budget</div>
+        </div>
+        <div class="kpi-card purple">
+            <div class="kpi-label">Top Spend Category</div>
+            <div class="kpi-value">IT</div>
+            <div class="kpi-change neutral">31.3% of annual spend</div>
+        </div>
+    </section>
+
+    <!-- ROW 1: Category Donut + Monthly Trend -->
+    <div class="chart-row wide-narrow">
+        <div class="chart-card">
+            <h3>Monthly Spend Trend</h3>
+            <div class="chart-subtitle">Oct 2024 – Mar 2025 · by category (USD)</div>
+            <canvas id="trend-chart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>Spend by Category</h3>
+            <div class="chart-subtitle">FY2025 annualised · % of total</div>
+            <canvas id="category-donut"></canvas>
+        </div>
+    </div>
+
+    <!-- ROW 2: BvA + Top Suppliers -->
+    <div class="chart-row two-col">
+        <div class="chart-card">
+            <h3>Budget vs Actual — Jan 2025</h3>
+            <div class="chart-subtitle">Variance by supplier (USD)</div>
+            <canvas id="bva-chart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>Top 10 Suppliers by Annual Spend</h3>
+            <div class="chart-subtitle">FY2025 annualised (USD)</div>
+            <canvas id="top-suppliers-chart"></canvas>
+        </div>
+    </div>
+
+    <!-- ROW 3: Global Spend + Payment Terms -->
+    <div class="chart-row two-col">
+        <div class="chart-card">
+            <h3>Global Spend by Region</h3>
+            <div class="chart-subtitle">Jan 2025 · local currency converted to USD</div>
+            <canvas id="region-chart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>Payment Terms Distribution</h3>
+            <div class="chart-subtitle">Annual spend by terms bucket (DPO proxy)</div>
+            <canvas id="payterms-chart"></canvas>
+        </div>
+    </div>
+
+    <!-- SUPPLIER DETAIL TABLE -->
+    <div class="table-section">
+        <div class="table-header">
+            <h3>Supplier Spend Detail — FY2025 Annualised</h3>
+            <span class="table-count" id="table-count">Showing 20 suppliers</span>
+        </div>
+        <div class="table-wrapper">
+            <table class="data-table" id="supplier-table">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable('supplier')">Supplier ⇅</th>
+                        <th onclick="sortTable('category')">Category ⇅</th>
+                        <th onclick="sortTable('business_unit')">Business Unit ⇅</th>
+                        <th onclick="sortTable('payment_terms')">Payment Terms ⇅</th>
+                        <th onclick="sortTable('amount')">Annual Spend ⇅</th>
+                        <th>Spend Share</th>
+                    </tr>
+                </thead>
+                <tbody id="supplier-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer class="dashboard-footer">
+        Enterprise Spend Profile · Sources: BvA Actuals vs Budget, Comprehensive FP&A, Multicurrency Global, Payment Terms/DPO, Temporal Multi-Period · Generated March 2025
+    </footer>
+
+</div>
+
+<script>
+/* ════════════════════════════════════════════════
+   DATA LAYER — pre-aggregated from all 5 CSV files
+   ════════════════════════════════════════════════ */
+
+// 1. Monthly trend: Oct 2024 – Mar 2025 (temporal_multiperiod.csv)
+const TREND_DATA = {
+    labels: ['Oct 2024', 'Nov 2024', 'Dec 2024', 'Jan 2025', 'Feb 2025', 'Mar 2025'],
+    byCategory: {
+        'IT':                    [355000, 373000, 405000, 428000, 443000, 462000],
+        'Prof. Services':        [120000, 130000, 200000, 210000,  95000,  45000],
+        'Facilities':            [180000, 180000, 180000, 185000, 185000, 185000],
+        'Marketing':             [110000, 118000, 125000, 132000, 140000, 148000],
+        'Contingent Workforce':  [ 88000,  92000,  98000, 105000, 112000, 118000],
+    }
+};
+
+// 2. Category spend (payment_terms_dpo.csv — annualised)
+const CATEGORY_DATA = [
+    { category: 'IT',                   amount: 6204000 },
+    { category: 'Professional Services', amount: 4380000 },
+    { category: 'Facilities',           amount: 3060000 },
+    { category: 'Marketing',            amount: 2400000 },
+    { category: 'Contingent Workforce', amount: 1176000 },
+    { category: 'HR',                   amount:  720000 },
+    { category: 'Logistics',            amount: 1020000 },
+    { category: 'Travel',               amount:  408000 },
+    { category: 'Telecom',              amount:  360000 },
+    { category: 'Office Supplies',      amount:  120000 },
+];
+
+// 3. Budget vs Actual Jan 2025 (bva_actuals_vs_budget.csv)
+const BVA_DATA = [
+    { supplier: 'AWS',          category: 'IT',           actual: 320000, budget: 280000 },
+    { supplier: 'McKinsey',     category: 'Prof. Services', actual: 210000, budget: 150000 },
+    { supplier: 'CBRE',         category: 'Facilities',   actual: 180000, budget: 180000 },
+    { supplier: 'Azure',        category: 'IT',           actual:  85000, budget:  90000 },
+    { supplier: 'Google Ads',   category: 'Marketing',    actual: 125000, budget: 140000 },
+    { supplier: 'Randstad',     category: 'Cont. Workforce', actual:  98000, budget:  80000 },
+    { supplier: 'Deloitte',     category: 'Prof. Services', actual:  95000, budget: 100000 },
+    { supplier: 'Salesforce',   category: 'IT',           actual:  72000, budget:  70000 },
+    { supplier: 'Sodexo',       category: 'Facilities',   actual:  45000, budget:  48000 },
+    { supplier: 'United Airlines', category: 'Travel',    actual:  34000, budget:  40000 },
+];
+
+// 4. Top suppliers by annual spend (payment_terms_dpo.csv)
+const SUPPLIER_DATA = [
+    { supplier: 'AWS',           category: 'IT',                   business_unit: 'Engineering', payment_terms: 'Net 30', amount: 3840000 },
+    { supplier: 'McKinsey',      category: 'PROFESSIONAL_SERVICES', business_unit: 'Strategy',    payment_terms: 'Net 30', amount: 2520000 },
+    { supplier: 'CBRE',          category: 'FACILITIES',            business_unit: 'Admin',        payment_terms: 'Net 30', amount: 2160000 },
+    { supplier: 'Deloitte',      category: 'PROFESSIONAL_SERVICES', business_unit: 'Finance',      payment_terms: 'Net 30', amount: 1140000 },
+    { supplier: 'WPP',           category: 'MARKETING',             business_unit: 'Marketing',    payment_terms: 'Net 30', amount: 1500000 },
+    { supplier: 'Randstad',      category: 'CONTINGENT_WORKFORCE',  business_unit: 'HR',           payment_terms: 'Net 21', amount: 1176000 },
+    { supplier: 'Microsoft',     category: 'IT',                   business_unit: 'Engineering',  payment_terms: 'Net 30', amount: 1020000 },
+    { supplier: 'Publicis',      category: 'MARKETING',             business_unit: 'Marketing',    payment_terms: 'Net 30', amount:  900000 },
+    { supplier: 'Salesforce',    category: 'IT',                   business_unit: 'Sales',        payment_terms: 'Net 30', amount:  864000 },
+    { supplier: 'EY',            category: 'PROFESSIONAL_SERVICES', business_unit: 'Finance',      payment_terms: 'Net 30', amount:  720000 },
+    { supplier: 'DHL',           category: 'LOGISTICS',             business_unit: 'Operations',   payment_terms: 'Net 30', amount:  720000 },
+    { supplier: 'Sodexo',        category: 'FACILITIES',            business_unit: 'Admin',        payment_terms: 'Net 30', amount:  540000 },
+    { supplier: 'ServiceNow',    category: 'IT',                   business_unit: 'Engineering',  payment_terms: 'Net 45', amount:  480000 },
+    { supplier: 'Heidrick &amp; Struggles', category: 'HR', business_unit: 'HR', payment_terms: 'Net 30', amount: 480000 },
+    { supplier: 'United Airlines', category: 'TRAVEL',             business_unit: 'Admin',        payment_terms: 'Net 14', amount:  408000 },
+    { supplier: 'AT&amp;T',      category: 'TELECOMMUNICATIONS',    business_unit: 'IT',           payment_terms: 'Net 30', amount:  360000 },
+    { supplier: 'JLL',           category: 'FACILITIES',            business_unit: 'Admin',        payment_terms: 'Net 30', amount:  360000 },
+    { supplier: 'FedEx',         category: 'LOGISTICS',             business_unit: 'Operations',   payment_terms: 'Net 14', amount:  300000 },
+    { supplier: 'Cornerstone',   category: 'HR',                   business_unit: 'HR',           payment_terms: 'Net 30', amount:  240000 },
+    { supplier: 'Staples',       category: 'OFFICE_SUPPLIES',       business_unit: 'Admin',        payment_terms: 'Net 30', amount:  120000 },
+];
+
+// 5. Global spend by region (multicurrency_global.csv — USD equiv)
+const REGION_DATA = {
+    labels: ['Americas (AMER)', 'Europe / EMEA', 'Asia-Pacific (APAC)'],
+    values: [3610000, 6523350, 2738400],
+    byCategory: {
+        'AMER': { 'IT': 320000, 'Prof. Services': 210000, 'Facilities': 2200000, 'Cont. Workforce': 880000 },
+        'EMEA': { 'IT': 697850, 'Prof. Services': 359600, 'Facilities': 3048000, 'Marketing': 1670000, 'Cont. Workforce': 1308000, 'Logistics': 490500, 'Travel': 406400 },
+        'APAC': { 'IT': 540000, 'Prof. Services': 207200, 'Facilities': 1332000, 'Logistics': 348400, 'Travel': 310800 },
+    }
+};
+
+// 6. Payment terms breakdown
+const PAYTERMS_DATA = {
+    labels: ['Net 14', 'Net 21', 'Net 30', 'Net 45'],
+    values: [708000, 1176000, 17464000, 480000],
+};
+
+/* ════════════════
+   CHART COLOURS
+   ════════════════ */
+const COLORS = [
+    '#2563eb','#f59e0b','#10b981','#ef4444','#8b5cf6',
+    '#06b6d4','#f97316','#84cc16','#ec4899','#6366f1'
+];
+
+function fmtCurrency(v) {
+    if (v >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
+    if (v >= 1e3) return '$' + (v/1e3).toFixed(0) + 'K';
+    return '$' + v.toFixed(0);
+}
+
+function fmtPct(v) { return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; }
+
+/* ════════════════
+   CHART INSTANCES
+   ════════════════ */
+let charts = {};
+
+function buildTrendChart() {
+    const ctx = document.getElementById('trend-chart').getContext('2d');
+    const datasets = Object.keys(TREND_DATA.byCategory).map((cat, i) => ({
+        label: cat,
+        data: TREND_DATA.byCategory[cat],
+        borderColor: COLORS[i],
+        backgroundColor: COLORS[i] + '18',
+        borderWidth: 2,
+        tension: 0.35,
+        fill: false,
+        pointRadius: 3,
+        pointHoverRadius: 6,
+    }));
+
+    charts.trend = new Chart(ctx, {
+        type: 'line',
+        data: { labels: TREND_DATA.labels, datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16, font: { size: 11 } } },
+                tooltip: {
+                    callbacks: {
+                        label: c => `${c.dataset.label}: ${fmtCurrency(c.parsed.y)}`
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: v => fmtCurrency(v), font: { size: 11 } },
+                    grid: { color: '#f3f4f6' }
+                }
+            }
+        }
+    });
+}
+
+function buildCategoryDonut() {
+    const ctx = document.getElementById('category-donut').getContext('2d');
+    charts.catDonut = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: CATEGORY_DATA.map(d => d.category),
+            datasets: [{
+                data: CATEGORY_DATA.map(d => d.amount),
+                backgroundColor: COLORS.map(c => c + 'DD'),
+                borderColor: '#fff',
+                borderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '62%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { usePointStyle: true, padding: 12, font: { size: 10 } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: c => {
+                            const total = c.dataset.data.reduce((a,b)=>a+b,0);
+                            const pct = ((c.parsed/total)*100).toFixed(1);
+                            return `${fmtCurrency(c.parsed)} (${pct}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function buildBvAChart() {
+    const ctx = document.getElementById('bva-chart').getContext('2d');
+    const sorted = [...BVA_DATA].sort((a,b) => b.actual - a.actual);
+    charts.bva = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: sorted.map(d => d.supplier),
+            datasets: [
+                {
+                    label: 'Actual',
+                    data: sorted.map(d => d.actual),
+                    backgroundColor: COLORS[0] + 'CC',
+                    borderColor: COLORS[0],
+                    borderWidth: 1,
+                    borderRadius: 4,
+                },
+                {
+                    label: 'Budget',
+                    data: sorted.map(d => d.budget),
+                    backgroundColor: COLORS[1] + 'AA',
+                    borderColor: COLORS[1],
+                    borderWidth: 1,
+                    borderRadius: 4,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', labels: { usePointStyle: true, font: { size: 11 } } },
+                tooltip: {
+                    callbacks: {
+                        afterBody: (items) => {
+                            if (items.length >= 2) {
+                                const act = items[0].parsed.y;
+                                const bud = items[1].parsed.y;
+                                const diff = act - bud;
+                                return `Variance: ${fmtCurrency(diff)} (${fmtPct((diff/bud)*100)})`;
+                            }
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: v => fmtCurrency(v), font: { size: 11 } },
+                    grid: { color: '#f3f4f6' }
+                }
+            }
+        }
+    });
+}
+
+function buildTopSuppliersChart() {
+    const ctx = document.getElementById('top-suppliers-chart').getContext('2d');
+    const top10 = [...SUPPLIER_DATA].sort((a,b) => b.amount - a.amount).slice(0,10);
+    charts.topSuppliers = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: top10.map(d => d.supplier),
+            datasets: [{
+                label: 'Annual Spend',
+                data: top10.map(d => d.amount),
+                backgroundColor: COLORS.map(c => c + 'CC'),
+                borderColor: COLORS,
+                borderWidth: 1,
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: c => fmtCurrency(c.parsed.x)
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: { callback: v => fmtCurrency(v), font: { size: 11 } },
+                    grid: { color: '#f3f4f6' }
+                },
+                y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+            }
+        }
+    });
+}
+
+function buildRegionChart() {
+    const ctx = document.getElementById('region-chart').getContext('2d');
+    charts.region = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: REGION_DATA.labels,
+            datasets: [{
+                label: 'USD Equivalent Spend',
+                data: REGION_DATA.values,
+                backgroundColor: [COLORS[0]+'CC', COLORS[2]+'CC', COLORS[4]+'CC'],
+                borderColor:     [COLORS[0],        COLORS[2],        COLORS[4]],
+                borderWidth: 1,
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: c => fmtCurrency(c.parsed.y),
+                        afterLabel: c => {
+                            const total = REGION_DATA.values.reduce((a,b)=>a+b,0);
+                            return `${((c.parsed.y/total)*100).toFixed(1)}% of global spend`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: v => fmtCurrency(v), font: { size: 11 } },
+                    grid: { color: '#f3f4f6' }
+                }
+            }
+        }
+    });
+}
+
+function buildPayTermsChart() {
+    const ctx = document.getElementById('payterms-chart').getContext('2d');
+    charts.payTerms = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: PAYTERMS_DATA.labels,
+            datasets: [{
+                data: PAYTERMS_DATA.values,
+                backgroundColor: [COLORS[3]+'DD', COLORS[2]+'DD', COLORS[0]+'DD', COLORS[4]+'DD'],
+                borderColor: '#fff',
+                borderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '58%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { usePointStyle: true, padding: 14, font: { size: 11 } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: c => {
+                            const total = c.dataset.data.reduce((a,b)=>a+b,0);
+                            const pct = ((c.parsed/total)*100).toFixed(1);
+                            return `${fmtCurrency(c.parsed)} · ${pct}% of spend`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+/* ════════════════
+   SUPPLIER TABLE
+   ════════════════ */
+const TOTAL_SPEND = SUPPLIER_DATA.reduce((s,d) => s+d.amount, 0);
+
+const CATEGORY_COLORS = {
+    'IT': 'tag',
+    'PROFESSIONAL_SERVICES': 'tag orange',
+    'FACILITIES': 'tag green',
+    'MARKETING': 'tag purple',
+    'CONTINGENT_WORKFORCE': 'tag teal',
+    'HR': 'tag pink',
+    'LOGISTICS': 'tag gray',
+    'TRAVEL': 'tag gray',
+    'TELECOMMUNICATIONS': 'tag gray',
+    'OFFICE_SUPPLIES': 'tag gray',
+};
+
+const CATEGORY_LABELS = {
+    'IT': 'IT', 'PROFESSIONAL_SERVICES': 'Prof. Services',
+    'FACILITIES': 'Facilities', 'MARKETING': 'Marketing',
+    'CONTINGENT_WORKFORCE': 'Cont. Workforce', 'HR': 'HR',
+    'LOGISTICS': 'Logistics', 'TRAVEL': 'Travel',
+    'TELECOMMUNICATIONS': 'Telecom', 'OFFICE_SUPPLIES': 'Office Supplies',
+};
+
+let sortCol = 'amount';
+let sortDir = 'desc';
+let filteredSuppliers = [...SUPPLIER_DATA];
+
+function renderSupplierTable(data) {
+    const tbody = document.getElementById('supplier-tbody');
+    const maxAmt = Math.max(...data.map(d => d.amount));
+
+    tbody.innerHTML = data.map(d => {
+        const barWidth = Math.round((d.amount / maxAmt) * 80);
+        const pct = ((d.amount / TOTAL_SPEND) * 100).toFixed(1);
+        const catLabel = CATEGORY_LABELS[d.category] || d.category;
+        const catClass = CATEGORY_COLORS[d.category] || 'tag';
+        return `
+            <tr>
+                <td><strong>${d.supplier}</strong></td>
+                <td><span class="${catClass}">${catLabel}</span></td>
+                <td>${d.business_unit}</td>
+                <td>${d.payment_terms}</td>
+                <td>${fmtCurrency(d.amount)}</td>
+                <td>
+                    <div class="spend-bar-wrap">
+                        <div class="spend-bar" style="width:${barWidth}px"></div>
+                        <span style="font-size:11px;color:var(--text-secondary)">${pct}%</span>
+                    </div>
+                </td>
+            </tr>`;
+    }).join('');
+
+    document.getElementById('table-count').textContent = `Showing ${data.length} suppliers`;
+}
+
+window.sortTable = function(col) {
+    if (sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    else { sortCol = col; sortDir = 'desc'; }
+
+    filteredSuppliers.sort((a, b) => {
+        const av = a[col], bv = b[col];
+        const cmp = av < bv ? -1 : av > bv ? 1 : 0;
+        return sortDir === 'asc' ? cmp : -cmp;
+    });
+    renderSupplierTable(filteredSuppliers);
+};
+
+/* ════════════════
+   FILTER LOGIC
+   ════════════════ */
+function applyFilters() {
+    const catFilter = document.getElementById('filter-category').value;
+    const regionFilter = document.getElementById('filter-region').value;
+
+    // Filter supplier table (category only — region not in this dataset)
+    filteredSuppliers = SUPPLIER_DATA.filter(d => {
+        if (catFilter !== 'all' && d.category !== catFilter) return false;
+        return true;
+    });
+
+    filteredSuppliers.sort((a, b) => {
+        const av = a[sortCol], bv = b[sortCol];
+        const cmp = av < bv ? -1 : av > bv ? 1 : 0;
+        return sortDir === 'asc' ? cmp : -cmp;
+    });
+
+    renderSupplierTable(filteredSuppliers);
+
+    // Update KPI row totals
+    const filtTotal = filteredSuppliers.reduce((s, d) => s + d.amount, 0);
+    const supplierCount = filteredSuppliers.length;
+    document.getElementById('kpi-annual').textContent = fmtCurrency(filtTotal);
+    document.getElementById('kpi-annual-sub').textContent = `${supplierCount} suppliers`;
+
+    // Update Top Suppliers chart
+    const top10 = [...filteredSuppliers].sort((a,b)=>b.amount-a.amount).slice(0,10);
+    charts.topSuppliers.data.labels = top10.map(d => d.supplier);
+    charts.topSuppliers.data.datasets[0].data = top10.map(d => d.amount);
+    charts.topSuppliers.update('none');
+
+    // Update Category Donut (if no category filter applied)
+    if (catFilter === 'all') {
+        charts.catDonut.data.labels = CATEGORY_DATA.map(d => d.category);
+        charts.catDonut.data.datasets[0].data = CATEGORY_DATA.map(d => d.amount);
+    } else {
+        const catTotal = filtTotal;
+        charts.catDonut.data.labels = [CATEGORY_LABELS[catFilter] || catFilter];
+        charts.catDonut.data.datasets[0].data = [catTotal];
+    }
+    charts.catDonut.update('none');
+
+    // Region chart — apply region filter
+    if (regionFilter !== 'all') {
+        const regionMap = { 'AMER': 0, 'EMEA': 1, 'APAC': 2 };
+        const idx = regionMap[regionFilter];
+        charts.region.data.labels = [REGION_DATA.labels[idx]];
+        charts.region.data.datasets[0].data = [REGION_DATA.values[idx]];
+        charts.region.data.datasets[0].backgroundColor = [[COLORS[0]+'CC', COLORS[2]+'CC', COLORS[4]+'CC'][idx]];
+    } else {
+        charts.region.data.labels = REGION_DATA.labels;
+        charts.region.data.datasets[0].data = REGION_DATA.values;
+        charts.region.data.datasets[0].backgroundColor = [COLORS[0]+'CC', COLORS[2]+'CC', COLORS[4]+'CC'];
+    }
+    charts.region.update('none');
+}
+
+/* ════════════════
+   INIT
+   ════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+    buildTrendChart();
+    buildCategoryDonut();
+    buildBvAChart();
+    buildTopSuppliersChart();
+    buildRegionChart();
+    buildPayTermsChart();
+    renderSupplierTable(SUPPLIER_DATA.sort((a,b) => b.amount - a.amount));
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+pack_id: conglomerate
+sector: Indian Business Conglomerate (Multi-Sector)
+version: "0.1"
+schema_version: "1"
+status: scaffold
+description: Scaffold for multi-sector Indian conglomerates. Handles intercompany elimination and group shared-services allocation. Full content deferred.
+applicable_entity_types: [diversified_conglomerate, family_owned_group, holding_company]
+regulatory_bodies: [SEBI, MCA21, CCI, RBI_if_nbfc, sectoral_regulators]
+fiscal_year_end: "March 31"
+reporting_currency: INR
+default_wacc_pct: 13.0
+default_tax_rate_pct: 25.17
+created_at: "2026-05-01"
+effective_from: "2026-05-01"
+maintained_by: opex_platform_core
+notes: "Requires intercompany elimination at ingestion; related_party_flag and legal_entity_id must be set on NormalizedSpendLine."

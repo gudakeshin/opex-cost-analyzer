@@ -1,0 +1,19 @@
+{
+  "sector": "fmcg_consumer",
+  "currency": "INR",
+  "peers": [
+    {"name": "Hindustan Unilever", "ticker": "HINDUNILVR.NS", "exchange": "NSE", "revenue_cr": 60000},
+    {"name": "ITC Ltd", "ticker": "ITC.NS", "exchange": "NSE", "revenue_cr": 75000},
+    {"name": "Nestlé India", "ticker": "NESTLEIND.NS", "exchange": "NSE", "revenue_cr": 20000},
+    {"name": "Dabur India", "ticker": "DABUR.NS", "exchange": "NSE", "revenue_cr": 13000},
+    {"name": "Marico", "ticker": "MARICO.NS", "exchange": "NSE", "revenue_cr": 10000},
+    {"name": "Colgate-Palmolive India", "ticker": "COLPAL.NS", "exchange": "NSE", "revenue_cr": 5800}
+  ],
+  "benchmark_metrics": {
+    "ebitda_margin_pct": {"p25": 16.0, "p50": 21.0, "p75": 28.0},
+    "a_and_p_to_revenue_pct": {"p25": 8.0, "p50": 12.0, "p75": 17.0},
+    "distribution_to_revenue_pct": {"p25": 5.0, "p50": 8.0, "p75": 13.0}
+  },
+  "data_source": "BSE/NSE annual reports FY25",
+  "refresh_date": "2026-04-01"
+}

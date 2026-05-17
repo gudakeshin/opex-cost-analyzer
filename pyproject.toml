@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+markers = [
+    "llm_judge: marks tests that make live LLM API calls (deselect with -m 'not llm_judge')",
+]

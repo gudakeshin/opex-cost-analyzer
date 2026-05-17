@@ -1,0 +1,10 @@
+[
+  {"kpi_id": "cost_to_income_ratio", "kpi_name": "Cost-to-Income Ratio", "unit": "pct", "formula": "total_opex / net_revenue * 100", "target_direction": "lower", "p50_benchmark_pct": 47.5},
+  {"kpi_id": "opex_to_avg_assets", "kpi_name": "OpEx / Average Assets", "unit": "pct", "formula": "total_opex / avg_total_assets * 100", "target_direction": "lower", "p50_benchmark_pct": 2.4},
+  {"kpi_id": "staff_cost_ratio", "kpi_name": "Staff Cost % of OpEx", "unit": "pct", "formula": "staff_cost / total_opex * 100", "target_direction": "lower", "p50_benchmark_pct": 55.0},
+  {"kpi_id": "tech_opex_ratio", "kpi_name": "Technology % of OpEx", "unit": "pct", "formula": "it_spend / total_opex * 100", "target_direction": "higher", "p50_benchmark_pct": 12.0},
+  {"kpi_id": "branch_opex_per_branch", "kpi_name": "OpEx per Branch (₹ Cr)", "unit": "INR_cr", "formula": "branch_opex / branch_count", "target_direction": "lower", "p50_benchmark_cr": 0.85},
+  {"kpi_id": "digital_transaction_pct", "kpi_name": "Digital Transaction %", "unit": "pct", "formula": "digital_txn_count / total_txn_count * 100", "target_direction": "higher", "p50_benchmark_pct": 85.0},
+  {"kpi_id": "npa_provision_to_opex", "kpi_name": "NPA Provisions % of OpEx", "unit": "pct", "formula": "npa_provisions / total_opex * 100", "target_direction": "lower", "p50_benchmark_pct": 18.0},
+  {"kpi_id": "kyc_cost_per_customer", "kpi_name": "KYC Cost per Customer (₹)", "unit": "INR", "formula": "kyc_aml_cost / total_customers", "target_direction": "lower", "p50_benchmark_inr": 180}
+]

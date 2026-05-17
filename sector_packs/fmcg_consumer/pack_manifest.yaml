@@ -1,0 +1,15 @@
+pack_id: fmcg_consumer
+sector: FMCG & Consumer Goods (India)
+version: "0.1"
+schema_version: "1"
+status: scaffold
+description: Scaffold for Indian FMCG, foods, personal care, and consumer goods companies. Full content deferred.
+applicable_entity_types: [fmcg_foods, fmcg_personal_care, fmcg_homecare, beverages]
+regulatory_bodies: [FSSAI, BIS, SEBI, MoCI]
+fiscal_year_end: "March 31"
+reporting_currency: INR
+default_wacc_pct: 13.5
+default_tax_rate_pct: 25.17
+created_at: "2026-05-01"
+effective_from: "2026-05-01"
+maintained_by: opex_platform_core

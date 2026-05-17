@@ -1,0 +1,35 @@
+sector: manufacturing_diversified
+
+free_sources:
+  - id: bse_annual_reports
+    name: BSE Annual Report Filings
+    data_available: [segment_revenue, ebitda, material_cost, energy_cost, logistics_cost]
+    refresh_frequency: annual
+    parser: bse_pdf_parser
+  - id: mca21_financials
+    name: MCA21 Financial Statements (Schedule III)
+    data_available: [opex_breakdown, depreciation, employee_benefit_expense, other_expenses]
+    refresh_frequency: annual
+    parser: mca21_xbrl_parser
+  - id: brsr_disclosures
+    name: BRSR Core Disclosures (energy, water, waste)
+    data_available: [scope1_emissions, scope2_emissions, water_consumed_kl, waste_generated_t]
+    refresh_frequency: annual
+    parser: brsr_xml_parser
+  - id: cea_energy_statistics
+    name: Central Electricity Authority — Industry Energy Consumption Data
+    data_available: [industrial_energy_intensity, sector_avg_tariff]
+    refresh_frequency: annual
+    parser: cea_excel_parser
+
+licensed_sources_stubs:
+  - id: cmie_prowess_iq
+    name: CMIE Prowess IQ
+    credential_env: CMIE_API_KEY
+    data_available: [detailed_cost_lines, 10yr_time_series]
+    adapter_class: app.services.benchmarks_india.CmieAdapter
+  - id: crisil_research
+    name: CRISIL Industry Reports
+    credential_env: CRISIL_API_KEY
+    data_available: [sector_ebitda_margins, cost_benchmarks]
+    adapter_class: app.services.benchmarks_india.CrisilAdapter

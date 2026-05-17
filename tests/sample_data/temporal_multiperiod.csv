@@ -1,0 +1,37 @@
+supplier,description,amount,spend_date,category,gl_code,business_unit
+AWS,Cloud infrastructure,280000,2024-10-01,IT,6100,Engineering
+Azure,SaaS licenses,75000,2024-10-01,IT,6110,Engineering
+McKinsey,Strategy consulting,120000,2024-10-01,PROFESSIONAL_SERVICES,7200,Strategy
+CBRE,Office lease,180000,2024-10-01,FACILITIES,8100,Admin
+Google Ads,Digital advertising,110000,2024-10-01,MARKETING,9100,Marketing
+Randstad,Contract staffing,88000,2024-10-01,CONTINGENT_WORKFORCE,7500,HR
+AWS,Cloud infrastructure,295000,2024-11-01,IT,6100,Engineering
+Azure,SaaS licenses,78000,2024-11-01,IT,6110,Engineering
+McKinsey,Strategy consulting,130000,2024-11-01,PROFESSIONAL_SERVICES,7200,Strategy
+CBRE,Office lease,180000,2024-11-01,FACILITIES,8100,Admin
+Google Ads,Digital advertising,118000,2024-11-01,MARKETING,9100,Marketing
+Randstad,Contract staffing,92000,2024-11-01,CONTINGENT_WORKFORCE,7500,HR
+AWS,Cloud infrastructure,320000,2024-12-01,IT,6100,Engineering
+Azure,SaaS licenses,85000,2024-12-01,IT,6110,Engineering
+McKinsey,Strategy consulting,200000,2024-12-01,PROFESSIONAL_SERVICES,7200,Strategy
+CBRE,Office lease,180000,2024-12-01,FACILITIES,8100,Admin
+Google Ads,Digital advertising,125000,2024-12-01,MARKETING,9100,Marketing
+Randstad,Contract staffing,98000,2024-12-01,CONTINGENT_WORKFORCE,7500,HR
+AWS,Cloud infrastructure,338000,2025-01-01,IT,6100,Engineering
+Azure,SaaS licenses,90000,2025-01-01,IT,6110,Engineering
+McKinsey,Strategy consulting,210000,2025-01-01,PROFESSIONAL_SERVICES,7200,Strategy
+CBRE,Office lease,185000,2025-01-01,FACILITIES,8100,Admin
+Google Ads,Digital advertising,132000,2025-01-01,MARKETING,9100,Marketing
+Randstad,Contract staffing,105000,2025-01-01,CONTINGENT_WORKFORCE,7500,HR
+AWS,Cloud infrastructure,350000,2025-02-01,IT,6100,Engineering
+Azure,SaaS licenses,93000,2025-02-01,IT,6110,Engineering
+Deloitte,Audit Q1,95000,2025-02-01,PROFESSIONAL_SERVICES,7210,Finance
+CBRE,Office lease,185000,2025-02-01,FACILITIES,8100,Admin
+Google Ads,Digital advertising,140000,2025-02-01,MARKETING,9100,Marketing
+Randstad,Contract staffing,112000,2025-02-01,CONTINGENT_WORKFORCE,7500,HR
+AWS,Cloud infrastructure,365000,2025-03-01,IT,6100,Engineering
+Azure,SaaS licenses,97000,2025-03-01,IT,6110,Engineering
+Deloitte,Audit Q1 final,45000,2025-03-01,PROFESSIONAL_SERVICES,7210,Finance
+CBRE,Office lease,185000,2025-03-01,FACILITIES,8100,Admin
+Google Ads,Digital advertising,148000,2025-03-01,MARKETING,9100,Marketing
+Randstad,Contract staffing,118000,2025-03-01,CONTINGENT_WORKFORCE,7500,HR

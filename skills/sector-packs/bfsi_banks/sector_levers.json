@@ -1,0 +1,328 @@
+{
+  "pack_id": "bfsi_banks",
+  "sector": "Banking & Financial Services (India)",
+  "version": "1.0",
+  "applicable_entity_types": [
+    "scheduled_commercial_bank",
+    "nbfc_systemically_important",
+    "housing_finance_company",
+    "payments_bank",
+    "small_finance_bank"
+  ],
+  "industry_signals": [
+    "npa_provisioning_keywords",
+    "core_banking_keywords",
+    "rbi_keywords",
+    "bfsi_regulatory_context"
+  ],
+  "universal_levers": [
+    "contract_renegotiation",
+    "process_standardization",
+    "demand_management",
+    "supplier_consolidation",
+    "automation",
+    "payment_terms",
+    "maverick_compliance",
+    "outsourcing",
+    "internal_best_practice",
+    "tail_spend_automation",
+    "should_cost_modeling",
+    "zero_based_rebaseline",
+    "shared_services_consolidation",
+    "geographic_arbitrage",
+    "rebate_pricing_recovery",
+    "benefits_cost_optimization",
+    "contingent_workforce_optimization",
+    "consulting_spend_governance",
+    "legal_spend_optimization",
+    "ld_rationalization",
+    "space_utilization_optimization",
+    "lease_restructuring",
+    "cost_governance",
+    "insurance_premium_optimization",
+    "bank_fee_optimization",
+    "p2p_o2c_automation"
+  ],
+  "sector_specific_levers": [
+    {
+      "lever_id": "branch_network_optimization",
+      "lever_name": "Branch Network Rationalisation & Format Optimisation",
+      "lever_family": "structure",
+      "savings_range_pct": {
+        "p10": 10,
+        "p50": 18,
+        "p90": 28
+      },
+      "cta_rate": 0.08,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.85,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Branch-level P&L and footfall data available for ≥ 24 months",
+        "RBI approval for branch closure obtained per banking regulation",
+        "Digital channel migration capacity (mobile / internet banking) confirmed"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.6,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 44,
+        "p90": 72
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:FACILITIES > 3% revenue"
+      ]
+    },
+    {
+      "lever_id": "ops_process_digitization",
+      "lever_name": "Back-Office Operations Digitisation (Front-to-Back STP)",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 10,
+        "p50": 17,
+        "p90": 26
+      },
+      "cta_rate": 0.1,
+      "phasing_curve": [
+        0.1,
+        0.4,
+        0.5
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.88,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Process mining analysis completed for high-volume back-office processes",
+        "Core banking system APIs exposed for workflow automation",
+        "RBI operational risk and cyber security review of automation completed"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 18,
+        "p50": 40,
+        "p90": 64
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:IT or OUTSOURCED present"
+      ]
+    },
+    {
+      "lever_id": "it_vendor_consolidation",
+      "lever_name": "IT Vendor & Core Banking Platform Consolidation",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 22,
+        "p90": 34
+      },
+      "cta_rate": 0.12,
+      "phasing_curve": [
+        0.05,
+        0.35,
+        0.6
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.88,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "IT application landscape rationalisation roadmap approved by CTO",
+        "Core banking system upgrade / migration plan approved and budgeted",
+        "RBI IT framework compliance assessment completed for new systems"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.55,
+      "implementation_weeks": {
+        "p10": 36,
+        "p50": 72,
+        "p90": 120
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:IT > 5% revenue"
+      ]
+    },
+    {
+      "lever_id": "kyc_aml_automation",
+      "lever_name": "KYC / AML Process Automation",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 20,
+        "p50": 30,
+        "p90": 40
+      },
+      "cta_rate": 0.09,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.88,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "V-KYC / digital KYC approved under RBI Master Directions",
+        "AI-based AML transaction monitoring system validated",
+        "PMLA compliance review of automated alert disposition completed"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 36,
+        "p90": 60
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:PROF_SVCS or OUTSOURCED present"
+      ]
+    },
+    {
+      "lever_id": "collections_efficiency",
+      "lever_name": "Collections & Recovery Process Optimisation",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 15,
+        "p90": 24
+      },
+      "cta_rate": 0.07,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.8,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Predictive dialler and AI-based collections scoring deployed",
+        "Collections agency panel rationalised (performance-based empanelment)",
+        "IBC / SARFAESI process automation for secured assets implemented"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 38
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:OUTSOURCED or PROF_SVCS present"
+      ]
+    },
+    {
+      "lever_id": "treasury_ops_efficiency",
+      "lever_name": "Treasury Operations & ALM Cost Efficiency",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 3,
+        "p50": 7,
+        "p90": 12
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Treasury management system (Murex / Kondor) upgraded for automation",
+        "ALM framework reviewed by board and RBI-appointed actuary / auditor",
+        "Correspondent banking relationships rationalised"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.68,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 24,
+        "p90": 42
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:FIN_SVCS or BANKING_TREASURY present"
+      ]
+    },
+    {
+      "lever_id": "fraud_detection_ai",
+      "lever_name": "AI-Driven Fraud Detection & Prevention",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 5,
+        "p50": 12,
+        "p90": 20
+      },
+      "cta_rate": 0.09,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.85,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Historical transaction fraud data labelled (≥ 2 years, min 10,000 confirmed fraud cases)",
+        "ML fraud scoring engine integrated with core banking / payment switch",
+        "RBI cyber security framework compliance for AI fraud models confirmed"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 36,
+        "p90": 60
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:IT or OUTSOURCED present"
+      ]
+    },
+    {
+      "lever_id": "regulatory_reporting_automation",
+      "lever_name": "Regulatory Reporting Automation (RBI / SEBI Returns)",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 15,
+        "p50": 24,
+        "p90": 34
+      },
+      "cta_rate": 0.08,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.88,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Regulatory data dictionary aligned with RBI XBRL / XSLT taxonomy",
+        "Single source of truth for financial data (data warehouse / data lake) established",
+        "Parallel run validation completed before switching off manual returns"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 28,
+        "p90": 48
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:PROF_SVCS or IT present"
+      ]
+    }
+  ]
+}

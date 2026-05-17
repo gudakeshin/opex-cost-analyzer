@@ -1,0 +1,158 @@
+{
+  "version": "1.0",
+  "description": "Standard OpEx category taxonomy with keyword mappings for classification",
+  "categories": [
+    {
+      "id": "IT",
+      "name": "IT & Technology",
+      "subcategories": ["Software & SaaS", "Cloud Infrastructure", "Hardware & Devices", "IT Support & Helpdesk", "Cybersecurity", "IT Professional Services", "Data & Analytics Tools"],
+      "keywords": ["software", "saas", "cloud", "aws", "azure", "gcp", "hardware", "laptop", "server", "license", "IT support", "helpdesk", "cybersecurity", "firewall", "antivirus", "data center", "hosting", "microsoft", "google workspace", "salesforce", "servicenow", "jira", "confluence", "slack", "zoom", "webex", "endpoint", "network"]
+    },
+    {
+      "id": "PROF_SVCS",
+      "name": "Professional Services",
+      "subcategories": ["Management Consulting", "Legal Services", "Audit & Accounting", "Tax Advisory", "Specialized Advisory"],
+      "keywords": ["consulting", "legal", "audit", "advisory", "accounting", "tax", "deloitte", "mckinsey", "bcg", "bain", "kpmg", "pwc", "ey", "ernst", "accenture", "law firm", "counsel", "attorney", "litigation", "compliance advisory"]
+    },
+    {
+      "id": "FACILITIES",
+      "name": "Facilities & Real Estate",
+      "subcategories": ["Rent & Lease", "Utilities", "Maintenance & Repairs", "Security & Safety", "Janitorial", "Space Management"],
+      "keywords": ["rent", "lease", "office space", "utilities", "electric", "gas", "water", "maintenance", "janitorial", "cleaning", "security guard", "HVAC", "elevator", "parking", "real estate", "property management", "building", "facility", "workspace"]
+    },
+    {
+      "id": "TRAVEL",
+      "name": "Travel & Entertainment",
+      "subcategories": ["Air Travel", "Hotels & Lodging", "Ground Transport", "Meals & Entertainment", "Conferences & Events"],
+      "keywords": ["flight", "airline", "hotel", "travel", "uber", "lyft", "taxi", "rental car", "meals", "entertainment", "conference", "event", "per diem", "lodging", "accommodation", "booking", "expedia", "concur", "amex travel"]
+    },
+    {
+      "id": "MARKETING",
+      "name": "Marketing & Advertising",
+      "subcategories": ["Digital Marketing", "Print & Traditional Media", "Events & Sponsorship", "Brand & Creative", "PR & Communications", "Market Research"],
+      "keywords": ["marketing", "advertising", "digital ads", "google ads", "facebook ads", "social media", "SEO", "SEM", "brand", "creative", "PR", "public relations", "media", "sponsorship", "print", "billboard", "campaign", "agency", "hubspot", "marketo"]
+    },
+    {
+      "id": "HR",
+      "name": "HR & Recruitment",
+      "subcategories": ["Recruitment & Staffing", "Learning & Development", "Benefits Administration", "HR Technology", "Relocation", "Employee Engagement"],
+      "keywords": ["recruitment", "staffing", "hiring", "headhunter", "training", "L&D", "learning", "development", "benefits", "payroll", "HR", "human resources", "relocation", "onboarding", "linkedin recruiter", "workday", "greenhouse", "indeed"]
+    },
+    {
+      "id": "LOGISTICS",
+      "name": "Logistics & Supply Chain",
+      "subcategories": ["Freight & Shipping", "Warehousing", "Distribution", "Fleet Management", "Courier & Express"],
+      "keywords": ["freight", "shipping", "logistics", "warehouse", "distribution", "fleet", "courier", "fedex", "ups", "dhl", "transportation", "trucking", "ocean freight", "air cargo", "supply chain", "3PL", "fulfillment"]
+    },
+    {
+      "id": "TELECOM",
+      "name": "Telecommunications",
+      "subcategories": ["Voice Services", "Data & Internet", "Mobile", "Unified Communications", "Network Infrastructure"],
+      "keywords": ["telecom", "phone", "mobile", "internet", "broadband", "data line", "voice", "conferencing", "VoIP", "AT&T", "verizon", "t-mobile", "vodafone", "bandwidth", "MPLS", "SD-WAN", "cellular"]
+    },
+    {
+      "id": "INSURANCE",
+      "name": "Insurance & Risk",
+      "subcategories": ["Property Insurance", "Liability Insurance", "D&O Insurance", "Cyber Insurance", "Workers Compensation"],
+      "keywords": ["insurance", "premium", "policy", "coverage", "liability", "property insurance", "D&O", "directors", "officers", "cyber insurance", "workers comp", "risk", "indemnity", "underwriting"]
+    },
+    {
+      "id": "OFFICE",
+      "name": "Office Supplies & Equipment",
+      "subcategories": ["Office Supplies", "Furniture", "Printing & Copiers", "Kitchen & Pantry"],
+      "keywords": ["office supplies", "stationery", "furniture", "desk", "chair", "printer", "copier", "paper", "toner", "kitchen", "pantry", "coffee", "breakroom", "staples", "office depot"]
+    },
+    {
+      "id": "OUTSOURCED",
+      "name": "Outsourced Operations",
+      "subcategories": ["BPO", "Contact Center", "Managed Services", "Staff Augmentation"],
+      "keywords": ["BPO", "outsourcing", "managed services", "contact center", "call center", "staff augmentation", "offshore", "nearshore", "infosys", "wipro", "tata", "cognizant", "genpact", "accenture operations"]
+    },
+    {
+      "id": "RND",
+      "name": "R&D & Engineering",
+      "subcategories": ["Lab Supplies", "Prototyping", "Testing & QA", "Patents & IP", "R&D Tools & Platforms"],
+      "keywords": ["R&D", "research", "development", "lab", "prototype", "testing", "QA", "patent", "IP", "intellectual property", "innovation", "engineering", "experiment"]
+    },
+    {
+      "id": "FIN_SVCS",
+      "name": "Financial Services",
+      "subcategories": ["Banking Fees", "Payment Processing", "Treasury Services", "FX Costs"],
+      "keywords": ["banking", "bank fees", "payment processing", "merchant fees", "credit card processing", "treasury", "FX", "foreign exchange", "wire transfer", "ACH", "lockbox"]
+    },
+    {
+      "id": "CONTINGENT",
+      "name": "Contingent Workforce",
+      "subcategories": ["Contractors", "Freelancers", "Temp Labor", "SOW-Based Services"],
+      "keywords": ["contractor", "freelancer", "temp", "temporary", "contingent", "SOW", "statement of work", "independent contractor", "1099", "agency temp", "contract worker"]
+    },
+    {
+      "id": "OTHER",
+      "name": "Other / Unclassified",
+      "subcategories": ["Miscellaneous", "Unclassified"],
+      "keywords": []
+    },
+    {
+      "id": "POWER_ENERGY",
+      "name": "Power & Energy",
+      "subcategories": ["Grid Power", "Captive Power", "Open Access", "Renewable Energy", "Fuel & Lubricants"],
+      "keywords": ["electricity", "power", "energy", "grid", "captive power", "open access", "solar", "wind", "renewable", "fuel", "diesel", "LDO", "HFO", "coal", "natural gas", "PNG", "LPG", "RPO", "energy bill", "DISCOM", "TRANSCO", "power purchase agreement", "PPA"]
+    },
+    {
+      "id": "LOGISTICS_INDIA",
+      "name": "Logistics — India Modes",
+      "subcategories": ["Road Freight", "Rail Freight", "Coastal Shipping", "Air Cargo", "Warehousing India", "Demurrage & Detention"],
+      "keywords": ["road freight", "truck", "lorry", "GTA", "goods transport agency", "rail freight", "railway", "CONCOR", "coastal shipping", "vessel", "barge", "demurrage", "detention", "LTL", "FTL", "express cargo", "blue dart", "DTDC", "warehousing India", "cold chain", "3PL India"]
+    },
+    {
+      "id": "PLANT_MAINTENANCE",
+      "name": "Plant & Machinery Maintenance",
+      "subcategories": ["Preventive Maintenance", "Breakdown Maintenance", "Spares & Consumables", "AMC", "Predictive Maintenance"],
+      "keywords": ["maintenance", "AMC", "annual maintenance", "spares", "spare parts", "breakdown", "preventive maintenance", "predictive maintenance", "lubrication", "consumables", "tools", "plant repair", "machinery repair", "calibration", "overhauling", "shutdown maintenance"]
+    },
+    {
+      "id": "GST_TAX",
+      "name": "Tax & Statutory Payments",
+      "subcategories": ["GST Payments", "TDS/TCS", "Income Tax Advance", "CSR", "Regulatory Levies"],
+      "keywords": ["GST", "CGST", "SGST", "IGST", "TDS", "TCS", "income tax", "advance tax", "customs duty", "excise", "CSR", "corporate social responsibility", "regulatory levy", "stamp duty", "registration fee", "MCA filing", "ROC fee"]
+    },
+    {
+      "id": "RELATED_PARTY",
+      "name": "Related-Party & Intercompany",
+      "subcategories": ["Intra-Group Services", "Management Fees", "Brand Royalties", "Shared Services Allocation"],
+      "keywords": ["intercompany", "intra-group", "related party", "management fee", "royalty", "brand fee", "shared services", "allocation", "recharge", "cost allocation", "group company", "subsidiary", "holding company", "associate company"]
+    },
+    {
+      "id": "CSR",
+      "name": "CSR & Social Obligations",
+      "subcategories": ["CSR Programmes", "Foundation Contributions", "Community Development"],
+      "keywords": ["CSR", "corporate social responsibility", "Section 135", "foundation", "NGO grant", "social impact", "community development", "Swachh Bharat", "skill development CSR"]
+    },
+    {
+      "id": "BANKING_TREASURY",
+      "name": "Banking & Treasury",
+      "subcategories": ["Bank Charges", "Forex & Hedging", "Letter of Credit", "Working Capital Interest", "Cash Management"],
+      "keywords": ["bank charges", "banking fees", "forex loss", "hedging cost", "forward contract", "LC", "letter of credit", "bank guarantee", "BG", "cash credit", "working capital interest", "overdraft", "MCLR", "processing fee bank", "SWIFT charges"]
+    },
+    {
+      "id": "BRSR_ESG",
+      "name": "ESG & Sustainability",
+      "subcategories": ["Environment Compliance", "Water & Effluent Treatment", "Waste Management", "BRSR Reporting"],
+      "keywords": ["ETP", "STP", "effluent treatment", "pollution control", "CPCB", "waste management", "e-waste", "hazardous waste", "water treatment", "carbon credit", "BRSR", "ESG audit", "sustainability reporting", "GRI", "RPO compliance", "green building"]
+    },
+    {
+      "id": "PACKAGING",
+      "name": "Packaging Materials",
+      "subcategories": ["Primary Packaging", "Secondary Packaging", "Tertiary Packaging", "Sustainable Packaging"],
+      "keywords": ["packaging", "carton", "box", "bag", "pouch", "bottle", "label", "foil", "shrink wrap", "pallet", "crate", "packaging material", "corrugated", "mono carton", "blister", "sachet"]
+    }
+  ],
+
+  "india_taxonomy_extensions": {
+    "version": "2.0",
+    "note": "India context extensions per PRD v2.0 §17.A",
+    "non_addressable_categories": ["GST_TAX", "CSR"],
+    "real_estate_tiers": ["Metro", "Tier-2 city", "Tier-3 city", "SEZ", "STPI", "GIFT City"],
+    "people_cost_sub_types": ["On-roll", "Off-roll", "Contract labour", "GIC/GCC shared"]
+  }
+}

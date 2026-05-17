@@ -1,0 +1,20 @@
+{
+  "sector": "it_ites",
+  "currency": "INR",
+  "peers": [
+    {"name": "Tata Consultancy Services", "ticker": "TCS.NS", "exchange": "NSE", "revenue_cr": 240000},
+    {"name": "Infosys", "ticker": "INFY.NS", "exchange": "NSE", "revenue_cr": 162000},
+    {"name": "Wipro", "ticker": "WIPRO.NS", "exchange": "NSE", "revenue_cr": 90000},
+    {"name": "HCL Technologies", "ticker": "HCLTECH.NS", "exchange": "NSE", "revenue_cr": 115000},
+    {"name": "Tech Mahindra", "ticker": "TECHM.NS", "exchange": "NSE", "revenue_cr": 54000},
+    {"name": "Mphasis", "ticker": "MPHASIS.NS", "exchange": "NSE", "revenue_cr": 15000}
+  ],
+  "benchmark_metrics": {
+    "ebit_margin_pct": {"p25": 16.0, "p50": 20.0, "p75": 25.5},
+    "opex_to_revenue_pct": {"p25": 68.0, "p50": 74.0, "p75": 80.0},
+    "employee_cost_to_revenue_pct": {"p25": 52.0, "p50": 58.0, "p75": 65.0},
+    "subcon_to_revenue_pct": {"p25": 5.0, "p50": 9.0, "p75": 14.0}
+  },
+  "data_source": "BSE/NSE annual reports FY25",
+  "refresh_date": "2026-04-01"
+}

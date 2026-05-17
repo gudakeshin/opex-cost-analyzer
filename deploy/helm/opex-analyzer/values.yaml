@@ -1,0 +1,83 @@
+replicaCount: 2
+
+image:
+  repository: opex-api
+  pullPolicy: IfNotPresent
+  tag: "2.1.0"
+
+service:
+  type: ClusterIP
+  port: 8000
+
+engagement:
+  id: ""           # REQUIRED: set at deploy time
+  environment: production
+
+resources:
+  requests:
+    cpu: "1"
+    memory: "2Gi"
+  limits:
+    cpu: "4"
+    memory: "8Gi"
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: true
+    password: ""    # Set via --set redis.auth.password or sealed secret
+  master:
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "512Mi"
+      limits:
+        cpu: "1"
+        memory: "2Gi"
+
+persistence:
+  enabled: true
+  storageClass: ""
+  size: 50Gi
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+  readOnlyRootFilesystem: false
+
+env:
+  LOG_LEVEL: "info"
+  PYTHONPATH: "."
+
+secrets:
+  anthropicApiKey: ""     # Provide via sealed secret or external secrets operator
+  redisPassword: ""
+
+ingress:
+  enabled: false          # Disable public ingress; access via kubectl port-forward
+  className: nginx
+  annotations: {}
+  hosts: []
+  tls: []
+
+nodeSelector: {}
+tolerations: []
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: opex-analyzer
+        topologyKey: "kubernetes.io/hostname"
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1

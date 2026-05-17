@@ -1,0 +1,24 @@
+{
+  "sector": "bfsi_banks",
+  "currency": "INR",
+  "peers": [
+    {"name": "State Bank of India", "ticker": "SBIN.NS", "exchange": "NSE", "entity_type": "psu_bank", "total_assets_cr": 6200000},
+    {"name": "HDFC Bank", "ticker": "HDFCBANK.NS", "exchange": "NSE", "entity_type": "private_bank", "total_assets_cr": 3400000},
+    {"name": "ICICI Bank", "ticker": "ICICIBANK.NS", "exchange": "NSE", "entity_type": "private_bank", "total_assets_cr": 2400000},
+    {"name": "Axis Bank", "ticker": "AXISBANK.NS", "exchange": "NSE", "entity_type": "private_bank", "total_assets_cr": 1400000},
+    {"name": "Kotak Mahindra Bank", "ticker": "KOTAKBANK.NS", "exchange": "NSE", "entity_type": "private_bank", "total_assets_cr": 750000},
+    {"name": "Bank of Baroda", "ticker": "BANKBARODA.NS", "exchange": "NSE", "entity_type": "psu_bank", "total_assets_cr": 1350000},
+    {"name": "Punjab National Bank", "ticker": "PNB.NS", "exchange": "NSE", "entity_type": "psu_bank", "total_assets_cr": 1300000},
+    {"name": "IndusInd Bank", "ticker": "INDUSINDBK.NS", "exchange": "NSE", "entity_type": "private_bank", "total_assets_cr": 500000},
+    {"name": "Yes Bank", "ticker": "YESBANK.NS", "exchange": "NSE", "entity_type": "private_bank", "total_assets_cr": 360000},
+    {"name": "Federal Bank", "ticker": "FEDERALBNK.NS", "exchange": "NSE", "entity_type": "private_bank", "total_assets_cr": 280000}
+  ],
+  "benchmark_metrics": {
+    "cost_to_income_ratio_pct": {"p25": 42.0, "p50": 47.5, "p75": 55.0},
+    "opex_to_assets_pct": {"p25": 1.8, "p50": 2.4, "p75": 3.2},
+    "staff_cost_to_total_opex_pct": {"p25": 48.0, "p50": 55.0, "p75": 65.0},
+    "technology_to_total_opex_pct": {"p25": 8.0, "p50": 12.0, "p75": 18.0}
+  },
+  "data_source": "BSE/NSE annual reports FY25",
+  "refresh_date": "2026-04-01"
+}

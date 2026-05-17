@@ -1,0 +1,23 @@
+{
+  "description": "Spend profiler HHI: single supplier per category = HHI of 1.0 = highly concentrated",
+  "skill": "spend-profiler",
+  "input_lines": [
+    {
+      "row_id": 601, "supplier": "Sole Supplier", "description": "Cloud all-in",
+      "category_id": "cloud", "category_name": "Cloud",
+      "amount": 500000.0, "spend_date": "2025-01-15", "fiscal_period": "2025-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 500000.0
+    },
+    {
+      "row_id": 602, "supplier": "Sole Supplier", "description": "Cloud all-in Feb",
+      "category_id": "cloud", "category_name": "Cloud",
+      "amount": 500000.0, "spend_date": "2025-02-15", "fiscal_period": "2025-02",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 500000.0
+    }
+  ],
+  "extra_kwargs": {},
+  "assertions": {
+    "required_keys": ["total_spend", "category_profile"],
+    "min_category_profile": 1
+  }
+}

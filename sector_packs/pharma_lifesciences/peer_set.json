@@ -1,0 +1,19 @@
+{
+  "sector": "pharma_lifesciences",
+  "currency": "INR",
+  "peers": [
+    {"name": "Sun Pharmaceutical Industries", "ticker": "SUNPHARMA.NS", "exchange": "NSE", "revenue_cr": 48000},
+    {"name": "Dr. Reddy's Laboratories", "ticker": "DRREDDY.NS", "exchange": "NSE", "revenue_cr": 28000},
+    {"name": "Cipla", "ticker": "CIPLA.NS", "exchange": "NSE", "revenue_cr": 24000},
+    {"name": "Divi's Laboratories", "ticker": "DIVISLAB.NS", "exchange": "NSE", "revenue_cr": 8200},
+    {"name": "Aurobindo Pharma", "ticker": "AUROPHARMA.NS", "exchange": "NSE", "revenue_cr": 29000},
+    {"name": "Alkem Laboratories", "ticker": "ALKEM.NS", "exchange": "NSE", "revenue_cr": 12000}
+  ],
+  "benchmark_metrics": {
+    "ebitda_margin_pct": {"p25": 18.0, "p50": 24.0, "p75": 32.0},
+    "r_and_d_to_revenue_pct": {"p25": 4.0, "p50": 7.5, "p75": 12.0},
+    "logistics_to_revenue_pct": {"p25": 3.0, "p50": 5.5, "p75": 9.0}
+  },
+  "data_source": "BSE/NSE annual reports FY25",
+  "refresh_date": "2026-04-01"
+}

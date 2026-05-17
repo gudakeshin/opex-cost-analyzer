@@ -1,0 +1,321 @@
+{
+  "pack_id": "energy_utilities",
+  "sector": "Energy & Utilities",
+  "version": "1.0",
+  "applicable_entity_types": [
+    "power_generation",
+    "power_distribution",
+    "water_utility",
+    "gas_distribution",
+    "renewable_energy",
+    "oil_gas"
+  ],
+  "industry_signals": [
+    "power_energy_gt_10pct_spend",
+    "plant_maintenance_gt_8pct",
+    "capex_intensity_high"
+  ],
+  "universal_levers": [
+    "contract_renegotiation",
+    "process_standardization",
+    "demand_management",
+    "supplier_consolidation",
+    "automation",
+    "payment_terms",
+    "maverick_compliance",
+    "outsourcing",
+    "internal_best_practice",
+    "tail_spend_automation",
+    "should_cost_modeling",
+    "zero_based_rebaseline",
+    "shared_services_consolidation",
+    "rebate_pricing_recovery",
+    "benefits_cost_optimization",
+    "contingent_workforce_optimization",
+    "consulting_spend_governance",
+    "legal_spend_optimization",
+    "ld_rationalization",
+    "space_utilization_optimization",
+    "lease_restructuring",
+    "cost_governance"
+  ],
+  "sector_specific_levers": [
+    {
+      "lever_id": "predictive_maintenance",
+      "lever_name": "Predictive / Condition-Based Maintenance",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 18,
+        "p50": 26,
+        "p90": 34
+      },
+      "cta_rate": 0.12,
+      "phasing_curve": [
+        0.1,
+        0.4,
+        0.5
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.87,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "IoT / sensor data available for critical assets with < 5% data loss",
+        "CMMS / EAM system updated with asset criticality ratings",
+        "Maintenance technician capability built for condition-based protocols"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 40,
+        "p90": 60
+      },
+      "applicable_if": [
+        "category:PLANT_MAINTENANCE > 3% revenue",
+        "asset_intensive_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "energy_loss_reduction",
+      "lever_name": "AT&C / Technical Distribution Loss Reduction",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 5,
+        "p50": 10,
+        "p90": 18
+      },
+      "cta_rate": 0.1,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.82,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Smart meter / AMI data available for loss mapping at feeder level",
+        "GIS-based network inventory updated and validated",
+        "Field enforcement programme for commercial losses established"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 18,
+        "p50": 36,
+        "p90": 56
+      },
+      "applicable_if": [
+        "category:POWER_ENERGY present",
+        "utility_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "fuel_procurement_optimization",
+      "lever_name": "Fuel / Energy Procurement Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4,
+        "p50": 7,
+        "p90": 12
+      },
+      "cta_rate": 0.04,
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Price forecasting model and hedging policy approved by board",
+        "Spot vs. long-term contract mix optimised for cost and risk",
+        "Trading desk or treasury authorised for commodity hedging"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 30
+      },
+      "applicable_if": [
+        "category:POWER_ENERGY > 5% spend"
+      ]
+    },
+    {
+      "lever_id": "workforce_scheduling",
+      "lever_name": "Field Workforce Scheduling & Route Optimisation",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 10,
+        "p50": 16,
+        "p90": 24
+      },
+      "cta_rate": 0.07,
+      "phasing_curve": [
+        0.25,
+        0.45,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Field force management system (e.g. ClickSoftware, Oracle FSM) deployed",
+        "Job categorisation and time standards established",
+        "Mobile workforce app rolled out with GPS tracking"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 36
+      },
+      "applicable_if": [
+        "headcount > 100",
+        "field_operations_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "grid_modernization",
+      "lever_name": "Grid / Network Modernisation (OPEX Reduction Component)",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 28
+      },
+      "cta_rate": 0.14,
+      "phasing_curve": [
+        0.05,
+        0.25,
+        0.7
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.9,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "SCADA / DMS upgrade roadmap approved and funded",
+        "Advanced metering infrastructure (AMI) rollout plan in place",
+        "Regulatory approval for network investment obtained"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.55,
+      "implementation_weeks": {
+        "p10": 40,
+        "p50": 80,
+        "p90": 130
+      },
+      "applicable_if": [
+        "category:POWER_ENERGY > 8% spend",
+        "utility_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "renewable_energy_transition",
+      "lever_name": "Renewable Energy Procurement / Captive Solar",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 22,
+        "p90": 32
+      },
+      "cta_rate": 0.08,
+      "phasing_curve": [
+        0.1,
+        0.35,
+        0.55
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.88,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Energy consumption audit and load profile analysis completed",
+        "Power Purchase Agreement (PPA) or captive plant economics validated",
+        "Grid connectivity and wheeling approvals obtained from DISCOM / CERC"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 44,
+        "p90": 72
+      },
+      "applicable_if": [
+        "category:POWER_ENERGY > 5% spend"
+      ]
+    },
+    {
+      "lever_id": "outsourced_operations",
+      "lever_name": "O&M Contract Outsourcing (Distribution / Generation)",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 15,
+        "p50": 25,
+        "p90": 36
+      },
+      "cta_rate": 0.1,
+      "phasing_curve": [
+        0.1,
+        0.4,
+        0.5
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.82,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "TCO analysis confirming outsourced O&M cheaper than in-house by > 15%",
+        "RFP issued to qualified O&M contractors with performance guarantees",
+        "IR / union consultation and HR transition plan completed"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.6,
+      "implementation_weeks": {
+        "p10": 24,
+        "p50": 52,
+        "p90": 84
+      },
+      "applicable_if": [
+        "category:OUTSOURCED or CONTINGENT present",
+        "headcount > 200"
+      ]
+    },
+    {
+      "lever_id": "material_inventory_optimization",
+      "lever_name": "MRO Material & Spares Inventory Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 7,
+        "p50": 12,
+        "p90": 18
+      },
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Asset criticality classification completed (A/B/C analysis)",
+        "Min/max reorder levels reset to criticality-based model",
+        "Vendor-managed inventory (VMI) piloted for fast-moving MRO categories"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 36
+      },
+      "applicable_if": [
+        "category:PLANT_MAINTENANCE present"
+      ]
+    }
+  ]
+}

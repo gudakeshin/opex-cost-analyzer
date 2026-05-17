@@ -1,0 +1,40 @@
+{
+  "description": "Scenario columns and labels present",
+  "skill": "model-contextualizer",
+  "input_lines": [],
+  "extra_kwargs": {
+    "structural_summary": {
+      "workbook_name": "RE_Scenarios.xlsx",
+      "sheet_order": ["Scenarios", "OpEx Build", "Summary"],
+      "sheets": [
+        {
+          "sheet_name": "Scenarios",
+          "row_count": 25,
+          "first_rows": [["Scenario", "Base Case", "Bull Case", "Bear Case"], ["Total OpEx", "100", "110", "90"]],
+          "first_col_values": ["Base Case", "Bull Case", "Bear Case"],
+          "formula_refs": []
+        },
+        {
+          "sheet_name": "OpEx Build",
+          "row_count": 80,
+          "first_rows": [["Category", "Q1 2024", "Q2 2024", "Q3 2024"], ["IT Costs", "1000", "1050", "1100"]],
+          "first_col_values": ["IT & Technology", "Professional Services"],
+          "formula_refs": []
+        },
+        {
+          "sheet_name": "Summary",
+          "row_count": 20,
+          "first_rows": [["Metric", "FY24"], ["Net Savings", "5000"]],
+          "first_col_values": ["Total OpEx", "Net Savings", "EBITDA"],
+          "formula_refs": []
+        }
+      ]
+    }
+  },
+  "assertions": {
+    "required_keys": ["scenarios", "ingestion_strategy", "sheet_graph"],
+    "ingestion_strategy": "hybrid",
+    "min_scenarios": 2,
+    "min_sheet_graph": 3
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "sector": "manufacturing_diversified",
+  "currency": "INR",
+  "peers": [
+    {"name": "Larsen & Toubro", "ticker": "LT.NS", "exchange": "NSE", "sub_sector": "capital_goods", "revenue_cr": 220000},
+    {"name": "Bharat Forge", "ticker": "BHARATFORG.NS", "exchange": "NSE", "sub_sector": "auto_components", "revenue_cr": 15000},
+    {"name": "Havells India", "ticker": "HAVELLS.NS", "exchange": "NSE", "sub_sector": "consumer_electricals", "revenue_cr": 18000},
+    {"name": "Cummins India", "ticker": "CUMMINSIND.NS", "exchange": "NSE", "sub_sector": "capital_goods", "revenue_cr": 8500},
+    {"name": "Greaves Cotton", "ticker": "GREAVESCOT.NS", "exchange": "NSE", "sub_sector": "capital_goods", "revenue_cr": 2200},
+    {"name": "Thermax", "ticker": "THERMAX.NS", "exchange": "NSE", "sub_sector": "energy_environment", "revenue_cr": 9500},
+    {"name": "Bosch India", "ticker": "BOSCHLTD.NS", "exchange": "NSE", "sub_sector": "auto_components", "revenue_cr": 14000},
+    {"name": "SKF India", "ticker": "SKFINDIA.NS", "exchange": "NSE", "sub_sector": "bearings", "revenue_cr": 4500},
+    {"name": "Pidilite Industries", "ticker": "PIDILITIND.NS", "exchange": "NSE", "sub_sector": "specialty_chemicals", "revenue_cr": 12000},
+    {"name": "Aarti Industries", "ticker": "AARTIIND.NS", "exchange": "NSE", "sub_sector": "chemicals", "revenue_cr": 7000}
+  ],
+  "benchmark_metrics": {
+    "ebitda_margin_pct": {"p25": 10.5, "p50": 14.0, "p75": 19.5},
+    "opex_to_revenue_pct": {"p25": 62.0, "p50": 70.0, "p75": 78.0},
+    "energy_to_revenue_pct": {"p25": 2.5, "p50": 4.2, "p75": 7.0},
+    "logistics_to_revenue_pct": {"p25": 4.0, "p50": 6.5, "p75": 9.5},
+    "mro_to_revenue_pct": {"p25": 1.2, "p50": 2.0, "p75": 3.5}
+  },
+  "data_source": "BSE/NSE annual reports FY25 + CMIE Prowess (licensed)",
+  "refresh_date": "2026-04-01"
+}

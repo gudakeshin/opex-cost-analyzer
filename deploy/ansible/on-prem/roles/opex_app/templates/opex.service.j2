@@ -1,0 +1,32 @@
+[Unit]
+Description=OpEx Intelligence Platform API
+After=network.target redis.service
+Wants=redis.service
+
+[Service]
+Type=exec
+User=opex
+Group=opex
+WorkingDirectory=/opt/opex/app
+EnvironmentFile=/opt/opex/.env
+ExecStart=/opt/opex/venv/bin/uvicorn app.main:app \
+  --host 127.0.0.1 \
+  --port {{ opex_port | default(8000) }} \
+  --workers {{ opex_workers | default(4) }} \
+  --log-level info \
+  --access-log \
+  --log-config /opt/opex/app/logging.json
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=5
+StandardOutput=append:/opt/opex/logs/api.log
+StandardError=append:/opt/opex/logs/api_error.log
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/opex/data /opt/opex/logs
+PrivateTmp=true
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

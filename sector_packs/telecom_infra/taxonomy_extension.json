@@ -1,0 +1,11 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "spectrum_license_fees", "category_name": "Spectrum Licence Fees & AGR Dues", "gl_prefix": "SPC"},
+    {"category_id": "network_opex_access", "category_name": "Network O&M, Access & Interconnect", "gl_prefix": "NET"},
+    {"category_id": "tower_power_diesel", "category_name": "Tower Power, Diesel & Energy", "gl_prefix": "TWR"},
+    {"category_id": "roaming_ir_costs", "category_name": "Roaming & International Termination", "gl_prefix": "ROM"},
+    {"category_id": "content_platform_costs", "category_name": "Content, OTT & Platform Costs", "gl_prefix": "CNT"}
+  ],
+  "overrides": []
+}

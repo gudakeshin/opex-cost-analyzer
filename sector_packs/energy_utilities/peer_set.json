@@ -1,0 +1,19 @@
+{
+  "sector": "energy_utilities",
+  "currency": "INR",
+  "peers": [
+    {"name": "NTPC Limited", "ticker": "NTPC.NS", "exchange": "NSE", "revenue_cr": 180000},
+    {"name": "Power Grid Corporation", "ticker": "POWERGRID.NS", "exchange": "NSE", "revenue_cr": 46000},
+    {"name": "Adani Power", "ticker": "ADANIPOWER.NS", "exchange": "NSE", "revenue_cr": 52000},
+    {"name": "Tata Power", "ticker": "TATAPOWER.NS", "exchange": "NSE", "revenue_cr": 55000},
+    {"name": "NHPC", "ticker": "NHPC.NS", "exchange": "NSE", "revenue_cr": 11000},
+    {"name": "Torrent Power", "ticker": "TORNTPOWER.NS", "exchange": "NSE", "revenue_cr": 18000}
+  ],
+  "benchmark_metrics": {
+    "ebitda_margin_pct": {"p25": 22.0, "p50": 30.0, "p75": 40.0},
+    "o_and_m_to_revenue_pct": {"p25": 8.0, "p50": 14.0, "p75": 22.0},
+    "fuel_to_revenue_pct": {"p25": 35.0, "p50": 50.0, "p75": 65.0}
+  },
+  "data_source": "BSE/NSE annual reports FY25 + CERC annual report",
+  "refresh_date": "2026-04-01"
+}

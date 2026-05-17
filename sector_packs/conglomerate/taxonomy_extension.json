@@ -1,0 +1,11 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "group_shared_services", "category_name": "Group Shared Services Allocation", "gl_prefix": "GSS"},
+    {"category_id": "intercompany_eliminations", "category_name": "Intercompany Transactions (Pre-elimination)", "gl_prefix": "ICE"},
+    {"category_id": "holding_co_overhead", "category_name": "Holding Company Management & Overhead", "gl_prefix": "HCO"},
+    {"category_id": "related_party_transactions", "category_name": "Related Party Transactions (Ind AS 24)", "gl_prefix": "RPT"},
+    {"category_id": "group_treasury_funding", "category_name": "Group Treasury & Intra-Group Financing", "gl_prefix": "GTF"}
+  ],
+  "overrides": []
+}

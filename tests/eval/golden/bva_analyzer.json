@@ -1,0 +1,48 @@
+{
+  "description": "BvA analyzer: 3 categories with actuals above budget — all variances must be unfavorable",
+  "skill": "bva-analyzer",
+  "input_lines": [
+    {
+      "row_id": 101, "supplier": "Cloud Co", "description": "Cloud infra",
+      "category_id": "cloud", "category_name": "Cloud",
+      "amount": 150000.0, "spend_date": "2025-01-15",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 150000.0
+    },
+    {
+      "row_id": 102, "supplier": "Cloud Co", "description": "Cloud infra budget",
+      "category_id": "cloud", "category_name": "Cloud",
+      "amount": 100000.0, "spend_date": "2025-01-15",
+      "amount_type": "budget", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 100000.0
+    },
+    {
+      "row_id": 103, "supplier": "Agency X", "description": "Marketing agency",
+      "category_id": "marketing", "category_name": "Marketing",
+      "amount": 90000.0, "spend_date": "2025-01-15",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 90000.0
+    },
+    {
+      "row_id": 104, "supplier": "Agency X", "description": "Marketing budget",
+      "category_id": "marketing", "category_name": "Marketing",
+      "amount": 75000.0, "spend_date": "2025-01-15",
+      "amount_type": "budget", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 75000.0
+    },
+    {
+      "row_id": 105, "supplier": "HR Vendor", "description": "HR system",
+      "category_id": "hr_systems", "category_name": "HR Systems",
+      "amount": 40000.0, "spend_date": "2025-01-15",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 40000.0
+    },
+    {
+      "row_id": 106, "supplier": "HR Vendor", "description": "HR system budget",
+      "category_id": "hr_systems", "category_name": "HR Systems",
+      "amount": 35000.0, "spend_date": "2025-01-15",
+      "amount_type": "budget", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 35000.0
+    }
+  ],
+  "extra_kwargs": {},
+  "assertions": {
+    "required_keys": ["bva_available", "total_actual", "total_budget", "variances"],
+    "bva_available": true,
+    "min_variances": 3
+  }
+}

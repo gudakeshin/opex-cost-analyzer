@@ -1,0 +1,43 @@
+{
+  "description": "Payment terms optimizer: 4 suppliers on Net-14/Net-21, all can extend to Net-30",
+  "skill": "payment-terms-optimizer",
+  "input_lines": [
+    {
+      "row_id": 301, "supplier": "Supplier Alpha", "description": "Invoice Q1",
+      "category_id": "professional_services", "category_name": "Professional Services",
+      "amount": 200000.0, "spend_date": "2025-01-10",
+      "amount_type": "actual", "payment_terms_days": 14,
+      "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 200000.0
+    },
+    {
+      "row_id": 302, "supplier": "Supplier Beta", "description": "Invoice Q1",
+      "category_id": "software", "category_name": "Software",
+      "amount": 150000.0, "spend_date": "2025-01-12",
+      "amount_type": "actual", "payment_terms_days": 21,
+      "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 150000.0
+    },
+    {
+      "row_id": 303, "supplier": "Supplier Gamma", "description": "Invoice Q1",
+      "category_id": "marketing", "category_name": "Marketing",
+      "amount": 100000.0, "spend_date": "2025-01-14",
+      "amount_type": "actual", "payment_terms_days": 14,
+      "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 100000.0
+    },
+    {
+      "row_id": 304, "supplier": "Supplier Delta", "description": "Invoice Q1",
+      "category_id": "facilities", "category_name": "Facilities",
+      "amount": 80000.0, "spend_date": "2025-01-16",
+      "amount_type": "actual", "payment_terms_days": 21,
+      "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 80000.0
+    }
+  ],
+  "extra_kwargs": {
+    "wacc": 0.08,
+    "industry": "technology"
+  },
+  "assertions": {
+    "required_keys": ["payment_terms_available", "total_working_capital_release", "opportunities"],
+    "payment_terms_available": true,
+    "min_opportunities": 1
+  }
+}

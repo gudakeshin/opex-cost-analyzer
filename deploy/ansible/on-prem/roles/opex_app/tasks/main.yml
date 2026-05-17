@@ -1,0 +1,135 @@
+---
+- name: Install system dependencies
+  package:
+    name:
+      - python3.11
+      - python3.11-venv
+      - python3-pip
+      - redis
+      - nginx
+      - git
+      - curl
+      - jq
+    state: present
+
+- name: Create opex system user
+  user:
+    name: opex
+    system: true
+    shell: /bin/false
+    home: /opt/opex
+    create_home: true
+
+- name: Create application directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: opex
+    group: opex
+    mode: "0750"
+  loop:
+    - /opt/opex/app
+    - /opt/opex/data
+    - /opt/opex/logs
+    - /opt/opex/sector_packs
+    - /opt/opex/skills
+
+- name: Copy application code
+  synchronize:
+    src: "{{ playbook_dir }}/../../../"
+    dest: /opt/opex/app/
+    delete: true
+    rsync_opts:
+      - "--exclude=.git"
+      - "--exclude=__pycache__"
+      - "--exclude=*.pyc"
+      - "--exclude=tests/"
+      - "--exclude=deploy/"
+  notify: restart opex
+
+- name: Create Python virtual environment
+  command:
+    cmd: python3.11 -m venv /opt/opex/venv
+    creates: /opt/opex/venv/bin/activate
+
+- name: Install Python dependencies
+  pip:
+    requirements: /opt/opex/app/requirements.txt
+    virtualenv: /opt/opex/venv
+    state: present
+
+- name: Write environment file (vault-encrypted values)
+  template:
+    src: opex.env.j2
+    dest: /opt/opex/.env
+    owner: opex
+    group: opex
+    mode: "0600"
+  notify: restart opex
+
+- name: Write systemd service file
+  template:
+    src: opex.service.j2
+    dest: /etc/systemd/system/opex.service
+    mode: "0644"
+  notify:
+    - reload systemd
+    - restart opex
+
+- name: Enable and start Redis
+  service:
+    name: redis
+    state: started
+    enabled: true
+
+- name: Harden Redis configuration
+  lineinfile:
+    path: /etc/redis/redis.conf
+    regexp: "^#?\\s*{{ item.key }}"
+    line: "{{ item.key }} {{ item.value }}"
+    backup: true
+  loop:
+    - { key: "bind", value: "127.0.0.1 ::1" }
+    - { key: "protected-mode", value: "yes" }
+    - { key: "requirepass", value: "{{ redis_password }}" }
+    - { key: "maxmemory", value: "{{ redis_maxmemory | default('2gb') }}" }
+    - { key: "maxmemory-policy", value: "allkeys-lru" }
+  notify: restart redis
+
+- name: Configure Nginx reverse proxy
+  template:
+    src: nginx_opex.conf.j2
+    dest: /etc/nginx/sites-available/opex
+    mode: "0644"
+  notify: reload nginx
+
+- name: Enable Nginx site
+  file:
+    src: /etc/nginx/sites-available/opex
+    dest: /etc/nginx/sites-enabled/opex
+    state: link
+  notify: reload nginx
+
+- name: Enable and start OpEx service
+  service:
+    name: opex
+    state: started
+    enabled: true
+
+- name: Configure log rotation
+  copy:
+    dest: /etc/logrotate.d/opex
+    content: |
+      /opt/opex/logs/*.log {
+        daily
+        rotate 30
+        compress
+        delaycompress
+        missingok
+        notifempty
+        sharedscripts
+        postrotate
+          systemctl kill -s USR1 opex.service
+        endscript
+      }
+    mode: "0644"

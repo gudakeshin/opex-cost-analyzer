@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Deloitte digital — https://www.deloitte.com/in/en/issues/digital.html */
+  --sidebar-width: 240px;
+  --deloitte-green: #86bc25;
+  --deloitte-black: #000000;
+  --deloitte-gray: #53565a;
+  --deloitte-gray-light: #bbbcbc;
+  --deloitte-surface: #ffffff;
+  --deloitte-surface-alt: #f7f7f5;
+  --brand-green: var(--deloitte-green);
+  --brand-navy: #000000;
+  --deloitte-navy: #000000;
+  --brand-navy-light: #53565a;
+  --brand-ink: var(--deloitte-black);
+  --brand-surface: var(--deloitte-surface);
+  --brand-surface-muted: var(--deloitte-surface-alt);
+  --brand-muted: var(--deloitte-gray);
+  --brand-border: #e0e0e0;
+  --semantic-success: #22c55e;
+  --semantic-warning: #f59e0b;
+  --semantic-danger: #ef4444;
+  --semantic-info: #0563c1;
+}
+
+@layer base {
+  html {
+    font-family: 'Open Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    font-family: inherit;
+    color: var(--brand-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: inherit;
+    color: var(--brand-ink);
+  }
+}
+
+.executive-shell {
+  background-color: var(--brand-surface);
+  color: var(--brand-ink);
+}
+
+.executive-shell table {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 768px) {
+  aside.sidebar {
+    transform: translateX(-100%);
+  }
+  aside.sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+/* Smooth transitions */
+* {
+  @apply transition-colors duration-200;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 dark:bg-gray-600 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500 dark:bg-gray-500;
+}

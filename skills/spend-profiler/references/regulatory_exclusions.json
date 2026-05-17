@@ -1,0 +1,83 @@
+{
+  "version": "1.0",
+  "description": "Spend categories and sub-types that are statutory, regulatory or legally mandatory and therefore non-addressable for cost optimisation purposes. These are hard exclusions applied before any addressability calculation.",
+  "non_addressable_categories": [
+    {
+      "category_id": "GST_TAX",
+      "reason": "Statutory tax obligation under GST Act, Income Tax Act, TDS/TCS provisions",
+      "addressability_override": 0.0,
+      "exceptions": ["gst_itc_recovery lever may recover credits — applies separately to ITC line items"]
+    },
+    {
+      "category_id": "CSR",
+      "reason": "Mandatory under Companies Act 2013 Section 135 for qualifying entities — minimum 2% of average net profit must be spent",
+      "addressability_override": 0.0,
+      "exceptions": ["csr_efficiency lever may improve impact-per-rupee of mandated spend — not a cost reduction"]
+    }
+  ],
+  "keyword_based_exclusions": [
+    {
+      "keywords": ["statutory audit", "tax audit", "transfer pricing audit", "secretarial audit"],
+      "reason": "Statutory audit requirements under Companies Act — cannot be avoided, only tendered",
+      "addressability_override": 0.15,
+      "note": "15% addressability retained — competitive tendering at renewal is still possible"
+    },
+    {
+      "keywords": ["provident fund", "esic", "gratuity", "minimum wages", "pf contribution", "epfo"],
+      "reason": "Statutory employee benefit contributions — non-negotiable under Indian labour law",
+      "addressability_override": 0.0,
+      "note": "No addressability — employer's statutory contribution rates are fixed by law"
+    },
+    {
+      "keywords": ["workmen compensation", "group personal accident", "employer liability"],
+      "reason": "Mandatory insurance under Workmen's Compensation Act and Factories Act",
+      "addressability_override": 0.10,
+      "note": "10% retained — competitive tendering of mandatory insurance is possible"
+    },
+    {
+      "keywords": ["pollution control", "effluent treatment", "environmental compliance", "hazardous waste", "consent to operate"],
+      "reason": "Environmental compliance mandated under Environment Protection Act and CPCB/SPCB regulations",
+      "addressability_override": 0.05,
+      "note": "5% retained — vendor tendering possible; core compliance spend is non-avoidable"
+    },
+    {
+      "keywords": ["electricity duty", "cross subsidy surcharge", "wheeling charge", "transmission charge"],
+      "reason": "Regulatory levies on power tariff — set by state electricity regulatory commission (SERC)",
+      "addressability_override": 0.0,
+      "note": "No addressability — tariff components fixed by regulation"
+    },
+    {
+      "keywords": ["stamp duty", "registration charges", "court fees", "arbitration fees"],
+      "reason": "Statutory legal charges — non-discretionary",
+      "addressability_override": 0.0,
+      "note": "No addressability"
+    },
+    {
+      "keywords": ["tds", "tcs", "advance tax", "income tax payment", "deferred tax"],
+      "reason": "Income tax obligations — non-avoidable; only timing of payment may differ",
+      "addressability_override": 0.0,
+      "note": "Tax optimisation is a separate exercise outside procurement/OPEX scope"
+    },
+    {
+      "keywords": ["sebi filing", "bse filing", "nse filing", "roc filing", "mca compliance"],
+      "reason": "Regulatory filing and listing compliance — mandatory for listed entities",
+      "addressability_override": 0.10,
+      "note": "10% retained — vendor/platform choice possible; core fees are fixed"
+    },
+    {
+      "keywords": ["insurance premium pf", "annuity", "nps contribution"],
+      "reason": "Statutory retirement and social security contributions",
+      "addressability_override": 0.0,
+      "note": "No addressability — employer contributions are legally mandated"
+    }
+  ],
+  "contract_based_exclusions": {
+    "description": "Spend under active contracts with > 18 months remaining and hard minimum purchase commitments receives reduced addressability until the contract window opens.",
+    "in_contract_gt_18m_addressability_multiplier": 0.15,
+    "in_contract_6_to_18m_addressability_multiplier": 0.40,
+    "in_contract_lt_6m_addressability_multiplier": 0.80,
+    "rolling_contract_addressability_multiplier": 0.70,
+    "expired_contract_addressability_multiplier": 1.00,
+    "at_risk_contract_addressability_multiplier": 0.60
+  }
+}

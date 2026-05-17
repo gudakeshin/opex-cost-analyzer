@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpEx Cost Analyzer - Executive Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ── Deloitte brand nav ── */
+        .deloitte-nav {
+            background: #1b1b1b;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .deloitte-wordmark {
+            font-family: 'Calibri', 'Segoe UI', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+        .deloitte-wordmark span {
+            color: #86BC25;
+        }
+        .deloitte-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .deloitte-nav-tag {
+            font-family: 'Calibri', 'Segoe UI', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        .deloitte-back-link {
+            font-family: 'Calibri', 'Segoe UI', sans-serif;
+            font-size: 13px;
+            color: #86BC25;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .deloitte-back-link:hover { color: #9fce49; }
+
+        body {
+            font-family: 'Calibri', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #2c3e50;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            border-top: 4px solid #86BC25;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #1a252f;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .filter-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #7f8c8d;
+        }
+
+        select {
+            padding: 10px 14px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            background: white;
+            color: #2c3e50;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .view-btn {
+            padding: 10px 16px;
+            border: 2px solid #bdc3c7;
+            background: white;
+            color: #2c3e50;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn.active {
+            background: #2c3e50;
+            color: white;
+            border-color: #2c3e50;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border-left: 5px solid #3498db;
+        }
+
+        .kpi-card.opportunity {
+            border-left-color: #27ae60;
+        }
+
+        .kpi-card.variance {
+            border-left-color: #e74c3c;
+        }
+
+        .kpi-card.neutral {
+            border-left-color: #95a5a6;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a252f;
+            margin-bottom: 4px;
+        }
+
+        .kpi-subtext {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a252f;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background: #2c3e50;
+            border-radius: 2px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            margin-bottom: 10px;
+        }
+
+        .legend {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .table-container {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .positive {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .negative {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .neutral-text {
+            color: #7f8c8d;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .tab-container {
+            background: white;
+            padding: 0;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px 24px;
+            text-align: center;
+            cursor: pointer;
+            background: white;
+            color: #7f8c8d;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .tab.active {
+            background: #f8f9fa;
+            color: #2c3e50;
+            border-bottom: 3px solid #2c3e50;
+        }
+
+        .tab-content {
+            padding: 24px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-high {
+            background: #fadbd8;
+            color: #c0392b;
+        }
+
+        .badge-medium {
+            background: #fef5e7;
+            color: #d68910;
+        }
+
+        .badge-low {
+            background: #d5f4e6;
+            color: #16a085;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .view-toggle {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-wrapper {
+                height: 300px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="deloitte-nav" aria-label="Deloitte platform navigation">
+        <span class="deloitte-wordmark">Deloitte<span>.</span></span>
+        <div class="deloitte-nav-right">
+            <span class="deloitte-nav-tag">OpEx Intelligence Platform</span>
+            <a class="deloitte-back-link" href="/ui">&#8592; Back to Platform</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>OpEx Intelligence Dashboard</h1>
+            <p class="subtitle">Agentic Cost Optimization &amp; Value Lever Analysis | Global Enterprise Spend FY2026</p>
+        </header>
+
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label>Business Unit</label>
+                <select id="buFilter">
+                    <option value="all">All BUs</option>
+                    <option value="NA">North America</option>
+                    <option value="EMEA">EMEA</option>
+                    <option value="APAC">APAC</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Period</label>
+                <select id="periodFilter">
+                    <option value="2026-Q1">Q1 2026</option>
+                    <option value="2026-Q1-Annualized">Q1 2026 (Annualized)</option>
+                    <option value="2025-Q4">Q4 2025</option>
+                </select>
+            </div>
+            <div class="view-toggle">
+                <button class="view-btn active" onclick="switchView('executive')">Executive View</button>
+                <button class="view-btn" onclick="switchView('operational')">Operational Detail</button>
+            </div>
+        </div>
+
+        <!-- EXECUTIVE VIEW -->
+        <div id="executive" class="section active">
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Annual Spend</div>
+                    <div class="kpi-value">$847M</div>
+                    <div class="kpi-subtext">↑ 8.2% vs. FY2025 | YTD Q1</div>
+                </div>
+                <div class="kpi-card opportunity">
+                    <div class="kpi-label">Identified Savings Potential</div>
+                    <div class="kpi-value">$92.1M</div>
+                    <div class="kpi-subtext">10.9% of total spend | P50 confidence</div>
+                </div>
+                <div class="kpi-card variance">
+                    <div class="kpi-label">Budget vs. Actuals Variance</div>
+                    <div class="kpi-value">$21.3M</div>
+                    <div class="kpi-subtext">+2.5% overspend | Price-driven</div>
+                </div>
+                <div class="kpi-card neutral">
+                    <div class="kpi-label">Initiatives In-Flight</div>
+                    <div class="kpi-value">14</div>
+                    <div class="kpi-subtext">$18.2M run-rate | On track</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">Spend by Category (Actual vs. Benchmark Percentile)</div>
+                <div class="chart-wrapper">
+                    <canvas id="spendCategoryChart"></canvas>
+                </div>
+                <div class="legend">
+                    <strong>Note:</strong> Blue bars show actual spend; orange line indicates industry benchmark percentile. Categories above the 75th percentile are candidates for deeper analysis.
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">Value-at-the-Table: Savings Opportunity by Lever</div>
+                <div class="chart-wrapper">
+                    <canvas id="savingsOpportunityChart"></canvas>
+                </div>
+                <div class="legend">
+                    <strong>Note:</strong> Stacked bars show estimated savings by value lever (cost reduction, consolidation, optimization, working capital). Includes low, mid, and high confidence scenarios.
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h3 class="chart-title" style="margin-bottom: 16px;">Top 10 Savings Opportunities by Category</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Spend Category</th>
+                            <th>Current Spend</th>
+                            <th>Benchmark (P50)</th>
+                            <th>Gap</th>
+                            <th>Est. Savings ($)</th>
+                            <th>Est. Savings (%)</th>
+                            <th>Primary Lever</th>
+                            <th>Priority</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>IT Infrastructure & Services</strong></td>
+                            <td>$187.4M</td>
+                            <td>$156.2M</td>
+                            <td class="negative">+19.8%</td>
+                            <td class="positive">$18.2M</td>
+                            <td class="positive">9.7%</td>
+                            <td>Consolidation & Optimization</td>
+                            <td><span class="badge badge-high">HIGH</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Professional Services</strong></td>
+                            <td>$142.8M</td>
+                            <td>$128.4M</td>
+                            <td class="negative">+11.2%</td>
+                            <td class="positive">$12.6M</td>
+                            <td class="positive">8.8%</td>
+                            <td>Rate Optimization</td>
+                            <td><span class="badge badge-high">HIGH</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Facilities & Real Estate</strong></td>
+                            <td>$98.6M</td>
+                            <td>$101.2M</td>
+                            <td class="positive">-2.6%</td>
+                            <td class="positive">$4.8M</td>
+                            <td class="positive">4.9%</td>
+                            <td>Workspace Optimization</td>
+                            <td><span class="badge badge-medium">MEDIUM</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Travel & Expense</strong></td>
+                            <td>$67.2M</td>
+                            <td>$58.9M</td>
+                            <td class="negative">+14.0%</td>
+                            <td class="positive">$8.1M</td>
+                            <td class="positive">12.0%</td>
+                            <td>Policy Tightening</td>
+                            <td><span class="badge badge-high">HIGH</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Marketing & Events</strong></td>
+                            <td>$52.3M</td>
+                            <td>$45.6M</td>
+                            <td class="negative">+14.6%</td>
+                            <td class="positive">$6.4M</td>
+                            <td class="positive">12.2%</td>
+                            <td>Channel Mix Shift</td>
+                            <td><span class="badge badge-high">HIGH</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Indirect Materials & Logistics</strong></td>
+                            <td>$156.8M</td>
+                            <td>$162.1M</td>
+                            <td class="positive">-3.3%</td>
+                            <td class="positive">$7.2M</td>
+                            <td class="positive">4.6%</td>
+                            <td>Supplier Consolidation</td>
+                            <td><span class="badge badge-medium">MEDIUM</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Telecommunications</strong></td>
+                            <td>$41.2M</td>
+                            <td>$36.8M</td>
+                            <td class="negative">+11.9%</td>
+                            <td class="positive">$5.1M</td>
+                            <td class="positive">12.4%</td>
+                            <td>Renegotiation</td>
+                            <td><span class="badge badge-high">HIGH</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Software Licenses</strong></td>
+                            <td>$67.9M</td>
+                            <td>$62.3M</td>
+                            <td class="negative">+9.0%</td>
+                            <td class="positive">$5.8M</td>
+                            <td class="positive">8.5%</td>
+                            <td>License Optimization</td>
+                            <td><span class="badge badge-medium">MEDIUM</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Contractor & Contingent Labor</strong></td>
+                            <td>$28.4M</td>
+                            <td>$24.1M</td>
+                            <td class="negative">+17.8%</td>
+                            <td class="positive">$4.1M</td>
+                            <td class="positive">14.4%</td>
+                            <td>FTE Conversion</td>
+                            <td><span class="badge badge-high">HIGH</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Other Expenses</strong></td>
+                            <td>$204.2M</td>
+                            <td>$219.4M</td>
+                            <td class="positive">-6.9%</td>
+                            <td class="positive">$4.8M</td>
+                            <td class="positive">2.3%</td>
+                            <td>Misc. Optimization</td>
+                            <td><span class="badge badge-low">LOW</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- OPERATIONAL VIEW -->
+        <div id="operational" class="section">
+            <div class="tab-container">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab(event, 'budgetVariance')">Budget vs. Actuals</button>
+                    <button class="tab" onclick="switchTab(event, 'trends')">Spend Trends</button>
+                    <button class="tab" onclick="switchTab(event, 'benchmark')">Benchmark Analysis</button>
+                    <button class="tab" onclick="switchTab(event, 'pipeline')">Initiative Pipeline</button>
+                </div>
+
+                <!-- Budget vs. Actuals Tab -->
+                <div id="budgetVariance" class="tab-content active">
+                    <div class="chart-wrapper" style="height: 350px; margin-bottom: 20px;">
+                        <canvas id="budgetVarianceChart"></canvas>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Budget</th>
+                                <th>Actual</th>
+                                <th>Variance ($)</th>
+                                <th>Variance (%)</th>
+                                <th>Primary Driver</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>IT Infrastructure</strong></td>
+                                <td>$182.1M</td>
+                                <td>$187.4M</td>
+                                <td class="negative">-$5.3M</td>
+                                <td class="negative">-2.9%</td>
+                                <td>Price inflation (cloud costs +4.2%)</td>
+                                <td><span class="badge badge-high">Over</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Professional Services</strong></td>
+                                <td>$138.2M</td>
+                                <td>$142.8M</td>
+                                <td class="negative">-$4.6M</td>
+                                <td class="negative">-3.3%</td>
+                                <td>Volume increase (12% more engagements)</td>
+                                <td><span class="badge badge-high">Over</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Facilities & Real Estate</strong></td>
+                                <td>$102.3M</td>
+                                <td>$98.6M</td>
+                                <td class="positive">+$3.7M</td>
+                                <td class="positive">+3.6%</td>
+                                <td>Hybrid model reducing footprint</td>
+                                <td><span class="badge badge-low">Under</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Travel & Expense</strong></td>
+                                <td>$61.8M</td>
+                                <td>$67.2M</td>
+                                <td class="negative">-$5.4M</td>
+                                <td class="negative">-8.7%</td>
+                                <td>Higher-than-expected travel volumes post-pandemic</td>
+                                <td><span class="badge badge-high">Over</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Marketing & Events</strong></td>
+                                <td>$48.1M</td>
+                                <td>$52.3M</td>
+                                <td class="negative">-$4.2M</td>
+                                <td class="negative">-8.7%</td>
+                                <td>Mix shift to premium digital channels</td>
+                                <td><span class="badge badge-high">Over</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Indirect Materials</strong></td>
+                                <td>$158.9M</td>
+                                <td>$156.8M</td>
+                                <td class="positive">+$2.1M</td>
+                                <td class="positive">+1.3%</td>
+                                <td>Volume decline, favorable pricing</td>
+                                <td><span class="badge badge-low">Under</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Spend Trends Tab -->
+                <div id="trends" class="tab-content">
+                    <div class="chart-wrapper" style="height: 350px; margin-bottom: 20px;">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Q4 2025</th>
+                                <th>Q1 2026</th>
+                                <th>QoQ Change</th>
+                                <th>12-Month Trend</th>
+                                <th>Annualized Run-Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>IT Infrastructure</strong></td>
+                                <td>$183.2M</td>
+                                <td>$187.4M</td>
+                                <td class="negative">+2.3%</td>
+                                <td>↑ Rising</td>
+                                <td>$749.6M</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Professional Services</strong></td>
+                                <td>$139.6M</td>
+                                <td>$142.8M</td>
+                                <td class="negative">+2.3%</td>
+                                <td>↑ Rising</td>
+                                <td>$571.2M</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Facilities & Real Estate</strong></td>
+                                <td>$100.1M</td>
+                                <td>$98.6M</td>
+                                <td class="positive">-1.5%</td>
+                                <td>↓ Declining</td>
+                                <td>$394.4M</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Travel & Expense</strong></td>
+                                <td>$64.3M</td>
+                                <td>$67.2M</td>
+                                <td class="negative">+4.5%</td>
+                                <td>↑ Rising</td>
+                                <td>$268.8M</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Marketing & Events</strong></td>
+                                <td>$51.2M</td>
+                                <td>$52.3M</td>
+                                <td class="negative">+2.1%</td>
+                                <td>→ Stable</td>
+                                <td>$209.2M</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Benchmark Analysis Tab -->
+                <div id="benchmark" class="tab-content">
+                    <div class="chart-wrapper" style="height: 350px; margin-bottom: 20px;">
+                        <canvas id="benchmarkChart"></canvas>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Our Spend ($/Employee)</th>
+                                <th>Benchmark P50 ($/Employee)</th>
+                                <th>Our Percentile</th>
+                                <th>Gap</th>
+                                <th>Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>IT Infrastructure</strong></td>
+                                <td>$3,892</td>
+                                <td>$3,245</td>
+                                <td>78th</td>
+                                <td class="negative">+$647 (19.9%)</td>
+                                <td>High</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Professional Services</strong></td>
+                                <td>$2,968</td>
+                                <td>$2,667</td>
+                                <td>72nd</td>
+                                <td class="negative">+$301 (11.3%)</td>
+                                <td>High</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Facilities & Real Estate</strong></td>
+                                <td>$2,048</td>
+                                <td>$2,099</td>
+                                <td>48th</td>
+                                <td class="positive">-$51 (-2.4%)</td>
+                                <td>High</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Travel & Expense</strong></td>
+                                <td>$1,395</td>
+                                <td>$1,222</td>
+                                <td>68th</td>
+                                <td class="negative">+$173 (14.2%)</td>
+                                <td>Medium</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pipeline Tab -->
+                <div id="pipeline" class="tab-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Initiative</th>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Est. Annual Savings</th>
+                                <th>Status</th>
+                                <th>Timeline</th>
+                                <th>Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Cloud Infrastructure Optimization</strong></td>
+                                <td>IT Infrastructure</td>
+                                <td>Run-Rate</td>
+                                <td class="positive">$4.2M</td>
+                                <td><span class="badge badge-low">In Progress</span></td>
+                                <td>Q2 2026</td>
+                                <td>High (P75)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Professional Services Rate Reduction</strong></td>
+                                <td>Professional Services</td>
+                                <td>Run-Rate</td>
+                                <td class="positive">$3.8M</td>
+                                <td><span class="badge badge-low">In Progress</span></td>
+                                <td>Q2 2026</td>
+                                <td>Medium (P50)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Travel Policy Tightening</strong></td>
+                                <td>Travel & Expense</td>
+                                <td>Run-Rate</td>
+                                <td class="positive">$2.4M</td>
+                                <td><span class="badge badge-low">Planned</span></td>
+                                <td>Q3 2026</td>
+                                <td>High (P75)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Software License Audit & Consolidation</strong></td>
+                                <td>Software Licenses</td>
+                                <td>Run-Rate</td>
+                                <td class="positive">$2.1M</td>
+                                <td><span class="badge badge-low">In Progress</span></td>
+                                <td>Q3 2026</td>
+                                <td>Medium (P50)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Telecom Renegotiation</strong></td>
+                                <td>Telecommunications</td>
+                                <td>Run-Rate</td>
+                                <td class="positive">$1.8M</td>
+                                <td><span class="badge badge-low">Not Started</span></td>
+                                <td>Q3 2026</td>
+                                <td>Medium (P50)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Contractor to FTE Conversion</strong></td>
+                                <td>Contractor Labor</td>
+                                <td>Mixed</td>
+                                <td class="positive">$1.9M</td>
+                                <td><span class="badge badge-medium">Planned</span></td>
+                                <td>Q4 2026</td>
+                                <td>Medium (P50)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Marketing Channel Mix Optimization</strong></td>
+                                <td>Marketing & Events</td>
+                                <td>Run-Rate</td>
+                                <td class="positive">$2.0M</td>
+                                <td><span class="badge badge-low">Planned</span></td>
+                                <td>Q4 2026</td>
+                                <td>Low (P25)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Supplier Consolidation (Logistics)</strong></td>
+                                <td>Indirect Materials</td>
+                                <td>Run-Rate</td>
+                                <td class="positive">$1.1M</td>
+                                <td><span class="badge badge-medium">Planned</span></td>
+                                <td>Q1 2027</td>
+                                <td>Medium (P50)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>OpEx Intelligence Platform v1.8 | Data as of Q1 2026 | Next update: 2026-05-31</p>
+            <p>This dashboard contains confidential cost analysis. Distribute with care.</p>
+        </div>
+    </div>
+
+    <script>
+        function switchView(view) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(view).classList.add('active');
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function switchTab(e, tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            e.target.classList.add('active');
+        }
+
+        // Spend by Category Chart
+        const spendCategoryCtx = document.getElementById('spendCategoryChart').getContext('2d');
+        new Chart(spendCategoryCtx, {
+            type: 'bar',
+            data: {
+                labels: ['IT Infra', 'Prof Svc', 'Indirect Mat', 'Facilities', 'Travel', 'Marketing', 'Software', 'Telecom', 'Contractor', 'Other'],
+                datasets: [
+                    {
+                        label: 'Actual Spend ($M)',
+                        data: [187.4, 142.8, 156.8, 98.6, 67.2, 52.3, 67.9, 41.2, 28.4, 204.2],
+                        backgroundColor: '#3498db',
+                        borderRadius: 6,
+                        borderSkipped: false,
+                    },
+                    {
+                        label: 'Benchmark P50 ($M)',
+                        data: [156.2, 128.4, 162.1, 101.2, 58.9, 45.6, 62.3, 36.8, 24.1, 219.4],
+                        backgroundColor: '#bdc3c7',
+                        borderRadius: 6,
+                        borderSkipped: false,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 15, font: { size: 12, weight: '600' } }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { callback: value => '$' + value + 'M' }
+                    }
+                }
+            }
+        });
+
+        // Savings Opportunity Chart
+        const savingsCtx = document.getElementById('savingsOpportunityChart').getContext('2d');
+        new Chart(savingsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['IT Infra', 'Prof Svc', 'Facilities', 'Travel', 'Marketing', 'Indirect Mat', 'Telecom', 'Software', 'Contractor', 'Other'],
+                datasets: [
+                    {
+                        label: 'Cost Reduction ($M)',
+                        data: [8.2, 5.8, 2.1, 3.2, 2.8, 3.1, 2.4, 2.4, 1.8, 1.2],
+                        backgroundColor: '#e74c3c',
+                    },
+                    {
+                        label: 'Consolidation ($M)',
+                        data: [5.4, 3.2, 1.2, 2.1, 1.8, 2.3, 1.8, 1.6, 1.4, 0.8],
+                        backgroundColor: '#f39c12',
+                    },
+                    {
+                        label: 'Optimization ($M)',
+                        data: [3.2, 2.4, 1.3, 1.8, 1.2, 1.5, 0.9, 1.1, 0.7, 0.5],
+                        backgroundColor: '#27ae60',
+                    },
+                    {
+                        label: 'Working Capital ($M)',
+                        data: [1.4, 1.2, 0.2, 1.0, 0.6, 0.3, 0.0, 0.7, 0.2, 0.3],
+                        backgroundColor: '#3498db',
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: undefined,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 15, font: { size: 12, weight: '600' } }
+                    }
+                },
+                scales: {
+                    x: { stacked: true },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: { callback: value => '$' + value + 'M' }
+                    }
+                }
+            }
+        });
+
+        // Budget vs. Actuals Chart
+        const budgetCtx = document.getElementById('budgetVarianceChart').getContext('2d');
+        new Chart(budgetCtx, {
+            type: 'bar',
+            data: {
+                labels: ['IT Infra', 'Prof Svc', 'Facilities', 'Travel', 'Marketing', 'Indirect Mat'],
+                datasets: [
+                    {
+                        label: 'Budget ($M)',
+                        data: [182.1, 138.2, 102.3, 61.8, 48.1, 158.9],
+                        backgroundColor: '#95a5a6',
+                        borderRadius: 6,
+                        borderSkipped: false,
+                    },
+                    {
+                        label: 'Actual ($M)',
+                        data: [187.4, 142.8, 98.6, 67.2, 52.3, 156.8],
+                        backgroundColor: '#e74c3c',
+                        borderRadius: 6,
+                        borderSkipped: false,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 15, font: { size: 12, weight: '600' } }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { callback: value => '$' + value + 'M' }
+                    }
+                }
+            }
+        });
+
+        // Trend Chart
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: ['Q2 2025', 'Q3 2025', 'Q4 2025', 'Q1 2026'],
+                datasets: [
+                    {
+                        label: 'IT Infrastructure ($M)',
+                        data: [181.2, 182.8, 183.2, 187.4],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#3498db',
+                    },
+                    {
+                        label: 'Professional Services ($M)',
+                        data: [137.2, 138.4, 139.6, 142.8],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#e74c3c',
+                    },
+                    {
+                        label: 'Travel & Expense ($M)',
+                        data: [61.2, 62.8, 64.3, 67.2],
+                        borderColor: '#f39c12',
+                        backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#f39c12',
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 15, font: { size: 12, weight: '600' } }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: { callback: value => '$' + value + 'M' }
+                    }
+                }
+            }
+        });
+
+        // Benchmark Chart
+        const benchmarkCtx = document.getElementById('benchmarkChart').getContext('2d');
+        new Chart(benchmarkCtx, {
+            type: 'bar',
+            data: {
+                labels: ['IT Infra', 'Prof Svc', 'Facilities', 'Travel', 'Marketing'],
+                datasets: [
+                    {
+                        label: 'Our Spend ($/Emp)',
+                        data: [3892, 2968, 2048, 1395, 1086],
+                        backgroundColor: '#e74c3c',
+                        borderRadius: 6,
+                        borderSkipped: false,
+                    },
+                    {
+                        label: 'Benchmark P50 ($/Emp)',
+                        data: [3245, 2667, 2099, 1222, 946],
+                        backgroundColor: '#27ae60',
+                        borderRadius: 6,
+                        borderSkipped: false,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 15, font: { size: 12, weight: '600' } }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { callback: value => '$' + value }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

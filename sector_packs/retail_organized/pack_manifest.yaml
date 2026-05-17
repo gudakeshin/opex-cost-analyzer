@@ -1,0 +1,15 @@
+pack_id: retail_organized
+sector: Organized Retail (India)
+version: "0.1"
+schema_version: "1"
+status: scaffold
+description: Scaffold for Indian organized retail — hypermarkets, fashion, e-commerce, quick commerce. Full content deferred.
+applicable_entity_types: [hypermarket_grocery, fashion_retail, ecommerce_pure_play, quick_commerce]
+regulatory_bodies: [SEBI, MoCI, CCI, FSSAI_if_food]
+fiscal_year_end: "March 31"
+reporting_currency: INR
+default_wacc_pct: 14.0
+default_tax_rate_pct: 25.17
+created_at: "2026-05-01"
+effective_from: "2026-05-01"
+maintained_by: opex_platform_core

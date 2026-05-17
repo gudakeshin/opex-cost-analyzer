@@ -1,0 +1,23 @@
+{
+  "description": "Temporal adversarial: only 1 fiscal period — temporal_available must be false",
+  "skill": "temporal-analyzer",
+  "input_lines": [
+    {
+      "row_id": 401, "supplier": "Alpha SaaS", "description": "Subscription",
+      "category_id": "software", "category_name": "Software",
+      "amount": 50000.0, "spend_date": "2025-01-15", "fiscal_period": "2025-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 50000.0
+    },
+    {
+      "row_id": 402, "supplier": "Beta SaaS", "description": "License",
+      "category_id": "software", "category_name": "Software",
+      "amount": 30000.0, "spend_date": "2025-01-20", "fiscal_period": "2025-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 30000.0
+    }
+  ],
+  "extra_kwargs": {},
+  "assertions": {
+    "required_keys": ["temporal_available"],
+    "temporal_available": false
+  }
+}

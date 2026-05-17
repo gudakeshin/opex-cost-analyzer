@@ -1,0 +1,363 @@
+{
+  "pack_id": "it_ites",
+  "sector": "IT / IT-Enabled Services",
+  "version": "1.0",
+  "applicable_entity_types": [
+    "software_product",
+    "it_services",
+    "bpm",
+    "gic",
+    "saas",
+    "ecommerce"
+  ],
+  "industry_signals": [
+    "it_spend_gt_15pct",
+    "contingent_plus_it_gt_40pct",
+    "rnd_gt_2pct"
+  ],
+  "universal_levers": [
+    "contract_renegotiation",
+    "process_standardization",
+    "demand_management",
+    "supplier_consolidation",
+    "automation",
+    "payment_terms",
+    "maverick_compliance",
+    "insourcing",
+    "outsourcing",
+    "internal_best_practice",
+    "tail_spend_automation",
+    "should_cost_modeling",
+    "zero_based_rebaseline",
+    "shared_services_consolidation",
+    "geographic_arbitrage",
+    "rebate_pricing_recovery",
+    "specification_optimization",
+    "benefits_cost_optimization",
+    "contingent_workforce_optimization",
+    "consulting_spend_governance",
+    "legal_spend_optimization",
+    "ld_rationalization",
+    "space_utilization_optimization",
+    "lease_restructuring",
+    "cost_governance",
+    "saas_sprawl_audit",
+    "hyperscaler_commitment_optimization"
+  ],
+  "sector_specific_levers": [
+    {
+      "lever_id": "license_rightsizing",
+      "lever_name": "Software License Right-Sizing",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 22,
+        "p90": 32
+      },
+      "cta_rate": 0.07,
+      "phasing_curve": [
+        0.4,
+        0.4,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.85,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "License utilisation audit completed (usage data ≥ 90 days)",
+        "Over-provisioned tiers identified; downgrade path confirmed with vendor",
+        "ITAM tooling deployed to prevent re-provisioning creep"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 14,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:IT present",
+        "sw_license_keywords detected OR it_spend_gt_5pct_revenue"
+      ]
+    },
+    {
+      "lever_id": "cloud_finops",
+      "lever_name": "Cloud FinOps / Reserved Instance Optimisation",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 18,
+        "p50": 28,
+        "p90": 40
+      },
+      "cta_rate": 0.08,
+      "phasing_curve": [
+        0.35,
+        0.4,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.88,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Cloud cost visibility tooling deployed (e.g. CloudHealth, Apptio, native dashboards)",
+        "Tagging taxonomy enforced for cost allocation by team / product / environment",
+        "Reserved instance or savings plan commitment approved by Finance"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.78,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 16,
+        "p90": 28
+      },
+      "applicable_if": [
+        "cloud_keywords detected in spend descriptions",
+        "category:IT spend > 3% revenue"
+      ]
+    },
+    {
+      "lever_id": "subcontractor_optimization",
+      "lever_name": "Subcontractor / Delivery Cost Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 18
+      },
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Rate card benchmarked against market (offshore, nearshore, onshore mix)",
+        "SOW vs. T&M billing ratio reviewed and optimised",
+        "Preferred supplier panel rationalised to < 5 strategic vendors"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 20,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:CONTINGENT or OUTSOURCED > 10% spend"
+      ]
+    },
+    {
+      "lever_id": "tech_debt_payoff",
+      "lever_name": "Technical Debt Payoff (BAU Cost Reduction)",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 6,
+        "p50": 14,
+        "p90": 22
+      },
+      "cta_rate": 0.15,
+      "phasing_curve": [
+        0.05,
+        0.35,
+        0.6
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.82,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Tech debt inventory quantified (story points and BAU cost per module)",
+        "Engineering capacity ring-fenced for debt remediation (not feature work)",
+        "Architecture review board approval for platform simplification"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.58,
+      "implementation_weeks": {
+        "p10": 24,
+        "p50": 48,
+        "p90": 80
+      },
+      "applicable_if": [
+        "category:IT present",
+        "legacy_system_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "platform_consolidation",
+      "lever_name": "Platform & Tool Consolidation (Shadow IT Elimination)",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 20,
+        "p90": 28
+      },
+      "cta_rate": 0.08,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.8,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "SaaS inventory audit completed (all subscriptions catalogued)",
+        "Functional overlap map produced; retirement list approved by IT governance",
+        "Data migration plan for deprecated tools executed"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 36
+      },
+      "applicable_if": [
+        "supplier_count_IT > 15",
+        "category:IT > 5% revenue"
+      ]
+    },
+    {
+      "lever_id": "genai_productivity",
+      "lever_name": "GenAI / Copilot Engineering Productivity",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 13,
+        "p90": 18
+      },
+      "cta_rate": 0.09,
+      "phasing_curve": [
+        0.15,
+        0.4,
+        0.45
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "AI tool procurement approved (GitHub Copilot, Cursor, Gemini Code, etc.)",
+        "Developer productivity baseline established (velocity, commit throughput)",
+        "Training and change management programme executed for engineering org"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 20,
+        "p90": 36
+      },
+      "applicable_if": [
+        "category:IT or RND present",
+        "headcount > 50"
+      ]
+    },
+    {
+      "lever_id": "remote_first_realestate",
+      "lever_name": "Remote-First Real Estate Optimisation",
+      "lever_family": "structure",
+      "savings_range_pct": {
+        "p10": 30,
+        "p50": 48,
+        "p90": 65
+      },
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.85,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Remote / hybrid work policy formalised and board-approved",
+        "Office utilisation data collected (badge scans / desk booking ≥ 3 months)",
+        "Lease break clauses or upcoming renewal windows identified"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 18,
+        "p90": 36
+      },
+      "applicable_if": [
+        "category:FACILITIES present",
+        "contract_status: rolling or expiring_lt_18m"
+      ]
+    },
+    {
+      "lever_id": "build_vs_buy_optimization",
+      "lever_name": "Build vs. Buy Rationalisation",
+      "lever_family": "demand",
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 22,
+        "p90": 32
+      },
+      "cta_rate": 0.1,
+      "phasing_curve": [
+        0.1,
+        0.4,
+        0.5
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.8,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "TCO analysis completed for bespoke vs. COTS alternatives",
+        "Engineering capacity freed from maintenance of proprietary systems",
+        "Vendor selection and contract for COTS replacement finalised"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.6,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 40,
+        "p90": 64
+      },
+      "applicable_if": [
+        "category:IT or RND > 5% revenue",
+        "bespoke_development_keywords detected"
+      ]
+    },
+    {
+      "lever_id": "devops_automation",
+      "lever_name": "DevOps / CI-CD Pipeline Automation",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 10,
+        "p50": 18,
+        "p90": 26
+      },
+      "cta_rate": 0.09,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.88,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Engineering maturity assessment completed (manual testing > 30% of release cycle)",
+        "Automated test coverage target set (> 70% unit / integration)",
+        "DevOps toolchain selected and infrastructure provisioned"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 32,
+        "p90": 52
+      },
+      "applicable_if": [
+        "category:IT or RND present",
+        "headcount > 30"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+supplier,description,amount,business unit,country,date
+Amazon Web Services,cloud infrastructure invoice,145000,Engineering,US,2025-01-10
+Microsoft,enterprise software licenses,98000,Engineering,US,2025-01-15
+Deloitte,transformation consulting engagement,175000,Finance,US,2025-01-12
+McKinsey,strategy advisory retainer,120000,Finance,US,2025-01-20
+Office Depot,office consumables replenishment,14000,Operations,US,2025-01-11
+Concur,travel expense platform subscription,28000,Operations,US,2025-01-08
+Hilton,business travel lodging,22000,Sales,US,2025-01-18
+Uber,ground transport expense,9000,Sales,US,2025-01-19
+AT&T,telecom circuits and mobile plans,36000,IT,US,2025-01-16
+FedEx,priority shipment and courier services,41000,Supply Chain,US,2025-01-14
+Workday,hr system annual subscription,67000,HR,US,2025-01-09
+LinkedIn,recruitment and job posting spend,33000,HR,US,2025-01-22
+Google Ads,digital campaign spend,76000,Marketing,US,2025-01-24
+HubSpot,marketing automation tooling,29000,Marketing,US,2025-01-25
+JLL,facility maintenance and lease advisory,58000,Facilities,US,2025-01-17
+Zurich,corporate insurance premium,49000,Legal,US,2025-01-13

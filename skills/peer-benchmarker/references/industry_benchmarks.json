@@ -1,0 +1,80 @@
+{
+  "version": "1.0",
+  "description": "Industry benchmark percentile distributions for operating expenditure categories. Values expressed as spend-as-%-of-revenue. Sources: Compiled from publicly available data, Gartner, Hackett Group ranges, and consulting framework reference ranges.",
+  "note": "These are illustrative reference ranges for platform initialization. Production deployment should be enriched with licensed benchmark data.",
+  "size_bands": {
+    "small": {"label": "Small (<$100M revenue)", "min_revenue": 0, "max_revenue": 100000000},
+    "mid": {"label": "Mid-Market ($100M-$1B)", "min_revenue": 100000000, "max_revenue": 1000000000},
+    "large": {"label": "Large Enterprise ($1B-$10B)", "min_revenue": 1000000000, "max_revenue": 10000000000},
+    "mega": {"label": "Mega Enterprise (>$10B)", "min_revenue": 10000000000, "max_revenue": null}
+  },
+  "benchmarks": {
+    "technology": {
+      "label": "Technology",
+      "categories": {
+        "IT": {"P25": 4.5, "P50": 6.2, "P75": 8.5, "P90": 11.0, "unit": "% of revenue"},
+        "PROF_SVCS": {"P25": 1.0, "P50": 2.2, "P75": 3.8, "P90": 5.5},
+        "FACILITIES": {"P25": 1.5, "P50": 2.8, "P75": 4.2, "P90": 6.0},
+        "TRAVEL": {"P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.5},
+        "MARKETING": {"P25": 5.0, "P50": 8.0, "P75": 12.0, "P90": 18.0},
+        "HR": {"P25": 1.0, "P50": 1.8, "P75": 2.8, "P90": 4.0},
+        "TELECOM": {"P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5},
+        "INSURANCE": {"P25": 0.2, "P50": 0.5, "P75": 1.0, "P90": 1.5},
+        "OFFICE": {"P25": 0.1, "P50": 0.3, "P75": 0.6, "P90": 1.0}
+      }
+    },
+    "financial_services": {
+      "label": "Financial Services",
+      "categories": {
+        "IT": {"P25": 6.0, "P50": 8.5, "P75": 11.0, "P90": 14.0},
+        "PROF_SVCS": {"P25": 2.0, "P50": 3.5, "P75": 5.5, "P90": 8.0},
+        "FACILITIES": {"P25": 3.0, "P50": 5.0, "P75": 7.5, "P90": 10.0},
+        "TRAVEL": {"P25": 0.5, "P50": 1.0, "P75": 2.0, "P90": 3.0},
+        "MARKETING": {"P25": 1.5, "P50": 3.0, "P75": 5.0, "P90": 7.0},
+        "HR": {"P25": 1.5, "P50": 2.5, "P75": 4.0, "P90": 5.5},
+        "TELECOM": {"P25": 0.5, "P50": 1.0, "P75": 2.0, "P90": 3.0},
+        "INSURANCE": {"P25": 0.5, "P50": 1.0, "P75": 2.0, "P90": 3.5},
+        "OFFICE": {"P25": 0.2, "P50": 0.4, "P75": 0.7, "P90": 1.0}
+      }
+    },
+    "manufacturing": {
+      "label": "Manufacturing",
+      "categories": {
+        "IT": {"P25": 1.0, "P50": 1.8, "P75": 3.0, "P90": 4.5},
+        "PROF_SVCS": {"P25": 0.5, "P50": 1.2, "P75": 2.5, "P90": 4.0},
+        "FACILITIES": {"P25": 2.5, "P50": 4.5, "P75": 7.0, "P90": 10.0},
+        "TRAVEL": {"P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5},
+        "MARKETING": {"P25": 1.0, "P50": 2.0, "P75": 3.5, "P90": 5.0},
+        "HR": {"P25": 0.8, "P50": 1.5, "P75": 2.5, "P90": 3.5},
+        "LOGISTICS": {"P25": 3.0, "P50": 5.5, "P75": 8.0, "P90": 12.0},
+        "TELECOM": {"P25": 0.2, "P50": 0.5, "P75": 1.0, "P90": 1.8},
+        "INSURANCE": {"P25": 0.5, "P50": 1.0, "P75": 1.8, "P90": 2.5}
+      }
+    },
+    "healthcare": {
+      "label": "Healthcare",
+      "categories": {
+        "IT": {"P25": 2.5, "P50": 4.0, "P75": 6.0, "P90": 8.5},
+        "PROF_SVCS": {"P25": 1.5, "P50": 3.0, "P75": 5.0, "P90": 7.0},
+        "FACILITIES": {"P25": 4.0, "P50": 6.5, "P75": 9.0, "P90": 12.0},
+        "TRAVEL": {"P25": 0.3, "P50": 0.6, "P75": 1.2, "P90": 2.0},
+        "MARKETING": {"P25": 1.0, "P50": 2.5, "P75": 4.5, "P90": 7.0},
+        "HR": {"P25": 1.5, "P50": 2.5, "P75": 4.0, "P90": 5.5},
+        "INSURANCE": {"P25": 1.0, "P50": 2.0, "P75": 3.5, "P90": 5.0}
+      }
+    },
+    "retail_consumer": {
+      "label": "Retail & Consumer",
+      "categories": {
+        "IT": {"P25": 1.5, "P50": 2.5, "P75": 4.0, "P90": 6.0},
+        "PROF_SVCS": {"P25": 0.5, "P50": 1.0, "P75": 2.0, "P90": 3.5},
+        "FACILITIES": {"P25": 5.0, "P50": 8.0, "P75": 12.0, "P90": 16.0},
+        "TRAVEL": {"P25": 0.3, "P50": 0.7, "P75": 1.2, "P90": 2.0},
+        "MARKETING": {"P25": 3.0, "P50": 5.5, "P75": 9.0, "P90": 14.0},
+        "HR": {"P25": 1.0, "P50": 1.8, "P75": 2.8, "P90": 4.0},
+        "LOGISTICS": {"P25": 4.0, "P50": 7.0, "P75": 10.0, "P90": 14.0},
+        "TELECOM": {"P25": 0.3, "P50": 0.6, "P75": 1.2, "P90": 2.0}
+      }
+    }
+  }
+}

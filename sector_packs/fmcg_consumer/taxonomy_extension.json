@@ -1,0 +1,13 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "advertising_promotion", "category_name": "Advertising, Promotions & Trade Spends", "gl_prefix": "A&P"},
+    {"category_id": "distribution_gt_mt", "category_name": "GT/MT Channel Distribution Costs", "gl_prefix": "DST"},
+    {"category_id": "packaging_material", "category_name": "Packaging Material & Design", "gl_prefix": "PKG"},
+    {"category_id": "fssai_regulatory", "category_name": "FSSAI, BIS & Quality Compliance", "gl_prefix": "FSS"},
+    {"category_id": "cold_chain_fmcg", "category_name": "Cold Chain & Ambient Distribution", "gl_prefix": "CCF"}
+  ],
+  "overrides": [
+    {"category_id": "logistics", "category_name": "Distribution & Logistics (GT + MT + e-com)"}
+  ]
+}

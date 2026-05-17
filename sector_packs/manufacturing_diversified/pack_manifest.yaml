@@ -1,0 +1,24 @@
+pack_id: manufacturing_diversified
+sector: Manufacturing — Diversified (India)
+version: "1.0"
+schema_version: "1"
+status: full
+description: >
+  Full sector pack for Indian diversified manufacturers (auto, capital goods,
+  chemicals, consumer durables). Covers GST ITC optimisation, energy cost
+  management, PLI scheme alignment, and Ind AS 116 lease reclassification.
+applicable_entity_types:
+  - diversified_manufacturer
+  - auto_oem
+  - capital_goods_manufacturer
+  - chemical_manufacturer
+  - consumer_durables
+regulatory_bodies: [MoCI, MoEFCC, BIS, FSSAI_if_applicable, DPIIT_PLI]
+fiscal_year_end: "March 31"
+reporting_currency: INR
+default_wacc_pct: 13.0
+default_tax_rate_pct: 25.17
+ebitda_benchmark_pct: 14.0
+created_at: "2026-05-01"
+effective_from: "2026-05-01"
+maintained_by: opex_platform_core

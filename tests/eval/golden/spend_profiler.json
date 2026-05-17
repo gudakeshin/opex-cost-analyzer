@@ -1,0 +1,48 @@
+{
+  "description": "Spend profiler: 3 categories, 6 actual lines, totals and shares computed correctly",
+  "skill": "spend-profiler",
+  "input_lines": [
+    {
+      "row_id": 1, "supplier": "Vendor A", "description": "SaaS license",
+      "category_id": "software", "category_name": "Software",
+      "amount": 120000.0, "spend_date": "2025-01-10",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 120000.0
+    },
+    {
+      "row_id": 2, "supplier": "Vendor B", "description": "SaaS license 2",
+      "category_id": "software", "category_name": "Software",
+      "amount": 80000.0, "spend_date": "2025-01-15",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 80000.0
+    },
+    {
+      "row_id": 3, "supplier": "Vendor C", "description": "Consulting project",
+      "category_id": "professional_services", "category_name": "Professional Services",
+      "amount": 200000.0, "spend_date": "2025-01-20",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 200000.0
+    },
+    {
+      "row_id": 4, "supplier": "Vendor D", "description": "Consulting project 2",
+      "category_id": "professional_services", "category_name": "Professional Services",
+      "amount": 150000.0, "spend_date": "2025-01-22",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 150000.0
+    },
+    {
+      "row_id": 5, "supplier": "Vendor E", "description": "Office supplies",
+      "category_id": "facilities", "category_name": "Facilities",
+      "amount": 30000.0, "spend_date": "2025-01-05",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 30000.0
+    },
+    {
+      "row_id": 6, "supplier": "Vendor F", "description": "Maintenance",
+      "category_id": "facilities", "category_name": "Facilities",
+      "amount": 20000.0, "spend_date": "2025-01-08",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 20000.0
+    }
+  ],
+  "extra_kwargs": {},
+  "assertions": {
+    "required_keys": ["total_spend", "category_profile"],
+    "total_spend": 600000.0,
+    "min_category_profile": 3
+  }
+}

@@ -1,0 +1,64 @@
+/* App-level styles */
+
+/* Sidebar responsive styling */
+@media (max-width: 768px) {
+  aside.sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  aside.sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+/* Smooth animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Table styling for Deloitte theme */
+table {
+  @apply w-full border-collapse;
+}
+
+th {
+  @apply bg-gray-100 dark:bg-gray-800 text-left px-4 py-3 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700;
+}
+
+td {
+  @apply px-4 py-3 border-b border-gray-100 dark:border-gray-800;
+}
+
+tr:hover {
+  @apply bg-gray-50 dark:bg-gray-800 transition-colors;
+}
+
+/* Modal styles */
+.modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4;
+}
+
+/* Loading skeleton */
+.skeleton {
+  @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded;
+}
+
+/* Focus styles for accessibility */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  @apply outline-none ring-2 ring-deloitte-green ring-offset-2 dark:ring-offset-gray-900;
+}

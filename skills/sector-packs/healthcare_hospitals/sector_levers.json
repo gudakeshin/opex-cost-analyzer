@@ -1,0 +1,145 @@
+{
+  "pack_id": "healthcare_hospitals",
+  "sector": "Healthcare / Hospital Systems & Diagnostics",
+  "version": "1.0",
+  "applicable_entity_types": ["hospital_chain", "multi_specialty_hospital", "diagnostics_lab", "clinic_chain", "day_care_centre", "healthcare_aggregator"],
+  "industry_signals": ["bed_capacity_keywords", "nabh_keywords", "clinical_staff_keywords", "ot_utilization_keywords"],
+  "universal_levers": [
+    "contract_renegotiation", "process_standardization", "demand_management",
+    "supplier_consolidation", "automation", "payment_terms", "maverick_compliance",
+    "outsourcing", "internal_best_practice", "tail_spend_automation",
+    "should_cost_modeling", "zero_based_rebaseline", "rebate_pricing_recovery",
+    "specification_optimization", "geographic_arbitrage",
+    "benefits_cost_optimization", "contingent_workforce_optimization",
+    "consulting_spend_governance", "legal_spend_optimization", "ld_rationalization",
+    "space_utilization_optimization", "lease_restructuring", "cost_governance"
+  ],
+  "sector_specific_levers": [
+    {
+      "lever_id": "clinical_workforce_optimization",
+      "lever_name": "Clinical Workforce Mix Optimisation (FTE vs. Agency Nursing & Locum Doctors)",
+      "lever_family": "structure",
+      "savings_range_pct": {"p10": 8, "p50": 16, "p90": 25},
+      "cta_rate": 0.07,
+      "phasing_curve": [0.25, 0.50, 0.25],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.70,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "high",
+      "condition_precedents": [
+        "Clinical staffing ratio analysis completed (FTE vs. agency ratio by department and shift)",
+        "Agency nursing cost benchmarked vs. full-time equivalent cost including benefits",
+        "HR and clinical leadership sign-off on optimised staffing model (patient safety maintained)"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {"p10": 16, "p50": 32, "p90": 52},
+      "applicable_if": ["category:HR or CONTINGENT > 30% spend", "clinical_staff_keywords detected"]
+    },
+    {
+      "lever_id": "medical_supplies_procurement",
+      "lever_name": "Medical Supplies & Implant Cost Optimisation (GPO vs. Direct Sourcing)",
+      "lever_family": "supply",
+      "savings_range_pct": {"p10": 8, "p50": 15, "p90": 24},
+      "cta_rate": 0.06,
+      "phasing_curve": [0.25, 0.50, 0.25],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Medical supplies spend classified by category (consumables, implants, reagents, pharmaceuticals)",
+        "GPO membership evaluated vs. direct contract savings for top 10 categories by spend",
+        "Clinician preference item (CPI) committee established — physician engagement on implant standardisation"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {"p10": 18, "p50": 36, "p90": 60},
+      "applicable_if": ["bed_capacity_keywords detected", "category:OFFICE or OTHER > 5% spend"]
+    },
+    {
+      "lever_id": "pharmacy_cost_optimization",
+      "lever_name": "Pharmacy Cost Optimisation (Formulary Management & Generic Substitution)",
+      "lever_family": "demand",
+      "savings_range_pct": {"p10": 12, "p50": 20, "p90": 30},
+      "cta_rate": 0.05,
+      "phasing_curve": [0.35, 0.45, 0.20],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.75,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "medium",
+      "condition_precedents": [
+        "Formulary committee established with clinical pharmacy leadership",
+        "Generic substitution rate benchmarked vs. hospital peer group (target > 70%)",
+        "Prescriber behaviour analytics deployed — high branded prescribers identified and coached"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.70,
+      "implementation_weeks": {"p10": 12, "p50": 24, "p90": 40},
+      "applicable_if": ["category:OUTSOURCED or OTHER present", "nabh_keywords detected"]
+    },
+    {
+      "lever_id": "revenue_cycle_automation",
+      "lever_name": "Revenue Cycle Management Automation (Denial Management & Pre-Auth)",
+      "lever_family": "technology",
+      "savings_range_pct": {"p10": 15, "p50": 25, "p90": 38},
+      "cta_rate": 0.09,
+      "phasing_curve": [0.15, 0.45, 0.40],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.88,
+      "bounce_back_risk": "low",
+      "org_change_risk": "medium",
+      "condition_precedents": [
+        "Denial rate benchmarked by payer and denial reason (target < 5% first-pass denial)",
+        "Pre-authorisation workflow mapped and automated triggers configured",
+        "Revenue cycle platform selected (Athena, Epic Resolute, or equivalent)"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {"p10": 18, "p50": 36, "p90": 60},
+      "applicable_if": ["category:IT or OUTSOURCED present", "nabh_keywords detected"]
+    },
+    {
+      "lever_id": "clinical_space_utilization",
+      "lever_name": "Clinical Space Utilisation (OT, ICU & Bed Occupancy Optimisation)",
+      "lever_family": "structure",
+      "savings_range_pct": {"p10": 8, "p50": 15, "p90": 22},
+      "cta_rate": 0.06,
+      "phasing_curve": [0.20, 0.50, 0.30],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.75,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "medium",
+      "condition_precedents": [
+        "OT utilisation data available (target > 75% first-case on-time starts)",
+        "Bed occupancy tracking system deployed (ADT system with real-time census)",
+        "Theatre scheduling optimisation model implemented — case sequencing and block booking"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.68,
+      "implementation_weeks": {"p10": 12, "p50": 24, "p90": 40},
+      "applicable_if": ["ot_utilization_keywords detected", "bed_capacity_keywords detected"]
+    },
+    {
+      "lever_id": "medical_equipment_rationalization",
+      "lever_name": "Medical Equipment Asset Optimisation (Lease vs. Buy & Maintenance Cost)",
+      "lever_family": "supply",
+      "savings_range_pct": {"p10": 10, "p50": 18, "p90": 28},
+      "cta_rate": 0.07,
+      "phasing_curve": [0.20, 0.50, 0.30],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "low",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Medical equipment asset register updated with utilisation data (target > 65% utilisation)",
+        "Lease vs. buy TCO analysis completed for high-value equipment (CT, MRI, linear accelerators)",
+        "Preventive maintenance programme optimised — OEM vs. independent service provider benchmarked"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.70,
+      "implementation_weeks": {"p10": 12, "p50": 24, "p90": 44},
+      "applicable_if": ["category:FACILITIES or OTHER > 5% spend", "nabh_keywords detected"]
+    }
+  ]
+}

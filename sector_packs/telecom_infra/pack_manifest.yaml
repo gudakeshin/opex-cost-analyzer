@@ -1,0 +1,15 @@
+pack_id: telecom_infra
+sector: Telecom & Digital Infrastructure (India)
+version: "0.1"
+schema_version: "1"
+status: scaffold
+description: Scaffold for Indian telecom operators, tower companies, and data centres. Full content deferred.
+applicable_entity_types: [mobile_operator, tower_company, data_centre, isp]
+regulatory_bodies: [TRAI, DoT, SEBI, MeitY]
+fiscal_year_end: "March 31"
+reporting_currency: INR
+default_wacc_pct: 13.5
+default_tax_rate_pct: 25.17
+created_at: "2026-05-01"
+effective_from: "2026-05-01"
+maintained_by: opex_platform_core

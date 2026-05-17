@@ -1,0 +1,48 @@
+{
+  "description": "BvA adversarial: all actuals BELOW budget — all variances must be favorable (negative total_variance)",
+  "skill": "bva-analyzer",
+  "input_lines": [
+    {
+      "row_id": 301, "supplier": "SaaS Corp", "description": "License fee",
+      "category_id": "software", "category_name": "Software",
+      "amount": 80000.0, "spend_date": "2025-03-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 80000.0
+    },
+    {
+      "row_id": 302, "supplier": "SaaS Corp", "description": "License budget",
+      "category_id": "software", "category_name": "Software",
+      "amount": 100000.0, "spend_date": "2025-03-01",
+      "amount_type": "budget", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 100000.0
+    },
+    {
+      "row_id": 303, "supplier": "Facilities Co", "description": "Rent",
+      "category_id": "facilities", "category_name": "Facilities",
+      "amount": 42000.0, "spend_date": "2025-03-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 42000.0
+    },
+    {
+      "row_id": 304, "supplier": "Facilities Co", "description": "Rent budget",
+      "category_id": "facilities", "category_name": "Facilities",
+      "amount": 50000.0, "spend_date": "2025-03-01",
+      "amount_type": "budget", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 50000.0
+    },
+    {
+      "row_id": 305, "supplier": "Staffing Inc", "description": "Contractors",
+      "category_id": "professional_services", "category_name": "Professional Services",
+      "amount": 110000.0, "spend_date": "2025-03-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 110000.0
+    },
+    {
+      "row_id": 306, "supplier": "Staffing Inc", "description": "Contractors budget",
+      "category_id": "professional_services", "category_name": "Professional Services",
+      "amount": 130000.0, "spend_date": "2025-03-01",
+      "amount_type": "budget", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 130000.0
+    }
+  ],
+  "extra_kwargs": {},
+  "assertions": {
+    "required_keys": ["bva_available", "total_actual", "total_budget", "total_variance", "variances"],
+    "bva_available": true,
+    "min_variances": 3
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "version": "1.0",
+  "description": "Switching cost rates as a percentage of annual spend by category. Applied to net addressable spend to prevent over-stating savings when vendor migration costs are material.",
+  "switching_cost_rate_by_category": {
+    "IT": 0.12,
+    "PROF_SVCS": 0.04,
+    "FACILITIES": 0.06,
+    "TRAVEL": 0.01,
+    "MARKETING": 0.03,
+    "HR": 0.05,
+    "LOGISTICS": 0.05,
+    "TELECOM": 0.08,
+    "INSURANCE": 0.02,
+    "OFFICE": 0.01,
+    "OUTSOURCED": 0.07,
+    "RND": 0.08,
+    "FIN_SVCS": 0.03,
+    "CONTINGENT": 0.04,
+    "POWER_ENERGY": 0.04,
+    "LOGISTICS_INDIA": 0.04,
+    "PLANT_MAINTENANCE": 0.05,
+    "GST_TAX": 0.00,
+    "RELATED_PARTY": 0.10,
+    "CSR": 0.00,
+    "BANKING_TREASURY": 0.04,
+    "BRSR_ESG": 0.02,
+    "PACKAGING": 0.05,
+    "OTHER": 0.03
+  },
+  "notes": {
+    "IT": "High switching costs driven by data migration, integration re-wiring, retraining and ERP customisation. Core ERP/CBS switches cost 15-20%; SaaS switches 5-8%.",
+    "TELECOM": "Core network vendor switches (RAN, transmission) carry 10-15% migration costs; enterprise comms 3-5%.",
+    "OUTSOURCED": "BPO/ITO transitions typically 6-9% of TCV for knowledge transfer, parallel running and stabilisation.",
+    "RELATED_PARTY": "Exit from related-party arrangements carries legal, transfer pricing and regulatory risk — modelled conservatively at 10%.",
+    "GST_TAX": "Regulatory payments — no switching cost concept applicable.",
+    "CSR": "No vendor lock-in; switching cost negligible."
+  }
+}

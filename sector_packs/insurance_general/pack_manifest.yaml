@@ -1,0 +1,15 @@
+pack_id: insurance_general
+sector: Insurance — General & Life (India)
+version: "0.1"
+schema_version: "1"
+status: scaffold
+description: Scaffold pack for Indian general and life insurers. Full content deferred.
+applicable_entity_types: [general_insurer, life_insurer, health_insurer, reinsurer]
+regulatory_bodies: [IRDAI, SEBI, RBI]
+fiscal_year_end: "March 31"
+reporting_currency: INR
+default_wacc_pct: 15.0
+default_tax_rate_pct: 25.17
+created_at: "2026-05-01"
+effective_from: "2026-05-01"
+maintained_by: opex_platform_core

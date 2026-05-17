@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "description": "Industry benchmark DPO (Days Payable Outstanding) by spend category and industry tier.",
+  "default_target_dpo": 45,
+  "category_benchmarks": {
+    "IT": {"p50_dpo": 45, "p75_dpo": 60, "p90_dpo": 75, "notes": "Software/SaaS often net-30 by contract; hardware net-45 to net-60 achievable"},
+    "PROFESSIONAL_SERVICES": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "Consulting firms typically net-30; pushing to net-45 feasible for large engagements"},
+    "FACILITIES": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "Utilities often fixed; maintenance and FM services net-45 achievable"},
+    "MARKETING": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "Agency retainers often net-30; project work can push to net-45"},
+    "LOGISTICS": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "Freight and 3PL benchmark around net-30 to net-45"},
+    "TRAVEL": {"p50_dpo": 14, "p75_dpo": 30, "p90_dpo": 45, "notes": "Corporate card programs settle quickly; focus on corporate card DPO vs direct billing"},
+    "HR": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "RPO and benefits admin net-30 standard; benchmarks achievable at net-45"},
+    "CONTINGENT_WORKFORCE": {"p50_dpo": 21, "p75_dpo": 30, "p90_dpo": 45, "notes": "Staffing agencies often require weekly/bi-weekly pay; net-30 is the stretch target"},
+    "TELECOMMUNICATIONS": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "Telco contracts often fixed; consolidation to one provider enables better terms"},
+    "OFFICE_SUPPLIES": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "Office supply distributors routinely offer net-45 to net-60 for volume accounts"},
+    "INSURANCE": {"p50_dpo": 30, "p75_dpo": 30, "p90_dpo": 30, "notes": "Insurance premiums are typically fixed-schedule; limited DPO leverage"},
+    "OTHER": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "Default target; apply category-specific benchmarks where possible"}
+  },
+  "industry_adjustments": {
+    "manufacturing": 1.20,
+    "retail": 1.30,
+    "technology": 0.90,
+    "financial_services": 0.85,
+    "healthcare": 0.90,
+    "energy": 1.10,
+    "default": 1.00
+  },
+  "working_capital_notes": "DPO extension benefit = (target_dpo - current_dpo) / 365 * annual_category_spend. This is a one-time working capital release, not an ongoing P&L saving. At a 10% WACC, the annual cash flow value = working_capital_released * wacc."
+}

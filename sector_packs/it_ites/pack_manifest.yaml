@@ -1,0 +1,15 @@
+pack_id: it_ites
+sector: IT & ITeS — Indian IT Services and BPM
+version: "0.1"
+schema_version: "1"
+status: scaffold
+description: Scaffold pack for Indian IT services, BPM, and engineering R&D companies. Full content deferred.
+applicable_entity_types: [it_services, bpm_bpo, engineering_rd, saas_product]
+regulatory_bodies: [SEBI, MeitY, DoT, STPI]
+fiscal_year_end: "March 31"
+reporting_currency: INR
+default_wacc_pct: 12.0
+default_tax_rate_pct: 25.17
+created_at: "2026-05-01"
+effective_from: "2026-05-01"
+maintained_by: opex_platform_core

@@ -1,0 +1,34 @@
+supplier,description,amount,currency,fx_rate,amount_type,category,gl_code,cost_center,fiscal_period,payment_terms,business_unit
+AWS,Cloud infrastructure,320000,USD,1.00,actual,IT,6100,TECH,2025-01,Net 30,Engineering
+Azure,SaaS licenses,85000,USD,1.00,actual,IT,6110,TECH,2025-01,Net 30,Engineering
+ServiceNow,ITSM platform,42000,USD,1.00,actual,IT,6130,TECH,2025-01,Net 45,Engineering
+McKinsey,Strategy consulting,210000,USD,1.00,actual,PROFESSIONAL_SERVICES,7200,STRATEGY,2025-01,Net 30,Strategy
+Deloitte,Audit fees,95000,USD,1.00,actual,PROFESSIONAL_SERVICES,7210,FINANCE,2025-01,Net 30,Finance
+CBRE,Office lease,180000,USD,1.00,actual,FACILITIES,8100,ADMIN,2025-01,Net 30,Admin
+Google Ads,Digital advertising,125000,USD,1.00,actual,MARKETING,9100,MARKETING,2025-01,Net 30,Marketing
+Randstad,Contract staffing,98000,USD,1.00,actual,CONTINGENT_WORKFORCE,7500,HR,2025-01,Net 21,HR
+United Airlines,Business travel,34000,USD,1.00,actual,TRAVEL,9200,ADMIN,2025-01,Net 14,Admin
+SAP UK,ERP licenses EMEA,65000,GBP,1.27,actual,IT,6130,TECH,2025-01,Net 45,Engineering EMEA
+Roland Berger,EU consulting,80000,EUR,1.09,actual,PROFESSIONAL_SERVICES,7205,STRATEGY,2025-01,Net 30,Strategy EMEA
+AWS,Cloud infrastructure,280000,USD,1.00,budget,IT,6100,TECH,2025-01,Net 30,Engineering
+Azure,SaaS licenses,90000,USD,1.00,budget,IT,6110,TECH,2025-01,Net 30,Engineering
+ServiceNow,ITSM platform,42000,USD,1.00,budget,IT,6130,TECH,2025-01,Net 45,Engineering
+McKinsey,Strategy consulting,150000,USD,1.00,budget,PROFESSIONAL_SERVICES,7200,STRATEGY,2025-01,Net 30,Strategy
+Deloitte,Audit fees,100000,USD,1.00,budget,PROFESSIONAL_SERVICES,7210,FINANCE,2025-01,Net 30,Finance
+CBRE,Office lease,180000,USD,1.00,budget,FACILITIES,8100,ADMIN,2025-01,Net 30,Admin
+Google Ads,Digital advertising,140000,USD,1.00,budget,MARKETING,9100,MARKETING,2025-01,Net 30,Marketing
+Randstad,Contract staffing,80000,USD,1.00,budget,CONTINGENT_WORKFORCE,7500,HR,2025-01,Net 21,HR
+United Airlines,Business travel,40000,USD,1.00,budget,TRAVEL,9200,ADMIN,2025-01,Net 14,Admin
+SAP UK,ERP licenses EMEA,60000,GBP,1.27,budget,IT,6130,TECH,2025-01,Net 45,Engineering EMEA
+Roland Berger,EU consulting,75000,EUR,1.09,budget,PROFESSIONAL_SERVICES,7205,STRATEGY,2025-01,Net 30,Strategy EMEA
+AWS,Cloud infrastructure,295000,USD,1.00,actual,IT,6100,TECH,2024-12,Net 30,Engineering
+Azure,SaaS licenses,80000,USD,1.00,actual,IT,6110,TECH,2024-12,Net 30,Engineering
+McKinsey,Strategy consulting,130000,USD,1.00,actual,PROFESSIONAL_SERVICES,7200,STRATEGY,2024-12,Net 30,Strategy
+CBRE,Office lease,178000,USD,1.00,actual,FACILITIES,8100,ADMIN,2024-12,Net 30,Admin
+Google Ads,Digital advertising,118000,USD,1.00,actual,MARKETING,9100,MARKETING,2024-12,Net 30,Marketing
+Randstad,Contract staffing,92000,USD,1.00,actual,CONTINGENT_WORKFORCE,7500,HR,2024-12,Net 21,HR
+AWS,Cloud infrastructure,275000,USD,1.00,actual,IT,6100,TECH,2024-11,Net 30,Engineering
+Azure,SaaS licenses,77000,USD,1.00,actual,IT,6110,TECH,2024-11,Net 30,Engineering
+McKinsey,Strategy consulting,115000,USD,1.00,actual,PROFESSIONAL_SERVICES,7200,STRATEGY,2024-11,Net 30,Strategy
+CBRE,Office lease,178000,USD,1.00,actual,FACILITIES,8100,ADMIN,2024-11,Net 30,Admin
+Google Ads,Digital advertising,110000,USD,1.00,actual,MARKETING,9100,MARKETING,2024-11,Net 30,Marketing

@@ -1,0 +1,23 @@
+Northstar Retail Group - Operating Model and Budget Context
+
+Business profile:
+- Multi-country retail and e-commerce operator with centralized procurement and distributed BU ownership.
+- Current cost pressure from margin compression and higher logistics volatility.
+
+Organizational signals for analysis:
+- Store expansion paused for 2 quarters; leadership expects SG&A discipline.
+- Hiring limited to customer-facing and cyber-critical roles.
+- Product and growth teams requested temporary flexibility for campaign spend in Q1.
+
+Budget timing:
+- Mid-year budget re-forecast freeze date: 2026-06-20.
+- CFO asks for initiatives with visible year-1 impact and payback under 18 months where possible.
+
+Known caveats:
+- Some demand spikes in Q1 are seasonal and may normalize in Q2.
+- IT and Marketing have overlapping tooling and agency spend that can create double-counting risk if not deduplicated.
+
+What leadership wants from this cycle:
+- Top categories with defensible savings potential.
+- Root causes tied to practical levers.
+- Phased view of savings (gross, cost-to-achieve, net) for executive review.

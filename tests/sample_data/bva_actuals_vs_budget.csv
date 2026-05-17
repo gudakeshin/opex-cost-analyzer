@@ -1,0 +1,21 @@
+supplier,description,amount,amount_type,category,gl_code,cost_center,fiscal_period
+AWS,Cloud infrastructure - actual,320000,actual,IT,6100,TECH,2025-01
+Azure,SaaS licenses - actual,85000,actual,IT,6110,TECH,2025-01
+McKinsey,Strategy consulting - actual,210000,actual,PROFESSIONAL_SERVICES,7200,STRATEGY,2025-01
+Deloitte,Audit fees - actual,95000,actual,PROFESSIONAL_SERVICES,7210,FINANCE,2025-01
+CBRE,Office lease - actual,180000,actual,FACILITIES,8100,ADMIN,2025-01
+Sodexo,Facilities management - actual,45000,actual,FACILITIES,8110,ADMIN,2025-01
+Google Ads,Digital advertising - actual,125000,actual,MARKETING,9100,MARKETING,2025-01
+Salesforce,CRM platform - actual,72000,actual,IT,6120,SALES,2025-01
+Randstad,Contract staffing - actual,98000,actual,CONTINGENT_WORKFORCE,7500,HR,2025-01
+United Airlines,Business travel - actual,34000,actual,TRAVEL,9200,ADMIN,2025-01
+AWS,Cloud infrastructure - budget,280000,budget,IT,6100,TECH,2025-01
+Azure,SaaS licenses - budget,90000,budget,IT,6110,TECH,2025-01
+McKinsey,Strategy consulting - budget,150000,budget,PROFESSIONAL_SERVICES,7200,STRATEGY,2025-01
+Deloitte,Audit fees - budget,100000,budget,PROFESSIONAL_SERVICES,7210,FINANCE,2025-01
+CBRE,Office lease - budget,180000,budget,FACILITIES,8100,ADMIN,2025-01
+Sodexo,Facilities management - budget,48000,budget,FACILITIES,8110,ADMIN,2025-01
+Google Ads,Digital advertising - budget,140000,budget,MARKETING,9100,MARKETING,2025-01
+Salesforce,CRM platform - budget,70000,budget,IT,6120,SALES,2025-01
+Randstad,Contract staffing - budget,80000,budget,CONTINGENT_WORKFORCE,7500,HR,2025-01
+United Airlines,Business travel - budget,40000,budget,TRAVEL,9200,ADMIN,2025-01

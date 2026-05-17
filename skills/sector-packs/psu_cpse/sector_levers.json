@@ -1,0 +1,321 @@
+{
+  "pack_id": "psu_cpse",
+  "sector": "Public Sector Undertakings (PSU / CPSE)",
+  "version": "1.0",
+  "applicable_entity_types": [
+    "central_psu",
+    "state_psu",
+    "navratna",
+    "miniratna",
+    "defence_psu",
+    "port_trust"
+  ],
+  "industry_signals": [
+    "related_party_flag_high",
+    "gst_tax_present",
+    "csr_present",
+    "regulatory_keywords_high"
+  ],
+  "universal_levers": [
+    "contract_renegotiation",
+    "process_standardization",
+    "demand_management",
+    "supplier_consolidation",
+    "automation",
+    "payment_terms",
+    "maverick_compliance",
+    "outsourcing",
+    "internal_best_practice",
+    "tail_spend_automation",
+    "should_cost_modeling",
+    "zero_based_rebaseline",
+    "shared_services_consolidation",
+    "rebate_pricing_recovery",
+    "specification_optimization",
+    "benefits_cost_optimization",
+    "contingent_workforce_optimization",
+    "consulting_spend_governance",
+    "legal_spend_optimization",
+    "ld_rationalization",
+    "space_utilization_optimization",
+    "lease_restructuring",
+    "cost_governance"
+  ],
+  "sector_specific_levers": [
+    {
+      "lever_id": "gst_itc_recovery",
+      "lever_name": "GST Input Tax Credit Optimisation & Recovery",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 2,
+        "p50": 5,
+        "p90": 9
+      },
+      "cta_rate": 0.04,
+      "phasing_curve": [
+        0.7,
+        0.2,
+        0.1
+      ],
+      "savings_type": "mixed",
+      "sustainability_score": 0.8,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "GST reconciliation between GSTR-2A / 2B and purchase register completed",
+        "Reverse charge mechanism (RCM) liabilities identified and accounted",
+        "ERP configured for auto-population of GST fields and ITC matching"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.85,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "gst_treatment field present",
+        "related_party_flag present"
+      ]
+    },
+    {
+      "lever_id": "ind_as_116_lease",
+      "lever_name": "Ind AS 116 Lease Reclassification (Operating vs. Finance)",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 1,
+        "p50": 3,
+        "p90": 7
+      },
+      "cta_rate": 0.03,
+      "phasing_curve": [
+        0.6,
+        0.3,
+        0.1
+      ],
+      "savings_type": "mixed",
+      "sustainability_score": 0.88,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Lease register compiled with all lease contracts (term, payments, break clauses)",
+        "Incremental borrowing rate (IBR) confirmed with treasury / auditors",
+        "Ind AS 116 accounting entries reviewed by statutory auditors"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.88,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "lease_treatment field present",
+        "category:FACILITIES present"
+      ]
+    },
+    {
+      "lever_id": "csr_efficiency",
+      "lever_name": "CSR Spend Efficiency & Impact Optimisation",
+      "lever_family": "demand",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 15,
+        "p90": 22
+      },
+      "cta_rate": 0.04,
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "CSR programme impact assessment completed (outcome per rupee spent)",
+        "Preferred implementing agency panel approved by CSR committee",
+        "CSR spend aligned to Section 135 and Schedule VII permissible activities"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 14,
+        "p90": 26
+      },
+      "applicable_if": [
+        "category:CSR present"
+      ]
+    },
+    {
+      "lever_id": "public_procurement_reform",
+      "lever_name": "Public Procurement Reform (GeM / DGS&D Rate Contracts)",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5,
+        "p50": 10,
+        "p90": 18
+      },
+      "cta_rate": 0.04,
+      "phasing_curve": [
+        0.35,
+        0.45,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "GeM portal adoption rate mapped for eligible categories",
+        "DGS&D / RCCL rate contracts reviewed for applicable categories",
+        "CVC / CAG audit risk assessment for procurement reforms completed"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 32
+      },
+      "applicable_if": [
+        "related_party_flag present OR gst_treatment present"
+      ]
+    },
+    {
+      "lever_id": "mro_consolidation",
+      "lever_name": "MRO Vendor Consolidation & Rate Contracts",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 7,
+        "p50": 15,
+        "p90": 26
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.75,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "MRO spend classified and vendor rationalisation target set",
+        "Annual rate contracts (ARCs) negotiated with empanelled MRO vendors",
+        "FSNL / safety stock norms reset based on consumption data"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 36
+      },
+      "applicable_if": [
+        "category:PLANT_MAINTENANCE present"
+      ]
+    },
+    {
+      "lever_id": "energy_audit_compliance",
+      "lever_name": "BEE Energy Audit & PAT Cycle Compliance",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 16,
+        "p90": 24
+      },
+      "cta_rate": 0.07,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.82,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Bureau of Energy Efficiency (BEE) audit completed",
+        "Perform, Achieve, Trade (PAT) cycle targets identified",
+        "Energy conservation measures (ECMs) approved by board"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 24,
+        "p90": 40
+      },
+      "applicable_if": [
+        "category:POWER_ENERGY > 5% spend"
+      ]
+    },
+    {
+      "lever_id": "manpower_rationalisation",
+      "lever_name": "Manpower Rationalisation (VRS / Role Automation)",
+      "lever_family": "structure",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 28
+      },
+      "cta_rate": 0.1,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.8,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Voluntary Retirement Scheme (VRS) designed per DPE guidelines",
+        "DPE / Ministry approval obtained for headcount reduction plan",
+        "Roles earmarked for automation mapped and implementation timeline set"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.6,
+      "implementation_weeks": {
+        "p10": 24,
+        "p50": 52,
+        "p90": 80
+      },
+      "applicable_if": [
+        "headcount > 200",
+        "related_party_flag present"
+      ]
+    },
+    {
+      "lever_id": "project_cost_overrun_control",
+      "lever_name": "Capital Project Cost & Overrun Control",
+      "lever_family": "process",
+      "savings_range_pct": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 16
+      },
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Project Management Office (PMO) established with Earned Value Management (EVM)",
+        "Contractor governance framework with performance bonds in place",
+        "DPR (Detailed Project Report) quality gate implemented before sanction"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 26,
+        "p90": 44
+      },
+      "applicable_if": [
+        "related_party_flag present OR category:PROF_SVCS present"
+      ]
+    }
+  ]
+}
