@@ -1,0 +1,24 @@
+pack_id: gcc_capability_centers
+sector: Global Capability Centers — India GCC & Captive Shared Services
+version: "0.4"
+schema_version: "1"
+status: draft
+description: Scaffold pack for India-based GCCs and captive shared services centers established by MNCs. Covers technology, analytics, finance, HR, and operations CoEs.
+applicable_entity_types:
+  - captive_gcc
+  - shared_services_center
+  - coe_hub
+  - knowledge_services_center
+regulatory_bodies:
+  - SEBI
+  - MeitY
+  - STPI
+  - RBI
+  - MCA
+fiscal_year_end: "March 31"
+reporting_currency: INR
+default_wacc_pct: 11.5
+default_tax_rate_pct: 25.17
+created_at: "2026-05-20"
+effective_from: "2026-05-20"
+maintained_by: opex_platform_core

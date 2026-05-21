@@ -1,0 +1,20 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "seat_based_infra", "category_name": "Seat-Based Infrastructure & Facilities", "gl_prefix": "SBI", "cost_nature": "operations"},
+    {"category_id": "captive_talent_development", "category_name": "Captive L&D, Upskilling & Global Mobility", "gl_prefix": "CTD", "cost_nature": "operations"},
+    {"category_id": "parent_recharge_costs", "category_name": "Parent Company Recharges & Intercompany Allocations", "gl_prefix": "PRC", "cost_nature": "intercompany"},
+    {"category_id": "gcc_governance_compliance", "category_name": "GCC Governance, Audit & Regulatory Compliance", "gl_prefix": "GGC", "cost_nature": "compliance"},
+    {"category_id": "digital_automation_ops", "category_name": "Digital Automation & RPA Operations", "gl_prefix": "DAO", "cost_nature": "technology"},
+    {"category_id": "expat_global_mobility", "category_name": "Expat Assignments, Housing & Global Mobility Costs", "gl_prefix": "EXP", "cost_nature": "operations"},
+    {"category_id": "quality_certifications", "category_name": "Quality Certifications & Audit (CMMI, ISO, SOC2, PCI-DSS)", "gl_prefix": "QCA", "cost_nature": "compliance"},
+    {"category_id": "bench_management", "category_name": "Bench & Unallocated Headcount Costs", "gl_prefix": "BCH", "cost_nature": "operations"},
+    {"category_id": "data_privacy_security", "category_name": "Data Privacy, GDPR Compliance & Information Security", "gl_prefix": "DPS", "cost_nature": "compliance"},
+    {"category_id": "parent_entity_it_license", "category_name": "Parent-Allocated IT Licenses (SAP, Salesforce, ServiceNow)", "gl_prefix": "PIL", "cost_nature": "technology"}
+  ],
+  "overrides": [
+    {"category_id": "hr", "category_name": "Employee Costs (incl. global mobility & expat benefits)", "cost_nature": "operations"},
+    {"category_id": "facilities", "category_name": "Facilities & Seat-Based Infrastructure", "cost_nature": "operations"},
+    {"category_id": "it", "category_name": "Technology & Automation Infrastructure", "cost_nature": "technology"}
+  ]
+}

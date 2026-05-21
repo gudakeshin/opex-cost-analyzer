@@ -1,0 +1,35 @@
+pack_id: gcc_capability_centers
+schema_version: '1.0'
+confidence: illustrative
+free_sources:
+- name: NASSCOM GCC India Annual Report
+  type: public_disclosure
+- name: BSE/NSE annual filings (third-party BPO proxies)
+  type: public_disclosure
+- name: STPI public disclosures
+  type: government
+- name: MCA subsidiary filings (ROC annual returns)
+  type: government
+- name: BRSR disclosures (ESG & workforce data)
+  type: public_disclosure
+- name: RBI remittance and FEMA compliance data
+  type: government
+licensed_sources_stubs:
+- name: CMIE Prowess IQ
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: CmieAdapter
+- name: Everest Group GCC State of the Market Research
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: EverestGroupAdapter
+- name: Gartner BPS & Shared Services Benchmarks
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: GartnerBpsAdapter
+- name: Deloitte India GCC Survey
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: DeloitteGccSurveyAdapter
+refresh_cycle: Annual
+notes: GCCs are not independently listed; free sources provide structural benchmarks via third-party BPO proxies. Everest Group is the gold standard for GCC-specific FTE cost, automation maturity, and seat cost benchmarks. MCA ROC filings provide subsidiary-level financials for captive entities that file standalone accounts. RBI data useful for intercompany recharge and remittance normalization.
