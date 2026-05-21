@@ -1,0 +1,243 @@
+{
+  "schema_version": "1.0",
+  "eval_name": "OpEx Platform Feature Completeness Evaluation",
+  "description": "Static analysis rubric for feature completeness: skill pipeline wiring, frontend-backend API connectivity, OPAR loop coverage, and infrastructure readiness. Complements the reference-data quality eval (criteria.json).",
+  "scoring_scale": { "min": 0, "max": 10 },
+  "domains": [
+    {
+      "name": "skill_pipeline",
+      "display_name": "Skill Pipeline Completeness",
+      "weight": 0.35,
+      "description": "Are all skill directories wired through the dispatch layer, implemented with real logic, covered by output contracts, and reachable from OPAR intent classification?",
+      "dimensions": [
+        {
+          "id": "sp_01",
+          "name": "Skill Directory-to-Dispatch Parity",
+          "description": "Every skills/ subdirectory that contains a SKILL.md (excluding sector-packs/, references/, and _capability_matrix.json) should be registered in app/skills/dispatch.py via @register(). Unregistered skills are dead code — OPAR can never invoke them.",
+          "weight": 0.30,
+          "scoring_method": "registered_skill_count / skill_dirs_with_SKILL_md * 10",
+          "threshold_pass": 9.0,
+          "data_sources": [
+            "skills/*/SKILL.md",
+            "app/skills/dispatch.py"
+          ]
+        },
+        {
+          "id": "sp_02",
+          "name": "Dispatch Handler Implementation Depth",
+          "description": "Each @register() handler in dispatch.py must be a real implementation (>5 non-blank lines in the handler body), not a stub or passthrough. Stubs silently return empty results and corrupt OPAR reflection.",
+          "weight": 0.20,
+          "scoring_method": "handlers_with_5plus_non_blank_lines / total_registered * 10",
+          "threshold_pass": 8.0,
+          "data_sources": [
+            "app/skills/dispatch.py"
+          ]
+        },
+        {
+          "id": "sp_03",
+          "name": "Skill Output Contract Coverage",
+          "description": "Each registered skill should have a corresponding Output dataclass in app/skills/contracts.py. Missing contracts mean the Act phase cannot validate LLM outputs, leading to silent data-quality failures downstream.",
+          "weight": 0.25,
+          "scoring_method": "registered_skills_with_contract_class / total_registered * 10",
+          "threshold_pass": 7.0,
+          "data_sources": [
+            "app/skills/dispatch.py",
+            "app/skills/contracts.py"
+          ]
+        },
+        {
+          "id": "sp_04",
+          "name": "OPAR Intent-to-Plan Mapping Coverage",
+          "description": "Every IntentClass value in app/opar/models.py must appear as a handled case in app/opar/plan.py. Unhandled intents fall through to generic_qa and lose all structured output.",
+          "weight": 0.25,
+          "scoring_method": "intents_handled_in_plan / total_intents * 10",
+          "threshold_pass": 8.0,
+          "data_sources": [
+            "app/opar/models.py",
+            "app/opar/plan.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "api_connectivity",
+      "display_name": "Frontend-Backend API Connectivity",
+      "weight": 0.35,
+      "description": "Do all frontend API calls resolve to backend routes? Are backend features exposed in the UI? Is the API versioning consistent? Are the new FP&A endpoints fully wired?",
+      "dimensions": [
+        {
+          "id": "api_01",
+          "name": "Frontend Call Resolution Rate",
+          "description": "Every unique API path called from frontend .tsx/.ts files (via apiGet/apiPost/apiPut/apiUpload or href) must resolve to a registered backend route in app/routers/. Unresolved calls produce 404s at runtime.",
+          "weight": 0.25,
+          "scoring_method": "frontend_calls_resolved / total_unique_frontend_calls * 10",
+          "threshold_pass": 9.0,
+          "data_sources": [
+            "frontend/src/**/*.tsx",
+            "frontend/src/**/*.ts",
+            "app/routers/*.py"
+          ]
+        },
+        {
+          "id": "api_02",
+          "name": "Backend Feature Frontend Exposure",
+          "description": "8 backend feature groups (benchmarks, sector-packs, initiative milestones/actuals, consolidation, cost-to-serve, business-case exports, incremental analyze) have zero frontend pages calling them. Score = feature groups with at least one frontend call / 8.",
+          "weight": 0.30,
+          "scoring_method": "backend_groups_with_frontend_call / 8 * 10",
+          "threshold_pass": 6.0,
+          "data_sources": [
+            "frontend/src/pages/*.tsx",
+            "app/routers/benchmarks.py",
+            "app/routers/enterprise.py",
+            "app/routers/outputs.py",
+            "app/routers/pipeline.py"
+          ],
+          "backend_feature_groups": [
+            "benchmarks_api",
+            "sector_packs",
+            "initiative_milestones",
+            "initiative_actuals",
+            "enterprise_consolidation",
+            "cost_to_serve",
+            "output_board_cfo",
+            "incremental_analyze"
+          ]
+        },
+        {
+          "id": "api_03",
+          "name": "API Version Consistency",
+          "description": "Backend marks /api/ (unversioned) paths as deprecated (Sunset: 2027-01-01). Frontend should use /api/v1/ consistently. Score = calls using /api/v1/ prefix / total API calls. Mixed usage creates upgrade-path debt.",
+          "weight": 0.25,
+          "scoring_method": "v1_prefixed_calls / total_api_calls * 10",
+          "threshold_pass": 6.0,
+          "data_sources": [
+            "frontend/src/**/*.tsx",
+            "frontend/src/**/*.ts"
+          ]
+        },
+        {
+          "id": "api_04",
+          "name": "FP&A Endpoint Wiring Completeness",
+          "description": "The three FP&A endpoints introduced in the March 2026 enhancements (GET /api/v1/trends/{id}, GET /api/v1/bva/{id}, GET /api/v1/payment-terms/{id}) must be present in both backend routers AND called from frontend pages. 1 point each side per endpoint (6 total → /6*10).",
+          "weight": 0.20,
+          "scoring_method": "sum(backend_present + frontend_present for each of 3 endpoints) / 6 * 10",
+          "threshold_pass": 9.0,
+          "data_sources": [
+            "app/routers/outputs.py",
+            "frontend/src/pages/CostRoom.tsx"
+          ],
+          "fpna_endpoints": [
+            "/api/v1/trends/{session_id}",
+            "/api/v1/bva/{session_id}",
+            "/api/v1/payment-terms/{session_id}"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "opar_loop",
+      "display_name": "OPAR Loop Completeness",
+      "weight": 0.20,
+      "description": "Are all four OPAR phases implemented with substantive code? Does plan.py handle every intent? Does reflect.py have quality gates for core skill outputs?",
+      "dimensions": [
+        {
+          "id": "opar_01",
+          "name": "Phase Module Non-Empty Coverage",
+          "description": "All four OPAR phase modules (observe.py, plan.py, act.py, reflect.py) must exist under app/opar/ and contain >100 lines of code. Thin or absent phase files indicate incomplete loop implementation.",
+          "weight": 0.30,
+          "scoring_method": "2.5 pts per phase file present with >100 lines (max 10)",
+          "threshold_pass": 9.0,
+          "data_sources": [
+            "app/opar/observe.py",
+            "app/opar/plan.py",
+            "app/opar/act.py",
+            "app/opar/reflect.py"
+          ]
+        },
+        {
+          "id": "opar_02",
+          "name": "Intent Handler Coverage in Plan",
+          "description": "plan.py must contain a handling branch (as string match) for every IntentClass value defined in models.py. Unhandled intents silently fall back to generic_qa, bypassing all structured analysis.",
+          "weight": 0.40,
+          "scoring_method": "intents_with_string_match_in_plan / total_intents * 10",
+          "threshold_pass": 8.0,
+          "data_sources": [
+            "app/opar/models.py",
+            "app/opar/plan.py"
+          ]
+        },
+        {
+          "id": "opar_03",
+          "name": "Quality Gate Coverage in Reflect",
+          "description": "reflect.py must reference quality-check logic for core skill output types: validate_core_skill_outputs (generic gate), savings-related validation, and peer_benchmarker output validation. Missing gates allow corrupt skill outputs to reach the final response.",
+          "weight": 0.30,
+          "scoring_method": "required_quality_checks_present / 3 * 10",
+          "threshold_pass": 8.0,
+          "data_sources": [
+            "app/opar/reflect.py"
+          ],
+          "required_quality_checks": [
+            "validate_core_skill_outputs",
+            "savings",
+            "peer_benchmarker"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "infrastructure",
+      "display_name": "Infrastructure Completeness",
+      "weight": 0.10,
+      "description": "Are connectors implemented with required methods? Are health endpoints present? Are LLM-facing endpoints rate-limited?",
+      "dimensions": [
+        {
+          "id": "infra_01",
+          "name": "Connector Method Completeness",
+          "description": "Each of the 6 concrete connectors (ariba_csv, bank_mt940, gst_portal, hrms_csv, sap_odata, tally_xml) must define at least one of: ingest(), fetch(), authenticate(), or connect(). Connectors missing these entry points cannot be called by ingestion.py.",
+          "weight": 0.35,
+          "scoring_method": "connectors_with_required_method / 6 * 10",
+          "threshold_pass": 8.0,
+          "data_sources": [
+            "app/connectors/ariba_csv.py",
+            "app/connectors/bank_mt940.py",
+            "app/connectors/gst_portal.py",
+            "app/connectors/hrms_csv.py",
+            "app/connectors/sap_odata.py",
+            "app/connectors/tally_xml.py"
+          ]
+        },
+        {
+          "id": "infra_02",
+          "name": "Health Endpoint Coverage",
+          "description": "app/main.py must expose GET /health (liveness) and GET /health/ready (readiness — returns 503 if Anthropic key missing). Both are required for Kubernetes probes and deployment automation.",
+          "weight": 0.30,
+          "scoring_method": "health_present * 5 + ready_present * 5",
+          "threshold_pass": 9.0,
+          "data_sources": [
+            "app/main.py"
+          ]
+        },
+        {
+          "id": "infra_03",
+          "name": "Rate Limit Coverage for LLM Endpoints",
+          "description": "The global slowapi Limiter must be configured in main.py. Chat endpoints (which call Anthropic API) should have per-route @limiter.limit() decorators distinct from the default. Missing per-route limits allow LLM cost spikes.",
+          "weight": 0.35,
+          "scoring_method": "global_limiter_present * 7 + per_route_limiter_in_chat * 3",
+          "threshold_pass": 6.0,
+          "data_sources": [
+            "app/main.py",
+            "app/routers/chat.py"
+          ]
+        }
+      ]
+    }
+  ],
+  "global_metadata": {
+    "eval_version": "1.0",
+    "target_platform_version": "2.0",
+    "created_date": "2026-05-21",
+    "domain_pass_threshold": 6.5,
+    "overall_pass_threshold": 6.0,
+    "companion_eval": "eval/criteria.json"
+  }
+}

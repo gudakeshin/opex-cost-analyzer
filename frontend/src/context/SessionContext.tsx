@@ -68,7 +68,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!sessionId) return;
     setLoadingEngagement(true);
     try {
-      const manifest = await apiGet<SessionManifest>(`/api/sessions/${sessionId}/manifest`);
+      const manifest = await apiGet<SessionManifest>(`/api/v1/sessions/${sessionId}/manifest`);
       setEngagement(engagementFromManifest(manifest));
       const mode = manifestAudienceToMode(manifest.audience);
       if (mode) setAudience(mode);
@@ -85,7 +85,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return;
     }
     try {
-      await apiGet(`/api/sessions/${sessionId}`);
+      await apiGet(`/api/v1/sessions/${sessionId}`);
       setHasAnalysis(true);
     } catch {
       setHasAnalysis(false);
@@ -99,7 +99,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         company_name?: string;
         industry?: string;
         annual_revenue?: number;
-      }>(`/api/sessions/${sessionId}`);
+      }>(`/api/v1/sessions/${sessionId}`);
       setHasAnalysis(true);
       if (analysis.company_name && !isPlaceholderCompanyName(analysis.company_name)) {
         setEngagement((prev) => ({
@@ -135,7 +135,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const ensureSession = useCallback(async (): Promise<string> => {
     if (sessionId) return sessionId;
-    const res = await apiPost<SessionManifest>('/api/sessions', {
+    const res = await apiPost<SessionManifest>('/api/v1/sessions', {
       company_name: 'New engagement',
       industry: '',
       currency: 'INR',

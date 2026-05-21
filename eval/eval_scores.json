@@ -1,0 +1,561 @@
+{
+  "overall_score": 10.0,
+  "passed": true,
+  "eval_date": "2026-05-21",
+  "dimensions": [
+    {
+      "dimension_id": "lc_01",
+      "name": "Universal Lever Count & Family Completeness",
+      "domain": "lever_coverage",
+      "raw_score": 10.0,
+      "threshold_pass": 7.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "46 levers, 6/6 families present, no orphans",
+      "evidence": {
+        "file": "skills/savings-modeler/references/model_parameters.json",
+        "lever_count": 46,
+        "families_found": [
+          "demand",
+          "finance",
+          "process",
+          "structure",
+          "supply",
+          "technology"
+        ],
+        "families_missing": [],
+        "orphan_levers": []
+      }
+    },
+    {
+      "dimension_id": "lc_02",
+      "name": "Lever Structural Integrity",
+      "domain": "lever_coverage",
+      "raw_score": 10.0,
+      "threshold_pass": 8.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "46/46 levers fully valid; 0 failure(s)",
+      "evidence": {
+        "file": "skills/savings-modeler/references/model_parameters.json",
+        "total_levers": 46,
+        "complete_count": 46,
+        "valid_count": 46,
+        "failures": []
+      }
+    },
+    {
+      "dimension_id": "lc_03",
+      "name": "Sector Pack Count & Architecture Parity",
+      "domain": "lever_coverage",
+      "raw_score": 10.0,
+      "threshold_pass": 7.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "15/15 packs architecturally complete; missing: none",
+      "evidence": {
+        "skills_sector_packs": [
+          "bfsi_banks",
+          "conglomerate",
+          "energy_utilities",
+          "financial_services_nonbank",
+          "fmcg_consumer",
+          "gcc_capability_centers",
+          "healthcare_hospitals",
+          "hospitality_travel",
+          "insurance_general",
+          "it_ites",
+          "manufacturing_diversified",
+          "pharma_lifesciences",
+          "psu_cpse",
+          "retail_organized",
+          "telecom_infra"
+        ],
+        "sector_packs_dirs": [
+          "bfsi_banks",
+          "conglomerate",
+          "energy_utilities",
+          "financial_services_nonbank",
+          "fmcg_consumer",
+          "gcc_capability_centers",
+          "healthcare_hospitals",
+          "hospitality_travel",
+          "insurance_general",
+          "it_ites",
+          "manufacturing_diversified",
+          "pharma_lifesciences",
+          "psu_cpse",
+          "retail_organized",
+          "telecom_infra"
+        ],
+        "architecturally_complete": [
+          "bfsi_banks",
+          "conglomerate",
+          "energy_utilities",
+          "financial_services_nonbank",
+          "fmcg_consumer",
+          "gcc_capability_centers",
+          "healthcare_hospitals",
+          "hospitality_travel",
+          "insurance_general",
+          "it_ites",
+          "manufacturing_diversified",
+          "pharma_lifesciences",
+          "psu_cpse",
+          "retail_organized",
+          "telecom_infra"
+        ],
+        "missing_sector_packs_dir": []
+      }
+    },
+    {
+      "dimension_id": "lc_04",
+      "name": "Full-Pack Artifact Completeness",
+      "domain": "lever_coverage",
+      "raw_score": 10.0,
+      "threshold_pass": 8.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "2 full-status pack(s); avg artifact completeness 100.0%",
+      "evidence": {
+        "full_packs": [
+          {
+            "pack_id": "bfsi_banks",
+            "status": "full",
+            "artifacts_present": [
+              "sector_levers.json",
+              "benchmark_sources.yaml",
+              "kpi_pack.json",
+              "regulatory_layer.md",
+              "peer_set.json",
+              "taxonomy_extension.json"
+            ],
+            "artifacts_missing": [],
+            "fraction": 1.0
+          },
+          {
+            "pack_id": "manufacturing_diversified",
+            "status": "full",
+            "artifacts_present": [
+              "sector_levers.json",
+              "benchmark_sources.yaml",
+              "kpi_pack.json",
+              "regulatory_layer.md",
+              "peer_set.json",
+              "taxonomy_extension.json"
+            ],
+            "artifacts_missing": [],
+            "fraction": 1.0
+          }
+        ],
+        "required_artifacts": [
+          "sector_levers.json",
+          "benchmark_sources.yaml",
+          "kpi_pack.json",
+          "regulatory_layer.md",
+          "peer_set.json",
+          "taxonomy_extension.json"
+        ]
+      }
+    },
+    {
+      "dimension_id": "lc_05",
+      "name": "Sector Lever Structural Integrity",
+      "domain": "lever_coverage",
+      "raw_score": 10.0,
+      "threshold_pass": 8.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "127/127 sector levers fully valid; 0 failure(s)",
+      "evidence": {
+        "total_sector_levers": 127,
+        "valid_count": 127,
+        "failures": []
+      }
+    },
+    {
+      "dimension_id": "lc_06",
+      "name": "Sector Lever ID Global Uniqueness",
+      "domain": "lever_coverage",
+      "raw_score": 10.0,
+      "threshold_pass": 7.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "0 duplicate lever ID(s) across packs",
+      "evidence": {
+        "total_unique_ids": 119,
+        "duplicate_ids": {}
+      }
+    },
+    {
+      "dimension_id": "lc_07",
+      "name": "Universal Lever Cross-Reference Validity",
+      "domain": "lever_coverage",
+      "raw_score": 10.0,
+      "threshold_pass": 9.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "363/363 universal lever references resolve to canonical definitions",
+      "evidence": {
+        "total_references": 363,
+        "valid_references": 363,
+        "invalid_references": []
+      }
+    },
+    {
+      "dimension_id": "lc_08",
+      "name": "Mutual Exclusion & Dependency DAG",
+      "domain": "lever_coverage",
+      "raw_score": 10.0,
+      "threshold_pass": 7.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "mutually_exclusive_with: present; depends_on: present",
+      "evidence": {
+        "mutually_exclusive_with_field_present": true,
+        "depends_on_field_present": true,
+        "levers_with_informal_dag_in_conditions": [
+          "saas_sprawl_audit",
+          "cost_avoidance"
+        ],
+        "sentinel_exclusive_pair_check": {
+          "insourcing_has_me": true,
+          "outsourcing_has_me": true
+        },
+        "sentinel_dag_check": {
+          "automation_has_depends_on": true
+        }
+      }
+    },
+    {
+      "dimension_id": "ba_01",
+      "name": "Industry Benchmark Source Attribution Quality",
+      "domain": "benchmark_authenticity",
+      "raw_score": 10.0,
+      "threshold_pass": 7.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "Rubric level 4/4 \u2192 score 10.0/10. Named source: yes. Year: yes.",
+      "evidence": {
+        "file": "skills/peer-benchmarker/references/industry_benchmarks.json",
+        "rubric_level": 4,
+        "rubric_checks": {
+          "named_source": true,
+          "pub_type_keyword": true,
+          "year_present": true
+        },
+        "per_category_source_field": true,
+        "description_excerpt": "Industry benchmark percentile distributions for operating expenditure categories. Values expressed as spend-as-%-of-revenue. These are illustrative reference ranges for platform initialization. Produc",
+        "sectors_covered": [
+          "technology",
+          "financial_services",
+          "manufacturing",
+          "healthcare",
+          "retail_consumer"
+        ]
+      }
+    },
+    {
+      "dimension_id": "ba_02",
+      "name": "Heuristic Targets Source Attribution",
+      "domain": "benchmark_authenticity",
+      "raw_score": 10.0,
+      "threshold_pass": 7.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "Source field: data_source. Currency: present.",
+      "evidence": {
+        "file": "skills/heuristic-analyzer/references/heuristic_targets.json",
+        "source_key_found": "data_source",
+        "source_value": "Internal consulting benchmarks \u2014 India market, FY2024-25 engagement data. % of revenue targets deriv",
+        "currency_found": true,
+        "currency_at_top": true,
+        "currency_in_per_employee": false,
+        "per_employee_values": {
+          "HR": 2500,
+          "IT": 5000,
+          "FACILITIES": 3000,
+          "MARKETING": 8000,
+          "TRAVEL": 2000,
+          "OFFICE": 500
+        },
+        "top_level_keys": [
+          "version",
+          "source_type",
+          "data_source",
+          "disclaimer",
+          "currency",
+          "geography",
+          "targets_pct",
+          "per_employee_targets"
+        ]
+      }
+    },
+    {
+      "dimension_id": "ba_03",
+      "name": "DPO Benchmark Source Attribution",
+      "domain": "benchmark_authenticity",
+      "raw_score": 10.0,
+      "threshold_pass": 7.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "Rubric level 3/4 (base 9.0) + notes bonus 2 = 10.0/10. Named source: yes.",
+      "evidence": {
+        "file": "skills/payment-terms-optimizer/references/dpo_benchmarks.json",
+        "rubric_level": 3,
+        "rubric_checks": {
+          "named_source": true,
+          "pub_type_keyword": true,
+          "year_present": true
+        },
+        "notes_bonus_applied": true,
+        "categories_covered": [
+          "IT",
+          "PROFESSIONAL_SERVICES",
+          "FACILITIES",
+          "MARKETING",
+          "LOGISTICS",
+          "TRAVEL",
+          "HR",
+          "CONTINGENT_WORKFORCE",
+          "TELECOMMUNICATIONS",
+          "OFFICE_SUPPLIES",
+          "INSURANCE",
+          "OTHER"
+        ],
+        "description_excerpt": "Industry benchmark DPO (Days Payable Outstanding) by spend category and industry tier.  Derived from: (1) Hackett Group AP Benchmarking Study 2024 (World-Class AP Performance, thehackettgroup.com) \u2014 v"
+      }
+    },
+    {
+      "dimension_id": "ba_04",
+      "name": "Diagnostic Threshold Source Attribution",
+      "domain": "benchmark_authenticity",
+      "raw_score": 10.0,
+      "threshold_pass": 6.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "9/9 threshold values have source/rationale attribution. Top-level rationale: NO.",
+      "evidence": {
+        "file": "skills/root-cause-analyzer/references/diagnostic_thresholds.json",
+        "total_threshold_values": 9,
+        "values_with_rationale": 9,
+        "top_level_rationale_present": false,
+        "threshold_names": [
+          "peer_percentile_include",
+          "supplier_fragmentation_hhi_max",
+          "supplier_fragmentation_min_suppliers",
+          "maverick_spend_ratio_min",
+          "cost_per_transaction_max",
+          "addressable_rates.supplier_consolidation",
+          "addressable_rates.maverick_compliance",
+          "addressable_rates.demand_management",
+          "addressable_rates.baseline_optimization"
+        ]
+      }
+    },
+    {
+      "dimension_id": "ba_05",
+      "name": "Industry Benchmark Taxonomy Coverage",
+      "domain": "benchmark_authenticity",
+      "raw_score": 10.0,
+      "threshold_pass": 6.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "21/21 addressable categories have peer benchmarks (100%). Missing: []...",
+      "evidence": {
+        "total_taxonomy_categories": 24,
+        "addressable_categories": [
+          "BANKING_TREASURY",
+          "BRSR_ESG",
+          "CONTINGENT",
+          "FACILITIES",
+          "FIN_SVCS",
+          "HR",
+          "INSURANCE",
+          "IT",
+          "LOGISTICS",
+          "LOGISTICS_INDIA",
+          "MARKETING",
+          "OFFICE",
+          "OUTSOURCED",
+          "PACKAGING",
+          "PLANT_MAINTENANCE",
+          "POWER_ENERGY",
+          "PROF_SVCS",
+          "RELATED_PARTY",
+          "RND",
+          "TELECOM",
+          "TRAVEL"
+        ],
+        "benchmarked_categories": [
+          "BANKING_TREASURY",
+          "BRSR_ESG",
+          "CONTINGENT",
+          "FACILITIES",
+          "FIN_SVCS",
+          "HR",
+          "INSURANCE",
+          "IT",
+          "LOGISTICS",
+          "LOGISTICS_INDIA",
+          "MARKETING",
+          "OFFICE",
+          "OUTSOURCED",
+          "PACKAGING",
+          "PLANT_MAINTENANCE",
+          "POWER_ENERGY",
+          "PROF_SVCS",
+          "RELATED_PARTY",
+          "RND",
+          "TELECOM",
+          "TRAVEL"
+        ],
+        "covered_addressable": [
+          "BANKING_TREASURY",
+          "BRSR_ESG",
+          "CONTINGENT",
+          "FACILITIES",
+          "FIN_SVCS",
+          "HR",
+          "INSURANCE",
+          "IT",
+          "LOGISTICS",
+          "LOGISTICS_INDIA",
+          "MARKETING",
+          "OFFICE",
+          "OUTSOURCED",
+          "PACKAGING",
+          "PLANT_MAINTENANCE",
+          "POWER_ENERGY",
+          "PROF_SVCS",
+          "RELATED_PARTY",
+          "RND",
+          "TELECOM",
+          "TRAVEL"
+        ],
+        "missing_addressable": [],
+        "coverage_pct": "100.0%"
+      }
+    },
+    {
+      "dimension_id": "ba_06",
+      "name": "Heuristic Target Taxonomy Coverage",
+      "domain": "benchmark_authenticity",
+      "raw_score": 10.0,
+      "threshold_pass": 6.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "21/21 addressable categories have heuristic targets (100%).",
+      "evidence": {
+        "addressable_categories": [
+          "BANKING_TREASURY",
+          "BRSR_ESG",
+          "CONTINGENT",
+          "FACILITIES",
+          "FIN_SVCS",
+          "HR",
+          "INSURANCE",
+          "IT",
+          "LOGISTICS",
+          "LOGISTICS_INDIA",
+          "MARKETING",
+          "OFFICE",
+          "OUTSOURCED",
+          "PACKAGING",
+          "PLANT_MAINTENANCE",
+          "POWER_ENERGY",
+          "PROF_SVCS",
+          "RELATED_PARTY",
+          "RND",
+          "TELECOM",
+          "TRAVEL"
+        ],
+        "heuristic_categories": [
+          "BANKING_TREASURY",
+          "BRSR_ESG",
+          "CONTINGENT",
+          "FACILITIES",
+          "FIN_SVCS",
+          "HR",
+          "INSURANCE",
+          "IT",
+          "LOGISTICS",
+          "LOGISTICS_INDIA",
+          "MARKETING",
+          "OFFICE",
+          "OUTSOURCED",
+          "PACKAGING",
+          "PLANT_MAINTENANCE",
+          "POWER_ENERGY",
+          "PROF_SVCS",
+          "RELATED_PARTY",
+          "RND",
+          "TELECOM",
+          "TRAVEL"
+        ],
+        "covered": [
+          "BANKING_TREASURY",
+          "BRSR_ESG",
+          "CONTINGENT",
+          "FACILITIES",
+          "FIN_SVCS",
+          "HR",
+          "INSURANCE",
+          "IT",
+          "LOGISTICS",
+          "LOGISTICS_INDIA",
+          "MARKETING",
+          "OFFICE",
+          "OUTSOURCED",
+          "PACKAGING",
+          "PLANT_MAINTENANCE",
+          "POWER_ENERGY",
+          "PROF_SVCS",
+          "RELATED_PARTY",
+          "RND",
+          "TELECOM",
+          "TRAVEL"
+        ],
+        "missing": [],
+        "coverage_pct": "100.0%"
+      }
+    },
+    {
+      "dimension_id": "ba_07",
+      "name": "Licensed Benchmark Stub Transparency",
+      "domain": "benchmark_authenticity",
+      "raw_score": 10.0,
+      "threshold_pass": 5.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "15/15 packs have benchmark_sources.yaml. Stubs transparent: yes. Adapters: ['CmieAdapter', 'CapitalineAdapter'].",
+      "evidence": {
+        "total_sector_packs": 15,
+        "packs_with_benchmark_sources_yaml": [
+          "healthcare_hospitals",
+          "bfsi_banks",
+          "telecom_infra",
+          "fmcg_consumer",
+          "conglomerate",
+          "psu_cpse",
+          "hospitality_travel",
+          "insurance_general",
+          "gcc_capability_centers",
+          "it_ites",
+          "energy_utilities",
+          "retail_organized",
+          "financial_services_nonbank",
+          "manufacturing_diversified",
+          "pharma_lifesciences"
+        ],
+        "pack_coverage_pct": "100.0%",
+        "transparency_label_found": true,
+        "adapter_classes_found": [
+          "CmieAdapter",
+          "CapitalineAdapter"
+        ],
+        "adapter_classes_missing": []
+      }
+    }
+  ]
+}

@@ -267,6 +267,118 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
     # Phase 3: Enterprise intent handlers
     # -----------------------------------------------------------------------
 
+    # -----------------------------------------------------------------------
+    # Phase 2b: FP&A-specific intents (temporal / bva / payment_terms /
+    #           sensitivity / drill_down / savings_plan / export_business_case)
+    # -----------------------------------------------------------------------
+
+    if intent == "temporal":
+        _add_task(tasks, SkillTask(skill_name="spend-profiler", inputs={}, depends_on=[], parallel_group=0, estimated_tokens=400))
+        _add_task(tasks, SkillTask(skill_name="temporal-analyzer", inputs={}, depends_on=["spend-profiler"], parallel_group=1, estimated_tokens=500))
+        return _finalize_plan(
+            tasks,
+            "I'll run period-over-period trend analysis (YoY / QoQ / MoM) and surface annualised run-rate changes.",
+            "~20 seconds",
+            False,
+        )
+
+    if intent == "bva":
+        _add_task(tasks, SkillTask(skill_name="spend-profiler", inputs={}, depends_on=[], parallel_group=0, estimated_tokens=400))
+        _add_task(tasks, SkillTask(skill_name="bva-analyzer", inputs={}, depends_on=["spend-profiler"], parallel_group=1, estimated_tokens=500))
+        return _finalize_plan(
+            tasks,
+            "I'll compute budget-vs-actual variances with price / volume / mix decomposition.",
+            "~20 seconds",
+            False,
+        )
+
+    if intent == "payment_terms":
+        _add_task(tasks, SkillTask(skill_name="spend-profiler", inputs={}, depends_on=[], parallel_group=0, estimated_tokens=400))
+        _add_task(tasks, SkillTask(skill_name="payment-terms-optimizer", inputs={}, depends_on=["spend-profiler"], parallel_group=1, estimated_tokens=450))
+        return _finalize_plan(
+            tasks,
+            "I'll identify DPO improvement opportunities and model the working-capital release potential.",
+            "~20 seconds",
+            False,
+        )
+
+    if intent == "sensitivity":
+        _add_task(tasks, SkillTask(skill_name="spend-profiler", inputs={}, depends_on=[], parallel_group=0, estimated_tokens=400))
+        _add_task(tasks, SkillTask(skill_name="peer-benchmarker", inputs={}, depends_on=["spend-profiler"], parallel_group=1, estimated_tokens=700))
+        _add_task(tasks, SkillTask(skill_name="internal-benchmarker", inputs={}, depends_on=["spend-profiler"], parallel_group=1, estimated_tokens=500))
+        savings_deps = ["peer-benchmarker", "internal-benchmarker"]
+        if ctx.has_annual_revenue:
+            _add_task(tasks, SkillTask(skill_name="heuristic-analyzer", inputs={}, depends_on=["spend-profiler"], parallel_group=1, estimated_tokens=400))
+            savings_deps.append("heuristic-analyzer")
+        _add_task(tasks, SkillTask(skill_name="savings-modeler", inputs={}, depends_on=savings_deps, parallel_group=2, estimated_tokens=800))
+        _add_task(tasks, SkillTask(skill_name="value-bridge-calculator", inputs={}, depends_on=["savings-modeler"], parallel_group=3, estimated_tokens=600))
+        return _finalize_plan(
+            tasks,
+            "I'll model NPV sensitivity across discount rate, tax rate, execution rate, headcount growth, and revenue growth scenarios.",
+            "~50 seconds",
+            False,
+        )
+
+    if intent == "drill_down":
+        _add_task(tasks, SkillTask(skill_name="spend-profiler", inputs={}, depends_on=[], parallel_group=0, estimated_tokens=500))
+        _add_task(tasks, SkillTask(skill_name="peer-benchmarker", inputs={}, depends_on=["spend-profiler"], parallel_group=1, estimated_tokens=700))
+        _add_task(tasks, SkillTask(skill_name="internal-benchmarker", inputs={}, depends_on=["spend-profiler"], parallel_group=1, estimated_tokens=500))
+        _add_task(tasks, SkillTask(skill_name="root-cause-analyzer", inputs={}, depends_on=["spend-profiler", "peer-benchmarker"], parallel_group=2, estimated_tokens=600))
+        bridge_deps = ["peer-benchmarker", "internal-benchmarker"]
+        if ctx.has_annual_revenue:
+            _add_task(tasks, SkillTask(skill_name="heuristic-analyzer", inputs={}, depends_on=["spend-profiler"], parallel_group=1, estimated_tokens=400))
+            bridge_deps.append("heuristic-analyzer")
+        _add_task(tasks, SkillTask(skill_name="savings-modeler", inputs={}, depends_on=bridge_deps + ["root-cause-analyzer"], parallel_group=3, estimated_tokens=800))
+        _add_task(tasks, SkillTask(skill_name="value-bridge-calculator", inputs={}, depends_on=["savings-modeler"] + bridge_deps, parallel_group=4, estimated_tokens=600))
+        return _finalize_plan(
+            tasks,
+            "I'll drill into the specific category, surface root causes, and model the targeted value-release opportunity.",
+            "~55 seconds",
+            False,
+        )
+
+    if intent == "savings_plan":
+        _add_task(tasks, SkillTask(skill_name="spend-profiler", inputs={}, depends_on=[], parallel_group=0, estimated_tokens=500))
+        _add_task(tasks, SkillTask(skill_name="peer-benchmarker", inputs={}, depends_on=["spend-profiler"], parallel_group=1, estimated_tokens=700))
+        _add_task(tasks, SkillTask(skill_name="internal-benchmarker", inputs={}, depends_on=["spend-profiler"], parallel_group=1, estimated_tokens=500))
+        _add_task(tasks, SkillTask(skill_name="root-cause-analyzer", inputs={}, depends_on=["spend-profiler", "peer-benchmarker"], parallel_group=2, estimated_tokens=600))
+        savings_deps = ["peer-benchmarker", "internal-benchmarker", "root-cause-analyzer"]
+        if ctx.has_annual_revenue:
+            _add_task(tasks, SkillTask(skill_name="heuristic-analyzer", inputs={}, depends_on=["spend-profiler"], parallel_group=1, estimated_tokens=400))
+            savings_deps.append("heuristic-analyzer")
+        _add_task(tasks, SkillTask(skill_name="savings-modeler", inputs={}, depends_on=savings_deps, parallel_group=3, estimated_tokens=900))
+        _add_task(tasks, SkillTask(skill_name="value-bridge-calculator", inputs={}, depends_on=["savings-modeler", "peer-benchmarker", "internal-benchmarker"], parallel_group=4, estimated_tokens=700))
+        _add_task(tasks, SkillTask(skill_name="assumption-register", inputs={}, depends_on=["value-bridge-calculator"], parallel_group=5, estimated_tokens=300))
+        return _finalize_plan(
+            tasks,
+            "I'll build a prioritised 3-year savings plan with lever-level phasing, NPV, and implementation assumptions.",
+            "~65 seconds",
+            True,
+        )
+
+    if intent == "export_business_case":
+        _add_task(tasks, SkillTask(skill_name="spend-profiler", inputs={}, depends_on=[], parallel_group=0, estimated_tokens=400))
+        _add_task(tasks, SkillTask(skill_name="peer-benchmarker", inputs={}, depends_on=["spend-profiler"], parallel_group=1, estimated_tokens=700))
+        _add_task(tasks, SkillTask(skill_name="internal-benchmarker", inputs={}, depends_on=["spend-profiler"], parallel_group=1, estimated_tokens=500))
+        savings_deps = ["peer-benchmarker", "internal-benchmarker"]
+        if ctx.has_annual_revenue:
+            _add_task(tasks, SkillTask(skill_name="heuristic-analyzer", inputs={}, depends_on=["spend-profiler"], parallel_group=1, estimated_tokens=400))
+            savings_deps.append("heuristic-analyzer")
+        _add_task(tasks, SkillTask(skill_name="savings-modeler", inputs={}, depends_on=savings_deps, parallel_group=2, estimated_tokens=800))
+        _add_task(tasks, SkillTask(skill_name="value-bridge-calculator", inputs={}, depends_on=["savings-modeler"] + savings_deps, parallel_group=3, estimated_tokens=600))
+        _add_task(tasks, SkillTask(skill_name="business-case-builder", inputs={}, depends_on=["value-bridge-calculator"], parallel_group=4, estimated_tokens=1200))
+        _add_task(tasks, SkillTask(skill_name="export-formatter", inputs={}, depends_on=["business-case-builder", "value-bridge-calculator"], parallel_group=5, estimated_tokens=400))
+        return _finalize_plan(
+            tasks,
+            "I'll build the full business case and package it as a downloadable Excel / DOCX export ready for client delivery.",
+            "~90 seconds",
+            True,
+        )
+
+    # -----------------------------------------------------------------------
+    # Phase 3: Enterprise intent handlers
+    # -----------------------------------------------------------------------
+
     if intent == "conflict_review":
         _add_task(tasks, SkillTask(
             skill_name="spend-profiler", inputs={}, depends_on=[], parallel_group=0, estimated_tokens=300,

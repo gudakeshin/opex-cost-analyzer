@@ -1,0 +1,465 @@
+{
+  "overall_score": 9.487,
+  "passed": true,
+  "eval_date": "2026-05-21",
+  "dimensions": [
+    {
+      "dimension_id": "sp_01",
+      "name": "Skill Directory-to-Dispatch Parity",
+      "domain": "skill_pipeline",
+      "raw_score": 10.0,
+      "threshold_pass": 9.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "24/24 skills registered in dispatch.py",
+      "evidence": {
+        "total_skill_dirs_with_SKILL_md": 24,
+        "registered_count": 24,
+        "registered": [
+          "analysis-synthesizer",
+          "assumption-register",
+          "brsr-cobenefit-calculator",
+          "business-case-builder",
+          "chart-builder",
+          "dashboard-builder",
+          "data-classifier",
+          "data-validator",
+          "document-contextualizer",
+          "executive-communication",
+          "export-formatter",
+          "heuristic-analyzer",
+          "indian-tax-optimizer",
+          "internal-benchmarker",
+          "llm-context-builder",
+          "peer-benchmarker",
+          "peer-disclosure-miner",
+          "pii-stripper",
+          "root-cause-analyzer",
+          "savings-modeler",
+          "scenario-modeler",
+          "spend-profiler",
+          "value-bridge-calculator",
+          "value-to-shareholder-bridge"
+        ],
+        "unregistered": []
+      }
+    },
+    {
+      "dimension_id": "sp_02",
+      "name": "Dispatch Handler Implementation Depth",
+      "domain": "skill_pipeline",
+      "raw_score": 4.167,
+      "threshold_pass": 8.0,
+      "passed": false,
+      "gap": 3.833,
+      "finding_summary": "15/36 handlers have \u22655 non-blank lines (implemented)",
+      "evidence": {
+        "total_registered": 36,
+        "implemented_count": 15,
+        "stubs": [
+          "spend-profiler",
+          "document-contextualizer",
+          "bva-analyzer",
+          "temporal-analyzer",
+          "internal-benchmarker",
+          "data-validator",
+          "pii-stripper",
+          "data-classifier",
+          "llm-context-builder",
+          "assumption-register",
+          "indian-tax-optimizer",
+          "brsr-cobenefit-calculator",
+          "scenario-modeler",
+          "value-to-shareholder-bridge",
+          "peer-disclosure-miner",
+          "conflict-detector",
+          "vendor-master-builder",
+          "consolidation-analyzer",
+          "msme-compliance-checker",
+          "contract-lifecycle-manager",
+          "gstr-reconciler"
+        ]
+      }
+    },
+    {
+      "dimension_id": "sp_03",
+      "name": "Skill Output Contract Coverage",
+      "domain": "skill_pipeline",
+      "raw_score": 10.0,
+      "threshold_pass": 7.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "36/36 registered skills have output contracts (or intentionally use inline dict)",
+      "evidence": {
+        "total_registered": 36,
+        "with_contract_or_intentionally_none": 36,
+        "missing_contract_class": [],
+        "intentionally_no_dedicated_class": [
+          "my-new-skill",
+          "root-cause-analyzer",
+          "savings-modeler",
+          "data-validator",
+          "chart-builder",
+          "business-case-builder",
+          "pii-stripper",
+          "data-classifier",
+          "llm-context-builder",
+          "assumption-register",
+          "indian-tax-optimizer",
+          "brsr-cobenefit-calculator",
+          "scenario-modeler",
+          "value-to-shareholder-bridge",
+          "peer-disclosure-miner",
+          "conflict-detector",
+          "vendor-master-builder",
+          "consolidation-analyzer",
+          "msme-compliance-checker",
+          "contract-lifecycle-manager",
+          "gstr-reconciler",
+          "zbb-modeler",
+          "cost-to-serve-analyzer",
+          "dashboard-builder",
+          "export-formatter"
+        ],
+        "contract_map_used": {
+          "spend-profiler": "SpendProfilerOutput",
+          "document-contextualizer": "DocumentContextOutput",
+          "bva-analyzer": "BvAAnalyzerOutput",
+          "temporal-analyzer": "TemporalAnalyzerOutput",
+          "payment-terms-optimizer": "PaymentTermsOptimizerOutput",
+          "heuristic-analyzer": "HeuristicAnalyzerOutput",
+          "internal-benchmarker": "InternalBenchmarkerOutput",
+          "peer-benchmarker": "PeerBenchmarkerOutput",
+          "value-bridge-calculator": "ValueBridgeOutput",
+          "analysis-synthesizer": "AnalysisSynthesizerOutput",
+          "executive-communication": "ExecutiveCommunicationOutput"
+        }
+      }
+    },
+    {
+      "dimension_id": "sp_04",
+      "name": "OPAR Intent-to-Plan Mapping Coverage",
+      "domain": "skill_pipeline",
+      "raw_score": 10.0,
+      "threshold_pass": 8.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "19/19 IntentClass values handled in plan.py",
+      "evidence": {
+        "total_intents": 19,
+        "handled_in_plan": 19,
+        "unhandled": [],
+        "intents": [
+          "upload_data",
+          "benchmark",
+          "value_bridge",
+          "business_case",
+          "export_business_case",
+          "drill_down",
+          "savings_plan",
+          "sensitivity",
+          "temporal",
+          "bva",
+          "payment_terms",
+          "general_qa",
+          "conflict_review",
+          "consolidate",
+          "vendor_master",
+          "contract_review",
+          "zbb",
+          "cost_to_serve",
+          "gstr_reconcile"
+        ]
+      }
+    },
+    {
+      "dimension_id": "api_01",
+      "name": "Frontend Call Resolution Rate",
+      "domain": "api_connectivity",
+      "raw_score": 10.0,
+      "threshold_pass": 9.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "30/30 unique frontend API calls resolve to a backend route",
+      "evidence": {
+        "total_unique_frontend_calls": 30,
+        "resolved_count": 30,
+        "unresolved": [],
+        "resolved": [
+          "/api/v1/sessions/{param}/manifest",
+          "/api/v1/sessions/{param}",
+          "/api/v1/sessions",
+          "/api/v1/template/spend-csv",
+          "/api/v1/compliance/audit-log",
+          "/api/v1/chat",
+          "/api/v1/upload/{param}",
+          "/api/v1/chat/plan",
+          "/api/v1/analyze/{param}",
+          "/api/v1/analyze/{param}/incremental",
+          "/api/v1/diagnostic/company-research",
+          "/api/v1/initiatives",
+          "/api/v1/pipeline/summary",
+          "/api/v1/sensitivity/{param}{param}",
+          "/api/v1/conflicts/{param}",
+          "/api/v1/trends/{param}",
+          "/api/v1/bva/{param}",
+          "/api/v1/payment-terms/{param}",
+          "/api/v1/cost-to-serve",
+          "/api/v1/initiatives/{param}/stage",
+          "/api/v1/initiatives/{param}/reject",
+          "/api/v1/conflicts/resolve",
+          "/api/v1/business-case/{param}",
+          "/api/v1/consolidate/{param}",
+          "/api/v1/initiatives/{param}/milestones",
+          "/api/v1/initiatives/{param}/actuals",
+          "/api/v1/benchmarks",
+          "/api/v1/sector-packs",
+          "/api/v1/skills",
+          "/api/v1/skills/{param}"
+        ]
+      }
+    },
+    {
+      "dimension_id": "api_02",
+      "name": "Backend Feature Frontend Exposure",
+      "domain": "api_connectivity",
+      "raw_score": 10.0,
+      "threshold_pass": 6.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "8/8 backend feature groups have at least one frontend page calling them",
+      "evidence": {
+        "total_feature_groups": 8,
+        "exposed_count": 8,
+        "exposure_detail": {
+          "benchmarks_api": true,
+          "sector_packs": true,
+          "initiative_milestones": true,
+          "initiative_actuals": true,
+          "enterprise_consolidation": true,
+          "cost_to_serve": true,
+          "output_board_cfo": true,
+          "incremental_analyze": true
+        },
+        "not_exposed": []
+      }
+    },
+    {
+      "dimension_id": "api_03",
+      "name": "API Version Consistency",
+      "domain": "api_connectivity",
+      "raw_score": 10.0,
+      "threshold_pass": 6.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "30/30 unique frontend API calls use /api/v1/ prefix",
+      "evidence": {
+        "total_unique_calls": 30,
+        "v1_prefixed_count": 30,
+        "unversioned_count": 0,
+        "v1_calls": [
+          "/api/v1/analyze/{param}",
+          "/api/v1/analyze/{param}/incremental",
+          "/api/v1/benchmarks",
+          "/api/v1/business-case/{param}",
+          "/api/v1/bva/{param}",
+          "/api/v1/chat",
+          "/api/v1/chat/plan",
+          "/api/v1/compliance/audit-log",
+          "/api/v1/conflicts/resolve",
+          "/api/v1/conflicts/{param}",
+          "/api/v1/consolidate/{param}",
+          "/api/v1/cost-to-serve",
+          "/api/v1/diagnostic/company-research",
+          "/api/v1/initiatives",
+          "/api/v1/initiatives/{param}/actuals",
+          "/api/v1/initiatives/{param}/milestones",
+          "/api/v1/initiatives/{param}/reject",
+          "/api/v1/initiatives/{param}/stage",
+          "/api/v1/payment-terms/{param}",
+          "/api/v1/pipeline/summary",
+          "/api/v1/sector-packs",
+          "/api/v1/sensitivity/{param}{param}",
+          "/api/v1/sessions",
+          "/api/v1/sessions/{param}",
+          "/api/v1/sessions/{param}/manifest",
+          "/api/v1/skills",
+          "/api/v1/skills/{param}",
+          "/api/v1/template/spend-csv",
+          "/api/v1/trends/{param}",
+          "/api/v1/upload/{param}"
+        ],
+        "unversioned_calls": []
+      }
+    },
+    {
+      "dimension_id": "api_04",
+      "name": "FP&A Endpoint Wiring Completeness",
+      "domain": "api_connectivity",
+      "raw_score": 10.0,
+      "threshold_pass": 9.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "6/6 FP&A endpoint check-points pass (backend+frontend per endpoint)",
+      "evidence": {
+        "endpoints_checked": [
+          "trends",
+          "bva",
+          "payment-terms"
+        ],
+        "detail": {
+          "trends": {
+            "backend": true,
+            "frontend": true
+          },
+          "bva": {
+            "backend": true,
+            "frontend": true
+          },
+          "payment-terms": {
+            "backend": true,
+            "frontend": true
+          }
+        },
+        "points_scored": 6,
+        "points_possible": 6
+      }
+    },
+    {
+      "dimension_id": "opar_01",
+      "name": "Phase Module Non-Empty Coverage",
+      "domain": "opar_loop",
+      "raw_score": 10.0,
+      "threshold_pass": 9.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "4/4 OPAR phase modules exist with >100 lines",
+      "evidence": {
+        "phases": {
+          "observe": {
+            "exists": true,
+            "line_count": 567
+          },
+          "plan": {
+            "exists": true,
+            "line_count": 669
+          },
+          "act": {
+            "exists": true,
+            "line_count": 356
+          },
+          "reflect": {
+            "exists": true,
+            "line_count": 1441
+          }
+        },
+        "thin_or_missing": []
+      }
+    },
+    {
+      "dimension_id": "opar_02",
+      "name": "Intent Handler Coverage in Plan",
+      "domain": "opar_loop",
+      "raw_score": 10.0,
+      "threshold_pass": 8.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "19/19 IntentClass values have a plan branch in plan.py",
+      "evidence": {
+        "total_intents": 19,
+        "handled_count": 19,
+        "unhandled": []
+      }
+    },
+    {
+      "dimension_id": "opar_03",
+      "name": "Quality Gate Coverage in Reflect",
+      "domain": "opar_loop",
+      "raw_score": 10.0,
+      "threshold_pass": 8.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "3/3 required quality gate symbols present in reflect.py",
+      "evidence": {
+        "required_checks": [
+          "validate_core_skill_outputs",
+          "savings",
+          "peer_benchmarker"
+        ],
+        "present": [
+          "validate_core_skill_outputs",
+          "savings",
+          "peer_benchmarker"
+        ],
+        "missing": []
+      }
+    },
+    {
+      "dimension_id": "infra_01",
+      "name": "Connector Method Completeness",
+      "domain": "infrastructure",
+      "raw_score": 10.0,
+      "threshold_pass": 8.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "6/6 connectors have at least one required entry-point method",
+      "evidence": {
+        "connectors": {
+          "ariba_csv.py": {
+            "exists": true,
+            "has_method": true
+          },
+          "bank_mt940.py": {
+            "exists": true,
+            "has_method": true
+          },
+          "gst_portal.py": {
+            "exists": true,
+            "has_method": true
+          },
+          "hrms_csv.py": {
+            "exists": true,
+            "has_method": true
+          },
+          "sap_odata.py": {
+            "exists": true,
+            "has_method": true
+          },
+          "tally_xml.py": {
+            "exists": true,
+            "has_method": true
+          }
+        },
+        "missing_method": []
+      }
+    },
+    {
+      "dimension_id": "infra_02",
+      "name": "Health Endpoint Coverage",
+      "domain": "infrastructure",
+      "raw_score": 10.0,
+      "threshold_pass": 9.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "/health: \u2713, /health/ready: \u2713",
+      "evidence": {
+        "health_endpoint_present": true,
+        "health_ready_endpoint_present": true
+      }
+    },
+    {
+      "dimension_id": "infra_03",
+      "name": "Rate Limit Coverage for LLM Endpoints",
+      "domain": "infrastructure",
+      "raw_score": 7.0,
+      "threshold_pass": 6.0,
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "Global limiter: \u2713 (+7), per-route limiter in chat: \u2717 (+3)",
+      "evidence": {
+        "global_limiter_in_main": true,
+        "per_route_limiter_in_chat": false
+      }
+    }
+  ]
+}

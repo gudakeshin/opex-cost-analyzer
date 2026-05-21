@@ -75,7 +75,7 @@ function EmptyPipeline({ onGoToAnalysis }: { onGoToAnalysis: () => void }) {
             Go to Analysis →
           </button>
           <a
-            href="/api/template/spend-csv"
+            href="/api/v1/template/spend-csv"
             download="opex_spend_template.csv"
             className="px-5 py-2.5 rounded-xl border border-brand-border text-brand-ink text-sm hover:bg-brand-surface-muted transition-colors"
           >
@@ -91,6 +91,7 @@ const FPA_TABS = [
   { id: 'trends', label: 'Trends' },
   { id: 'bva', label: 'Budget vs Actuals' },
   { id: 'payment-terms', label: 'Payment Terms' },
+  { id: 'cost-to-serve', label: 'Cost to Serve' },
 ];
 
 function scenarioExecutionRate(scenario: ScenarioPreset): number | undefined {
@@ -123,6 +124,9 @@ export default function CostRoom() {
   const [trends, setTrends] = useState<Record<string, unknown> | null>(null);
   const [bva, setBva] = useState<Record<string, unknown> | null>(null);
   const [paymentTerms, setPaymentTerms] = useState<Record<string, unknown> | null>(null);
+  const [costToServe, setCostToServe] = useState<Record<string, unknown> | null>(null);
+  const [milestones, setMilestones] = useState<Record<string, unknown>[] | null>(null);
+  const [businessCaseLoading, setBusinessCaseLoading] = useState(false);
   const [tabLoading, setTabLoading] = useState(false);
   const [tabError, setTabError] = useState<string | null>(null);
   const [lastSync, setLastSync] = useState(() => new Date().toISOString());
@@ -220,7 +224,7 @@ export default function CostRoom() {
     try {
       const execRate = scenarioExecutionRate(scenario);
       const qs = execRate != null ? `?execution_rate_pct=${execRate}` : '';
-      const data = await apiGet<SensitivityResponse>(`/api/sensitivity/${sessionId}${qs}`);
+      const data = await apiGet<SensitivityResponse>(`/api/v1/sensitivity/${sessionId}${qs}`);
       setSensitivity(data);
     } catch {
       setSensitivity(null);
@@ -238,7 +242,7 @@ export default function CostRoom() {
   }, [loadSensitivity]);
 
   useEffect(() => {
-    apiGet<ComplianceAuditResponse>('/api/compliance/audit-log?limit=1')
+    apiGet<ComplianceAuditResponse>('/api/v1/compliance/audit-log?limit=1')
       .then((res) => {
         setServerAuditCount(res.integrity?.records ?? res.entries?.length ?? 0);
         setChainValid(res.integrity?.chain_valid);
@@ -285,6 +289,8 @@ export default function CostRoom() {
           setBva(await apiGet(`/api/v1/bva/${sessionId}`));
         } else if (activeTab === 'payment-terms') {
           setPaymentTerms(await apiGet(`/api/v1/payment-terms/${sessionId}`));
+        } else if (activeTab === 'cost-to-serve') {
+          setCostToServe(await apiPost('/api/v1/cost-to-serve', { session_id: sessionId }));
         }
       } catch (err) {
         setTabError(getApiErrorMessage(err));
@@ -337,6 +343,8 @@ export default function CostRoom() {
     setSelected(init);
     setDrawerOpen(true);
     appendAudit(`Opened initiative ${init.initiative_id} (${percentileBand} view)`);
+    setMilestones(null);
+    loadMilestones(init.initiative_id);
   };
 
   const resolveConflicts = async () => {
@@ -355,6 +363,51 @@ export default function CostRoom() {
       setResolvingConflicts(false);
     }
   };
+
+  const exportBusinessCase = useCallback(async () => {
+    if (!sessionId) return;
+    setBusinessCaseLoading(true);
+    try {
+      await apiPost(`/api/v1/business-case/${sessionId}`, { format: 'pptx' });
+      appendAudit('business_case_export_requested');
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setBusinessCaseLoading(false);
+    }
+  }, [sessionId, appendAudit]);
+
+  const handleConsolidate = useCallback(async () => {
+    if (!sessionId) return;
+    try {
+      await apiPost(`/api/v1/consolidate/${sessionId}`, {});
+      appendAudit('consolidation_run');
+      await loadPipeline();
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    }
+  }, [sessionId, appendAudit, loadPipeline]);
+
+  const loadMilestones = useCallback(async (initiativeId: string) => {
+    try {
+      const res = await apiGet<{ milestones: unknown[] }>(
+        `/api/v1/initiatives/${initiativeId}/milestones`,
+      );
+      setMilestones((res.milestones ?? []) as Record<string, unknown>[]);
+    } catch {
+      setMilestones([]);
+    }
+  }, []);
+
+  const addActuals = useCallback(async (initiativeId: string, amount: number) => {
+    try {
+      await apiPost(`/api/v1/initiatives/${initiativeId}/actuals`, { amount_cr: amount });
+      appendAudit(`actuals_recorded: ${initiativeId}`);
+      await loadPipeline();
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    }
+  }, [appendAudit, loadPipeline]);
 
   const auditCountTotal = serverAuditCount + auditLog.length;
   const friendlyError = error ? friendlyErrorMessage(error) : null;
@@ -433,8 +486,17 @@ export default function CostRoom() {
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
               <Card className="xl:col-span-2 !p-0 overflow-hidden bg-white border-brand-border">
-                <div className="px-6 pt-4 pb-2 border-b border-brand-border">
+                <div className="px-6 pt-4 pb-2 border-b border-brand-border flex items-center justify-between">
                   <h2 className="font-semibold text-brand-ink">Initiative portfolio</h2>
+                  {!isExecutive && sessionId && (
+                    <button
+                      type="button"
+                      onClick={handleConsolidate}
+                      className="text-xs px-2.5 py-1.5 rounded-lg border border-brand-border hover:bg-brand-surface-muted text-brand-muted"
+                    >
+                      Consolidate entities
+                    </button>
+                  )}
                 </div>
                 <div className="p-4 md:p-6 overflow-x-auto">
                   <InitiativePortfolio
@@ -506,6 +568,19 @@ export default function CostRoom() {
                   {activeTab === 'payment-terms' && (
                     <PaymentTermsTab data={paymentTerms} loading={tabLoading} error={tabError} />
                   )}
+                  {activeTab === 'cost-to-serve' && (
+                    tabLoading ? (
+                      <Loader label="Computing cost-to-serve…" />
+                    ) : tabError ? (
+                      <p className="text-sm text-red-600">{tabError}</p>
+                    ) : costToServe ? (
+                      <pre className="text-xs font-mono bg-brand-surface rounded p-4 overflow-x-auto">
+                        {JSON.stringify(costToServe, null, 2)}
+                      </pre>
+                    ) : (
+                      <p className="text-sm text-brand-muted">No cost-to-serve data. Run full analysis first.</p>
+                    )
+                  )}
                 </div>
               </>
             )}
@@ -517,7 +592,7 @@ export default function CostRoom() {
           lastSync={lastSyncLabel}
           chainValid={chainValid}
           onOpenAudit={() => setTrustOpen(true)}
-          onExportDeck={() => appendAudit('export_deck_requested')}
+          onExportDeck={exportBusinessCase}
           onExportExcel={() => appendAudit('export_excel_requested')}
         />
       </div>
@@ -532,12 +607,34 @@ export default function CostRoom() {
         ]}
       />
 
+      {businessCaseLoading && (
+        <div className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50">
+          <div className="bg-white border border-brand-border rounded-xl px-4 py-2 shadow-lg flex items-center gap-2 text-sm text-brand-ink">
+            <Loader />
+            Generating business case…
+          </div>
+        </div>
+      )}
+
       <InitiativeDrawer
         initiative={selected}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         percentileBand={percentileBand}
       />
+
+      {selected && milestones !== null && drawerOpen && (
+        <div className="fixed bottom-4 right-4 z-50 bg-white border border-brand-border rounded-xl px-4 py-2 shadow text-xs text-brand-muted flex items-center gap-3">
+          <span>{milestones.length} milestone{milestones.length !== 1 ? 's' : ''}</span>
+          <button
+            type="button"
+            className="underline hover:text-deloitte-green"
+            onClick={() => addActuals(selected.initiative_id, 0)}
+          >
+            Record actuals
+          </button>
+        </div>
+      )}
 
       <Modal
         open={rejectModalOpen}

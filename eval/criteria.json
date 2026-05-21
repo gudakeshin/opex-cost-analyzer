@@ -1,0 +1,199 @@
+{
+  "schema_version": "1.0",
+  "eval_name": "OpEx Platform Reference-Data Quality Evaluation",
+  "description": "Rigorous scoring rubric for lever coverage completeness and benchmark authenticity. Each dimension is independently computable from platform reference files.",
+  "scoring_scale": { "min": 0, "max": 10 },
+  "domains": [
+    {
+      "name": "lever_coverage",
+      "display_name": "Lever Coverage",
+      "weight": 0.45,
+      "description": "How exhaustive, structurally correct, and internally consistent the cost-reduction lever taxonomy is.",
+      "dimensions": [
+        {
+          "id": "lc_01",
+          "name": "Universal Lever Count & Family Completeness",
+          "description": "Library should have ≥40 levers covering all 6 families (supply, demand, technology, finance, process, structure). Orphaned lever IDs in savings_type_by_lever without a levers{} definition block deduct 0.5 each.",
+          "weight": 0.15,
+          "scoring_method": "0.6 * min(10, actual_count/40*10) + 0.4 * (families_present/6*10) - 0.5*orphan_count",
+          "threshold_pass": 7.0,
+          "data_sources": ["skills/savings-modeler/references/model_parameters.json"],
+          "required_families": ["supply", "demand", "technology", "finance", "process", "structure"]
+        },
+        {
+          "id": "lc_02",
+          "name": "Lever Structural Integrity",
+          "description": "Every lever must have all 12 required fields. Phasing curves must sum to 1.0 ± 0.001. Float fields must be in [0,1]. implementation_weeks must satisfy p10 ≤ p50 ≤ p90.",
+          "weight": 0.15,
+          "scoring_method": "(completeness_rate * 0.5 + integrity_rate * 0.5) * 10",
+          "threshold_pass": 8.0,
+          "data_sources": ["skills/savings-modeler/references/model_parameters.json"],
+          "required_fields": ["lever_name", "lever_family", "phasing_curve", "savings_type", "cta_rate", "sustainability_score", "bounce_back_risk", "org_change_risk", "condition_precedents", "complexity_tier", "base_execution_probability", "implementation_weeks"]
+        },
+        {
+          "id": "lc_03",
+          "name": "Sector Pack Count & Architecture Parity",
+          "description": "14 packs have sector_levers.json in skills/sector-packs/. Only packs that ALSO have a pack_manifest.yaml in sector_packs/ are architecturally complete. Score = intersection / skills_packs * 10.",
+          "weight": 0.12,
+          "scoring_method": "|skills_packs ∩ sector_packs_dirs| / |skills_packs| * 10",
+          "threshold_pass": 7.0,
+          "data_sources": [
+            "skills/sector-packs/*/sector_levers.json",
+            "sector_packs/*/pack_manifest.yaml"
+          ]
+        },
+        {
+          "id": "lc_04",
+          "name": "Full-Pack Artifact Completeness",
+          "description": "Packs with status='full' in pack_manifest.yaml must have all 6 artifacts: sector_levers.json, benchmark_sources.yaml, kpi_pack.json, regulatory_layer.md, peer_set.json, taxonomy_extension.json. Score = mean artifact fraction across full packs.",
+          "weight": 0.10,
+          "scoring_method": "mean(present_artifacts / 6 for full packs) * 10",
+          "threshold_pass": 8.0,
+          "data_sources": ["sector_packs/*/pack_manifest.yaml"],
+          "required_artifacts": ["sector_levers.json", "benchmark_sources.yaml", "kpi_pack.json", "regulatory_layer.md", "peer_set.json", "taxonomy_extension.json"]
+        },
+        {
+          "id": "lc_05",
+          "name": "Sector Lever Structural Integrity",
+          "description": "Each sector-specific lever must have all 13 required fields. savings_range_pct must have p10/p50/p90 with p10≤p50≤p90. implementation_weeks must have p10≤p50≤p90. phasing_curve must sum to 1.0.",
+          "weight": 0.10,
+          "scoring_method": "pass_rate * 10",
+          "threshold_pass": 8.0,
+          "data_sources": ["skills/sector-packs/*/sector_levers.json"],
+          "required_fields": ["lever_id", "lever_name", "lever_family", "savings_range_pct", "cta_rate", "phasing_curve", "savings_type", "sustainability_score", "bounce_back_risk", "condition_precedents", "complexity_tier", "base_execution_probability", "implementation_weeks"]
+        },
+        {
+          "id": "lc_06",
+          "name": "Sector Lever ID Global Uniqueness",
+          "description": "Lever IDs appearing in multiple sector packs without explicit cross-sector metadata create dispatch ambiguity. Deduct 0.5 per duplicate pair (capped at 5 pairs = max deduction 2.5).",
+          "weight": 0.08,
+          "scoring_method": "max(0, 10 - min(5, duplicate_id_count) * 0.5)",
+          "threshold_pass": 7.0,
+          "data_sources": ["skills/sector-packs/*/sector_levers.json"]
+        },
+        {
+          "id": "lc_07",
+          "name": "Universal Lever Cross-Reference Validity",
+          "description": "Each sector pack's universal_levers list references IDs that must resolve to entries in model_parameters.json levers{}. Dangling references indicate maintenance drift.",
+          "weight": 0.10,
+          "scoring_method": "valid_refs / total_refs * 10",
+          "threshold_pass": 9.0,
+          "data_sources": [
+            "skills/sector-packs/*/sector_levers.json",
+            "skills/savings-modeler/references/model_parameters.json"
+          ]
+        },
+        {
+          "id": "lc_08",
+          "name": "Mutual Exclusion & Dependency DAG",
+          "description": "Two structural gaps: (1) No mutually_exclusive_with field prevents insourcing+outsourcing from being simultaneously recommended for the same category. (2) No depends_on field means automation can be recommended without ensuring process_standardization precedes it. Each field contributes 5 points.",
+          "weight": 0.20,
+          "scoring_method": "int(any_lever_has_mutually_exclusive_with) * 5 + int(any_lever_has_depends_on) * 5",
+          "threshold_pass": 7.0,
+          "data_sources": ["skills/savings-modeler/references/model_parameters.json"],
+          "sentinel_exclusive_pairs": [["insourcing", "outsourcing"]],
+          "sentinel_dag_pairs": [["automation", "process_standardization"], ["p2p_o2c_automation", "process_standardization"]]
+        }
+      ]
+    },
+    {
+      "name": "benchmark_authenticity",
+      "display_name": "Benchmark Authenticity",
+      "weight": 0.55,
+      "description": "How credibly sourced, attributed, and taxonomically complete the benchmark data is. Source attribution is weighted highest — unattributed benchmarks cannot be defended in a client engagement.",
+      "dimensions": [
+        {
+          "id": "ba_01",
+          "name": "Industry Benchmark Source Attribution Quality",
+          "description": "4-level rubric applied to industry_benchmarks.json: 0=no source named; 3=source named; 6=source+publication type; 9=source+title+year; 10=all+per-category attribution. Current state: Gartner/Hackett named in description but no titles, years, or per-category fields.",
+          "weight": 0.25,
+          "scoring_method": "score_map[rubric_level] where rubric_level = sum(named_source, pub_type_keyword, year_regex_match, per_category_source_field)",
+          "threshold_pass": 7.0,
+          "data_sources": ["skills/peer-benchmarker/references/industry_benchmarks.json"],
+          "rubric_score_map": {"0": 0, "1": 3, "2": 6, "3": 9, "4": 10},
+          "source_keywords": ["gartner", "hackett", "mckinsey", "deloitte", "accenture", "kpmg", "pwc", "bcg", "bain", "ey", "consulting", "forrester", "idc", "aberdeen"],
+          "pub_type_keywords": ["study", "survey", "report", "benchmark", "publication", "research", "analysis"]
+        },
+        {
+          "id": "ba_02",
+          "name": "Heuristic Targets Source Attribution",
+          "description": "heuristic_targets.json has no source field and no currency denomination. Per-employee targets (HR:2500, IT:5000) are numerically ambiguous — in USD they overstate cost ~83x vs INR. Both failures are blocking for global deployment.",
+          "weight": 0.20,
+          "scoring_method": "source_score * 0.7 + currency_score * 0.3; source_score = 0/5/10 (absent/generic/specific); currency_score = 0/10 (absent/present)",
+          "threshold_pass": 7.0,
+          "data_sources": ["skills/heuristic-analyzer/references/heuristic_targets.json"],
+          "source_keys_to_check": ["source", "attribution", "data_source", "reference", "derived_from"],
+          "currency_keys_to_check": ["currency", "currency_denomination", "reporting_currency"]
+        },
+        {
+          "id": "ba_03",
+          "name": "DPO Benchmark Source Attribution",
+          "description": "dpo_benchmarks.json lacks a named source. Per-category notes exist and provide analytical context (+2 bonus). DPO figures are sensitive commercial data typically sourced from Hackett AP Benchmarking or Aberdeen.",
+          "weight": 0.15,
+          "scoring_method": "min(10, score_map[rubric_level] + 2 * int(any_category_has_notes))",
+          "threshold_pass": 7.0,
+          "data_sources": ["skills/payment-terms-optimizer/references/dpo_benchmarks.json"],
+          "rubric_score_map": {"0": 0, "1": 3, "2": 6, "3": 9, "4": 10}
+        },
+        {
+          "id": "ba_04",
+          "name": "Diagnostic Threshold Source Attribution",
+          "description": "diagnostic_thresholds.json contains 5 threshold values and 4 addressable rates — 9 total numeric claims. None have a companion rationale, source, or reference sub-field. The HHI threshold of 0.15 is defensible (DOJ/FTC guidelines use 0.25); maverick ratio of 20% and cost-per-transaction of ₹1000 are unattributed.",
+          "weight": 0.10,
+          "scoring_method": "thresholds_with_rationale / total_threshold_values * 10",
+          "threshold_pass": 6.0,
+          "data_sources": ["skills/root-cause-analyzer/references/diagnostic_thresholds.json"],
+          "rationale_keys": ["rationale", "source", "reference", "basis", "derived_from"]
+        },
+        {
+          "id": "ba_05",
+          "name": "Industry Benchmark Taxonomy Coverage",
+          "description": "Measures what fraction of addressable taxonomy categories have peer benchmark data. Addressable = all 24 categories minus statutory non-addressable (GST_TAX, CSR) minus catch-all (OTHER). Currently 10 of 21 addressable categories have benchmarks — 14 are missing including commercially significant India categories (POWER_ENERGY, PLANT_MAINTENANCE, LOGISTICS_INDIA).",
+          "weight": 0.15,
+          "scoring_method": "|benchmarked ∩ addressable| / |addressable| * 10",
+          "threshold_pass": 6.0,
+          "data_sources": [
+            "skills/peer-benchmarker/references/industry_benchmarks.json",
+            "skills/spend-profiler/references/spend_taxonomy.json",
+            "skills/spend-profiler/references/regulatory_exclusions.json"
+          ],
+          "excluded_categories": ["OTHER"]
+        },
+        {
+          "id": "ba_06",
+          "name": "Heuristic Target Taxonomy Coverage",
+          "description": "Measures what fraction of addressable taxonomy categories have a heuristic % of revenue target. Uses same addressable set as BA_05. Currently 13 of 21 addressable categories covered.",
+          "weight": 0.10,
+          "scoring_method": "|heuristic_covered ∩ addressable| / |addressable| * 10",
+          "threshold_pass": 6.0,
+          "data_sources": [
+            "skills/heuristic-analyzer/references/heuristic_targets.json",
+            "skills/spend-profiler/references/spend_taxonomy.json",
+            "skills/spend-profiler/references/regulatory_exclusions.json"
+          ],
+          "excluded_categories": ["OTHER"]
+        },
+        {
+          "id": "ba_07",
+          "name": "Licensed Benchmark Stub Transparency",
+          "description": "2 full packs cite CMIE Prowess IQ / Capitaline Plus as licensed stubs. Score measures: transparency (stubs clearly labelled, not falsely claimed as populated), adapter infrastructure (CmieAdapter class exists), and breadth (what % of packs have any benchmark_sources.yaml).",
+          "weight": 0.05,
+          "scoring_method": "0.4 * transparency_score + 0.3 * adapter_score + 0.3 * pack_coverage_score",
+          "threshold_pass": 5.0,
+          "data_sources": [
+            "sector_packs/*/benchmark_sources.yaml",
+            "app/services/benchmarks_india.py"
+          ],
+          "adapter_classes": ["CmieAdapter", "CapitalineAdapter"]
+        }
+      ]
+    }
+  ],
+  "global_metadata": {
+    "eval_version": "1.0",
+    "target_platform_version": "2.0",
+    "created_date": "2026-05-20",
+    "domain_pass_threshold": 6.5,
+    "overall_pass_threshold": 6.0
+  }
+}

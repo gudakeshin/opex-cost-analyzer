@@ -82,7 +82,7 @@ export const ProcurementAnalysis: React.FC = () => {
       },
     ]);
     try {
-      const session = await apiGet<SessionResponse>(`/api/sessions/${sid}`);
+      const session = await apiGet<SessionResponse>(`/api/v1/sessions/${sid}`);
       setAnalysis(session);
       await refreshAnalysisStatus();
     } catch {
@@ -99,7 +99,7 @@ export const ProcurementAnalysis: React.FC = () => {
       const sid = await ensureSession();
       const fd = new FormData();
       fd.append('file', file);
-      await apiUpload(`/api/upload/${sid}`, fd);
+      await apiUpload(`/api/v1/upload/${sid}`, fd);
       setMessages((m) => [
         ...m,
         {
@@ -176,9 +176,9 @@ export const ProcurementAnalysis: React.FC = () => {
     setError(null);
     try {
       const sid = await ensureSession();
-      await apiPost(`/api/analyze/${sid}`, {});
+      await apiPost(`/api/v1/analyze/${sid}`, {});
       await syncEngagementFromAnalysis();
-      const session = await apiGet<SessionResponse>(`/api/sessions/${sid}`);
+      const session = await apiGet<SessionResponse>(`/api/v1/sessions/${sid}`);
       setAnalysis(session);
       setInsightsOpen(true);
       setMessages((m) => [
@@ -196,11 +196,31 @@ export const ProcurementAnalysis: React.FC = () => {
     }
   };
 
+  const handleIncrementalAnalyze = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const sid = await ensureSession();
+      await apiPost(`/api/v1/analyze/${sid}/incremental`, {});
+      setMessages((m) => [
+        ...m,
+        {
+          role: 'assistant',
+          content: 'Incremental analysis complete. New data merged into session insights.',
+        },
+      ]);
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleNewSession = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiPost<{ session_id: string }>('/api/sessions', {
+      const res = await apiPost<{ session_id: string }>('/api/v1/sessions', {
         company_name: 'New engagement',
         audience: 'consultant',
       });
@@ -231,6 +251,14 @@ export const ProcurementAnalysis: React.FC = () => {
               className="text-xs px-2.5 py-1.5 rounded-lg border border-brand-border hover:bg-brand-surface-muted lg:hidden"
             >
               {insightsOpen ? 'Hide insights' : 'Insights'}
+            </button>
+            <button
+              type="button"
+              onClick={handleIncrementalAnalyze}
+              disabled={loading}
+              className="text-xs px-2.5 py-1.5 rounded-lg border border-brand-border hover:bg-brand-surface-muted disabled:opacity-50"
+            >
+              Incremental update
             </button>
             <button
               type="button"
@@ -282,7 +310,7 @@ export const ProcurementAnalysis: React.FC = () => {
                       ))}
                     </div>
                     <a
-                      href="/api/template/spend-csv"
+                      href="/api/v1/template/spend-csv"
                       download="opex_spend_template.csv"
                       className="text-xs text-brand-muted hover:text-deloitte-green underline underline-offset-2 transition-colors"
                     >

@@ -49,7 +49,7 @@ export const TrustRail: React.FC<TrustRailProps> = ({
 
   useEffect(() => {
     if (!open) return;
-    apiGet<ComplianceAuditResponse>('/api/compliance/audit-log?limit=40')
+    apiGet<ComplianceAuditResponse>('/api/v1/compliance/audit-log?limit=40')
       .then((res) => {
         setIntegrity(res.integrity);
         setServerAudit(

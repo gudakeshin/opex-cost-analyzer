@@ -26,6 +26,7 @@ from app.skills.contracts import (
     validate_analysis_synthesizer_output,
     validate_core_skill_outputs,
     validate_executive_communication_output,
+    validate_peer_benchmarker_output,
 )
 from app.storage import read_json
 
@@ -546,6 +547,14 @@ def _layer1_optional_synthesis_validation(
     validated: Dict[str, Dict[str, Any]],
     failed: Dict[str, str],
 ) -> None:
+    # Standalone peer_benchmarker quality gate — validates when present outside full pipeline.
+    peer_benchmarker = validated.get("peer-benchmarker")
+    if peer_benchmarker and "contract_validation" not in failed:
+        try:
+            validate_peer_benchmarker_output(peer_benchmarker)
+        except Exception as e:
+            failed["peer_benchmarker_validation"] = str(e)
+
     synthesis = validated.get("analysis-synthesizer")
     if not synthesis:
         return

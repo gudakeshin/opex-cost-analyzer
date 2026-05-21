@@ -361,6 +361,11 @@ def validate_core_skill_outputs(
     DataValidatorOutput.model_validate(validator)
 
 
+def validate_peer_benchmarker_output(peer: Dict[str, Any]) -> None:
+    """Standalone peer_benchmarker contract check — used by reflect.py quality gate."""
+    PeerBenchmarkerOutput.model_validate(peer)
+
+
 def validate_bva_output(bva: Dict[str, Any]) -> None:
     BvAAnalyzerOutput.model_validate(bva)
 

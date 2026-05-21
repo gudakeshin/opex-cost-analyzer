@@ -185,7 +185,7 @@ test('CostRoom renders EmptyPipeline heading and CTA buttons when no data', () =
       <div>
         <h3>No initiatives yet</h3>
         <button type="button" onClick={onNavigate}>Go to Analysis →</button>
-        <a href="/api/template/spend-csv" download="opex_spend_template.csv">
+        <a href="/api/v1/template/spend-csv" download="opex_spend_template.csv">
           Download spend template ↓
         </a>
       </div>

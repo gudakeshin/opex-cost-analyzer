@@ -346,3 +346,153 @@ def _executive_communication(ctx: SkillContext) -> tuple[Dict[str, Any], str | N
         return (drafted or {}), degraded_reason
     except Exception:
         return {}, "provider_unavailable"
+
+
+# ── Group 0: security & context preparation ──────────────────────────────────
+
+@register("pii-stripper")
+def _pii_stripper(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    return _engine.pii_stripper(ctx.lines), None
+
+
+@register("data-classifier")
+def _data_classifier(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    return _engine.data_classifier(ctx.lines, skill_outputs=ctx.prior_results), None
+
+
+@register("llm-context-builder")
+def _llm_context_builder(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    classification = ctx.prior("data-classifier") or None
+    return _engine.llm_context_builder(ctx.prior_results, classification=classification), None
+
+
+# ── Context & assumption tracking ───────────────────────────────────────────
+
+@register("assumption-register")
+def _assumption_register(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    return _engine.assumption_register(ctx.lines), None
+
+
+# ── Compliance & ESG ─────────────────────────────────────────────────────────
+
+@register("indian-tax-optimizer")
+def _indian_tax_optimizer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    effective_tax_rate = float(ctx.manifest.get("effective_tax_rate") or 0.25)
+    return _engine.indian_tax_optimizer(ctx.lines, effective_tax_rate=effective_tax_rate), None
+
+
+@register("brsr-cobenefit-calculator")
+def _brsr_cobenefit_calculator(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    return _engine.brsr_cobenefit_calculator(ctx.lines), None
+
+
+# ── Strategic analytics ───────────────────────────────────────────────────────
+
+@register("scenario-modeler")
+def _scenario_modeler(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    return _engine.scenario_modeler(ctx.lines), None
+
+
+@register("value-to-shareholder-bridge")
+def _value_to_shareholder_bridge(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    return _engine.value_to_shareholder_bridge(ctx.lines), None
+
+
+@register("peer-disclosure-miner")
+def _peer_disclosure_miner(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    bench = ctx.prior("peer-benchmarker")
+    peer_set = bench.get("peer_set") if bench else None
+    return _engine.peer_disclosure_miner(ctx.lines, peer_set=peer_set), None
+
+
+# ── Enterprise: data quality & multi-entity ──────────────────────────────────
+
+@register("conflict-detector")
+def _conflict_detector(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    return _engine.conflict_detector(ctx.lines), None
+
+
+@register("vendor-master-builder")
+def _vendor_master_builder(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    return _engine.vendor_master_builder(ctx.lines), None
+
+
+@register("consolidation-analyzer")
+def _consolidation_analyzer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    entity_tree = ctx.manifest.get("entity_tree")
+    return _engine.consolidation_analyzer(ctx.lines, entity_tree=entity_tree), None
+
+
+@register("msme-compliance-checker")
+def _msme_compliance_checker(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    return _engine.msme_compliance_checker(ctx.lines), None
+
+
+@register("contract-lifecycle-manager")
+def _contract_lifecycle_manager(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    return _engine.contract_lifecycle_manager(ctx.lines), None
+
+
+@register("gstr-reconciler")
+def _gstr_reconciler(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    gstr_2a = ctx.manifest.get("gstr_2a_data")
+    return _engine.gstr_reconciler(ctx.lines, gstr_2a=gstr_2a), None
+
+
+@register("zbb-modeler")
+def _zbb_modeler(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    profile = _get_profile(ctx)
+    drivers = (
+        {"categories": profile.get("category_profile")}
+        if profile.get("category_profile")
+        else None
+    )
+    return _engine.zbb_modeler(ctx.lines, drivers=drivers), None
+
+
+@register("cost-to-serve-analyzer")
+def _cost_to_serve_analyzer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    return _engine.cost_to_serve_analyzer(
+        ctx.lines,
+        annual_revenue=ctx.annual_revenue,
+        headcount=ctx.headcount or 0.0,
+    ), None
+
+
+# ── Output & reporting ────────────────────────────────────────────────────────
+
+@register("dashboard-builder")
+def _dashboard_builder(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    from app.services.dashboard import build_dashboard_html  # lazy
+
+    session_key = ctx.manifest.get("session_id") or "session"
+    analysis = {
+        "company_name": ctx.company_name,
+        "industry": ctx.industry,
+        "annual_revenue": ctx.annual_revenue,
+        "skill_outputs": ctx.prior_results,
+    }
+    path = build_dashboard_html(analysis, filename=f"{session_key}_dashboard.html")
+    return {"dashboard_url": f"/api/v1/exports/{path.name}", "filename": path.name}, None
+
+
+@register("export-formatter")
+def _export_formatter(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    from app.services.pmo_export import build_pmo_data, export_pmo_xlsx  # lazy
+
+    profile = _get_profile(ctx)
+    bridge = ctx.prior("value-bridge-calculator")
+    analysis = {
+        "company_name": ctx.company_name,
+        "industry": ctx.industry,
+        "annual_revenue": ctx.annual_revenue,
+        "skill_outputs": {
+            **ctx.prior_results,
+            "spend-profiler": profile,
+            "value-bridge-calculator": bridge,
+        },
+    }
+    pmo_data = build_pmo_data(analysis)
+    session_key = ctx.manifest.get("session_id") or "session"
+    path = export_pmo_xlsx(pmo_data, filename=f"{session_key}_pmo_export.xlsx")
+    return {"export_url": f"/api/v1/exports/{path.name}", "filename": path.name}, None

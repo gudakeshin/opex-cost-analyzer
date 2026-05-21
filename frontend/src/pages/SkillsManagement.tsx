@@ -25,7 +25,7 @@ export const SkillsManagement: React.FC = () => {
   const hasDiff = content !== savedContent;
 
   useEffect(() => {
-    apiGet<SkillMeta[]>('/api/skills')
+    apiGet<SkillMeta[]>('/api/v1/skills')
       .then((list) => {
         setSkills(list);
         if (list.length && !selectedSkill) setSelectedSkill(list[0].name);
@@ -38,7 +38,7 @@ export const SkillsManagement: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiGet<{ content: string }>(`/api/skills/${selectedSkill}`);
+      const res = await apiGet<{ content: string }>(`/api/v1/skills/${selectedSkill}`);
       setContent(res.content);
       setSavedContent(res.content);
       setOutput(`Loaded ${selectedSkill}`);
@@ -55,7 +55,7 @@ export const SkillsManagement: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      await apiPut(`/api/skills/${selectedSkill}`, { content });
+      await apiPut(`/api/v1/skills/${selectedSkill}`, { content });
       setSavedContent(content);
       setOutput(`Saved ${selectedSkill} at ${new Date().toLocaleTimeString()}`);
     } catch (err) {
@@ -70,7 +70,7 @@ export const SkillsManagement: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiPost<Record<string, unknown>>(`/api/skills/${selectedSkill}/test`, {});
+      const res = await apiPost<Record<string, unknown>>(`/api/v1/skills/${selectedSkill}/test`, {});
       setOutput(JSON.stringify(res, null, 2));
     } catch (err) {
       setError(getApiErrorMessage(err));
@@ -85,8 +85,8 @@ export const SkillsManagement: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      await apiPost('/api/skills', { name, content: content || '# New Skill\n' });
-      const list = await apiGet<SkillMeta[]>('/api/skills');
+      await apiPost('/api/v1/skills', { name, content: content || '# New Skill\n' });
+      const list = await apiGet<SkillMeta[]>('/api/v1/skills');
       setSkills(list);
       setSelectedSkill(name);
       setOutput(`Created skill: ${name}`);
