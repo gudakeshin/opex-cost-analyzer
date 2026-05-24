@@ -398,13 +398,19 @@ async def run_opar_loop(
     user_id: str,
     file_ids: list[str] | None = None,
     progress_callback: Callable[[str, str], None] | None = None,
+    thinking_enabled: bool = False,
+    thinking_budget_tokens: int = 8000,
 ) -> ReflectOutput:
     """Run full Observe -> Plan -> Act -> Reflect cycle (async-native)."""
     _opar_start = time.perf_counter()
     progress: list[Dict[str, str]] = []
-    logger.info('"opar_start session_id=%s"', session_id)
+    logger.info('"opar_start session_id=%s thinking=%s"', session_id, thinking_enabled)
     try:
-        return await _run_opar_loop_inner(msg, session_id, user_id, file_ids, progress_callback, progress)
+        return await _run_opar_loop_inner(
+            msg, session_id, user_id, file_ids, progress_callback, progress,
+            thinking_enabled=thinking_enabled,
+            thinking_budget_tokens=thinking_budget_tokens,
+        )
     finally:
         opar_cycle_duration_seconds.observe(time.perf_counter() - _opar_start)
 
@@ -416,6 +422,8 @@ async def _run_opar_loop_inner(
     file_ids: list[str] | None,
     progress_callback: Callable[[str, str], None] | None,
     progress: list[Dict[str, str]],
+    thinking_enabled: bool = False,
+    thinking_budget_tokens: int = 8000,
 ) -> ReflectOutput:
 
     _add_progress_step(progress, "observe", "Understanding your request...")
@@ -585,7 +593,11 @@ async def _run_opar_loop_inner(
     _add_progress_step(progress, "reflect", "Validating and summarizing results...")
     if progress_callback:
         progress_callback("reflect", "Validating and summarizing results...")
-    result = reflect(act_result, exec_plan, ctx)
+    result = reflect(
+        act_result, exec_plan, ctx,
+        thinking_enabled=thinking_enabled,
+        thinking_budget_tokens=thinking_budget_tokens,
+    )
 
     # If this was a general_qa that ran the profiler, enhance the response
     if ctx.intent_class == "general_qa" and (

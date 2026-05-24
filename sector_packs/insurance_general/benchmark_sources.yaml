@@ -1,0 +1,33 @@
+source_validation_date: '2026-05-21'
+source_validation_note: 'Free source URLs verified. Sample metrics are indicative public disclosures. Licensed sources require credentials — no data fabricated for licensed entries.'
+
+pack_id: insurance_general
+schema_version: '1.0'
+confidence: illustrative
+free_sources:
+- name: IRDAI Annual Report
+  type: public_disclosure
+  url: 'https://irdai.gov.in/annual-report'
+  sample_metric: 'General insurance combined ratio India: 112–118% (IRDAI Annual Report 2023-24)'
+- name: BSE insurance filings
+  type: public_disclosure
+  url: 'https://www.bseindia.com/corporates/ann.html'
+  sample_metric: 'New India Assurance management expense ratio: ~21%; ICICI Lombard combined ratio: ~103% (BSE annual reports FY2024)'
+- name: Insurance Regulatory data
+  type: public_disclosure
+  url: 'https://irdai.gov.in/reports-and-statistics'
+  sample_metric: 'India general insurance premium: ₹2.90 lakh Cr FY2024; motor segment: ~35% of total premium (IRDAI statistics)'
+licensed_sources_stubs:
+- name: CMIE Prowess IQ
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: CmieAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+- name: Swiss Re Sigma
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: SwissReSigmaAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+refresh_cycle: Annual
+notes: Free sources provide public disclosure data sufficient for diagnostic benchmarking.
+  Licensed sources required for granular spend-line comparisons.

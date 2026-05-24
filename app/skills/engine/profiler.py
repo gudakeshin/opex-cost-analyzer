@@ -38,6 +38,11 @@ _DOC_INDUSTRY_SIGNALS: Dict[str, List[str]] = {
     "healthcare_hospitals": ["bed capacity", "nabh", "ot utilization", "inpatient", "outpatient", "clinical staff", "occupancy rate", "nurse", "physician", "pharmacy formulary", "revenue cycle", "denial rate"],
     "hospitality_travel": ["revpar", "adr", "ota commission", "food and beverage", "room nights", "channel manager", "pms", "housekeeping", "occupancy rate", "booking engine"],
     "financial_services_nonbank": ["aum", "fund management", "asset management", "fintech", "mifid", "sebi amc", "nav", "portfolio management", "broker vote", "custody fee", "performance attribution"],
+    "gcc_capability_centers": [
+        "global capability center", "gcc", "captive center", "shared service center", "ssc",
+        "center of excellence", "coe", "offshore delivery", "captive unit", "nasscom gcc",
+        "fte cost", "seat cost", "attrition", "bench management", "automation ops",
+    ],
 }
 
 
@@ -202,6 +207,14 @@ def infer_industry_from_spend(lines: List[NormalizedSpendLine], total_spend: flo
             keyword_hits["insurance_general"] += 1
         if any(k in desc for k in ("tower", "bts", "ran", "bss", "oss", "spectrum", "roaming")):
             keyword_hits["telecom_infra"] += 1
+        if any(
+            k in desc
+            for k in (
+                "gcc", "captive center", "shared service", "ssc", "center of excellence",
+                "coe", "offshore delivery", "global in-house", "captive unit",
+            )
+        ):
+            keyword_hits["gcc_capability_centers"] += 1
 
     if keyword_hits:
         return max(keyword_hits, key=keyword_hits.__getitem__)
@@ -214,6 +227,9 @@ def infer_industry_from_spend(lines: List[NormalizedSpendLine], total_spend: flo
     pwr_pct = by_cat.get("POWER_ENERGY", 0) / total_spend
     tel_pct = by_cat.get("TELECOM", 0) / total_spend
 
+    hr_pct = by_cat.get("HR", 0) / total_spend
+    if it_pct > 0.25 and hr_pct > 0.12:
+        return "gcc_capability_centers"
     if it_pct > 0.40:
         return "it_ites"
     if pm_pct > 0.08 and rnd_pct < 0.02:
@@ -628,8 +644,39 @@ def spend_profiler(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
 # Chart builder
 # ---------------------------------------------------------------------------
 
-def chart_builder(profile: Dict[str, Any]) -> Dict[str, Any]:
-    """Select FP&A-appropriate chart patterns and commentary for spend profile."""
+def _slim_profile_for_chart_llm(profile: Dict[str, Any]) -> Dict[str, Any]:
+    categories = profile.get("category_profile", []) if isinstance(profile, dict) else []
+    categories = sorted(categories, key=lambda x: float(x.get("spend", 0.0)), reverse=True)
+    total_spend = float(profile.get("total_spend", 0.0) or 0.0)
+    top3_spend = sum(float(c.get("spend", 0.0)) for c in categories[:3])
+    top3_share = (top3_spend / total_spend) if total_spend > 0 else 0.0
+    has_trend = bool(profile.get("trend_analysis", {}).get("distinct_periods", [])) if isinstance(profile, dict) else False
+    return {
+        "total_spend": total_spend,
+        "top3_share": top3_share,
+        "has_trend": has_trend,
+        "top_categories": [
+            {
+                "name": c.get("category_name") or c.get("category_id") or "Category",
+                "spend": float(c.get("spend", 0.0)),
+                "addressable_spend": float(c.get("addressable_spend", 0.0)),
+            }
+            for c in categories[:5]
+        ],
+    }
+
+
+def chart_builder(profile: Dict[str, Any], user_message: str | None = None) -> Dict[str, Any]:
+    """Select chart patterns and commentary, driven by LLM when user_message is provided."""
+    if user_message:
+        try:
+            from app.opar.claude_client import select_charts_claude
+            llm_result = select_charts_claude(user_message, _slim_profile_for_chart_llm(profile))
+            if llm_result and llm_result.get("selected_charts"):
+                return llm_result
+        except Exception:
+            pass
+
     categories = profile.get("category_profile", []) if isinstance(profile, dict) else []
     categories = sorted(categories, key=lambda x: float(x.get("spend", 0.0)), reverse=True)
     total_spend = float(profile.get("total_spend", 0.0) or 0.0)

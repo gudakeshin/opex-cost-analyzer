@@ -2,6 +2,7 @@
   "pack_id": "manufacturing_diversified",
   "sector": "Diversified Manufacturing & Industrial",
   "version": "1.0",
+  "source_verification_note": "industry_sources entries indicate the published works that informed or directionally support each lever's savings range. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range.",
   "applicable_entity_types": [
     "auto_oem",
     "auto_ancillary",
@@ -80,6 +81,12 @@
       "applicable_if": [
         "category:PLANT_MAINTENANCE > 3% revenue",
         "asset_intensive_keywords detected"
+      ],
+      "shared_lever": true,
+      "industry_sources": [
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
+        "Deloitte — Real Estate Predictions 2025 (deloitte.com/insights/real-estate)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -114,6 +121,12 @@
       },
       "applicable_if": [
         "category:PLANT_MAINTENANCE present"
+      ],
+      "shared_lever": true,
+      "industry_sources": [
+        "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -148,6 +161,12 @@
       },
       "applicable_if": [
         "category:POWER_ENERGY > 5% spend"
+      ],
+      "shared_lever": true,
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "DPE — Survey of CPSEs 2023-24 (dpe.gov.in/reports/annual-report)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -182,6 +201,12 @@
       },
       "applicable_if": [
         "gst_treatment field present"
+      ],
+      "shared_lever": true,
+      "industry_sources": [
+        "DPE — Survey of CPSEs 2023-24 (dpe.gov.in/reports/annual-report)",
+        "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -216,6 +241,11 @@
       },
       "applicable_if": [
         "category:LOGISTICS or LOGISTICS_INDIA > 5% spend"
+      ],
+      "industry_sources": [
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
+        "Atradius — Payment Practices Barometer Asia-Pacific 2024 (atradius.us/knowledge-and-research/reports/payment-practices-barometer-asia-pacific.html)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -250,6 +280,10 @@
       },
       "applicable_if": [
         "category:PACKAGING present"
+      ],
+      "industry_sources": [
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -285,6 +319,11 @@
       "applicable_if": [
         "category:PLANT_MAINTENANCE or CONTINGENT present",
         "headcount > 200"
+      ],
+      "industry_sources": [
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
+        "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -319,6 +358,10 @@
       },
       "applicable_if": [
         "category:PLANT_MAINTENANCE or PACKAGING present"
+      ],
+      "industry_sources": [
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     }
   ]

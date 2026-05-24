@@ -194,6 +194,7 @@ class ReflectOutput(BaseModel):
     advisory_sections: AdvisorySections | None = None
     quality_signals: Dict[str, Any] = Field(default_factory=dict)
     used_llm_synthesis: bool = False
+    thinking_text: str | None = None
     degraded_mode: bool = False
     fallback_reasons: Dict[str, str] = Field(default_factory=dict)
 

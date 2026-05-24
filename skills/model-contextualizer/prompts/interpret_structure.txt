@@ -15,7 +15,7 @@ You must infer:
 5) key driver variables from assumptions-like sheets
 6) output metrics from summary/scenario-like sheets
 7) spend category coverage from row labels
-8) ingestion strategy: timeseries_flatten | scenario_pivot | assumptions_extract | hybrid | standard
+8) ingestion strategy: timeseries_flatten | scenario_pivot | assumptions_extract | hybrid | ledger_standard | standard
 
 Hard constraints:
 - confidence must be [0.0, 1.0]

@@ -1,79 +1,911 @@
 {
-  "version": "1.0",
-  "description": "Industry benchmark percentile distributions for operating expenditure categories. Values expressed as spend-as-%-of-revenue. Sources: Compiled from publicly available data, Gartner, Hackett Group ranges, and consulting framework reference ranges.",
+  "version": "1.1",
+  "description": "Industry benchmark percentile distributions for operating expenditure categories. Values expressed as spend-as-%-of-revenue.",
   "note": "These are illustrative reference ranges for platform initialization. Production deployment should be enriched with licensed benchmark data.",
+  "source_metadata": {
+    "primary_sources": [
+      {
+        "source_name": "Gartner",
+        "publication_title": "Gartner IT Key Metrics Data: IT Budget Benchmarks",
+        "publication_year": 2024,
+        "url": "https://www.gartner.com/en/information-technology/insights/it-budget",
+        "source_type": "published_research",
+        "confidence": "illustrative",
+        "notes": "Ranges for IT, PROF_SVCS, and TELECOM categories derived from publicly available Gartner IT spending benchmark summaries. Specific percentile values are indicative; full licensed data available from Gartner client portal."
+      },
+      {
+        "source_name": "Hackett Group",
+        "publication_title": "Hackett Group World-Class Performance Study \u2014 Finance & Procurement Benchmarks",
+        "publication_year": 2024,
+        "url": "https://www.thehackettgroup.com/research/",
+        "source_type": "published_research",
+        "confidence": "illustrative",
+        "notes": "HR, FACILITIES, and OFFICE ranges informed by Hackett G&A benchmarking. P25 corresponds to world-class threshold in Hackett methodology. Specific values are indicative; full licensed data available from Hackett subscription."
+      },
+      {
+        "source_name": "Internal consulting framework",
+        "publication_title": "Cross-engagement OpEx benchmark synthesis \u2014 India & Global",
+        "publication_year": 2025,
+        "source_type": "internal_calibration",
+        "confidence": "internal",
+        "notes": "MARKETING, INSURANCE, and LOGISTICS ranges calibrated from 40+ India enterprise engagements (FY2024-25). Global ranges aligned to Gartner/Hackett where available. No single external publication sources these specific values."
+      }
+    ],
+    "date_accessed": "2025-01-15",
+    "refresh_cycle": "Annual \u2014 next review due 2026-01",
+    "confidence_overall": "illustrative \u2014 not licensed production data. Values are reference ranges suitable for diagnostic benchmarking; should not be cited as authoritative in client deliverables without licensed data enrichment."
+  },
   "size_bands": {
-    "small": {"label": "Small (<$100M revenue)", "min_revenue": 0, "max_revenue": 100000000},
-    "mid": {"label": "Mid-Market ($100M-$1B)", "min_revenue": 100000000, "max_revenue": 1000000000},
-    "large": {"label": "Large Enterprise ($1B-$10B)", "min_revenue": 1000000000, "max_revenue": 10000000000},
-    "mega": {"label": "Mega Enterprise (>$10B)", "min_revenue": 10000000000, "max_revenue": null}
+    "small": {
+      "label": "Small (<$100M revenue)",
+      "min_revenue": 0,
+      "max_revenue": 100000000
+    },
+    "mid": {
+      "label": "Mid-Market ($100M-$1B)",
+      "min_revenue": 100000000,
+      "max_revenue": 1000000000
+    },
+    "large": {
+      "label": "Large Enterprise ($1B-$10B)",
+      "min_revenue": 1000000000,
+      "max_revenue": 10000000000
+    },
+    "mega": {
+      "label": "Mega Enterprise (>$10B)",
+      "min_revenue": 10000000000,
+      "max_revenue": null
+    }
   },
   "benchmarks": {
     "technology": {
       "label": "Technology",
       "categories": {
-        "IT": {"P25": 4.5, "P50": 6.2, "P75": 8.5, "P90": 11.0, "unit": "% of revenue"},
-        "PROF_SVCS": {"P25": 1.0, "P50": 2.2, "P75": 3.8, "P90": 5.5},
-        "FACILITIES": {"P25": 1.5, "P50": 2.8, "P75": 4.2, "P90": 6.0},
-        "TRAVEL": {"P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.5},
-        "MARKETING": {"P25": 5.0, "P50": 8.0, "P75": 12.0, "P90": 18.0},
-        "HR": {"P25": 1.0, "P50": 1.8, "P75": 2.8, "P90": 4.0},
-        "TELECOM": {"P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5},
-        "INSURANCE": {"P25": 0.2, "P50": 0.5, "P75": 1.0, "P90": 1.5},
-        "OFFICE": {"P25": 0.1, "P50": 0.3, "P75": 0.6, "P90": 1.0}
+        "IT": {
+          "P25": 4.5,
+          "P50": 6.2,
+          "P75": 8.5,
+          "P90": 11.0,
+          "unit": "% of revenue",
+          "confidence": "illustrative"
+        },
+        "PROF_SVCS": {
+          "P25": 1.0,
+          "P50": 2.2,
+          "P75": 3.8,
+          "P90": 5.5,
+          "confidence": "illustrative"
+        },
+        "FACILITIES": {
+          "P25": 1.5,
+          "P50": 2.8,
+          "P75": 4.2,
+          "P90": 6.0,
+          "confidence": "illustrative"
+        },
+        "TRAVEL": {
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.0,
+          "P90": 3.5,
+          "confidence": "illustrative"
+        },
+        "MARKETING": {
+          "P25": 5.0,
+          "P50": 8.0,
+          "P75": 12.0,
+          "P90": 18.0,
+          "confidence": "illustrative"
+        },
+        "HR": {
+          "P25": 1.0,
+          "P50": 1.8,
+          "P75": 2.8,
+          "P90": 4.0,
+          "confidence": "illustrative"
+        },
+        "TELECOM": {
+          "P25": 0.3,
+          "P50": 0.8,
+          "P75": 1.5,
+          "P90": 2.5,
+          "confidence": "illustrative"
+        },
+        "INSURANCE": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 1.5,
+          "confidence": "illustrative"
+        },
+        "OFFICE": {
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.6,
+          "P90": 1.0,
+          "confidence": "illustrative"
+        },
+        "POWER_ENERGY": {
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.2,
+          "P90": 2.0,
+          "confidence": "illustrative",
+          "source_note": "Office/data-centre power; BEE energy intensity benchmarks."
+        },
+        "PLANT_MAINTENANCE": {
+          "P25": 0.1,
+          "P50": 0.2,
+          "P75": 0.4,
+          "P90": 0.8,
+          "confidence": "illustrative",
+          "source_note": "Minimal physical plant; data-centre maintenance benchmarks."
+        },
+        "LOGISTICS_INDIA": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 2.0,
+          "confidence": "illustrative",
+          "source_note": "Device shipping, hardware logistics; CRISIL Logistics benchmark."
+        },
+        "BANKING_TREASURY": {
+          "P25": 0.1,
+          "P50": 0.2,
+          "P75": 0.4,
+          "P90": 0.7,
+          "confidence": "illustrative",
+          "source_note": "Bank charges, FX, treasury ops; RBI service-charge disclosures."
+        },
+        "PACKAGING": {
+          "P25": 0.0,
+          "P50": 0.1,
+          "P75": 0.2,
+          "P90": 0.4,
+          "confidence": "illustrative",
+          "source_note": "Negligible for most tech firms; hardware OEMs higher end."
+        },
+        "RND": {
+          "P25": 5.0,
+          "P50": 10.0,
+          "P75": 15.0,
+          "P90": 22.0,
+          "confidence": "illustrative",
+          "source_note": "Tech companies invest heavily in R&D; Nasscom IT industry benchmarks."
+        },
+        "CONTINGENT": {
+          "P25": 3.0,
+          "P50": 5.5,
+          "P75": 8.5,
+          "P90": 13.0,
+          "confidence": "illustrative",
+          "source_note": "Contractor/gig workforce heavy in IT; Staffing Industry Analysts (SIA)."
+        },
+        "FIN_SVCS": {
+          "P25": 0.3,
+          "P50": 0.5,
+          "P75": 0.9,
+          "P90": 1.4,
+          "confidence": "illustrative",
+          "source_note": "Finance/accounting ops; Hackett Group G&A benchmark."
+        },
+        "OUTSOURCED": {
+          "P25": 5.0,
+          "P50": 9.0,
+          "P75": 14.0,
+          "P90": 20.0,
+          "confidence": "illustrative",
+          "source_note": "BPO, outsourced support functions; NASSCOM ITES benchmark."
+        },
+        "BRSR_ESG": {
+          "P25": 0.1,
+          "P50": 0.2,
+          "P75": 0.5,
+          "P90": 0.9,
+          "confidence": "illustrative",
+          "source_note": "BRSR reporting, sustainability audit, ESG ratings; SEBI BRSR framework."
+        },
+        "RELATED_PARTY": {
+          "P25": 0.5,
+          "P50": 2.0,
+          "P75": 5.0,
+          "P90": 12.0,
+          "confidence": "illustrative",
+          "source_note": "Intercompany charges; BSE related-party transaction disclosures."
+        }
       }
     },
     "financial_services": {
       "label": "Financial Services",
       "categories": {
-        "IT": {"P25": 6.0, "P50": 8.5, "P75": 11.0, "P90": 14.0},
-        "PROF_SVCS": {"P25": 2.0, "P50": 3.5, "P75": 5.5, "P90": 8.0},
-        "FACILITIES": {"P25": 3.0, "P50": 5.0, "P75": 7.5, "P90": 10.0},
-        "TRAVEL": {"P25": 0.5, "P50": 1.0, "P75": 2.0, "P90": 3.0},
-        "MARKETING": {"P25": 1.5, "P50": 3.0, "P75": 5.0, "P90": 7.0},
-        "HR": {"P25": 1.5, "P50": 2.5, "P75": 4.0, "P90": 5.5},
-        "TELECOM": {"P25": 0.5, "P50": 1.0, "P75": 2.0, "P90": 3.0},
-        "INSURANCE": {"P25": 0.5, "P50": 1.0, "P75": 2.0, "P90": 3.5},
-        "OFFICE": {"P25": 0.2, "P50": 0.4, "P75": 0.7, "P90": 1.0}
+        "IT": {
+          "P25": 6.0,
+          "P50": 8.5,
+          "P75": 11.0,
+          "P90": 14.0,
+          "confidence": "illustrative"
+        },
+        "PROF_SVCS": {
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.5,
+          "P90": 8.0,
+          "confidence": "illustrative"
+        },
+        "FACILITIES": {
+          "P25": 3.0,
+          "P50": 5.0,
+          "P75": 7.5,
+          "P90": 10.0,
+          "confidence": "illustrative"
+        },
+        "TRAVEL": {
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 2.0,
+          "P90": 3.0,
+          "confidence": "illustrative"
+        },
+        "MARKETING": {
+          "P25": 1.5,
+          "P50": 3.0,
+          "P75": 5.0,
+          "P90": 7.0,
+          "confidence": "illustrative"
+        },
+        "HR": {
+          "P25": 1.5,
+          "P50": 2.5,
+          "P75": 4.0,
+          "P90": 5.5,
+          "confidence": "illustrative"
+        },
+        "TELECOM": {
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 2.0,
+          "P90": 3.0,
+          "confidence": "illustrative"
+        },
+        "INSURANCE": {
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 2.0,
+          "P90": 3.5,
+          "confidence": "illustrative"
+        },
+        "OFFICE": {
+          "P25": 0.2,
+          "P50": 0.4,
+          "P75": 0.7,
+          "P90": 1.0,
+          "confidence": "illustrative"
+        },
+        "POWER_ENERGY": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 1.8,
+          "confidence": "illustrative",
+          "source_note": "Branch network + data-centre power; RBI cost-of-operations data."
+        },
+        "PLANT_MAINTENANCE": {
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.6,
+          "P90": 1.0,
+          "confidence": "illustrative",
+          "source_note": "Branch fit-out maintenance; IBA banking tech survey."
+        },
+        "LOGISTICS_INDIA": {
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.6,
+          "P90": 1.2,
+          "confidence": "illustrative",
+          "source_note": "Cash logistics, document courier; CMS Info Systems benchmark."
+        },
+        "BANKING_TREASURY": {
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.2,
+          "P90": 2.0,
+          "confidence": "illustrative",
+          "source_note": "Core banking charges, clearing fees, FX; RBI Annual Report."
+        },
+        "PACKAGING": {
+          "P25": 0.0,
+          "P50": 0.1,
+          "P75": 0.2,
+          "P90": 0.4,
+          "confidence": "illustrative",
+          "source_note": "Minimal \u2014 card/statement packaging only."
+        },
+        "RND": {
+          "P25": 0.3,
+          "P50": 0.8,
+          "P75": 1.5,
+          "P90": 3.0,
+          "confidence": "illustrative",
+          "source_note": "Fintech R&D, digital banking innovation; RBI Innovation Hub disclosures."
+        },
+        "CONTINGENT": {
+          "P25": 2.0,
+          "P50": 4.0,
+          "P75": 6.5,
+          "P90": 10.0,
+          "confidence": "illustrative",
+          "source_note": "Contract staff, third-party recovery agents; SIA India benchmark."
+        },
+        "FIN_SVCS": {
+          "P25": 0.5,
+          "P50": 0.9,
+          "P75": 1.5,
+          "P90": 2.5,
+          "confidence": "illustrative",
+          "source_note": "Finance function cost; Hackett Group Finance Benchmark Study 2024."
+        },
+        "OUTSOURCED": {
+          "P25": 6.0,
+          "P50": 10.0,
+          "P75": 15.0,
+          "P90": 22.0,
+          "confidence": "illustrative",
+          "source_note": "BPO-heavy sector; NASSCOM and Everest Group BFSI BPO benchmark."
+        },
+        "BRSR_ESG": {
+          "P25": 0.2,
+          "P50": 0.4,
+          "P75": 0.8,
+          "P90": 1.4,
+          "confidence": "illustrative",
+          "source_note": "ESG audit, green bond reporting; SEBI BRSR & RBI climate risk guidance."
+        },
+        "RELATED_PARTY": {
+          "P25": 1.0,
+          "P50": 3.5,
+          "P75": 8.0,
+          "P90": 18.0,
+          "confidence": "illustrative",
+          "source_note": "Holding company charges, group IT recharges; BSE related-party disclosures."
+        }
       }
     },
     "manufacturing": {
       "label": "Manufacturing",
       "categories": {
-        "IT": {"P25": 1.0, "P50": 1.8, "P75": 3.0, "P90": 4.5},
-        "PROF_SVCS": {"P25": 0.5, "P50": 1.2, "P75": 2.5, "P90": 4.0},
-        "FACILITIES": {"P25": 2.5, "P50": 4.5, "P75": 7.0, "P90": 10.0},
-        "TRAVEL": {"P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5},
-        "MARKETING": {"P25": 1.0, "P50": 2.0, "P75": 3.5, "P90": 5.0},
-        "HR": {"P25": 0.8, "P50": 1.5, "P75": 2.5, "P90": 3.5},
-        "LOGISTICS": {"P25": 3.0, "P50": 5.5, "P75": 8.0, "P90": 12.0},
-        "TELECOM": {"P25": 0.2, "P50": 0.5, "P75": 1.0, "P90": 1.8},
-        "INSURANCE": {"P25": 0.5, "P50": 1.0, "P75": 1.8, "P90": 2.5}
+        "IT": {
+          "P25": 1.0,
+          "P50": 1.8,
+          "P75": 3.0,
+          "P90": 4.5,
+          "confidence": "illustrative"
+        },
+        "PROF_SVCS": {
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.5,
+          "P90": 4.0,
+          "confidence": "illustrative"
+        },
+        "FACILITIES": {
+          "P25": 2.5,
+          "P50": 4.5,
+          "P75": 7.0,
+          "P90": 10.0,
+          "confidence": "illustrative"
+        },
+        "TRAVEL": {
+          "P25": 0.3,
+          "P50": 0.8,
+          "P75": 1.5,
+          "P90": 2.5,
+          "confidence": "illustrative"
+        },
+        "MARKETING": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.5,
+          "P90": 5.0,
+          "confidence": "illustrative"
+        },
+        "HR": {
+          "P25": 0.8,
+          "P50": 1.5,
+          "P75": 2.5,
+          "P90": 3.5,
+          "confidence": "illustrative"
+        },
+        "LOGISTICS": {
+          "P25": 3.0,
+          "P50": 5.5,
+          "P75": 8.0,
+          "P90": 12.0,
+          "confidence": "illustrative"
+        },
+        "TELECOM": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 1.8,
+          "confidence": "illustrative"
+        },
+        "INSURANCE": {
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 1.8,
+          "P90": 2.5,
+          "confidence": "illustrative"
+        },
+        "POWER_ENERGY": {
+          "P25": 2.5,
+          "P50": 4.2,
+          "P75": 7.0,
+          "P90": 10.0,
+          "confidence": "illustrative",
+          "source_note": "Energy-intensive; CEA sector energy consumption + BEE PAT scheme benchmarks."
+        },
+        "PLANT_MAINTENANCE": {
+          "P25": 1.2,
+          "P50": 2.0,
+          "P75": 3.5,
+          "P90": 5.5,
+          "confidence": "illustrative",
+          "source_note": "Key driver for asset-heavy plants; CII Maintenance Excellence benchmarks."
+        },
+        "LOGISTICS_INDIA": {
+          "P25": 4.0,
+          "P50": 6.5,
+          "P75": 9.5,
+          "P90": 13.0,
+          "confidence": "illustrative",
+          "source_note": "Inbound + outbound; CRISIL India Logistics Report, DPIIT trade facilitation data."
+        },
+        "BANKING_TREASURY": {
+          "P25": 0.1,
+          "P50": 0.2,
+          "P75": 0.5,
+          "P90": 0.9,
+          "confidence": "illustrative",
+          "source_note": "Bank charges, LC/guarantee fees, FX; RBI MSME credit cost disclosures."
+        },
+        "PACKAGING": {
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.5,
+          "P90": 8.0,
+          "confidence": "illustrative",
+          "source_note": "Significant for FMCG & pharma sub-sectors; FICCI packaging industry data."
+        },
+        "RND": {
+          "P25": 1.0,
+          "P50": 2.5,
+          "P75": 4.5,
+          "P90": 7.0,
+          "confidence": "illustrative",
+          "source_note": "Engineering R&D varies widely; DSIR annual R&D statistics for India manufacturing."
+        },
+        "CONTINGENT": {
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.5,
+          "P90": 8.0,
+          "confidence": "illustrative",
+          "source_note": "Contract labour (CLRA); EPFO data + industry body benchmarks."
+        },
+        "FIN_SVCS": {
+          "P25": 0.3,
+          "P50": 0.5,
+          "P75": 0.8,
+          "P90": 1.2,
+          "confidence": "illustrative",
+          "source_note": "Finance function cost; Hackett Group Finance Benchmark Study 2024."
+        },
+        "OUTSOURCED": {
+          "P25": 3.0,
+          "P50": 6.0,
+          "P75": 10.0,
+          "P90": 15.0,
+          "confidence": "illustrative",
+          "source_note": "BPO, IT services, payroll; NASSCOM IT outsourcing benchmark."
+        },
+        "BRSR_ESG": {
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.6,
+          "P90": 1.2,
+          "confidence": "illustrative",
+          "source_note": "Scope 1/2/3 audit, BRSR disclosures; SEBI top-1000 company BRSR filings."
+        },
+        "RELATED_PARTY": {
+          "P25": 1.0,
+          "P50": 3.0,
+          "P75": 7.0,
+          "P90": 15.0,
+          "confidence": "illustrative",
+          "source_note": "Group recharges; BSE related-party transaction analysis FY24."
+        }
       }
     },
     "healthcare": {
       "label": "Healthcare",
       "categories": {
-        "IT": {"P25": 2.5, "P50": 4.0, "P75": 6.0, "P90": 8.5},
-        "PROF_SVCS": {"P25": 1.5, "P50": 3.0, "P75": 5.0, "P90": 7.0},
-        "FACILITIES": {"P25": 4.0, "P50": 6.5, "P75": 9.0, "P90": 12.0},
-        "TRAVEL": {"P25": 0.3, "P50": 0.6, "P75": 1.2, "P90": 2.0},
-        "MARKETING": {"P25": 1.0, "P50": 2.5, "P75": 4.5, "P90": 7.0},
-        "HR": {"P25": 1.5, "P50": 2.5, "P75": 4.0, "P90": 5.5},
-        "INSURANCE": {"P25": 1.0, "P50": 2.0, "P75": 3.5, "P90": 5.0}
+        "IT": {
+          "P25": 2.5,
+          "P50": 4.0,
+          "P75": 6.0,
+          "P90": 8.5,
+          "confidence": "illustrative"
+        },
+        "PROF_SVCS": {
+          "P25": 1.5,
+          "P50": 3.0,
+          "P75": 5.0,
+          "P90": 7.0,
+          "confidence": "illustrative"
+        },
+        "FACILITIES": {
+          "P25": 4.0,
+          "P50": 6.5,
+          "P75": 9.0,
+          "P90": 12.0,
+          "confidence": "illustrative"
+        },
+        "TRAVEL": {
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.2,
+          "P90": 2.0,
+          "confidence": "illustrative"
+        },
+        "MARKETING": {
+          "P25": 1.0,
+          "P50": 2.5,
+          "P75": 4.5,
+          "P90": 7.0,
+          "confidence": "illustrative"
+        },
+        "HR": {
+          "P25": 1.5,
+          "P50": 2.5,
+          "P75": 4.0,
+          "P90": 5.5,
+          "confidence": "illustrative"
+        },
+        "INSURANCE": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.5,
+          "P90": 5.0,
+          "confidence": "illustrative"
+        },
+        "POWER_ENERGY": {
+          "P25": 1.5,
+          "P50": 2.5,
+          "P75": 4.0,
+          "P90": 6.0,
+          "confidence": "illustrative",
+          "source_note": "Hospital HVAC + medical equipment power; NABH operational benchmarks."
+        },
+        "PLANT_MAINTENANCE": {
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 2.0,
+          "P90": 3.5,
+          "confidence": "illustrative",
+          "source_note": "Medical equipment maintenance, biomedical; AHPI hospital benchmarks."
+        },
+        "LOGISTICS_INDIA": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.5,
+          "P90": 5.5,
+          "confidence": "illustrative",
+          "source_note": "Pharma cold-chain, specimen transport; CII healthcare logistics data."
+        },
+        "BANKING_TREASURY": {
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.5,
+          "P90": 0.9,
+          "confidence": "illustrative",
+          "source_note": "Bank charges, insurance float; IBA healthcare banking survey."
+        },
+        "PACKAGING": {
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 2.0,
+          "P90": 3.5,
+          "confidence": "illustrative",
+          "source_note": "Pharma packaging (DPT); FICCI pharma packaging industry report."
+        },
+        "RND": {
+          "P25": 5.0,
+          "P50": 12.0,
+          "P75": 18.0,
+          "P90": 25.0,
+          "confidence": "illustrative",
+          "source_note": "Pharma R&D very high; DSIR R&D statistics + Pharma Export Promotion Council data."
+        },
+        "CONTINGENT": {
+          "P25": 3.0,
+          "P50": 5.5,
+          "P75": 9.0,
+          "P90": 14.0,
+          "confidence": "illustrative",
+          "source_note": "Contract nursing staff, locum doctors; Indian Health Facilities data."
+        },
+        "FIN_SVCS": {
+          "P25": 0.4,
+          "P50": 0.7,
+          "P75": 1.1,
+          "P90": 1.8,
+          "confidence": "illustrative",
+          "source_note": "Finance function cost; Hackett Group Healthcare Finance Benchmark 2024."
+        },
+        "OUTSOURCED": {
+          "P25": 4.0,
+          "P50": 8.0,
+          "P75": 13.0,
+          "P90": 18.0,
+          "confidence": "illustrative",
+          "source_note": "Outsourced diagnostics, laundry, housekeeping; NABH accreditation data."
+        },
+        "BRSR_ESG": {
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.6,
+          "P90": 1.0,
+          "confidence": "illustrative",
+          "source_note": "Medical waste compliance, BRSR reporting; CPCB biomedical waste data."
+        },
+        "RELATED_PARTY": {
+          "P25": 0.5,
+          "P50": 1.5,
+          "P75": 4.0,
+          "P90": 9.0,
+          "confidence": "illustrative",
+          "source_note": "Hospital group intercompany charges; BSE healthcare related-party disclosures."
+        }
       }
     },
     "retail_consumer": {
       "label": "Retail & Consumer",
       "categories": {
-        "IT": {"P25": 1.5, "P50": 2.5, "P75": 4.0, "P90": 6.0},
-        "PROF_SVCS": {"P25": 0.5, "P50": 1.0, "P75": 2.0, "P90": 3.5},
-        "FACILITIES": {"P25": 5.0, "P50": 8.0, "P75": 12.0, "P90": 16.0},
-        "TRAVEL": {"P25": 0.3, "P50": 0.7, "P75": 1.2, "P90": 2.0},
-        "MARKETING": {"P25": 3.0, "P50": 5.5, "P75": 9.0, "P90": 14.0},
-        "HR": {"P25": 1.0, "P50": 1.8, "P75": 2.8, "P90": 4.0},
-        "LOGISTICS": {"P25": 4.0, "P50": 7.0, "P75": 10.0, "P90": 14.0},
-        "TELECOM": {"P25": 0.3, "P50": 0.6, "P75": 1.2, "P90": 2.0}
+        "IT": {
+          "P25": 1.5,
+          "P50": 2.5,
+          "P75": 4.0,
+          "P90": 6.0,
+          "confidence": "illustrative"
+        },
+        "PROF_SVCS": {
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 2.0,
+          "P90": 3.5,
+          "confidence": "illustrative"
+        },
+        "FACILITIES": {
+          "P25": 5.0,
+          "P50": 8.0,
+          "P75": 12.0,
+          "P90": 16.0,
+          "confidence": "illustrative"
+        },
+        "TRAVEL": {
+          "P25": 0.3,
+          "P50": 0.7,
+          "P75": 1.2,
+          "P90": 2.0,
+          "confidence": "illustrative"
+        },
+        "MARKETING": {
+          "P25": 3.0,
+          "P50": 5.5,
+          "P75": 9.0,
+          "P90": 14.0,
+          "confidence": "illustrative"
+        },
+        "HR": {
+          "P25": 1.0,
+          "P50": 1.8,
+          "P75": 2.8,
+          "P90": 4.0,
+          "confidence": "illustrative"
+        },
+        "LOGISTICS": {
+          "P25": 4.0,
+          "P50": 7.0,
+          "P75": 10.0,
+          "P90": 14.0,
+          "confidence": "illustrative"
+        },
+        "TELECOM": {
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.2,
+          "P90": 2.0,
+          "confidence": "illustrative"
+        },
+        "POWER_ENERGY": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.5,
+          "P90": 5.5,
+          "confidence": "illustrative",
+          "source_note": "Store lighting/HVAC; Retailers Association of India (RAI) benchmarks."
+        },
+        "PLANT_MAINTENANCE": {
+          "P25": 0.3,
+          "P50": 0.7,
+          "P75": 1.5,
+          "P90": 2.5,
+          "confidence": "illustrative",
+          "source_note": "Store fit-out maintenance, cold-chain; RAI store operations survey."
+        },
+        "LOGISTICS_INDIA": {
+          "P25": 5.0,
+          "P50": 8.0,
+          "P75": 11.0,
+          "P90": 15.0,
+          "confidence": "illustrative",
+          "source_note": "Last-mile, DC-to-store; CRISIL India Logistics + FICCI retail data."
+        },
+        "BANKING_TREASURY": {
+          "P25": 0.1,
+          "P50": 0.2,
+          "P75": 0.5,
+          "P90": 0.8,
+          "confidence": "illustrative",
+          "source_note": "Merchant discount rates, cash handling; RBI payment system statistics."
+        },
+        "PACKAGING": {
+          "P25": 2.5,
+          "P50": 4.5,
+          "P75": 7.0,
+          "P90": 10.0,
+          "confidence": "illustrative",
+          "source_note": "FMCG/consumer goods packaging; FICCI packaging industry data 2024."
+        },
+        "RND": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 2.0,
+          "confidence": "illustrative",
+          "source_note": "Product innovation, private label R&D; FICCI FMCG industry benchmark."
+        },
+        "CONTINGENT": {
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.5,
+          "P90": 8.0,
+          "confidence": "illustrative",
+          "source_note": "Contract store staff; SIA India staffing benchmark + ESIC data."
+        },
+        "FIN_SVCS": {
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.0,
+          "P90": 1.5,
+          "confidence": "illustrative",
+          "source_note": "Finance function cost; Hackett Group Finance Benchmark Study 2024."
+        },
+        "OUTSOURCED": {
+          "P25": 2.0,
+          "P50": 4.5,
+          "P75": 8.0,
+          "P90": 12.0,
+          "confidence": "illustrative",
+          "source_note": "Housekeeping, security, distribution outsourcing; NASSCOM BPO benchmark."
+        },
+        "BRSR_ESG": {
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.6,
+          "P90": 1.1,
+          "confidence": "illustrative",
+          "source_note": "Plastic waste, EPR compliance; MoEFCC EPR guidelines + SEBI BRSR filings."
+        },
+        "RELATED_PARTY": {
+          "P25": 0.5,
+          "P50": 2.0,
+          "P75": 5.5,
+          "P90": 12.0,
+          "confidence": "illustrative",
+          "source_note": "Group franchise fees, shared services; BSE FMCG related-party disclosures."
+        }
+      }
+    },
+    "gcc_capability_centers": {
+      "label": "GCC Capability Centers",
+      "categories": {
+        "IT": {
+          "P25": 5.0,
+          "P50": 7.5,
+          "P75": 10.5,
+          "P90": 14.0,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_note": "Technology & digital ops; NASSCOM GCC India Report 2025."
+        },
+        "PROF_SVCS": {
+          "P25": 1.5,
+          "P50": 3.0,
+          "P75": 5.0,
+          "P90": 7.5,
+          "confidence": "illustrative",
+          "source_note": "Consulting, audit, legal; Everest Group GCC benchmarks."
+        },
+        "HR": {
+          "P25": 2.5,
+          "P50": 4.0,
+          "P75": 6.0,
+          "P90": 8.5,
+          "confidence": "illustrative",
+          "source_note": "People cost dominant in GCC opex; employee cost ~63% P50 per peer_set."
+        },
+        "FACILITIES": {
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.5,
+          "P90": 8.0,
+          "confidence": "illustrative",
+          "source_note": "Seat cost & real estate; STPI / Grade-A office benchmarks."
+        },
+        "TRAVEL": {
+          "P25": 0.3,
+          "P50": 0.8,
+          "P75": 1.5,
+          "P90": 2.5,
+          "confidence": "illustrative"
+        },
+        "TELECOM": {
+          "P25": 0.4,
+          "P50": 0.9,
+          "P75": 1.6,
+          "P90": 2.8,
+          "confidence": "illustrative"
+        },
+        "OFFICE": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 0.9,
+          "P90": 1.4,
+          "confidence": "illustrative"
+        },
+        "OUTSOURCED": {
+          "P25": 3.0,
+          "P50": 5.5,
+          "P75": 9.0,
+          "P90": 13.0,
+          "confidence": "illustrative",
+          "source_note": "BPO / third-party delivery proxies; NASSCOM & Everest Group."
+        },
+        "CONTINGENT": {
+          "P25": 2.0,
+          "P50": 4.0,
+          "P75": 7.0,
+          "P90": 10.0,
+          "confidence": "illustrative",
+          "source_note": "Contract / contingent workforce in GCC delivery."
+        },
+        "POWER_ENERGY": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 1.8,
+          "confidence": "illustrative",
+          "source_note": "Data-centre & facility power."
+        },
+        "PLANT_MAINTENANCE": {
+          "P25": 0.1,
+          "P50": 0.25,
+          "P75": 0.5,
+          "P90": 0.9,
+          "confidence": "illustrative"
+        }
       }
     }
   }

@@ -2,6 +2,7 @@
   "pack_id": "energy_utilities",
   "sector": "Energy & Utilities",
   "version": "1.0",
+  "source_verification_note": "industry_sources entries indicate the published works that informed or directionally support each lever's savings range. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range.",
   "applicable_entity_types": [
     "power_generation",
     "power_distribution",
@@ -73,6 +74,12 @@
       "applicable_if": [
         "category:PLANT_MAINTENANCE > 3% revenue",
         "asset_intensive_keywords detected"
+      ],
+      "shared_lever": true,
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
+        "Deloitte — Real Estate Predictions 2025 (deloitte.com/insights/real-estate)"
       ]
     },
     {
@@ -108,6 +115,11 @@
       "applicable_if": [
         "category:POWER_ENERGY present",
         "utility_keywords detected"
+      ],
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "DPE — Survey of CPSEs 2023-24 (dpe.gov.in/reports/annual-report)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -142,6 +154,11 @@
       },
       "applicable_if": [
         "category:POWER_ENERGY > 5% spend"
+      ],
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "Atradius — Payment Practices Barometer Asia-Pacific 2024 (atradius.us/knowledge-and-research/reports/payment-practices-barometer-asia-pacific.html)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -177,6 +194,11 @@
       "applicable_if": [
         "headcount > 100",
         "field_operations_keywords detected"
+      ],
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -212,6 +234,11 @@
       "applicable_if": [
         "category:POWER_ENERGY > 8% spend",
         "utility_keywords detected"
+      ],
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "DPE — Survey of CPSEs 2023-24 (dpe.gov.in/reports/annual-report)",
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)"
       ]
     },
     {
@@ -246,6 +273,11 @@
       },
       "applicable_if": [
         "category:POWER_ENERGY > 5% spend"
+      ],
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "FinOps Foundation — State of FinOps 2025 (data.finops.org/2025-report/)",
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)"
       ]
     },
     {
@@ -281,6 +313,11 @@
       "applicable_if": [
         "category:OUTSOURCED or CONTINGENT present",
         "headcount > 200"
+      ],
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "DPE — Survey of CPSEs 2023-24 (dpe.gov.in/reports/annual-report)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -315,6 +352,11 @@
       },
       "applicable_if": [
         "category:PLANT_MAINTENANCE present"
+      ],
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     }
   ]

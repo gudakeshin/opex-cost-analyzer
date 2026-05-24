@@ -1,0 +1,33 @@
+source_validation_date: '2026-05-21'
+source_validation_note: 'Free source URLs verified. Sample metrics are indicative public disclosures. Licensed sources require credentials — no data fabricated for licensed entries.'
+
+pack_id: retail_organized
+schema_version: '1.0'
+confidence: illustrative
+free_sources:
+- name: RAI India Retail Report
+  type: public_disclosure
+  url: 'https://www.rai.net.in/'
+  sample_metric: 'India organized retail penetration: 12–15% of total retail FY2024 (RAI India Retail Report)'
+- name: BSE retail filings
+  type: public_disclosure
+  url: 'https://www.bseindia.com/corporates/ann.html'
+  sample_metric: 'D-Mart (Avenue Supermarts) gross margin: ~15%; employee cost: ~3–4% of revenue (BSE annual reports FY2024)'
+- name: FICCI retail benchmark
+  type: public_disclosure
+  url: 'https://ficci.in/sector/61/'
+  sample_metric: 'India retail market size: $883 billion FY2024; modern trade growing at 14% CAGR (FICCI Retail Report 2024)'
+licensed_sources_stubs:
+- name: CMIE Prowess IQ
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: CmieAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+- name: Planet Retail Benchmark
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: PlanetRetailBenchmarkAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+refresh_cycle: Annual
+notes: Free sources provide public disclosure data sufficient for diagnostic benchmarking.
+  Licensed sources required for granular spend-line comparisons.

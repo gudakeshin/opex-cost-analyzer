@@ -184,7 +184,19 @@ def _classify_intent_rule_based(msg: str) -> Tuple[str, str | None]:
     ]):
         return "value_bridge", None
 
-    # 4. Full analysis / benchmarking keywords
+    # 3.5. Interrogative capability questions — must precede benchmark keywords so
+    # "what can you analyze" / "can you analyze X" route to general_qa, not benchmark.
+    if any(lowered.startswith(p) for p in [
+        "what can you", "what do you", "what are you able", "can you analyze",
+        "can you help", "can you tell", "how do you", "what does this",
+        "what will you", "show me what",
+    ]):
+        return "general_qa", None
+
+    # 4. Full analysis / benchmarking keywords.
+    # "analyze" is safe here: step 3.5 already pre-empts interrogative forms
+    # ("what can you analyze", "can you analyze X") so only imperative uses
+    # ("analyze my spend") reach this step.
     if any(w in lowered for w in [
         "benchmark", "benchmarks", "compare", "peer", "industry", "percentile",
         "analyze", "analysis", "run analysis", "full analysis",

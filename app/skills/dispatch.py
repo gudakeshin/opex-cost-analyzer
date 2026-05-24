@@ -282,7 +282,7 @@ def _chart_builder(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     from app.services.spend_charts import build_spend_profile_chart_html  # lazy
 
     profile = _get_profile(ctx)
-    chart_plan = _engine.chart_builder(profile)
+    chart_plan = _engine.chart_builder(profile, user_message=ctx.user_message or None)
     session_key = (
         ctx.manifest.get("session_id")
         or ctx.manifest.get("turn_id")

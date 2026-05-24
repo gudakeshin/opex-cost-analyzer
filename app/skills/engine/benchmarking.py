@@ -23,6 +23,15 @@ def _category_pct_of_revenue(category_spend: float, revenue: float) -> float:
     return (category_spend / revenue) * 100
 
 
+def _threshold_val(raw: Any, default: Any) -> Any:
+    """Extract threshold value from either flat primitive or annotated {"value": X, ...} schema."""
+    if raw is None:
+        return default
+    if isinstance(raw, dict):
+        return raw.get("value", default)
+    return raw
+
+
 def peer_benchmarker(
     profile: Dict[str, Any],
     benchmark_data: Dict[str, Any],
@@ -139,9 +148,10 @@ def heuristic_analyzer(
     profile: Dict[str, Any],
     revenue: float,
     headcount: float | None = None,
+    reporting_currency: str = "USD",
 ) -> Dict[str, Any]:
     ranges = _get_heuristic_ranges()
-    per_emp_targets = _get_per_employee_targets()
+    per_emp_targets = _get_per_employee_targets(currency=reporting_currency)
     rows = []
     for cat in profile.get("category_profile", []):
         cid = cat["category_id"]
@@ -174,15 +184,20 @@ def root_cause_analyzer(
     transaction_count: float | None = None,
     industry: str = "",
     annual_revenue: float = 0.0,
+    reporting_currency: str = "USD",
 ) -> Dict[str, Any]:
     cfg = _get_root_cause_thresholds()
     th = cfg.get("thresholds", {})
     rates = cfg.get("addressable_rates", {})
-    include_bands = set(th.get("peer_percentile_include", ["P50-P75", "P75-P90", "P90+"]))
-    hhi_max = float(th.get("supplier_fragmentation_hhi_max", 0.15))
-    min_suppliers = int(th.get("supplier_fragmentation_min_suppliers", 5))
-    maverick_min = float(th.get("maverick_spend_ratio_min", 0.2))
-    cpt_max = float(th.get("cost_per_transaction_max", 1000.0))
+    include_bands = set(_threshold_val(th.get("peer_percentile_include"), ["P50-P75", "P75-P90", "P90+"]))
+    hhi_max = float(_threshold_val(th.get("supplier_fragmentation_hhi_max"), 0.15))
+    min_suppliers = int(_threshold_val(th.get("supplier_fragmentation_min_suppliers"), 5))
+    maverick_min = float(_threshold_val(th.get("maverick_spend_ratio_min"), 0.2))
+    cpt_cfg = th.get("cost_per_transaction_max", {})
+    if reporting_currency.upper() != "INR" and isinstance(cpt_cfg, dict) and "value_usd" in cpt_cfg:
+        cpt_max = float(cpt_cfg["value_usd"])
+    else:
+        cpt_max = float(_threshold_val(cpt_cfg, 1000.0))
 
     spend_by_cat = {c["category_id"]: c for c in profile.get("category_profile", [])}
     suppliers_by_cat: Dict[str, Dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -235,7 +250,7 @@ def root_cause_analyzer(
                 {
                     "diagnosis": f"Supplier fragmentation with {len(supplier_map)} active suppliers (HHI {hhi:.2f})",
                     "confidence": "high",
-                    "addressable_spend": total * float(rates.get("supplier_consolidation", 0.2)),
+                    "addressable_spend": total * float(_threshold_val(rates.get("supplier_consolidation"), 0.2)),
                     "recommended_lever": "supplier_consolidation",
                     "implementation_approach": "Consolidate vendors and rebid top spend clusters.",
                     "implementation_complexity": "medium",
@@ -248,7 +263,7 @@ def root_cause_analyzer(
                 {
                     "diagnosis": f"High maverick buying ({maverick:.0%} off-PO spend)",
                     "confidence": "medium",
-                    "addressable_spend": total * float(rates.get("maverick_compliance", 0.1)),
+                    "addressable_spend": total * float(_threshold_val(rates.get("maverick_compliance"), 0.1)),
                     "recommended_lever": "maverick_compliance",
                     "implementation_approach": "Enforce PO-first buying and renegotiate non-compliant contracts.",
                     "implementation_complexity": "low",
@@ -261,7 +276,7 @@ def root_cause_analyzer(
                 {
                     "diagnosis": "Cost per transaction above expected norm",
                     "confidence": "medium",
-                    "addressable_spend": total * float(rates.get("demand_management", 0.08)),
+                    "addressable_spend": total * float(_threshold_val(rates.get("demand_management"), 0.08)),
                     "recommended_lever": "demand_management",
                     "implementation_approach": "Tighten demand policies and approvals for low-value requests.",
                     "implementation_complexity": "medium",
@@ -274,7 +289,7 @@ def root_cause_analyzer(
                 {
                     "diagnosis": "No strong structural driver detected; baseline commercial optimization applicable",
                     "confidence": "low",
-                    "addressable_spend": total * float(rates.get("baseline_optimization", 0.05)),
+                    "addressable_spend": total * float(_threshold_val(rates.get("baseline_optimization"), 0.05)),
                     "recommended_lever": "contract_renegotiation",
                     "implementation_approach": "Targeted renegotiation on top suppliers.",
                     "implementation_complexity": "low",

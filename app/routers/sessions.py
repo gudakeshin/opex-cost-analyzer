@@ -12,6 +12,7 @@ from fastapi.responses import Response
 from app.config import MAX_UPLOAD_MB, UPLOAD_DIR, logger
 from app.routers._shared import (
     _memory,
+    merge_context_into_manifest,
     read_manifest,
     session_dir,
     session_lock,
@@ -19,17 +20,38 @@ from app.routers._shared import (
     validate_session_id,
     write_manifest,
 )
-from app.schemas import AnalyzeRequest, SessionCreateRequest
+from app.schemas import AnalyzeRequest, SessionCreateRequest, SessionManifestPatch
 from app.services.analysis import load_taxonomy, run_core_pipeline
 from app.services.compliance import append_audit_event
-from app.services.ingestion import infer_tabular_schema, parse_document, parse_spend_file
+from app.services.ingestion import infer_tabular_schema, parse_document, parse_spend_file_with_report
 from app.skills.model_contextualizer import (
     build_workbook_manifest,
     compute_file_fingerprint,
+    maybe_interpret_workbook_on_upload,
     should_run_model_contextualizer,
 )
 
 router = APIRouter()
+
+
+def _format_ingestion_summary(report: Dict[str, Any]) -> str:
+    if report.get("files"):
+        parts = [_format_ingestion_summary(f) for f in report.get("files", []) if isinstance(f, dict)]
+        return " ".join(p for p in parts if p)
+    ingested = report.get("sheets_ingested") or []
+    skipped = report.get("sheets_skipped") or []
+    lines: List[str] = []
+    for item in ingested:
+        if isinstance(item, dict):
+            lines.append(
+                f"Ingested worksheet '{item.get('sheet')}' ({item.get('rows', 0)} lines, {item.get('strategy', 'standard')})."
+            )
+    for item in skipped[:5]:
+        if isinstance(item, dict):
+            lines.append(
+                f"Skipped '{item.get('sheet')}' ({item.get('role', 'unknown')}: {item.get('reason', '')})."
+            )
+    return " ".join(lines)
 
 
 @router.get("/api/template/spend-csv")
@@ -81,8 +103,25 @@ def create_session(payload: SessionCreateRequest) -> Dict[str, Any]:
 @router.post("/api/v1/upload/{session_id}")
 async def upload_file(session_id: str, request: Request, file: UploadFile = File(...)) -> Dict[str, Any]:
     validate_session_id(session_id)
-    if not session_dir(session_id).exists():
-        raise HTTPException(status_code=404, detail="Session not found")
+    sdir = session_dir(session_id)
+    if not sdir.exists():
+        # Recreate if analysis data exists (session dir was wiped but memory intact).
+        analysis = _memory.get("session", session_id)
+        if analysis:
+            sdir.mkdir(parents=True, exist_ok=True)
+            recovered: Dict[str, Any] = {
+                "session_id": session_id,
+                "company_name": analysis.get("company_name", ""),
+                "industry": analysis.get("industry", ""),
+                "annual_revenue": analysis.get("annual_revenue"),
+                "currency": analysis.get("reporting_currency", "USD"),
+                "audience": "consultant",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "files": [],
+            }
+            write_manifest(session_id, recovered)
+        else:
+            raise HTTPException(status_code=404, detail="Session not found")
     _max_bytes = MAX_UPLOAD_MB * 1024 * 1024
     cl = request.headers.get("content-length")
     if cl and int(cl) > _max_bytes:
@@ -104,6 +143,15 @@ async def upload_file(session_id: str, request: Request, file: UploadFile = File
     async with session_lock(session_id):
         manifest = read_manifest(session_id)
         manifest["files"].append(entry)
+        if out_path.suffix.lower() in (".xlsx", ".xls"):
+            interpreted = await asyncio.to_thread(
+                maybe_interpret_workbook_on_upload,
+                out_path,
+                manifest,
+                "",
+            )
+            if interpreted:
+                manifest["model_manifest"] = interpreted
         write_manifest(session_id, manifest)
     append_audit_event(f"file_uploaded session_id={session_id} file={safe_filename}")
     return {"uploaded": safe_filename, "size_bytes": len(content)}
@@ -148,22 +196,35 @@ async def analyze_session(session_id: str, payload: AnalyzeRequest) -> Dict[str,
     taxonomy = load_taxonomy()
     spend_lines = []
     docs_text: List[str] = []
+    ingestion_reports: List[Dict[str, Any]] = []
     model_manifest = manifest.get("model_manifest") if isinstance(manifest, dict) else None
     for item in manifest.get("files", []):
         path = Path(item["path"])
         if path.suffix.lower() in (".xlsx", ".xls", ".csv"):
-            new_lines = await asyncio.to_thread(parse_spend_file, path, taxonomy, workbook_manifest=model_manifest)
+            new_lines, ing_report = await asyncio.to_thread(
+                parse_spend_file_with_report,
+                path,
+                taxonomy,
+                workbook_manifest=model_manifest,
+            )
             spend_lines.extend(new_lines)
+            ingestion_reports.append(ing_report)
         else:
             docs_text.append(await asyncio.to_thread(parse_document, path))
     if not spend_lines:
         raise HTTPException(status_code=400, detail="No spend file (.csv/.xlsx/.xls) uploaded")
+    manifest["ingestion_report"] = ingestion_reports[0] if len(ingestion_reports) == 1 else {
+        "source_file": "multiple",
+        "files": ingestion_reports,
+    }
+    write_manifest(session_id, manifest)
     if payload.currency is not None:
         manifest["currency"] = payload.currency
     if payload.audience is not None:
         manifest["audience"] = payload.audience
     if payload.currency is not None or payload.audience is not None:
         write_manifest(session_id, manifest)
+    ingestion_summary = _format_ingestion_summary(manifest.get("ingestion_report") or {})
     analysis = await asyncio.to_thread(
         run_core_pipeline,
         session_id=session_id,
@@ -175,6 +236,7 @@ async def analyze_session(session_id: str, payload: AnalyzeRequest) -> Dict[str,
         wacc=float(manifest.get("wacc") or payload.wacc or 0.10),
         effective_tax_rate=float(manifest.get("effective_tax_rate") or payload.effective_tax_rate or 0.0),
         reporting_currency=str(payload.currency or manifest.get("currency") or "USD"),
+        ingestion_summary=ingestion_summary or None,
     )
     manifest_changed = False
     if analysis.get("company_name") and manifest.get("company_name") != analysis["company_name"]:
@@ -204,12 +266,51 @@ def get_session_analysis(session_id: str) -> Dict[str, Any]:
     return result
 
 
+@router.patch("/api/sessions/{session_id}/manifest")
+@router.patch("/api/v1/sessions/{session_id}/manifest")
+async def patch_session_manifest(session_id: str, payload: SessionManifestPatch) -> Dict[str, Any]:
+    validate_session_id(session_id)
+    if not session_dir(session_id).exists():
+        raise HTTPException(status_code=404, detail="Session not found")
+    async with session_lock(session_id):
+        manifest = read_manifest(session_id)
+        if merge_context_into_manifest(
+            manifest,
+            company_name=payload.company_name,
+            industry=payload.industry,
+            annual_revenue=payload.annual_revenue,
+            currency=payload.currency,
+            audience=payload.audience,
+        ):
+            write_manifest(session_id, manifest)
+    manifest.setdefault("session_id", session_id)
+    return manifest
+
+
 @router.get("/api/sessions/{session_id}/manifest")
 @router.get("/api/v1/sessions/{session_id}/manifest")
 def get_session_manifest(session_id: str) -> Dict[str, Any]:
     validate_session_id(session_id)
-    if not session_dir(session_id).exists():
-        raise HTTPException(status_code=404, detail="Session not found")
+    sdir = session_dir(session_id)
+    if not sdir.exists():
+        # Try to recover from persisted data before giving up.
+        # Prefer the thin session_meta snapshot; fall back to the full analysis blob.
+        meta = _memory.get("session_meta", session_id) or _memory.get("session", session_id)
+        if not meta:
+            raise HTTPException(status_code=404, detail="Session not found")
+        sdir.mkdir(parents=True, exist_ok=True)
+        recovered: Dict[str, Any] = {
+            "session_id": session_id,
+            "company_name": meta.get("company_name", ""),
+            "industry": meta.get("industry", ""),
+            "annual_revenue": meta.get("annual_revenue"),
+            "currency": meta.get("reporting_currency", meta.get("currency", "USD")),
+            "audience": "consultant",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "files": [],
+        }
+        write_manifest(session_id, recovered)
+        logger.info('"session_recovered session_id=%s"', session_id)
     manifest = read_manifest(session_id)
     manifest.setdefault("session_id", session_id)
     return manifest

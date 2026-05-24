@@ -1,6 +1,8 @@
 {
   "version": "1.0",
+  "source_type": "internal_calibration",
   "description": "Switching cost rates as a percentage of annual spend by category. Applied to net addressable spend to prevent over-stating savings when vendor migration costs are material.",
+  "disclaimer": "All switching cost rates are internal estimates derived from consulting engagement analysis of vendor transition costs. No single external publication sources these specific rates. Rates are conservative directional estimates; actual switching costs vary significantly by contract size, vendor, and transition complexity. Validate against actual vendor exit clauses before applying in client deliverables. Published reference ranges where available: Gartner estimates ERP switching costs at 15-30% of ACV; GSMA/industry data on telecom RAN vendor migration at 10-20%; BPO/ITO transition norms from Everest Group at 6-12% of TCV.",
   "switching_cost_rate_by_category": {
     "IT": 0.12,
     "PROF_SVCS": 0.04,

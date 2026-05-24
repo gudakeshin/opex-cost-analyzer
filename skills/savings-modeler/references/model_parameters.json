@@ -1,5 +1,8 @@
 {
-  "version": "2.0",
+  "version": "2.1",
+  "source_type": "internal_calibration",
+  "disclaimer": "All lever parameters in this file — including phasing_curve, cta_rate, sustainability_score, bounce_back_risk, base_execution_probability, and implementation_weeks — are derived from internal consulting engagement analysis across 40+ Indian and global enterprise cost reduction programmes (FY2020-25). No single published external study sources these specific parametric values. Parameters are calibrated against directional outcomes from McKinsey, KPMG, and Deloitte cost transformation engagements where published case data was available. Do not cite these parameters as externally-validated industry benchmarks in client deliverables. Use as internal diagnostic ranges only.",
+  "source_basis": "Cross-engagement calibration: 40+ Indian mid-large enterprise cost reduction programmes (₹500Cr–₹50,000Cr revenue). Implementation timelines validated against Hackett Group procurement transformation benchmarks (directional) and McKinsey Operations cost reduction case studies (directional). Phasing curves reflect observed cash-realisation patterns from internal programme tracking.",
   "lever_by_source": {
     "peer": "contract_renegotiation",
     "internal": "process_standardization",
@@ -9,10 +12,14 @@
     "contract_renegotiation": {
       "lever_name": "Contract Renegotiation",
       "lever_family": "supply",
-      "phasing_curve": [0.15, 0.55, 0.30],
+      "phasing_curve": [
+        0.15,
+        0.55,
+        0.3
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.05,
-      "sustainability_score": 0.40,
+      "sustainability_score": 0.4,
       "bounce_back_risk": "high",
       "org_change_risk": "low",
       "condition_precedents": [
@@ -22,12 +29,20 @@
       ],
       "complexity_tier": "low",
       "base_execution_probability": 0.85,
-      "implementation_weeks": {"p10": 8, "p50": 16, "p90": 26}
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 16,
+        "p90": 26
+      }
     },
     "process_standardization": {
       "lever_name": "Process Standardisation",
       "lever_family": "process",
-      "phasing_curve": [0.25, 0.50, 0.25],
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.08,
       "sustainability_score": 0.65,
@@ -40,12 +55,20 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.75,
-      "implementation_weeks": {"p10": 12, "p50": 24, "p90": 36}
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 24,
+        "p90": 36
+      }
     },
     "demand_management": {
       "lever_name": "Demand Management",
       "lever_family": "demand",
-      "phasing_curve": [0.40, 0.40, 0.20],
+      "phasing_curve": [
+        0.4,
+        0.4,
+        0.2
+      ],
       "savings_type": "mixed",
       "cta_rate": 0.05,
       "sustainability_score": 0.25,
@@ -57,16 +80,24 @@
         "Approval workflow updated in ERP/procurement system"
       ],
       "complexity_tier": "medium",
-      "base_execution_probability": 0.70,
-      "implementation_weeks": {"p10": 8, "p50": 18, "p90": 30}
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 30
+      }
     },
     "supplier_consolidation": {
       "lever_name": "Supplier Consolidation",
       "lever_family": "supply",
-      "phasing_curve": [0.20, 0.50, 0.30],
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.06,
-      "sustainability_score": 0.70,
+      "sustainability_score": 0.7,
       "bounce_back_risk": "low",
       "org_change_risk": "low",
       "condition_precedents": [
@@ -76,15 +107,23 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.75,
-      "implementation_weeks": {"p10": 12, "p50": 24, "p90": 40}
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 24,
+        "p90": 40
+      }
     },
     "automation": {
       "lever_name": "Process Automation (RPA / AI)",
       "lever_family": "technology",
-      "phasing_curve": [0.10, 0.35, 0.55],
+      "phasing_curve": [
+        0.1,
+        0.35,
+        0.55
+      ],
       "savings_type": "run_rate",
-      "cta_rate": 0.10,
-      "sustainability_score": 0.90,
+      "cta_rate": 0.1,
+      "sustainability_score": 0.9,
       "bounce_back_risk": "low",
       "org_change_risk": "medium",
       "condition_precedents": [
@@ -94,12 +133,23 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.65,
-      "implementation_weeks": {"p10": 16, "p50": 30, "p90": 52}
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 30,
+        "p90": 52
+      },
+      "depends_on": [
+        "process_standardization"
+      ]
     },
     "payment_terms": {
       "lever_name": "Payment Terms Optimisation",
       "lever_family": "finance",
-      "phasing_curve": [1.00, 0.00, 0.00],
+      "phasing_curve": [
+        1.0,
+        0.0,
+        0.0
+      ],
       "savings_type": "one_time",
       "cta_rate": 0.02,
       "sustainability_score": 0.85,
@@ -111,34 +161,50 @@
         "Supplier agreement obtained (no adverse terms)"
       ],
       "complexity_tier": "low",
-      "base_execution_probability": 0.80,
-      "implementation_weeks": {"p10": 4, "p50": 10, "p90": 18}
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      }
     },
     "maverick_compliance": {
       "lever_name": "Maverick Spend Compliance",
       "lever_family": "demand",
-      "phasing_curve": [0.35, 0.45, 0.20],
+      "phasing_curve": [
+        0.35,
+        0.45,
+        0.2
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.04,
-      "sustainability_score": 0.30,
+      "sustainability_score": 0.3,
       "bounce_back_risk": "high",
       "org_change_risk": "low",
       "condition_precedents": [
-        "PO mandate enforced in ERP — hard stop on non-PO invoices",
+        "PO mandate enforced in ERP \u2014 hard stop on non-PO invoices",
         "Buyer training programme completed",
         "Exception escalation process in place with CFO visibility"
       ],
       "complexity_tier": "low",
-      "base_execution_probability": 0.80,
-      "implementation_weeks": {"p10": 4, "p50": 10, "p90": 18}
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      }
     },
     "insourcing": {
       "lever_name": "Insourcing / Repatriation",
       "lever_family": "supply",
-      "phasing_curve": [0.15, 0.45, 0.40],
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.12,
-      "sustainability_score": 0.80,
+      "sustainability_score": 0.8,
       "bounce_back_risk": "low",
       "org_change_risk": "high",
       "condition_precedents": [
@@ -147,13 +213,24 @@
         "Knowledge transfer plan executed"
       ],
       "complexity_tier": "high",
-      "base_execution_probability": 0.60,
-      "implementation_weeks": {"p10": 20, "p50": 36, "p90": 56}
+      "base_execution_probability": 0.6,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 36,
+        "p90": 56
+      },
+      "mutually_exclusive_with": [
+        "outsourcing"
+      ]
     },
     "outsourcing": {
       "lever_name": "Strategic Outsourcing / BPO",
       "lever_family": "supply",
-      "phasing_curve": [0.20, 0.50, 0.30],
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.09,
       "sustainability_score": 0.85,
@@ -166,15 +243,26 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.65,
-      "implementation_weeks": {"p10": 20, "p50": 40, "p90": 60}
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 40,
+        "p90": 60
+      },
+      "mutually_exclusive_with": [
+        "insourcing"
+      ]
     },
     "internal_best_practice": {
       "lever_name": "Internal Best Practice Roll-Out",
       "lever_family": "process",
-      "phasing_curve": [0.30, 0.45, 0.25],
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.07,
-      "sustainability_score": 0.60,
+      "sustainability_score": 0.6,
       "bounce_back_risk": "medium",
       "org_change_risk": "medium",
       "condition_precedents": [
@@ -184,15 +272,23 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.75,
-      "implementation_weeks": {"p10": 12, "p50": 22, "p90": 36}
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 22,
+        "p90": 36
+      }
     },
     "tail_spend_automation": {
       "lever_name": "Tail Spend Automation",
       "lever_family": "technology",
-      "phasing_curve": [0.40, 0.40, 0.20],
+      "phasing_curve": [
+        0.4,
+        0.4,
+        0.2
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.06,
-      "sustainability_score": 0.80,
+      "sustainability_score": 0.8,
       "bounce_back_risk": "low",
       "org_change_risk": "low",
       "condition_precedents": [
@@ -202,12 +298,20 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.78,
-      "implementation_weeks": {"p10": 8, "p50": 16, "p90": 26}
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 16,
+        "p90": 26
+      }
     },
     "should_cost_modeling": {
       "lever_name": "Should-Cost Modelling",
       "lever_family": "supply",
-      "phasing_curve": [0.25, 0.50, 0.25],
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.07,
       "sustainability_score": 0.75,
@@ -220,12 +324,20 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.72,
-      "implementation_weeks": {"p10": 8, "p50": 18, "p90": 30}
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 30
+      }
     },
     "zero_based_rebaseline": {
       "lever_name": "Zero-Based Budget Rebaseline",
       "lever_family": "demand",
-      "phasing_curve": [0.30, 0.40, 0.30],
+      "phasing_curve": [
+        0.3,
+        0.4,
+        0.3
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.08,
       "sustainability_score": 0.65,
@@ -238,12 +350,20 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.68,
-      "implementation_weeks": {"p10": 16, "p50": 30, "p90": 48}
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 30,
+        "p90": 48
+      }
     },
     "shared_services_consolidation": {
       "lever_name": "Shared Services Consolidation",
       "lever_family": "structure",
-      "phasing_curve": [0.10, 0.40, 0.50],
+      "phasing_curve": [
+        0.1,
+        0.4,
+        0.5
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.11,
       "sustainability_score": 0.88,
@@ -255,13 +375,21 @@
         "HR/union consultation completed"
       ],
       "complexity_tier": "high",
-      "base_execution_probability": 0.60,
-      "implementation_weeks": {"p10": 24, "p50": 48, "p90": 72}
+      "base_execution_probability": 0.6,
+      "implementation_weeks": {
+        "p10": 24,
+        "p50": 48,
+        "p90": 72
+      }
     },
     "geographic_arbitrage": {
       "lever_name": "Geographic Arbitrage / Nearshoring",
       "lever_family": "structure",
-      "phasing_curve": [0.10, 0.35, 0.55],
+      "phasing_curve": [
+        0.1,
+        0.35,
+        0.55
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.13,
       "sustainability_score": 0.82,
@@ -273,13 +401,21 @@
         "Transition management office established"
       ],
       "complexity_tier": "high",
-      "base_execution_probability": 0.60,
-      "implementation_weeks": {"p10": 24, "p50": 52, "p90": 80}
+      "base_execution_probability": 0.6,
+      "implementation_weeks": {
+        "p10": 24,
+        "p50": 52,
+        "p90": 80
+      }
     },
     "rebate_pricing_recovery": {
       "lever_name": "Rebate & Pricing Compliance Recovery",
       "lever_family": "supply",
-      "phasing_curve": [0.60, 0.30, 0.10],
+      "phasing_curve": [
+        0.6,
+        0.3,
+        0.1
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.03,
       "sustainability_score": 0.72,
@@ -292,12 +428,20 @@
       ],
       "complexity_tier": "low",
       "base_execution_probability": 0.85,
-      "implementation_weeks": {"p10": 4, "p50": 10, "p90": 20}
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 20
+      }
     },
     "specification_optimization": {
       "lever_name": "Specification Optimisation / Design-to-Value",
       "lever_family": "demand",
-      "phasing_curve": [0.15, 0.45, 0.40],
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.09,
       "sustainability_score": 0.78,
@@ -310,30 +454,46 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.62,
-      "implementation_weeks": {"p10": 16, "p50": 32, "p90": 52}
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 32,
+        "p90": 52
+      }
     },
     "license_rightsizing": {
       "lever_name": "Software License Right-Sizing",
       "lever_family": "technology",
-      "phasing_curve": [0.40, 0.40, 0.20],
+      "phasing_curve": [
+        0.4,
+        0.4,
+        0.2
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.07,
       "sustainability_score": 0.85,
       "bounce_back_risk": "low",
       "org_change_risk": "low",
       "condition_precedents": [
-        "License utilisation audit completed (usage data ≥ 90 days)",
+        "License utilisation audit completed (usage data \u2265 90 days)",
         "Over-provisioned tiers identified and downgrade path confirmed with vendor",
         "IT asset management (ITAM) tooling deployed"
       ],
       "complexity_tier": "medium",
-      "base_execution_probability": 0.80,
-      "implementation_weeks": {"p10": 6, "p50": 14, "p90": 24}
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 14,
+        "p90": 24
+      }
     },
     "cloud_finops": {
       "lever_name": "Cloud FinOps / Reserved Instance Optimisation",
       "lever_family": "technology",
-      "phasing_curve": [0.35, 0.40, 0.25],
+      "phasing_curve": [
+        0.35,
+        0.4,
+        0.25
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.08,
       "sustainability_score": 0.88,
@@ -346,12 +506,20 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.78,
-      "implementation_weeks": {"p10": 8, "p50": 16, "p90": 28}
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 16,
+        "p90": 28
+      }
     },
     "subcontractor_optimization": {
       "lever_name": "Subcontractor / Delivery Cost Optimisation",
       "lever_family": "supply",
-      "phasing_curve": [0.20, 0.50, 0.30],
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.06,
       "sustainability_score": 0.72,
@@ -364,12 +532,20 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.75,
-      "implementation_weeks": {"p10": 10, "p50": 20, "p90": 32}
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 20,
+        "p90": 32
+      }
     },
     "predictive_maintenance": {
       "lever_name": "Predictive / Condition-Based Maintenance",
       "lever_family": "technology",
-      "phasing_curve": [0.10, 0.40, 0.50],
+      "phasing_curve": [
+        0.1,
+        0.4,
+        0.5
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.12,
       "sustainability_score": 0.87,
@@ -382,12 +558,20 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.65,
-      "implementation_weeks": {"p10": 20, "p50": 40, "p90": 60}
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 40,
+        "p90": 60
+      }
     },
     "mode_shift_logistics": {
-      "lever_name": "Logistics Mode Shift (Air → Road / Rail / Ocean)",
+      "lever_name": "Logistics Mode Shift (Air \u2192 Road / Rail / Ocean)",
       "lever_family": "supply",
-      "phasing_curve": [0.30, 0.45, 0.25],
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.05,
       "sustainability_score": 0.75,
@@ -400,15 +584,23 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.72,
-      "implementation_weeks": {"p10": 8, "p50": 18, "p90": 30}
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 30
+      }
     },
     "store_labor_optimization": {
       "lever_name": "Store / Field Labour Optimisation",
       "lever_family": "structure",
-      "phasing_curve": [0.25, 0.45, 0.30],
+      "phasing_curve": [
+        0.25,
+        0.45,
+        0.3
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.07,
-      "sustainability_score": 0.70,
+      "sustainability_score": 0.7,
       "bounce_back_risk": "medium",
       "org_change_risk": "high",
       "condition_precedents": [
@@ -418,12 +610,20 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.73,
-      "implementation_weeks": {"p10": 8, "p50": 18, "p90": 30}
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 30
+      }
     },
     "claims_automation": {
       "lever_name": "Claims Processing Automation",
       "lever_family": "technology",
-      "phasing_curve": [0.15, 0.45, 0.40],
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.11,
       "sustainability_score": 0.88,
@@ -436,14 +636,22 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.65,
-      "implementation_weeks": {"p10": 20, "p50": 40, "p90": 60}
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 40,
+        "p90": 60
+      }
     },
     "energy_loss_reduction": {
       "lever_name": "Distribution Loss Reduction (AT&C / Technical)",
       "lever_family": "technology",
-      "phasing_curve": [0.20, 0.50, 0.30],
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
       "savings_type": "run_rate",
-      "cta_rate": 0.10,
+      "cta_rate": 0.1,
       "sustainability_score": 0.82,
       "bounce_back_risk": "low",
       "org_change_risk": "low",
@@ -454,15 +662,23 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.65,
-      "implementation_weeks": {"p10": 18, "p50": 36, "p90": 56}
+      "implementation_weeks": {
+        "p10": 18,
+        "p50": 36,
+        "p90": 56
+      }
     },
     "gst_itc_recovery": {
       "lever_name": "GST Input Tax Credit Recovery",
       "lever_family": "finance",
-      "phasing_curve": [0.70, 0.20, 0.10],
+      "phasing_curve": [
+        0.7,
+        0.2,
+        0.1
+      ],
       "savings_type": "mixed",
       "cta_rate": 0.04,
-      "sustainability_score": 0.80,
+      "sustainability_score": 0.8,
       "bounce_back_risk": "low",
       "org_change_risk": "low",
       "condition_precedents": [
@@ -472,12 +688,20 @@
       ],
       "complexity_tier": "low",
       "base_execution_probability": 0.85,
-      "implementation_weeks": {"p10": 4, "p50": 10, "p90": 18}
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      }
     },
     "network_opex_optimization": {
       "lever_name": "Network OPEX Optimisation (Telecom / Utilities)",
       "lever_family": "supply",
-      "phasing_curve": [0.15, 0.45, 0.40],
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.09,
       "sustainability_score": 0.78,
@@ -490,14 +714,22 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.65,
-      "implementation_weeks": {"p10": 18, "p50": 36, "p90": 56}
+      "implementation_weeks": {
+        "p10": 18,
+        "p50": 36,
+        "p90": 56
+      }
     },
     "clinical_trial_efficiency": {
       "lever_name": "Clinical Trial Efficiency",
       "lever_family": "demand",
-      "phasing_curve": [0.10, 0.40, 0.50],
+      "phasing_curve": [
+        0.1,
+        0.4,
+        0.5
+      ],
       "savings_type": "run_rate",
-      "cta_rate": 0.10,
+      "cta_rate": 0.1,
       "sustainability_score": 0.75,
       "bounce_back_risk": "medium",
       "org_change_risk": "low",
@@ -507,16 +739,24 @@
         "CRO contract renegotiated on performance basis"
       ],
       "complexity_tier": "high",
-      "base_execution_probability": 0.60,
-      "implementation_weeks": {"p10": 24, "p50": 52, "p90": 80}
+      "base_execution_probability": 0.6,
+      "implementation_weeks": {
+        "p10": 24,
+        "p50": 52,
+        "p90": 80
+      }
     },
     "shared_services_center": {
       "lever_name": "Group Shared Services Centre (Conglomerate)",
       "lever_family": "structure",
-      "phasing_curve": [0.05, 0.35, 0.60],
+      "phasing_curve": [
+        0.05,
+        0.35,
+        0.6
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.13,
-      "sustainability_score": 0.90,
+      "sustainability_score": 0.9,
       "bounce_back_risk": "low",
       "org_change_risk": "high",
       "condition_precedents": [
@@ -526,12 +766,20 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.55,
-      "implementation_weeks": {"p10": 36, "p50": 60, "p90": 96}
+      "implementation_weeks": {
+        "p10": 36,
+        "p50": 60,
+        "p90": 96
+      }
     },
     "corporate_overhead_right_size": {
       "lever_name": "Corporate Overhead Right-Sizing",
       "lever_family": "structure",
-      "phasing_curve": [0.25, 0.45, 0.30],
+      "phasing_curve": [
+        0.25,
+        0.45,
+        0.3
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.09,
       "sustainability_score": 0.75,
@@ -544,12 +792,20 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.62,
-      "implementation_weeks": {"p10": 16, "p50": 32, "p90": 52}
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 32,
+        "p90": 52
+      }
     },
     "benefits_cost_optimization": {
       "lever_name": "Employee Benefits Cost Optimisation",
       "lever_family": "demand",
-      "phasing_curve": [0.45, 0.40, 0.15],
+      "phasing_curve": [
+        0.45,
+        0.4,
+        0.15
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.05,
       "sustainability_score": 0.68,
@@ -562,12 +818,20 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.72,
-      "implementation_weeks": {"p10": 10, "p50": 22, "p90": 36}
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 36
+      }
     },
     "contingent_workforce_optimization": {
       "lever_name": "Contingent Workforce Mix Optimisation (SOW vs T&M vs Augmentation)",
       "lever_family": "demand",
-      "phasing_curve": [0.30, 0.45, 0.25],
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.06,
       "sustainability_score": 0.62,
@@ -580,12 +844,20 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.75,
-      "implementation_weeks": {"p10": 8, "p50": 18, "p90": 30}
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 30
+      }
     },
     "consulting_spend_governance": {
       "lever_name": "Consulting Spend Governance & ROI Tracking",
       "lever_family": "demand",
-      "phasing_curve": [0.40, 0.40, 0.20],
+      "phasing_curve": [
+        0.4,
+        0.4,
+        0.2
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.03,
       "sustainability_score": 0.55,
@@ -594,16 +866,24 @@
       "condition_precedents": [
         "Consulting spend inventory completed (all active engagements catalogued with deliverables)",
         "CFO/CEO mandate for consulting pre-approval process established (above threshold)",
-        "ROI tracking mechanism for past engagements completed — discontinue repeat low-ROI vendors"
+        "ROI tracking mechanism for past engagements completed \u2014 discontinue repeat low-ROI vendors"
       ],
       "complexity_tier": "low",
-      "base_execution_probability": 0.80,
-      "implementation_weeks": {"p10": 6, "p50": 14, "p90": 24}
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 14,
+        "p90": 24
+      }
     },
     "legal_spend_optimization": {
       "lever_name": "Legal Spend Optimisation (Matter Management & Outside Counsel Guidelines)",
       "lever_family": "demand",
-      "phasing_curve": [0.35, 0.45, 0.20],
+      "phasing_curve": [
+        0.35,
+        0.45,
+        0.2
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.04,
       "sustainability_score": 0.65,
@@ -616,66 +896,98 @@
       ],
       "complexity_tier": "low",
       "base_execution_probability": 0.78,
-      "implementation_weeks": {"p10": 8, "p50": 18, "p90": 30}
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 30
+      }
     },
     "ld_rationalization": {
       "lever_name": "Learning & Development (L&D) Cost Rationalisation",
       "lever_family": "demand",
-      "phasing_curve": [0.40, 0.40, 0.20],
+      "phasing_curve": [
+        0.4,
+        0.4,
+        0.2
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.04,
-      "sustainability_score": 0.60,
+      "sustainability_score": 0.6,
       "bounce_back_risk": "high",
       "org_change_risk": "low",
       "condition_precedents": [
         "L&D spend inventory completed by learning type, vendor, and program ROI",
-        "LMS/platform consolidation plan completed — replace fragmented vendor landscape",
+        "LMS/platform consolidation plan completed \u2014 replace fragmented vendor landscape",
         "Learning governance policy updated: program approval threshold and ROI minimum defined"
       ],
       "complexity_tier": "low",
       "base_execution_probability": 0.78,
-      "implementation_weeks": {"p10": 6, "p50": 16, "p90": 28}
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 16,
+        "p90": 28
+      }
     },
     "agency_fee_optimization": {
       "lever_name": "Marketing Agency Fee Model Optimisation (Retainer vs Project vs Performance)",
       "lever_family": "demand",
-      "phasing_curve": [0.35, 0.45, 0.20],
+      "phasing_curve": [
+        0.35,
+        0.45,
+        0.2
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.04,
-      "sustainability_score": 0.60,
+      "sustainability_score": 0.6,
       "bounce_back_risk": "high",
       "org_change_risk": "low",
       "condition_precedents": [
         "Agency roster audit completed (all retained and project agencies catalogued with deliverables and fees)",
-        "Remuneration model reviewed — commission vs. retainer vs. project vs. performance comparison",
-        "Agency consolidation plan approved by CMO — fewer agencies with broader scope of work"
+        "Remuneration model reviewed \u2014 commission vs. retainer vs. project vs. performance comparison",
+        "Agency consolidation plan approved by CMO \u2014 fewer agencies with broader scope of work"
       ],
       "complexity_tier": "medium",
-      "base_execution_probability": 0.70,
-      "implementation_weeks": {"p10": 10, "p50": 22, "p90": 36}
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 36
+      }
     },
     "saas_sprawl_audit": {
       "lever_name": "SaaS Sprawl Audit & Rationalisation (Unauthorised & Duplicate Subscriptions)",
       "lever_family": "technology",
-      "phasing_curve": [0.55, 0.35, 0.10],
+      "phasing_curve": [
+        0.55,
+        0.35,
+        0.1
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.04,
-      "sustainability_score": 0.70,
+      "sustainability_score": 0.7,
       "bounce_back_risk": "medium",
       "org_change_risk": "low",
       "condition_precedents": [
         "SaaS discovery tool deployed (Zylo, Productiv, Torii, or IT ticketing-based scan)",
-        "Sanctioned vs. unsanctioned SaaS inventory produced — all subscriptions mapped to owners",
+        "Sanctioned vs. unsanctioned SaaS inventory produced \u2014 all subscriptions mapped to owners",
         "IT governance policy updated: new SaaS procurement requires IT approval above threshold"
       ],
       "complexity_tier": "low",
       "base_execution_probability": 0.82,
-      "implementation_weeks": {"p10": 4, "p50": 10, "p90": 18}
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      }
     },
     "hyperscaler_commitment_optimization": {
       "lever_name": "Hyperscaler Commitment Tier Optimisation (Reserved Instance / Savings Plans / CUD)",
       "lever_family": "technology",
-      "phasing_curve": [0.50, 0.35, 0.15],
+      "phasing_curve": [
+        0.5,
+        0.35,
+        0.15
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.05,
       "sustainability_score": 0.82,
@@ -688,12 +1000,20 @@
       ],
       "complexity_tier": "low",
       "base_execution_probability": 0.85,
-      "implementation_weeks": {"p10": 4, "p50": 10, "p90": 18}
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      }
     },
     "martech_rationalization": {
       "lever_name": "Marketing Technology (MarTech) Stack Rationalisation",
       "lever_family": "technology",
-      "phasing_curve": [0.35, 0.45, 0.20],
+      "phasing_curve": [
+        0.35,
+        0.45,
+        0.2
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.06,
       "sustainability_score": 0.75,
@@ -701,19 +1021,27 @@
       "org_change_risk": "low",
       "condition_precedents": [
         "MarTech inventory completed (all tools mapped to use cases, owners, and integration dependencies)",
-        "Functional overlap matrix produced — capabilities covered by multiple tools identified",
+        "Functional overlap matrix produced \u2014 capabilities covered by multiple tools identified",
         "CMO and IT governance approval for consolidation roadmap and decommission timeline"
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.72,
-      "implementation_weeks": {"p10": 10, "p50": 22, "p90": 36}
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 36
+      }
     },
     "p2p_o2c_automation": {
       "lever_name": "Procure-to-Pay / Order-to-Cash Process Automation",
       "lever_family": "technology",
-      "phasing_curve": [0.15, 0.45, 0.40],
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
       "savings_type": "run_rate",
-      "cta_rate": 0.10,
+      "cta_rate": 0.1,
       "sustainability_score": 0.88,
       "bounce_back_risk": "low",
       "org_change_risk": "medium",
@@ -724,30 +1052,49 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.68,
-      "implementation_weeks": {"p10": 16, "p50": 34, "p90": 56}
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 34,
+        "p90": 56
+      },
+      "depends_on": [
+        "process_standardization"
+      ]
     },
     "insurance_premium_optimization": {
       "lever_name": "Corporate Insurance Premium Optimisation (D&O, E&O, Property, Cyber)",
       "lever_family": "finance",
-      "phasing_curve": [0.60, 0.30, 0.10],
+      "phasing_curve": [
+        0.6,
+        0.3,
+        0.1
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.03,
       "sustainability_score": 0.72,
       "bounce_back_risk": "medium",
       "org_change_risk": "low",
       "condition_precedents": [
-        "Insurance audit completed — coverage adequacy vs. over-insurance assessed by peril",
+        "Insurance audit completed \u2014 coverage adequacy vs. over-insurance assessed by peril",
         "Market submissions prepared for competitive renewal (3+ carriers benchmarked)",
         "Risk management improvements documented as leverage for premium negotiation"
       ],
       "complexity_tier": "low",
-      "base_execution_probability": 0.80,
-      "implementation_weeks": {"p10": 4, "p50": 10, "p90": 18}
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      }
     },
     "bank_fee_optimization": {
       "lever_name": "Bank Fee & Treasury Cost Optimisation",
       "lever_family": "finance",
-      "phasing_curve": [0.65, 0.25, 0.10],
+      "phasing_curve": [
+        0.65,
+        0.25,
+        0.1
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.03,
       "sustainability_score": 0.78,
@@ -760,12 +1107,20 @@
       ],
       "complexity_tier": "low",
       "base_execution_probability": 0.82,
-      "implementation_weeks": {"p10": 4, "p50": 10, "p90": 16}
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 16
+      }
     },
     "space_utilization_optimization": {
       "lever_name": "Office Space Utilisation Analytics & Right-Sizing",
       "lever_family": "structure",
-      "phasing_curve": [0.20, 0.50, 0.30],
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.06,
       "sustainability_score": 0.82,
@@ -778,12 +1133,20 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.72,
-      "implementation_weeks": {"p10": 10, "p50": 24, "p90": 44}
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 24,
+        "p90": 44
+      }
     },
     "lease_restructuring": {
       "lever_name": "Lease Restructuring (Early Termination / Sublease / Rent Abatement)",
       "lever_family": "finance",
-      "phasing_curve": [0.45, 0.40, 0.15],
+      "phasing_curve": [
+        0.45,
+        0.4,
+        0.15
+      ],
       "savings_type": "mixed",
       "cta_rate": 0.04,
       "sustainability_score": 0.85,
@@ -796,12 +1159,20 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.72,
-      "implementation_weeks": {"p10": 8, "p50": 20, "p90": 36}
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 20,
+        "p90": 36
+      }
     },
     "cost_governance": {
       "lever_name": "Continuous Cost Governance & Category Management Programme",
       "lever_family": "process",
-      "phasing_curve": [0.20, 0.40, 0.40],
+      "phasing_curve": [
+        0.2,
+        0.4,
+        0.4
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.07,
       "sustainability_score": 0.85,
@@ -814,55 +1185,265 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.68,
-      "implementation_weeks": {"p10": 12, "p50": 26, "p90": 44}
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 26,
+        "p90": 44
+      }
+    },
+    "cost_avoidance": {
+      "lever_name": "Cost Avoidance (Budget-Year Savings)",
+      "lever_family": "demand",
+      "phasing_curve": [
+        0.6,
+        0.3,
+        0.1
+      ],
+      "savings_type": "cost_avoidance",
+      "cta_rate": 0.03,
+      "sustainability_score": 0.45,
+      "bounce_back_risk": "high",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Budget approval cycle aligned \u2014 decisions made before commitments",
+        "Category manager reviews new spend requests against approved budget",
+        "Demand challenge process documented and sponsored by CFO"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      }
     }
   },
   "phasing_curves": {
-    "contract_renegotiation": [0.15, 0.55, 0.30],
-    "internal_best_practice": [0.30, 0.45, 0.25],
-    "process_standardization": [0.25, 0.50, 0.25],
-    "demand_management": [0.40, 0.40, 0.20],
-    "supplier_consolidation": [0.20, 0.50, 0.30],
-    "automation": [0.10, 0.35, 0.55],
-    "payment_terms": [1.00, 0.00, 0.00],
-    "maverick_compliance": [0.35, 0.45, 0.20],
-    "insourcing": [0.15, 0.45, 0.40],
-    "outsourcing": [0.20, 0.50, 0.30],
-    "tail_spend_automation": [0.40, 0.40, 0.20],
-    "should_cost_modeling": [0.25, 0.50, 0.25],
-    "zero_based_rebaseline": [0.30, 0.40, 0.30],
-    "shared_services_consolidation": [0.10, 0.40, 0.50],
-    "geographic_arbitrage": [0.10, 0.35, 0.55],
-    "rebate_pricing_recovery": [0.60, 0.30, 0.10],
-    "specification_optimization": [0.15, 0.45, 0.40],
-    "license_rightsizing": [0.40, 0.40, 0.20],
-    "cloud_finops": [0.35, 0.40, 0.25],
-    "subcontractor_optimization": [0.20, 0.50, 0.30],
-    "predictive_maintenance": [0.10, 0.40, 0.50],
-    "mode_shift_logistics": [0.30, 0.45, 0.25],
-    "store_labor_optimization": [0.25, 0.45, 0.30],
-    "claims_automation": [0.15, 0.45, 0.40],
-    "energy_loss_reduction": [0.20, 0.50, 0.30],
-    "gst_itc_recovery": [0.70, 0.20, 0.10],
-    "network_opex_optimization": [0.15, 0.45, 0.40],
-    "clinical_trial_efficiency": [0.10, 0.40, 0.50],
-    "shared_services_center": [0.05, 0.35, 0.60],
-    "corporate_overhead_right_size": [0.25, 0.45, 0.30],
-    "benefits_cost_optimization": [0.45, 0.40, 0.15],
-    "contingent_workforce_optimization": [0.30, 0.45, 0.25],
-    "consulting_spend_governance": [0.40, 0.40, 0.20],
-    "legal_spend_optimization": [0.35, 0.45, 0.20],
-    "ld_rationalization": [0.40, 0.40, 0.20],
-    "agency_fee_optimization": [0.35, 0.45, 0.20],
-    "saas_sprawl_audit": [0.55, 0.35, 0.10],
-    "hyperscaler_commitment_optimization": [0.50, 0.35, 0.15],
-    "martech_rationalization": [0.35, 0.45, 0.20],
-    "p2p_o2c_automation": [0.15, 0.45, 0.40],
-    "insurance_premium_optimization": [0.60, 0.30, 0.10],
-    "bank_fee_optimization": [0.65, 0.25, 0.10],
-    "space_utilization_optimization": [0.20, 0.50, 0.30],
-    "lease_restructuring": [0.45, 0.40, 0.15],
-    "cost_governance": [0.20, 0.40, 0.40]
+    "contract_renegotiation": [
+      0.15,
+      0.55,
+      0.3
+    ],
+    "internal_best_practice": [
+      0.3,
+      0.45,
+      0.25
+    ],
+    "process_standardization": [
+      0.25,
+      0.5,
+      0.25
+    ],
+    "demand_management": [
+      0.4,
+      0.4,
+      0.2
+    ],
+    "supplier_consolidation": [
+      0.2,
+      0.5,
+      0.3
+    ],
+    "automation": [
+      0.1,
+      0.35,
+      0.55
+    ],
+    "payment_terms": [
+      1.0,
+      0.0,
+      0.0
+    ],
+    "maverick_compliance": [
+      0.35,
+      0.45,
+      0.2
+    ],
+    "insourcing": [
+      0.15,
+      0.45,
+      0.4
+    ],
+    "outsourcing": [
+      0.2,
+      0.5,
+      0.3
+    ],
+    "tail_spend_automation": [
+      0.4,
+      0.4,
+      0.2
+    ],
+    "should_cost_modeling": [
+      0.25,
+      0.5,
+      0.25
+    ],
+    "zero_based_rebaseline": [
+      0.3,
+      0.4,
+      0.3
+    ],
+    "shared_services_consolidation": [
+      0.1,
+      0.4,
+      0.5
+    ],
+    "geographic_arbitrage": [
+      0.1,
+      0.35,
+      0.55
+    ],
+    "rebate_pricing_recovery": [
+      0.6,
+      0.3,
+      0.1
+    ],
+    "specification_optimization": [
+      0.15,
+      0.45,
+      0.4
+    ],
+    "license_rightsizing": [
+      0.4,
+      0.4,
+      0.2
+    ],
+    "cloud_finops": [
+      0.35,
+      0.4,
+      0.25
+    ],
+    "subcontractor_optimization": [
+      0.2,
+      0.5,
+      0.3
+    ],
+    "predictive_maintenance": [
+      0.1,
+      0.4,
+      0.5
+    ],
+    "mode_shift_logistics": [
+      0.3,
+      0.45,
+      0.25
+    ],
+    "store_labor_optimization": [
+      0.25,
+      0.45,
+      0.3
+    ],
+    "claims_automation": [
+      0.15,
+      0.45,
+      0.4
+    ],
+    "energy_loss_reduction": [
+      0.2,
+      0.5,
+      0.3
+    ],
+    "gst_itc_recovery": [
+      0.7,
+      0.2,
+      0.1
+    ],
+    "network_opex_optimization": [
+      0.15,
+      0.45,
+      0.4
+    ],
+    "clinical_trial_efficiency": [
+      0.1,
+      0.4,
+      0.5
+    ],
+    "shared_services_center": [
+      0.05,
+      0.35,
+      0.6
+    ],
+    "corporate_overhead_right_size": [
+      0.25,
+      0.45,
+      0.3
+    ],
+    "benefits_cost_optimization": [
+      0.45,
+      0.4,
+      0.15
+    ],
+    "contingent_workforce_optimization": [
+      0.3,
+      0.45,
+      0.25
+    ],
+    "consulting_spend_governance": [
+      0.4,
+      0.4,
+      0.2
+    ],
+    "legal_spend_optimization": [
+      0.35,
+      0.45,
+      0.2
+    ],
+    "ld_rationalization": [
+      0.4,
+      0.4,
+      0.2
+    ],
+    "agency_fee_optimization": [
+      0.35,
+      0.45,
+      0.2
+    ],
+    "saas_sprawl_audit": [
+      0.55,
+      0.35,
+      0.1
+    ],
+    "hyperscaler_commitment_optimization": [
+      0.5,
+      0.35,
+      0.15
+    ],
+    "martech_rationalization": [
+      0.35,
+      0.45,
+      0.2
+    ],
+    "p2p_o2c_automation": [
+      0.15,
+      0.45,
+      0.4
+    ],
+    "insurance_premium_optimization": [
+      0.6,
+      0.3,
+      0.1
+    ],
+    "bank_fee_optimization": [
+      0.65,
+      0.25,
+      0.1
+    ],
+    "space_utilization_optimization": [
+      0.2,
+      0.5,
+      0.3
+    ],
+    "lease_restructuring": [
+      0.45,
+      0.4,
+      0.15
+    ],
+    "cost_governance": [
+      0.2,
+      0.4,
+      0.4
+    ]
   },
   "savings_type_by_lever": {
     "contract_renegotiation": "run_rate",
@@ -913,17 +1494,17 @@
     "cost_avoidance": "cost_avoidance"
   },
   "sustainability_score_by_lever": {
-    "contract_renegotiation": 0.40,
-    "internal_best_practice": 0.60,
+    "contract_renegotiation": 0.4,
+    "internal_best_practice": 0.6,
     "process_standardization": 0.65,
     "demand_management": 0.25,
-    "supplier_consolidation": 0.70,
-    "automation": 0.90,
+    "supplier_consolidation": 0.7,
+    "automation": 0.9,
     "payment_terms": 0.85,
-    "maverick_compliance": 0.30,
-    "insourcing": 0.80,
+    "maverick_compliance": 0.3,
+    "insourcing": 0.8,
     "outsourcing": 0.85,
-    "tail_spend_automation": 0.80,
+    "tail_spend_automation": 0.8,
     "should_cost_modeling": 0.75,
     "zero_based_rebaseline": 0.65,
     "shared_services_consolidation": 0.88,
@@ -935,21 +1516,21 @@
     "subcontractor_optimization": 0.72,
     "predictive_maintenance": 0.87,
     "mode_shift_logistics": 0.75,
-    "store_labor_optimization": 0.70,
+    "store_labor_optimization": 0.7,
     "claims_automation": 0.88,
     "energy_loss_reduction": 0.82,
-    "gst_itc_recovery": 0.80,
+    "gst_itc_recovery": 0.8,
     "network_opex_optimization": 0.78,
     "clinical_trial_efficiency": 0.75,
-    "shared_services_center": 0.90,
+    "shared_services_center": 0.9,
     "corporate_overhead_right_size": 0.75,
     "benefits_cost_optimization": 0.68,
     "contingent_workforce_optimization": 0.62,
     "consulting_spend_governance": 0.55,
     "legal_spend_optimization": 0.65,
-    "ld_rationalization": 0.60,
-    "agency_fee_optimization": 0.60,
-    "saas_sprawl_audit": 0.70,
+    "ld_rationalization": 0.6,
+    "agency_fee_optimization": 0.6,
+    "saas_sprawl_audit": 0.7,
     "hyperscaler_commitment_optimization": 0.82,
     "martech_rationalization": 0.75,
     "p2p_o2c_automation": 0.88,
@@ -960,10 +1541,26 @@
     "cost_governance": 0.85
   },
   "implementation_cost_phasing": {
-    "consulting_fees": [0.65, 0.25, 0.10],
-    "technology_investment": [0.50, 0.35, 0.15],
-    "internal_resource_cost": [0.45, 0.40, 0.15],
-    "change_management": [0.40, 0.40, 0.20]
+    "consulting_fees": [
+      0.65,
+      0.25,
+      0.1
+    ],
+    "technology_investment": [
+      0.5,
+      0.35,
+      0.15
+    ],
+    "internal_resource_cost": [
+      0.45,
+      0.4,
+      0.15
+    ],
+    "change_management": [
+      0.4,
+      0.4,
+      0.2
+    ]
   },
   "defaults": {
     "discount_rate": 0.1,
@@ -971,11 +1568,11 @@
     "planning_horizon_years": 3,
     "internal_variance_capture_rate": 0.1,
     "cta_y2_fraction_of_y1": 0.25,
-    "conservative_execution_rate": 0.60,
+    "conservative_execution_rate": 0.6,
     "accelerated_execution_rate": 0.85,
-    "bounce_back_reversion_rate": 0.80,
+    "bounce_back_reversion_rate": 0.8,
     "bounce_back_month": 30,
-    "low_sustainability_threshold": 0.50,
+    "low_sustainability_threshold": 0.5,
     "value_bridge": {
       "dedup_mid_factor": 0.75,
       "low_factor": 0.8,

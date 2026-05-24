@@ -165,8 +165,12 @@ class TestSpendLineIndiaFields:
         defaults.update(kwargs)
         return NormalizedSpendLine(**defaults)
 
-    def test_default_currency_is_inr(self):
+    def test_default_currency_is_usd(self):
         line = self._line()
+        assert line.currency == "USD"
+
+    def test_explicit_inr_currency(self):
+        line = self._line(currency="INR")
         assert line.currency == "INR"
 
     def test_gst_treatment_field(self):

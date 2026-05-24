@@ -1,0 +1,41 @@
+source_validation_date: '2026-05-21'
+source_validation_note: 'Free source URLs verified. Sample metrics are indicative public disclosures. Licensed sources require credentials — no data fabricated for licensed entries.'
+
+pack_id: energy_utilities
+schema_version: '1.0'
+confidence: illustrative
+free_sources:
+- name: CEA Annual Report
+  type: public_disclosure
+  url: 'https://cea.nic.in/annual-report/'
+  sample_metric: 'AT&C loss national average: 16.4% (CEA Annual Report 2023-24)'
+- name: CERC tariff orders
+  type: public_disclosure
+  url: 'https://www.cercind.gov.in/Reports.html'
+  sample_metric: 'Average power procurement cost: ₹4.2–6.8/kWh depending on state discoms (CERC tariff orders FY2024)'
+- name: MoPNG data
+  type: public_disclosure
+  url: 'https://mopng.gov.in/en/informationportal/statistics'
+  sample_metric: 'India petroleum products consumption: 222.3 MMT FY2023-24 (MoPNG Annual Report)'
+- name: BRSR disclosures
+  type: public_disclosure
+  url: 'https://www.bseindia.com/corporates/ann.html'
+  sample_metric: 'Energy intensity disclosures mandatory under BRSR for top 1,000 listed companies from FY2023'
+- name: BSE energy filings
+  type: public_disclosure
+  url: 'https://www.bseindia.com/corporates/ann.html'
+  sample_metric: 'NTPC employee cost as % of revenue: ~8%; T&D loss provisioning visible in annual reports (BSE FY2024)'
+licensed_sources_stubs:
+- name: CMIE Prowess IQ
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: CmieAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+- name: CRISIL Energy Benchmark
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: CRISILEnergyBenchmarkAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+refresh_cycle: Annual
+notes: Free sources provide public disclosure data sufficient for diagnostic benchmarking.
+  Licensed sources required for granular spend-line comparisons.

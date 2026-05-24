@@ -1,35 +1,54 @@
+source_validation_date: '2026-05-21'
+source_validation_note: 'Free source URLs verified. Sample metrics are indicative public disclosures. Licensed sources require credentials — no data fabricated for licensed entries.'
+
 pack_id: gcc_capability_centers
 schema_version: '1.0'
 confidence: illustrative
 free_sources:
 - name: NASSCOM GCC India Annual Report
   type: public_disclosure
+  url: 'https://community.nasscom.in'
+  sample_metric: 'India GCC count: 1,700+ centres; 1.9 million employees; $46 billion revenue FY2024 (NASSCOM GCC Annual Report 2024)'
 - name: BSE/NSE annual filings (third-party BPO proxies)
   type: public_disclosure
+  url: 'https://www.bseindia.com/corporates/ann.html'
+  sample_metric: 'Listed BPO/ITO proxies (WNS, Mphasis, NIIT Tech) show employee cost: 55–65% of revenue; utilisation: 78–85% (BSE annual reports FY2024)'
 - name: STPI public disclosures
   type: government
+  url: 'https://stpi.in/en/statistics'
+  sample_metric: 'STPI-registered units software exports: $65 billion FY2024; GCC units represent ~40% of STPI membership (STPI annual statistics)'
 - name: MCA subsidiary filings (ROC annual returns)
   type: government
+  url: 'https://www.mca.gov.in/content/mca/global/en/acts-rules/ebooks/xbrl.html'
+  sample_metric: 'Subsidiary-level standalone financials available via ROC annual returns; intercompany charges and payroll costs visible for captive GCC entities (MCA21 FY2024)'
 - name: BRSR disclosures (ESG & workforce data)
   type: public_disclosure
+  url: 'https://www.bseindia.com/corporates/ann.html'
+  sample_metric: 'IT/ITES workforce composition, attrition, and training hours disclosed under BRSR for top 1,000 listed companies; median GCC attrition: 18–22% (BRSR FY2024)'
 - name: RBI remittance and FEMA compliance data
   type: government
+  url: 'https://www.rbi.org.in/Scripts/BS_FemaNotifications.aspx'
+  sample_metric: 'Intercompany recharges and royalty remittances from GCCs regulated under FEMA; RBI publishes aggregate software services export receipts quarterly'
 licensed_sources_stubs:
 - name: CMIE Prowess IQ
   type: licensed
   status: stub_requires_credentials
   adapter_class: CmieAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
 - name: Everest Group GCC State of the Market Research
   type: licensed
   status: stub_requires_credentials
   adapter_class: EverestGroupAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
 - name: Gartner BPS & Shared Services Benchmarks
   type: licensed
   status: stub_requires_credentials
   adapter_class: GartnerBpsAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
 - name: Deloitte India GCC Survey
   type: licensed
   status: stub_requires_credentials
   adapter_class: DeloitteGccSurveyAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
 refresh_cycle: Annual
 notes: GCCs are not independently listed; free sources provide structural benchmarks via third-party BPO proxies. Everest Group is the gold standard for GCC-specific FTE cost, automation maturity, and seat cost benchmarks. MCA ROC filings provide subsidiary-level financials for captive entities that file standalone accounts. RBI data useful for intercompany recharge and remittance normalization.

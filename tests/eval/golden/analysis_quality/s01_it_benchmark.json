@@ -1,0 +1,57 @@
+{
+  "scenario_id": "S01",
+  "description": "IT-heavy spend profile: IT category is ~25% of revenue, well above typical P50 (3-5%). Expect peer benchmarker to flag IT as Q3/Q4, root-cause-analyzer to fire, and value bridge to rank IT first.",
+  "scenario_context": {
+    "industry": "technology",
+    "annual_revenue": 2000000.0,
+    "company_name": "TechCo Eval S01",
+    "headcount": 200,
+    "reporting_currency": "USD",
+    "focus_category": null
+  },
+  "input_lines": [
+    {
+      "row_id": 1, "supplier": "Microsoft", "description": "Azure cloud licenses",
+      "category_id": "IT", "category_name": "IT & Technology",
+      "amount": 250000.0, "spend_date": "2025-01-15",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 250000.0
+    },
+    {
+      "row_id": 2, "supplier": "Oracle", "description": "Database maintenance",
+      "category_id": "IT", "category_name": "IT & Technology",
+      "amount": 200000.0, "spend_date": "2025-02-10",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 200000.0
+    },
+    {
+      "row_id": 3, "supplier": "McKinsey", "description": "Strategy consulting",
+      "category_id": "PROF_SVCS", "category_name": "Professional Services",
+      "amount": 120000.0, "spend_date": "2025-01-20",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 120000.0
+    },
+    {
+      "row_id": 4, "supplier": "Deloitte", "description": "Tax advisory",
+      "category_id": "PROF_SVCS", "category_name": "Professional Services",
+      "amount": 80000.0, "spend_date": "2025-03-05",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 80000.0
+    },
+    {
+      "row_id": 5, "supplier": "CBRE", "description": "Office lease management",
+      "category_id": "FACILITIES", "category_name": "Facilities",
+      "amount": 60000.0, "spend_date": "2025-01-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 60000.0
+    },
+    {
+      "row_id": 6, "supplier": "ISS", "description": "Facility maintenance services",
+      "category_id": "FACILITIES", "category_name": "Facilities",
+      "amount": 40000.0, "spend_date": "2025-02-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 40000.0
+    }
+  ],
+  "scoring_hints": {
+    "expected_top_category": "IT",
+    "expected_value_matrix_rows": 1,
+    "aq04_expect_sorted": true,
+    "aq06_expect_root_causes": true,
+    "conditional_signals": []
+  }
+}

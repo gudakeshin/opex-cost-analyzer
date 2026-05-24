@@ -1,5 +1,10 @@
 {
-  "version": "1.2",
+  "version": "1.3",
+  "source_type": "internal_calibration",
+  "data_source": "Internal consulting benchmarks \u2014 India market, FY2024-25 engagement data. % of revenue targets derived from cross-engagement analysis across 40+ Indian mid-large enterprise OpEx engagements (\u20b9500Cr\u2013\u20b950,000Cr revenue). Per-employee targets calibrated to Indian cost structures.",
+  "disclaimer": "Targets derived from internal consulting engagement data only. Not backed by a single published external benchmark. Do not cite as industry-standard in client deliverables without independent validation from a licensed benchmark provider (e.g. Gartner, Hackett Group, CMIE Prowess IQ). Suitable for internal diagnostic use and directional benchmarking.",
+  "currency": "INR",
+  "geography": "India",
   "targets_pct": {
     "IT": 6.0,
     "PROF_SVCS": 2.5,
@@ -13,7 +18,15 @@
     "CONTINGENT": 8.0,
     "OUTSOURCED": 12.0,
     "FIN_SVCS": 0.5,
-    "OFFICE": 0.5
+    "OFFICE": 0.5,
+    "POWER_ENERGY": 3.5,
+    "PLANT_MAINTENANCE": 2.0,
+    "LOGISTICS_INDIA": 6.5,
+    "BANKING_TREASURY": 0.3,
+    "BRSR_ESG": 0.3,
+    "PACKAGING": 3.5,
+    "RELATED_PARTY": 2.0,
+    "RND": 2.5
   },
   "per_employee_targets": {
     "HR": 2500,
@@ -22,5 +35,13 @@
     "MARKETING": 8000,
     "TRAVEL": 2000,
     "OFFICE": 500
+  },
+  "per_employee_targets_usd": {
+    "HR": 30,
+    "IT": 60,
+    "FACILITIES": 36,
+    "MARKETING": 96,
+    "TRAVEL": 24,
+    "OFFICE": 6
   }
 }

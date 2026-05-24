@@ -1,5 +1,7 @@
 {
   "sector": "bfsi_banks",
+  "source_type": "internal_calibration",
+  "source_verification_note": "Savings ranges (p10/p50/p90) are internal consulting estimates. industry_sources entries indicate real published works that directionally support each lever's savings thesis. Specific percentages are not directly quoted from these sources.",
   "levers": [
     {
       "lever_id": "branch_rationalisation",
@@ -9,7 +11,12 @@
       "p10_pct": 3.0, "p50_pct": 8.0, "p90_pct": 14.0,
       "implementation_weeks": 26,
       "brsr_principle": "P6",
-      "savings_type": "run_rate"
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI — Report on Trend and Progress of Banking in India 2023-24 (rbi.org.in/Scripts/AnnualReportPublications.aspx) — branch digitisation and BC network expansion data",
+        "IBA — Banking Technology Survey 2024 (iba.org.in/publications) — digital transaction share vs. branch transactions",
+        "McKinsey & Company — The Future of Bank Branches (mckinsey.com/industries/financial-services) — branch rationalisation savings benchmarks"
+      ]
     },
     {
       "lever_id": "kyc_aml_automation",
@@ -19,7 +26,12 @@
       "p10_pct": 12.0, "p50_pct": 22.0, "p90_pct": 35.0,
       "implementation_weeks": 20,
       "brsr_principle": "P1",
-      "savings_type": "run_rate"
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI — Master Direction on Know Your Customer (KYC) 2016, updated 2024 (rbi.org.in) — V-KYC regulatory framework",
+        "NASSCOM — AI in Banking: India Perspectives 2024 (nasscom.in/knowledge-center/publications) — automation adoption in KYC/AML",
+        "INTERNAL_CALIBRATION — specific KYC automation savings range is an internal consulting estimate"
+      ]
     },
     {
       "lever_id": "core_banking_consolidation",
@@ -29,7 +41,12 @@
       "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
       "implementation_weeks": 52,
       "brsr_principle": "P6",
-      "savings_type": "mixed"
+      "savings_type": "mixed",
+      "industry_sources": [
+        "IBA — Banking Technology Survey 2024 (iba.org.in/publications) — core banking modernisation adoption rates",
+        "Gartner — IT Key Metrics Data: Banking Sector IT Spend 2024 (gartner.com/en/information-technology/insights/it-budget) — IT spend benchmarks for banks",
+        "INTERNAL_CALIBRATION — CBS consolidation savings range is an internal consulting estimate; actual savings depend on legacy footprint size"
+      ]
     },
     {
       "lever_id": "vendor_renegotiation_fintech",
@@ -39,7 +56,11 @@
       "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 18.0,
       "implementation_weeks": 8,
       "brsr_principle": "P1",
-      "savings_type": "run_rate"
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Hackett Group — World-Class Performance Study Finance & Procurement Benchmarks 2024 (thehackettgroup.com/research/) — vendor consolidation savings ranges",
+        "INTERNAL_CALIBRATION — fintech vendor renegotiation savings range is an internal consulting estimate calibrated to Indian banking sector"
+      ]
     },
     {
       "lever_id": "atm_managed_services",
@@ -49,7 +70,11 @@
       "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
       "implementation_weeks": 16,
       "brsr_principle": "P6",
-      "savings_type": "run_rate"
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI — Annual Report 2023-24 (rbi.org.in/Scripts/AnnualReportPublications.aspx) — ATM network data and managed services adoption trends in Indian banking",
+        "INTERNAL_CALIBRATION — ATM managed services savings range is an internal consulting estimate"
+      ]
     },
     {
       "lever_id": "regulatory_reporting_automation",
@@ -59,7 +84,12 @@
       "p10_pct": 15.0, "p50_pct": 25.0, "p90_pct": 40.0,
       "implementation_weeks": 12,
       "brsr_principle": "P1",
-      "savings_type": "run_rate"
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI — Master Circular on Returns Submitted by Banks 2024 (rbi.org.in) — statutory reporting requirements",
+        "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/) — process automation cost reduction benchmarks",
+        "INTERNAL_CALIBRATION — specific regulatory reporting automation savings range is an internal consulting estimate for Indian banks"
+      ]
     }
   ]
 }

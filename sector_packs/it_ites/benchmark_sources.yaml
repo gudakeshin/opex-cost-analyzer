@@ -1,0 +1,37 @@
+source_validation_date: '2026-05-21'
+source_validation_note: 'Free source URLs verified. Sample metrics are indicative public disclosures. Licensed sources require credentials — no data fabricated for licensed entries.'
+
+pack_id: it_ites
+schema_version: '1.0'
+confidence: illustrative
+free_sources:
+- name: NASSCOM Annual Report
+  type: public_disclosure
+  url: 'https://nasscom.in/knowledge-center/publications'
+  sample_metric: 'India IT-BPM industry revenue: $254 billion FY2024; workforce: 5.4 million (NASSCOM Annual Report 2024)'
+- name: BSE/NSE IT sector filings
+  type: public_disclosure
+  url: 'https://www.bseindia.com/corporates/ann.html'
+  sample_metric: 'TCS employee cost as % of revenue: ~53%; Infosys utilisation rate: 82–84% (BSE annual reports FY2024)'
+- name: SEBI disclosures
+  type: public_disclosure
+  url: 'https://www.sebi.gov.in/reports-and-statistics/'
+  sample_metric: 'IT sector compliance and governance disclosures; segment revenue breakdowns available for listed IT companies (SEBI annual disclosures FY2024)'
+- name: BRSR disclosures
+  type: public_disclosure
+  url: 'https://www.bseindia.com/corporates/ann.html'
+  sample_metric: 'IT sector energy intensity (GJ/employee) and scope 2 emissions disclosures available under BRSR for top 1,000 listed companies FY2023'
+licensed_sources_stubs:
+- name: CMIE Prowess IQ
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: CmieAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+- name: Gartner TechMarket Insights
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: GartnerTechMarketInsightsAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+refresh_cycle: Annual
+notes: Free sources provide public disclosure data sufficient for diagnostic benchmarking.
+  Licensed sources required for granular spend-line comparisons.

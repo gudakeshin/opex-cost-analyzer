@@ -15,16 +15,59 @@ export interface ChatNextOption {
   message: string;
 }
 
+export interface CategoryInsightRow {
+  category_id: string;
+  category_name: string;
+  spend: number;
+  share_of_total: number;
+}
+
+export interface ChartCategoryRow {
+  category_id: string;
+  category_name: string;
+  spend: number;
+  share_of_total: number;
+  addressable_spend: number;
+  variable_spend: number;
+  fixed_spend: number;
+  semi_variable_spend: number;
+}
+
+export interface SpendChartData {
+  selected_charts: Array<{ chart: string; reason: string }>;
+  commentary_points: string[];
+  category_rows: ChartCategoryRow[];
+  period_totals: Array<{ period: string; spend: number }>;
+}
+
+export interface AnalysisInsightSnapshot {
+  total_spend: number;
+  reporting_currency: string;
+  line_count?: number;
+  company_name?: string;
+  industry?: string;
+  top_categories: CategoryInsightRow[];
+  peer_gap_count?: number;
+  peer_comparison_count?: number;
+  savings_headline?: string;
+  savings_headline_raw?: number;
+  ingestion_note?: string;
+  chart_data?: SpendChartData;
+}
+
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  thinking?: string;
   advisory_sections?: Record<string, unknown>;
   quality_signals?: QualitySignals;
   next_options?: ChatNextOption[];
   run_id?: string;
   progress_steps?: ProgressStep[];
   degraded_mode?: boolean;
-  artefacts?: Record<string, unknown>;
+  artefacts?: Record<string, unknown> | string[];
+  insight_snapshot?: AnalysisInsightSnapshot;
+  show_peer_savings?: boolean;
 }
 
 export interface SessionCreatePayload {
@@ -44,6 +87,30 @@ export interface SessionResponse {
   [key: string]: unknown;
 }
 
+export interface ManifestFileEntry {
+  name?: string;
+  content_type?: string;
+  size_bytes?: number;
+  path?: string;
+  schema?: unknown;
+}
+
+export interface IngestionReport {
+  source_file?: string;
+  sheets_ingested?: Array<{ sheet?: string; rows?: number; strategy?: string }>;
+  sheets_skipped?: Array<{ sheet?: string; role?: string; reason?: string }>;
+  files?: IngestionReport[];
+}
+
+export interface ModelManifest {
+  confidence?: number;
+  ingestion_strategy?: string;
+  ingestion_notes?: string;
+  sheet_graph?: Array<{ sheet_name?: string; role?: string }>;
+  model_type?: string;
+  [key: string]: unknown;
+}
+
 export interface SessionManifest {
   session_id: string;
   company_name?: string;
@@ -55,7 +122,23 @@ export interface SessionManifest {
   engagement_weeks_total?: number;
   gate_label?: string;
   created_at?: string;
-  files?: unknown[];
+  files?: ManifestFileEntry[];
+  model_manifest?: ModelManifest;
+  ingestion_report?: IngestionReport;
+}
+
+export interface ChatProgressResponse {
+  run_id: string;
+  status: string;
+  steps?: Array<{ phase?: string; message?: string; timestamp?: string }>;
+  error?: string | null;
+}
+
+export interface SessionManifestPatch {
+  industry?: string;
+  company_name?: string;
+  annual_revenue?: number;
+  currency?: string;
 }
 
 export interface SessionSummary {
@@ -85,10 +168,17 @@ export interface V1ChatPayload {
   message: string;
   session_id: string;
   user_id?: string;
+  run_id?: string;
+  company_name?: string;
+  industry?: string;
+  annual_revenue?: number;
+  currency?: string;
+  thinking_mode?: 'standard' | 'extended';
 }
 
 export interface V1ChatResponse {
   response_text: string;
+  thinking?: string;
   artefacts?: Record<string, unknown>;
   advisory_sections?: Record<string, unknown>;
   quality_signals?: QualitySignals;
@@ -98,6 +188,7 @@ export interface V1ChatResponse {
   next_loop_trigger?: string;
   progress_steps?: ProgressStep[];
   next_options?: ChatNextOption[];
+  ingestion_summary?: string;
   run_id?: string;
 }
 

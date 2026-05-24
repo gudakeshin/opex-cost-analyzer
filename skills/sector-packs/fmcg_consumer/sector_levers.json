@@ -76,6 +76,11 @@
       "applicable_if": [
         "category:LOGISTICS_INDIA or PACKAGING present",
         "cogs_keywords detected"
+      ],
+      "industry_sources": [
+        "FICCI — FMCG India Report 2024 (ficci.in/sector/61/) — raw material cost as % of FMCG revenue and procurement benchmarks",
+        "McKinsey & Company — Unlocking Value in FMCG Supply Chains (mckinsey.com/industries/consumer-packaged-goods) — COGS reduction levers 5-15%",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -111,6 +116,11 @@
       "applicable_if": [
         "category:PACKAGING or LOGISTICS present",
         "supplier_count > 20"
+      ],
+      "industry_sources": [
+        "FICCI — FMCG India Industry Survey 2024 (ficci.in) — SKU complexity and tail rationalization data",
+        "McKinsey & Company — SKU Rationalization in CPG (mckinsey.com/industries/consumer-packaged-goods) — 10-20% SKU reduction improving margins 2-4%",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -145,6 +155,10 @@
       },
       "applicable_if": [
         "category:MARKETING > 5% revenue"
+      ],
+      "industry_sources": [
+        "Nielsen — India FMCG Market Pulse 2024 (nielsen.com/insights/) — price-pack architecture and value tier benchmarks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -179,6 +193,10 @@
       },
       "applicable_if": [
         "category:LOGISTICS or MARKETING > 3% revenue"
+      ],
+      "industry_sources": [
+        "FICCI — Trade and Distribution Policy Report 2024 (ficci.in) — GTM cost benchmarks for FMCG India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -214,6 +232,11 @@
       "applicable_if": [
         "category:LOGISTICS > 5% revenue",
         "headcount > 200"
+      ],
+      "industry_sources": [
+        "CRISIL — India Logistics and Warehousing Report 2024 (crisil.com) — warehouse automation adoption and cost savings benchmarks",
+        "McKinsey & Company — Automation in Warehouse Operations (mckinsey.com/capabilities/operations) — 15-30% labour cost reduction through automation",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -249,6 +272,11 @@
       "applicable_if": [
         "express_like_pct > 0.10",
         "category:LOGISTICS present"
+      ],
+      "industry_sources": [
+        "DPIIT — Logistics Ease Across Different States (LEADS) Report 2023 (dpiit.gov.in) — modal mix and freight cost benchmarks India",
+        "CRISIL — India Logistics Report 2024 (crisil.com) — road vs. rail freight cost differential",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -284,6 +312,10 @@
       "applicable_if": [
         "category:PACKAGING or LOGISTICS present",
         "annual_revenue > 500M"
+      ],
+      "industry_sources": [
+        "RAI — India Retail Report 2024 (rai.net.in/) — private label penetration and margin benchmarks for Indian organized retail",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -318,6 +350,10 @@
       },
       "applicable_if": [
         "category:LOGISTICS or PACKAGING > 3% revenue"
+      ],
+      "industry_sources": [
+        "Gartner — Supply Chain Top 25 2024 (gartner.com/en/supply-chain/insights/supply-chain-top-25-research) — demand planning accuracy and inventory reduction benchmarks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -353,7 +389,12 @@
       "applicable_if": [
         "supplier_count > 10",
         "category:PACKAGING or LOGISTICS present"
+      ],
+      "industry_sources": [
+        "Nielsen — Assortment Optimisation in Retail 2024 (nielsen.com/insights/) — tail elimination and shelf productivity benchmarks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     }
-  ]
+  ],
+  "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."
 }

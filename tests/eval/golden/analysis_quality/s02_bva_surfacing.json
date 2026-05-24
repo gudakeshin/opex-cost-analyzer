@@ -1,0 +1,67 @@
+{
+  "scenario_id": "S02",
+  "description": "Mix of actual and budget lines: IT is 25% over budget, PROF_SVCS is 10% under budget. Expects bva_analyzer to fire with bva_available=True and surface the IT overrun.",
+  "scenario_context": {
+    "industry": "technology",
+    "annual_revenue": 2000000.0,
+    "company_name": "TechCo Eval S02",
+    "headcount": 200,
+    "reporting_currency": "USD",
+    "focus_category": null
+  },
+  "input_lines": [
+    {
+      "row_id": 1, "supplier": "Microsoft", "description": "Azure cloud licenses - actual",
+      "category_id": "IT", "category_name": "IT & Technology",
+      "amount": 250000.0, "spend_date": "2025-01-15",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 250000.0
+    },
+    {
+      "row_id": 2, "supplier": "Budget", "description": "IT budget line",
+      "category_id": "IT", "category_name": "IT & Technology",
+      "amount": 200000.0, "spend_date": "2025-01-01",
+      "amount_type": "budget", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 200000.0
+    },
+    {
+      "row_id": 3, "supplier": "McKinsey", "description": "Strategy consulting - actual",
+      "category_id": "PROF_SVCS", "category_name": "Professional Services",
+      "amount": 90000.0, "spend_date": "2025-01-20",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 90000.0
+    },
+    {
+      "row_id": 4, "supplier": "Budget", "description": "Professional services budget",
+      "category_id": "PROF_SVCS", "category_name": "Professional Services",
+      "amount": 100000.0, "spend_date": "2025-01-01",
+      "amount_type": "budget", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 100000.0
+    },
+    {
+      "row_id": 5, "supplier": "CBRE", "description": "Office lease management - actual",
+      "category_id": "FACILITIES", "category_name": "Facilities",
+      "amount": 60000.0, "spend_date": "2025-01-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 60000.0
+    },
+    {
+      "row_id": 6, "supplier": "Budget", "description": "Facilities budget",
+      "category_id": "FACILITIES", "category_name": "Facilities",
+      "amount": 65000.0, "spend_date": "2025-01-01",
+      "amount_type": "budget", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 65000.0
+    },
+    {
+      "row_id": 7, "supplier": "American Airlines", "description": "Business travel Q1 - actual",
+      "category_id": "TRAVEL", "category_name": "Travel & Entertainment",
+      "amount": 30000.0, "spend_date": "2025-01-31",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 30000.0
+    },
+    {
+      "row_id": 8, "supplier": "Budget", "description": "Travel budget",
+      "category_id": "TRAVEL", "category_name": "Travel & Entertainment",
+      "amount": 25000.0, "spend_date": "2025-01-01",
+      "amount_type": "budget", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 25000.0
+    }
+  ],
+  "scoring_hints": {
+    "expected_bva_available": true,
+    "expected_it_over_budget": true,
+    "conditional_signals": ["bva"]
+  }
+}

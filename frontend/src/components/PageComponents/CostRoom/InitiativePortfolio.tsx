@@ -11,6 +11,7 @@ interface InitiativePortfolioProps {
   initiatives: Initiative[];
   percentileBand: PercentileBand;
   executive?: boolean;
+  currency?: string;
   onSelect: (init: Initiative) => void;
   acceptInit: (id: string) => void;
   deferInit: (id: string) => void;
@@ -21,11 +22,14 @@ export const InitiativePortfolio: React.FC<InitiativePortfolioProps> = ({
   initiatives,
   percentileBand,
   executive = true,
+  currency = 'USD',
   onSelect,
   acceptInit,
   deferInit,
   rejectInit,
 }) => {
+  const sym = currency === 'INR' ? '₹' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '$';
+  const unit = currency === 'INR' ? 'Cr' : 'M';
   const columns: Column<Initiative>[] = [
     {
       key: 'index',
@@ -63,13 +67,13 @@ export const InitiativePortfolio: React.FC<InitiativePortfolioProps> = ({
       : []),
     {
       key: 'p50',
-      header: 'P50 ₹Cr',
+      header: `P50 ${sym}${unit}`,
       render: (r) => {
         const p50 = getBandSavings(r, 'p50');
         const perYear = r.savings_type === 'run_rate' || !r.savings_type;
         return (
           <span className="font-mono tabular-nums font-semibold">
-            {formatCr(p50, { perYear, decimals: 0 }).replace(' Cr', '')}
+            {formatCr(p50, { perYear, decimals: 0, currency }).replace(` ${unit}`, '')}
           </span>
         );
       },

@@ -32,9 +32,16 @@ def _load_seed_dataset() -> Dict[str, Any]:
     category_coverage = {}
     for industry, data in seed.get("benchmarks", {}).items():
         category_coverage[industry] = sorted(list((data.get("categories") or {}).keys()))
+    # Derive source attribution from seed metadata — prefer named external sources over internal ones
+    primary_sources = seed.get("source_metadata", {}).get("primary_sources", [])
+    external = [
+        s["source_name"] for s in primary_sources
+        if s.get("source_name") and s.get("source_type") not in ("internal_calibration", "internal")
+    ]
+    source_label = " / ".join(external) + " (illustrative)" if external else "platform_seed"
     return {
         "dataset_id": "seed-industry-benchmarks",
-        "source": "platform_seed",
+        "source": source_label,
         "industry_code": None,
         "industry_name": "Cross-industry seed benchmarks",
         "category_coverage": category_coverage,
@@ -52,8 +59,14 @@ def _load_seed_dataset() -> Dict[str, Any]:
 
 def _load_store() -> Dict[str, Any]:
     store = read_json(BENCHMARK_STORE_PATH, {"datasets": []})
-    if not store.get("datasets"):
+    datasets = store.get("datasets", [])
+    if not datasets:
         store["datasets"] = [_load_seed_dataset()]
+        write_json(BENCHMARK_STORE_PATH, store)
+    elif any(d.get("source") == "platform_seed" for d in datasets):
+        # Refresh cached seed entry that still has the old generic source label
+        fresh = _load_seed_dataset()
+        store["datasets"] = [fresh if d.get("source") == "platform_seed" else d for d in datasets]
         write_json(BENCHMARK_STORE_PATH, store)
     return store
 

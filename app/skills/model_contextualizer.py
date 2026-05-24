@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from openpyxl import load_workbook
 
@@ -19,6 +20,20 @@ _ROLE_KEYWORDS: Dict[str, tuple[str, ...]] = {
     "sensitivity": ("sensitivity", "what-if", "what if"),
     "cover": ("cover", "readme", "intro"),
     "helper": ("lookup", "helper", "mapping", "reference"),
+    "transaction_ledger": (
+        "raw data",
+        "spend data",
+        "transactions",
+        "transaction",
+        "ap extract",
+        "vendor",
+        "ledger",
+        "detail",
+        "line items",
+        "line item",
+        "spend detail",
+        "opex data",
+    ),
 }
 
 _SCENARIO_LABELS = (
@@ -197,6 +212,11 @@ def _classify_sheet_role(sheet: Dict[str, Any]) -> Tuple[str, float]:
             if w in haystack:
                 score_by_role[role] += 0.25
 
+    if any(tok in name for tok in ("raw data", "spend data", "transactions", "ledger", "ap extract", "line items")):
+        score_by_role["transaction_ledger"] += 1.2
+    if "dashboard" in name or "summary" in name:
+        score_by_role["summary"] += 0.8
+
     period_hits = sum(1 for token in sheet.get("first_rows", [[], []])[0] if _looks_like_period(token))
     if period_hits < 3 and len(sheet.get("first_rows", [])) > 1:
         period_hits = sum(1 for token in sheet.get("first_rows", [[], []])[1] if _looks_like_period(token))
@@ -312,7 +332,9 @@ def interpret_structure_heuristic(summary: Dict[str, Any]) -> Dict[str, Any]:
         )
 
     roles = {node["role"] for node in sheet_graph}
-    if "timeseries" in roles and "scenarios" in roles:
+    if "transaction_ledger" in roles and not ({"timeseries", "scenarios"} & roles):
+        ingestion_strategy = "ledger_standard"
+    elif "timeseries" in roles and "scenarios" in roles:
         ingestion_strategy = "hybrid"
     elif "timeseries" in roles and "assumptions" in roles:
         ingestion_strategy = "hybrid"
@@ -411,4 +433,51 @@ def build_workbook_manifest(
         "structural_summary": summary,
     }
     return parsed, meta
+
+
+def maybe_interpret_workbook_on_upload(
+    workbook_path: Path,
+    session_meta: Dict[str, Any],
+    user_message: str = "",
+) -> Optional[Dict[str, Any]]:
+    """Build workbook manifest on upload when layout is ambiguous or LLM interpret is enabled."""
+    if workbook_path.suffix.lower() not in (".xlsx", ".xls"):
+        return None
+    from app.services.ingestion import score_workbook_sheets
+
+    ranked = score_workbook_sheets(workbook_path)
+    force_llm = os.getenv("WORKBOOK_LLM_INTERPRET", "").lower() in ("1", "true", "yes")
+    ambiguous = False
+    if not ranked or ranked[0].score < 3.0:
+        ambiguous = True
+    elif len(ranked) > 1 and (ranked[0].score - ranked[1].score) < 1.0:
+        ambiguous = True
+    elif all(s.inferred_role in ("unknown", "summary") for s in ranked[:2]):
+        ambiguous = True
+
+    if not force_llm and not ambiguous:
+        return None
+    if not should_run_model_contextualizer(
+        [{"path": str(workbook_path), "schema": {"workbook": {"sheet_count": len(ranked)}}}],
+        user_message,
+    ):
+        return None
+
+    try:
+        parsed, meta = build_workbook_manifest(
+            workbook_path,
+            user_message=user_message or "upload workbook",
+            session_meta=session_meta,
+            force_llm=force_llm or ambiguous,
+        )
+        dumped = parsed.model_dump()
+        dumped["workbook_fingerprint"] = compute_file_fingerprint(
+            [{"path": str(workbook_path), "name": workbook_path.name}]
+        )
+        dumped["source_file"] = workbook_path.name
+        dumped["source"] = "llm" if meta.get("llm_used") else "heuristic"
+        dumped["upload_interpreted"] = True
+        return dumped
+    except Exception:
+        return None
 

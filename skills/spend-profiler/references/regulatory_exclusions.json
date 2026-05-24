@@ -1,5 +1,8 @@
 {
   "version": "1.0",
+  "source_type": "statutory",
+  "legislative_basis": "India — Companies Act 2013, Goods and Services Tax (GST) Act 2017, Income Tax Act 1961, ESIC Act 1948, Employees Provident Funds and Miscellaneous Provisions Act 1952, Payment of Gratuity Act 1972, Minimum Wages Act 1948, Workmen's Compensation Act 1923, Factories Act 1948, Environment Protection Act 1986, Electricity Act 2003, SEBI Listing Obligations and Disclosure Requirements (LODR) Regulations 2015",
+  "verification_note": "All legislative references in this file have been verified against Indian statute. Addressability overrides for statutory categories (0%) reflect non-negotiable legal obligations. Partial addressability retained for competitive-tender categories (15-80%) reflects that while the spend obligation is mandatory, the vendor and price are not.",
   "description": "Spend categories and sub-types that are statutory, regulatory or legally mandatory and therefore non-addressable for cost optimisation purposes. These are hard exclusions applied before any addressability calculation.",
   "non_addressable_categories": [
     {

@@ -1,0 +1,109 @@
+{
+  "scenario_id": "S05",
+  "description": "Broad five-category spend profile with balanced but above-benchmark spend across IT, Professional Services, Facilities, Travel, and Marketing. Tests that all top categories appear in the value bridge, initiatives have realistic timelines, and at least one quick-win is identified.",
+  "scenario_context": {
+    "industry": "technology",
+    "annual_revenue": 3000000.0,
+    "company_name": "TechCo Eval S05",
+    "headcount": 300,
+    "reporting_currency": "USD",
+    "focus_category": null
+  },
+  "input_lines": [
+    {
+      "row_id": 1, "supplier": "Microsoft", "description": "Azure cloud licenses",
+      "category_id": "IT", "category_name": "IT & Technology",
+      "amount": 200000.0, "spend_date": "2025-01-10",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 200000.0
+    },
+    {
+      "row_id": 2, "supplier": "AWS", "description": "Cloud infrastructure",
+      "category_id": "IT", "category_name": "IT & Technology",
+      "amount": 150000.0, "spend_date": "2025-01-15",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 150000.0
+    },
+    {
+      "row_id": 3, "supplier": "ServiceNow", "description": "ITSM platform",
+      "category_id": "IT", "category_name": "IT & Technology",
+      "amount": 100000.0, "spend_date": "2025-01-20",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 100000.0
+    },
+    {
+      "row_id": 4, "supplier": "McKinsey", "description": "Digital transformation",
+      "category_id": "PROF_SVCS", "category_name": "Professional Services",
+      "amount": 180000.0, "spend_date": "2025-01-05",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 180000.0
+    },
+    {
+      "row_id": 5, "supplier": "BCG", "description": "Strategy engagement",
+      "category_id": "PROF_SVCS", "category_name": "Professional Services",
+      "amount": 120000.0, "spend_date": "2025-02-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 120000.0
+    },
+    {
+      "row_id": 6, "supplier": "Deloitte", "description": "Technology advisory",
+      "category_id": "PROF_SVCS", "category_name": "Professional Services",
+      "amount": 90000.0, "spend_date": "2025-03-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 90000.0
+    },
+    {
+      "row_id": 7, "supplier": "CBRE", "description": "Office lease",
+      "category_id": "FACILITIES", "category_name": "Facilities",
+      "amount": 120000.0, "spend_date": "2025-01-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 120000.0
+    },
+    {
+      "row_id": 8, "supplier": "ISS", "description": "Facility management",
+      "category_id": "FACILITIES", "category_name": "Facilities",
+      "amount": 80000.0, "spend_date": "2025-02-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 80000.0
+    },
+    {
+      "row_id": 9, "supplier": "Cushman & Wakefield", "description": "Real estate advisory",
+      "category_id": "FACILITIES", "category_name": "Facilities",
+      "amount": 40000.0, "spend_date": "2025-02-15",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 40000.0
+    },
+    {
+      "row_id": 10, "supplier": "American Airlines", "description": "Business travel",
+      "category_id": "TRAVEL", "category_name": "Travel & Entertainment",
+      "amount": 90000.0, "spend_date": "2025-01-31",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 90000.0
+    },
+    {
+      "row_id": 11, "supplier": "Marriott", "description": "Hotel accommodation",
+      "category_id": "TRAVEL", "category_name": "Travel & Entertainment",
+      "amount": 60000.0, "spend_date": "2025-02-28",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 60000.0
+    },
+    {
+      "row_id": 12, "supplier": "Uber Business", "description": "Ground transportation",
+      "category_id": "TRAVEL", "category_name": "Travel & Entertainment",
+      "amount": 30000.0, "spend_date": "2025-03-15",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 30000.0
+    },
+    {
+      "row_id": 13, "supplier": "WPP", "description": "Marketing agency retainer",
+      "category_id": "MARKETING", "category_name": "Marketing & Advertising",
+      "amount": 120000.0, "spend_date": "2025-01-10",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 120000.0
+    },
+    {
+      "row_id": 14, "supplier": "Google Ads", "description": "Digital advertising",
+      "category_id": "MARKETING", "category_name": "Marketing & Advertising",
+      "amount": 80000.0, "spend_date": "2025-01-31",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 80000.0
+    },
+    {
+      "row_id": 15, "supplier": "Salesforce", "description": "CRM platform",
+      "category_id": "MARKETING", "category_name": "Marketing & Advertising",
+      "amount": 50000.0, "spend_date": "2025-02-10",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 50000.0
+    }
+  ],
+  "scoring_hints": {
+    "expected_top_3_categories": ["IT", "PROF_SVCS", "FACILITIES"],
+    "aq08_expect_quick_win": true,
+    "conditional_signals": []
+  }
+}

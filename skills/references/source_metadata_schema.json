@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "description": "Required schema for source attribution on all benchmark and heuristic reference data files in the OpEx Intelligence Platform. Every file containing benchmark values, thresholds, or heuristics MUST include source attribution conforming to this schema.",
+  "source_type_enum": {
+    "statutory": "Traceable to a specific Act, Section, Statutory Order, or Regulatory Notification. Example: GST Act Section 17(5), Companies Act 2013 Section 135.",
+    "published_research": "Traceable to a specific, named external publication with year and where possible a URL. Must be an actual published document (not a website landing page). Example: 'Atradius Payment Practices Barometer Asia-Pacific 2024, PDF: https://...'",
+    "internal_calibration": "Derived from internal consulting engagement data, cross-engagement analysis, or expert judgment. No single external publication sources this value. MUST include a disclaimer field. Safe to use for diagnostic purposes; must NOT be cited as an industry benchmark in client deliverables.",
+    "internal_design": "Internal platform design decision — a classification rule, taxonomy choice, or threshold that reflects platform architecture rather than a sourced benchmark. No external validation expected or claimed."
+  },
+  "required_fields": {
+    "top_level": ["source_type"],
+    "if_published_research": ["source_type", "citation", "year"],
+    "if_internal_calibration": ["source_type", "disclaimer"],
+    "if_statutory": ["source_type", "legislative_reference"]
+  },
+  "disclaimer_template": "This data is derived from internal consulting engagement analysis. Values are indicative reference ranges suitable for diagnostic benchmarking. Do not cite as authoritative industry benchmarks in client deliverables without independent validation from licensed benchmark providers (e.g. Gartner, Hackett Group, CMIE Prowess IQ).",
+  "examples": {
+    "statutory_example": {
+      "source_type": "statutory",
+      "legislative_reference": "MSMED Act 2006 Section 15 — payment terms for MSME suppliers capped at 45 days",
+      "verified_as_of": "2025-01-01"
+    },
+    "published_research_example": {
+      "source_type": "published_research",
+      "citation": "Atradius Payment Practices Barometer, Asia-Pacific Edition 2024",
+      "year": 2024,
+      "url": "https://atradius.us/knowledge-and-research/reports/payment-practices-barometer-asia-pacific.html",
+      "confidence": "illustrative"
+    },
+    "internal_calibration_example": {
+      "source_type": "internal_calibration",
+      "basis": "Cross-engagement analysis of 40+ Indian mid-large enterprise OpEx programmes (FY2020-25)",
+      "disclaimer": "Internal consulting benchmark. Not backed by a single published external study. Do not cite as industry-standard in client deliverables without independent validation."
+    }
+  },
+  "governance": {
+    "review_cycle": "Annual — all reference files should be reviewed and updated to reflect current market data",
+    "owner": "OpEx Intelligence Platform data team",
+    "escalation": "If a value previously marked internal_calibration is found to match a specific published source, upgrade source_type to published_research and add the citation"
+  }
+}

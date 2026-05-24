@@ -211,21 +211,39 @@ def test_savings_modeler_includes_irr_field() -> None:
 # ---------------------------------------------------------------------------
 
 def test_heuristic_analyzer_with_headcount() -> None:
-    """Headcount-applicable categories should emit per-employee fields."""
+    """Headcount-applicable categories should emit per-employee fields (INR path)."""
     revenue = 100_000_000.0
     headcount = 1000.0
-    # HR spend: $3,000,000 → $3,000/employee. Target is $2,500/employee.
-    # headcount_based_saving_amount = (3000 - 2500) * 1000 = $500,000
+    # HR spend: ₹3,000,000 → ₹3,000/employee. INR target is ₹2,500/employee.
+    # headcount_based_saving_amount = (3000 - 2500) * 1000 = ₹500,000
     profile = {
         "category_profile": [
             {"category_id": "HR", "category_name": "Human Resources", "spend": 3_000_000.0}
         ]
     }
-    result = engine.heuristic_analyzer(profile, revenue, headcount=headcount)
+    result = engine.heuristic_analyzer(profile, revenue, headcount=headcount, reporting_currency="INR")
     finding = result["heuristic_findings"][0]
     assert finding.get("actual_cost_per_employee") == 3000.0
     assert finding.get("target_cost_per_employee") == 2500.0
     assert finding.get("headcount_based_saving_amount") == pytest.approx(500_000.0, rel=1e-3)
+
+
+def test_heuristic_analyzer_with_headcount_usd() -> None:
+    """Headcount-applicable categories use USD per-employee targets when reporting_currency=USD."""
+    revenue = 100_000_000.0
+    headcount = 1000.0
+    # HR spend: $3,000,000 → $3,000/employee. USD target is $30/employee.
+    # headcount_based_saving_amount = (3000 - 30) * 1000 = $2,970,000
+    profile = {
+        "category_profile": [
+            {"category_id": "HR", "category_name": "Human Resources", "spend": 3_000_000.0}
+        ]
+    }
+    result = engine.heuristic_analyzer(profile, revenue, headcount=headcount, reporting_currency="USD")
+    finding = result["heuristic_findings"][0]
+    assert finding.get("actual_cost_per_employee") == 3000.0
+    assert finding.get("target_cost_per_employee") == 30.0
+    assert finding.get("headcount_based_saving_amount") == pytest.approx(2_970_000.0, rel=1e-3)
 
 
 def test_heuristic_analyzer_without_headcount() -> None:

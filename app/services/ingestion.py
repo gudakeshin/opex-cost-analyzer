@@ -5,6 +5,7 @@ import io
 import re
 from datetime import datetime
 from pathlib import Path
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
@@ -55,10 +56,203 @@ _LANG_SCRIPTS = {
 }
 
 
-def _read_tabular(file_path: Path) -> pd.DataFrame:
+_AMOUNT_HEADER_TOKENS = ("amount", "spend", "total", "cost", "value", "inr", "usd")
+_SUPPLIER_HEADER_TOKENS = ("supplier", "vendor", "payee", "party", "name")
+_DATE_HEADER_TOKENS = ("date", "invoice", "month", "period", "fy")
+_CATEGORY_HEADER_TOKENS = ("category", "gl", "account", "cost type", "expense")
+_LEDGER_NAME_TOKENS = ("raw", "data", "spend", "detail", "ledger", "transaction", "ap ", "extract", "vendor", "line item")
+_SKIP_NAME_TOKENS = ("dashboard", "summary", "cover", "chart", "readme", "index", "toc")
+
+
+@dataclass
+class SheetScore:
+    sheet_name: str
+    score: float
+    header_row: int
+    inferred_role: str
+    row_count: int
+    has_amount_col: bool
+    has_supplier_col: bool
+    reason: str = ""
+
+
+def _header_match_score(cell_values: List[str]) -> Tuple[float, bool, bool]:
+    """Score a candidate header row; return (score, has_amount, has_supplier)."""
+    joined = " ".join(v.lower() for v in cell_values if v)
+    has_amount = any(t in joined for t in _AMOUNT_HEADER_TOKENS)
+    has_supplier = any(t in joined for t in _SUPPLIER_HEADER_TOKENS)
+    has_date = any(t in joined for t in _DATE_HEADER_TOKENS)
+    has_category = any(t in joined for t in _CATEGORY_HEADER_TOKENS)
+    score = 0.0
+    if has_amount:
+        score += 3.0
+    if has_supplier:
+        score += 2.0
+    if has_date:
+        score += 0.5
+    if has_category:
+        score += 0.5
+    return score, has_amount, has_supplier
+
+
+def _sniff_header_row_openpyxl(ws: Any, max_scan: int = 15) -> Tuple[int, float, bool, bool]:
+    best_row = 0
+    best_score = 0.0
+    best_amount = False
+    best_supplier = False
+    for r in range(1, min(max_scan, ws.max_row or 1) + 1):
+        vals = [
+            str(ws.cell(row=r, column=c).value or "").strip()
+            for c in range(1, min(ws.max_column or 1, 40) + 1)
+        ]
+        if not any(vals):
+            continue
+        score, has_amount, has_supplier = _header_match_score(vals)
+        if score > best_score:
+            best_score = score
+            best_row = r - 1  # pandas header index (0-based)
+            best_amount = has_amount
+            best_supplier = has_supplier
+    return best_row, best_score, best_amount, best_supplier
+
+
+def _sheet_name_bonus(name: str) -> Tuple[float, str]:
+    low = name.lower()
+    bonus = 0.0
+    role = "unknown"
+    if any(t in low for t in _SKIP_NAME_TOKENS):
+        bonus -= 4.0
+        role = "summary"
+    if any(t in low for t in _LEDGER_NAME_TOKENS):
+        bonus += 2.5
+        role = "transaction_ledger"
+    if any(t in low for t in ("assumption", "input", "driver")):
+        role = "assumptions"
+    if any(t in low for t in ("scenario", "forecast", "budget", "opex build")):
+        role = "timeseries"
+    return bonus, role
+
+
+def score_workbook_sheets(file_path: Path) -> List[SheetScore]:
+    """Rank worksheets for transactional spend ingestion (highest score first)."""
+    suffix = file_path.suffix.lower()
+    if suffix == ".csv":
+        try:
+            frame = pd.read_csv(file_path, nrows=5)
+            cols = [str(c) for c in frame.columns]
+            hscore, has_amount, has_supplier = _header_match_score(cols)
+            return [
+                SheetScore(
+                    sheet_name=file_path.stem,
+                    score=hscore + (2.0 if has_amount and has_supplier else 0),
+                    header_row=0,
+                    inferred_role="transaction_ledger",
+                    row_count=0,
+                    has_amount_col=has_amount,
+                    has_supplier_col=has_supplier,
+                    reason="single CSV file",
+                )
+            ]
+        except Exception:
+            return []
+
+    if suffix not in (".xlsx", ".xls"):
+        return []
+
+    scores: List[SheetScore] = []
+    try:
+        wb = load_workbook(file_path, data_only=True, read_only=True)
+    except Exception:
+        return []
+
+    for ws in wb.worksheets:
+        name = ws.title
+        header_row, hscore, has_amount, has_supplier = _sniff_header_row_openpyxl(ws)
+        name_bonus, inferred_role = _sheet_name_bonus(name)
+        row_count = int(ws.max_row or 0)
+        data_rows = max(0, row_count - header_row - 1)
+
+        score = hscore + name_bonus
+        if has_amount and has_supplier:
+            score += 2.0
+        if data_rows >= 10:
+            score += min(3.0, data_rows / 500.0)
+        elif data_rows < 5:
+            score -= 2.0
+
+        period_hits = 0
+        if ws.max_row and ws.max_row >= 2:
+            row1 = [
+                str(ws.cell(row=1, column=c).value or "")
+                for c in range(1, min(ws.max_column or 1, 20) + 1)
+            ]
+            period_hits = sum(1 for v in row1 if _looks_like_period_header(v))
+        if period_hits >= 3 and hscore < 4:
+            inferred_role = "timeseries"
+            score += 1.0
+
+        reason_parts = []
+        if has_amount:
+            reason_parts.append("amount column")
+        if has_supplier:
+            reason_parts.append("supplier column")
+        if name_bonus > 0:
+            reason_parts.append("sheet name signal")
+
+        scores.append(
+            SheetScore(
+                sheet_name=name,
+                score=round(score, 2),
+                header_row=header_row,
+                inferred_role=inferred_role,
+                row_count=row_count,
+                has_amount_col=has_amount,
+                has_supplier_col=has_supplier,
+                reason=", ".join(reason_parts) or "low signal",
+            )
+        )
+
+    scores.sort(key=lambda s: s.score, reverse=True)
+    return scores
+
+
+def workbook_schema_hints(file_path: Path) -> Dict[str, Any]:
+    """Summary for upload manifest schema.workbook."""
+    ranked = score_workbook_sheets(file_path)
+    selected = ranked[0] if ranked else None
+    return {
+        "sheet_count": len(ranked),
+        "sheet_names": [s.sheet_name for s in ranked],
+        "selected_sheet": selected.sheet_name if selected else None,
+        "selected_header_row": selected.header_row if selected else 0,
+        "sheet_scores": [
+            {
+                "sheet": s.sheet_name,
+                "score": s.score,
+                "role": s.inferred_role,
+                "header_row": s.header_row,
+                "row_count": s.row_count,
+            }
+            for s in ranked[:5]
+        ],
+        "planning_signal_confidence": min(1.0, max((s.score for s in ranked), default=0.0) / 8.0),
+    }
+
+
+def _read_tabular(
+    file_path: Path,
+    sheet_name: str | None = None,
+    header_row: int = 0,
+) -> pd.DataFrame:
     suffix = file_path.suffix.lower()
     if suffix == ".csv":
         return pd.read_csv(file_path)
+    if sheet_name is not None:
+        return pd.read_excel(file_path, sheet_name=sheet_name, header=header_row)
+    ranked = score_workbook_sheets(file_path)
+    if ranked and ranked[0].score > 0 and ranked[0].has_amount_col:
+        best = ranked[0]
+        return pd.read_excel(file_path, sheet_name=best.sheet_name, header=best.header_row)
     return pd.read_excel(file_path)
 
 
@@ -72,6 +266,103 @@ def _best_column_match(columns: List[str], candidates: List[str], default: str =
             if candidate in c.lower():
                 return c
     return default
+
+
+# Headers that look monetary but are dimensions (Spend_Category, Invoice_ID, …).
+_AMOUNT_NEGATIVE_TOKENS = (
+    "category",
+    "type",
+    "id",
+    "name",
+    "status",
+    "department",
+    "region",
+    "vendor",
+    "supplier",
+    "date",
+    "invoice",
+    "memo",
+    "description",
+    "dept",
+    "business unit",
+    "geo",
+    "location",
+    "code",
+    "period",
+    "month",
+    "quarter",
+    "scenario",
+)
+
+
+def _column_amount_score(col: str, series: Optional[pd.Series] = None) -> float:
+    """Score how likely a column holds numeric spend amounts (higher = better)."""
+    low = col.lower().strip().replace("_", " ")
+    if "spend" in low and any(t in low for t in ("category", "cat", "class", "type")):
+        return -1.0
+    has_amount_token = any(t in low for t in ("amount", "value", "total", "cost", "price", "fee"))
+    if any(t in low for t in _AMOUNT_NEGATIVE_TOKENS) and not has_amount_token:
+        return -1.0
+
+    score = 0.0
+    if low in ("amount", "value", "cost", "total"):
+        score += 10.0
+    elif low.startswith("amount") or " amount" in low or low.endswith(" amount"):
+        score += 9.0
+        if any(ccy in low for ccy in ("usd", "inr", "eur", "gbp", "sgd", "aed")):
+            score += 3.0
+    elif "amount" in low:
+        score += 8.0
+    elif "total" in low and "category" not in low:
+        score += 6.0
+    elif "cost" in low and "center" not in low and "centre" not in low:
+        score += 5.0
+    elif "value" in low:
+        score += 5.0
+    elif "spend" in low:
+        score += 2.0
+
+    if series is not None and len(series) > 0:
+        numeric = pd.to_numeric(
+            series.astype(str).str.replace(",", "", regex=False), errors="coerce"
+        )
+        valid_ratio = float(numeric.notna().sum()) / max(len(series), 1)
+        if valid_ratio > 0.8:
+            score += 8.0
+        elif valid_ratio > 0.5:
+            score += 4.0
+        if numeric.notna().any() and float(numeric.fillna(0).median()) > 0:
+            score += 2.0
+    return score
+
+
+def _best_amount_column_match(
+    columns: List[str],
+    frame: Optional[pd.DataFrame] = None,
+    default: str = "",
+) -> str:
+    """Pick the monetary amount column; avoids Spend_Category-style false positives."""
+    best_col = default
+    best_score = 0.0
+    for col in columns:
+        series = frame[col] if frame is not None and col in frame.columns else None
+        score = _column_amount_score(col, series)
+        if score > best_score:
+            best_score = score
+            best_col = col
+    return best_col
+
+
+def _infer_currency_from_column_name(col_name: str) -> Optional[str]:
+    low = col_name.lower()
+    for code in ("usd", "inr", "eur", "gbp", "sgd", "aed", "chf", "jpy"):
+        if code in low:
+            return code.upper()
+    if "rupee" in low or "₹" in col_name:
+        return "INR"
+    if "$" in col_name:
+        return "USD"
+    return None
 
 
 def _classify(description: str, supplier: str, taxonomy: Dict) -> Tuple[str, str]:
@@ -322,7 +613,7 @@ def infer_tabular_schema(file_path: Path) -> Dict[str, Any]:
     frame = _read_tabular(file_path)
     columns = [str(c) for c in frame.columns]
     role_map = {
-        "amount": _best_column_match(columns, ["amount", "spend", "total", "cost"]),
+        "amount": _best_amount_column_match(columns, frame),
         "supplier": _best_column_match(columns, ["supplier", "vendor", "payee"]),
         "description": _best_column_match(columns, ["description", "memo", "line item", "item"]),
         "business_unit": _best_column_match(columns, ["bu", "business unit", "department"]),
@@ -378,7 +669,11 @@ def infer_tabular_schema(file_path: Path) -> Dict[str, Any]:
         "semantic_map": role_map,
     }
     if file_path.suffix.lower() in (".xlsx", ".xls"):
-        result["workbook"] = _infer_workbook_summary(file_path)
+        hints = workbook_schema_hints(file_path)
+        result["workbook"] = {
+            **_infer_workbook_summary(file_path),
+            **hints,
+        }
     return result
 
 
@@ -534,32 +829,16 @@ def _parse_planning_workbook(
     return out
 
 
-def parse_spend_file(
+def _dataframe_to_spend_lines(
+    frame: pd.DataFrame,
     file_path: Path,
     taxonomy: Dict,
     default_amount_type: str = "actual",
     reporting_currency: str = "INR",
-    workbook_manifest: Dict[str, Any] | None = None,
     source_system_id: Optional[str] = None,
+    row_id_start: int = 1,
 ) -> List[NormalizedSpendLine]:
-    strategy = str((workbook_manifest or {}).get("ingestion_strategy") or "standard")
-    if file_path.suffix.lower() in (".xlsx", ".xls") and strategy in {
-        "timeseries_flatten",
-        "scenario_pivot",
-        "hybrid",
-        "assumptions_extract",
-    }:
-        planning_lines = _parse_planning_workbook(
-            file_path=file_path,
-            taxonomy=taxonomy,
-            workbook_manifest=workbook_manifest or {},
-            reporting_currency=reporting_currency,
-        )
-        if planning_lines:
-            return planning_lines
-
     file_hash = _compute_file_hash(file_path)
-    frame = _read_tabular(file_path)
 
     # --- Row-count guardrails ---
     n_rows = len(frame)
@@ -578,9 +857,16 @@ def parse_spend_file(
         logger.warning('"large_file rows=%d file=%s"', n_rows, file_path.name)
 
     cols = [str(c) for c in frame.columns]
-    amount_col = _best_column_match(cols, ["amount", "spend", "total", "cost"], cols[0] if cols else "")
+    amount_col = _best_amount_column_match(cols, frame)
     supplier_col = _best_column_match(cols, ["supplier", "vendor", "payee"], "")
     desc_col = _best_column_match(cols, ["description", "memo", "line item", "item"], "")
+    if not desc_col:
+        desc_col = _best_column_match(
+            cols,
+            ["spend category", "spend_category", "expense category", "category"],
+            "",
+        )
+    amount_currency_hint = _infer_currency_from_column_name(amount_col) if amount_col else None
     bu_col = _best_column_match(cols, ["bu", "business unit", "department"], "")
     geo_col = _best_column_match(cols, ["country", "geo", "region", "location"], "")
     date_col = _best_column_match(cols, ["date", "invoice date", "month"], "")
@@ -651,7 +937,11 @@ def parse_spend_file(
         date_raw = str(date_s.iloc[i]).strip()
         gl_code = str(gl_s.iloc[i]).strip() or None
         cost_center = str(cc_s.iloc[i]).strip() or None
-        currency = str(currency_s.iloc[i]).strip() or reporting_currency
+        currency = (
+            str(currency_s.iloc[i]).strip()
+            or amount_currency_hint
+            or reporting_currency
+        )
         fx_rate = _parse_fx_rate(fx_s.iloc[i])
         amount_type = _detect_amount_type(str(type_s.iloc[i]).strip()) if type_col else default_amount_type
         payment_terms = _parse_payment_terms(terms_s.iloc[i])
@@ -700,7 +990,7 @@ def parse_spend_file(
 
         out.append(
             NormalizedSpendLine(
-                row_id=i + 1,
+                row_id=row_id_start + i,
                 supplier=supplier or "Unknown",
                 description=description or "N/A",
                 amount=amount,
@@ -739,6 +1029,187 @@ def parse_spend_file(
             )
         )
     return out
+
+
+def _ledger_sheets_from_manifest(workbook_manifest: Dict[str, Any] | None) -> List[str]:
+    if not workbook_manifest:
+        return []
+    names: List[str] = []
+    for node in workbook_manifest.get("sheet_graph", []):
+        if isinstance(node, dict) and node.get("role") == "transaction_ledger":
+            sn = str(node.get("sheet_name") or "").strip()
+            if sn:
+                names.append(sn)
+    return names
+
+
+def _build_ingestion_skip_list(
+    file_path: Path,
+    ingested: List[str],
+) -> List[Dict[str, str]]:
+    skipped: List[Dict[str, str]] = []
+    for sc in score_workbook_sheets(file_path):
+        if sc.sheet_name in ingested:
+            continue
+        skipped.append(
+            {
+                "sheet": sc.sheet_name,
+                "role": sc.inferred_role,
+                "reason": "non-ledger" if sc.inferred_role in {"summary", "unknown"} else "lower score",
+            }
+        )
+    return skipped
+
+
+def parse_spend_file_with_report(
+    file_path: Path,
+    taxonomy: Dict,
+    default_amount_type: str = "actual",
+    reporting_currency: str = "INR",
+    workbook_manifest: Dict[str, Any] | None = None,
+    source_system_id: Optional[str] = None,
+) -> Tuple[List[NormalizedSpendLine], Dict[str, Any]]:
+    """Parse spend file and return normalized lines plus ingestion diagnostics."""
+    report: Dict[str, Any] = {
+        "source_file": file_path.name,
+        "sheets_ingested": [],
+        "sheets_skipped": [],
+    }
+    strategy = str((workbook_manifest or {}).get("ingestion_strategy") or "standard")
+    suffix = file_path.suffix.lower()
+    ranked = score_workbook_sheets(file_path) if suffix in (".xlsx", ".xls") else []
+    score_by_name = {s.sheet_name: s for s in ranked}
+
+    planning_strategies = {
+        "timeseries_flatten",
+        "scenario_pivot",
+        "hybrid",
+        "assumptions_extract",
+    }
+    ledger_from_manifest = _ledger_sheets_from_manifest(workbook_manifest)
+
+    if suffix in (".xlsx", ".xls") and strategy in planning_strategies and strategy != "ledger_standard":
+        planning_lines = _parse_planning_workbook(
+            file_path=file_path,
+            taxonomy=taxonomy,
+            workbook_manifest=workbook_manifest or {},
+            reporting_currency=reporting_currency,
+        )
+        if planning_lines:
+            for node in (workbook_manifest or {}).get("sheet_graph", []):
+                if node.get("role") in {"timeseries", "scenarios"}:
+                    report["sheets_ingested"].append(
+                        {
+                            "sheet": node.get("sheet_name"),
+                            "rows": len(planning_lines),
+                            "strategy": strategy,
+                        }
+                    )
+            report["sheets_skipped"] = _build_ingestion_skip_list(
+                file_path, [x["sheet"] for x in report["sheets_ingested"] if x.get("sheet")]
+            )
+            return planning_lines, report
+
+    all_lines: List[NormalizedSpendLine] = []
+    ingested_names: List[str] = []
+
+    def _parse_one_sheet(sheet_name: str, strategy_label: str) -> int:
+        sc = score_by_name.get(sheet_name)
+        header_row = sc.header_row if sc else 0
+        frame = _read_tabular(file_path, sheet_name=sheet_name, header_row=header_row)
+        n_rows = len(frame)
+        if n_rows > _ROW_MAX:
+            raise ValueError(
+                f"{file_path.name} sheet '{sheet_name}' has {n_rows:,} rows (limit: {_ROW_MAX:,})."
+            )
+        sid = source_system_id or sheet_name
+        lines = _dataframe_to_spend_lines(
+            frame,
+            file_path,
+            taxonomy,
+            default_amount_type=default_amount_type,
+            reporting_currency=reporting_currency,
+            source_system_id=sid,
+            row_id_start=len(all_lines) + 1,
+        )
+        if lines:
+            all_lines.extend(lines)
+            ingested_names.append(sheet_name)
+            report["sheets_ingested"].append(
+                {"sheet": sheet_name, "rows": len(lines), "strategy": strategy_label}
+            )
+        return len(lines)
+
+    if suffix in (".xlsx", ".xls"):
+        sheets_to_try: List[str] = []
+        if ledger_from_manifest:
+            sheets_to_try = ledger_from_manifest
+        elif strategy == "ledger_standard":
+            sheets_to_try = [
+                s.sheet_name
+                for s in ranked
+                if s.inferred_role == "transaction_ledger"
+                or (s.has_amount_col and s.has_supplier_col and s.score >= 3.0)
+            ]
+        if not sheets_to_try and ranked:
+            sheets_to_try = [ranked[0].sheet_name]
+
+        for sheet_name in sheets_to_try:
+            _parse_one_sheet(sheet_name, "ledger_standard")
+
+        if all_lines:
+            report["sheets_skipped"] = _build_ingestion_skip_list(file_path, ingested_names)
+            return all_lines, report
+
+    sc = ranked[0] if ranked else None
+    if suffix in (".xlsx", ".xls") and sc:
+        _parse_one_sheet(sc.sheet_name, "standard")
+    else:
+        frame = _read_tabular(file_path)
+        n_rows = len(frame)
+        if n_rows > _ROW_MAX:
+            raise ValueError(
+                f"{file_path.name} has {n_rows:,} rows (limit: {_ROW_MAX:,}). "
+                "Split by entity or fiscal year and upload each part separately."
+            )
+        lines = _dataframe_to_spend_lines(
+            frame,
+            file_path,
+            taxonomy,
+            default_amount_type=default_amount_type,
+            reporting_currency=reporting_currency,
+            source_system_id=source_system_id,
+        )
+        if lines:
+            sheet_label = sc.sheet_name if sc else file_path.stem
+            all_lines.extend(lines)
+            ingested_names.append(sheet_label)
+            report["sheets_ingested"].append(
+                {"sheet": sheet_label, "rows": len(lines), "strategy": "standard"}
+            )
+
+    if suffix in (".xlsx", ".xls"):
+        report["sheets_skipped"] = _build_ingestion_skip_list(file_path, ingested_names)
+    return all_lines, report
+
+
+def parse_spend_file(
+    file_path: Path,
+    taxonomy: Dict,
+    default_amount_type: str = "actual",
+    reporting_currency: str = "INR",
+    workbook_manifest: Dict[str, Any] | None = None,
+    source_system_id: Optional[str] = None,
+) -> List[NormalizedSpendLine]:
+    lines, _report = parse_spend_file_with_report(
+        file_path,
+        taxonomy,
+        default_amount_type=default_amount_type,
+        reporting_currency=reporting_currency,
+        workbook_manifest=workbook_manifest,
+        source_system_id=source_system_id,
+    )
+    return lines
 
 
 def _ocr_image(file_path: Path, lang: str = "eng") -> str:

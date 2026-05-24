@@ -35,6 +35,11 @@ export async function apiPut<T>(url: string, body?: unknown): Promise<T> {
   return data;
 }
 
+export async function apiPatch<T>(url: string, body?: unknown): Promise<T> {
+  const { data } = await client.patch<T>(url, body);
+  return data;
+}
+
 export async function apiUpload<T>(
   url: string,
   formData: FormData,

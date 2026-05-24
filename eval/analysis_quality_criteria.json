@@ -1,0 +1,133 @@
+{
+  "schema_version": "1.0",
+  "eval_name": "OpEx Platform Analysis Quality Evaluation",
+  "description": "Runtime rubric that exercises the analysis pipeline against five golden spend scenarios and scores the quality of skill outputs on 8 deterministic dimensions. Complements run_eval.py (reference-data quality) and run_feature_eval.py (structural completeness). This eval targets the question: given correct wiring, does the pipeline produce high-quality, faithful, evidence-grounded recommendations?",
+  "scoring_scale": { "min": 0, "max": 10 },
+  "domains": [
+    {
+      "name": "skill_output_integrity",
+      "display_name": "Skill Output Integrity",
+      "weight": 0.55,
+      "description": "Arithmetic correctness, internal consistency, and specificity of what each skill computes.",
+      "dimensions": [
+        {
+          "id": "AQ-01",
+          "name": "Numerical Faithfulness",
+          "weight": 0.25,
+          "threshold_pass": 7.0,
+          "description": "Arithmetic self-consistency within skill outputs. Checks: (a) profiler total_spend matches sum-of-categories within 1%; (b) confidence bands are monotonically ordered low≤mid≤high; (c) deduped_mid_savings ≤ gross_3yr for every value_matrix row; (d) net_npv ≤ gross_3yr for every row (NPV is discounted, so strictly ≤ gross).",
+          "scoring_method": "checks_passed / 4 × 10",
+          "data_sources": ["spend-profiler", "value-bridge-calculator"]
+        },
+        {
+          "id": "AQ-02",
+          "name": "Recommendation Specificity",
+          "weight": 0.20,
+          "threshold_pass": 7.0,
+          "description": "Each initiative in the value bridge must carry a specific lever name (not empty/unknown), a non-empty root_cause, a positive payback_months, and a recognized confidence level. Savings-modeler initiatives must also include a non-empty assumptions list.",
+          "scoring_method": "sum(row_checks_passed) / (checks_per_row × total_rows) × 10",
+          "data_sources": ["value-bridge-calculator", "savings-modeler"]
+        },
+        {
+          "id": "AQ-03",
+          "name": "Evidence Grounding",
+          "weight": 0.20,
+          "threshold_pass": 7.0,
+          "description": "Every category appearing in the value bridge must be traceable to at least one benchmark lens (peer, internal, or heuristic). Also checks that peer_benchmarker carries a non-empty source attribution and that each comparison row has an estimated_saving_amount ≥ 0.",
+          "scoring_method": "grounded_categories / bridge_categories × 7 + source_attribution_bonus × 3 (normalized to 10)",
+          "data_sources": ["peer-benchmarker", "internal-benchmarker", "value-bridge-calculator"]
+        },
+        {
+          "id": "AQ-04",
+          "name": "Priority Ranking Correctness",
+          "weight": 0.15,
+          "threshold_pass": 8.0,
+          "description": "value_matrix must be sorted descending by deduped_mid_savings. Inversion count (pairwise i<j where savings[i] < savings[j]) determines penalty. A perfectly sorted list scores 10; each inversion reduces the score proportionally.",
+          "scoring_method": "(1 - 2*inversions / max(1, n*(n-1))) × 10",
+          "data_sources": ["value-bridge-calculator"]
+        },
+        {
+          "id": "AQ-06",
+          "name": "Causal Reasoning Quality",
+          "weight": 0.20,
+          "threshold_pass": 6.0,
+          "description": "Root-cause-analyzer findings must carry specific diagnoses (≥15 chars, not a generic fallback), a named recommended_lever, and a non-empty implementation_approach. Empty or absent findings when categories are above-benchmark is treated as a coverage gap.",
+          "scoring_method": "quality_findings / total_findings × 10; if no findings and categories above P50, score = 4.0",
+          "data_sources": ["root-cause-analyzer"]
+        }
+      ]
+    },
+    {
+      "name": "signal_coverage",
+      "display_name": "Signal Coverage & Composition Quality",
+      "weight": 0.45,
+      "description": "Whether all high-impact signals (benchmarks, variance, compliance, contracts) are surfaced into skill outputs, and whether the platform composes a decision-quality advisory for category-focused asks.",
+      "dimensions": [
+        {
+          "id": "AQ-05",
+          "name": "Coverage Completeness",
+          "weight": 0.30,
+          "threshold_pass": 7.0,
+          "description": "All high-spend categories should appear in the value bridge. Conditional signals: if budget data is present, bva_analyzer must fire with bva_available=True and at least one variance; if MSME-flagged lines exist, msme_compliance must report at_risk data; if contract expiry lines are present, contract_lifecycle must report renewal_alerts.",
+          "scoring_method": "always_signals_passed / always_expected + conditional_signals_passed / conditional_expected (weighted 50/50) × 10",
+          "data_sources": ["spend-profiler", "value-bridge-calculator", "bva-analyzer", "msme-compliance-checker", "contract-lifecycle-manager"]
+        },
+        {
+          "id": "AQ-07",
+          "name": "Decision Memo Quality",
+          "weight": 0.35,
+          "threshold_pass": 7.0,
+          "description": "For category-focused scenarios (S03), the focus category must have complete coverage across all four benchmark lenses: value bridge entry, peer comparison, root-cause finding, and heuristic finding. Non-category-focused scenarios receive a neutral 7.5 on this dimension.",
+          "scoring_method": "4 binary checks × 2.5 pts each = 10 max (only scored on S03; other scenarios get 7.5)",
+          "data_sources": ["value-bridge-calculator", "peer-benchmarker", "root-cause-analyzer", "heuristic-analyzer"]
+        },
+        {
+          "id": "AQ-08",
+          "name": "Action Timeframe Clarity",
+          "weight": 0.35,
+          "threshold_pass": 6.0,
+          "description": "Savings-modeler initiatives must have realistic payback timelines (1–36 months), at least one quick-win opportunity (payback ≤ 6 months), and non-zero cost-to-achieve values (zero CTA suggests the lever was not properly costed).",
+          "scoring_method": "all_realistic_payback × 4 + has_quick_win × 3 + all_nonzero_cta × 3",
+          "data_sources": ["savings-modeler"]
+        }
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "S01",
+      "name": "IT Benchmark Gap",
+      "file": "tests/eval/golden/analysis_quality/s01_it_benchmark.json",
+      "primary_dimensions": ["AQ-01", "AQ-04", "AQ-06"],
+      "conditional_signals": []
+    },
+    {
+      "id": "S02",
+      "name": "BvA Variance Surfacing",
+      "file": "tests/eval/golden/analysis_quality/s02_bva_surfacing.json",
+      "primary_dimensions": ["AQ-03", "AQ-05"],
+      "conditional_signals": ["bva"]
+    },
+    {
+      "id": "S03",
+      "name": "Category-Focused Ask",
+      "file": "tests/eval/golden/analysis_quality/s03_category_focus.json",
+      "primary_dimensions": ["AQ-07"],
+      "conditional_signals": []
+    },
+    {
+      "id": "S04",
+      "name": "MSME and Contract Risk",
+      "file": "tests/eval/golden/analysis_quality/s04_msme_contract.json",
+      "primary_dimensions": ["AQ-05"],
+      "conditional_signals": ["msme", "contracts"]
+    },
+    {
+      "id": "S05",
+      "name": "Multi-Category Coverage",
+      "file": "tests/eval/golden/analysis_quality/s05_multi_category.json",
+      "primary_dimensions": ["AQ-02", "AQ-05", "AQ-08"],
+      "conditional_signals": []
+    }
+  ]
+}

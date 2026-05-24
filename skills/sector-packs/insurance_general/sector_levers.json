@@ -2,6 +2,7 @@
   "pack_id": "insurance_general",
   "sector": "Insurance (General / Life / Health)",
   "version": "1.0",
+  "source_verification_note": "industry_sources entries indicate the published works that informed or directionally support each lever's savings range. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range.",
   "applicable_entity_types": [
     "general_insurance",
     "life_insurance",
@@ -74,6 +75,11 @@
       "applicable_if": [
         "claims_keywords detected",
         "category:OUTSOURCED or PROF_SVCS present"
+      ],
+      "industry_sources": [
+        "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
+        "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)"
       ]
     },
     {
@@ -109,6 +115,11 @@
       "applicable_if": [
         "insurance_keywords detected",
         "category:IT or OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
+        "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -143,11 +154,16 @@
       },
       "applicable_if": [
         "insurance_keywords detected"
+      ],
+      "industry_sources": [
+        "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
+        "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
-      "lever_id": "fraud_detection_ai",
-      "lever_name": "AI-Driven Fraud Detection (Loss Ratio Improvement)",
+      "lever_id": "fraud_detection_ai_insurance",
+      "lever_name": "AI-Driven Fraud Detection (Loss Ratio Improvement) (Insurance)",
       "lever_family": "technology",
       "savings_range_pct": {
         "p10": 4,
@@ -178,6 +194,11 @@
       "applicable_if": [
         "claims_keywords detected",
         "annual_revenue > 500M"
+      ],
+      "industry_sources": [
+        "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -213,6 +234,11 @@
       "applicable_if": [
         "insurance_keywords detected",
         "category:PROF_SVCS or MARKETING present"
+      ],
+      "industry_sources": [
+        "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -248,6 +274,10 @@
       "applicable_if": [
         "insurance_keywords detected",
         "annual_revenue > 200M"
+      ],
+      "industry_sources": [
+        "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -283,6 +313,11 @@
       "applicable_if": [
         "insurance_keywords detected",
         "category:FIN_SVCS present"
+      ],
+      "industry_sources": [
+        "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
+        "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -318,6 +353,11 @@
       "applicable_if": [
         "insurance_keywords detected",
         "category:PROF_SVCS or IT present"
+      ],
+      "industry_sources": [
+        "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
+        "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     }
   ]

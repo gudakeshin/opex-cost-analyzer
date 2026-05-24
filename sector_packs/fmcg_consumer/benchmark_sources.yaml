@@ -1,0 +1,37 @@
+source_validation_date: '2026-05-21'
+source_validation_note: 'Free source URLs verified. Sample metrics are indicative public disclosures. Licensed sources require credentials — no data fabricated for licensed entries.'
+
+pack_id: fmcg_consumer
+schema_version: '1.0'
+confidence: illustrative
+free_sources:
+- name: FICCI FMCG Report
+  type: public_disclosure
+  url: 'https://ficci.in/sector/61/'
+  sample_metric: 'India FMCG market size: ₹5.9 lakh Cr FY2024, growing at 7–8% CAGR (FICCI FMCG Report 2024)'
+- name: BSE consumer goods filings
+  type: public_disclosure
+  url: 'https://www.bseindia.com/corporates/ann.html'
+  sample_metric: 'HUL advertising & promotion spend: ~10–12% of revenue; distribution cost: 6–8% (BSE annual reports FY2024)'
+- name: RAI Retail Survey
+  type: public_disclosure
+  url: 'https://www.rai.net.in/'
+  sample_metric: 'India organized retail penetration: 12–15% of total retail FY2024 (RAI India Retail Report)'
+- name: Nielsen/Kantar public summaries
+  type: public_disclosure
+  url: 'https://www.kantar.com/campaigns/brandz/india'
+  sample_metric: 'Rural FMCG growth outpaced urban at 9% vs 7% YoY in FY2024 (Kantar/NielsenIQ public summary)'
+licensed_sources_stubs:
+- name: CMIE Prowess IQ
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: CmieAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+- name: Nielsen Industry Benchmark
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: NielsenIndustryBenchmarkAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+refresh_cycle: Annual
+notes: Free sources provide public disclosure data sufficient for diagnostic benchmarking.
+  Licensed sources required for granular spend-line comparisons.

@@ -1,6 +1,8 @@
 {
   "version": "1.0",
+  "source_type": "internal_design",
   "description": "Standard OpEx category taxonomy with keyword mappings for classification",
+  "design_note": "Category definitions and keyword mappings are internal platform design choices. No external source is claimed for the taxonomy structure. Categories broadly align with common procurement category management frameworks (UNSPSC, Hackett Group G&A taxonomy) but are not directly derived from any single published standard.",
   "categories": [
     {
       "id": "IT",

@@ -629,9 +629,9 @@ class TestCostRoomFrontend:
         assert "p50" in content
         assert "p90" in content
 
-    def test_cost_room_has_scenario_slider(self):
+    def test_cost_room_has_scenario_controls(self):
         content = (ROOT / "frontend" / "src" / "pages" / "CostRoom.tsx").read_text()
-        assert "macroSlider" in content or "macroMultiplier" in content
+        assert "ScenarioControls" in content or "macroScenarios" in content
 
     def test_cost_room_has_audit_log(self):
         content = (ROOT / "frontend" / "src" / "pages" / "CostRoom.tsx").read_text()

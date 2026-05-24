@@ -47,14 +47,18 @@ def run_core_pipeline(
     headcount: float | None = None,
     wacc: float = 0.10,
     effective_tax_rate: float = 0.0,
-    reporting_currency: str = "INR",
+    reporting_currency: str = "USD",
     engagement_id: str | None = None,
     entity_tree: Dict[str, Any] | None = None,
     segment_revenue: Dict[str, float] | None = None,
     sector_weights: Dict[str, float] | None = None,
+    ingestion_summary: str | None = None,
 ) -> Dict[str, Any]:
     profile = engine.spend_profiler(lines)
     context = engine.document_contextualizer(docs_text)
+    if ingestion_summary:
+        base = str(context.get("context_summary") or "").strip()
+        context["context_summary"] = f"{base}\n{ingestion_summary}".strip() if base else ingestion_summary
 
     # Auto-detect industry if not supplied — prefer document signals, fall back to spend patterns
     if not industry:
@@ -74,12 +78,13 @@ def run_core_pipeline(
         selection_rationale=bench_resolved.get("selection_rationale"),
     )
     internal = engine.internal_benchmarker(lines)
-    heuristics = engine.heuristic_analyzer(profile, annual_revenue, headcount=headcount)
+    heuristics = engine.heuristic_analyzer(profile, annual_revenue, headcount=headcount, reporting_currency=reporting_currency)
     root_causes = engine.root_cause_analyzer(
         profile, benchmarks, lines,
         headcount=headcount,
         industry=industry,
         annual_revenue=annual_revenue,
+        reporting_currency=reporting_currency,
     )
 
     # Build raw rows once and feed them to savings_modeler — avoids a full
@@ -196,7 +201,18 @@ def run_core_pipeline(
         context_summary=context["context_summary"],
         skill_outputs=skill_outputs,
     )
-    _memory.put("session", session_id, state.model_dump(mode="json"))
+    state_dict = state.model_dump(mode="json")
+    _memory.put("session", session_id, state_dict)
+    # Persist a thin manifest snapshot so get_session_manifest can recover the
+    # session directory even if data/uploads/{id}/ is wiped after analysis.
+    _memory.put("session_meta", session_id, {
+        "session_id": session_id,
+        "company_name": company_name or "",
+        "industry": industry,
+        "annual_revenue": annual_revenue,
+        "reporting_currency": reporting_currency,
+        "engagement_id": engagement_id,
+    })
     if company_name:
         _memory.put(
             "user",

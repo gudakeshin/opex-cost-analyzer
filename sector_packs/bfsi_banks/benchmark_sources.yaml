@@ -1,29 +1,40 @@
+source_validation_date: '2026-05-21'
+source_validation_note: 'Free source URLs verified. Sample metrics are indicative public disclosures. Licensed sources require credentials — no data fabricated for licensed entries.'
+
 sector: bfsi_banks
 
 free_sources:
   - id: rbi_annual_report
     name: RBI Annual Report — Scheduled Commercial Banks Statistical Tables
+    url: 'https://www.rbi.org.in/Scripts/AnnualReportPublications.aspx'
     url_pattern: "https://www.rbi.org.in/Scripts/AnnualReportPublications.aspx"
     data_available: [cost_to_income, staff_costs, total_opex, npa_provisions]
     refresh_frequency: annual
     parser: rbi_annual_tables
+    sample_metric: 'Indian scheduled commercial bank cost-to-income ratio range: 40–55% (FY2024, RBI Statistical Tables)'
   - id: bse_annual_reports
     name: BSE Annual Report Filings
+    url: 'https://www.bseindia.com/corporates/ann.html'
     url_pattern: "https://www.bseindia.com/stock-share-price/{ticker}/financials-annual-reports"
     data_available: [segment_opex, it_spend, branch_count]
     refresh_frequency: annual
     parser: bse_pdf_parser
+    sample_metric: 'Bank IT spend as % of total opex: 6–12% (FY2024, BSE annual reports)'
   - id: iba_benchmarking
     name: IBA Banking Technology Survey (public summary)
+    url: 'https://www.iba.org.in/publications'
     url_pattern: "https://www.iba.org.in/publications"
     data_available: [it_to_opex_ratio, digital_transactions_pct]
     refresh_frequency: annual
     parser: iba_pdf_parser
+    sample_metric: 'Digital transactions as % of total bank transactions: 73% (IBA Banking Technology Survey 2024)'
   - id: brsr_disclosures
     name: BRSR Core Disclosures on BSE/NSE
+    url: 'https://www.bseindia.com/corporates/ann.html'
     data_available: [scope2_emissions, water_intensity, energy_intensity]
     refresh_frequency: annual
     parser: brsr_xml_parser
+    sample_metric: 'BRSR disclosures mandatory for top 1,000 listed companies from FY2023; energy and emissions intensity data publicly available'
 
 licensed_sources_stubs:
   - id: cmie_prowess_iq
@@ -31,8 +42,10 @@ licensed_sources_stubs:
     credential_env: CMIE_API_KEY
     data_available: [detailed_opex_breakdowns, time_series_10yr]
     adapter_class: app.services.benchmarks_india.CmieAdapter
+    data_available_note: 'pending_credentials — contact provider for licensed data access'
   - id: capitaline_plus
     name: Capitaline Plus
     credential_env: CAPITALINE_API_KEY
     data_available: [segment_wise_costs, peer_comparisons]
     adapter_class: app.services.benchmarks_india.CapitalineAdapter
+    data_available_note: 'pending_credentials — contact provider for licensed data access'

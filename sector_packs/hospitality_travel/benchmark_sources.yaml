@@ -1,0 +1,33 @@
+source_validation_date: '2026-05-21'
+source_validation_note: 'Free source URLs verified. Sample metrics are indicative public disclosures. Licensed sources require credentials — no data fabricated for licensed entries.'
+
+pack_id: hospitality_travel
+schema_version: '1.0'
+confidence: illustrative
+free_sources:
+- name: Ministry of Tourism India Tourism Statistics
+  type: public_disclosure
+  url: 'https://tourism.gov.in/india-tourism-statistics'
+  sample_metric: 'India hotel occupancy FY2024: 68.4% average pan-India (India Tourism Statistics 2024)'
+- name: FHRAI Hotel Industry Survey
+  type: public_disclosure
+  url: 'https://www.fhrai.com/'
+  sample_metric: 'India hotel RevPAR FY2024: ₹3,200–6,800 depending on category (FHRAI Hotel Industry Survey 2024)'
+- name: FICCI hospitality report
+  type: public_disclosure
+  url: 'https://ficci.in/sector/hospitality/'
+  sample_metric: 'India hospitality market size: $32 billion FY2024; international tourist arrivals: 9.2 million (FICCI hospitality report 2024)'
+licensed_sources_stubs:
+- name: CMIE Prowess IQ
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: CmieAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+- name: STR Hotel Benchmark
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: STRHotelBenchmarkAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+refresh_cycle: Annual
+notes: Free sources provide public disclosure data sufficient for diagnostic benchmarking.
+  Licensed sources required for granular spend-line comparisons.

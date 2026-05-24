@@ -59,6 +59,14 @@ class AnalyzeRequest(_FinancialParamsMixin):
     effective_tax_rate: float = 0.0
 
 
+class SessionManifestPatch(BaseModel):
+    company_name: str | None = None
+    industry: str | None = None
+    annual_revenue: float | None = None
+    currency: str | None = None
+    audience: str | None = None
+
+
 class SkillEditRequest(BaseModel):
     content: str
 
@@ -83,6 +91,7 @@ class V1ChatRequest(BaseModel):
     currency: str | None = None
     audience: str | None = None
     headcount: float | None = None
+    thinking_mode: str | None = None  # "standard" | "extended"
 
 
 class InitiativeCreateRequest(BaseModel):

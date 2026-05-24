@@ -1,0 +1,226 @@
+{
+  "overall_score": 10.0,
+  "passed": true,
+  "eval_date": "2026-05-24",
+  "dimensions": [
+    {
+      "dimension_id": "OB_01",
+      "name": "Intent Classification Accuracy",
+      "domain": "observe",
+      "raw_score": 10.0,
+      "threshold_pass": 8.5,
+      "passed": true,
+      "gap": 0.0,
+      "cases_run": 20,
+      "cases_passed": 20,
+      "finding_summary": "20/20 cases correct",
+      "evidence": {
+        "cases": [
+          "benchmark my spend against industry peers \u2192 benchmark",
+          "run full analysis on my data \u2192 benchmark",
+          "compare spend with peer companies \u2192 benchmark",
+          "reduce costs across the organization \u2192 benchmark",
+          "calculate value at the table \u2192 value_bridge",
+          "what is our addressable spend \u2192 value_bridge",
+          "optimize costs across categories \u2192 value_bridge",
+          "calculate NPV and IRR of savings \u2192 value_bridge",
+          "model addressable savings opportunity \u2192 value_bridge",
+          "generate a business case \u2192 business_case",
+          "create a proposal for cost savings program \u2192 business_case",
+          "export as docx \u2192 export_business_case",
+          "download the business case \u2192 export_business_case",
+          "what is our total spend \u2192 general_qa",
+          "how many categories do we have \u2192 general_qa",
+          "show me the IT spend breakdown \u2192 general_qa",
+          "upload my spend file \u2192 upload_data",
+          "show conflicts in the uploaded data \u2192 conflict_review",
+          "reconcile gstr2a with our books \u2192 gstr_reconcile",
+          "run zero based budgeting analysis \u2192 zbb"
+        ],
+        "total_cases": 20,
+        "cases_passed": 20,
+        "failed_cases": []
+      }
+    },
+    {
+      "dimension_id": "OB_02",
+      "name": "Clarification Gate Correctness",
+      "domain": "observe",
+      "raw_score": 10.0,
+      "threshold_pass": 9.0,
+      "passed": true,
+      "gap": 0.0,
+      "cases_run": 8,
+      "cases_passed": 8,
+      "finding_summary": "8/8 cases correct",
+      "evidence": {
+        "total_cases": 8,
+        "cases_passed": 8,
+        "failed_cases": []
+      }
+    },
+    {
+      "dimension_id": "OB_03",
+      "name": "Query Capability Detection",
+      "domain": "observe",
+      "raw_score": 10.0,
+      "threshold_pass": 8.0,
+      "passed": true,
+      "gap": 0.0,
+      "cases_run": 10,
+      "cases_passed": 10,
+      "finding_summary": "10/10 cases correct",
+      "evidence": {
+        "total_cases": 10,
+        "cases_passed": 10,
+        "failed_cases": []
+      }
+    },
+    {
+      "dimension_id": "OB_04",
+      "name": "Context Assembly Correctness",
+      "domain": "observe",
+      "raw_score": 10.0,
+      "threshold_pass": 8.0,
+      "passed": true,
+      "gap": 0.0,
+      "cases_run": 10,
+      "cases_passed": 10,
+      "finding_summary": "10/10 cases correct",
+      "evidence": {
+        "intent_class": "benchmark",
+        "data_quality_score": 0.8500000000000001,
+        "intent_confidence": 0.85,
+        "total_cases": 10,
+        "cases_passed": 10,
+        "failed_cases": []
+      }
+    },
+    {
+      "dimension_id": "PL_01",
+      "name": "Skill DAG Correctness",
+      "domain": "plan",
+      "raw_score": 10.0,
+      "threshold_pass": 8.5,
+      "passed": true,
+      "gap": 0.0,
+      "cases_run": 12,
+      "cases_passed": 12,
+      "finding_summary": "12/12 cases correct",
+      "evidence": {
+        "total_cases": 12,
+        "cases_passed": 12,
+        "failed_cases": []
+      }
+    },
+    {
+      "dimension_id": "PL_02",
+      "name": "Group 0 Security Skill Injection",
+      "domain": "plan",
+      "raw_score": 10.0,
+      "threshold_pass": 9.0,
+      "passed": true,
+      "gap": 0.0,
+      "cases_run": 6,
+      "cases_passed": 6,
+      "finding_summary": "6/6 cases correct",
+      "evidence": {
+        "skills_with_tabular": [
+          "data-classifier",
+          "heuristic-analyzer",
+          "internal-benchmarker",
+          "llm-context-builder",
+          "peer-benchmarker",
+          "pii-stripper",
+          "spend-profiler"
+        ],
+        "total_cases": 6,
+        "cases_passed": 6,
+        "failed_cases": []
+      }
+    },
+    {
+      "dimension_id": "PL_03",
+      "name": "DAG Dependency Group Ordering",
+      "domain": "plan",
+      "raw_score": 10.0,
+      "threshold_pass": 10.0,
+      "passed": true,
+      "gap": 0.0,
+      "cases_run": 6,
+      "cases_passed": 6,
+      "finding_summary": "6/6 cases correct",
+      "evidence": {
+        "intents_checked": [
+          "benchmark",
+          "value_bridge",
+          "business_case",
+          "sensitivity",
+          "savings_plan",
+          "export_business_case"
+        ],
+        "total_cases": 6,
+        "cases_passed": 6,
+        "failed_cases": []
+      }
+    },
+    {
+      "dimension_id": "PL_04",
+      "name": "Replanner Branch Logic",
+      "domain": "plan",
+      "raw_score": 10.0,
+      "threshold_pass": 7.5,
+      "passed": true,
+      "gap": 0.0,
+      "cases_run": 7,
+      "cases_passed": 7,
+      "finding_summary": "7/7 cases correct",
+      "evidence": {
+        "branches_tested": [
+          "wc_deep_dive",
+          "internal_only",
+          "add_core_skill"
+        ],
+        "total_cases": 7,
+        "cases_passed": 7,
+        "failed_cases": []
+      }
+    },
+    {
+      "dimension_id": "OR_01",
+      "name": "No-Data Orchestrator Routing",
+      "domain": "orchestrator",
+      "raw_score": 10.0,
+      "threshold_pass": 8.5,
+      "passed": true,
+      "gap": 0.0,
+      "cases_run": 15,
+      "cases_passed": 15,
+      "finding_summary": "15/15 cases correct",
+      "evidence": {
+        "total_cases": 15,
+        "cases_passed": 15,
+        "failed_cases": []
+      }
+    },
+    {
+      "dimension_id": "OR_02",
+      "name": "General QA Answer Quality",
+      "domain": "orchestrator",
+      "raw_score": 10.0,
+      "threshold_pass": 7.5,
+      "passed": true,
+      "gap": 0.0,
+      "cases_run": 8,
+      "cases_passed": 8,
+      "finding_summary": "8/8 cases correct",
+      "evidence": {
+        "total_spend": 5000000,
+        "categories": 3,
+        "total_cases": 8,
+        "cases_passed": 8,
+        "failed_cases": []
+      }
+    }
+  ]
+}

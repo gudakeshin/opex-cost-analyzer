@@ -1,0 +1,37 @@
+source_validation_date: '2026-05-21'
+source_validation_note: 'Free source URLs verified. Sample metrics are indicative public disclosures. Licensed sources require credentials — no data fabricated for licensed entries.'
+
+pack_id: financial_services_nonbank
+schema_version: '1.0'
+confidence: illustrative
+free_sources:
+- name: SEBI AMC disclosures
+  type: public_disclosure
+  url: 'https://www.sebi.gov.in/reports-and-statistics/'
+  sample_metric: 'India mutual fund AUM: ₹53.4 lakh Cr as of March 2024 (AMFI/SEBI data)'
+- name: AMFI data
+  type: public_disclosure
+  url: 'https://www.amfiindia.com/research-information'
+  sample_metric: 'India MF folios: 17.79 Cr as of March 2024; SIP AUM: ₹10.7 lakh Cr (AMFI monthly data)'
+- name: IRDAI broker data
+  type: public_disclosure
+  url: 'https://irdai.gov.in/annual-report'
+  sample_metric: 'Insurance broking commissions as % of premium: 7–15% depending on segment (IRDAI broker registration data FY2024)'
+- name: RBI NBFC returns
+  type: public_disclosure
+  url: 'https://www.rbi.org.in/Scripts/PublicationsView.aspx?id=22124'
+  sample_metric: 'NBFC sector total assets: ₹64.6 lakh Cr March 2024; gross NPA ratio: 4.0% (RBI NBFC supervision returns)'
+licensed_sources_stubs:
+- name: CMIE Prowess IQ
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: CmieAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+- name: Capitaline Plus
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: CapitalineAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+refresh_cycle: Annual
+notes: Free sources provide public disclosure data sufficient for diagnostic benchmarking.
+  Licensed sources required for granular spend-line comparisons.

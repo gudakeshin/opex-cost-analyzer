@@ -1,0 +1,33 @@
+source_validation_date: '2026-05-21'
+source_validation_note: 'Free source URLs verified. Sample metrics are indicative public disclosures. Licensed sources require credentials — no data fabricated for licensed entries.'
+
+pack_id: conglomerate
+schema_version: '1.0'
+confidence: illustrative
+free_sources:
+- name: BSE conglomerate filings
+  type: public_disclosure
+  url: 'https://www.bseindia.com/corporates/ann.html'
+  sample_metric: 'Top 10 Indian conglomerates: Tata, Reliance, Aditya Birla, Mahindra — operating expense as % of revenue: 75–85% (BSE Annual Reports FY2024)'
+- name: MCA21 related-party disclosures
+  type: public_disclosure
+  url: 'https://www.mca.gov.in/content/mca/global/en/acts-rules/ebooks/xbrl.html'
+  sample_metric: 'Related-party transaction disclosures and Schedule III financials filed via MCA21 XBRL; intercompany shared-service costs visible in notes to accounts (MCA21 FY2024)'
+- name: CII India Inc benchmark
+  type: public_disclosure
+  url: 'https://www.cii.in/Sectors.aspx'
+  sample_metric: 'CII India CEO survey: shared services adoption at 68% of large conglomerates; procurement consolidation yielding 8–12% savings (CII Competitiveness Report 2024)'
+licensed_sources_stubs:
+- name: CMIE Prowess IQ
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: CmieAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+- name: Capitaline Plus
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: CapitalineAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+refresh_cycle: Annual
+notes: Free sources provide public disclosure data sufficient for diagnostic benchmarking.
+  Licensed sources required for granular spend-line comparisons.

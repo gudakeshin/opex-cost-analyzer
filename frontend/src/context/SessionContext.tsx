@@ -21,7 +21,7 @@ interface SessionContextValue {
 const defaultEngagement: EngagementMeta = {
   company_name: 'New engagement',
   industry: 'manufacturing_diversified',
-  currency: 'INR',
+  currency: 'USD',
   engagement_week: 1,
   engagement_weeks_total: 12,
   gate_label: 'Gate 1: Data & diagnostic',
@@ -40,7 +40,7 @@ function engagementFromManifest(manifest: SessionManifest): EngagementMeta {
   return {
     company_name: manifest.company_name || defaultEngagement.company_name,
     industry: manifest.industry || defaultEngagement.industry,
-    currency: manifest.currency || 'INR',
+    currency: manifest.currency || 'USD',
     audience: manifest.audience,
     engagement_week: manifest.engagement_week ?? weeksSince,
     engagement_weeks_total: manifest.engagement_weeks_total ?? 12,
@@ -72,8 +72,11 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setEngagement(engagementFromManifest(manifest));
       const mode = manifestAudienceToMode(manifest.audience);
       if (mode) setAudience(mode);
-    } catch {
-      /* keep defaults when manifest unavailable */
+    } catch (err) {
+      // Session directory no longer exists — clear stale ID so pages don't keep hitting 404
+      if ((err as { response?: { status?: number } })?.response?.status === 404) {
+        setSessionIdState(null);
+      }
     } finally {
       setLoadingEngagement(false);
     }

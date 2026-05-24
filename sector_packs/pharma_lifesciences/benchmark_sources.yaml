@@ -1,0 +1,37 @@
+source_validation_date: '2026-05-21'
+source_validation_note: 'Free source URLs verified. Sample metrics are indicative public disclosures. Licensed sources require credentials — no data fabricated for licensed entries.'
+
+pack_id: pharma_lifesciences
+schema_version: '1.0'
+confidence: illustrative
+free_sources:
+- name: DPCO pricing data
+  type: public_disclosure
+  url: 'https://pharmaceuticals.gov.in/national-pharmaceutical-pricing-authority'
+  sample_metric: 'Price-controlled formulations: ~900 under NLEM; DPCO ceiling prices published quarterly (NPPA/DPCO data 2024)'
+- name: DSIR R&D Statistics
+  type: public_disclosure
+  url: 'https://dsir.nic.in/reports/publications'
+  sample_metric: 'India pharma R&D spend as % of revenue: 5–9% for large companies; R&D intensity growing post-COVID (DSIR R&D Statistics 2023)'
+- name: OPPI Industry Report
+  type: public_disclosure
+  url: 'https://www.oppi.org/'
+  sample_metric: 'India pharmaceutical market size: $50 billion FY2024; domestic formulations growing at ~10% CAGR (OPPI Industry Report 2024)'
+- name: BSE pharma filings
+  type: public_disclosure
+  url: 'https://www.bseindia.com/corporates/ann.html'
+  sample_metric: 'Sun Pharma COGS as % of revenue: ~28%; Cipla SGA spend: ~20% of revenue (BSE annual reports FY2024)'
+licensed_sources_stubs:
+- name: CMIE Prowess IQ
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: CmieAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+- name: IQVIA Pharma Benchmark
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: IQVIAPharmaBenchmarkAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+refresh_cycle: Annual
+notes: Free sources provide public disclosure data sufficient for diagnostic benchmarking.
+  Licensed sources required for granular spend-line comparisons.

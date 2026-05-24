@@ -218,6 +218,7 @@ def savings_modeler(
             "sustainability_score": round(float(sustainability_score), 2),
             "bounce_back_risk": bounce_back_risk,
             "condition_precedents": condition_precedents,
+            "assumptions": condition_precedents,
             "base_execution_probability": round(float(base_execution_probability), 2),
             "tco_adjusted": tco_adjusted,
             "gross_savings": {"y1": y1, "y2": y2, "y3": y3, "total_3yr": y1 + y2 + y3},

@@ -199,6 +199,41 @@ def _call_claude(
     return text.strip()
 
 
+def _call_claude_with_thinking(
+    system: str,
+    user_content: str,
+    max_tokens: int = 1800,
+    model: str = "claude-sonnet-4-5-20250929",
+    budget_tokens: int = 8000,
+) -> Tuple[str, str | None]:
+    """Call Claude with extended thinking enabled. Returns (response_text, thinking_text)."""
+    if os.getenv("PYTEST_CURRENT_TEST"):
+        raise RuntimeError("Claude calls disabled during pytest runs")
+    if not ANTHROPIC_ENABLED or not ANTHROPIC_API_KEY:
+        raise RuntimeError("Anthropic not configured")
+    try:
+        import anthropic
+    except ImportError:
+        raise RuntimeError("anthropic package not installed")
+
+    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    response = client.messages.create(
+        model=model,
+        max_tokens=max_tokens + budget_tokens,
+        system=system,
+        messages=[{"role": "user", "content": user_content}],
+        thinking={"type": "enabled", "budget_tokens": budget_tokens},
+    )
+    text = ""
+    thinking = ""
+    for block in response.content:
+        if getattr(block, "type", None) == "thinking":
+            thinking = getattr(block, "thinking", "") or ""
+        elif getattr(block, "type", None) == "text":
+            text = getattr(block, "text", "") or ""
+    return text.strip(), thinking.strip() or None
+
+
 def _extract_json(text: str) -> Dict[str, Any] | List[Any]:
     """Extract JSON from response, handling markdown code blocks."""
     text = text.strip()
@@ -295,6 +330,83 @@ def plan_with_claude(ctx: ObserveContext) -> Dict[str, Any] | None:
     if isinstance(data, dict) and "tasks" in data:
         return data
     return None
+
+
+_CHART_SELECTION_SYSTEM_PROMPT = (
+    "You are a data-visualization advisor for an OpEx cost analysis platform. "
+    "Given the user's question and a spend profile summary, choose 1–3 chart types "
+    "that best answer the question. "
+    "Respond with JSON only — no prose, no markdown fence."
+)
+
+_AVAILABLE_CHARTS = (
+    "Available chart types:\n"
+    "- pareto_spend: Pareto concentration view — best when top-3 categories dominate (>55% of spend) "
+    "or when the user asks about concentration, top spenders, or where most money goes.\n"
+    "- ranked_bar_spend: Ranked bar chart — best for distributed portfolios or 'which categories?' questions.\n"
+    "- stacked_addressability: Addressable vs fixed vs variable split — best for optimization, "
+    "savings, addressable spend, or 'what can we cut?' questions.\n"
+    "- trend_line_total_spend: Spend trend over time — only select if has_trend is true; "
+    "best for trajectory, trend, run rate, or period-over-period questions.\n"
+)
+
+
+def select_charts_claude(
+    user_message: str,
+    profile_summary: Dict[str, Any],
+) -> Dict[str, Any] | None:
+    """Use Claude to select chart types and generate commentary based on user intent.
+
+    Returns {"selected_charts": [...], "commentary_points": [...]} or None on failure.
+    """
+    if not ANTHROPIC_ENABLED:
+        return None
+    top_cats = profile_summary.get("top_categories", [])
+    cat_lines = "\n".join(
+        f"  - {c['name']}: ${float(c.get('spend', 0)):,.0f} spend, "
+        f"${float(c.get('addressable_spend', 0)):,.0f} addressable"
+        for c in top_cats[:5]
+    )
+    user_prompt = (
+        f"User question: {user_message}\n\n"
+        f"Spend profile summary:\n"
+        f"  total_spend: ${float(profile_summary.get('total_spend', 0)):,.0f}\n"
+        f"  top3_share: {float(profile_summary.get('top3_share', 0)):.1%}\n"
+        f"  has_trend_data: {profile_summary.get('has_trend', False)}\n"
+        f"  top categories:\n{cat_lines}\n\n"
+        f"{_AVAILABLE_CHARTS}\n"
+        "Output JSON with keys 'selected_charts' (array of {{chart, reason}}) "
+        "and 'commentary_points' (array of 3–5 strings that directly address the user's question "
+        "using the profile numbers above)."
+    )
+    executor = ThreadPoolExecutor(max_workers=1)
+    future = executor.submit(_call_claude, _CHART_SELECTION_SYSTEM_PROMPT, user_prompt, 512)
+    try:
+        raw = future.result(timeout=10)
+    except (FuturesTimeoutError, Exception):
+        future.cancel()
+        executor.shutdown(wait=False, cancel_futures=True)
+        return None
+    finally:
+        if not future.cancelled():
+            executor.shutdown(wait=True, cancel_futures=True)
+    try:
+        data = _extract_json(raw)
+    except Exception:
+        return None
+    if not isinstance(data, dict):
+        return None
+    charts = data.get("selected_charts")
+    if not isinstance(charts, list) or not charts:
+        return None
+    valid_types = {"pareto_spend", "ranked_bar_spend", "stacked_addressability", "trend_line_total_spend"}
+    charts = [c for c in charts if isinstance(c, dict) and c.get("chart") in valid_types]
+    if not charts:
+        return None
+    return {
+        "selected_charts": charts,
+        "commentary_points": data.get("commentary_points") or [],
+    }
 
 
 # Pure UI artefacts — no narrative value for synthesis
@@ -407,10 +519,15 @@ def synthesize_analysis_claude(
     docs_text: List[str],
     transaction_examples: Dict[str, List[Dict[str, Any]]] | None = None,
     strict_mode: bool = False,
-) -> Dict[str, Any] | None:
-    """Synthesize executive recommendations from deterministic skill outputs."""
+    thinking_enabled: bool = False,
+    thinking_budget_tokens: int = 8000,
+) -> Tuple[Dict[str, Any] | None, str | None]:
+    """Synthesize executive recommendations from deterministic skill outputs.
+
+    Returns (advisory_dict, thinking_text). thinking_text is None unless thinking_enabled=True.
+    """
     if not ANTHROPIC_ENABLED:
-        return None
+        return None, None
     payload = {
         "user_message": user_message,
         "session_context": {
@@ -438,31 +555,51 @@ def synthesize_analysis_claude(
             "Explain the causal mechanism, not just the gap. "
             "Make it self-contained — a CFO must be able to act on it without reading anything else.\n"
         )
-    executor = ThreadPoolExecutor(max_workers=1)
-    future = executor.submit(
-        _call_claude,
-        ANALYSIS_SYNTHESIS_SYSTEM_PROMPT,
-        (
-            "Synthesize recommendations from this JSON context:\n"
-            f"{json.dumps(payload, ensure_ascii=False)}\n"
-            f"{strict_hint}"
-        ),
-        1800,
+    user_prompt = (
+        "Synthesize recommendations from this JSON context:\n"
+        f"{json.dumps(payload, ensure_ascii=False)}\n"
+        f"{strict_hint}"
     )
+    timeout_s = 35 if thinking_enabled else 8
+    executor = ThreadPoolExecutor(max_workers=1)
+    if thinking_enabled:
+        future = executor.submit(
+            _call_claude_with_thinking,
+            ANALYSIS_SYNTHESIS_SYSTEM_PROMPT,
+            user_prompt,
+            1800,
+            "claude-sonnet-4-5-20250929",
+            thinking_budget_tokens,
+        )
+    else:
+        future = executor.submit(
+            _call_claude,
+            ANALYSIS_SYNTHESIS_SYSTEM_PROMPT,
+            user_prompt,
+            1800,
+        )
     try:
-        raw = future.result(timeout=8)
+        result = future.result(timeout=timeout_s)
     except FuturesTimeoutError:
         future.cancel()
         executor.shutdown(wait=False, cancel_futures=True)
-        return None
+        return None, None
     finally:
-        # Non-timeout paths should release resources normally.
         if not future.cancelled():
             executor.shutdown(wait=True, cancel_futures=True)
-    data = _extract_json(raw)
+
+    if thinking_enabled:
+        raw, thinking_text = result
+    else:
+        raw, thinking_text = result, None
+
+    try:
+        data = _extract_json(raw)
+    except Exception:
+        return None, thinking_text
     if isinstance(data, dict):
-        return data
-    return None
+        return data, thinking_text
+    return None, thinking_text
 
 
 def _timeout_budget_seconds(payload: Dict[str, Any], strict_mode: bool = False) -> int:

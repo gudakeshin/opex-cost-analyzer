@@ -2,6 +2,7 @@
   "pack_id": "bfsi_banks",
   "sector": "Banking & Financial Services (India)",
   "version": "1.0",
+  "source_verification_note": "industry_sources entries indicate the published works that informed or directionally support each lever's savings range. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range.",
   "applicable_entity_types": [
     "scheduled_commercial_bank",
     "nbfc_systemically_important",
@@ -77,6 +78,11 @@
       "applicable_if": [
         "bfsi_keywords detected",
         "category:FACILITIES > 3% revenue"
+      ],
+      "industry_sources": [
+        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
+        "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)"
       ]
     },
     {
@@ -112,6 +118,11 @@
       "applicable_if": [
         "bfsi_keywords detected",
         "category:IT or OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
+        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
+        "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)"
       ]
     },
     {
@@ -147,6 +158,11 @@
       "applicable_if": [
         "bfsi_keywords detected",
         "category:IT > 5% revenue"
+      ],
+      "industry_sources": [
+        "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
+        "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)",
+        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)"
       ]
     },
     {
@@ -182,6 +198,11 @@
       "applicable_if": [
         "bfsi_keywords detected",
         "category:PROF_SVCS or OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
+        "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)"
       ]
     },
     {
@@ -217,6 +238,11 @@
       "applicable_if": [
         "bfsi_keywords detected",
         "category:OUTSOURCED or PROF_SVCS present"
+      ],
+      "industry_sources": [
+        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
+        "Atradius — Payment Practices Barometer Asia-Pacific 2024 (atradius.us/knowledge-and-research/reports/payment-practices-barometer-asia-pacific.html)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -252,11 +278,16 @@
       "applicable_if": [
         "bfsi_keywords detected",
         "category:FIN_SVCS or BANKING_TREASURY present"
+      ],
+      "industry_sources": [
+        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
+        "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
-      "lever_id": "fraud_detection_ai",
-      "lever_name": "AI-Driven Fraud Detection & Prevention",
+      "lever_id": "fraud_detection_ai_banking",
+      "lever_name": "AI-Driven Fraud Detection & Prevention (Banking)",
       "lever_family": "technology",
       "savings_range_pct": {
         "p10": 5,
@@ -287,6 +318,11 @@
       "applicable_if": [
         "bfsi_keywords detected",
         "category:IT or OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
+        "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
+        "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)"
       ]
     },
     {
@@ -322,6 +358,11 @@
       "applicable_if": [
         "bfsi_keywords detected",
         "category:PROF_SVCS or IT present"
+      ],
+      "industry_sources": [
+        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
+        "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
+        "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)"
       ]
     }
   ]

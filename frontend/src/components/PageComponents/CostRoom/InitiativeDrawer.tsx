@@ -11,6 +11,7 @@ interface InitiativeDrawerProps {
   open: boolean;
   onClose: () => void;
   percentileBand: PercentileBand;
+  currency?: string;
 }
 
 export const InitiativeDrawer: React.FC<InitiativeDrawerProps> = ({
@@ -18,9 +19,12 @@ export const InitiativeDrawer: React.FC<InitiativeDrawerProps> = ({
   open,
   onClose,
   percentileBand,
+  currency = 'USD',
 }) => {
   if (!initiative) return null;
 
+  const sym = currency === 'INR' ? '₹' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '$';
+  const unit = currency === 'INR' ? 'Cr' : 'M';
   const aqs = getAqs(initiative);
   const p10 = getBandSavings(initiative, 'p10');
   const p50 = getBandSavings(initiative, 'p50');
@@ -54,23 +58,23 @@ export const InitiativeDrawer: React.FC<InitiativeDrawerProps> = ({
         </section>
 
         <section className="p-4 rounded-xl bg-brand-surface-muted border border-brand-border">
-          <p className="font-semibold text-brand-navy mb-3">Savings bands (₹ Cr)</p>
+          <p className="font-semibold text-brand-navy mb-3">Savings bands ({sym} {unit})</p>
           <div className="grid grid-cols-3 gap-3 tabular-nums">
             <div>
               <p className="text-xs text-brand-muted">P10</p>
-              <p className="font-mono font-semibold">{formatCr(p10)}</p>
+              <p className="font-mono font-semibold">{formatCr(p10, { currency })}</p>
             </div>
             <div>
               <p className="text-xs text-brand-muted">P50</p>
-              <p className="font-mono font-semibold text-brand-green">{formatCr(p50)}</p>
+              <p className="font-mono font-semibold text-brand-green">{formatCr(p50, { currency })}</p>
             </div>
             <div>
               <p className="text-xs text-brand-muted">P90</p>
-              <p className="font-mono font-semibold">{formatCr(p90)}</p>
+              <p className="font-mono font-semibold">{formatCr(p90, { currency })}</p>
             </div>
           </div>
           <p className="text-xs text-brand-muted mt-2">
-            Active view ({percentileBand}): {formatCr(bandSavings)} · Range {formatBandRange(p10, p90)}
+            Active view ({percentileBand}): {formatCr(bandSavings, { currency })} · Range {formatBandRange(p10, p90)}
           </p>
         </section>
 

@@ -1,0 +1,26 @@
+pack_id: financial_services_nonbank
+sector: Financial Services (Non-Bank)
+version: '0.1'
+schema_version: '1.0'
+status: scaffold
+description: Asset managers, insurance brokers, NBFCs, mutual funds, wealth management
+  firms.
+applicable_entity_types:
+- NBFC
+- AMC
+- Wealth_Manager
+- Broker
+- Insurance_Broker
+regulatory_bodies:
+- SEBI
+- IRDAI
+- RBI_NBFC
+- AMFI
+- PFRDA
+fiscal_year_end: March
+reporting_currency: INR
+default_wacc_pct: 13.5
+default_tax_rate_pct: 25.17
+created_at: '2026-05-20'
+effective_from: FY2025-26
+maintained_by: opex-platform-team

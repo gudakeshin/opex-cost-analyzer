@@ -31,7 +31,14 @@ router = APIRouter()
 _OPAR_TIMEOUT_S = int(os.getenv("OPAR_TIMEOUT_SECONDS", "120"))
 
 
-def _opar_response(result: Any, run_id: str) -> Dict[str, Any]:
+def _opar_response(result: Any, run_id: str, session_id: str | None = None) -> Dict[str, Any]:
+    ingestion_summary = None
+    if session_id:
+        try:
+            manifest = read_manifest(session_id)
+            ingestion_summary = manifest.get("ingestion_summary")
+        except Exception:
+            pass
     return {
         "response_text": result.response_text,
         "artefacts": result.response_artefacts,
@@ -40,12 +47,14 @@ def _opar_response(result: Any, run_id: str) -> Dict[str, Any]:
         else {},
         "quality_signals": getattr(result, "quality_signals", {}),
         "used_llm_synthesis": getattr(result, "used_llm_synthesis", False),
+        "thinking": getattr(result, "thinking_text", None),
         "degraded_mode": getattr(result, "degraded_mode", False),
         "fallback_reasons": getattr(result, "fallback_reasons", {}),
         "loop_complete": result.loop_complete,
         "next_loop_trigger": result.next_loop_trigger,
         "progress_steps": getattr(result, "progress_steps", []),
         "next_options": getattr(result, "next_options", []),
+        "ingestion_summary": ingestion_summary,
         "run_id": run_id,
     }
 
@@ -176,7 +185,7 @@ async def chat_v1_with_files(
         raise
     append_audit_event(f"opar_chat_with_files session_id={session_id} files={len(files)}")
 
-    response = _opar_response(result, run_id)
+    response = _opar_response(result, run_id, session_id=session_id)
     if uploaded_summaries:
         response["uploaded_files"] = uploaded_summaries
     return response
@@ -204,6 +213,7 @@ async def chat_v1_opar(payload: V1ChatRequest) -> Dict[str, Any]:
     if not user_id:
         company = manifest.get("company_name") or "default"
         user_id = company.lower().replace(" ", "_").replace(".", "_")
+    thinking_enabled = (payload.thinking_mode == "extended")
     try:
         result = await asyncio.wait_for(
             run_opar_loop(
@@ -212,6 +222,7 @@ async def chat_v1_opar(payload: V1ChatRequest) -> Dict[str, Any]:
                 user_id,
                 None,
                 lambda phase, msg: progress_append(run_id, phase, msg),
+                thinking_enabled=thinking_enabled,
             ),
             timeout=float(_OPAR_TIMEOUT_S),
         )
@@ -226,7 +237,7 @@ async def chat_v1_opar(payload: V1ChatRequest) -> Dict[str, Any]:
         progress_complete(run_id, failed=True, error=str(e))
         raise
     append_audit_event(f"opar_chat session_id={payload.session_id}")
-    return _opar_response(result, run_id)
+    return _opar_response(result, run_id, session_id=payload.session_id)
 
 
 @router.get("/api/v1/chat/progress/{run_id}")

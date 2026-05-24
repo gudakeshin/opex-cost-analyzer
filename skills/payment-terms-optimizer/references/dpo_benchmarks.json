@@ -1,29 +1,134 @@
 {
   "version": "1.0",
   "description": "Industry benchmark DPO (Days Payable Outstanding) by spend category and industry tier.",
+  "source": "Derived from: (1) Hackett Group AP Benchmarking Study 2024 (World-Class AP Performance, thehackettgroup.com) — verified published report; (2) Atradius Payment Practices Barometer Asia-Pacific Edition 2024 (atradius.us) — verified published report; (3) Ardent Partners AP Metrics That Matter 2024 (ardentpartners.com) — verified published report. Note: Aberdeen Group Payment Practice Report 2023 previously cited was not verified — reclassified as internal_calibration. Values represent indicative ranges — treat as confidence: illustrative.",
+  "source_metadata": {
+    "primary_sources": [
+      {
+        "source_name": "Hackett Group",
+        "publication_title": "Hackett Group Accounts Payable Benchmarking \u2014 World-Class AP Performance",
+        "publication_year": 2024,
+        "url": "https://www.thehackettgroup.com/working-capital-management-hackett/",
+        "source_type": "published_research",
+        "confidence": "illustrative",
+        "notes": "Hackett Group publishes annual AP benchmarking studies. DPO ranges for IT, Professional Services, and standard categories directionally informed by Hackett world-class AP benchmarks. Specific DPO values are indicative, not directly quoted from a licensed report."
+      },
+      {
+        "source_name": "Atradius",
+        "publication_title": "Atradius Payment Practices Barometer \u2014 Asia-Pacific Edition 2024",
+        "publication_year": 2024,
+        "url": "https://atradius.us/knowledge-and-research/reports/payment-practices-barometer-asia-pacific.html",
+        "pdf_url": "https://atradiusdutchstatebusiness.nl/dam/jcr:96004635-1f55-466c-8f98-8e827e953b48/payment-practices-barometer-asia-en.pdf",
+        "source_type": "published_research",
+        "confidence": "illustrative",
+        "notes": "Real annual publication covering B2B payment practices across Asia including India, China, Japan, Singapore. DPO ranges for contingent workforce and travel categories informed by Atradius payment timing data."
+      },
+      {
+        "source_name": "Ardent Partners",
+        "publication_title": "Ardent Partners AP Metrics That Matter in 2024",
+        "publication_year": 2024,
+        "url": "https://ardentpartners.com/ap-metrics-that-matter-in-2025/",
+        "vendor_pdf": "https://tradeshift.com/wp-content/uploads/2024/05/Ardent-Partners-AP-Metrics-that-Matter-in-2024-Tradeshift.pdf",
+        "source_type": "published_research",
+        "confidence": "illustrative",
+        "notes": "Annual survey of 190+ AP and F&A leaders. Invoice processing cost benchmarks and DPO targets inform the cost_per_transaction and default DPO ranges."
+      },
+      {
+        "source_name": "Aberdeen Group (historical)",
+        "publication_title": "Aberdeen Group Payment Practice Report",
+        "source_type": "unverified",
+        "confidence": "not_verified",
+        "notes": "REMOVED: Aberdeen Group (now abrdn) no longer publishes AP/payment practice reports. No 2023 edition of this title could be verified. References to Aberdeen Group Payment Practice Report 2023 in prior versions of this file were unverified and have been reclassified. DPO ranges previously attributed to Aberdeen are now treated as internal_calibration."
+      }
+    ],
+    "overall_source_type": "internal_calibration",
+    "disclaimer": "Specific DPO values (P50/P75/P90 by category) are indicative ranges derived from internal consulting engagement analysis supplemented by directional data from the above published sources. Values are not directly quoted from any licensed report. Do not cite these specific DPO figures as authoritative benchmarks in client deliverables without licensed data enrichment.",
+    "date_last_reviewed": "2026-05-21"
+  },
+  "confidence": "illustrative",
   "default_target_dpo": 45,
   "category_benchmarks": {
-    "IT": {"p50_dpo": 45, "p75_dpo": 60, "p90_dpo": 75, "notes": "Software/SaaS often net-30 by contract; hardware net-45 to net-60 achievable"},
-    "PROFESSIONAL_SERVICES": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "Consulting firms typically net-30; pushing to net-45 feasible for large engagements"},
-    "FACILITIES": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "Utilities often fixed; maintenance and FM services net-45 achievable"},
-    "MARKETING": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "Agency retainers often net-30; project work can push to net-45"},
-    "LOGISTICS": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "Freight and 3PL benchmark around net-30 to net-45"},
-    "TRAVEL": {"p50_dpo": 14, "p75_dpo": 30, "p90_dpo": 45, "notes": "Corporate card programs settle quickly; focus on corporate card DPO vs direct billing"},
-    "HR": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "RPO and benefits admin net-30 standard; benchmarks achievable at net-45"},
-    "CONTINGENT_WORKFORCE": {"p50_dpo": 21, "p75_dpo": 30, "p90_dpo": 45, "notes": "Staffing agencies often require weekly/bi-weekly pay; net-30 is the stretch target"},
-    "TELECOMMUNICATIONS": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "Telco contracts often fixed; consolidation to one provider enables better terms"},
-    "OFFICE_SUPPLIES": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "Office supply distributors routinely offer net-45 to net-60 for volume accounts"},
-    "INSURANCE": {"p50_dpo": 30, "p75_dpo": 30, "p90_dpo": 30, "notes": "Insurance premiums are typically fixed-schedule; limited DPO leverage"},
-    "OTHER": {"p50_dpo": 30, "p75_dpo": 45, "p90_dpo": 60, "notes": "Default target; apply category-specific benchmarks where possible"}
+    "IT": {
+      "p50_dpo": 45,
+      "p75_dpo": 60,
+      "p90_dpo": 75,
+      "notes": "Software/SaaS often net-30 by contract; hardware net-45 to net-60 achievable"
+    },
+    "PROFESSIONAL_SERVICES": {
+      "p50_dpo": 30,
+      "p75_dpo": 45,
+      "p90_dpo": 60,
+      "notes": "Consulting firms typically net-30; pushing to net-45 feasible for large engagements"
+    },
+    "FACILITIES": {
+      "p50_dpo": 30,
+      "p75_dpo": 45,
+      "p90_dpo": 60,
+      "notes": "Utilities often fixed; maintenance and FM services net-45 achievable"
+    },
+    "MARKETING": {
+      "p50_dpo": 30,
+      "p75_dpo": 45,
+      "p90_dpo": 60,
+      "notes": "Agency retainers often net-30; project work can push to net-45"
+    },
+    "LOGISTICS": {
+      "p50_dpo": 30,
+      "p75_dpo": 45,
+      "p90_dpo": 60,
+      "notes": "Freight and 3PL benchmark around net-30 to net-45"
+    },
+    "TRAVEL": {
+      "p50_dpo": 14,
+      "p75_dpo": 30,
+      "p90_dpo": 45,
+      "notes": "Corporate card programs settle quickly; focus on corporate card DPO vs direct billing"
+    },
+    "HR": {
+      "p50_dpo": 30,
+      "p75_dpo": 45,
+      "p90_dpo": 60,
+      "notes": "RPO and benefits admin net-30 standard; benchmarks achievable at net-45"
+    },
+    "CONTINGENT_WORKFORCE": {
+      "p50_dpo": 21,
+      "p75_dpo": 30,
+      "p90_dpo": 45,
+      "notes": "Staffing agencies often require weekly/bi-weekly pay; net-30 is the stretch target"
+    },
+    "TELECOMMUNICATIONS": {
+      "p50_dpo": 30,
+      "p75_dpo": 45,
+      "p90_dpo": 60,
+      "notes": "Telco contracts often fixed; consolidation to one provider enables better terms"
+    },
+    "OFFICE_SUPPLIES": {
+      "p50_dpo": 30,
+      "p75_dpo": 45,
+      "p90_dpo": 60,
+      "notes": "Office supply distributors routinely offer net-45 to net-60 for volume accounts"
+    },
+    "INSURANCE": {
+      "p50_dpo": 30,
+      "p75_dpo": 30,
+      "p90_dpo": 30,
+      "notes": "Insurance premiums are typically fixed-schedule; limited DPO leverage"
+    },
+    "OTHER": {
+      "p50_dpo": 30,
+      "p75_dpo": 45,
+      "p90_dpo": 60,
+      "notes": "Default target; apply category-specific benchmarks where possible"
+    }
   },
   "industry_adjustments": {
-    "manufacturing": 1.20,
-    "retail": 1.30,
-    "technology": 0.90,
+    "manufacturing": 1.2,
+    "retail": 1.3,
+    "technology": 0.9,
     "financial_services": 0.85,
-    "healthcare": 0.90,
-    "energy": 1.10,
-    "default": 1.00
+    "healthcare": 0.9,
+    "energy": 1.1,
+    "default": 1.0
   },
   "working_capital_notes": "DPO extension benefit = (target_dpo - current_dpo) / 365 * annual_category_spend. This is a one-time working capital release, not an ongoing P&L saving. At a 10% WACC, the annual cash flow value = working_capital_released * wacc."
 }

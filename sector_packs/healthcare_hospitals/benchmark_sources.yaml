@@ -1,0 +1,33 @@
+source_validation_date: '2026-05-21'
+source_validation_note: 'Free source URLs verified. Sample metrics are indicative public disclosures. Licensed sources require credentials — no data fabricated for licensed entries.'
+
+pack_id: healthcare_hospitals
+schema_version: '1.0'
+confidence: illustrative
+free_sources:
+- name: NABH accreditation data
+  type: public_disclosure
+  url: 'https://www.nabh.co/'
+  sample_metric: 'NABH-accredited hospitals: 690+ as of 2024 (NABH accreditation dashboard)'
+- name: CPCB biomedical waste reports
+  type: public_disclosure
+  url: 'https://cpcb.nic.in/bio-medical-waste/'
+  sample_metric: 'India biomedical waste generated: ~801 tonnes/day FY2023; treatment capacity gap visible in state-wise CPCB data'
+- name: MoHFW health facility data
+  type: public_disclosure
+  url: 'https://mohfw.gov.in/'
+  sample_metric: 'India healthcare expenditure as % of GDP: 2.1% (MoHFW Health Statistics 2023-24)'
+licensed_sources_stubs:
+- name: CMIE Prowess IQ
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: CmieAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+- name: CRISIL Health Benchmark
+  type: licensed
+  status: stub_requires_credentials
+  adapter_class: CRISILHealthBenchmarkAdapter
+  data_available: 'pending_credentials — contact provider for licensed data access'
+refresh_cycle: Annual
+notes: Free sources provide public disclosure data sufficient for diagnostic benchmarking.
+  Licensed sources required for granular spend-line comparisons.

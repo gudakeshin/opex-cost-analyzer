@@ -338,7 +338,14 @@ class WorkbookManifest(BaseModel):
     key_driver_variables: List[KeyDriverVariable] = Field(default_factory=list)
     output_metrics: List[OutputMetric] = Field(default_factory=list)
     spend_category_coverage: List[str] = Field(default_factory=list)
-    ingestion_strategy: Literal["timeseries_flatten", "scenario_pivot", "assumptions_extract", "hybrid", "standard"] = "standard"
+    ingestion_strategy: Literal[
+        "timeseries_flatten",
+        "scenario_pivot",
+        "assumptions_extract",
+        "hybrid",
+        "ledger_standard",
+        "standard",
+    ] = "standard"
     ingestion_notes: str = ""
     confidence: float = 0.0
 

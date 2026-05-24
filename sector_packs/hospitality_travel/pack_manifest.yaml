@@ -1,0 +1,24 @@
+pack_id: hospitality_travel
+sector: Hospitality & Travel
+version: '0.1'
+schema_version: '1.0'
+status: scaffold
+description: Hotel chains, OTAs, airline catering, travel management companies, QSR
+  chains.
+applicable_entity_types:
+- Hotel_Chain
+- OTA
+- QSR_Chain
+- Travel_Management_Company
+regulatory_bodies:
+- Ministry_of_Tourism
+- FSSAI
+- MCA
+- SEBI
+fiscal_year_end: March
+reporting_currency: INR
+default_wacc_pct: 12.5
+default_tax_rate_pct: 25.17
+created_at: '2026-05-20'
+effective_from: FY2025-26
+maintained_by: opex-platform-team

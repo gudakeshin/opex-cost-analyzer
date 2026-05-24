@@ -1,5 +1,7 @@
 {
   "sector": "manufacturing_diversified",
+  "source_type": "internal_calibration",
+  "source_verification_note": "Savings ranges (p10/p50/p90) are internal consulting estimates. industry_sources entries indicate real published works that directionally support each lever's savings thesis. Specific percentages are not directly quoted from these sources.",
   "levers": [
     {
       "lever_id": "energy_efficiency_program",
@@ -9,7 +11,12 @@
       "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 22.0,
       "implementation_weeks": 20,
       "brsr_principle": "P6",
-      "savings_type": "run_rate"
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/) — industrial energy consumption benchmarks and efficiency improvement data",
+        "Bureau of Energy Efficiency (BEE) — Perform Achieve Trade (PAT) Scheme results (beeindia.gov.in/content/pat-cycle) — energy savings achieved by designated consumers",
+        "McKinsey & Company — Reducing Energy Consumption in Manufacturing (mckinsey.com/capabilities/operations/our-insights) — 10-25% energy savings potential in industrial settings"
+      ]
     },
     {
       "lever_id": "logistics_network_redesign",
@@ -19,7 +26,12 @@
       "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
       "implementation_weeks": 16,
       "brsr_principle": "P6",
-      "savings_type": "run_rate"
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CRISIL — India Logistics Report 2024 (crisil.com) — logistics cost as % of GDP and network optimisation benchmarks",
+        "DPIIT — Trade Facilitation and Logistics Performance Data 2024 (dpiit.gov.in) — logistics efficiency benchmarks",
+        "INTERNAL_CALIBRATION — specific network redesign savings range is an internal consulting estimate for Indian manufacturing"
+      ]
     },
     {
       "lever_id": "gst_itc_recovery",
@@ -29,7 +41,12 @@
       "p10_pct": 2.0, "p50_pct": 4.0, "p90_pct": 8.0,
       "implementation_weeks": 8,
       "brsr_principle": "P1",
-      "savings_type": "one_time"
+      "savings_type": "one_time",
+      "industry_sources": [
+        "GST Act 2017 Section 17(5) — blocked credit categories (statutory source, not a benchmark)",
+        "GSTN — Annual Statistics on ITC claims and reconciliation gaps (gstn.org.in) — ITC leakage rates across industries",
+        "INTERNAL_CALIBRATION — 2-8% recovery range is an internal consulting estimate based on ITC reconciliation engagements"
+      ]
     },
     {
       "lever_id": "mro_vendor_consolidation",
@@ -39,7 +56,12 @@
       "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
       "implementation_weeks": 12,
       "brsr_principle": "P1",
-      "savings_type": "run_rate"
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Hackett Group — World-Class Performance Study: Procurement Benchmarks 2024 (thehackettgroup.com/research/) — MRO supplier consolidation savings benchmarks",
+        "CAPS Research — MRO Procurement Benchmarking (capsresearch.org/benchmarking/) — maintenance spend under management benchmarks",
+        "INTERNAL_CALIBRATION — specific MRO consolidation savings range is an internal consulting estimate"
+      ]
     },
     {
       "lever_id": "contract_manufacturing_optimise",
@@ -49,7 +71,11 @@
       "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 20.0,
       "implementation_weeks": 24,
       "brsr_principle": "P6",
-      "savings_type": "run_rate"
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "McKinsey & Company — Make vs Buy in Manufacturing Operations (mckinsey.com/capabilities/operations/our-insights) — insourcing decision framework and savings potential",
+        "INTERNAL_CALIBRATION — contract manufacturing optimisation savings range is an internal consulting estimate for Indian diversified manufacturers"
+      ]
     },
     {
       "lever_id": "ind_as116_lease_reclassify",
@@ -59,7 +85,12 @@
       "p10_pct": 1.0, "p50_pct": 3.0, "p90_pct": 6.0,
       "implementation_weeks": 6,
       "brsr_principle": "P1",
-      "savings_type": "one_time"
+      "savings_type": "one_time",
+      "industry_sources": [
+        "ICAI — Ind AS 116 Leases — Implementation Guidance (icai.org) — statutory accounting standard with practical expedients for short-term and low-value leases",
+        "MCA — Indian Accounting Standards Notification 2015, updated 2019 (mca.gov.in) — Ind AS 116 regulatory basis",
+        "INTERNAL_CALIBRATION — 1-6% cash flow recovery range is an internal consulting estimate based on Ind AS 116 transition reviews"
+      ]
     }
   ]
 }

@@ -1,5 +1,8 @@
 {
   "version": "1.0",
+  "source_type": "statutory",
+  "legislative_basis": "Central Goods and Services Tax Act 2017, Integrated Goods and Services Tax Act 2017, Income Tax Act 1961 (TDS sections), GST Council rate notifications",
+  "verification_note": "All GST rates, ITC eligibility rules, RCM categories, and TDS rates in this file are sourced from Indian statute and GST Council notifications. Rates are current as of GST Council 53rd Meeting (June 2024). Verify against latest GST Council notifications before use in client advisory as rates are periodically revised.",
   "description": "GST treatment rules, RCM categories, inverted-duty sectors, and TDS rates for Indian enterprise spend analysis",
   "gst_rate_bands": [0, 5, 12, 18, 28],
 

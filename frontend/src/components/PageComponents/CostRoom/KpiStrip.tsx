@@ -9,6 +9,7 @@ interface KpiStripProps {
   ebitdaBps: number;
   initiativeCount: number;
   gateProgressPct: number;
+  currency?: string;
 }
 
 export const KpiStrip: React.FC<KpiStripProps> = ({
@@ -17,16 +18,17 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
   ebitdaBps,
   initiativeCount,
   gateProgressPct,
+  currency = 'USD',
 }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
     <MetricTile
       label="Portfolio P50"
-      value={formatCr(portfolioP50Cr)}
+      value={formatCr(portfolioP50Cr, { currency })}
       change={`${initiativeCount} initiatives`}
     />
     <MetricTile
       label="Committed (P50)"
-      value={formatCr(committedP50Cr)}
+      value={formatCr(committedP50Cr, { currency })}
       change={`${gateProgressPct}% of portfolio`}
     />
     <MetricTile label="EBITDA impact (Y3)" value={formatBps(ebitdaBps)} change="Steady-state P50" />

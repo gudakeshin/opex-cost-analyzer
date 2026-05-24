@@ -105,6 +105,19 @@ _INDUSTRY_TO_PACK: Dict[str, str] = {
     "wealth management": "financial_services_nonbank",
     "amc": "financial_services_nonbank",
     "mutual fund": "financial_services_nonbank",
+    # GCC / captive capability centers
+    "gcc": "gcc_capability_centers",
+    "gcc capability": "gcc_capability_centers",
+    "gcc capability center": "gcc_capability_centers",
+    "gcc capability centers": "gcc_capability_centers",
+    "capability center": "gcc_capability_centers",
+    "global capability center": "gcc_capability_centers",
+    "global capability centers": "gcc_capability_centers",
+    "captive center": "gcc_capability_centers",
+    "captive gcc": "gcc_capability_centers",
+    "shared service center": "gcc_capability_centers",
+    "ssc": "gcc_capability_centers",
+    "gcc_capability_centers": "gcc_capability_centers",
 }
 
 # ---------------------------------------------------------------------------
@@ -129,13 +142,17 @@ def _get_heuristic_ranges() -> Dict[str, float]:
     return _HEURISTIC_RANGES
 
 
-def _get_per_employee_targets() -> Dict[str, float]:
+def _get_per_employee_targets(currency: str = "INR") -> Dict[str, float]:
     global _PER_EMPLOYEE_TARGETS
+    data = _read_json(HEURISTIC_TARGETS_PATH)
+    key = "per_employee_targets_usd" if currency.upper() != "INR" else "per_employee_targets"
     if _PER_EMPLOYEE_TARGETS is None:
         _PER_EMPLOYEE_TARGETS = {
             str(k): float(v)
-            for k, v in _read_json(HEURISTIC_TARGETS_PATH).get("per_employee_targets", {}).items()
+            for k, v in data.get("per_employee_targets", {}).items()
         }
+    if currency.upper() != "INR":
+        return {str(k): float(v) for k, v in data.get(key, {}).items()}
     return _PER_EMPLOYEE_TARGETS
 
 

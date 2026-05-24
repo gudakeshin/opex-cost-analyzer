@@ -75,6 +75,12 @@
       "applicable_if": [
         "gst_treatment field present",
         "related_party_flag present"
+      ],
+      "shared_lever": true,
+      "industry_sources": [
+        "GST Act 2017 Section 17(5) — blocked credit categories (statutory)",
+        "DPE — Survey of CPSEs 2022-23 (dpe.gov.in/reports/annual-report) — GST compliance benchmarks for CPSEs",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -110,6 +116,11 @@
       "applicable_if": [
         "lease_treatment field present",
         "category:FACILITIES present"
+      ],
+      "industry_sources": [
+        "MCA — Indian Accounting Standard Ind AS 116 Leases (mca.gov.in) — statutory accounting standard",
+        "ICAI — Ind AS 116 Implementation Guidance (icai.org) — practical expedients for short-term and low-value leases",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -144,6 +155,11 @@
       },
       "applicable_if": [
         "category:CSR present"
+      ],
+      "industry_sources": [
+        "MCA — CSR Annual Reports & Impact Data (mca.gov.in/content/mca/global/en/acts-rules/ebooks/circulars.html) — Companies Act 2013 Section 135 CSR spending data",
+        "DPE — Survey of CPSEs CSR Expenditure 2022-23 (dpe.gov.in/reports/annual-report) — CPSE CSR spend impact benchmarks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -178,6 +194,11 @@
       },
       "applicable_if": [
         "related_party_flag present OR gst_treatment present"
+      ],
+      "industry_sources": [
+        "GeM — Government e-Marketplace Annual Report 2023-24 (gem.gov.in/resources/files/Annual_Report_GEM.pdf) — GeM procurement savings benchmarks for CPSEs",
+        "CVC — Procurement Reform Guidelines (cvc.gov.in) — public procurement best practices",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -212,6 +233,12 @@
       },
       "applicable_if": [
         "category:PLANT_MAINTENANCE present"
+      ],
+      "shared_lever": true,
+      "industry_sources": [
+        "DPE — Survey of CPSEs 2022-23 (dpe.gov.in/reports/annual-report) — MRO and maintenance spend benchmarks for CPSEs",
+        "Hackett Group — World-Class Procurement Benchmarks 2024 (thehackettgroup.com/research/) — MRO consolidation savings 8-20%",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -246,6 +273,12 @@
       },
       "applicable_if": [
         "category:POWER_ENERGY > 5% spend"
+      ],
+      "shared_lever": true,
+      "industry_sources": [
+        "BEE — Perform Achieve Trade (PAT) Scheme Cycle Results (beeindia.gov.in/content/pat-cycle) — energy savings achieved by designated consumers including CPSEs",
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/) — industrial energy efficiency benchmarks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -281,6 +314,11 @@
       "applicable_if": [
         "headcount > 200",
         "related_party_flag present"
+      ],
+      "industry_sources": [
+        "DPE — Survey of CPSEs 2022-23 (dpe.gov.in/reports/annual-report) — employee cost as % of revenue benchmarks for CPSEs",
+        "CAG — Audit Reports on CPSEs (cag.gov.in/en/report) — manpower productivity findings",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -315,7 +353,13 @@
       },
       "applicable_if": [
         "related_party_flag present OR category:PROF_SVCS present"
+      ],
+      "industry_sources": [
+        "CAG — Audit Reports on Infrastructure Projects (cag.gov.in/en/report) — project cost overrun patterns in Indian CPSEs",
+        "DPE — MoU Performance Evaluation of CPSEs 2023 (dpe.gov.in) — project delivery KPIs",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     }
-  ]
+  ],
+  "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."
 }

@@ -1,0 +1,178 @@
+{
+  "eval_date": "2026-05-24",
+  "platform_version": "v2.1",
+  "overall_score": 9.685,
+  "passed": true,
+  "scenario_run_count": 5,
+  "scenario_pass_count": 5,
+  "domains": [
+    {
+      "name": "skill_output_integrity",
+      "display": "Skill Output Integrity",
+      "weight": 0.55,
+      "score": 10.0,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "AQ-01",
+          "name": "Numerical Faithfulness",
+          "weight": 0.25,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 5,
+          "scenarios_below_threshold": 0,
+          "remediation": "Standardize amount formatting with a shared fmt_amount() helper in reflect.py. Assert that deduped_mid_savings propagates consistently through _build_response_text."
+        },
+        {
+          "id": "AQ-02",
+          "name": "Recommendation Specificity",
+          "weight": 0.2,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 5,
+          "scenarios_below_threshold": 0,
+          "remediation": "Add supplier injection into value bridge rows: ensure each initiative inherits the top supplier from spend_profiler.category_profile. Validate lever names against the canonical lever registry."
+        },
+        {
+          "id": "AQ-03",
+          "name": "Evidence Grounding",
+          "weight": 0.2,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 5,
+          "scenarios_below_threshold": 0,
+          "remediation": "Propagate PeerComparisonRow.source into value_matrix rows so downstream response composition can cite the benchmark source. Cross-reference bridge categories to peer/internal outputs."
+        },
+        {
+          "id": "AQ-04",
+          "name": "Priority Ranking Correctness",
+          "weight": 0.15,
+          "threshold": 8.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 5,
+          "scenarios_below_threshold": 0,
+          "remediation": "value_bridge_calculator already sorts by deduped_mid_savings. If this fails, check whether savings_modeler returned initiatives in a fixed ordering that overrides the sort."
+        },
+        {
+          "id": "AQ-06",
+          "name": "Causal Reasoning Quality",
+          "weight": 0.2,
+          "threshold": 6.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 5,
+          "scenarios_below_threshold": 0,
+          "remediation": "Root-cause-analyzer only fires for categories in P50-P75/P75-P90/P90+ bands. Inject live metrics into diagnoses: include actual HHI, maverick spend %, or DPO gap in the diagnosis string."
+        }
+      ]
+    },
+    {
+      "name": "signal_coverage",
+      "display": "Signal Coverage & Composition Quality",
+      "weight": 0.45,
+      "score": 9.3,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "AQ-05",
+          "name": "Coverage Completeness",
+          "weight": 0.3,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 5,
+          "scenarios_below_threshold": 0,
+          "remediation": "Add BvA and MSME flags to _build_response_text deterministic path. For BvA: inject bva.variances into the response when bva_available=True. For MSME: add a compliance block when at_risk_count > 0."
+        },
+        {
+          "id": "AQ-07",
+          "name": "Decision Memo Quality",
+          "weight": 0.35,
+          "threshold": 7.0,
+          "score": 8.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 5,
+          "scenarios_below_threshold": 0,
+          "remediation": "For category-focused intents, ensure all four lenses (value bridge, peer benchmark, root cause, heuristic) compute results for the focus category. Check that heuristic_analyzer runs when headcount=0 (revenue-only targets)."
+        },
+        {
+          "id": "AQ-08",
+          "name": "Action Timeframe Clarity",
+          "weight": 0.35,
+          "threshold": 6.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 5,
+          "scenarios_below_threshold": 0,
+          "remediation": "Validate payback_months in savings_modeler: if computed payback > 36 months, cap it with a warning rather than silently returning an unrealistic value. Ensure cost_to_achieve.total_3yr is always populated."
+        }
+      ]
+    }
+  ],
+  "top_gaps": [],
+  "remediation_roadmap": [],
+  "per_scenario_raw_scores": {
+    "S01": {
+      "AQ-01": 10.0,
+      "AQ-02": 10.0,
+      "AQ-03": 10.0,
+      "AQ-04": 10.0,
+      "AQ-05": 10.0,
+      "AQ-06": 10.0,
+      "AQ-07": 7.5,
+      "AQ-08": 10.0
+    },
+    "S02": {
+      "AQ-01": 10.0,
+      "AQ-02": 10.0,
+      "AQ-03": 10.0,
+      "AQ-04": 10.0,
+      "AQ-05": 10.0,
+      "AQ-06": 10.0,
+      "AQ-07": 7.5,
+      "AQ-08": 10.0
+    },
+    "S03": {
+      "AQ-01": 10.0,
+      "AQ-02": 10.0,
+      "AQ-03": 10.0,
+      "AQ-04": 10.0,
+      "AQ-05": 10.0,
+      "AQ-06": 10.0,
+      "AQ-07": 10.0,
+      "AQ-08": 10.0
+    },
+    "S04": {
+      "AQ-01": 10.0,
+      "AQ-02": 10.0,
+      "AQ-03": 10.0,
+      "AQ-04": 10.0,
+      "AQ-05": 10.0,
+      "AQ-06": 10.0,
+      "AQ-07": 7.5,
+      "AQ-08": 10.0
+    },
+    "S05": {
+      "AQ-01": 10.0,
+      "AQ-02": 10.0,
+      "AQ-03": 10.0,
+      "AQ-04": 10.0,
+      "AQ-05": 10.0,
+      "AQ-06": 10.0,
+      "AQ-07": 7.5,
+      "AQ-08": 10.0
+    }
+  }
+}

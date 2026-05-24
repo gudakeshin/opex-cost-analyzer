@@ -74,6 +74,11 @@
       "applicable_if": [
         "headcount > 500",
         "multi_bu_structure detected"
+      ],
+      "industry_sources": [
+        "Deloitte — Global Shared Services & Outsourcing Survey 2024 (deloitte.com/content/dam/Deloitte/global/Documents/Tax/dttl-tax-global-shared-services-survey.pdf) — 25-50% cost reduction benchmarks for SSC migration",
+        "McKinsey & Company — Transforming the Back Office (mckinsey.com/capabilities/operations/our-insights) — shared services ROI studies across large conglomerates",
+        "Hackett Group — World-Class Shared Services Performance 2024 (thehackettgroup.com/research/) — G&A cost reduction through SSC"
       ]
     },
     {
@@ -109,6 +114,11 @@
       "applicable_if": [
         "multi_bu_structure detected",
         "supplier_count > 30"
+      ],
+      "industry_sources": [
+        "Hackett Group — World-Class Procurement Performance Study 2024 (thehackettgroup.com/research/) — group procurement aggregation savings 8-20%",
+        "CAPS Research — Group Purchasing & Consortium Benchmarks (capsresearch.org/benchmarking/) — spend aggregation leverage benchmarks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -144,6 +154,11 @@
       "applicable_if": [
         "annual_revenue > 500M",
         "multi_bu_structure detected"
+      ],
+      "industry_sources": [
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again) — 10-25% corporate overhead reduction",
+        "CII — India Inc. Cost Competitiveness Report 2024 (cii.in) — corporate overhead benchmarks for Indian conglomerates",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -179,6 +194,10 @@
       "applicable_if": [
         "multi_bu_structure detected",
         "annual_revenue > 1000M"
+      ],
+      "industry_sources": [
+        "McKinsey & Company — The Five Traps of Portfolio Rationalisation (mckinsey.com/capabilities/strategy-and-corporate-finance) — divestiture impact on EBITDA margins",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -214,6 +233,10 @@
       "applicable_if": [
         "category:INSURANCE present",
         "multi_bu_structure detected"
+      ],
+      "industry_sources": [
+        "Aon — Global Insurance Market Conditions Report 2024 (aon.com/risk-services/risk-consulting/insurance-market-update.jsp) — group pooling discount benchmarks 10-25%",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -249,6 +272,11 @@
       "applicable_if": [
         "related_party_flag_high",
         "multi_bu_structure detected"
+      ],
+      "industry_sources": [
+        "OECD — Transfer Pricing Guidelines for Multinational Enterprises 2022 (oecd.org/tax/transfer-pricing/) — arm's length principle for intercompany pricing",
+        "PwC — International Transfer Pricing 2024 (pwc.com/gx/en/services/tax/international-tax/transfer-pricing.html) — transfer pricing optimisation frameworks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -284,6 +312,11 @@
       "applicable_if": [
         "category:FACILITIES > 3% revenue",
         "multi_bu_structure detected"
+      ],
+      "industry_sources": [
+        "JLL India — India Office Market Report 2024 (jll.com/en-in/research/india-office-market-report) — office space rationalisation benchmarks",
+        "CBRE — India Real Estate Market Outlook 2024 (cbre.com/insights/reports/india-real-estate-market-outlook) — real estate portfolio optimisation",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -319,7 +352,13 @@
       "applicable_if": [
         "category:FIN_SVCS or BANKING_TREASURY present",
         "multi_bu_structure detected"
+      ],
+      "industry_sources": [
+        "Atradius — Payment Practices Barometer Asia-Pacific 2024 (atradius.us/knowledge-and-research/reports/payment-practices-barometer-asia-pacific.html) — working capital benchmarks",
+        "Hackett Group — Working Capital Management 2024 (thehackettgroup.com/working-capital-management-hackett/) — cash pooling and netting benefits",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     }
-  ]
+  ],
+  "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."
 }

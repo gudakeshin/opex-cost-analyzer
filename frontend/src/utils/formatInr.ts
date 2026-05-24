@@ -1,15 +1,21 @@
-/** INR-native formatting for executive Cost Room (₹ Cr). */
+/** Currency-aware formatting for executive Cost Room. INR uses Cr scale; others use M scale. */
 
-export function formatCr(value: number, opts?: { perYear?: boolean; decimals?: number }): string {
+export function formatCr(
+  value: number,
+  opts?: { perYear?: boolean; decimals?: number; currency?: string },
+): string {
+  const currency = (opts?.currency ?? 'INR').toUpperCase();
+  const sym = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '₹';
   const n = Number(value);
   if (!Number.isFinite(n)) return '—';
   const decimals = opts?.decimals ?? (Math.abs(n) >= 100 ? 0 : 1);
-  const formatted = n.toLocaleString('en-IN', {
-    maximumFractionDigits: decimals,
-    minimumFractionDigits: 0,
-  });
   const suffix = opts?.perYear ? '/yr' : '';
-  return `₹${formatted} Cr${suffix}`;
+  if (currency === 'INR') {
+    const formatted = n.toLocaleString('en-IN', { maximumFractionDigits: decimals, minimumFractionDigits: 0 });
+    return `${sym}${formatted} Cr${suffix}`;
+  }
+  const formatted = n.toLocaleString('en-US', { maximumFractionDigits: decimals, minimumFractionDigits: 0 });
+  return `${sym}${formatted} M${suffix}`;
 }
 
 export function formatBps(value: number): string {

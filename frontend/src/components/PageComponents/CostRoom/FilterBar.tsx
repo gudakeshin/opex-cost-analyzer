@@ -36,6 +36,7 @@ interface FilterBarProps {
   onChange: (next: PortfolioFilters) => void;
   filteredCount: number;
   exceptionCount?: number;
+  currency?: string;
 }
 
 function uniqueOptions(rows: Initiative[], key: keyof Initiative): string[] {
@@ -53,7 +54,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   onChange,
   filteredCount,
   exceptionCount = 0,
+  currency = 'USD',
 }) => {
+  const sym = currency === 'INR' ? '₹' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '$';
+  const unit = currency === 'INR' ? 'Cr' : 'M';
   const levers = useMemo(() => uniqueOptions(initiatives, 'lever'), [initiatives]);
   const categories = useMemo(() => uniqueOptions(initiatives, 'category'), [initiatives]);
   const owners = useMemo(() => uniqueOptions(initiatives, 'owner_name'), [initiatives]);
@@ -152,7 +156,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           ))}
         </select>
       </FilterField>
-      <FilterField label="Min P50 (₹ Cr)">
+      <FilterField label={`Min P50 (${sym} ${unit})`}>
         <input
           type="number"
           min={0}

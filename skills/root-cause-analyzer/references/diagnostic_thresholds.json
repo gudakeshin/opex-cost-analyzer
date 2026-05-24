@@ -1,16 +1,78 @@
 {
-  "version": "1.0",
+  "version": "1.2",
+  "source_type_legend": "Each threshold carries a source_type field: 'statutory' = law/regulation, 'published_research' = named external study with year, 'internal_calibration' = consulting engagement data with no single external source.",
   "thresholds": {
-    "peer_percentile_include": ["P50-P75", "P75-P90", "P90+"],
-    "supplier_fragmentation_hhi_max": 0.15,
-    "supplier_fragmentation_min_suppliers": 5,
-    "maverick_spend_ratio_min": 0.2,
-    "cost_per_transaction_max": 1000.0
+    "peer_percentile_include": {
+      "value": ["P50-P75", "P75-P90", "P90+"],
+      "source_type": "internal_calibration",
+      "rationale": "Flags categories where actual spend sits above the peer median. P50 is the minimum bar; P75-P90 and P90+ indicate increasingly severe overspend relative to peer group.",
+      "source": "Internal platform design — consistent with Hackett Group World-Class benchmark methodology which uses P25 as the top-quartile target and P75 as the underperformance flag.",
+      "disclaimer": "Band boundaries are internal design choices; the Hackett Group methodology referenced is directional, not directly quoted."
+    },
+    "supplier_fragmentation_hhi_max": {
+      "value": 0.15,
+      "source_type": "published_research",
+      "citation": "DOJ/FTC Horizontal Merger Guidelines (2010) — Section 5.3: markets with HHI < 1500 (= 0.15 in 0-1 scale) are unconcentrated",
+      "source_url": "https://www.justice.gov/atr/herfindahl-hirschman-index",
+      "guidelines_pdf": "https://www.justice.gov/sites/default/files/atr/legacy/2010/08/19/hmg-2010.pdf",
+      "rationale": "An HHI below 0.15 within a spend category (across active suppliers) indicates fragmentation. HHI of 0 = perfectly fragmented; HHI of 1 = single supplier. Threshold of 0.15 set conservatively to catch meaningful fragmentation without over-triggering on categories with naturally distributed spend.",
+      "adaptation_note": "DOJ/FTC uses HHI at market level for merger analysis. Applied here to supplier concentration within a single buyer's spend category — methodologically analogous but not the original intended use."
+    },
+    "supplier_fragmentation_min_suppliers": {
+      "value": 5,
+      "source_type": "internal_calibration",
+      "rationale": "Minimum number of active suppliers in a category before HHI fragmentation flag is meaningful. Fewer than 5 suppliers means HHI may reflect intentional dual-sourcing rather than unmanaged proliferation.",
+      "source": "Internal heuristic based on procurement best practice; consistent with Hackett Group procurement diagnostic thresholds.",
+      "disclaimer": "No specific Hackett Group publication sources this exact threshold. It is an internal judgment call."
+    },
+    "maverick_spend_ratio_min": {
+      "value": 0.2,
+      "source_type": "internal_calibration",
+      "rationale": "Spend through non-preferred channels (outside approved vendors or PO process) exceeding 20% of category spend indicates a compliance problem. CAPS Research data shows average managed spend is 85% of total (implying ~15% unmanaged); best-in-class is 91% managed (<9% maverick).",
+      "source": "CAPS Research (Institute for Supply Management) — capsresearch.org — benchmarks show average 85% spend under management, implying ~15% unmanaged spend. Hackett Group world-class AP threshold is <5% maverick spend. 20% threshold is an internal calibration at the median-to-poor boundary.",
+      "caps_research_url": "https://www.capsresearch.org/benchmarking/",
+      "disclaimer": "The 20% threshold is an internal platform design choice. CAPS Research and Hackett are directional references, not the source of this specific threshold."
+    },
+    "cost_per_transaction_max": {
+      "value": 1000.0,
+      "currency": "INR",
+      "value_usd": 12.0,
+      "source_type": "internal_calibration",
+      "rationale": "Cost per invoice processed above ₹1,000 (or $12 USD) signals manual-intensive AP operations. Benchmark for automated AP is ₹100-300 ($1.2-3.6) per invoice; semi-automated ₹300-600 ($3.6-7.2); fully manual ₹600-1,500+ ($7.2-18+).",
+      "source": "Ardent Partners AP Metrics That Matter 2024 (ardentpartners.com) reports global cost-per-invoice benchmarks. India-market ₹ values are internal calibrations at ~83x USD/INR FX. Global automated benchmark: ~$3-7 USD per invoice; manual: ~$10-25 USD.",
+      "ardent_partners_url": "https://ardentpartners.com/ap-metrics-that-matter-in-2025/",
+      "disclaimer": "The ₹1,000 / $12 thresholds are internal calibrations. Ardent Partners reports in USD; the INR equivalent is approximate and should be updated with current FX rates."
+    }
   },
   "addressable_rates": {
-    "supplier_consolidation": 0.2,
-    "maverick_compliance": 0.1,
-    "demand_management": 0.08,
-    "baseline_optimization": 0.05
+    "supplier_consolidation": {
+      "value": 0.2,
+      "source_type": "internal_calibration",
+      "rationale": "20% of fragmented category spend is typically addressable through consolidation in the first programme cycle — reflects that not all suppliers can be exited immediately due to contractual lock-ins and transition risk.",
+      "source": "Internal platform calibration based on consulting engagement outcomes. Directionally consistent with Hackett Group procurement value realisation benchmarks (not directly quoted from a specific study).",
+      "disclaimer": "Internal estimate. No single published source states 20% as a standard addressability rate for supplier consolidation."
+    },
+    "maverick_compliance": {
+      "value": 0.1,
+      "source_type": "internal_calibration",
+      "rationale": "10% of total category spend is the conservative addressable quantum for maverick compliance programmes — reflects partial compliance uplift achievable without full P2P transformation.",
+      "source": "Internal calibration. Hackett Group directionally references 3-8% of addressable spend as typical maverick reduction yield from a compliance programme alone; 10% is the internal platform upper-bound for first-cycle addressability.",
+      "disclaimer": "Internal estimate. The 10% figure is not directly quoted from any Hackett Group publication."
+    },
+    "demand_management": {
+      "value": 0.08,
+      "source_type": "internal_calibration",
+      "rationale": "8% addressability for demand management reflects discretionary spend reduction achievable through policy tightening and approval controls, without structural changes to operations.",
+      "source": "Internal calibration from India enterprise cost reduction programmes. McKinsey zero-based budgeting reports cite 10-25% reduction across cost categories when ZBB is applied comprehensively (not specifically discretionary-only). The 8% platform default is a conservative India-enterprise calibration for policy-level changes only.",
+      "mckinsey_zbb_url": "https://www.mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again",
+      "disclaimer": "8% is an internal platform default. McKinsey's 10-25% ZBB figure covers broader cost categories; the specific 8% for demand management is an internal calibration."
+    },
+    "baseline_optimization": {
+      "value": 0.05,
+      "source_type": "internal_calibration",
+      "rationale": "5% floor applied when no specific root cause is identified — represents the minimum savings achievable through basic vendor negotiations and process clean-up in any addressable category.",
+      "source": "Internal conservative floor. KPMG and Deloitte public cost optimisation frameworks directionally suggest 3-8% baseline savings in mature procurement organisations; 5% is the internal platform midpoint for this range.",
+      "disclaimer": "Internal estimate. No KPMG or Deloitte publication specifically sources a 5% baseline floor figure."
+    }
   }
 }

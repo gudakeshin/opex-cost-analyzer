@@ -37,7 +37,7 @@ class NormalizedSpendLine(BaseModel):
     # FP&A fields
     gl_code: Optional[str] = None
     cost_center_id: Optional[str] = None
-    currency: str = "INR"
+    currency: str = "USD"
     fx_rate_to_reporting: float = 1.0
     amount_reporting: Optional[float] = None  # None = same as amount
     amount_type: str = "actual"  # "actual" | "budget" | "forecast" | "accrual"
@@ -110,7 +110,7 @@ class SessionAnalysisState(BaseModel):
     company_name: Optional[str] = None
     industry: str = ""
     annual_revenue: float = 0.0
-    reporting_currency: str = "INR"
+    reporting_currency: str = "USD"
     normalized_spend: List[NormalizedSpendLine] = Field(default_factory=list)
     context_summary: str = ""
     skill_outputs: Dict[str, Dict[str, Any]] = Field(default_factory=dict)

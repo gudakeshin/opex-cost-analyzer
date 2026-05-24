@@ -21,12 +21,14 @@ interface ValueBridgeChartProps {
   portfolioP50Cr: number;
   committedP50Cr: number;
   ebitdaBps: number;
+  currency?: string;
 }
 
 export const ValueBridgeChart: React.FC<ValueBridgeChartProps> = ({
   portfolioP50Cr,
   committedP50Cr,
   ebitdaBps,
+  currency = 'USD',
 }) => {
   const data = [
     { name: 'Portfolio P50', value: portfolioP50Cr, fill: BRAND.navy },
@@ -56,7 +58,7 @@ export const ValueBridgeChart: React.FC<ValueBridgeChartProps> = ({
             formatter={(value: number, _name, item) => {
               const payload = item?.payload as { display?: string; name: string };
               if (payload?.display) return [payload.display, payload.name];
-              return [formatCr(value), payload?.name ?? ''];
+              return [formatCr(value, { currency }), payload?.name ?? ''];
             }}
           />
           <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
@@ -72,7 +74,7 @@ export const ValueBridgeChart: React.FC<ValueBridgeChartProps> = ({
           {data.map((row) => (
             <tr key={row.name}>
               <th scope="row">{row.name}</th>
-              <td>{row.display ?? formatCr(row.value)}</td>
+              <td>{row.display ?? formatCr(row.value, { currency })}</td>
             </tr>
           ))}
         </tbody>

@@ -1,5 +1,7 @@
 {
   "version": "1.1",
+  "source_type": "internal_design",
+  "design_note": "Cost behaviour rules, discretionary spend heuristics, and spend quadrant definitions are internal platform design choices. No external benchmark is claimed for these classification rules. Addressability percentages (fixed: 0%, semi-variable: 60%, variable: 100%) are internal defaults; override at the category level using regulatory_exclusions.json and contract-specific data.",
   "cost_behaviour": {
     "fixed_keywords": ["rent", "lease", "license", "subscription annual", "ea"],
     "semi_variable_keywords": ["cloud", "utility", "support", "maintenance"],

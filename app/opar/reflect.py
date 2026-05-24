@@ -448,15 +448,17 @@ def _generate_llm_advisory_sections(
     ctx: ObserveContext,
     manifest: Dict[str, Any],
     validated: Dict[str, Dict[str, Any]],
-) -> AdvisorySections | None:
+    thinking_enabled: bool = False,
+    thinking_budget_tokens: int = 8000,
+) -> Tuple[AdvisorySections | None, str | None]:
     if not ANTHROPIC_ENABLED:
-        return None
+        return None, None
     if "value-bridge-calculator" not in validated:
-        return None
+        return None, None
     try:
         from app.opar.claude_client import synthesize_analysis_claude
     except Exception:
-        return None
+        return None, None
 
     docs = []
     doc_summary = str(validated.get("document-contextualizer", {}).get("context_summary", "")).strip()
@@ -479,15 +481,16 @@ def _generate_llm_advisory_sections(
             estimated_tokens,
             _LLM_TOKEN_LIMIT,
         )
-        return None
+        return None, None
 
     best_effort: AdvisorySections | None = None
+    captured_thinking: str | None = None
     category_focused = _is_category_focused_request(ctx, validated)
 
     mode_order = (True, False) if category_focused else (False, True)
     for strict_mode in mode_order:
         try:
-            raw = synthesize_analysis_claude(
+            raw, thinking_text = synthesize_analysis_claude(
                 user_message=ctx.user_message,
                 manifest=manifest,
                 model_manifest=ctx.model_manifest,
@@ -495,14 +498,18 @@ def _generate_llm_advisory_sections(
                 docs_text=docs,
                 transaction_examples=tx_examples,
                 strict_mode=strict_mode,
+                thinking_enabled=thinking_enabled,
+                thinking_budget_tokens=thinking_budget_tokens,
             )
         except Exception:
-            raw = None
+            raw, thinking_text = None, None
+        if thinking_text and not captured_thinking:
+            captured_thinking = thinking_text
         advisory = _normalize_advisory_sections(raw or {})
         if not advisory:
             continue
         if _advisory_quality_ok(advisory, category_focused=category_focused):
-            return advisory
+            return advisory, captured_thinking
         # Keep best effort so category asks can still use LLM-first narrative
         # instead of dropping to deterministic canned executive text.
         if (
@@ -510,7 +517,7 @@ def _generate_llm_advisory_sections(
             and len(advisory.business_levers) >= (2 if category_focused else 1)
         ):
             best_effort = advisory
-    return best_effort
+    return best_effort, captured_thinking
 
 
 def _layer1_schema_validation(
@@ -778,7 +785,13 @@ def _run_reg_watcher(
     )
 
 
-def reflect(act_result: ActResult, plan: ExecutionPlan, ctx: ObserveContext) -> ReflectOutput:
+def reflect(
+    act_result: ActResult,
+    plan: ExecutionPlan,
+    ctx: ObserveContext,
+    thinking_enabled: bool = False,
+    thinking_budget_tokens: int = 8000,
+) -> ReflectOutput:
     """Validate outputs (3-layer), score confidence, persist memory, determine loop control."""
     validated: Dict[str, Dict[str, Any]] = {}
     failed: Dict[str, str] = {}
@@ -830,7 +843,11 @@ def reflect(act_result: ActResult, plan: ExecutionPlan, ctx: ObserveContext) -> 
     manifest_path = UPLOAD_DIR / ctx.session_id / "manifest.json"
     manifest = read_json(manifest_path, {}) if manifest_path.exists() else {}
 
-    advisory_sections = _generate_llm_advisory_sections(ctx, manifest, validated)
+    advisory_sections, thinking_text = _generate_llm_advisory_sections(
+        ctx, manifest, validated,
+        thinking_enabled=thinking_enabled,
+        thinking_budget_tokens=thinking_budget_tokens,
+    )
     category_focused = _is_category_focused_request(ctx, validated)
     if advisory_sections is not None:
         response = _compose_response_from_advisory(
@@ -976,6 +993,7 @@ def reflect(act_result: ActResult, plan: ExecutionPlan, ctx: ObserveContext) -> 
         ),
         quality_signals=quality_signals,
         used_llm_synthesis=bool(validated.get("analysis-synthesizer") or validated.get("executive-communication") or advisory_sections),
+        thinking_text=thinking_text,
         degraded_mode=bool(degradation_reasons),
         fallback_reasons=degradation_reasons,
         next_options=next_options,
@@ -1350,6 +1368,48 @@ def _build_response_text(
             except Exception:
                 spec_pct = str(specificity)
             parts.append(f"Benchmarked using {source} (vintage {vintage}, specificity {spec_pct}).")
+    bva = validated.get("bva-analyzer", {})
+    if bva.get("bva_available"):
+        variances = bva.get("variances", [])
+        overruns = [v for v in variances if v.get("flag") == "over_budget" and v.get("variance_pct")]
+        if overruns:
+            over_text = ", ".join(
+                f"{v['category_name']} ({v.get('variance_pct', 0):+.1f}%)"
+                for v in sorted(overruns, key=lambda x: abs(x.get("variance_pct") or 0), reverse=True)[:3]
+            )
+            total_var = bva.get("total_variance", 0)
+            total_var_pct = bva.get("total_variance_pct", 0) or 0
+            parts.append(
+                f"**Budget vs. Actuals:** {len(overruns)} {'category' if len(overruns) == 1 else 'categories'} over budget — "
+                f"{over_text}. Total spend variance: {_format_currency(total_var)} ({total_var_pct:+.1f}% vs budget)."
+            )
+
+    msme = validated.get("msme-compliance-checker", {})
+    if msme.get("msme_data_available") and msme.get("at_risk_count", 0) > 0:
+        at_risk_count = msme["at_risk_count"]
+        at_risk_spend = _format_currency(msme.get("at_risk_spend", 0))
+        penalty = _format_currency(msme.get("penalty_exposure", 0))
+        parts.append(
+            f"**MSME Compliance Risk:** {at_risk_count} payment{'s' if at_risk_count > 1 else ''} to MSME vendors "
+            f"at risk of breaching the 45-day payment limit (Section 15 MSMED Act). "
+            f"At-risk spend: {at_risk_spend}. Estimated penalty exposure: {penalty}."
+        )
+
+    contracts = validated.get("contract-lifecycle-manager", {})
+    renewal_alerts = contracts.get("renewal_alerts", [])
+    if renewal_alerts:
+        urgent = [a for a in renewal_alerts if (a.get("days_to_expiry") or 999) <= 60]
+        if urgent:
+            alert_text = ", ".join(
+                f"{a['supplier']} ({a.get('days_to_expiry', '?')}d)"
+                for a in urgent[:3]
+            )
+            penalty_exposure = _format_currency(contracts.get("exit_penalty_exposure", 0))
+            parts.append(
+                f"**Contract Renewal Alerts:** {len(urgent)} contract{'s' if len(urgent) > 1 else ''} expiring within 60 days — "
+                f"{alert_text}. Exit penalty exposure: {penalty_exposure}."
+            )
+
     if validated.get("value-bridge-calculator"):
         b = validated["value-bridge-calculator"]
         bands = b.get("confidence_bands", {})

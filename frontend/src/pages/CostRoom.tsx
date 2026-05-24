@@ -466,6 +466,7 @@ export default function CostRoom() {
           onChange={setFilters}
           filteredCount={filteredInitiatives.length}
           exceptionCount={exceptionCount}
+          currency={engagement.currency}
         />
 
         {!loading && initiatives.length === 0 ? (
@@ -481,6 +482,7 @@ export default function CostRoom() {
                 ebitdaBps={ebitdaBps}
                 initiativeCount={filteredInitiatives.length}
                 gateProgressPct={gateProgressPct}
+                currency={engagement.currency}
               />
             )}
 
@@ -503,6 +505,7 @@ export default function CostRoom() {
                     initiatives={filteredInitiatives}
                     percentileBand={percentileBand}
                     executive={isExecutive}
+                    currency={engagement.currency}
                     onSelect={handleSelectInitiative}
                     acceptInit={acceptInit}
                     deferInit={deferInit}
@@ -621,6 +624,7 @@ export default function CostRoom() {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         percentileBand={percentileBand}
+        currency={engagement.currency}
       />
 
       {selected && milestones !== null && drawerOpen && (

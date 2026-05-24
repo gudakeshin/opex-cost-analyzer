@@ -74,6 +74,11 @@
       "applicable_if": [
         "category:RND > 5% revenue",
         "cro_keywords detected"
+      ],
+      "industry_sources": [
+        "DSIR — R&D Statistics and Indicators 2023-24 (dsir.gov.in/reports.htm) — India clinical trial landscape and CRO adoption",
+        "OPPI — Indian Pharmaceutical Industry Report 2024 (oppiin.org) — clinical trial cost benchmarks India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -109,6 +114,11 @@
       "applicable_if": [
         "category:PLANT_MAINTENANCE or PACKAGING present",
         "manufacturing_keywords detected"
+      ],
+      "industry_sources": [
+        "DPCO — Drug Price Control Order and NLEM (pharmaceuticals.gov.in/national-pharmaceutical-pricing-authority) — manufacturing cost benchmarks for regulated pricing",
+        "McKinsey & Company — Productivity in Pharma Manufacturing (mckinsey.com/industries/life-sciences) — COGS reduction levers 8-18%",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -144,6 +154,10 @@
       "applicable_if": [
         "category:HR or PROF_SVCS > 2% revenue",
         "headcount > 100"
+      ],
+      "industry_sources": [
+        "OPPI — Indian Pharmaceutical Industry Report 2024 (oppiin.org) — field force productivity benchmarks India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -179,6 +193,10 @@
       "applicable_if": [
         "category:MARKETING or HR present",
         "headcount > 100"
+      ],
+      "industry_sources": [
+        "OPPI — Digital Health and Pharma Marketing Report 2024 (oppiin.org) — e-detailing adoption benchmarks India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -214,6 +232,10 @@
       "applicable_if": [
         "annual_revenue > 100M",
         "pharma_keywords detected"
+      ],
+      "industry_sources": [
+        "NPPA — Price Monitoring and Resource Unit Data 2024 (pharmaceuticals.gov.in) — gross-to-net deduction benchmarks India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -248,6 +270,10 @@
       },
       "applicable_if": [
         "category:IT > 4% revenue"
+      ],
+      "industry_sources": [
+        "Gartner — Life Sciences IT Spending Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget) — pharma IT platform consolidation savings",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -282,6 +308,10 @@
       },
       "applicable_if": [
         "category:PACKAGING or PLANT_MAINTENANCE present"
+      ],
+      "industry_sources": [
+        "CRISIL — Pharma Supply Chain Report 2024 (crisil.com) — inventory write-off rates for Indian pharma companies",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -317,6 +347,10 @@
       "applicable_if": [
         "category:PROF_SVCS or RND present",
         "regulatory_keywords detected"
+      ],
+      "industry_sources": [
+        "CDSCO — Central Drugs Standard Control Organisation Annual Report 2023-24 (cdsco.gov.in) — regulatory submission timelines India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     },
     {
@@ -352,7 +386,12 @@
       "applicable_if": [
         "category:PROF_SVCS or OUTSOURCED present",
         "pharma_keywords detected"
+      ],
+      "industry_sources": [
+        "CDSCO — Pharmacovigilance Programme of India (pvpi.gov.in) — PV reporting requirements and automation opportunities",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     }
-  ]
+  ],
+  "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."
 }

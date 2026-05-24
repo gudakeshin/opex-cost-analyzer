@@ -1,6 +1,6 @@
 # OpEx Platform Feature Completeness Eval
 
-**Eval date**: 2026-05-21  
+**Eval date**: 2026-05-24  
 **Platform version**: 2.0  
 **Overall score**: 9.49/10  
 **Status**: PASS ✓
@@ -95,9 +95,9 @@ Domain score: **10.00/10** (PASS ✓)
 
 **Score**: 10.00/10 (threshold 9.0) — PASS ✓
 
-**Finding**: 30/30 unique frontend API calls resolve to a backend route
+**Finding**: 31/31 unique frontend API calls resolve to a backend route
 
-**Detail**: Scanned all .tsx/.ts files under frontend/src for apiGet/apiPost/apiPut/apiUpload calls and href=/api/... links. Found 30 unique paths. Unresolved (would 404): none.
+**Detail**: Scanned all .tsx/.ts files under frontend/src for apiGet/apiPost/apiPut/apiUpload calls and href=/api/... links. Found 31 unique paths. Unresolved (would 404): none.
 
 **Remediation**: All frontend calls resolve. No broken links.
 
@@ -115,7 +115,7 @@ Domain score: **10.00/10** (PASS ✓)
 
 **Score**: 10.00/10 (threshold 6.0) — PASS ✓
 
-**Finding**: 30/30 unique frontend API calls use /api/v1/ prefix
+**Finding**: 31/31 unique frontend API calls use /api/v1/ prefix
 
 **Detail**: Backend marks /api/ (unversioned) paths as deprecated (Sunset: 2027-01-01). 0 frontend calls still use the deprecated /api/ prefix: [].
 
@@ -149,7 +149,7 @@ Domain score: **10.00/10** (PASS ✓)
 
 **Finding**: 4/4 OPAR phase modules exist with >100 lines
 
-**Detail**: Checked app/opar/observe.py, plan.py, act.py, reflect.py for existence and line count >100. Thin/missing: none. observe: 567 lines, plan: 669 lines, act: 356 lines, reflect: 1441 lines
+**Detail**: Checked app/opar/observe.py, plan.py, act.py, reflect.py for existence and line count >100. Thin/missing: none. observe: 567 lines, plan: 669 lines, act: 356 lines, reflect: 1501 lines
 
 **Remediation**: All 4 OPAR phase modules are substantively implemented.
 

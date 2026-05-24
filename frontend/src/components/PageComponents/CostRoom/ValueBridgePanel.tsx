@@ -23,6 +23,9 @@ export const ValueBridgePanel: React.FC<ValueBridgePanelProps> = ({
   committedP50Cr,
   ebitdaBps,
 }) => {
+  const currency = engagement.currency ?? 'USD';
+  const sym = currency === 'INR' ? '₹' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '$';
+  const unit = currency === 'INR' ? 'Cr' : 'M';
   const committedPct = portfolioP50Cr > 0 ? Math.round((committedP50Cr / portfolioP50Cr) * 100) : 0;
   const revenueCr = engagement.annual_revenue_cr ?? 25000;
   const roceBps = Math.round(ebitdaBps * 0.85);
@@ -39,7 +42,7 @@ export const ValueBridgePanel: React.FC<ValueBridgePanelProps> = ({
       <div>
         <h3 className="text-sm font-semibold uppercase tracking-wide text-brand-muted">Value Bridge (P50)</h3>
         <p className="text-xs text-brand-muted mt-1">
-          {engagement.company_name} · ₹{revenueCr.toLocaleString('en-IN')} Cr revenue
+          {engagement.company_name} · {sym}{revenueCr.toLocaleString('en-US')} {unit} revenue
         </p>
       </div>
 
@@ -47,21 +50,22 @@ export const ValueBridgePanel: React.FC<ValueBridgePanelProps> = ({
         portfolioP50Cr={portfolioP50Cr}
         committedP50Cr={committedP50Cr}
         ebitdaBps={ebitdaBps}
+        currency={currency}
       />
 
       <div className="space-y-3">
-        <BridgeRow label="Portfolio P50" value={formatCr(portfolioP50Cr)} highlight />
+        <BridgeRow label="Portfolio P50" value={formatCr(portfolioP50Cr, { currency })} highlight />
         <BridgeRow
           label="Committed"
-          value={`${formatCr(committedP50Cr)} (${committedPct}%)`}
+          value={`${formatCr(committedP50Cr, { currency })} (${committedPct}%)`}
           sub={`Gate 2 threshold: ${GATE2_COMMIT_THRESHOLD_PCT}%`}
         />
         <BridgeRow label="EBITDA impact (steady-state Y3)" value={formatBps(ebitdaBps)} />
         <BridgeRow label="ROCE impact" value={formatBps(roceBps)} />
-        <BridgeRow label="EPS uplift (Y3)" value={epsUplift !== '—' ? `₹${epsUplift}` : '—'} />
+        <BridgeRow label="EPS uplift (Y3)" value={epsUplift !== '—' ? `${sym}${epsUplift}` : '—'} />
         <BridgeRow
           label="Equity value @ 15× P/E"
-          value={equityUpliftCr > 0 ? `₹${equityUpliftCr.toLocaleString('en-IN')}+ Cr` : '—'}
+          value={equityUpliftCr > 0 ? `${sym}${equityUpliftCr.toLocaleString('en-US')}+ ${unit}` : '—'}
         />
       </div>
 

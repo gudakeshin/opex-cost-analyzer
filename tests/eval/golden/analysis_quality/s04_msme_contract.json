@@ -1,0 +1,64 @@
+{
+  "scenario_id": "S04",
+  "description": "Spend lines with MSME-flagged vendors and upcoming contract expiry dates. Expects msme_compliance to surface at-risk payments and contract_lifecycle to surface renewal alerts.",
+  "scenario_context": {
+    "industry": "technology",
+    "annual_revenue": 2000000.0,
+    "company_name": "TechCo Eval S04",
+    "headcount": 200,
+    "reporting_currency": "USD",
+    "focus_category": null
+  },
+  "input_lines": [
+    {
+      "row_id": 1, "supplier": "SmallTechCo", "description": "Software development services",
+      "category_id": "IT", "category_name": "IT & Technology",
+      "amount": 150000.0, "spend_date": "2025-01-15",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 150000.0,
+      "vendor_msme_flag": true, "vendor_category": "msme",
+      "contract_expiry_date": "2026-06-15",
+      "contract_status": "at_risk",
+      "early_exit_penalty_pct": 0.15,
+      "auto_renewal_notice_days": 30,
+      "payment_terms_days": 60
+    },
+    {
+      "row_id": 2, "supplier": "MicroDev Solutions", "description": "QA testing services",
+      "category_id": "IT", "category_name": "IT & Technology",
+      "amount": 80000.0, "spend_date": "2025-02-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 80000.0,
+      "vendor_msme_flag": true, "vendor_category": "msme",
+      "payment_terms_days": 50
+    },
+    {
+      "row_id": 3, "supplier": "McKinsey", "description": "Strategy consulting",
+      "category_id": "PROF_SVCS", "category_name": "Professional Services",
+      "amount": 120000.0, "spend_date": "2025-01-20",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 120000.0,
+      "contract_expiry_date": "2026-07-01",
+      "contract_status": "in_contract",
+      "early_exit_penalty_pct": 0.20
+    },
+    {
+      "row_id": 4, "supplier": "LocalConsulting Ltd", "description": "Process consulting",
+      "category_id": "PROF_SVCS", "category_name": "Professional Services",
+      "amount": 60000.0, "spend_date": "2025-02-15",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 60000.0,
+      "vendor_msme_flag": true, "vendor_category": "msme",
+      "payment_terms_days": 55
+    },
+    {
+      "row_id": 5, "supplier": "CBRE", "description": "Office lease management",
+      "category_id": "FACILITIES", "category_name": "Facilities",
+      "amount": 80000.0, "spend_date": "2025-01-01",
+      "amount_type": "actual", "currency": "USD", "fx_rate_to_reporting": 1.0, "amount_reporting": 80000.0,
+      "contract_expiry_date": "2026-06-30",
+      "contract_status": "in_contract"
+    }
+  ],
+  "scoring_hints": {
+    "expected_msme_at_risk": true,
+    "expected_contract_alerts": true,
+    "conditional_signals": ["msme", "contracts"]
+  }
+}

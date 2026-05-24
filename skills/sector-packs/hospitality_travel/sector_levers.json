@@ -2,26 +2,60 @@
   "pack_id": "hospitality_travel",
   "sector": "Hospitality, Hotels & Travel Management",
   "version": "1.0",
-  "applicable_entity_types": ["hotel_chain", "resort_operator", "restaurant_chain", "travel_management_company", "airline_ground_ops", "qsr_chain"],
-  "industry_signals": ["revpar_keywords", "adr_keywords", "ota_commission_keywords", "fnb_keywords"],
+  "applicable_entity_types": [
+    "hotel_chain",
+    "resort_operator",
+    "restaurant_chain",
+    "travel_management_company",
+    "airline_ground_ops",
+    "qsr_chain"
+  ],
+  "industry_signals": [
+    "revpar_keywords",
+    "adr_keywords",
+    "ota_commission_keywords",
+    "fnb_keywords"
+  ],
   "universal_levers": [
-    "contract_renegotiation", "process_standardization", "demand_management",
-    "supplier_consolidation", "automation", "payment_terms", "maverick_compliance",
-    "outsourcing", "internal_best_practice", "tail_spend_automation",
-    "should_cost_modeling", "zero_based_rebaseline", "rebate_pricing_recovery",
+    "contract_renegotiation",
+    "process_standardization",
+    "demand_management",
+    "supplier_consolidation",
+    "automation",
+    "payment_terms",
+    "maverick_compliance",
+    "outsourcing",
+    "internal_best_practice",
+    "tail_spend_automation",
+    "should_cost_modeling",
+    "zero_based_rebaseline",
+    "rebate_pricing_recovery",
     "geographic_arbitrage",
-    "benefits_cost_optimization", "contingent_workforce_optimization",
-    "consulting_spend_governance", "legal_spend_optimization", "ld_rationalization",
-    "space_utilization_optimization", "lease_restructuring", "cost_governance"
+    "benefits_cost_optimization",
+    "contingent_workforce_optimization",
+    "consulting_spend_governance",
+    "legal_spend_optimization",
+    "ld_rationalization",
+    "space_utilization_optimization",
+    "lease_restructuring",
+    "cost_governance"
   ],
   "sector_specific_levers": [
     {
       "lever_id": "ota_commission_reduction",
       "lever_name": "OTA Commission Reduction (Direct Booking Channel Mix Shift)",
       "lever_family": "supply",
-      "savings_range_pct": {"p10": 12, "p50": 22, "p90": 35},
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 22,
+        "p90": 35
+      },
       "cta_rate": 0.06,
-      "phasing_curve": [0.20, 0.50, 0.30],
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.72,
       "bounce_back_risk": "medium",
@@ -32,17 +66,37 @@
         "Revenue management strategy updated: direct-channel rate advantage validated"
       ],
       "complexity_tier": "medium",
-      "base_execution_probability": 0.70,
-      "implementation_weeks": {"p10": 10, "p50": 22, "p90": 38},
-      "applicable_if": ["ota_commission_keywords detected", "category:MARKETING present"]
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 38
+      },
+      "applicable_if": [
+        "ota_commission_keywords detected",
+        "category:MARKETING present"
+      ],
+      "industry_sources": [
+        "Ministry of Tourism India — India Tourism Statistics 2024 (tourism.gov.in/india-tourism-statistics) — OTA distribution channel mix benchmarks",
+        "FHRAI — Hotel Industry Survey 2024 (fhrai.com/) — OTA commission rates and direct booking benchmarks India 12-25%",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
     },
     {
       "lever_id": "fnb_procurement_optimization",
       "lever_name": "Food & Beverage Procurement Optimisation (Menu Engineering & Waste Reduction)",
       "lever_family": "supply",
-      "savings_range_pct": {"p10": 8, "p50": 14, "p90": 22},
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 14,
+        "p90": 22
+      },
       "cta_rate": 0.05,
-      "phasing_curve": [0.30, 0.45, 0.25],
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.68,
       "bounce_back_risk": "medium",
@@ -54,16 +108,36 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.72,
-      "implementation_weeks": {"p10": 8, "p50": 18, "p90": 30},
-      "applicable_if": ["fnb_keywords detected", "category:LOGISTICS or OFFICE present"]
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 30
+      },
+      "applicable_if": [
+        "fnb_keywords detected",
+        "category:LOGISTICS or OFFICE present"
+      ],
+      "industry_sources": [
+        "FHRAI — Hotel Industry Survey 2024 (fhrai.com/) — F&B cost as % of revenue benchmarks India",
+        "Ministry of Tourism — India Tourism Statistics 2024 (tourism.gov.in/india-tourism-statistics) — hospitality sector cost structure data",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
     },
     {
       "lever_id": "energy_per_key_reduction",
       "lever_name": "Energy Cost per Key Reduction (Smart Room Energy Management & HVAC Optimisation)",
       "lever_family": "technology",
-      "savings_range_pct": {"p10": 12, "p50": 20, "p90": 30},
+      "savings_range_pct": {
+        "p10": 12,
+        "p50": 20,
+        "p90": 30
+      },
       "cta_rate": 0.08,
-      "phasing_curve": [0.20, 0.50, 0.30],
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.82,
       "bounce_back_risk": "low",
@@ -75,16 +149,36 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.72,
-      "implementation_weeks": {"p10": 10, "p50": 22, "p90": 36},
-      "applicable_if": ["category:POWER_ENERGY or FACILITIES present", "revpar_keywords detected"]
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 22,
+        "p90": 36
+      },
+      "applicable_if": [
+        "category:POWER_ENERGY or FACILITIES present",
+        "revpar_keywords detected"
+      ],
+      "industry_sources": [
+        "Ministry of Tourism — Green Hotel Guidelines (tourism.gov.in) — energy efficiency standards for Indian hotels",
+        "BEE — Hotel Energy Efficiency Programme (beeindia.gov.in) — energy intensity benchmarks for hospitality sector",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
     },
     {
       "lever_id": "housekeeping_optimization",
       "lever_name": "Housekeeping Labour & Chemical Cost Optimisation",
       "lever_family": "structure",
-      "savings_range_pct": {"p10": 8, "p50": 15, "p90": 22},
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 15,
+        "p90": 22
+      },
       "cta_rate": 0.05,
-      "phasing_curve": [0.30, 0.45, 0.25],
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.65,
       "bounce_back_risk": "medium",
@@ -95,19 +189,38 @@
         "Housekeeping chemical and linen supplier consolidation completed with volume pricing"
       ],
       "complexity_tier": "medium",
-      "base_execution_probability": 0.70,
-      "implementation_weeks": {"p10": 8, "p50": 18, "p90": 30},
-      "applicable_if": ["adr_keywords detected", "category:HR or CONTINGENT present"]
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 30
+      },
+      "applicable_if": [
+        "adr_keywords detected",
+        "category:HR or CONTINGENT present"
+      ],
+      "industry_sources": [
+        "FHRAI — Hotel Industry Survey 2024 (fhrai.com/) — housekeeping cost per occupied room benchmarks India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
     },
     {
       "lever_id": "revenue_management_optimization",
       "lever_name": "Revenue Management & Dynamic Pricing Optimisation",
       "lever_family": "technology",
-      "savings_range_pct": {"p10": 4, "p50": 9, "p90": 15},
+      "savings_range_pct": {
+        "p10": 4,
+        "p50": 9,
+        "p90": 15
+      },
       "cta_rate": 0.07,
-      "phasing_curve": [0.25, 0.50, 0.25],
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
       "savings_type": "run_rate",
-      "sustainability_score": 0.80,
+      "sustainability_score": 0.8,
       "bounce_back_risk": "low",
       "org_change_risk": "low",
       "condition_precedents": [
@@ -117,8 +230,21 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.72,
-      "implementation_weeks": {"p10": 8, "p50": 18, "p90": 30},
-      "applicable_if": ["revpar_keywords detected", "category:IT present"]
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 30
+      },
+      "applicable_if": [
+        "revpar_keywords detected",
+        "category:IT present"
+      ],
+      "industry_sources": [
+        "STR — India Hotel Benchmark 2024 (str.com/solutions/benchmarking) — RevPAR, ADR, occupancy benchmarks by hotel category and city",
+        "Ministry of Tourism — India Tourism Statistics 2024 (tourism.gov.in/india-tourism-statistics) — hotel performance data India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
     }
-  ]
+  ],
+  "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."
 }
