@@ -58,19 +58,40 @@ def delete_memory(scope: str, key: str) -> Dict[str, str]:
     return {"status": "deleted", "scope": scope, "key": key}
 
 
+@router.get("/api/v1/engagement/{engagement_id}/teardown-plan")
+def get_teardown_plan(engagement_id: str) -> Dict[str, Any]:
+    """Preview the ordered tear-down steps (IaC notify, artefact sweeps, DLP
+    checklist, cloud-tag verification) without executing anything."""
+    if not engagement_id or "/" in engagement_id or ".." in engagement_id:
+        raise HTTPException(status_code=400, detail="Invalid engagement_id")
+    from app.services.tear_down import generate_tear_down_plan
+    return generate_tear_down_plan(engagement_id, dry_run=True).to_dict()
+
+
 @router.delete("/api/v1/engagement/{engagement_id}")
 def teardown_engagement(engagement_id: str) -> Dict[str, Any]:
     if not engagement_id or "/" in engagement_id or ".." in engagement_id:
         raise HTTPException(status_code=400, detail="Invalid engagement_id")
     from app.opar.memory_adapter import get_memory_adapter
+    from app.services.tear_down import execute_tear_down
     adapter = get_memory_adapter()
     result = adapter.teardown_engagement(engagement_id)
+    # Run the full artefact sweep (pack-locks, calibration export+sweep, backups)
+    # and capture the DLP/attestation envelope from the richer tear-down service.
+    sweep = execute_tear_down(engagement_id, dry_run=False, executor="api")
     receipt: Dict[str, Any] = {
         "engagement_id": engagement_id,
         "status": "purged",
         "attested_at": datetime.now(timezone.utc).isoformat(),
         "deleted_scopes": result.get("deleted_scopes", []),
         "records_deleted": result.get("records_deleted", 0),
+        "artefact_sweep": {
+            "completed": sweep.get("completed", 0),
+            "skipped": sweep.get("skipped", 0),
+            "failed": sweep.get("failed", 0),
+            "artefacts": sweep.get("artefacts", []),
+            "steps": sweep.get("steps", []),
+        },
     }
     append_audit_event(
         f"engagement_teardown engagement_id={engagement_id} records_deleted={receipt['records_deleted']}",

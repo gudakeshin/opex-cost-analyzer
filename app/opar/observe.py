@@ -148,6 +148,24 @@ def _classify_intent_rule_based(msg: str) -> Tuple[str, str | None]:
     if any(w in lowered for w in ["zero based", "zbb ", " zbb", "zero-based"]):
         return "zbb", None
 
+    # 0.5 FP&A-specific intents — checked before the generic value/benchmark
+    # keywords so NPV-sensitivity, savings-plan, trend, BvA, working-capital and
+    # cost-to-serve asks route to their dedicated DAGs instead of value_bridge.
+    if any(w in lowered for w in ["sensitivity", "what if", "what-if", "stress test", "discount rate", "scenario analysis"]):
+        return "sensitivity", None
+    if any(w in lowered for w in ["savings plan", "savings roadmap", "3-year plan", "three year plan", "initiative roadmap"]):
+        return "savings_plan", None
+    if any(w in lowered for w in ["cost to serve", "cost-to-serve", "per-employee cost", "per employee cost", "unprofitable segment", "segment profitability"]):
+        return "cost_to_serve", None
+    if any(w in lowered for w in ["payment terms", "dpo", "days payable", "working capital"]):
+        return "payment_terms", None
+    if any(w in lowered for w in ["budget vs", "budget versus", "budget-vs", "variance analysis", "bva", "over budget", "under budget", "budget variance"]):
+        return "bva", None
+    if any(w in lowered for w in ["year over year", "year-over-year", "yoy", "qoq", "month over month", "run rate", "run-rate", "spend trend", "trend analysis", "trend over time"]):
+        return "temporal", None
+    if any(w in lowered for w in ["drill down", "drill-down", "deep dive", "deep-dive", "drill into"]):
+        return "drill_down", None
+
     # 1. Export / download intent (must precede business_case to avoid partial match)
     if any(w in lowered for w in ["export", "download", "save as docx", "generate docx", "create document"]):
         return "export_business_case", None
@@ -268,6 +286,13 @@ def _classify_intent_rule_based_with_meta(msg: str) -> Dict[str, Any]:
         "contract_review": 0.90,
         "gstr_reconcile": 0.95,
         "zbb": 0.88,
+        "sensitivity": 0.88,
+        "savings_plan": 0.90,
+        "cost_to_serve": 0.88,
+        "payment_terms": 0.88,
+        "bva": 0.85,
+        "temporal": 0.85,
+        "drill_down": 0.82,
     }.get(intent, 0.7)
     if explicit is None:
         extracted, category_conf = _extract_explicit_category(msg)

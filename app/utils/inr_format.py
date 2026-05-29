@@ -55,6 +55,27 @@ def format_inr(
     return f"{prefix}{formatted}{suffix}"
 
 
+_CURRENCY_SYMBOLS = {"USD": "$", "EUR": "€", "GBP": "£", "JPY": "¥", "AUD": "A$", "SGD": "S$"}
+
+
+def format_money(amount: float, currency: str | None = None, decimals: int | None = None) -> str:
+    """Currency-aware money formatter.
+
+    INR uses the Indian Lakh/Crore convention (₹1.20 Cr); other currencies use
+    their symbol with grouped thousands. Unknown currencies fall back to the
+    ISO code suffix. This is the single helper chat/general-QA responses should
+    use instead of hardcoding '$'.
+    """
+    cur = (currency or "USD").upper()
+    if cur == "INR":
+        return format_inr(amount, decimals=2 if decimals is None else decimals)
+    dp = 0 if decimals is None else decimals
+    symbol = _CURRENCY_SYMBOLS.get(cur)
+    if symbol:
+        return f"{symbol}{amount:,.{dp}f}"
+    return f"{amount:,.{dp}f} {cur}"
+
+
 def format_inr_range(p10: float, p50: float, p90: float, **kwargs) -> str:
     """Return a P10/P50/P90 range string, e.g. '₹190–260–320 Cr'."""
     def _val(v: float) -> str:

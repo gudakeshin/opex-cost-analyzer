@@ -383,19 +383,44 @@ def _indian_tax_optimizer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None
 
 @register("brsr-cobenefit-calculator")
 def _brsr_cobenefit_calculator(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
-    return _engine.brsr_cobenefit_calculator(ctx.lines), None
+    initiatives, _wacc, _tax_rate, _base = _portfolio_inputs(ctx)
+    return _engine.brsr_cobenefit_calculator(ctx.lines, initiatives=initiatives), None
 
 
 # ── Strategic analytics ───────────────────────────────────────────────────────
 
+def _portfolio_inputs(ctx: SkillContext) -> tuple[list, float, float, float]:
+    """Shared inputs for strategic skills: (initiatives, wacc, tax_rate, base_savings_mid)."""
+    savings = ctx.prior("savings-modeler")
+    initiatives = savings.get("initiatives", []) if isinstance(savings, dict) else []
+    wacc = float(ctx.manifest.get("wacc") or 0.12)
+    tax_rate = float(ctx.manifest.get("effective_tax_rate") or 0.2517)
+    bridge = ctx.prior("value-bridge-calculator")
+    base_savings_mid = float(bridge.get("confidence_bands", {}).get("mid", 0.0) or 0.0) if isinstance(bridge, dict) else 0.0
+    return initiatives, wacc, tax_rate, base_savings_mid
+
+
 @register("scenario-modeler")
 def _scenario_modeler(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
-    return _engine.scenario_modeler(ctx.lines), None
+    initiatives, wacc, tax_rate, base_savings_mid = _portfolio_inputs(ctx)
+    return _engine.scenario_modeler(
+        ctx.lines,
+        initiatives=initiatives,
+        base_savings=base_savings_mid,
+        wacc=wacc,
+        effective_tax_rate=tax_rate,
+    ), None
 
 
 @register("value-to-shareholder-bridge")
 def _value_to_shareholder_bridge(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
-    return _engine.value_to_shareholder_bridge(ctx.lines), None
+    initiatives, wacc, _tax_rate, _base = _portfolio_inputs(ctx)
+    return _engine.value_to_shareholder_bridge(
+        ctx.lines,
+        initiatives=initiatives,
+        annual_revenue=ctx.annual_revenue,
+        wacc=wacc,
+    ), None
 
 
 @register("peer-disclosure-miner")
@@ -479,20 +504,15 @@ def _dashboard_builder(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
 @register("export-formatter")
 def _export_formatter(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     from app.services.pmo_export import build_pmo_data, export_pmo_xlsx  # lazy
+    from app.services.pipeline import pipeline_summary as get_pipeline_summary  # lazy
 
-    profile = _get_profile(ctx)
-    bridge = ctx.prior("value-bridge-calculator")
-    analysis = {
-        "company_name": ctx.company_name,
-        "industry": ctx.industry,
-        "annual_revenue": ctx.annual_revenue,
-        "skill_outputs": {
-            **ctx.prior_results,
-            "spend-profiler": profile,
-            "value-bridge-calculator": bridge,
-        },
-    }
-    pmo_data = build_pmo_data(analysis)
+    # build_pmo_data(pipeline_summary, initiatives, *, company_name=...): the
+    # initiative tracker is sourced from the savings-modeler portfolio, and the
+    # KPI headline from the live pipeline summary.
+    savings = ctx.prior("savings-modeler")
+    initiatives = savings.get("initiatives", []) if isinstance(savings, dict) else []
+    summary = get_pipeline_summary()
+    pmo_data = build_pmo_data(summary, initiatives, company_name=ctx.company_name or "Client")
     session_key = ctx.manifest.get("session_id") or "session"
     path = export_pmo_xlsx(pmo_data, filename=f"{session_key}_pmo_export.xlsx")
     return {"export_url": f"/api/v1/exports/{path.name}", "filename": path.name}, None

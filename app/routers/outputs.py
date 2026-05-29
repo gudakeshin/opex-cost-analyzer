@@ -8,10 +8,13 @@ from fastapi.responses import FileResponse
 
 from app.config import OUTPUT_DIR
 from app.routers._shared import _memory, read_manifest, session_dir, validate_session_id
+from app.services.board_deck import build_board_deck, export_board_deck_pptx
 from app.services.business_case import build_business_case, export_docx, export_pdf_like_text
+from app.services.cfo_brief import build_cfo_brief, export_cfo_brief_docx
 from app.services.compliance import append_audit_event
 from app.services.dashboard import build_dashboard_html
-from app.services.pipeline import create_initiative, list_initiatives
+from app.services.mor_pack import build_mor_pack, export_mor_docx
+from app.services.pipeline import create_initiative, list_initiatives, pipeline_summary
 from app.services.sensitivity import compute_sensitivity
 
 router = APIRouter()
@@ -81,6 +84,75 @@ def create_dashboard(session_id: str) -> Dict[str, str]:
     path = build_dashboard_html(analysis, filename=f"{session_id}_dashboard.html")
     append_audit_event(f"dashboard_generated session_id={session_id}")
     return {"dashboard_url": f"/api/exports/{path.name}"}
+
+
+def _engagement_context(session_id: str, analysis: Dict[str, Any]) -> Dict[str, Any]:
+    """Resolve company / engagement-week / pack from analysis state + manifest."""
+    manifest = read_manifest(session_id)
+    return {
+        "company_name": analysis.get("company_name") or manifest.get("company_name") or "Client",
+        "engagement_week": int(manifest.get("engagement_week") or 1),
+        "pack_id": manifest.get("pack_id"),
+    }
+
+
+@router.post("/api/board-deck/{session_id}")
+@router.post("/api/v1/board-deck/{session_id}")
+def create_board_deck(session_id: str) -> Dict[str, Any]:
+    validate_session_id(session_id)
+    analysis = _memory.get("session", session_id)
+    if not analysis:
+        raise HTTPException(status_code=404, detail="No analysis for session")
+    ctx = _engagement_context(session_id, analysis)
+    deck = build_board_deck(
+        analysis,
+        company_name=ctx["company_name"],
+        engagement_week=ctx["engagement_week"],
+        pack_id=ctx["pack_id"],
+    )
+    path = export_board_deck_pptx(deck, f"{session_id}_board_deck.pptx")
+    append_audit_event(f"board_deck_generated session_id={session_id}")
+    return {"board_deck": deck, "export_url": f"/api/exports/{path.name}", "filename": path.name}
+
+
+@router.post("/api/cfo-brief/{session_id}")
+@router.post("/api/v1/cfo-brief/{session_id}")
+def create_cfo_brief(session_id: str) -> Dict[str, Any]:
+    validate_session_id(session_id)
+    analysis = _memory.get("session", session_id)
+    if not analysis:
+        raise HTTPException(status_code=404, detail="No analysis for session")
+    ctx = _engagement_context(session_id, analysis)
+    brief = build_cfo_brief(
+        analysis,
+        engagement_week=ctx["engagement_week"],
+        pack_id=ctx["pack_id"],
+        company_name=ctx["company_name"],
+    )
+    path = export_cfo_brief_docx(brief, f"{session_id}_cfo_brief.docx")
+    append_audit_event(f"cfo_brief_generated session_id={session_id}")
+    return {"cfo_brief": brief, "export_url": f"/api/exports/{path.name}", "filename": path.name}
+
+
+@router.post("/api/mor-pack/{session_id}")
+@router.post("/api/v1/mor-pack/{session_id}")
+def create_mor_pack(session_id: str, user_id: str | None = None) -> Dict[str, Any]:
+    validate_session_id(session_id)
+    analysis = _memory.get("session", session_id)
+    if not analysis:
+        raise HTTPException(status_code=404, detail="No analysis for session")
+    ctx = _engagement_context(session_id, analysis)
+    bva = analysis.get("skill_outputs", {}).get("bva-analyzer", {}) or {}
+    summary = pipeline_summary(user_id=user_id)
+    mor = build_mor_pack(
+        summary,
+        bva,
+        company_name=ctx["company_name"],
+        engagement_week=ctx["engagement_week"],
+    )
+    path = export_mor_docx(mor, f"{session_id}_mor_pack.docx")
+    append_audit_event(f"mor_pack_generated session_id={session_id}")
+    return {"mor_pack": mor, "export_url": f"/api/exports/{path.name}", "filename": path.name}
 
 
 @router.get("/api/sensitivity/{session_id}")

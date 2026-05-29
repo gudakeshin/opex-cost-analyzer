@@ -4,13 +4,16 @@ from typing import Any, Dict
 
 from fastapi import APIRouter, HTTPException
 
+from app.config import logger
 from app.schemas import (
     ActualsCreateRequest,
     InitiativeCreateRequest,
     InitiativeRejectRequest,
     InitiativeStageRequest,
     MilestoneCreateRequest,
+    RealisedSavingsIngestRequest,
 )
+from app.services.calibration import generate_calibration_report, ingest_realised_savings
 from app.services.compliance import append_audit_event
 from app.services.pipeline import (
     add_actual,
@@ -25,6 +28,36 @@ from app.services.pipeline import (
 )
 
 router = APIRouter()
+
+
+def _forward_actual_to_calibration(initiative_id: str, actual: Dict[str, Any]) -> None:
+    """Best-effort: feed a recorded actual into the calibration loop.
+
+    Never blocks actuals recording — calibration is an optional analytics
+    downstream. Amounts are stored absolute; the calibration model expects Crore
+    (₹), so we scale by 1e7. pack_id/lever may be empty on legacy initiatives,
+    in which case realisation-rate tracking still works but pack version-bump
+    proposals are skipped by the calibration engine.
+    """
+    try:
+        match = next((i for i in list_initiatives() if i.get("initiative_id") == initiative_id), None)
+        if not match:
+            return
+        engagement_id = match.get("engagement_id") or match.get("session_id") or match.get("analysis_id")
+        if not engagement_id:
+            return
+        ingest_realised_savings(engagement_id, [{
+            "engagement_id": engagement_id,
+            "initiative_id": initiative_id,
+            "lever_id": match.get("lever") or "",
+            "pack_id": match.get("pack_id") or "",
+            "planned_p50_cr": float(actual.get("committed_savings") or 0.0) / 1e7,
+            "realised_cr": float(actual.get("actual_savings") or 0.0) / 1e7,
+            "realised_date": actual.get("period") or actual.get("created_at") or "",
+            "data_source": "self_reported",
+        }])
+    except Exception as exc:  # pragma: no cover - defensive
+        logger.debug('"calibration_forward_skipped initiative_id=%s error=%s"', initiative_id, exc)
 
 
 @router.get("/api/v1/initiatives")
@@ -80,7 +113,24 @@ def create_initiative_milestone(initiative_id: str, payload: MilestoneCreateRequ
 def create_initiative_actuals(initiative_id: str, payload: ActualsCreateRequest) -> Dict[str, Any]:
     actual = add_actual(initiative_id, payload.model_dump())
     append_audit_event(f"initiative_actuals_created initiative_id={initiative_id}")
+    _forward_actual_to_calibration(initiative_id, actual)
     return actual
+
+
+@router.post("/api/v1/calibration/{engagement_id}/realised")
+def ingest_calibration_realised(engagement_id: str, payload: RealisedSavingsIngestRequest) -> Dict[str, Any]:
+    if "/" in engagement_id or "\\" in engagement_id or ".." in engagement_id:
+        raise HTTPException(status_code=400, detail="Invalid engagement_id")
+    result = ingest_realised_savings(engagement_id, payload.records)
+    append_audit_event(f"calibration_realised_ingested engagement={engagement_id} records={result.get('records_ingested', 0)}")
+    return result
+
+
+@router.get("/api/v1/calibration/{engagement_id}/report")
+def get_calibration_report(engagement_id: str) -> Dict[str, Any]:
+    if "/" in engagement_id or "\\" in engagement_id or ".." in engagement_id:
+        raise HTTPException(status_code=400, detail="Invalid engagement_id")
+    return generate_calibration_report(engagement_id).to_dict()
 
 
 @router.get("/api/v1/pipeline/summary")

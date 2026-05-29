@@ -141,6 +141,13 @@ class ActualsCreateRequest(BaseModel):
     notes: str | None = None
 
 
+class RealisedSavingsIngestRequest(BaseModel):
+    """Realised-savings records feeding the calibration loop. Each record maps to
+    calibration.RealisedSavingsRecord (initiative_id, lever_id, pack_id,
+    planned_p50_cr, realised_cr, realised_date, data_source, ...)."""
+    records: List[Dict[str, Any]]
+
+
 class BenchmarkDatasetCreateRequest(BaseModel):
     source: str
     industry_code: str | None = None

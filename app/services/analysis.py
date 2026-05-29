@@ -103,6 +103,30 @@ def run_core_pipeline(
     validation = engine.data_validator(bridge)
     validate_core_skill_outputs(profile, context, benchmarks, internal, heuristics, bridge, validation)
 
+    # --- Strategic skills (board-deck / CFO-brief / business-case consumers) ---
+    # scenario surface, shareholder-value bridge, BRSR co-benefits, assumption
+    # register, and peer disclosure mining. These previously ran in neither
+    # pipeline, so downstream board-deck / CFO-brief sections that read them
+    # silently rendered empty. Wiring them here populates those sections.
+    initiatives = savings_model.get("initiatives", [])
+    base_savings_mid = float(bridge.get("confidence_bands", {}).get("mid", 0.0) or 0.0)
+    assumptions = engine.assumption_register(lines)
+    scenarios = engine.scenario_modeler(
+        lines,
+        initiatives=initiatives,
+        base_savings=base_savings_mid,
+        wacc=wacc,
+        effective_tax_rate=effective_tax_rate,
+    )
+    shareholder_bridge = engine.value_to_shareholder_bridge(
+        lines,
+        initiatives=initiatives,
+        annual_revenue=annual_revenue,
+        wacc=wacc,
+    )
+    brsr_cobenefits = engine.brsr_cobenefit_calculator(lines, initiatives=initiatives)
+    peer_disclosures = engine.peer_disclosure_miner(lines, peer_set=benchmarks.get("peer_set"))
+
     # --- FP&A: BvA Analyzer (runs when both actual and budget lines present) ---
     has_budget = any(x.amount_type == "budget" for x in lines)
     bva = engine.bva_analyzer(lines)
@@ -188,6 +212,12 @@ def run_core_pipeline(
         "consolidation-analyzer": consolidation,
         # Phase 5
         "cost-to-serve-analyzer": cost_to_serve,
+        # Strategic skills feeding board-deck / CFO-brief / business-case
+        "assumption-register": assumptions,
+        "scenario-modeler": scenarios,
+        "value-to-shareholder-bridge": shareholder_bridge,
+        "brsr-cobenefit-calculator": brsr_cobenefits,
+        "peer-disclosure-miner": peer_disclosures,
     }
 
     state = SessionAnalysisState(

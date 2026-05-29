@@ -5,9 +5,11 @@ import re
 import time
 from typing import Any, Callable, Dict, List
 
-from app.config import logger
+from app.config import UPLOAD_DIR, logger
 from app.metrics import opar_cycle_duration_seconds
 from app.memory import MemoryStore
+from app.storage import read_json
+from app.utils.inr_format import format_money
 from app.opar.act import act
 from app.opar.models import ExecutionPlan, ReflectOutput, SkillTask
 from app.opar.observe import observe
@@ -16,6 +18,25 @@ from app.opar.reflect import reflect
 from app.services.business_case import build_business_case, export_docx
 
 _memory = MemoryStore()
+
+
+def _session_currency(session_id: str) -> str:
+    """Resolve the reporting currency for a session (session state → meta →
+    upload manifest), defaulting to USD when unknown. Used to format chat money
+    answers in the right currency (₹ Cr for INR engagements)."""
+    analysis = _memory.get("session", session_id)
+    if isinstance(analysis, dict) and analysis.get("reporting_currency"):
+        return str(analysis["reporting_currency"])
+    meta = _memory.get("session_meta", session_id)
+    if isinstance(meta, dict) and meta.get("reporting_currency"):
+        return str(meta["reporting_currency"])
+    try:
+        manifest = read_json(UPLOAD_DIR / session_id / "manifest.json", {})
+        if manifest.get("currency"):
+            return str(manifest["currency"])
+    except Exception:
+        pass
+    return "USD"
 
 
 # ---------------------------------------------------------------------------
@@ -38,11 +59,11 @@ _FILE_FORMAT_MSG = (
     "| Column | Required? | Example values |\n"
     "|--------|-----------|----------------|\n"
     "| **Amount / Spend / Cost / Total** | ✅ Yes | 125000, 45000.50 |\n"
-    "| **Supplier / Vendor / Payee** | Recommended | Accenture, AWS |\n"
+    "| **Supplier / Vendor / Payee** | Recommended | Infosys, AWS |\n"
     "| **Description / Memo / Line Item** | Recommended | Cloud hosting, Legal advisory |\n"
     "| **Department / BU / Business Unit** | Optional | Finance, IT, Marketing |\n"
     "| **Date / Invoice Date / Month** | Optional | 2024-03-15 |\n"
-    "| **Country / Region / Geo** | Optional | US, EMEA |\n\n"
+    "| **Country / Region / Geo** | Optional | India, APAC |\n\n"
     "Click the **📎** button in the chat to attach your file."
 )
 
@@ -105,13 +126,14 @@ def _schema_summary_for_session(session_id: str) -> str | None:
     categories = profile.get("category_profile", []) if isinstance(profile, dict) else []
     if not categories:
         return None
+    currency = str(analysis.get("reporting_currency") or "USD")
     top = sorted(categories, key=lambda c: float(c.get("spend", 0.0) or 0.0), reverse=True)[:5]
     lines = [
         f"I can see **{len(categories)} spend categories** in your uploaded data.",
         "Top categories by spend:",
     ]
     for i, row in enumerate(top, 1):
-        lines.append(f"{i}. **{row.get('category_name', row.get('category_id', 'Category'))}** — ${float(row.get('spend', 0.0) or 0.0):,.0f}")
+        lines.append(f"{i}. **{row.get('category_name', row.get('category_id', 'Category'))}** — {format_money(float(row.get('spend', 0.0) or 0.0), currency)}")
     return "\n".join(lines)
 
 
@@ -193,8 +215,9 @@ def _skipped_skill_reasons(ctx: Any, selected_skills: set[str]) -> list[str]:
     return reasons[:5]
 
 
-def _answer_general_qa(msg: str, validated: Dict[str, Any]) -> str:
+def _answer_general_qa(msg: str, validated: Dict[str, Any], currency: str = "USD") -> str:
     """Construct a contextual answer for general_qa when spend data is available."""
+    fmt = lambda v: format_money(float(v or 0.0), currency)  # noqa: E731
     lowered = msg.lower()
     normalized_msg = re.sub(r"[^a-z0-9]+", " ", lowered).strip()
     profile = validated.get("spend-profiler", {})
@@ -225,20 +248,20 @@ def _answer_general_qa(msg: str, validated: Dict[str, Any]) -> str:
 
         if asks_addressable:
             return (
-                f"**{nm}** has **${addressable:,.0f}** modeled as addressable spend "
-                f"({addressable_pct_cat:.1f}% of that category; total category spend ${spend:,.0f})."
+                f"**{nm}** has **{fmt(addressable)}** modeled as addressable spend "
+                f"({addressable_pct_cat:.1f}% of that category; total category spend {fmt(spend)})."
             )
         if asks_discretionary:
             disc_pct = (discretionary / spend * 100) if spend else 0.0
             nondisc_pct = (nondisc / spend * 100) if spend else 0.0
             return (
-                f"**{nm}** discretionary mix: discretionary **${discretionary:,.0f}** ({disc_pct:.1f}%), "
-                f"non-discretionary **${nondisc:,.0f}** ({nondisc_pct:.1f}%)."
+                f"**{nm}** discretionary mix: discretionary **{fmt(discretionary)}** ({disc_pct:.1f}%), "
+                f"non-discretionary **{fmt(nondisc)}** ({nondisc_pct:.1f}%)."
             )
         if asks_line_count:
-            return f"**{nm}** contains **{lines:,}** line item(s), with total spend **${spend:,.0f}**."
+            return f"**{nm}** contains **{lines:,}** line item(s), with total spend **{fmt(spend)}**."
         if asks_share:
-            return f"**{nm}** represents **${spend:,.0f}** ({pct:.1f}% of total spend)."
+            return f"**{nm}** represents **{fmt(spend)}** ({pct:.1f}% of total spend)."
         if asks_optimization and isinstance(value_matrix, list) and value_matrix:
             row = next(
                 (r for r in value_matrix if str(r.get("category_name", "")).lower() == str(nm).lower() or str(r.get("category_id", "")).lower() == str(matched_cat.get("category_id", "")).lower()),
@@ -252,12 +275,12 @@ def _answer_general_qa(msg: str, validated: Dict[str, Any]) -> str:
                 return (
                     f"**{nm} optimization focus**\n"
                     f"- Modeled lever: **{lever}**\n"
-                    f"- Modeled value-release potential: **${mid:,.0f}**\n"
+                    f"- Modeled value-release potential: **{fmt(mid)}**\n"
                     f"- Business rationale: address root-cause bottlenecks and shift spend to controlled commercial terms."
                     f"\n- Ask for a **business case** if you want NPV/payback economics."
                 )
         return (
-            f"**{nm}** accounts for **${spend:,.0f}** ({pct:.1f}% of total spend) "
+            f"**{nm}** accounts for **{fmt(spend)}** ({pct:.1f}% of total spend) "
             f"across {lines} line item(s)."
         )
 
@@ -266,24 +289,24 @@ def _answer_general_qa(msg: str, validated: Dict[str, Any]) -> str:
         addr_pct_total = (addr_total / total * 100) if total else 0.0
         top_addr = sorted(categories, key=lambda c: float(c.get("addressable_spend", 0.0) or 0.0), reverse=True)[:3]
         lines_out = [
-            f"Total modeled **addressable spend** is **${addr_total:,.0f}** ({addr_pct_total:.1f}% of total spend)."
+            f"Total modeled **addressable spend** is **{fmt(addr_total)}** ({addr_pct_total:.1f}% of total spend)."
         ]
         if top_addr:
             lines_out.append("Top addressable categories:")
             for i, c in enumerate(top_addr, 1):
                 nm = c.get("category_name", c.get("category_id", "Category"))
                 amt = float(c.get("addressable_spend", 0.0) or 0.0)
-                lines_out.append(f"  {i}. **{nm}**: ${amt:,.0f}")
+                lines_out.append(f"  {i}. **{nm}**: {fmt(amt)}")
         return "\n".join(lines_out)
 
     # Total / biggest / top categories
     if any(w in lowered for w in ["total", "biggest", "largest", "top", "highest", "most", "overview"]):
         if categories:
             top = sorted(categories, key=lambda c: c.get("spend", 0), reverse=True)[:5]
-            lines_out = [f"Your total spend is **${total:,.0f}**. Top categories:"]
+            lines_out = [f"Your total spend is **{fmt(total)}**. Top categories:"]
             for i, c in enumerate(top, 1):
                 pct = (c.get("spend", 0) / total * 100) if total else 0.0
-                lines_out.append(f"  {i}. **{c.get('category_name')}**: ${c.get('spend', 0):,.0f} ({pct:.1f}%)")
+                lines_out.append(f"  {i}. **{c.get('category_name')}**: {fmt(c.get('spend', 0))} ({pct:.1f}%)")
             return "\n".join(lines_out)
 
     # Category list
@@ -307,7 +330,7 @@ def _answer_general_qa(msg: str, validated: Dict[str, Any]) -> str:
     has_spend_profile = bool(categories) or float(total or 0) > 0
     if has_spend_profile:
         return (
-            f"Based on your uploaded data: total spend is **${total:,.0f}** across "
+            f"Based on your uploaded data: total spend is **{fmt(total)}** across "
             f"**{len(categories)} spend categories**. "
             "Ask me to **benchmark**, run **value-at-the-table** analysis, "
             "or **generate a business case**."
@@ -493,7 +516,7 @@ async def _run_opar_loop_inner(
                 if not validated:
                     # Wrap entire analysis as if it were skill outputs
                     validated = {"spend-profiler": existing_analysis} if existing_analysis.get("category_profile") else {}
-                answer = _answer_general_qa(msg, validated)
+                answer = _answer_general_qa(msg, validated, currency=str(existing_analysis.get("reporting_currency") or _session_currency(session_id)))
                 next_opts = []
                 if validated.get("spend-profiler"):
                     next_opts = [
@@ -618,7 +641,7 @@ async def _run_opar_loop_inner(
         # Preserve chart-builder output formatting when the user asked for spend visualization.
         # Preserve richer reflect/advisory output when deeper category analysis already ran.
         if not deep_analysis_present and not (ctx.wants_spend_visualization and "chart-builder" in act_result.skill_outputs):
-            result.response_text = _answer_general_qa(msg, act_result.skill_outputs)
+            result.response_text = _answer_general_qa(msg, act_result.skill_outputs, currency=_session_currency(session_id))
 
     result.progress_steps = progress
     logger.info('"opar_complete session_id=%s loop_complete=%s"', session_id, result.loop_complete)
