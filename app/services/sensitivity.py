@@ -107,15 +107,24 @@ def compute_sensitivity(
         )[:3]
         partial_savings_3yr = sum(i.get("net_savings", {}).get("total_3yr", 0.0) for i in top3)
 
-    def _scenario_npv(exec_rate: float, tl_months: int, savings_override: List[float] | None = None) -> float:
+    # Tax is applied in exactly ONE place — the ``tax_rate`` argument below.
+    # Callers pass ``tax_rate=0.0`` for pre-tax NPV and ``tax_rate=effective_tax_rate``
+    # for after-tax NPV.  (Previously the helpers baked in tax AND the scenarios
+    # multiplied again, double-taxing the after-tax figure and mislabelling pre-tax.)
+    def _scenario_npv(
+        exec_rate: float,
+        tl_months: int,
+        tax_rate: float,
+        savings_override: List[float] | None = None,
+    ) -> float:
         sav = savings_override or [s * exec_rate for s in phased_savings]
         # If timeline compressed, shift more savings earlier (simplified linear ramp)
-        return _npv_phased(sav, phased_costs, discount_rate, effective_tax_rate)
+        return _npv_phased(sav, phased_costs, discount_rate, tax_rate)
 
-    def _simple_npv(annual_savings: float, years: float) -> float:
+    def _simple_npv(annual_savings: float, years: float, tax_rate: float) -> float:
         per_yr = annual_savings / years if years > 0 else 0
         return sum(
-            per_yr * (1.0 - effective_tax_rate) / (1.0 + discount_rate) ** t
+            per_yr * (1.0 - tax_rate) / (1.0 + discount_rate) ** t
             for t in range(1, int(years) + 1)
         )
 
@@ -142,8 +151,8 @@ def compute_sensitivity(
             ),
             "savings_3yr": round(mid * conservative_exec, 2),
             "timeline_months": int(36 * timeline_factor),
-            "npv_pretax": round(_simple_npv(mid * conservative_exec, 3.0 * timeline_factor), 2),
-            "npv_aftertax": round(_simple_npv(mid * conservative_exec, 3.0 * timeline_factor) * (1.0 - effective_tax_rate), 2),
+            "npv_pretax": round(_simple_npv(mid * conservative_exec, 3.0 * timeline_factor, 0.0), 2),
+            "npv_aftertax": round(_simple_npv(mid * conservative_exec, 3.0 * timeline_factor, effective_tax_rate), 2),
             "execution_rate": conservative_exec,
             "driver_adjusted": bool(drivers),
         },
@@ -155,8 +164,8 @@ def compute_sensitivity(
             ),
             "savings_3yr": round(mid * base_exec, 2),
             "timeline_months": int(36 * timeline_factor),
-            "npv_pretax": round(_scenario_npv(base_exec, int(36 * timeline_factor)), 2),
-            "npv_aftertax": round(_scenario_npv(base_exec, int(36 * timeline_factor)) * (1.0 - effective_tax_rate) if not phased_savings[0] else _scenario_npv(base_exec, int(36 * timeline_factor)), 2),
+            "npv_pretax": round(_scenario_npv(base_exec, int(36 * timeline_factor), 0.0), 2),
+            "npv_aftertax": round(_scenario_npv(base_exec, int(36 * timeline_factor), effective_tax_rate), 2),
             "execution_rate": base_exec,
             "driver_adjusted": bool(drivers),
         },
@@ -168,8 +177,8 @@ def compute_sensitivity(
             ),
             "savings_3yr": round(mid * accelerated_exec, 2),
             "timeline_months": int(18 * timeline_factor),
-            "npv_pretax": round(_simple_npv(mid * accelerated_exec, 1.5 * timeline_factor), 2),
-            "npv_aftertax": round(_simple_npv(mid * accelerated_exec, 1.5 * timeline_factor) * (1.0 - effective_tax_rate), 2),
+            "npv_pretax": round(_simple_npv(mid * accelerated_exec, 1.5 * timeline_factor, 0.0), 2),
+            "npv_aftertax": round(_simple_npv(mid * accelerated_exec, 1.5 * timeline_factor, effective_tax_rate), 2),
             "execution_rate": accelerated_exec,
             "driver_adjusted": bool(drivers),
         },
@@ -178,8 +187,8 @@ def compute_sensitivity(
             "key_assumption": "Full savings but 48-month timeline — contract lock-ins and organizational friction",
             "savings_3yr": round(mid * base_exec, 2),
             "timeline_months": int(48 * timeline_factor),
-            "npv_pretax": round(_simple_npv(mid * base_exec, 4.0 * timeline_factor), 2),
-            "npv_aftertax": round(_simple_npv(mid * base_exec, 4.0 * timeline_factor) * (1.0 - effective_tax_rate), 2),
+            "npv_pretax": round(_simple_npv(mid * base_exec, 4.0 * timeline_factor, 0.0), 2),
+            "npv_aftertax": round(_simple_npv(mid * base_exec, 4.0 * timeline_factor, effective_tax_rate), 2),
             "execution_rate": base_exec,
             "driver_adjusted": bool(drivers),
         },
@@ -188,8 +197,8 @@ def compute_sensitivity(
             "key_assumption": "Only top-3 categories deliver — lower-priority initiatives not executed",
             "savings_3yr": round(partial_savings_3yr, 2),
             "timeline_months": int(36 * timeline_factor),
-            "npv_pretax": round(_simple_npv(partial_savings_3yr, 3.0 * timeline_factor), 2),
-            "npv_aftertax": round(_simple_npv(partial_savings_3yr, 3.0 * timeline_factor) * (1.0 - effective_tax_rate), 2),
+            "npv_pretax": round(_simple_npv(partial_savings_3yr, 3.0 * timeline_factor, 0.0), 2),
+            "npv_aftertax": round(_simple_npv(partial_savings_3yr, 3.0 * timeline_factor, effective_tax_rate), 2),
             "execution_rate": 1.0,
             "driver_adjusted": False,
         },
@@ -201,8 +210,8 @@ def compute_sensitivity(
             ),
             "savings_3yr": round(mid * base_exec * volume_growth_factor, 2),
             "timeline_months": int(36 * timeline_factor),
-            "npv_pretax": round(_simple_npv(mid * base_exec * volume_growth_factor, 3.0 * timeline_factor), 2),
-            "npv_aftertax": round(_simple_npv(mid * base_exec * volume_growth_factor, 3.0 * timeline_factor) * (1.0 - effective_tax_rate), 2),
+            "npv_pretax": round(_simple_npv(mid * base_exec * volume_growth_factor, 3.0 * timeline_factor, 0.0), 2),
+            "npv_aftertax": round(_simple_npv(mid * base_exec * volume_growth_factor, 3.0 * timeline_factor, effective_tax_rate), 2),
             "execution_rate": base_exec,
             "driver_adjusted": True,
         },
@@ -230,12 +239,12 @@ def compute_sensitivity(
             else:
                 sustained_3yr += total_3yr
         bounce_back_3yr = at_risk_3yr + sustained_3yr
-        bounce_back_npv_pretax = _scenario_npv(base_exec, int(36 * timeline_factor),
+        bounce_back_npv_pretax = _scenario_npv(base_exec, int(36 * timeline_factor), 0.0,
                                                savings_override=[phased_savings[0], phased_savings[1],
                                                                   phased_savings[2] * (1.0 - bounce_back_reversion_rate)])
     else:
         bounce_back_3yr = mid * base_exec * (1.0 - bounce_back_reversion_rate * 0.33)
-        bounce_back_npv_pretax = _simple_npv(bounce_back_3yr, 3.0 * timeline_factor)
+        bounce_back_npv_pretax = _simple_npv(bounce_back_3yr, 3.0 * timeline_factor, 0.0)
 
     bounce_back_npv_aftertax = bounce_back_npv_pretax * (1.0 - effective_tax_rate)
 

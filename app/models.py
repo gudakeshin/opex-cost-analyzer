@@ -89,9 +89,18 @@ class NormalizedSpendLine(BaseModel):
         """Amount in the engagement reporting currency."""
         if self.amount_reporting is not None:
             return self.amount_reporting
-        if self.fx_rate_to_reporting == 0:
-            return self.amount
+        # fx_rate_to_reporting is guaranteed > 0 by _fx_rate_positive validator.
         return self.amount * self.fx_rate_to_reporting
+
+
+def is_actual(line: "NormalizedSpendLine") -> bool:
+    """Canonical actual-spend predicate.
+
+    Treats an empty ``amount_type`` as actual (defensive: some sources leave the
+    column blank). Use this everywhere actuals are filtered so spend_profiler,
+    temporal_analyzer and payment_terms_optimizer stay consistent.
+    """
+    return line.amount_type in ("actual", "")
 
 
 class SkillIO(BaseModel):

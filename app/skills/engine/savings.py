@@ -31,6 +31,10 @@ def _compute_irr(
         if abs(dnpv) < 1e-12:
             break
         r_new = r - npv / dnpv
+        # Clamp away from r = -1.0 where (1 + r) ** t collapses to 0 (ZeroDivisionError
+        # on the next iteration). IRRs below -100% are economically meaningless anyway.
+        if r_new <= -0.9999:
+            r_new = -0.9999
         if abs(r_new - r) < tol:
             return round(r_new * 100.0, 1) if r_new > -1.0 else None
         r = r_new

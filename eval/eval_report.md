@@ -1,6 +1,6 @@
 # OpEx Platform — Lever & Benchmark Evaluation Report
 
-**Evaluation date:** 2026-05-21  
+**Evaluation date:** 2026-05-30  
 **Platform version:** 2.0  
 **Overall score:** [████████████████████] 10.0/10  
 **Overall verdict:** PASS ✓  
@@ -295,7 +295,8 @@
     "financial_services",
     "manufacturing",
     "healthcare",
-    "retail_consumer"
+    "retail_consumer",
+    "gcc_capability_centers"
   ]
 }
 ```
@@ -304,7 +305,7 @@
 
 **Summary:** Source field: data_source. Currency: present.
 
-**Detail:** File keys: ['version', 'source_type', 'data_source', 'disclaimer', 'currency', 'geography', 'targets_pct', 'per_employee_targets']. Source attribution: data_source=Internal consulting benchmarks — India market, FY2024-25 engagement data. % of r. Currency denomination: present. Per-employee values {'HR': 2500, 'IT': 5000, 'FACILITIES': 3000, 'MARKETING': 8000, 'TRAVEL': 2000, 'OFFICE': 500} — without currency label, these are unverifiable (INR 5000 ≠ USD 5000).
+**Detail:** File keys: ['version', 'source_type', 'data_source', 'disclaimer', 'currency', 'geography', 'targets_pct', 'per_employee_targets', 'per_employee_targets_usd']. Source attribution: data_source=Internal consulting benchmarks — India market, FY2024-25 engagement data. % of r. Currency denomination: present. Per-employee values {'HR': 2500, 'IT': 5000, 'FACILITIES': 3000, 'MARKETING': 8000, 'TRAVEL': 2000, 'OFFICE': 500} — without currency label, these are unverifiable (INR 5000 ≠ USD 5000).
 
 **Remediation:** P0 fix: Add 'data_source': 'Internal consulting benchmarks — India market, FY2024-25', 'currency': 'INR', 'geography': 'India' to the top level of heuristic_targets.json. If values are from published sources, cite them explicitly.
 
@@ -533,7 +534,7 @@
 {
   "overall_score": 10.0,
   "passed": true,
-  "eval_date": "2026-05-21",
+  "eval_date": "2026-05-30",
   "domains": [
     {
       "name": "lever_coverage",

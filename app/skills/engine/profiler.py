@@ -6,7 +6,7 @@ from collections import defaultdict
 from datetime import date
 from typing import Any, Dict, List, Optional, Tuple
 
-from app.models import NormalizedSpendLine
+from app.models import NormalizedSpendLine, is_actual
 
 from ._loaders import (
     _get_classification_rules,
@@ -449,7 +449,7 @@ def resolve_eligible_levers(
 # ---------------------------------------------------------------------------
 
 def spend_profiler(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
-    actual_lines = [x for x in lines if x.amount_type == "actual"]
+    actual_lines = [x for x in lines if is_actual(x)]
     if not actual_lines:
         actual_lines = lines
 
@@ -530,7 +530,9 @@ def spend_profiler(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
             cat_periods[period_key] = cat_periods.get(period_key, 0.0) + amt
 
         ccy = (line.currency or "USD").upper()
-        currency_breakdown[ccy] = currency_breakdown.get(ccy, 0.0) + line.amount
+        # Use reporting_amount (not raw line.amount) so currency_breakdown is
+        # denominated in the reporting currency and reconciles with total_spend.
+        currency_breakdown[ccy] = currency_breakdown.get(ccy, 0.0) + amt
 
         if line.gl_code:
             gl_breakdown[line.gl_code] = gl_breakdown.get(line.gl_code, 0.0) + amt

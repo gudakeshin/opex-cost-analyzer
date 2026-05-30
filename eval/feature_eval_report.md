@@ -1,8 +1,8 @@
 # OpEx Platform Feature Completeness Eval
 
-**Eval date**: 2026-05-24  
+**Eval date**: 2026-05-30  
 **Platform version**: 2.0  
-**Overall score**: 9.49/10  
+**Overall score**: 9.54/10  
 **Status**: PASS ✓
 
 ---
@@ -11,7 +11,7 @@
 
 | Domain | Score | Status |
 |--------|-------|--------|
-| Skill Pipeline Completeness (w=0.35) | 8.83/10 | PASS ✓ |
+| Skill Pipeline Completeness (w=0.35) | 9.00/10 | PASS ✓ |
 | Frontend-Backend API Connectivity (w=0.35) | 10.00/10 | PASS ✓ |
 | OPAR Loop Completeness (w=0.20) | 10.00/10 | PASS ✓ |
 | Infrastructure Completeness (w=0.10) | 8.95/10 | PASS ✓ |
@@ -21,20 +21,20 @@
 ## Top Gaps (ranked by severity)
 
 ### SP_02 — Dispatch Handler Implementation Depth
-- **Score**: 4.17/10 (threshold 8.0, gap 3.83)
-- **Finding**: 15/36 handlers have ≥5 non-blank lines (implemented)
-- **Remediation**: Flesh out stub handlers for: ['spend-profiler', 'document-contextualizer', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'brsr-cobenefit-calculator', 'scenario-modeler', 'value-to-shareholder-bridge', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].
+- **Score**: 5.00/10 (threshold 8.0, gap 3.00)
+- **Finding**: 18/36 handlers have ≥5 non-blank lines (implemented)
+- **Remediation**: Flesh out stub handlers for: ['spend-profiler', 'document-contextualizer', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].
 
 ---
 
 ## Skill Pipeline Completeness
 
-Domain score: **8.83/10** (PASS ✓)
+Domain score: **9.00/10** (PASS ✓)
 
 | Dimension | Score | Threshold | Status |
 |-----------|-------|-----------|--------|
 | Skill Directory-to-Dispatch Parity | 10.00 | 9.0 | ✓ |
-| Dispatch Handler Implementation Depth | 4.17 | 8.0 | ✗ |
+| Dispatch Handler Implementation Depth | 5.00 | 8.0 | ✗ |
 | Skill Output Contract Coverage | 10.00 | 7.0 | ✓ |
 | OPAR Intent-to-Plan Mapping Coverage | 10.00 | 8.0 | ✓ |
 
@@ -42,21 +42,21 @@ Domain score: **8.83/10** (PASS ✓)
 
 **Score**: 10.00/10 (threshold 9.0) — PASS ✓
 
-**Finding**: 24/24 skills registered in dispatch.py
+**Finding**: 35/35 skills registered in dispatch.py
 
-**Detail**: Found 24 skills/ dirs with SKILL.md. 24 are registered via @register() in dispatch.py. Unregistered (dead code): none.
+**Detail**: Found 35 skills/ dirs with SKILL.md. 35 are registered via @register() in dispatch.py. Unregistered (dead code): none.
 
 **Remediation**: All skills registered. Add CI parity check to prevent future drift.
 
 ### SP_02 — Dispatch Handler Implementation Depth
 
-**Score**: 4.17/10 (threshold 8.0) — FAIL ✗
+**Score**: 5.00/10 (threshold 8.0) — FAIL ✗
 
-**Finding**: 15/36 handlers have ≥5 non-blank lines (implemented)
+**Finding**: 18/36 handlers have ≥5 non-blank lines (implemented)
 
-**Detail**: Checked 36 @register() handlers. 15 have ≥5 non-blank lines indicating real logic. Potential stubs: ['spend-profiler', 'document-contextualizer', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'brsr-cobenefit-calculator', 'scenario-modeler', 'value-to-shareholder-bridge', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].
+**Detail**: Checked 36 @register() handlers. 18 have ≥5 non-blank lines indicating real logic. Potential stubs: ['spend-profiler', 'document-contextualizer', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].
 
-**Remediation**: Flesh out stub handlers for: ['spend-profiler', 'document-contextualizer', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'brsr-cobenefit-calculator', 'scenario-modeler', 'value-to-shareholder-bridge', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].
+**Remediation**: Flesh out stub handlers for: ['spend-profiler', 'document-contextualizer', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].
 
 ### SP_03 — Skill Output Contract Coverage
 
@@ -149,7 +149,7 @@ Domain score: **10.00/10** (PASS ✓)
 
 **Finding**: 4/4 OPAR phase modules exist with >100 lines
 
-**Detail**: Checked app/opar/observe.py, plan.py, act.py, reflect.py for existence and line count >100. Thin/missing: none. observe: 567 lines, plan: 669 lines, act: 356 lines, reflect: 1501 lines
+**Detail**: Checked app/opar/observe.py, plan.py, act.py, reflect.py for existence and line count >100. Thin/missing: none. observe: 604 lines, plan: 669 lines, act: 356 lines, reflect: 1501 lines
 
 **Remediation**: All 4 OPAR phase modules are substantively implemented.
 
@@ -219,5 +219,5 @@ Domain score: **8.95/10** (PASS ✓)
 
 ## Remediation Roadmap
 
-**1.** `sp_02` — Flesh out stub handlers for: ['spend-profiler', 'document-contextualizer', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'brsr-cobenefit-calculator', 'scenario-modeler', 'value-to-shareholder-bridge', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].  
-*Closes gap of 3.8 pts (severity 0.2683)*
+**1.** `sp_02` — Flesh out stub handlers for: ['spend-profiler', 'document-contextualizer', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].  
+*Closes gap of 3.0 pts (severity 0.2100)*

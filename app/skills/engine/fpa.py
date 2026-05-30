@@ -4,7 +4,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any, Dict, List, Optional
 
-from app.models import NormalizedSpendLine
+from app.models import NormalizedSpendLine, is_actual
 
 from ._loaders import _get_dpo_benchmarks
 
@@ -88,9 +88,48 @@ def bva_analyzer(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
 # Temporal Analyzer
 # ---------------------------------------------------------------------------
 
+def _infer_period_grain(periods: List[str]) -> tuple[int, int, str]:
+    """Infer ``(months_per_period, periods_per_year, grain_label)`` from fiscal_period strings.
+
+    Recognizes ``YYYY-MM`` (monthly), ``YYYY-Qn`` (quarterly) and ``YYYY`` (annual).
+    Picks the dominant recognized format; falls back to monthly when unknown/mixed.
+    Without this, CAGR and annualized run-rate silently assume every period is one
+    month, over-stating CAGR ~3x and mis-scaling run-rate for quarterly/annual data.
+    """
+    monthly = quarterly = annual = 0
+    for p in periods:
+        s = (p or "").strip().upper()
+        if len(s) == 7 and s[4] == "-" and s[5:7].isdigit():
+            monthly += 1
+        elif len(s) >= 6 and s[4] == "-" and s[5] == "Q":
+            quarterly += 1
+        elif len(s) == 4 and s.isdigit():
+            annual += 1
+    counts = {"monthly": monthly, "quarterly": quarterly, "annual": annual}
+    label = max(counts, key=counts.get)
+    if counts[label] == 0:
+        return 1, 12, "monthly"
+    return {"monthly": (1, 12), "quarterly": (3, 4), "annual": (12, 1)}[label] + (label,)
+
+
+def _prior_year_period(fp: str, grain: str) -> Optional[str]:
+    """Return the fiscal_period one year earlier in the same grain format, or None."""
+    s = (fp or "").strip()
+    try:
+        if grain == "monthly" and len(s) == 7 and s[4] == "-":
+            return f"{int(s[:4]) - 1}-{s[5:7]}"
+        if grain == "quarterly" and len(s) >= 6 and s[4] == "-":
+            return f"{int(s[:4]) - 1}-{s[5:]}"
+        if grain == "annual" and len(s) == 4:
+            return str(int(s) - 1)
+    except ValueError:
+        return None
+    return None
+
+
 def temporal_analyzer(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
     """Period-over-period spend trend analysis."""
-    actual_lines = [x for x in lines if x.amount_type in ("actual", "")]
+    actual_lines = [x for x in lines if is_actual(x)]
     if not actual_lines:
         actual_lines = lines
 
@@ -119,18 +158,16 @@ def temporal_analyzer(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
             "category_trends": [],
         }
 
+    months_per_period, periods_per_year, grain_label = _infer_period_grain(sorted_periods)
+
     period_trends: List[Dict[str, Any]] = []
     for i, fp in enumerate(sorted_periods):
         spend = period_totals[fp]
         prev_spend = period_totals[sorted_periods[i - 1]] if i > 0 else None
         mom_delta = spend - prev_spend if prev_spend is not None else None
         mom_pct = (mom_delta / prev_spend * 100) if (prev_spend and prev_spend > 0) else None
-        yoy_period = None
-        if len(fp) == 7 and fp[4] == "-":
-            year, month = int(fp[:4]), int(fp[5:])
-            prev_year = year - 1
-            yoy_period = f"{prev_year}-{month:02d}"
-        yoy_spend = period_totals.get(yoy_period)
+        yoy_period = _prior_year_period(fp, grain_label)
+        yoy_spend = period_totals.get(yoy_period) if yoy_period else None
         yoy_delta = (spend - yoy_spend) if yoy_spend is not None else None
         yoy_pct = (yoy_delta / yoy_spend * 100) if (yoy_spend and yoy_spend > 0) else None
         period_trends.append(
@@ -144,18 +181,18 @@ def temporal_analyzer(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
             }
         )
 
-    if len(sorted_periods) >= 12:
-        annualized_run_rate = sum(period_totals[p] for p in sorted_periods[-12:])
+    if len(sorted_periods) >= periods_per_year:
+        annualized_run_rate = sum(period_totals[p] for p in sorted_periods[-periods_per_year:])
         arr_basis = "TTM"
     else:
-        last3 = [period_totals[p] for p in sorted_periods[-3:]]
-        annualized_run_rate = (sum(last3) / len(last3)) * 12
-        arr_basis = "3M_extrapolated"
+        recent = sorted_periods[-3:]
+        annualized_run_rate = (sum(period_totals[p] for p in recent) / len(recent)) * periods_per_year
+        arr_basis = f"{len(recent)}P_extrapolated"
 
     cagr_pct: float | None = None
     first_total = period_totals[sorted_periods[0]]
     last_total = period_totals[sorted_periods[-1]]
-    months_elapsed = len(sorted_periods) - 1
+    months_elapsed = (len(sorted_periods) - 1) * months_per_period
     if len(sorted_periods) >= 3 and first_total > 0 and months_elapsed > 0:
         cagr_pct = round(
             ((last_total / first_total) ** (12.0 / months_elapsed) - 1.0) * 100, 1
@@ -172,16 +209,16 @@ def temporal_analyzer(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
         change_pct = (total_change / first_spend * 100) if first_spend > 0 else None
         trend_dir = "increasing" if total_change > 0 else ("decreasing" if total_change < 0 else "flat")
 
-        if len(sorted_ps) >= 12:
-            cat_run_rate = sum(period_map.get(p, 0.0) for p in sorted_ps[-12:])
+        if len(sorted_ps) >= periods_per_year:
+            cat_run_rate = sum(period_map.get(p, 0.0) for p in sorted_ps[-periods_per_year:])
             cat_arr_basis = "TTM"
         else:
-            cat_last3 = [period_map.get(p, 0.0) for p in sorted_ps[-3:]]
-            cat_run_rate = (sum(cat_last3) / len(cat_last3)) * 12
-            cat_arr_basis = "3M_extrapolated"
+            cat_recent = sorted_ps[-3:]
+            cat_run_rate = (sum(period_map.get(p, 0.0) for p in cat_recent) / len(cat_recent)) * periods_per_year
+            cat_arr_basis = f"{len(cat_recent)}P_extrapolated"
 
         cat_cagr_pct: float | None = None
-        cat_months = len(sorted_ps) - 1
+        cat_months = (len(sorted_ps) - 1) * months_per_period
         if len(sorted_ps) >= 3 and first_spend > 0 and cat_months > 0:
             cat_cagr_pct = round(
                 ((last_spend / first_spend) ** (12.0 / cat_months) - 1.0) * 100, 1
@@ -210,6 +247,7 @@ def temporal_analyzer(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
     return {
         "temporal_available": True,
         "period_count": len(sorted_periods),
+        "period_grain": grain_label,
         "first_period": sorted_periods[0],
         "last_period": sorted_periods[-1],
         "annualized_run_rate": round(annualized_run_rate, 2),
@@ -240,7 +278,7 @@ def payment_terms_optimizer(
     cat_terms_weighted: Dict[str, float] = defaultdict(float)
     cat_terms_lines: Dict[str, int] = defaultdict(int)
     cat_names: Dict[str, str] = {}
-    actual_lines = [x for x in lines if x.amount_type in ("actual", "")]
+    actual_lines = [x for x in lines if is_actual(x)]
     if not actual_lines:
         actual_lines = lines
 

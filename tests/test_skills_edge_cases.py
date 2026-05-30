@@ -216,14 +216,15 @@ class TestTemporalAnalyzerEdgeCases:
         # TTM = 12 * 100k = 1_200_000
         assert result.get("annualized_run_rate") == pytest.approx(1_200_000.0, rel=0.01)
 
-    def test_arr_basis_3m_for_less_than_12_periods(self):
-        """With < 12 periods, arr_basis must be '3M_extrapolated'."""
+    def test_arr_basis_extrapolated_for_less_than_full_year(self):
+        """With < 12 monthly periods, arr_basis is period-extrapolated."""
         lines = [
             _line(row_id=i + 1, fiscal_period=f"2025-0{i + 1}", amount=100_000.0)
             for i in range(3)
         ]
         result = engine.temporal_analyzer(lines)
-        assert result.get("arr_basis") == "3M_extrapolated"
+        assert result.get("arr_basis") == "3P_extrapolated"
+        assert result.get("period_grain") == "monthly"
 
 
 # ---------------------------------------------------------------------------

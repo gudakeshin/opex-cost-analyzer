@@ -88,6 +88,7 @@ Open `http://localhost:5173/ui/` for hot-reload development.
 
 - This project uses local JSON/file-backed memory as a baseline implementation for user/session/agent memory scopes.
 - The API shape is intentionally compatible with future external connectors (Mem0 managed service, Claude API calls, and licensed benchmark feeds).
+- **Source-system connectors (`app/connectors/`) are experimental and not yet wired.** SAP OData, Ariba, Tally, MT940 bank, GST portal, and HRMS connectors implement `ConnectorInterface` and normalize to `NormalizedSpendLine`, but no endpoint routes ingestion through them yet (current ingestion is file upload via `app/services/ingestion.py`). Planned: a generic `POST /connectors/{type}/ingest` that feeds the existing `run_core_pipeline`.
 - Manual test files are included in:
   - `test_data/sample_spend_for_manual_testing.csv`
   - `test_data/sample_context_for_manual_testing.txt`

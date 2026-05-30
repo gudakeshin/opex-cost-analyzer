@@ -1,7 +1,7 @@
 {
-  "overall_score": 9.487,
+  "overall_score": 9.545,
   "passed": true,
-  "eval_date": "2026-05-24",
+  "eval_date": "2026-05-30",
   "dimensions": [
     {
       "dimension_id": "sp_01",
@@ -11,26 +11,34 @@
       "threshold_pass": 9.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "24/24 skills registered in dispatch.py",
+      "finding_summary": "35/35 skills registered in dispatch.py",
       "evidence": {
-        "total_skill_dirs_with_SKILL_md": 24,
-        "registered_count": 24,
+        "total_skill_dirs_with_SKILL_md": 35,
+        "registered_count": 35,
         "registered": [
           "analysis-synthesizer",
           "assumption-register",
           "brsr-cobenefit-calculator",
           "business-case-builder",
+          "bva-analyzer",
           "chart-builder",
+          "conflict-detector",
+          "consolidation-analyzer",
+          "contract-lifecycle-manager",
+          "cost-to-serve-analyzer",
           "dashboard-builder",
           "data-classifier",
           "data-validator",
           "document-contextualizer",
           "executive-communication",
           "export-formatter",
+          "gstr-reconciler",
           "heuristic-analyzer",
           "indian-tax-optimizer",
           "internal-benchmarker",
           "llm-context-builder",
+          "msme-compliance-checker",
+          "payment-terms-optimizer",
           "peer-benchmarker",
           "peer-disclosure-miner",
           "pii-stripper",
@@ -38,8 +46,11 @@
           "savings-modeler",
           "scenario-modeler",
           "spend-profiler",
+          "temporal-analyzer",
           "value-bridge-calculator",
-          "value-to-shareholder-bridge"
+          "value-to-shareholder-bridge",
+          "vendor-master-builder",
+          "zbb-modeler"
         ],
         "unregistered": []
       }
@@ -48,14 +59,14 @@
       "dimension_id": "sp_02",
       "name": "Dispatch Handler Implementation Depth",
       "domain": "skill_pipeline",
-      "raw_score": 4.167,
+      "raw_score": 5.0,
       "threshold_pass": 8.0,
       "passed": false,
-      "gap": 3.833,
-      "finding_summary": "15/36 handlers have \u22655 non-blank lines (implemented)",
+      "gap": 3.0,
+      "finding_summary": "18/36 handlers have \u22655 non-blank lines (implemented)",
       "evidence": {
         "total_registered": 36,
-        "implemented_count": 15,
+        "implemented_count": 18,
         "stubs": [
           "spend-profiler",
           "document-contextualizer",
@@ -68,9 +79,6 @@
           "llm-context-builder",
           "assumption-register",
           "indian-tax-optimizer",
-          "brsr-cobenefit-calculator",
-          "scenario-modeler",
-          "value-to-shareholder-bridge",
           "peer-disclosure-miner",
           "conflict-detector",
           "vendor-master-builder",
@@ -340,7 +348,7 @@
         "phases": {
           "observe": {
             "exists": true,
-            "line_count": 567
+            "line_count": 604
           },
           "plan": {
             "exists": true,

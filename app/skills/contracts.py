@@ -200,6 +200,7 @@ class BvAAnalyzerOutput(BaseModel):
     categories_over_budget: int = 0
     categories_under_budget: int = 0
     variances: List[BvAVarianceRow]
+    decomposition_note: str | None = None
 
 
 class TemporalPeriodRow(BaseModel):
@@ -223,15 +224,20 @@ class TemporalCategoryTrendRow(BaseModel):
     change_pct: float | None = None
     trend_direction: str
     annualized_run_rate: float
+    arr_basis: str | None = None
+    cagr_pct: float | None = None
 
 
 class TemporalAnalyzerOutput(BaseModel):
     temporal_available: bool
     reason: str | None = None
     period_count: int = 0
+    period_grain: str | None = None
     first_period: str | None = None
     last_period: str | None = None
     annualized_run_rate: float = 0.0
+    arr_basis: str | None = None
+    cagr_pct: float | None = None
     period_trends: List[TemporalPeriodRow] = Field(default_factory=list)
     category_trends: List[TemporalCategoryTrendRow] = Field(default_factory=list)
 

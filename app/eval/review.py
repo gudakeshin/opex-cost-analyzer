@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import Optional
 
 from app.config import UPLOAD_DIR
+from app.eval.counterfactual import SignalSpec, score_prioritization
 from app.eval.trace import load_trace, summarize_trace
 from app.opar.models import EvalTrace
 
@@ -51,6 +52,7 @@ class ReviewBundle:
 def generate_review_bundle(
     session_id: str,
     run_faithfulness_judge: bool = False,
+    counterfactual_signal: Optional[SignalSpec] = None,
 ) -> ReviewBundle:
     """Build a ReviewBundle for the given session.
 
@@ -58,6 +60,9 @@ def generate_review_bundle(
         session_id:               The session to review.
         run_faithfulness_judge:   If True, call FaithfulnessJudge for each skill
                                   (requires ANTHROPIC_API_KEY).
+        counterfactual_signal:    If provided, score whether this injected signal
+                                  (supplier/category) was surfaced in the response,
+                                  using the deterministic score_prioritization check.
     """
     bundle = ReviewBundle(session_id=session_id)
 
@@ -115,12 +120,36 @@ def generate_review_bundle(
         )
     bundle.faithfulness_section = "".join(faithfulness_lines)
 
-    # --- Counterfactual section (placeholder) ----------------------------
-    bundle.counterfactual_section = (
-        "## Layer 3: Counterfactual Score\n\n"
-        "> Run `tests/eval/test_layer3_counterfactual.py` and paste "
-        "`PrioritizationResult` output here.\n"
-    )
+    # --- Counterfactual section -------------------------------------------
+    cf_lines = ["## Layer 3: Counterfactual Score\n\n"]
+    if counterfactual_signal is not None:
+        try:
+            bva_output = next(
+                (st.output for st in trace.skill_traces
+                 if st.output and "bva" in st.skill_name.lower()),
+                None,
+            )
+            result = score_prioritization(
+                response_text=response_text,
+                signal=counterfactual_signal,
+                bva_output=bva_output,
+            )
+            icon = "✅" if result.signal_surfaced else "⚠️"
+            cf_lines.append(
+                f"- {icon} **signal_surfaced={result.signal_surfaced}** "
+                f"| mentions={result.mention_count} "
+                f"| prominence={result.prominence_score:.2f}\n"
+                f"  - {result.details}\n"
+            )
+        except Exception as exc:
+            cf_lines.append(f"> Counterfactual scoring failed: {exc}\n")
+    else:
+        cf_lines.append(
+            "> No counterfactual signal supplied. Pass `counterfactual_signal=SignalSpec(...)` "
+            "(see `app/eval/counterfactual.py`) to score whether an injected anomaly was "
+            "surfaced in the response.\n"
+        )
+    bundle.counterfactual_section = "".join(cf_lines)
 
     # --- Assemble markdown ------------------------------------------------
     parts = [
