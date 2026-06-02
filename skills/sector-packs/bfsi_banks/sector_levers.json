@@ -83,6 +83,57 @@
         "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
         "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map 24-month branch P&L, footfall, and digital-adoption by branch; rank viability against break-even threshold",
+          "owner_role": "Retail Banking Analytics",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Cluster branches into full-service, lite-format, and digital-only; model revenue and cost impact per scenario",
+          "owner_role": "Strategy / FP&A",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Initiate RBI closure approvals; negotiate lease exits; redeploy ATMs/BCs to adjacent catchments",
+          "owner_role": "Regulatory Affairs / Real Estate",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Execute digital migration campaign for displaced customers; track balances and transaction shift to digital channels",
+          "owner_role": "Retail Banking / Digital",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Monitor revenue retention, occupancy cost savings, and customer NPS post-format change; rebaseline quarterly",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "FACILITIES spend >3% of revenue with ≥20% of branches showing negative unit P&L for ≥2 years",
+          "evidence_source": "branch_pl_data",
+          "confirms": "Over-networked footprint with structural cost drag"
+        },
+        {
+          "signal": "Digital channel adoption >60% in clusters with overlapping full-service branches within 2 km",
+          "evidence_source": "digital_channel_analytics",
+          "confirms": "Format rationalisation feasible without material revenue loss"
+        },
+        {
+          "signal": "Fixed occupancy cost >40% of total branch OPEX in bottom-quartile branches",
+          "evidence_source": "gl_by_branch",
+          "confirms": "Cost structure savings achievable via format or closure"
+        }
+      ],
+      "required_data_fields": [
+        "Branch-level P&L for ≥24 months (revenue, direct cost, allocated overhead)",
+        "Monthly footfall and transaction count per branch",
+        "Digital adoption by geography (mobile/internet banking penetration)",
+        "Lease terms, WALE, and break-clause positions per branch",
+        "RBI branch closure approval requirements and timelines"
       ]
     },
     {
@@ -123,6 +174,57 @@
         "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
         "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
         "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Run process mining on top-10 back-office processes by volume (NEFT/RTGS, account opening, trade-finance docs) to identify STP candidates",
+          "owner_role": "Process Excellence / Automation CoE",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Expose CBS APIs for workflow automation; design Front-to-Back STP architecture and data-flow diagram",
+          "owner_role": "CTO / IT Architecture",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Deploy RPA bots and API integrations in waves—Wave 1 high-volume/low-risk, Wave 2 regulatory processes, Wave 3 exception handling",
+          "owner_role": "IT Delivery",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Complete RBI operational-risk and cyber-security review; obtain IS Audit sign-off before production cutover",
+          "owner_role": "CISO / Risk",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Stabilise bots, hand over to run team, and track FTE release and error-rate reduction monthly",
+          "owner_role": "IT Operations / FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Manual touchpoints >40% in high-volume back-office processes (account opening, reconciliation, trade-finance docs)",
+          "evidence_source": "process_mining_output",
+          "confirms": "STP automation ROI is achievable"
+        },
+        {
+          "signal": "Back-office headcount cost as % of OPEX above peer benchmark (OUTSOURCED/IT >8% revenue)",
+          "evidence_source": "spend_profile",
+          "confirms": "Digitisation opportunity is material"
+        },
+        {
+          "signal": "Error or rework rate in back-office processes >5% of transaction volume",
+          "evidence_source": "ops_quality_metrics",
+          "confirms": "Quality and cost-reduction case for automation is compelling"
+        }
+      ],
+      "required_data_fields": [
+        "Process inventory with transaction volumes and manual vs automated step breakdown",
+        "CBS API capability documentation and integration readiness",
+        "FTE count and loaded labour cost per back-office process",
+        "IT application landscape map",
+        "RBI IT-framework compliance checklist"
       ]
     },
     {
@@ -163,6 +265,57 @@
         "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
         "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)",
         "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Complete IT application-landscape audit: map all active applications to vendor, annual cost, and usage metrics",
+          "owner_role": "IT Procurement / SAM",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Build rationalization roadmap—classify apps as keep/consolidate/retire; develop CBS upgrade/migration plan",
+          "owner_role": "CTO / Enterprise Architecture",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Run competitive RFPs for consolidated IT categories (infrastructure, middleware, testing); negotiate multi-year terms",
+          "owner_role": "IT Procurement",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Execute CBS migration in controlled phases with RBI IT-framework compliance assessment at each stage gate",
+          "owner_role": "Core Banking Programme",
+          "duration_weeks": 24
+        },
+        {
+          "step": "Decommission retired applications; track licence spend reduction and vendor-count trend monthly",
+          "owner_role": "IT Finance / FP&A",
+          "duration_weeks": 6
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "IT vendor count >50 with top-10 vendors representing <60% of IT spend",
+          "evidence_source": "vendor_master",
+          "confirms": "Fragmented supply base with consolidation potential"
+        },
+        {
+          "signal": "IT spend >5% of revenue with >30% on maintenance of legacy or duplicate systems",
+          "evidence_source": "gl_by_it_category",
+          "confirms": "Material cost reduction available through rationalization"
+        },
+        {
+          "signal": "Duplicate capability across ≥2 applications in same functional domain (multiple CRMs, reporting tools)",
+          "evidence_source": "application_portfolio_assessment",
+          "confirms": "Platform consolidation case is justified"
+        }
+      ],
+      "required_data_fields": [
+        "Full IT application inventory with vendor, annual cost, and active user count",
+        "CBS vendor agreement terms and migration risk assessment",
+        "IT spend by sub-category (infrastructure, applications, services, telecom)",
+        "RBI IT framework compliance status per system",
+        "Contract terms and renewal dates for top-20 IT vendors"
       ]
     },
     {
@@ -203,6 +356,57 @@
         "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
         "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map end-to-end KYC (onboarding + periodic refresh) and AML (transaction monitoring + alert disposition) workflows; measure FTE-hours per case",
+          "owner_role": "Compliance / Operations",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Select V-KYC platform and AI AML engine; validate against RBI Master Directions and PMLA requirements",
+          "owner_role": "Compliance / Technology",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Integrate V-KYC with CBS and document management; run AI AML model in shadow mode for parallel validation",
+          "owner_role": "IT Delivery / Compliance",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Complete PMLA compliance review of automated alert disposition; obtain internal-audit and external-auditor sign-off",
+          "owner_role": "Chief Compliance Officer",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Go live; track KYC turnaround, AML false-positive rate, and FTE release monthly",
+          "owner_role": "Operations / FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "KYC/AML operations headcount or outsourced cost >15% of total compliance budget",
+          "evidence_source": "compliance_cost_breakdown",
+          "confirms": "Scale of manual effort justifies automation investment"
+        },
+        {
+          "signal": "AML alert false-positive rate >85% consuming analyst time without commensurate risk reduction",
+          "evidence_source": "aml_operations_report",
+          "confirms": "AI-tuned model will materially reduce alert volume and cost"
+        },
+        {
+          "signal": "Average KYC turnaround time >5 days (individual) or >15 days (corporate)",
+          "evidence_source": "operations_sla_tracker",
+          "confirms": "STP opportunity exists with material customer-experience upside"
+        }
+      ],
+      "required_data_fields": [
+        "KYC workflow map with FTE-hours per step and monthly case volumes",
+        "AML alert data: total volume, disposition rate, false-positive rate, and analyst hours",
+        "CBS API readiness and V-KYC regulatory approval status",
+        "PMLA/RBI Master Directions compliance checklist",
+        "Current KYC/AML vendor contracts and SLA performance data"
       ]
     },
     {
@@ -243,6 +447,57 @@
         "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
         "Atradius — Payment Practices Barometer Asia-Pacific 2024 (atradius.us/knowledge-and-research/reports/payment-practices-barometer-asia-pacific.html)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Segment NPA portfolio by bucket (0–30, 31–60, 61–90, 90+ DPD), product, and geography; identify highest-yield recovery segments",
+          "owner_role": "Collections Analytics",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Deploy predictive collections scoring and AI call-routing; rationalise agency panel to performance-based empanelment",
+          "owner_role": "Collections Head / Technology",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Automate IBC/SARFAESI process flows for secured recovery; integrate legal case management with collections workflow",
+          "owner_role": "Legal / IT",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Launch digital self-cure channels (WhatsApp, net-banking EMI) for early-bucket accounts to reduce outbound cost",
+          "owner_role": "Digital / Collections",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Track recovery rate by segment, cost-per-recovery, and agent productivity; rebalance channel mix quarterly",
+          "owner_role": "FP&A / Collections",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Collections cost as % of NPA book >2% indicating a manual-heavy model",
+          "evidence_source": "collections_pl",
+          "confirms": "Automation and agency rationalisation will reduce cost per recovery"
+        },
+        {
+          "signal": "Collections agency panel >10 vendors with bottom-quartile agencies contributing <15% of recoveries",
+          "evidence_source": "agency_performance_report",
+          "confirms": "Performance-based empanelment will improve recovery yield"
+        },
+        {
+          "signal": "Digital self-cure adoption <20% for early-bucket (0–30 DPD) accounts",
+          "evidence_source": "collections_channel_report",
+          "confirms": "Shift to digital channels will reduce outbound call cost"
+        }
+      ],
+      "required_data_fields": [
+        "NPA portfolio by bucket, product, and geography (12-month history)",
+        "Collections agency performance data (recovery rate, cost per recovery, case allocation)",
+        "IBC/SARFAESI case inventory and resolution timelines",
+        "Digital channel adoption rates by customer segment",
+        "Collections FTE count and cost breakdown by activity"
       ]
     },
     {
@@ -283,6 +538,57 @@
         "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
         "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Conduct ALM gap analysis: map funding cost, liquidity buffers, and correspondent relationships; benchmark against peer banks",
+          "owner_role": "Treasury / ALM",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Upgrade TMS (Murex/Kondor) to automate deal capture, limit monitoring, and regulatory return generation",
+          "owner_role": "CTO / Treasury Technology",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Rationalise correspondent banking panel—retain key corridors, exit low-volume relationships",
+          "owner_role": "Treasury / Compliance",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Automate intra-day liquidity monitoring and SLR/CRR reporting; reduce manual FTE overhead",
+          "owner_role": "Treasury Operations",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Track ALM cost, correspondent-fee reduction, and treasury-ops FTE productivity quarterly",
+          "owner_role": "FP&A",
+          "duration_weeks": 3
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Treasury operations team >15 FTEs with >50% of time on manual reconciliation and regulatory reporting",
+          "evidence_source": "treasury_ops_time_study",
+          "confirms": "Automation will materially reduce treasury ops cost"
+        },
+        {
+          "signal": "Correspondent banking fee spend >₹2 Cr/year with >20 active correspondents",
+          "evidence_source": "correspondent_fees_gl",
+          "confirms": "Panel rationalisation opportunity is material"
+        },
+        {
+          "signal": "SLR/CRR returns prepared manually by >2 FTEs taking >3 days per period",
+          "evidence_source": "regulatory_reporting_ops",
+          "confirms": "Automation of regulatory returns is justified"
+        }
+      ],
+      "required_data_fields": [
+        "ALM gap report and liquidity buffer composition",
+        "Correspondent banking fee schedule and transaction volumes by corridor",
+        "Treasury ops FTE count and time allocation by activity",
+        "Current TMS capability assessment and upgrade roadmap",
+        "SLR/CRR and RBI regulatory reporting FTE cost and frequency"
       ]
     },
     {
@@ -323,6 +629,57 @@
         "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
         "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
         "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Label historical transaction fraud data (≥2 years, min 10,000 confirmed fraud cases); build feature-engineering pipeline",
+          "owner_role": "Data Science / Risk",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Develop and validate ML fraud scoring engine vs current rules engine using holdout dataset; document precision/recall tradeoffs",
+          "owner_role": "Data Science",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Integrate scoring engine with CBS/payment switch in real-time; complete RBI cyber-security framework compliance review",
+          "owner_role": "IT Delivery / CISO",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Run 60-day parallel validation: compare fraud catch rate and false-positive rate vs legacy rules engine",
+          "owner_role": "Fraud Risk / IT",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Decommission legacy rules engine; monitor fraud loss rate, detection rate, and model drift monthly",
+          "owner_role": "Fraud Risk / FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Fraud loss as % of disbursements >0.1% indicating inadequacy of current detection",
+          "evidence_source": "fraud_loss_report",
+          "confirms": "ML model will improve catch rate and reduce fraud losses"
+        },
+        {
+          "signal": "False-positive rate on current rules engine >60% generating customer friction and analyst overhead",
+          "evidence_source": "fraud_operations_report",
+          "confirms": "ML will reduce false positives and investigation cost"
+        },
+        {
+          "signal": "Manual fraud investigation team >20 FTEs with case backlog >500 outstanding",
+          "evidence_source": "fraud_ops_tracker",
+          "confirms": "Automation and better triage will reduce investigation cost"
+        }
+      ],
+      "required_data_fields": [
+        "Transaction history ≥2 years with confirmed fraud labels",
+        "Current fraud rules engine architecture and detection-rate data",
+        "CBS/payment-switch API capability for real-time ML scoring integration",
+        "Fraud loss data by product, channel, and customer segment",
+        "RBI cyber-security framework compliance checklist"
       ]
     },
     {
@@ -363,6 +720,57 @@
         "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
         "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
         "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Inventory all RBI/SEBI regulatory returns: frequency, data sources, FTE-hours, and manual touchpoints per return",
+          "owner_role": "Compliance / Regulatory Reporting",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Align financial data dictionary with RBI XBRL/XSLT taxonomy; establish single source of truth in data warehouse",
+          "owner_role": "Data Management / IT",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Build automated generation for top-10 high-effort returns (SLR, CRR, CRILC, large exposure); configure validation rules",
+          "owner_role": "IT Delivery / Compliance",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Run two full reporting cycles in parallel (automated vs manual); reconcile and sign off with internal audit",
+          "owner_role": "Compliance / Audit",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Decommission manual returns; track FTE release and on-time submission rate",
+          "owner_role": "FP&A / Compliance",
+          "duration_weeks": 3
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Regulatory reporting team >10 FTEs spending >60% of time on data extraction and manual report preparation",
+          "evidence_source": "compliance_ops_time_study",
+          "confirms": "Automation will release significant FTE capacity"
+        },
+        {
+          "signal": "Number of unique regulatory returns >30 with >5 source systems feeding each return",
+          "evidence_source": "return_inventory",
+          "confirms": "Data integration and automation investment is justified"
+        },
+        {
+          "signal": "Late or restated returns ≥2 per year due to manual data aggregation errors",
+          "evidence_source": "regulatory_submission_log",
+          "confirms": "Quality and compliance-risk reduction from automation is material"
+        }
+      ],
+      "required_data_fields": [
+        "Inventory of all regulatory returns (name, regulator, frequency, source systems, FTE-hours)",
+        "RBI XBRL/XSLT taxonomy mapping to chart of accounts",
+        "Data warehouse/lake architecture and data-quality assessment",
+        "Compliance team FTE count and time allocation per return",
+        "Historical late/restated return log with root-cause analysis"
       ]
     }
   ]

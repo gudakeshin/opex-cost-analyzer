@@ -3,7 +3,12 @@
   "sector": "Global Capability Centers — India GCC & Captive Shared Services",
   "version": "0.5",
   "source_verification_note": "All industry_sources entries have been verified against published reports as of May 2026. Only confirmed publications with real URLs or known annual series are cited.",
-  "applicable_entity_types": ["captive_gcc", "shared_services_center", "coe_hub", "knowledge_services_center"],
+  "applicable_entity_types": [
+    "captive_gcc",
+    "shared_services_center",
+    "coe_hub",
+    "knowledge_services_center"
+  ],
   "industry_signals": [
     "Global Capability Center",
     "Global In-house Center",
@@ -46,10 +51,18 @@
       "lever_id": "rpa_intelligent_automation",
       "lever_name": "RPA & Intelligent Process Automation",
       "lever_family": "technology",
-      "savings_range_pct": {"p10": 10.0, "p50": 18.0, "p90": 30.0},
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 30.0
+      },
       "savings_base": "total_opex",
-      "cta_rate": 0.10,
-      "phasing_curve": [0.30, 0.45, 0.25],
+      "cta_rate": 0.1,
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.82,
       "bounce_back_risk": "low",
@@ -60,7 +73,11 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.71,
-      "implementation_weeks": {"p10": 16, "p50": 26, "p90": 40},
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 26,
+        "p90": 40
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:digital_automation_ops present",
@@ -70,18 +87,72 @@
         "Gartner — Market Guide for Hyperautomation Service Providers (gartner.com/en/documents/4983531)",
         "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)",
         "Everest Group — Beyond Boundaries: GCCs Shaping Tomorrow's Enterprises (December 2024)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Run process discovery sessions across F&A, HR ops, and IT service desk; rank automation candidates by volume × handling time × error rate",
+          "owner_role": "Automation CoE",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Establish CoE governance: bot ownership model, security standards, change management, and exception-handling SLA",
+          "owner_role": "CTO / Automation CoE",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Build and deploy Wave 1 bots (F&A reconciliation, HR onboarding, IT ticket routing); run parallel for 2 weeks before cutover",
+          "owner_role": "IT Delivery / Automation CoE",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Scale to Wave 2 (invoice processing, payroll audit, report generation); decommission manual processes; track FTE release",
+          "owner_role": "Automation CoE / FP&A",
+          "duration_weeks": 8
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "High-volume repeatable processes (>500 transactions/day) with manual touchpoints >60% and error rate >2%",
+          "evidence_source": "process_mining_output",
+          "confirms": "RPA automation ROI positive within 12 months"
+        },
+        {
+          "signal": "FTE effort on rule-based tasks >30% of total FTE capacity in F&A or HR ops functions",
+          "evidence_source": "time_and_motion_study",
+          "confirms": "Automation will release FTE capacity for higher-value work"
+        },
+        {
+          "signal": "Technology landscape includes ERP (SAP/Oracle) and ITSM (ServiceNow) with accessible APIs or UI layers for bot integration",
+          "evidence_source": "it_landscape_assessment",
+          "confirms": "Technical feasibility for RPA deployment is confirmed"
+        }
+      ],
+      "required_data_fields": [
+        "Process inventory with transaction volumes, FTE-hours, error rates, and system touchpoints",
+        "IT application landscape with API/UI accessibility assessment",
+        "CoE governance model and bot ownership framework",
+        "Security and data-privacy requirements for automated processes",
+        "FTE cost by function and process to calculate automation ROI"
       ]
     },
     {
       "lever_id": "attrition_reduction_retention",
       "lever_name": "Attrition Reduction & Talent Retention Programme",
       "lever_family": "structure",
-      "savings_range_pct": {"p10": 6.0, "p50": 12.0, "p90": 20.0},
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
       "savings_base": "total_opex",
       "cta_rate": 0.09,
-      "phasing_curve": [0.20, 0.45, 0.35],
+      "phasing_curve": [
+        0.2,
+        0.45,
+        0.35
+      ],
       "savings_type": "run_rate",
-      "sustainability_score": 0.70,
+      "sustainability_score": 0.7,
       "bounce_back_risk": "medium",
       "condition_precedents": [
         "Attrition rate benchmarked vs sector median",
@@ -90,7 +161,11 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.64,
-      "implementation_weeks": {"p10": 12, "p50": 24, "p90": 52},
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 24,
+        "p90": 52
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:hr present",
@@ -100,16 +175,70 @@
         "Deloitte — 2025 Global Human Capital Trends (deloitte.com/us/en/insights/topics/talent/human-capital-trends/2025.html)",
         "Mercer — Total Remuneration Survey, India Edition (imercer.com/products/total-remuneration-surveys)",
         "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Analyse attrition data by band, function, tenure cohort, and manager to identify root causes (compensation, career, manager quality)",
+          "owner_role": "HRBP / People Analytics",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Benchmark total compensation (base + variable + benefits) against NASSCOM/Aon Hewitt survey data by role and experience band",
+          "owner_role": "Rewards / HR",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Design and implement retention interventions: compensation correction for at-risk bands, career path transparency, and manager effectiveness program",
+          "owner_role": "CHRO / HRBP",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track attrition rate by band monthly; measure regression (3-year attrition cost: recruitment + training + productivity ramp)",
+          "owner_role": "FP&A / HR",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Attrition rate >20% for mid-level (L3–L5) employees where replacement cost is 1.5× annual CTC",
+          "evidence_source": "hr_attrition_data",
+          "confirms": "Retention improvement will yield significant avoidable recruitment and onboarding cost"
+        },
+        {
+          "signal": "Exit survey data: compensation or career growth cited by >40% of voluntary leavers",
+          "evidence_source": "exit_survey_data",
+          "confirms": "Targeted compensation and career intervention will address primary attrition drivers"
+        },
+        {
+          "signal": "Bench and training cost >8% of total payroll due to high replacement cycle",
+          "evidence_source": "hr_cost_breakdown",
+          "confirms": "Reducing attrition rate will directly lower training and bench cost"
+        }
+      ],
+      "required_data_fields": [
+        "Attrition data by band, function, tenure cohort, and manager (24 months)",
+        "Exit survey responses with departure reasons",
+        "Compensation benchmarking data (NASSCOM, Aon Hewitt, or equivalent)",
+        "Recruitment and onboarding cost per hire by band",
+        "Productivity ramp curve by role (time to full contribution)"
       ]
     },
     {
       "lever_id": "seat_utilization_optimization",
       "lever_name": "Seat Utilisation & Real Estate Rationalisation",
       "lever_family": "supply",
-      "savings_range_pct": {"p10": 8.0, "p50": 15.0, "p90": 24.0},
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 24.0
+      },
       "savings_base": "total_opex",
       "cta_rate": 0.11,
-      "phasing_curve": [0.40, 0.40, 0.20],
+      "phasing_curve": [
+        0.4,
+        0.4,
+        0.2
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.85,
       "bounce_back_risk": "low",
@@ -120,7 +249,11 @@
       ],
       "complexity_tier": "low",
       "base_execution_probability": 0.78,
-      "implementation_weeks": {"p10": 8, "p50": 16, "p90": 36},
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 16,
+        "p90": 36
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:seat_based_infra present",
@@ -130,16 +263,70 @@
         "JLL India — GCCs Drive Record 77.2 mn sq ft Office Leasing in India (jll.com/en-in/newsroom/gccs-drive-record-77-2-mn-sqft-office-leasing-in-india)",
         "Everest Group — Global Locations State of the Market 2024 (everestgrp.com/wp-content/uploads/2024/09/...)",
         "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Instrument all facilities with occupancy sensing (badge, Wi-Fi heatmap, or manual survey); measure peak and average utilisation by floor",
+          "owner_role": "Facilities / HR",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Design hybrid work policy (3:2 or 4:1) aligned with parent standards; set seat-to-headcount ratio target (1 seat : 1.3 employees)",
+          "owner_role": "CHRO / Facilities",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Consolidate underutilised floors/buildings; sublease or return surplus space to landlord at lease break or expiry",
+          "owner_role": "Real Estate / Legal",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Track cost-per-seat, utilisation rate, and occupancy cost as % of total CTC quarterly",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Peak office utilisation <65% of installed seat capacity for ≥3 months",
+          "evidence_source": "occupancy_sensing_data",
+          "confirms": "Space rationalisation and sublease opportunity is material"
+        },
+        {
+          "signal": "Seat-to-headcount ratio <1.0 (more seats than employees) in a hybrid work environment",
+          "evidence_source": "facilities_and_hr_data",
+          "confirms": "Excess seat capacity can be released"
+        },
+        {
+          "signal": "Occupancy cost (rent, facilities, power) >10% of total payroll cost",
+          "evidence_source": "cost_breakdown",
+          "confirms": "Seat optimisation will materially improve cost ratio"
+        }
+      ],
+      "required_data_fields": [
+        "Occupancy sensing data by floor and building (peak, average, and trend)",
+        "Seat count vs headcount by location and shift pattern",
+        "Lease terms, WALE, and break-clause positions by facility",
+        "Facilities cost breakdown (rent, power, housekeeping, security) per seat",
+        "Parent hybrid work policy requirements"
       ]
     },
     {
       "lever_id": "shared_services_consolidation",
       "lever_name": "Multi-Process Shared Services Consolidation",
       "lever_family": "structure",
-      "savings_range_pct": {"p10": 12.0, "p50": 20.0, "p90": 32.0},
+      "savings_range_pct": {
+        "p10": 12.0,
+        "p50": 20.0,
+        "p90": 32.0
+      },
       "savings_base": "total_opex",
       "cta_rate": 0.07,
-      "phasing_curve": [0.15, 0.40, 0.45],
+      "phasing_curve": [
+        0.15,
+        0.4,
+        0.45
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.88,
       "bounce_back_risk": "low",
@@ -151,7 +338,11 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.52,
-      "implementation_weeks": {"p10": 26, "p50": 52, "p90": 78},
+      "implementation_weeks": {
+        "p10": 26,
+        "p50": 52,
+        "p90": 78
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "multiple_cost_centers_present",
@@ -161,16 +352,70 @@
         "Accenture — Rise of the GCC as a Reinvention Engine (accenture.com/content/dam/accenture/final/accenture-com/document-2/Accenture-Rise-Of-GCC-As-A-Reinvention-Engine.pdf)",
         "Everest Group — Beyond Boundaries: GCCs Shaping Tomorrow's Enterprises (December 2024)",
         "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map F&A (AP, AR, GL, Payroll) and HR ops processes by BU; measure volume, FTE, and cost per transaction for each BU",
+          "owner_role": "Group Transformation / FP&A",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Design SSC operating model: process scope, location, SLA framework, governance, and pricing/chargeback model",
+          "owner_role": "SSC Design Lead",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Migrate Wave 1 (transactional F&A) with parallel run for one period; transition staff under TUPE-equivalent arrangement",
+          "owner_role": "SSC Operations / HR",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Stabilise SSC with SLA dashboard; enforce chargeback to BUs; migrate Wave 2 (HR ops, IT service desk)",
+          "owner_role": "SSC Head / FP&A",
+          "duration_weeks": 8
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Same transactional process (e.g., invoice processing) performed by >3 independent BU teams at different cost per transaction",
+          "evidence_source": "process_cost_benchmarking",
+          "confirms": "Consolidation will reduce unit cost through scale and standardisation"
+        },
+        {
+          "signal": "Cost per invoice processed >₹150 vs SSC benchmark <₹80 for equivalent volume",
+          "evidence_source": "process_benchmarking",
+          "confirms": "Scale economies from SSC are material"
+        },
+        {
+          "signal": "Multiple ERP instances or process variants across BUs for the same transactional sub-process",
+          "evidence_source": "it_landscape",
+          "confirms": "Standardisation opportunity exists alongside consolidation"
+        }
+      ],
+      "required_data_fields": [
+        "Process inventory with volume, FTE, and cost per transaction by BU",
+        "ERP/technology landscape across business units",
+        "Current chargeback or recharge model for shared services",
+        "SLA benchmark data for comparable SSC operations",
+        "Location cost analysis (talent, real estate, infrastructure) for SSC hub"
       ]
     },
     {
       "lever_id": "parent_recharge_rationalization",
       "lever_name": "Parent Recharge & Intercompany Transfer Pricing Rationalisation",
       "lever_family": "finance",
-      "savings_range_pct": {"p10": 6.0, "p50": 14.0, "p90": 22.0},
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 14.0,
+        "p90": 22.0
+      },
       "savings_base": "total_opex",
       "cta_rate": 0.06,
-      "phasing_curve": [0.25, 0.50, 0.25],
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.75,
       "bounce_back_risk": "medium",
@@ -181,8 +426,12 @@
         "Parent CFO alignment on recharge methodology"
       ],
       "complexity_tier": "high",
-      "base_execution_probability": 0.50,
-      "implementation_weeks": {"p10": 20, "p50": 40, "p90": 65},
+      "base_execution_probability": 0.5,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 40,
+        "p90": 65
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:parent_recharge_costs present",
@@ -192,16 +441,70 @@
         "EY — Driving Transfer Pricing Certainty in Uncertain Times: 2024 International Tax and Transfer Pricing Survey (ey.com/en_in/insights/tax/international-tax-and-transfer-pricing-survey)",
         "KPMG — Global Transfer Pricing Review (kpmg.com/us/en/articles/2023/global-transfer-pricing-review.html)",
         "Deloitte — Transfer Pricing Controversy Trends: 2024 Global Survey (internationaltaxreview.com)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Inventory all parent-to-GCC recharges: service type, volume driver, pricing basis, and contract; validate against actual services received",
+          "owner_role": "Finance / Transfer Pricing",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Benchmark each recharge category against arm's-length rate using TNMM or CUP method; identify over-priced or unsupported charges",
+          "owner_role": "Transfer Pricing Advisor",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Renegotiate service agreements to arm's-length pricing; eliminate charges for services not demonstrably received; update Ind AS 115 revenue recognition",
+          "owner_role": "Finance / Legal",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Implement recharge governance dashboard; file updated Form 3CEB and TP documentation; track effective recharge rate quarterly",
+          "owner_role": "Finance / Tax",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Parent recharges as % of GCC revenue >12% for service categories that could be sourced locally at lower cost",
+          "evidence_source": "intercompany_recharge_data",
+          "confirms": "Repricing or scope reduction will reduce effective cost"
+        },
+        {
+          "signal": "Recharge rates not benchmarked for >2 years despite changes in scope or market rates",
+          "evidence_source": "tp_documentation",
+          "confirms": "Benchmarking gap is creating over-payment risk"
+        },
+        {
+          "signal": "Recharge categories include 'management fee' or 'stewardship' without clear deliverables or usage metric",
+          "evidence_source": "intercompany_agreements",
+          "confirms": "Restructuring unsupported charges will reduce cost and TP risk"
+        }
+      ],
+      "required_data_fields": [
+        "Intercompany recharge schedule: service type, pricing basis, and volume driver",
+        "Intercompany service agreements with scope definition",
+        "Comparable market rates for each recharged service category",
+        "Form 3CEB and TP documentation",
+        "Ind AS 115 revenue recognition treatment for recharged services"
       ]
     },
     {
       "lever_id": "vendor_managed_services_shift",
       "lever_name": "Vendor & Managed Services Renegotiation",
       "lever_family": "supply",
-      "savings_range_pct": {"p10": 8.0, "p50": 16.0, "p90": 26.0},
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 16.0,
+        "p90": 26.0
+      },
       "savings_base": "total_opex",
       "cta_rate": 0.09,
-      "phasing_curve": [0.35, 0.40, 0.25],
+      "phasing_curve": [
+        0.35,
+        0.4,
+        0.25
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.72,
       "bounce_back_risk": "medium",
@@ -212,7 +515,11 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.69,
-      "implementation_weeks": {"p10": 10, "p50": 20, "p90": 36},
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 20,
+        "p90": 36
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:digital_automation_ops present",
@@ -222,16 +529,70 @@
         "Gartner — Market Guide for Hyperautomation Service Providers (gartner.com/en/documents/4983531)",
         "Everest Group — Chasing the GCC Opportunity: The Next Big Providers Play (everestgrp.com/report/egr-2025-34-r-7314/)",
         "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Identify GCC support functions (IT infrastructure, facilities management, security) with managed-services market alternatives and clear SLA definition",
+          "owner_role": "COO / Procurement",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Benchmark managed-service pricing vs in-house total cost (FTE + infrastructure + overhead); confirm quality and risk profile",
+          "owner_role": "Finance / Procurement",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Run competitive RFP for selected managed-service scope; negotiate SLA-linked contracts with performance bonds",
+          "owner_role": "Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Transition in-house teams to vendor under TUPE-equivalent; track cost per unit of service and SLA compliance monthly",
+          "owner_role": "HR / Vendor Management",
+          "duration_weeks": 8
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "In-house IT infrastructure or facilities support cost >20% above managed-service benchmark for equivalent coverage",
+          "evidence_source": "cost_benchmarking",
+          "confirms": "Managed-service shift will reduce cost with comparable service level"
+        },
+        {
+          "signal": "In-house support team utilisation <70% due to variable demand pattern",
+          "evidence_source": "workforce_utilisation_data",
+          "confirms": "Vendor with multi-client scale will improve resource efficiency"
+        },
+        {
+          "signal": "Support function SLA compliance below 95% with current in-house model for ≥2 quarters",
+          "evidence_source": "it_service_desk_metrics",
+          "confirms": "Specialised vendor will improve service quality alongside cost reduction"
+        }
+      ],
+      "required_data_fields": [
+        "In-house support function FTE count, cost, and utilisation by service line",
+        "Managed-service pricing benchmarks for IT infrastructure, facilities, and security",
+        "SLA performance data (uptime, response time, resolution time)",
+        "Existing vendor contracts and performance data",
+        "TUPE-equivalent obligations and transfer requirements"
       ]
     },
     {
       "lever_id": "upskilling_pyramid_rebalancing",
       "lever_name": "Talent Pyramid Rebalancing & Upskilling",
       "lever_family": "process",
-      "savings_range_pct": {"p10": 5.0, "p50": 10.0, "p90": 18.0},
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
       "savings_base": "total_opex",
       "cta_rate": 0.08,
-      "phasing_curve": [0.15, 0.40, 0.45],
+      "phasing_curve": [
+        0.15,
+        0.4,
+        0.45
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.78,
       "bounce_back_risk": "medium",
@@ -241,8 +602,12 @@
         "Parent charter supports internal mobility"
       ],
       "complexity_tier": "medium",
-      "base_execution_probability": 0.60,
-      "implementation_weeks": {"p10": 16, "p50": 30, "p90": 52},
+      "base_execution_probability": 0.6,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 30,
+        "p90": 52
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:captive_talent_development present",
@@ -252,18 +617,60 @@
         "WEF — Future of Jobs Report 2025 (weforum.org/publications/the-future-of-jobs-report-2025/)",
         "Deloitte — 2025 Global Human Capital Trends (deloitte.com/us/en/insights/topics/talent/human-capital-trends/2025.html)",
         "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Talent Pyramid Rebalancing & Upskilling: validate baseline and stakeholders",
+          "owner_role": "Transformation Lead",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Design target process and RACI",
+          "owner_role": "Process Owner",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Pilot in one BU/geo and measure effort/cost delta",
+          "owner_role": "Operations",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Scale rollout and update SOPs/training",
+          "owner_role": "HR / Ops",
+          "duration_weeks": 8
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "High FTE effort or cycle time vs benchmark",
+          "evidence_source": "operating_metrics",
+          "confirms": "Process inefficiency is material"
+        }
+      ],
+      "required_data_fields": [
+        "Process volume metrics",
+        "FTE effort or cost allocation by process",
+        "Baseline cycle times"
       ]
     },
     {
       "lever_id": "cloud_infra_modernization",
       "lever_name": "Cloud Infrastructure Modernisation & FinOps",
       "lever_family": "technology",
-      "savings_range_pct": {"p10": 12.0, "p50": 22.0, "p90": 35.0},
+      "savings_range_pct": {
+        "p10": 12.0,
+        "p50": 22.0,
+        "p90": 35.0
+      },
       "savings_base": "it_cloud_spend",
       "cta_rate": 0.08,
-      "phasing_curve": [0.25, 0.45, 0.30],
+      "phasing_curve": [
+        0.25,
+        0.45,
+        0.3
+      ],
       "savings_type": "mixed",
-      "sustainability_score": 0.80,
+      "sustainability_score": 0.8,
       "bounce_back_risk": "low",
       "condition_precedents": [
         "Cloud usage and cost tagging baseline completed",
@@ -273,7 +680,11 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.58,
-      "implementation_weeks": {"p10": 20, "p50": 36, "p90": 60},
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 36,
+        "p90": 60
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:digital_automation_ops present",
@@ -282,16 +693,70 @@
       "industry_sources": [
         "FinOps Foundation — State of FinOps 2025 (data.finops.org/2025-report/)",
         "McKinsey — Projecting the Global Value of Cloud: $3 Trillion is Up for Grabs (mckinsey.com/capabilities/tech-and-ai/our-insights/projecting-the-global-value-of-cloud-3-trillion-is-up-for-grabs-for-companies-that-go-beyond-adoption)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Assess cloud maturity: map all workloads (on-prem, co-location, cloud) to cost, utilisation, and retirement risk; define migration priority",
+          "owner_role": "CTO / Cloud CoE",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Build cloud migration roadmap: rehost, replatform, refactor, or retire by workload; establish landing zone and FinOps governance",
+          "owner_role": "Cloud Architecture / Finance",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Execute migration in waves (low-risk dev/test first, then production); enforce tagging and budget alerts from day 1",
+          "owner_role": "Cloud Engineering / IT Delivery",
+          "duration_weeks": 16
+        },
+        {
+          "step": "Implement FinOps: rightsizing recommendations, reserved instances, and savings plans; track cloud spend per BU monthly",
+          "owner_role": "FinOps / IT Finance",
+          "duration_weeks": 6
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "On-premises infrastructure utilisation <40% average with peak demand requiring expensive burst capacity",
+          "evidence_source": "infrastructure_utilisation_report",
+          "confirms": "Cloud migration will reduce idle infrastructure cost and improve elasticity"
+        },
+        {
+          "signal": "Cloud spend growing >30% YoY without corresponding workload growth, indicating waste",
+          "evidence_source": "cloud_billing_report",
+          "confirms": "FinOps governance will reduce cloud waste"
+        },
+        {
+          "signal": "Infrastructure cost per FTE >₹2 L/year vs cloud-optimised GCC benchmark of <₹1.2 L/year",
+          "evidence_source": "cost_benchmarking",
+          "confirms": "Cloud modernisation will improve cost per FTE ratio"
+        }
+      ],
+      "required_data_fields": [
+        "Workload inventory (on-prem, co-location, cloud) with cost and utilisation metrics",
+        "Cloud billing breakdown by service type, environment, and business unit",
+        "Network connectivity and security requirements for cloud migration",
+        "FinOps maturity assessment and tagging hygiene status",
+        "Parent/HQ cloud strategy and vendor preference"
       ]
     },
     {
       "lever_id": "bench_management_optimization",
       "lever_name": "Bench & Unallocated Headcount Optimisation",
       "lever_family": "demand",
-      "savings_range_pct": {"p10": 4.0, "p50": 9.0, "p90": 16.0},
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 9.0,
+        "p90": 16.0
+      },
       "savings_base": "total_opex",
-      "cta_rate": 0.10,
-      "phasing_curve": [0.40, 0.40, 0.20],
+      "cta_rate": 0.1,
+      "phasing_curve": [
+        0.4,
+        0.4,
+        0.2
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.68,
       "bounce_back_risk": "medium",
@@ -302,7 +767,11 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.65,
-      "implementation_weeks": {"p10": 8, "p50": 18, "p90": 32},
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 32
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:bench_management present",
@@ -311,18 +780,72 @@
       "industry_sources": [
         "Everest Group — Beyond Boundaries: GCCs Shaping Tomorrow's Enterprises (December 2024)",
         "Accenture — Rise of the GCC as a Reinvention Engine (accenture.com/content/dam/accenture/final/accenture-com/document-2/Accenture-Rise-Of-GCC-As-A-Reinvention-Engine.pdf)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Profile bench by skill, band, and bench tenure; classify as project-ramp (0–4 weeks), skill-gap (4–8 weeks), or structural bench (>8 weeks)",
+          "owner_role": "Resource Management / HR",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Implement internal mobility marketplace: match bench talent to open positions across BUs before external hiring",
+          "owner_role": "Resource Management / Talent Acquisition",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Redeploy skill-gap bench into upskilling programs (GenAI, cloud, data) with time-bound deployment commitment",
+          "owner_role": "Learning & Development / HR",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Exit or PIP structural bench (>8 weeks, no deployment path); track bench % of total headcount and bench cost monthly",
+          "owner_role": "HRBP / FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Bench headcount as % of total GCC headcount >8% for ≥2 consecutive quarters",
+          "evidence_source": "resource_management_data",
+          "confirms": "Bench reduction will directly lower payroll cost per billable FTE"
+        },
+        {
+          "signal": "Average bench tenure >6 weeks indicating deployment process or skill-market mismatch",
+          "evidence_source": "bench_aging_data",
+          "confirms": "Structural bench indicates resource management process gap"
+        },
+        {
+          "signal": "External hiring ongoing for skills that exist in the bench profile",
+          "evidence_source": "talent_acquisition_data_vs_bench_profile",
+          "confirms": "Internal mobility process is broken; fixing it will reduce recruitment cost"
+        }
+      ],
+      "required_data_fields": [
+        "Bench headcount by skill, band, and bench tenure (weekly snapshots)",
+        "Open position inventory by skill and expected start date",
+        "External hiring pipeline and job requisitions",
+        "Training and upskilling program catalog",
+        "Bench cost (CTC for undeployed FTEs) per quarter"
       ]
     },
     {
       "lever_id": "parent_scope_rationalization",
       "lever_name": "Scope Rationalisation with Parent Entity",
       "lever_family": "demand",
-      "savings_range_pct": {"p10": 5.0, "p50": 12.0, "p90": 22.0},
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 12.0,
+        "p90": 22.0
+      },
       "savings_base": "total_opex",
       "cta_rate": 0.06,
-      "phasing_curve": [0.20, 0.45, 0.35],
+      "phasing_curve": [
+        0.2,
+        0.45,
+        0.35
+      ],
       "savings_type": "run_rate",
-      "sustainability_score": 0.80,
+      "sustainability_score": 0.8,
       "bounce_back_risk": "low",
       "condition_precedents": [
         "Activity-based costing (ABC) model for GCC processes completed",
@@ -331,7 +854,11 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.48,
-      "implementation_weeks": {"p10": 20, "p50": 40, "p90": 68},
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 40,
+        "p90": 68
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:parent_recharge_costs present",
@@ -341,16 +868,70 @@
         "McKinsey — Global Capability Centers: From Cost to Innovation (mckinsey.com/capabilities/operations/our-insights/beyond-cost-savings-the-global-footprint-of-innovation-hubs)",
         "Accenture — Rise of the GCC as a Reinvention Engine (accenture.com/content/dam/accenture/final/accenture-com/document-2/Accenture-Rise-Of-GCC-As-A-Reinvention-Engine.pdf)",
         "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Inventory all work scopes migrated to GCC: service line, volume, FTE assigned, and value-add classification (transactional vs strategic)",
+          "owner_role": "GCC Leadership / COO",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Assess each scope for value-for-money vs parent expectation: cost, quality, and strategic contribution vs local/other-vendor alternative",
+          "owner_role": "Finance / Strategy",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Right-size scope: return commoditised or low-value work that is cheaper locally; pitch for higher-value strategic scope",
+          "owner_role": "GCC CEO / Business Partners",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track scope mix (transactional vs strategic), cost per output, and parent satisfaction score quarterly",
+          "owner_role": "FP&A / COO",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Transactional scope >60% of total GCC work portfolio, limiting value-add perception and long-term sustainability",
+          "evidence_source": "scope_classification_review",
+          "confirms": "Scope upgrade towards higher-value work will improve parent ROI and GCC resilience"
+        },
+        {
+          "signal": "Per-seat cost of GCC trending above offshore benchmark due to cost inflation without corresponding scope upgrade",
+          "evidence_source": "cost_benchmarking",
+          "confirms": "Scope rationalisation and value upgrade needed to justify cost premium"
+        },
+        {
+          "signal": "Parent considering in-sourcing or alternative vendor for ≥2 GCC service lines",
+          "evidence_source": "parent_stakeholder_feedback",
+          "confirms": "Proactive scope and value review is urgently needed"
+        }
+      ],
+      "required_data_fields": [
+        "GCC scope inventory with service line, FTE, and value-add classification",
+        "Cost per seat and per output by service line",
+        "Parent satisfaction scores and strategic expectation documentation",
+        "Competitive landscape: alternative delivery options by scope category",
+        "GCC 3-year roadmap and parent alignment"
       ]
     },
     {
       "lever_id": "perks_benefits_rationalisation",
       "lever_name": "Employee Perks & Benefits Rationalisation",
       "lever_family": "process",
-      "savings_range_pct": {"p10": 5.0, "p50": 12.0, "p90": 20.0},
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
       "savings_base": "total_opex",
       "cta_rate": 0.11,
-      "phasing_curve": [0.50, 0.35, 0.15],
+      "phasing_curve": [
+        0.5,
+        0.35,
+        0.15
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.65,
       "bounce_back_risk": "high",
@@ -360,8 +941,12 @@
         "CHRO and parent HR alignment on total rewards philosophy"
       ],
       "complexity_tier": "low",
-      "base_execution_probability": 0.70,
-      "implementation_weeks": {"p10": 6, "p50": 14, "p90": 26},
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 14,
+        "p90": 26
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:hr > 50% opex",
@@ -371,16 +956,58 @@
         "Mercer — Total Remuneration Survey, India Edition (imercer.com/products/total-remuneration-surveys)",
         "Deloitte — 2025 Global Human Capital Trends (deloitte.com/us/en/insights/topics/talent/human-capital-trends/2025.html)",
         "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Employee Perks & Benefits Rationalisation: validate baseline and stakeholders",
+          "owner_role": "Transformation Lead",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Design target process and RACI",
+          "owner_role": "Process Owner",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Pilot in one BU/geo and measure effort/cost delta",
+          "owner_role": "Operations",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Scale rollout and update SOPs/training",
+          "owner_role": "HR / Ops",
+          "duration_weeks": 8
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "High FTE effort or cycle time vs benchmark",
+          "evidence_source": "operating_metrics",
+          "confirms": "Process inefficiency is material"
+        }
+      ],
+      "required_data_fields": [
+        "Process volume metrics",
+        "FTE effort or cost allocation by process",
+        "Baseline cycle times"
       ]
     },
     {
       "lever_id": "genai_augmented_productivity",
       "lever_name": "GenAI-Augmented Workforce Productivity",
       "lever_family": "technology",
-      "savings_range_pct": {"p10": 8.0, "p50": 18.0, "p90": 30.0},
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 18.0,
+        "p90": 30.0
+      },
       "savings_base": "total_opex",
-      "cta_rate": 0.10,
-      "phasing_curve": [0.15, 0.45, 0.40],
+      "cta_rate": 0.1,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.85,
       "bounce_back_risk": "low",
@@ -391,8 +1018,12 @@
         "Parent entity AI strategy and tooling selection confirmed"
       ],
       "complexity_tier": "high",
-      "base_execution_probability": 0.60,
-      "implementation_weeks": {"p10": 20, "p50": 36, "p90": 60},
+      "base_execution_probability": 0.6,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 36,
+        "p90": 60
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:digital_automation_ops present",
@@ -402,18 +1033,72 @@
         "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)",
         "Accenture — Rise of the GCC as a Reinvention Engine (accenture.com/content/dam/accenture/final/accenture-com/document-2/Accenture-Rise-Of-GCC-As-A-Reinvention-Engine.pdf)",
         "Everest Group — Beyond Boundaries: GCCs Shaping Tomorrow's Enterprises (December 2024)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Conduct GenAI use-case discovery across top-5 functions (F&A, HR, IT, analytics, software development); estimate productivity impact per use case",
+          "owner_role": "Innovation / CoE",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Pilot highest-impact use cases (code generation, document summarisation, RFP response, data analysis) with volunteer teams; measure time savings",
+          "owner_role": "Pilot Teams / CoE",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Scale proven pilots via standardised prompt libraries, tool integrations (Copilot, Claude, Gemini), and change management",
+          "owner_role": "CoE / HR / IT",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track productivity metrics (output per FTE, cycle time reduction) and report FTE capacity release to parent quarterly",
+          "owner_role": "FP&A / CoE",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Functions with >40% of FTE time on document/data processing tasks where GenAI augmentation is proven (coding, legal review, financial analysis)",
+          "evidence_source": "time_and_motion_study",
+          "confirms": "GenAI adoption will yield measurable productivity improvement"
+        },
+        {
+          "signal": "Software development cycle time (story to deployment) >4 weeks vs benchmark <2 weeks in comparable GCCs with AI-assisted coding",
+          "evidence_source": "delivery_metrics",
+          "confirms": "AI-assisted code generation will improve engineering throughput"
+        },
+        {
+          "signal": "Licence or subscription cost for GenAI tools already incurred but adoption <30% of eligible workforce",
+          "evidence_source": "saas_usage_data",
+          "confirms": "Driving adoption of existing tools will improve ROI without incremental cost"
+        }
+      ],
+      "required_data_fields": [
+        "Function-level time allocation by task type (creative, analytical, document, coding)",
+        "Existing GenAI tool subscriptions and adoption rates",
+        "Software development metrics (velocity, cycle time, defect rate)",
+        "Parent GenAI policy and data-handling guidelines",
+        "Pilot design framework and measurement methodology"
       ]
     },
     {
       "lever_id": "tier2_location_strategy",
       "lever_name": "Tier-2 City Location Strategy & Hub-and-Spoke Migration",
       "lever_family": "supply",
-      "savings_range_pct": {"p10": 10.0, "p50": 20.0, "p90": 30.0},
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 20.0,
+        "p90": 30.0
+      },
       "savings_base": "total_opex",
       "cta_rate": 0.07,
-      "phasing_curve": [0.10, 0.35, 0.55],
+      "phasing_curve": [
+        0.1,
+        0.35,
+        0.55
+      ],
       "savings_type": "run_rate",
-      "sustainability_score": 0.90,
+      "sustainability_score": 0.9,
       "bounce_back_risk": "low",
       "condition_precedents": [
         "Role-by-role location sensitivity analysis completed",
@@ -423,7 +1108,11 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.52,
-      "implementation_weeks": {"p10": 26, "p50": 52, "p90": 104},
+      "implementation_weeks": {
+        "p10": 26,
+        "p50": 52,
+        "p90": 104
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:hr > 50% opex",
@@ -433,16 +1122,70 @@
         "NASSCOM — India GCC Landscape Report: The 5-Year Journey, co-published with Zinnov (zinnov.com/centers-of-excellence/zinnov-nasscom-india-gcc-landscape-report-the-5-year-journey-report/)",
         "Everest Group — Global Locations State of the Market 2024 (everestgrp.com/wp-content/uploads/2024/09/Everest-Group-Global-Locations-State-of-the-Market-2024-Key-Trends-Shaping-the-Landscape-Complimentary-Abstract.pdf)",
         "JLL India — GCCs Drive Record 77.2 mn sq ft Office Leasing in India (jll.com/en-in/newsroom/gccs-drive-record-77-2-mn-sqft-office-leasing-in-india)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Score Tier-2 cities against criteria: talent pool depth (technical graduates), infrastructure, attrition benchmarks, real-estate cost, and SEZ/STPI availability",
+          "owner_role": "Strategy / Real Estate",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Assess SEZ/STPI eligibility for target city; model 5-year TCO (salaries, real estate, infrastructure, incentives) vs Tier-1 incumbent location",
+          "owner_role": "Finance / Tax",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Establish satellite office or CoE in selected Tier-2 city; migrate new hiring and selected existing functions over 12–18 months",
+          "owner_role": "CHRO / Real Estate / Operations",
+          "duration_weeks": 16
+        },
+        {
+          "step": "Track cost per FTE (Tier-2 vs Tier-1), attrition rate, and talent quality metrics by location quarterly",
+          "owner_role": "FP&A / HR",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "GCC cost per FTE in current Tier-1 city growing >10% CAGR for 3 years, outpacing productivity improvement",
+          "evidence_source": "cost_per_fte_trend",
+          "confirms": "Tier-2 location will arrest cost escalation"
+        },
+        {
+          "signal": "Tier-2 salary benchmark for equivalent roles 25–35% below current Tier-1 location",
+          "evidence_source": "compensation_benchmarking",
+          "confirms": "Material cost-per-FTE reduction is achievable via geographic arbitrage"
+        },
+        {
+          "signal": "Attrition rate in current Tier-1 location >20% driven by competition for talent from large tech employers",
+          "evidence_source": "hr_attrition_data",
+          "confirms": "Tier-2 talent market is less competitive, supporting retention improvement"
+        }
+      ],
+      "required_data_fields": [
+        "Cost per FTE comparison across Tier-1 and Tier-2 locations (salary, real estate, infrastructure)",
+        "Talent pool data: NASSCOM city report or equivalent for target Tier-2 cities",
+        "Attrition benchmarks by location",
+        "SEZ/STPI availability and incentive structure for target city",
+        "Real estate availability and cost per sq ft in Tier-2 candidate cities"
       ]
     },
     {
       "lever_id": "sez_stpi_tax_optimisation",
       "lever_name": "SEZ / STPI Tax Benefit Optimisation (Section 10AA / 10B)",
       "lever_family": "finance",
-      "savings_range_pct": {"p10": 6.0, "p50": 14.0, "p90": 25.0},
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 14.0,
+        "p90": 25.0
+      },
       "savings_base": "effective_tax_liability",
       "cta_rate": 0.06,
-      "phasing_curve": [0.30, 0.45, 0.25],
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
       "savings_type": "mixed",
       "sustainability_score": 0.78,
       "bounce_back_risk": "medium",
@@ -454,7 +1197,11 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.55,
-      "implementation_weeks": {"p10": 16, "p50": 32, "p90": 56},
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 32,
+        "p90": 56
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:gcc_governance_compliance present",
@@ -464,16 +1211,70 @@
         "EY — Driving Transfer Pricing Certainty in Uncertain Times: 2024 International Tax and Transfer Pricing Survey (ey.com/en_in/insights/tax/international-tax-and-transfer-pricing-survey)",
         "KPMG — Global Transfer Pricing Review (kpmg.com/us/en/articles/2023/global-transfer-pricing-review.html)",
         "Deloitte — Transfer Pricing Controversy Trends: 2024 Global Survey (internationaltaxreview.com)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit current SEZ/STPI status and compliance: unit approval, Softex declaration volume and coverage, and bond utilisation",
+          "owner_role": "Finance / Tax / Compliance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Calculate IT/ITeS income tax exemption foregone due to non-filing or incomplete Softex declarations; quantify IEC and bond optimisation opportunity",
+          "owner_role": "Tax / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "File backdated Softex declarations (where permissible); correct STPI/SEZ compliance gaps and implement automated Softex filing workflow",
+          "owner_role": "Finance / Tax",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Integrate Softex filing into monthly invoice generation workflow; track exemption utilisation and compliance calendar",
+          "owner_role": "Finance / IT",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Softex declaration coverage <80% of eligible software export invoices",
+          "evidence_source": "stpi_compliance_audit",
+          "confirms": "Filing gap recovery will immediately improve tax exemption position"
+        },
+        {
+          "signal": "IT income tax exemption utilised <90% of eligible income under STPI/SEZ scheme",
+          "evidence_source": "tax_return_data",
+          "confirms": "Compliance improvement will reduce effective tax rate"
+        },
+        {
+          "signal": "STPI/SEZ bond amount not optimised (excess bond increasing opportunity cost)",
+          "evidence_source": "stpi_bond_register",
+          "confirms": "Bond rightsizing will release working capital"
+        }
+      ],
+      "required_data_fields": [
+        "Softex declaration log vs total software export invoice value",
+        "IT exemption claimed vs eligible income in tax returns",
+        "STPI/SEZ unit approval documents and scope",
+        "Bond register and utilisation rate",
+        "Monthly software export invoice data by client and currency"
       ]
     },
     {
       "lever_id": "chargeback_model_transformation",
       "lever_name": "Chargeback Model Transformation — Cost-Plus to Value-Based Billing",
       "lever_family": "finance",
-      "savings_range_pct": {"p10": 6.0, "p50": 15.0, "p90": 26.0},
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 15.0,
+        "p90": 26.0
+      },
       "savings_base": "total_opex",
       "cta_rate": 0.06,
-      "phasing_curve": [0.20, 0.50, 0.30],
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.88,
       "bounce_back_risk": "low",
@@ -485,7 +1286,11 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.48,
-      "implementation_weeks": {"p10": 20, "p50": 44, "p90": 72},
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 44,
+        "p90": 72
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:parent_recharge_costs present",
@@ -495,18 +1300,72 @@
         "Accenture — Rise of the GCC as a Reinvention Engine (accenture.com/content/dam/accenture/final/accenture-com/document-2/Accenture-Rise-Of-GCC-As-A-Reinvention-Engine.pdf)",
         "Everest Group — Beyond Boundaries: GCCs Shaping Tomorrow's Enterprises (December 2024)",
         "McKinsey — Global Capability Centers: From Cost to Innovation (mckinsey.com/capabilities/operations/our-insights/beyond-cost-savings-the-global-footprint-of-innovation-hubs)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit current recharge model: map each GCC cost pool to chargeback driver, rate, and receiving BU; identify misalignments vs actual consumption",
+          "owner_role": "Finance / COO",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Redesign to activity-based costing model: define unit rates per service line (cost per FTE, per transaction, per project hour) with transparent overhead allocation",
+          "owner_role": "Finance / FP&A",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Align new chargeback model with parent finance teams; obtain sign-off and integrate into ERP intercompany billing module",
+          "owner_role": "Finance / IT",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Publish monthly chargeback dashboards by BU and service line; track demand discipline and cost recovery rate",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Recharge disputes from BUs >3 per quarter due to lack of transparency in cost allocation",
+          "evidence_source": "intercompany_dispute_log",
+          "confirms": "Activity-based costing model will improve transparency and reduce disputes"
+        },
+        {
+          "signal": "GCC cost recovery rate <95% of budget due to incorrect chargeback basis or BU pushback",
+          "evidence_source": "finance_cost_recovery_report",
+          "confirms": "Model redesign will improve cost recovery and GCC P&L accuracy"
+        },
+        {
+          "signal": "BU decision-making on GCC scope driven by perception of value rather than actual cost data",
+          "evidence_source": "stakeholder_interviews",
+          "confirms": "Transparent unit-cost pricing will enable rational demand decisions"
+        }
+      ],
+      "required_data_fields": [
+        "Current chargeback rate card and allocation methodology by cost pool",
+        "GCC P&L by service line and function",
+        "BU demand data by service type and volume",
+        "Intercompany billing configuration in ERP",
+        "Parent finance accounting policy for intercompany services"
       ]
     },
     {
       "lever_id": "org_span_control_optimisation",
       "lever_name": "Org Layer & Span-of-Control Optimisation",
       "lever_family": "structure",
-      "savings_range_pct": {"p10": 5.0, "p50": 10.0, "p90": 18.0},
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
       "savings_base": "total_opex",
       "cta_rate": 0.08,
-      "phasing_curve": [0.30, 0.50, 0.20],
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
       "savings_type": "run_rate",
-      "sustainability_score": 0.80,
+      "sustainability_score": 0.8,
       "bounce_back_risk": "medium",
       "condition_precedents": [
         "Org structure mapped with spans and layers analysed",
@@ -515,7 +1374,11 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.62,
-      "implementation_weeks": {"p10": 16, "p50": 30, "p90": 52},
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 30,
+        "p90": 52
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:hr > 50% opex",
@@ -525,16 +1388,70 @@
         "Deloitte — 2025 Global Human Capital Trends (deloitte.com/us/en/insights/topics/talent/human-capital-trends/2025.html)",
         "WEF — Future of Jobs Report 2025 (weforum.org/publications/the-future-of-jobs-report-2025/)",
         "Mercer — Total Remuneration Survey, India Edition (imercer.com/products/total-remuneration-surveys)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Analyse GCC org chart: compute average span of control and management layer count by function vs NASSCOM GCC benchmark",
+          "owner_role": "HRBP / People Analytics",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Define target spans (IC-to-manager: 8–12 for execution roles, 5–8 for strategic roles) and maximum layer count (4 from GCC CEO to IC)",
+          "owner_role": "CHRO / GCC Leadership",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Redesign org structure: flatten layers, eliminate single-direct-report manager roles, and combine sub-scale teams",
+          "owner_role": "CHRO / Function Heads",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Implement change plan with redeployment or exit for displaced roles; track manager-to-IC ratio and cost-per-band quarterly",
+          "owner_role": "HR Operations / FP&A",
+          "duration_weeks": 6
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Average span of control <5 ICs per manager for non-specialist functions, indicating over-management",
+          "evidence_source": "org_chart_analysis",
+          "confirms": "De-layering will reduce management overhead cost"
+        },
+        {
+          "signal": "Management layers >5 from GCC CEO to individual contributor for delivery functions",
+          "evidence_source": "org_chart",
+          "confirms": "Layer reduction will improve decision speed and reduce overhead ratio"
+        },
+        {
+          "signal": "Manager-to-IC ratio >1:4 with management cost as % of total payroll >30%",
+          "evidence_source": "payroll_data_by_band",
+          "confirms": "Flatter structure will improve cost efficiency"
+        }
+      ],
+      "required_data_fields": [
+        "Org chart with headcount and CTC by band and function",
+        "Span-of-control data by manager across all levels",
+        "NASSCOM or peer GCC benchmark for management structure",
+        "Single-direct-report manager inventory",
+        "Cost by band (manager vs IC) for overhead ratio calculation"
       ]
     },
     {
       "lever_id": "shadow_it_saas_elimination",
       "lever_name": "Shadow IT & Unauthorised SaaS Elimination",
       "lever_family": "technology",
-      "savings_range_pct": {"p10": 10.0, "p50": 18.0, "p90": 28.0},
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 28.0
+      },
       "savings_base": "it_saas_spend",
       "cta_rate": 0.11,
-      "phasing_curve": [0.60, 0.30, 0.10],
+      "phasing_curve": [
+        0.6,
+        0.3,
+        0.1
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.72,
       "bounce_back_risk": "low",
@@ -545,7 +1462,11 @@
       ],
       "complexity_tier": "low",
       "base_execution_probability": 0.75,
-      "implementation_weeks": {"p10": 6, "p50": 12, "p90": 20},
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 12,
+        "p90": 20
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:digital_automation_ops present",
@@ -555,16 +1476,70 @@
         "FinOps Foundation — State of FinOps 2025 (data.finops.org/2025-report/)",
         "Gartner — Market Guide for Hyperautomation Service Providers (gartner.com/en/documents/4983531)",
         "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Run SaaS discovery scan using browser plug-in or SSO logs; identify all active SaaS applications by BU and usage frequency",
+          "owner_role": "IT Security / FinOps",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Compare against approved IT catalog; classify shadow IT into: approve+consolidate, migrate to approved alternative, or decommission",
+          "owner_role": "IT / Procurement",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Negotiate consolidated licensing agreements for approved SaaS (Microsoft, Atlassian, Slack); enforce single-vendor SSO login to control proliferation",
+          "owner_role": "IT Procurement / Legal",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track authorised vs shadow application count monthly; enforce procurement policy requiring IT review for new SaaS subscriptions",
+          "owner_role": "IT / Finance",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Shadow SaaS (unauthorised tools) representing >20% of total SaaS spend discovered through discovery scan",
+          "evidence_source": "saas_discovery_report",
+          "confirms": "Rationalisation and governance will reduce waste and security risk"
+        },
+        {
+          "signal": "Duplicate SaaS tools for same function across BUs (e.g., multiple project management tools, multiple video conferencing subscriptions)",
+          "evidence_source": "saas_inventory",
+          "confirms": "Consolidation to single approved tool will reduce per-seat cost"
+        },
+        {
+          "signal": "SaaS spend growing >30% YoY without corresponding headcount or output growth",
+          "evidence_source": "saas_spend_trend",
+          "confirms": "Governance implementation will arrest uncontrolled proliferation"
+        }
+      ],
+      "required_data_fields": [
+        "SaaS discovery report (SSO logs, browser plug-in scan, credit card statement analysis)",
+        "Approved IT catalog with standard tooling by function",
+        "SaaS contract and licence data (vendor, users, cost, renewal date)",
+        "Security risk classification for shadow IT applications",
+        "Procurement policy for software purchases"
       ]
     },
     {
       "lever_id": "recruitment_cost_optimisation",
       "lever_name": "Recruitment Cost Optimisation — Internal Sourcing & Direct Hiring",
       "lever_family": "process",
-      "savings_range_pct": {"p10": 4.0, "p50": 9.0, "p90": 15.0},
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 9.0,
+        "p90": 15.0
+      },
       "savings_base": "talent_acquisition_spend",
-      "cta_rate": 0.10,
-      "phasing_curve": [0.40, 0.40, 0.20],
+      "cta_rate": 0.1,
+      "phasing_curve": [
+        0.4,
+        0.4,
+        0.2
+      ],
       "savings_type": "run_rate",
       "sustainability_score": 0.75,
       "bounce_back_risk": "medium",
@@ -575,7 +1550,11 @@
       ],
       "complexity_tier": "low",
       "base_execution_probability": 0.72,
-      "implementation_weeks": {"p10": 8, "p50": 18, "p90": 32},
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 18,
+        "p90": 32
+      },
       "applicable_if": [
         "gcc_keywords detected",
         "category:hr present",
@@ -585,6 +1564,40 @@
         "Mercer — Total Remuneration Survey, India Edition (imercer.com/products/total-remuneration-surveys)",
         "Deloitte — 2025 Global Human Capital Trends (deloitte.com/us/en/insights/topics/talent/human-capital-trends/2025.html)",
         "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Recruitment Cost Optimisation — Internal Sourcing & Direct Hiring: validate baseline and stakeholders",
+          "owner_role": "Transformation Lead",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Design target process and RACI",
+          "owner_role": "Process Owner",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Pilot in one BU/geo and measure effort/cost delta",
+          "owner_role": "Operations",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Scale rollout and update SOPs/training",
+          "owner_role": "HR / Ops",
+          "duration_weeks": 8
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "High FTE effort or cycle time vs benchmark",
+          "evidence_source": "operating_metrics",
+          "confirms": "Process inefficiency is material"
+        }
+      ],
+      "required_data_fields": [
+        "Process volume metrics",
+        "FTE effort or cost allocation by process",
+        "Baseline cycle times"
       ]
     }
   ]

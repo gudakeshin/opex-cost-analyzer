@@ -197,12 +197,33 @@ def run_regression_test(pack_id: str) -> Dict[str, Any]:
     if not checks["version_semver"]:
         errors.append(f"Version '{version}' is not semver-like")
 
-    # 5. If levers present, each lever has P50
-    levers = pack.get("sector_levers", {}).get("levers", [])
-    bad_levers = [lv["lever_id"] for lv in levers if "p50_pct" not in lv]
-    checks["lever_p50_present"] = len(bad_levers) == 0
-    if bad_levers:
-        errors.append(f"Levers missing p50_pct: {bad_levers}")
+    # 5. Skills-pack levers: savings_range_pct.p50 + playbook fields
+    skills_levers_path = (
+        Path(__file__).resolve().parents[2]
+        / "skills"
+        / "sector-packs"
+        / pack_id
+        / "sector_levers.json"
+    )
+    sector_levers: List[Dict[str, Any]] = []
+    if skills_levers_path.exists():
+        sector_levers = _load_json(skills_levers_path).get("sector_specific_levers", [])
+    bad_p50: List[str] = []
+    bad_playbook: List[str] = []
+    for lv in sector_levers:
+        lid = lv.get("lever_id", "?")
+        sr = lv.get("savings_range_pct") or {}
+        if sr.get("p50") is None:
+            bad_p50.append(lid)
+        for field in ("execution_playbook", "diagnostic_signals", "required_data_fields"):
+            if not lv.get(field):
+                bad_playbook.append(f"{lid}.{field}")
+    checks["lever_p50_present"] = len(bad_p50) == 0
+    checks["lever_playbook_fields"] = len(bad_playbook) == 0
+    if bad_p50:
+        errors.append(f"Sector levers missing savings_range_pct.p50: {bad_p50}")
+    if bad_playbook:
+        errors.append(f"Sector levers missing playbook fields: {bad_playbook[:10]}")
 
     passed = all(checks.values())
     return {"passed": passed, "pack_id": pack_id, "version": pack["version"], "checks": checks, "errors": errors}

@@ -80,6 +80,52 @@
         "Ministry of Tourism India — India Tourism Statistics 2024 (tourism.gov.in/india-tourism-statistics) — OTA distribution channel mix benchmarks",
         "FHRAI — Hotel Industry Survey 2024 (fhrai.com/) — OTA commission rates and direct booking benchmarks India 12-25%",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit channel mix: map room-night volume and commission cost by OTA channel (Booking.com, Expedia, MakeMyTrip) vs direct (website, walk-in, corporate)",
+          "owner_role": "Revenue Management / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Design direct booking incentive program: rate parity management, loyalty rate advantage, and value-add (F&B credit, upgrade) for direct bookers",
+          "owner_role": "Marketing / Revenue Management",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Negotiate OTA commission rates by market segment; explore OTA preferred-partner programs that reduce commission for volume commitments",
+          "owner_role": "Revenue Management / GM",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track OTA commission as % of room revenue, direct booking share, and RevPAR by channel monthly",
+          "owner_role": "FP&A / Revenue Management",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "OTA channel contributing >40% of room revenue with average commission >18% of room rate",
+          "evidence_source": "channel_mix_report",
+          "confirms": "Direct booking shift will materially reduce distribution cost"
+        },
+        {
+          "signal": "Direct booking share declining YoY while OTA acquisition cost growing faster than RevPAR",
+          "evidence_source": "revenue_channel_trend",
+          "confirms": "Channel rebalancing is strategically and financially necessary"
+        },
+        {
+          "signal": "Customer loyalty program contribution to direct bookings <15% of eligible members",
+          "evidence_source": "loyalty_program_data",
+          "confirms": "Loyalty program activation can drive higher-value direct bookings"
+        }
+      ],
+      "required_data_fields": [
+        "Room revenue and commission cost by channel (OTA, direct, corporate, GDS)",
+        "Commission rate agreements by OTA and market segment",
+        "Direct booking conversion data (website traffic, conversion rate, booking value)",
+        "Loyalty program enrolment and redemption data",
+        "Competitor channel mix and rate parity compliance data"
       ]
     },
     {
@@ -121,6 +167,52 @@
         "FHRAI — Hotel Industry Survey 2024 (fhrai.com/) — F&B cost as % of revenue benchmarks India",
         "Ministry of Tourism — India Tourism Statistics 2024 (tourism.gov.in/india-tourism-statistics) — hospitality sector cost structure data",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit F&B raw material spend by category (proteins, dairy, dry goods, beverages); map vendor, unit price, and yield per kg for key items",
+          "owner_role": "Executive Chef / Procurement",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Develop recipe costing for top-50 menu items; identify food cost ratio outliers vs menu engineering benchmark",
+          "owner_role": "Executive Chef / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Join group purchasing organisation or negotiate direct supply agreements for high-volume commodities; audit portion control and yield standards",
+          "owner_role": "Procurement / Operations",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track food cost ratio by outlet and category weekly; enforce menu engineering principles at seasonal menu review",
+          "owner_role": "FP&A / F&B Manager",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Food cost ratio >35% for restaurant or >40% for banquet, vs benchmark of <30% for comparable segment",
+          "evidence_source": "fb_cost_report",
+          "confirms": "Procurement optimisation and portion control will improve F&B margin"
+        },
+        {
+          "signal": "F&B vendor count >50 for high-volume commodities (proteins, dairy) with no volume-based contracts",
+          "evidence_source": "vendor_master",
+          "confirms": "Consolidation and direct supply will reduce per-unit cost"
+        },
+        {
+          "signal": "Wastage and spoilage >5% of F&B procurement value due to overordering or poor yield management",
+          "evidence_source": "kitchen_waste_log",
+          "confirms": "Demand-led ordering and yield training will reduce waste cost"
+        }
+      ],
+      "required_data_fields": [
+        "F&B raw material spend by category and vendor (12 months)",
+        "Recipe cost cards for top-50 menu items with portion specifications",
+        "Food cost ratio by outlet type and menu category",
+        "Vendor pricing and minimum order quantity by commodity",
+        "Wastage and spoilage data by item and kitchen section"
       ]
     },
     {
@@ -162,6 +254,52 @@
         "Ministry of Tourism — Green Hotel Guidelines (tourism.gov.in) — energy efficiency standards for Indian hotels",
         "BEE — Hotel Energy Efficiency Programme (beeindia.gov.in) — energy intensity benchmarks for hospitality sector",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Conduct energy audit (kWh per occupied room per night) by property; benchmark against LEED/hotel association energy intensity norms",
+          "owner_role": "Facilities / Engineering",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Deploy BMS (Building Management System) and smart HVAC controls linked to room occupancy sensor; replace high-wattage lighting with LED",
+          "owner_role": "Engineering / Facilities",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Install sub-metering by department (rooms, restaurants, pool, spa) to enable targeted energy accountability and departmental KPI tracking",
+          "owner_role": "Engineering / Finance",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Track energy cost per occupied room per night (kWh and ₹) and total property energy intensity monthly",
+          "owner_role": "FP&A / Engineering",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Energy cost per key >₹150/occupied room/night vs comparable hotel benchmark of <₹100",
+          "evidence_source": "energy_cost_report",
+          "confirms": "Energy management investment will yield positive ROI within 18 months"
+        },
+        {
+          "signal": "HVAC representing >50% of total energy consumption without occupancy-linked control system",
+          "evidence_source": "energy_audit",
+          "confirms": "BMS and smart HVAC controls will reduce HVAC energy by 20-30%"
+        },
+        {
+          "signal": "Energy cost growing faster than RevPAR over 3-year trend",
+          "evidence_source": "property_p_and_l",
+          "confirms": "Energy as % of revenue is structurally increasing and requires active management"
+        }
+      ],
+      "required_data_fields": [
+        "Energy consumption data (kWh) by fuel type and department (12 months)",
+        "Energy cost per occupied room per night by property",
+        "BMS and HVAC system specifications and age",
+        "Occupancy rate and seasonality pattern",
+        "Capital cost estimates for energy efficiency upgrades"
       ]
     },
     {
@@ -202,6 +340,52 @@
       "industry_sources": [
         "FHRAI — Hotel Industry Survey 2024 (fhrai.com/) — housekeeping cost per occupied room benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Conduct time-and-motion study for room cleaning and public-area housekeeping; establish standard room-turn time by room type",
+          "owner_role": "Housekeeping Manager / HR",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Design demand-linked rostering: schedule housekeeping team against occupancy forecast; reduce permanent headcount in low-season",
+          "owner_role": "Housekeeping / HR",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Evaluate outsourcing part of housekeeping (public areas, laundry) to specialist contractor vs in-house model; build TCO comparison",
+          "owner_role": "GM / Procurement / HR",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Track rooms cleaned per housekeeper per shift, overtime %, and housekeeping cost per occupied room monthly",
+          "owner_role": "FP&A / Housekeeping",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Housekeeping cost per occupied room >₹200/night vs comparable hotel benchmark of <₹140/night",
+          "evidence_source": "departmental_cost_report",
+          "confirms": "Rostering and outsourcing optimisation will reduce housekeeping cost"
+        },
+        {
+          "signal": "Permanent housekeeping headcount sized for 95% occupancy with no seasonal adjustment",
+          "evidence_source": "hr_headcount_vs_occupancy",
+          "confirms": "Demand-linked rostering will reduce labour cost in low-occupancy periods"
+        },
+        {
+          "signal": "Housekeeping overtime as % of department payroll >15%",
+          "evidence_source": "payroll_data",
+          "confirms": "Staffing-model optimisation will reduce overtime premium cost"
+        }
+      ],
+      "required_data_fields": [
+        "Housekeeping FTE count and cost breakdown (permanent vs casual vs outsourced)",
+        "Rooms cleaned per housekeeper per shift (current vs benchmark)",
+        "Occupancy rate by month and season",
+        "Housekeeping cost per occupied room by property",
+        "Outsourced housekeeping pricing and SLA benchmarks"
       ]
     },
     {
@@ -243,6 +427,52 @@
         "STR — India Hotel Benchmark 2024 (str.com/solutions/benchmarking) — RevPAR, ADR, occupancy benchmarks by hotel category and city",
         "Ministry of Tourism — India Tourism Statistics 2024 (tourism.gov.in/india-tourism-statistics) — hotel performance data India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit RevPAR gap vs compset: decompose into occupancy and ADR components; identify rate and volume levers by segment and season",
+          "owner_role": "Revenue Management",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Implement or upgrade RMS (Revenue Management System) with demand forecasting and dynamic pricing engine; integrate with PMS and channel manager",
+          "owner_role": "Revenue Management / IT",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Rebalance segment mix towards higher-value transient and corporate accounts; renegotiate corporate rate agreements using ADR data",
+          "owner_role": "Revenue Management / Sales",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track RevPAR index vs compset, ADR realisation, and segment mix monthly; report to ownership",
+          "owner_role": "GM / FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "RevPAR index (RGI) <0.9 vs compset indicating under-performance relative to market",
+          "evidence_source": "str_report",
+          "confirms": "Revenue management improvement will capture share from compset"
+        },
+        {
+          "signal": "OTA and wholesale channels generating >30% of revenue at ADRs 25% below best available rate",
+          "evidence_source": "channel_mix_report",
+          "confirms": "Channel and rate management tightening will improve ADR and RevPAR"
+        },
+        {
+          "signal": "No revenue management system in place or RMS used for reporting only (not active pricing)",
+          "evidence_source": "technology_landscape",
+          "confirms": "Implementing active demand-based pricing will improve RevPAR"
+        }
+      ],
+      "required_data_fields": [
+        "RevPAR, occupancy, and ADR data by segment and channel (12 months)",
+        "Compset performance data from STR or hotel benchmarking service",
+        "PMS and channel manager integration capability",
+        "Corporate account rate agreements and production data",
+        "Demand forecast accuracy and pace data"
       ]
     }
   ],

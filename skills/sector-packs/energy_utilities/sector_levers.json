@@ -80,6 +80,52 @@
         "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "Deloitte — Real Estate Predictions 2025 (deloitte.com/insights/real-estate)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Rank assets by criticality (availability impact × replacement cost); instrument top-20 critical assets with vibration, temperature, and oil sensors",
+          "owner_role": "Asset Management / O&M",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Build ML predictive models (anomaly detection, remaining useful life) using historian and CMMS data; validate on holdout failure events",
+          "owner_role": "Data Science / O&M",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Integrate PdM predictions into CMMS (SAP PM/IBM Maximo); shift maintenance triggers from calendar to condition-based",
+          "owner_role": "CMMS Team / IT",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track OEE improvement, unplanned-outage reduction, and maintenance cost per MW; rebaseline after 6 months",
+          "owner_role": "FP&A / Asset Management",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Unplanned outage rate >5% of planned generation hours for critical rotating equipment",
+          "evidence_source": "cmms_outage_data",
+          "confirms": "Condition-based maintenance will reduce forced outage cost"
+        },
+        {
+          "signal": "Preventive maintenance cost >30% of total maintenance budget with >40% of PMs yielding no defect found",
+          "evidence_source": "cmms_maintenance_records",
+          "confirms": "Optimising PM frequency and shifting to PdM will reduce unnecessary maintenance"
+        },
+        {
+          "signal": "Mean time between failures declining YoY for pumps, compressors, or transformers",
+          "evidence_source": "asset_failure_history",
+          "confirms": "Asset degradation trend justifies condition-monitoring investment"
+        }
+      ],
+      "required_data_fields": [
+        "Asset criticality register with replacement cost and availability impact",
+        "CMMS maintenance history (work orders, failure codes, costs) ≥3 years",
+        "Historian/SCADA data for instrumented assets (vibration, temperature, pressure)",
+        "Current PM frequency schedule and inspection outcomes",
+        "Unplanned outage log with duration and production impact"
       ]
     },
     {
@@ -120,6 +166,57 @@
         "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
         "DPE — Survey of CPSEs 2023-24 (dpe.gov.in/reports/annual-report)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Conduct AT&C loss audit by distribution zone/feeder: segregate technical (I²R, core) losses from commercial losses (theft, metering error)",
+          "owner_role": "Distribution Engineering",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Deploy smart meters and AMI on high-loss feeders; automate DT-level loss monitoring and tamper alerts",
+          "owner_role": "AMI Programme / IT",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Execute technical loss reduction projects (conductor reconductoring, capacitor banks, DT loss reduction) on top-10 loss feeders",
+          "owner_role": "Distribution Projects",
+          "duration_weeks": 16
+        },
+        {
+          "step": "Enforce anti-theft drive (inspection, metering audit, legal action) for commercial loss feeders >20% loss level",
+          "owner_role": "Vigilance / Revenue Protection",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track AT&C loss monthly by zone; recalibrate DISCOM targets per SERC mandate",
+          "owner_role": "FP&A / Regulatory",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "AT&C loss >15% of energy input indicating material technical or commercial loss above SERC benchmark",
+          "evidence_source": "energy_audit_report",
+          "confirms": "Loss-reduction projects will yield direct cost savings and revenue recovery"
+        },
+        {
+          "signal": "Feeder-level loss variance >10 percentage points across distribution zones for similar feeder types",
+          "evidence_source": "feeder_loss_data",
+          "confirms": "Targeted interventions on high-loss feeders will disproportionately reduce system losses"
+        },
+        {
+          "signal": "Metering error or billing gap >5% of units sold on high-revenue commercial feeders",
+          "evidence_source": "metering_audit",
+          "confirms": "Metering and billing accuracy correction will recover commercial losses"
+        }
+      ],
+      "required_data_fields": [
+        "Feeder-level energy sent and billed data (12 months)",
+        "DT loss audit data by distribution transformer",
+        "Conductor specifications and age profile for high-loss feeders",
+        "Smart meter installation status and AMI coverage by zone",
+        "SERC-mandated AT&C loss reduction targets by year"
       ]
     },
     {
@@ -159,6 +256,52 @@
         "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
         "Atradius — Payment Practices Barometer Asia-Pacific 2024 (atradius.us/knowledge-and-research/reports/payment-practices-barometer-asia-pacific.html)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Baseline total fuel spend by type (coal, gas, HFO, diesel); split by spot vs long-term contract volumes and landed cost per unit",
+          "owner_role": "Fuel Procurement / FP&A",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Optimise spot vs long-term contract split per fuel type; model hedging ratios against price volatility and generation dispatch schedule",
+          "owner_role": "Fuel Procurement / Treasury",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Consolidate logistics (rail, road, port) to reduce handling cost per unit; negotiate long-term contracts with top-3 fuel suppliers",
+          "owner_role": "Fuel Procurement / Logistics",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Implement fuel management system for real-time inventory and consumption tracking; enforce GCV/quality reconciliation",
+          "owner_role": "Plant Operations / IT",
+          "duration_weeks": 6
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Fuel cost per unit generated >10% above comparable plant benchmark for same technology and fuel type",
+          "evidence_source": "plant_benchmarking",
+          "confirms": "Procurement and logistics optimisation will reduce landed fuel cost"
+        },
+        {
+          "signal": "Spot market fuel purchases >40% of total volume in a volatile price environment",
+          "evidence_source": "fuel_procurement_data",
+          "confirms": "Increasing long-term contract coverage will reduce price risk and average cost"
+        },
+        {
+          "signal": "GCV (Gross Calorific Value) shortfall vs contracted specification >3% on coal deliveries",
+          "evidence_source": "fuel_quality_monitoring",
+          "confirms": "Quality enforcement and rebate recovery will reduce effective fuel cost"
+        }
+      ],
+      "required_data_fields": [
+        "Fuel procurement data: type, volume, price, source, and logistics cost (24 months)",
+        "Spot vs long-term contract volume split and price comparison",
+        "GCV measurement data by delivery consignment",
+        "Generation dispatch schedule and fuel consumption plan",
+        "Market price forecasts and hedging policy"
       ]
     },
     {
@@ -199,6 +342,52 @@
         "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map plant and field maintenance outage calendar; baseline current shift patterns, overtime spend, and contractor utilisation by skill category",
+          "owner_role": "HR / O&M Planning",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Deploy workforce management software with skills-based scheduling and outage-linked demand forecasting",
+          "owner_role": "HR / IT",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Optimise shift patterns and reduce unplanned overtime by scheduling against maintenance demand windows, not calendar",
+          "owner_role": "Operations Manager",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Convert recurring maintenance contractor work to in-house where skill is available; track productivity per crew per shift",
+          "owner_role": "HR / FP&A",
+          "duration_weeks": 6
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Overtime as % of total labour cost >15% for field and maintenance workforce",
+          "evidence_source": "payroll_data",
+          "confirms": "Scheduling inefficiency is driving avoidable premium pay"
+        },
+        {
+          "signal": "Contractor utilisation in maintenance >40% for activities where in-house skills are available",
+          "evidence_source": "contractor_spend_and_hr_skills_matrix",
+          "confirms": "In-sourcing recurring maintenance will reduce per-unit cost"
+        },
+        {
+          "signal": "Unplanned call-outs >20% of total maintenance work orders",
+          "evidence_source": "cmms_work_order_data",
+          "confirms": "Improved scheduling and PdM will reduce emergency response cost"
+        }
+      ],
+      "required_data_fields": [
+        "Workforce headcount by skill category and shift pattern",
+        "Overtime and call-out records by team and month (12 months)",
+        "Maintenance contractor spend by activity and skill category",
+        "Plant outage and maintenance schedule (annual)",
+        "Skills matrix for in-house workforce"
       ]
     },
     {
@@ -239,6 +428,52 @@
         "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
         "DPE — Survey of CPSEs 2023-24 (dpe.gov.in/reports/annual-report)",
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Conduct grid topology audit: age profile of key assets (transformers, cables, substations) and SAIDI/SAIFI reliability metrics by zone",
+          "owner_role": "Network Planning / Engineering",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Develop SCADA/DMS/AMI upgrade roadmap prioritised by loss reduction and reliability impact; obtain CERC/SERC capex approval",
+          "owner_role": "Network Planning / Regulatory",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Execute AMI rollout on priority feeders; deploy demand-response management to shift peak load and reduce peak procurement cost",
+          "owner_role": "AMI Programme / Smart Grid",
+          "duration_weeks": 20
+        },
+        {
+          "step": "Track SAIDI/SAIFI improvement, peak demand reduction, and O&M cost savings vs capex deployed; report to board",
+          "owner_role": "FP&A / Regulatory",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "SAIDI >300 minutes/year or SAIFI >15 interruptions/year for distribution network",
+          "evidence_source": "reliability_reports",
+          "confirms": "Grid investment will reduce penalty exposure and improve cost of supply"
+        },
+        {
+          "signal": "Network assets >25 years old representing >30% of transformer/cable base",
+          "evidence_source": "asset_age_profile",
+          "confirms": "Ageing infrastructure drives O&M cost and outage risk"
+        },
+        {
+          "signal": "Peak demand >15% above average demand with procurement premium for peak power",
+          "evidence_source": "load_profile_data",
+          "confirms": "Demand response and AMI will reduce peak procurement cost"
+        }
+      ],
+      "required_data_fields": [
+        "Network asset register with age, condition rating, and replacement cost",
+        "SAIDI/SAIFI reliability metrics by zone and feeder (3 years)",
+        "Load profile data by feeder and time of day",
+        "SCADA/DMS/AMI coverage and technology roadmap",
+        "CERC/SERC capex approval requirements and timelines"
       ]
     },
     {
@@ -278,6 +513,52 @@
         "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
         "FinOps Foundation — State of FinOps 2025 (data.finops.org/2025-report/)",
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map renewable energy capacity requirements vs RPO mandate; compare PPA vs capex route for solar/wind by site",
+          "owner_role": "Renewable Energy / Strategy",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Negotiate long-term solar/wind PPAs at competitive tariffs; obtain CERC/SERC approval for captive or open-access power",
+          "owner_role": "Regulatory Affairs / Procurement",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Execute preferred RE integration route (PPA or capex); manage grid-connection agreement with SLDC/RLDC",
+          "owner_role": "Renewable Energy Programme",
+          "duration_weeks": 16
+        },
+        {
+          "step": "Track RE share of generation mix, fuel cost displaced, and RPO compliance position quarterly",
+          "owner_role": "FP&A / Regulatory",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Thermal fuel cost per unit generated >₹4/kWh vs solar/wind LCOE <₹2.5/kWh in target region",
+          "evidence_source": "generation_cost_data",
+          "confirms": "RE transition will yield material reduction in variable generation cost"
+        },
+        {
+          "signal": "RPO compliance shortfall >5 percentage points vs state mandate, creating penalty risk",
+          "evidence_source": "rpo_compliance_report",
+          "confirms": "RE transition is both cost and regulatory-risk driven"
+        },
+        {
+          "signal": "Grid connectivity and land availability confirmed for ≥50 MW renewable capacity in low-cost wind/solar zones",
+          "evidence_source": "site_feasibility_study",
+          "confirms": "Physical constraints are manageable for RE transition"
+        }
+      ],
+      "required_data_fields": [
+        "Current generation mix: thermal, hydro, and RE capacity and cost",
+        "RPO mandate and current compliance position",
+        "Solar/wind resource maps and LCOE estimates by site",
+        "Grid connectivity assessments and SLDC/RLDC requirements",
+        "Existing PPA terms and renewal schedule"
       ]
     },
     {
@@ -318,6 +599,52 @@
         "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
         "DPE — Survey of CPSEs 2023-24 (dpe.gov.in/reports/annual-report)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Define O&M scope for outsourcing candidates (common in distribution, project O&M, renewable sites); benchmark current cost per MW",
+          "owner_role": "O&M Head / Strategy",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Develop performance-based SLA framework (availability, heat rate, SAIDI targets); run competitive RFP with leading O&M vendors",
+          "owner_role": "Procurement / Engineering",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Negotiate SLA-linked contracts with risk-sharing provisions; transition in-house team to vendor with TUPE-equivalent provisions",
+          "owner_role": "HR / Legal / Procurement",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Establish vendor performance review cadence; track cost per MW, availability, and SLA penalties monthly",
+          "owner_role": "Asset Management / FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "In-house O&M cost per MW >15% above comparable outsourced benchmark for similar plant type",
+          "evidence_source": "plant_cost_benchmarking",
+          "confirms": "Outsourcing will reduce operating cost"
+        },
+        {
+          "signal": "In-house maintenance team utilisation <70% due to lumpy maintenance demand and seasonal plant profile",
+          "evidence_source": "workforce_utilisation_data",
+          "confirms": "Specialised vendor with multi-site scale will improve resource efficiency"
+        },
+        {
+          "signal": "Plant availability below contractual requirement with current in-house model",
+          "evidence_source": "plant_availability_log",
+          "confirms": "Performance-based SLA with specialist vendor will improve output"
+        }
+      ],
+      "required_data_fields": [
+        "Plant O&M cost per MW by plant type and age",
+        "Current in-house team size, skills, and utilisation",
+        "Availability and heat rate performance vs design parameters",
+        "Competitive landscape of O&M service providers",
+        "Existing O&M contracts and SLA performance data"
       ]
     },
     {
@@ -357,6 +684,52 @@
         "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
         "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Classify MRO/spares inventory using ABC (value) and XYZ (criticality) analysis; identify slow-moving and obsolete items",
+          "owner_role": "Stores / Asset Management",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Implement vendor-managed inventory for fast-moving, non-critical spares with top-5 MRO vendors",
+          "owner_role": "Procurement / Stores",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Redesign reorder-point and safety-stock formulas using lead-time and outage-risk data; reduce overstock for slow-moving critical items",
+          "owner_role": "Supply Chain / Asset Management",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Run spares rationalisation auction for obsolete inventory; reinvest proceeds into high-criticality spares buffer",
+          "owner_role": "Stores / Finance",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "MRO inventory days-on-hand >180 days vs benchmark <90 days for comparable plant type",
+          "evidence_source": "inventory_aging_report",
+          "confirms": "Working capital tied in excess inventory is material"
+        },
+        {
+          "signal": "Obsolete or slow-moving spares >20% of total inventory value with no consumption in >12 months",
+          "evidence_source": "stores_data",
+          "confirms": "Write-down risk and storage cost reduction opportunity exists"
+        },
+        {
+          "signal": "Emergency procurement (spot market) events >10/year for items in OEM-recommended critical spares list",
+          "evidence_source": "procurement_records",
+          "confirms": "Safety-stock redesign will reduce premium emergency procurement cost"
+        }
+      ],
+      "required_data_fields": [
+        "MRO inventory register with value, criticality, and last-consumption date",
+        "OEM-recommended critical spares list by asset type",
+        "Historical material consumption data (3 years)",
+        "Lead times by vendor and item category",
+        "Emergency procurement log with premium cost data"
       ]
     }
   ]

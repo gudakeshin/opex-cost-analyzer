@@ -10,6 +10,7 @@ from app.models import NormalizedSpendLine, is_actual
 
 from ._loaders import (
     _get_classification_rules,
+    _get_keyword_families,
     _get_regulatory_exclusions,
     _get_switching_costs,
     _get_model_params,
@@ -18,6 +19,12 @@ from ._loaders import (
     _HEADCOUNT_APPLICABLE_CATEGORIES,
     _get_heuristic_ranges,
     _get_per_employee_targets,
+)
+from .lever_rules import (
+    build_line_flags,
+    build_signal_corpus,
+    evaluate_lever_applicable_if,
+    infer_multi_bu,
 )
 
 # ---------------------------------------------------------------------------
@@ -257,41 +264,26 @@ def _evaluate_lever_signals(
     total_spend: float,
     headcount: float,
     annual_revenue: float,
+    *,
+    signal_corpus: Optional[set] = None,
+    spend_profile: Optional[Dict[str, Any]] = None,
+    multi_bu_inferable: bool = False,
+    line_flags: Optional[Dict[str, Any]] = None,
 ) -> List[str]:
     """Evaluate applicable_if rules for a sector-specific lever."""
-    rules = lever_def.get("applicable_if", [])
-    if not rules:
-        return ["no_restriction"]
-
-    signals = []
-    for rule in rules:
-        rule_lower = rule.lower()
-        if rule_lower.startswith("category:"):
-            cat_id = rule.split(":")[1].split()[0].strip()
-            if cat_id in categories_present:
-                signals.append(f"category:{cat_id}_present")
-        elif "headcount >" in rule_lower:
-            try:
-                threshold = float(rule_lower.split(">")[1].strip())
-                if headcount and headcount > threshold:
-                    signals.append(f"headcount>{threshold:.0f}")
-            except (ValueError, IndexError):
-                pass
-        elif "annual_revenue >" in rule_lower:
-            try:
-                threshold = float(rule_lower.split(">")[1].strip().replace("m", "e6").replace("b", "e9"))
-                if annual_revenue and annual_revenue > threshold:
-                    signals.append(f"revenue>{threshold:.0f}")
-            except (ValueError, IndexError):
-                pass
-        elif "_gt_" in rule_lower and "pct" in rule_lower:
-            signals.append(rule)
-        elif "keywords detected" in rule_lower or "keywords" in rule_lower:
-            signals.append(rule)
-        elif "multi_bu_structure" in rule_lower:
-            signals.append("multi_bu_inferred")
-
-    return signals
+    return evaluate_lever_applicable_if(
+        lever_def.get("applicable_if", []),
+        categories_present=categories_present,
+        cat_spend=cat_spend,
+        total_spend=total_spend,
+        annual_revenue=annual_revenue,
+        headcount=headcount,
+        signal_corpus=signal_corpus,
+        keyword_families=_get_keyword_families(),
+        multi_bu_inferable=multi_bu_inferable,
+        spend_profile=spend_profile or {},
+        line_flags=line_flags,
+    )
 
 
 def _build_lever_entry(
@@ -318,6 +310,9 @@ def _build_lever_entry(
         "sustainability_score": round(float(sust), 2),
         "bounce_back_risk": bounce,
         "condition_precedents": conditions,
+        "execution_playbook": meta.get("execution_playbook") or [],
+        "diagnostic_signals": meta.get("diagnostic_signals") or [],
+        "required_data_fields": meta.get("required_data_fields") or [],
         "phasing_curve": meta.get("phasing_curve") or phasing.get(lever_id, [0.25, 0.50, 0.25]),
         "savings_type": meta.get("savings_type") or savings_types.get(lever_id, "run_rate"),
         "cta_rate": meta.get("cta_rate", 0.07),
@@ -335,6 +330,8 @@ def resolve_eligible_levers(
     root_causes: List[Dict[str, Any]],
     sector_weights: Optional[Dict[str, float]] = None,
     engagement_id: Optional[str] = None,
+    signal_corpus: Optional[set] = None,
+    line_flags: Optional[Dict[str, Any]] = None,
 ) -> List[Dict[str, Any]]:
     """Return ranked list of eligible levers for this company context."""
     params = _get_model_params()
@@ -347,6 +344,9 @@ def resolve_eligible_levers(
     cat_spend = {c["category_id"]: c.get("spend", 0.0) for c in spend_profile.get("category_profile", [])}
     total_spend = sum(cat_spend.values()) or 1.0
     root_cause_levers = {rc.get("recommended_lever") for rca in root_causes for rc in rca.get("root_causes", [])}
+    multi_bu_inferable = infer_multi_bu(sector_weights, spend_profile)
+    if signal_corpus is None:
+        signal_corpus = build_signal_corpus(spend_profile)
 
     if sector_weights and len(sector_weights) > 1:
         total_w = sum(max(0.0, w) for w in sector_weights.values()) or 1.0
@@ -382,7 +382,18 @@ def resolve_eligible_levers(
 
         for lever_def in sector_data.get("sector_specific_levers", []):
             lever_id = lever_def["lever_id"]
-            signals = _evaluate_lever_signals(lever_def, categories_present, cat_spend, total_spend, headcount, annual_revenue)
+            signals = _evaluate_lever_signals(
+                lever_def,
+                categories_present,
+                cat_spend,
+                total_spend,
+                headcount,
+                annual_revenue,
+                signal_corpus=signal_corpus,
+                spend_profile=spend_profile,
+                multi_bu_inferable=multi_bu_inferable,
+                line_flags=line_flags,
+            )
             if not signals:
                 continue
             base_score = min(0.95, 0.70 + 0.05 * len(signals))
@@ -452,6 +463,14 @@ def spend_profiler(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
     actual_lines = [x for x in lines if is_actual(x)]
     if not actual_lines:
         actual_lines = lines
+
+    distinct_bus: set = set()
+    distinct_cc: set = set()
+    for line in actual_lines:
+        if line.business_unit:
+            distinct_bus.add(line.business_unit)
+        if line.cost_center_id:
+            distinct_cc.add(line.cost_center_id)
 
     by_category: Dict[str, Dict[str, Any]] = {}
     total = sum(x.reporting_amount for x in actual_lines)
@@ -634,6 +653,10 @@ def spend_profiler(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
         "multi_currency": len(currency_breakdown) > 1,
         "currency_breakdown": currency_breakdown,
         "quadrant_breakdown": quadrant_breakdown,
+        "organizational_diversity": {
+            "distinct_business_units": len(distinct_bus),
+            "distinct_cost_centers": len(distinct_cc),
+        },
     }
     if gl_breakdown:
         result["gl_breakdown"] = dict(sorted(gl_breakdown.items(), key=lambda x: x[1], reverse=True))

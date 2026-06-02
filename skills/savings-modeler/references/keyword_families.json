@@ -1,0 +1,233 @@
+{
+  "version": "1.0",
+  "families": {
+    "gcc": [
+      "global capability center",
+      "gcc",
+      "captive center",
+      "shared service center",
+      "ssc",
+      "center of excellence",
+      "coe",
+      "offshore delivery",
+      "captive unit",
+      "nasscom gcc",
+      "fte cost",
+      "seat cost",
+      "attrition",
+      "bench management",
+      "automation ops",
+      "global in-house",
+      "gic"
+    ],
+    "bfsi": [
+      "npa",
+      "credit rating",
+      "loan book",
+      "casa ratio",
+      "core banking",
+      "nbfc",
+      "rbi circular",
+      "cbs"
+    ],
+    "pharma": [
+      "clinical trial",
+      "regulatory submission",
+      "api manufacturing",
+      "pharmacovigilance",
+      "drug master file",
+      "api batch",
+      "cro",
+      "dossier"
+    ],
+    "manufacturing": [
+      "plant maintenance",
+      "oee",
+      "downtime",
+      "production capacity",
+      "raw material",
+      "packaging material"
+    ],
+    "retail": [
+      "sku",
+      "distributor",
+      "trade promotion",
+      "shelf space",
+      "fmcg",
+      "consumer goods",
+      "retail chain",
+      "same store sales",
+      "footfall",
+      "shrinkage"
+    ],
+    "insurance": [
+      "claims ratio",
+      "loss ratio",
+      "underwriting",
+      "reinsurance",
+      "actuarial",
+      "premium income",
+      "irdai"
+    ],
+    "telecom": [
+      "spectrum",
+      "rpu",
+      "arpu",
+      "tower",
+      "ran",
+      "5g",
+      "telecom",
+      "bts",
+      "bss",
+      "oss",
+      "roaming"
+    ],
+    "utility": [
+      "power plant",
+      "generation capacity",
+      "transmission",
+      "at&c loss",
+      "renewable energy",
+      "grid"
+    ],
+    "cro": [
+      "clinical research organization",
+      "cro",
+      "clinical trial outsourcing"
+    ],
+    "regulatory": [
+      "compliance",
+      "regulatory",
+      "statutory",
+      "audit finding",
+      "regulator"
+    ],
+    "adr": [
+      "adr",
+      "average daily rate",
+      "room rate"
+    ],
+    "revpar": [
+      "revpar",
+      "revenue per available room"
+    ],
+    "ota_commission": [
+      "ota",
+      "online travel agent",
+      "booking.com",
+      "expedia",
+      "commission"
+    ],
+    "fnb": [
+      "food and beverage",
+      "f&b",
+      "restaurant",
+      "kitchen",
+      "catering"
+    ],
+    "aum": [
+      "aum",
+      "assets under management",
+      "fund management"
+    ],
+    "fund_management": [
+      "fund management",
+      "portfolio management",
+      "asset management"
+    ],
+    "sebi_mifid": [
+      "sebi",
+      "mifid",
+      "amc",
+      "mutual fund"
+    ],
+    "bed_capacity": [
+      "bed capacity",
+      "beds",
+      "inpatient beds"
+    ],
+    "clinical_staff": [
+      "clinical staff",
+      "nurse",
+      "physician",
+      "doctor"
+    ],
+    "nabh": [
+      "nabh",
+      "accreditation"
+    ],
+    "ot_utilization": [
+      "ot utilization",
+      "operating theatre",
+      "surgery utilization"
+    ],
+    "claims": [
+      "claims processing",
+      "claims ratio",
+      "loss ratio"
+    ],
+    "asset_intensive": [
+      "asset intensive",
+      "capex heavy",
+      "plant asset"
+    ],
+    "bespoke_development": [
+      "bespoke",
+      "custom development",
+      "bespoke software"
+    ],
+    "field_operations": [
+      "field force",
+      "field operations",
+      "last mile"
+    ],
+    "legacy_system": [
+      "legacy system",
+      "mainframe",
+      "end of life application"
+    ],
+    "cloud": [
+      "cloud infrastructure",
+      "data centre",
+      "devops"
+    ],
+    "cogs": [
+      "cost of goods",
+      "cogs",
+      "raw material"
+    ],
+    "international": [
+      "international",
+      "cross border",
+      "overseas entity"
+    ],
+    "network": [
+      "network",
+      "distribution network",
+      "dealer network"
+    ],
+    "org_complexity": [
+      "matrix organization",
+      "span of control",
+      "layer reduction"
+    ],
+    "stpi_sez": [
+      "stpi",
+      "sez",
+      "special economic zone",
+      "softex"
+    ],
+    "sw_license": [
+      "software license",
+      "saas",
+      "subscription software",
+      "microsoft",
+      "oracle license"
+    ],
+    "tower": [
+      "tower",
+      "passive infrastructure",
+      "tenancy"
+    ]
+  }
+}

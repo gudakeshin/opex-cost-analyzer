@@ -79,6 +79,52 @@
         "TRAI — Annual Report 2023-24 (trai.gov.in/release-publication/reports) — telecom network OPEX benchmarks India",
         "GSMA — Mobile Economy India 2024 (gsma.com/solutions-and-impact/connectivity/mobile-economy/) — network cost structure and efficiency benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Disaggregate network OPEX by cost driver: passive infrastructure (power, rent), active network (maintenance, spares), and managed services; benchmark vs revenue",
+          "owner_role": "Network Finance / Operations",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Identify top-5 cost reduction levers: tower power cost reduction, network equipment refresh, RAN-sharing, NOC automation, and spares pooling",
+          "owner_role": "Network Operations / Finance",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Execute quick wins (automated energy management, spares pooling); develop business case for medium-term investments (equipment refresh, RAN sharing)",
+          "owner_role": "Network Operations / Projects",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Track network OPEX as % of revenue and EBITDA, and cost per subscriber monthly",
+          "owner_role": "FP&A / Network Finance",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Network OPEX as % of service revenue >25% vs peer operator benchmark of <22%",
+          "evidence_source": "trai_performance_indicator_report",
+          "confirms": "Structural OPEX reduction will improve EBITDA margin"
+        },
+        {
+          "signal": "Power cost >35% of total passive infrastructure OPEX with diesel backup >20% of power mix",
+          "evidence_source": "network_cost_breakdown",
+          "confirms": "Energy management and green energy transition will reduce power cost"
+        },
+        {
+          "signal": "Managed service contract for RAN management not benchmarked for >3 years",
+          "evidence_source": "vendor_contract_register",
+          "confirms": "Managed service rebid will improve pricing and SLA"
+        }
+      ],
+      "required_data_fields": [
+        "Network OPEX breakdown by cost category and geography",
+        "Power consumption data: grid vs diesel ratio per tower/BTS",
+        "Network equipment age profile and maintenance cost",
+        "RAN managed service contract terms and SLA performance",
+        "TRAI network performance indicators (CAGR trends, EBITDA benchmarks)"
       ]
     },
     {
@@ -119,6 +165,52 @@
         "TRAI — Infrastructure Sharing in Telecom (trai.gov.in/release-publication/reports) — tower sharing benefits and benchmarks India",
         "GSMA — Tower Sharing Economics (gsma.com) — passive infrastructure sharing cost savings 15-35%",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit tower portfolio: segment by tenancy ratio, location type, and EBITDA contribution; identify low-tenancy towers for hosting commercial sharing",
+          "owner_role": "Tower Business / Network",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Approach alternate operators for co-location on strategic towers; negotiate standard TRAI-compliant sharing agreements with market-rate GLR (Ground Level Rent) pass-through",
+          "owner_role": "Business Development / Legal",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Evaluate sale-and-leaseback of non-core towers to infrastructure investor (IndiGrid, ATC, Brookfield) to unlock capital and reduce opex",
+          "owner_role": "Corporate Finance / Tower Business",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Track tenancy ratio, co-location revenue per tower, and passive infrastructure cost per subscriber monthly",
+          "owner_role": "FP&A / Tower Business",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Tenancy ratio <1.3× for >50% of tower portfolio vs industry leader benchmark of >2.0×",
+          "evidence_source": "tower_inventory_data",
+          "confirms": "Sharing agreements will monetise underutilised tower capacity"
+        },
+        {
+          "signal": "Passive infrastructure cost (rent, power, security, maintenance) >20% of total network OPEX",
+          "evidence_source": "network_cost_breakdown",
+          "confirms": "Tower sharing and potential sale-leaseback will reduce passive opex per site"
+        },
+        {
+          "signal": "Tower rollout cost >₹25 L per new site where equivalent co-location on existing tower is available at <₹6 L/year lease",
+          "evidence_source": "capex_vs_opex_analysis",
+          "confirms": "Sharing preference over new build will improve return on network investment"
+        }
+      ],
+      "required_data_fields": [
+        "Tower inventory with tenancy ratio, location, and EBITDA per tower",
+        "Co-location agreement terms with existing sharing partners",
+        "Sale-leaseback valuation assumptions and market comparables",
+        "TRAI sharing regulations and GLR pass-through framework",
+        "Network rollout plan and new site requirements"
       ]
     },
     {
@@ -159,6 +251,52 @@
         "TRAI — Spectrum Pricing and Efficiency Report 2024 (trai.gov.in) — spectrum utilisation benchmarks India",
         "DoT — National Spectrum Policy (dot.gov.in) — spectrum allocation and efficiency guidelines",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Analyse spectrum utilisation by band: measure traffic load, spectral efficiency (bps/Hz), and coverage-capacity trade-offs by geography",
+          "owner_role": "Radio Planning / Technology",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Optimise traffic offloading: deploy small cells and Wi-Fi offload in high-density urban areas to reduce macro spectrum congestion",
+          "owner_role": "Network Engineering",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Identify refarming opportunities: migrate 900 MHz/1800 MHz 2G traffic to LTE; release spectrum for higher-capacity 4G/5G use",
+          "owner_role": "Technology / Regulatory",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Model spectrum needs for upcoming auctions: estimate minimum auction quantity needed vs current spectral efficiency improvement trajectory",
+          "owner_role": "Strategy / Finance",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Spectral efficiency (bps/Hz) in dense urban cells <60% of theoretical maximum for deployed equipment",
+          "evidence_source": "network_performance_data",
+          "confirms": "RAN optimisation and traffic offloading will improve spectrum yield"
+        },
+        {
+          "signal": "2G traffic >15% of total voice minutes on spectrum bands (900/1800 MHz) that could serve higher-value LTE/5G traffic",
+          "evidence_source": "traffic_analytics",
+          "confirms": "Spectrum refarming will improve revenue per MHz by migrating to higher-value services"
+        },
+        {
+          "signal": "Upcoming spectrum auction costs can be partially offset by improved utilisation of current holdings",
+          "evidence_source": "spectrum_planning_report",
+          "confirms": "Efficiency improvement will reduce incremental spectrum capex need"
+        }
+      ],
+      "required_data_fields": [
+        "Spectrum holding by band, geography, and operator",
+        "Traffic load data by cell and band (busy hour utilisation)",
+        "Spectral efficiency benchmarks by equipment vendor and technology",
+        "2G/3G traffic migration timeline and customer base",
+        "Spectrum auction schedule and estimated pricing by band"
       ]
     },
     {
@@ -199,6 +337,52 @@
         "TRAI — Quality of Service Reports 2024 (trai.gov.in/release-publication/reports) — call centre performance benchmarks India telcos",
         "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/) — process automation benchmarks applicable to customer ops",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Analyse contact centre data: measure contact volume by reason, IVR containment rate, and cost per resolution by contact type",
+          "owner_role": "Customer Service / Operations",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Design chatbot/IVR upgrade: map top-10 contact reasons to automated resolution flows; integrate with BSS for real-time account data",
+          "owner_role": "Digital / IT / Customer Service",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Deploy AI chatbot (WhatsApp, app, web) for high-volume, low-complexity contacts (bill queries, plan changes, balance inquiry); pilot with 20% of inbound volume",
+          "owner_role": "IT Delivery / Customer Service",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track digital containment rate, cost per contact, and NPS by channel monthly; expand automation to complex contact types in Phase 2",
+          "owner_role": "FP&A / Customer Experience",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "IVR/chatbot containment rate <30% for contacts where top-10 contact reasons are automatable (bill, plan, balance)",
+          "evidence_source": "ivr_analytics",
+          "confirms": "Chatbot and IVR redesign will significantly increase automation containment"
+        },
+        {
+          "signal": "Cost per contact >₹80 via agent vs <₹10 via digital self-service for equivalent resolution",
+          "evidence_source": "contact_centre_cost_report",
+          "confirms": "Digital containment improvement will reduce total customer service cost"
+        },
+        {
+          "signal": "Agent utilisation <70% due to high volume of simple contacts that could be self-served",
+          "evidence_source": "workforce_management_data",
+          "confirms": "Automation will free agent capacity for complex and high-value interactions"
+        }
+      ],
+      "required_data_fields": [
+        "Contact volume by reason code and channel (IVR, agent, digital)",
+        "IVR containment rate by reason code",
+        "Cost per contact by channel (agent, IVR, digital)",
+        "BSS system API capability for real-time data in chatbot flows",
+        "NPS and CSAT by contact reason and resolution channel"
       ]
     },
     {
@@ -238,6 +422,52 @@
       "industry_sources": [
         "TRAI — Telecom Subscription Data Q4 FY2024 (trai.gov.in/release-publication/reports/telecom-subscription-data) — churn rates by operator India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Build churn prediction model by subscriber segment: identify leading indicators (declining ARPU, reduced data usage, customer service contacts, network complaints)",
+          "owner_role": "Data Science / Analytics",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Design win-back and retention programs by churn risk tier: targeted offers for high-value/high-risk subscribers; network experience improvement for service-driven churn",
+          "owner_role": "Marketing / Customer Retention",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Activate retention programs via outbound and app push; measure response rate and 90-day retention by offer type and segment",
+          "owner_role": "CRM / Customer Service",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track monthly churn rate, ARPU of retained base, and cost per retained subscriber monthly",
+          "owner_role": "FP&A / Marketing",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Monthly churn rate >2.5% for postpaid or >5% for prepaid vs peer operator benchmark",
+          "evidence_source": "trai_data_and_internal_churn_report",
+          "confirms": "Churn reduction will improve LTV and reduce subscriber acquisition cost burden"
+        },
+        {
+          "signal": "High-value subscriber (ARPU >₹500) churn rate disproportionately higher than average, indicating service quality issue for premium segment",
+          "evidence_source": "churn_cohort_analysis",
+          "confirms": "Targeted retention investment for high-ARPU customers will yield highest ROI"
+        },
+        {
+          "signal": "Network-related complaints (dropped calls, data speed) are primary churn driver for >30% of churned subscribers",
+          "evidence_source": "exit_survey_and_churn_reason_data",
+          "confirms": "Network quality improvement is a prerequisite for churn reduction"
+        }
+      ],
+      "required_data_fields": [
+        "Subscriber-level usage data and ARPU trend (12 months)",
+        "Churn data with reason codes and churn cohort by acquisition source",
+        "Network complaint and NPS data by geography and segment",
+        "Retention offer history and response rate",
+        "Customer LTV model by segment"
       ]
     },
     {
@@ -278,6 +508,52 @@
         "TRAI — International Roaming Charges Report 2024 (trai.gov.in) — international roaming cost benchmarks India",
         "GSMA — Roaming Services Report 2024 (gsma.com) — wholesale roaming pricing trends",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Analyse international roaming traffic: map volume by corridor, wholesale rate, and retail margin; identify corridors with below-market wholesale rates",
+          "owner_role": "International Business / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Renegotiate bilateral roaming agreements with top-10 traffic corridors: benchmark vs IPX (IP eXchange) hub rates; migrate to IPX for cost efficiency",
+          "owner_role": "Roaming Team / Procurement",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Implement real-time roaming cost control: per-session cost alerts for high-usage roamers; block inadvertent roaming on satellite or premium networks",
+          "owner_role": "IT / Customer Service",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Track wholesale roaming cost per MB/minute, retail vs wholesale margin, and roaming revenue contribution monthly",
+          "owner_role": "FP&A / International",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Roaming wholesale cost >60% of roaming retail revenue for top-3 traffic corridors",
+          "evidence_source": "roaming_p_and_l",
+          "confirms": "IPX routing and bilateral renegotiation will improve roaming margin"
+        },
+        {
+          "signal": "More than 5 corridors still on legacy bilateral agreements not routed through IPX hub, paying premium per-unit rates",
+          "evidence_source": "roaming_agreement_inventory",
+          "confirms": "IPX migration will reduce wholesale cost for high-traffic corridors"
+        },
+        {
+          "signal": "Inadvertent roaming events (satellite, premium partner network) generating bill shock and customer complaints",
+          "evidence_source": "customer_service_data",
+          "confirms": "Real-time controls will reduce inadvertent roaming cost and complaint volume"
+        }
+      ],
+      "required_data_fields": [
+        "Roaming traffic by corridor: volume (MB, minutes, SMS), wholesale cost, and retail revenue",
+        "Current bilateral agreement rates vs IPX benchmark by corridor",
+        "IPX hub connectivity and migration readiness",
+        "Inadvertent roaming incident log and cost",
+        "TRAI roaming tariff regulations"
       ]
     },
     {
@@ -318,6 +594,52 @@
         "GSMA — BSS/OSS Modernisation Trends 2024 (gsma.com/solutions-and-impact/technology) — cloud-native BSS/OSS migration savings 18-38%",
         "Gartner — Market Guide for Telecom BSS 2024 (gartner.com) — BSS modernisation ROI benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Assess BSS/OSS landscape: map all systems (billing, CRM, provisioning, mediation, network management) to vendor, age, and integration complexity",
+          "owner_role": "CTO / IT Architecture",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Develop modernisation roadmap: prioritise by business impact (revenue leakage, time-to-market, customer experience) and technical risk; select cloud-native vs SaaS replacement",
+          "owner_role": "CTO / Strategy",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Execute migration in phases starting with mediation and billing (revenue impact); implement API gateway for legacy integration; decompose monolith to microservices",
+          "owner_role": "IT Delivery / Programme",
+          "duration_weeks": 24
+        },
+        {
+          "step": "Track IT OPEX as % of revenue, time-to-market for new plan launch, and billing accuracy rate monthly",
+          "owner_role": "FP&A / IT",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "New product/plan time-to-market >30 days due to BSS configuration complexity vs cloud-native benchmark of <7 days",
+          "evidence_source": "product_launch_tracker",
+          "confirms": "BSS modernisation will improve time-to-market and commercial agility"
+        },
+        {
+          "signal": "IT OPEX for BSS/OSS maintenance >12% of total revenue vs cloud-native operator benchmark of <7%",
+          "evidence_source": "it_cost_breakdown",
+          "confirms": "Modernisation will reduce IT maintenance cost through platform consolidation"
+        },
+        {
+          "signal": "Revenue leakage from billing errors or unmediated traffic >0.5% of total revenue",
+          "evidence_source": "revenue_assurance_report",
+          "confirms": "BSS modernisation will close revenue assurance gaps"
+        }
+      ],
+      "required_data_fields": [
+        "BSS/OSS landscape: system inventory, vendor, age, and annual maintenance cost",
+        "Time-to-market data for recent product launches",
+        "Revenue assurance report with leakage estimate",
+        "IT OPEX breakdown (BSS/OSS maintenance, licensing, managed services)",
+        "Cloud-native or SaaS BSS vendor options and migration feasibility"
       ]
     },
     {
@@ -358,6 +680,52 @@
         "TRAI — Annual Report 2023-24 (trai.gov.in/release-publication/reports) — energy consumption benchmarks for Indian telecom networks",
         "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/) — energy cost benchmarks for telecom infrastructure",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Measure energy consumption per site: electricity units consumed per BTS/tower per month; calculate energy per GB traffic and trend YoY",
+          "owner_role": "Network Energy / Operations",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Deploy free cooling, battery energy storage systems (BESS), and solar at high-consumption sites; negotiate green energy PPA for grid supply",
+          "owner_role": "Network Infrastructure / Procurement",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Implement remote BTS (intelligent energy controller) and passive cooling optimisation (insulation, variable-speed fans) at all managed sites",
+          "owner_role": "Network Operations",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track energy cost per GB traffic, diesel % in energy mix, and carbon intensity monthly; report against SBTi targets",
+          "owner_role": "FP&A / Network Energy",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Diesel generator runtime >30% of total energy supply hours, indicating grid reliability issues and high diesel cost",
+          "evidence_source": "network_energy_monitoring",
+          "confirms": "BESS and solar will reduce diesel dependency and fuel cost"
+        },
+        {
+          "signal": "Energy cost per GB traffic growing >10% YoY due to traffic growth without corresponding energy efficiency improvement",
+          "evidence_source": "energy_per_gb_trend",
+          "confirms": "Energy efficiency programme will decouple energy cost from traffic growth"
+        },
+        {
+          "signal": "TowerCo SLA not optimised for energy efficiency (fixed rental structure with no energy pass-through incentive)",
+          "evidence_source": "towerco_lease_agreement",
+          "confirms": "Renegotiating energy-linked SLA will incentivise TowerCo energy management"
+        }
+      ],
+      "required_data_fields": [
+        "Energy consumption data by site (electricity units, diesel litres) per month",
+        "TowerCo energy SLA terms and diesel reimbursement structure",
+        "Solar and BESS feasibility data by site geography",
+        "Grid reliability metrics by region",
+        "Energy cost and carbon intensity targets"
       ]
     },
     {
@@ -397,6 +765,52 @@
       "industry_sources": [
         "TRAI — Quality of Service Reports 2024 (trai.gov.in/release-publication/reports) — field workforce productivity KPIs for Indian telcos",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Analyse field force utilisation: map jobs per engineer per day, travel time vs work time, and first-time fix rate by team and geography",
+          "owner_role": "Field Operations / HR",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Deploy FSO (Field Service Optimisation) tool with AI-based dispatch, route optimisation, and remote diagnostics integration",
+          "owner_role": "IT / Field Operations",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Implement performance-linked variable pay for field force: pay on first-time fix rate, jobs completed per day, and SLA compliance",
+          "owner_role": "HR / Field Operations",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Track jobs per engineer per day, first-time fix rate, and field force cost per resolved incident monthly",
+          "owner_role": "FP&A / Field Operations",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Jobs per field engineer per day <4 vs FSO benchmark of 6–8 for comparable urban/rural mix and job type",
+          "evidence_source": "field_operations_data",
+          "confirms": "Dispatch optimisation and route planning will increase jobs completed per engineer per day"
+        },
+        {
+          "signal": "First-time fix rate <75% generating high repeat-visit cost and customer dissatisfaction",
+          "evidence_source": "field_service_kpi_report",
+          "confirms": "Remote diagnostics and better parts provisioning will improve fix rate and reduce revisit cost"
+        },
+        {
+          "signal": "Travel time >40% of total field engineer productive hours due to poor territory planning or dispatch system",
+          "evidence_source": "time_and_motion_study",
+          "confirms": "Route optimisation will reduce travel time and increase productive work hours"
+        }
+      ],
+      "required_data_fields": [
+        "Field force utilisation data: jobs per engineer per day, travel time, and work time",
+        "First-time fix rate and repeat-visit rate by job type and team",
+        "Territory allocation and customer concentration data",
+        "FSO tool options and integration with workforce management system",
+        "Field engineer compensation structure and variable pay policy"
       ]
     }
   ],

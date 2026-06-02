@@ -87,6 +87,52 @@
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "Deloitte — Real Estate Predictions 2025 (deloitte.com/insights/real-estate)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Rank assets by criticality (availability impact × replacement cost); instrument top-20 critical assets with vibration, temperature, and oil sensors",
+          "owner_role": "Asset Management / O&M",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Build ML predictive models (anomaly detection, remaining useful life) using historian and CMMS data; validate on holdout failure events",
+          "owner_role": "Data Science / O&M",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Integrate PdM predictions into CMMS (SAP PM/IBM Maximo); shift maintenance triggers from calendar to condition-based",
+          "owner_role": "CMMS Team / IT",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track OEE improvement, unplanned-outage reduction, and maintenance cost per MW; rebaseline after 6 months",
+          "owner_role": "FP&A / Asset Management",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Unplanned outage rate >5% of planned generation hours for critical rotating equipment",
+          "evidence_source": "cmms_outage_data",
+          "confirms": "Condition-based maintenance will reduce forced outage cost"
+        },
+        {
+          "signal": "Preventive maintenance cost >30% of total maintenance budget with >40% of PMs yielding no defect found",
+          "evidence_source": "cmms_maintenance_records",
+          "confirms": "Optimising PM frequency and shifting to PdM will reduce unnecessary maintenance"
+        },
+        {
+          "signal": "Mean time between failures declining YoY for pumps, compressors, or transformers",
+          "evidence_source": "asset_failure_history",
+          "confirms": "Asset degradation trend justifies condition-monitoring investment"
+        }
+      ],
+      "required_data_fields": [
+        "Asset criticality register with replacement cost and availability impact",
+        "CMMS maintenance history (work orders, failure codes, costs) ≥3 years",
+        "Historian/SCADA data for instrumented assets (vibration, temperature, pressure)",
+        "Current PM frequency schedule and inspection outcomes",
+        "Unplanned outage log with duration and production impact"
       ]
     },
     {
@@ -127,6 +173,52 @@
         "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Aggregate MRO spend from plant stores, purchase orders, and P-cards across all sites; classify by category (mechanical, electrical, instrumentation, safety)",
+          "owner_role": "Procurement / Plant Management",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Identify consolidation candidates: categories with >5 vendors and fragmented spend; build RFQ for preferred vendor agreements by category",
+          "owner_role": "Strategic Sourcing / Stores",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Negotiate VMI (Vendor Managed Inventory) agreements for fast-moving C-class items with top MRO distributors; implement consignment for critical spares",
+          "owner_role": "Procurement / Stores",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Build MRO catalogue in procurement system; enforce catalogue buying; track MRO cost per site and spend under management monthly",
+          "owner_role": "Procurement / IT",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "MRO vendor count >100 per site with top-20 vendors representing <50% of spend, indicating fragmentation",
+          "evidence_source": "vendor_master",
+          "confirms": "Consolidation will improve leverage and reduce procurement overhead"
+        },
+        {
+          "signal": "MRO spend outside purchase order (P-card or credit card) >20%, indicating maverick purchasing",
+          "evidence_source": "spend_classification_data",
+          "confirms": "Catalogue discipline and VMI will reduce off-contract buying"
+        },
+        {
+          "signal": "MRO unit price variance >30% for same item across sites due to decentralised purchasing",
+          "evidence_source": "price_analysis",
+          "confirms": "Group contracts will harmonise pricing across plants"
+        }
+      ],
+      "required_data_fields": [
+        "MRO spend by site, category, and vendor (12 months)",
+        "Purchase order vs credit card spend split",
+        "Price data for common items across sites",
+        "Current VMI and consignment arrangements",
+        "Critical vs non-critical spares classification"
       ]
     },
     {
@@ -167,6 +259,52 @@
         "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
         "DPE — Survey of CPSEs 2023-24 (dpe.gov.in/reports/annual-report)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Commission BEE-certified energy audit for all facilities above PAT cycle threshold; establish SEC (Specific Energy Consumption) baseline by production unit",
+          "owner_role": "Energy Manager / Operations",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Prioritise energy efficiency projects by payback period (<3 years): motor replacement, variable frequency drives, compressed air, and lighting retrofit",
+          "owner_role": "Energy Team / Engineering",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Execute top-10 projects with investment approval; file PAT cycle designation certificate; install DECs (Designated Energy Consumers) as required",
+          "owner_role": "Engineering / Finance",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Track SEC monthly vs PAT cycle target; submit BEE annual report; prepare for ESCerts trading if target exceeded",
+          "owner_role": "Energy Manager / Compliance",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Specific Energy Consumption (SEC) above BEE benchmark for the sector or above PAT cycle target",
+          "evidence_source": "energy_audit_report",
+          "confirms": "Energy efficiency projects will reduce SEC and electricity cost, and avoid PAT penalty"
+        },
+        {
+          "signal": "Energy cost as % of COGS >12% for electricity-intensive processes (metal, cement, chemical, glass)",
+          "evidence_source": "cogs_breakdown",
+          "confirms": "Energy efficiency investment will materially reduce production cost"
+        },
+        {
+          "signal": "Motor load factor <60% for >30% of installed motor capacity indicating oversized or inefficient motors",
+          "evidence_source": "energy_audit_motor_survey",
+          "confirms": "Motor replacement or VFD installation will reduce electricity consumption"
+        }
+      ],
+      "required_data_fields": [
+        "Energy consumption data by fuel type, unit, and process (12 months)",
+        "BEE PAT cycle designation status and SEC target",
+        "Energy audit report with top-10 efficiency recommendations and investment estimates",
+        "Electricity tariff structure and peak demand charges",
+        "Motor inventory with load factor and age data"
       ]
     },
     {
@@ -207,6 +345,52 @@
         "DPE — Survey of CPSEs 2023-24 (dpe.gov.in/reports/annual-report)",
         "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Reconcile GSTR-2A/2B (supplier invoices filed) vs GSTR-3B (ITC claimed) for all returns periods; identify unclaimed ITC by GST head",
+          "owner_role": "Tax / Accounts",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Investigate ITC gaps: misclassified blocked credits, supplier non-filing, and wrong GST head mapping in ERP; quantify recoverable amount",
+          "owner_role": "Indirect Tax / Finance",
+          "duration_weeks": 4
+        },
+        {
+          "step": "File DRC-03 or revised GSTR-3B for recoverable credits; engage with vendors who have not filed returns to resolve mismatch",
+          "owner_role": "Tax / Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Implement monthly auto-reconciliation in ERP/GSTN portal; update chart of accounts to correctly classify ITC-eligible expenses",
+          "owner_role": "Finance / IT",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "ITC claimed as % of total GST paid <80% for input-intensive sectors (manufacturing, construction, logistics) indicating under-claim",
+          "evidence_source": "gst_returns_data",
+          "confirms": "ITC recovery will yield direct cash refund or credit"
+        },
+        {
+          "signal": "GSTR-2A/2B vs GSTR-3B ITC mismatch >5% of eligible ITC pool",
+          "evidence_source": "gst_reconciliation_report",
+          "confirms": "Reconciliation exercise will identify recoverable amount"
+        },
+        {
+          "signal": "Blocked credit (Schedule II items) incorrectly claimed or ITC-eligible items incorrectly coded in ERP as non-ITC",
+          "evidence_source": "gl_classification_audit",
+          "confirms": "GL reclassification will unlock additional ITC"
+        }
+      ],
+      "required_data_fields": [
+        "GSTR-2A/2B data vs GSTR-3B ITC claim (all periods under review)",
+        "GL coding for input costs by GST head (ITC eligible vs blocked)",
+        "Vendor GSTIN compliance status and filing history",
+        "ERP GST configuration and tax code mapping",
+        "Prior-year tax authority ITC mismatch notices if any"
       ]
     },
     {
@@ -246,6 +430,52 @@
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "Atradius — Payment Practices Barometer Asia-Pacific 2024 (atradius.us/knowledge-and-research/reports/payment-practices-barometer-asia-pacific.html)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Build current-state logistics network model: map all origin-destination lanes, carrier rates, volumes, and transit times; calculate cost per tonne-km by lane",
+          "owner_role": "Logistics / Supply Chain",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Run network optimisation model (linear programming or simulation) to identify depot location, mode mix, and lane consolidation opportunities",
+          "owner_role": "Supply Chain Analytics",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Negotiate revised contracts with carriers based on optimised lane volumes; implement route-and-load planning software",
+          "owner_role": "Logistics Procurement",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track freight cost per tonne-km, OTIF, and carrier performance monthly; reoptimise annually",
+          "owner_role": "FP&A / Logistics",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Freight cost as % of net sales above sector benchmark with <70% truck utilisation on primary lanes",
+          "evidence_source": "logistics_spend_report",
+          "confirms": "Network redesign and load optimisation will reduce freight cost"
+        },
+        {
+          "signal": "Average truck fill rate <75% on primary distribution lanes",
+          "evidence_source": "transport_management_system_data",
+          "confirms": "Load consolidation or route optimisation will improve cost per tonne"
+        },
+        {
+          "signal": "Depot footprint not reviewed in >5 years despite changes in production locations or customer geography",
+          "evidence_source": "logistics_network_assessment",
+          "confirms": "Network optimisation will reduce depot and haul costs"
+        }
+      ],
+      "required_data_fields": [
+        "Freight spend by lane, carrier, and mode (12 months)",
+        "Shipment volume and weight by origin-destination pair",
+        "Current depot locations and lease terms",
+        "Truck fill rate and load factor data by lane",
+        "Customer geography and delivery frequency requirements"
       ]
     },
     {
@@ -284,6 +514,52 @@
       "industry_sources": [
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map packaging specifications for top-50 SKUs: material type, weight per unit, supplier, unit cost, and waste generated",
+          "owner_role": "R&D / Procurement / Sustainability",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Identify lightweighting opportunities (reduce material per unit) and material substitution (mono-material, recycled content) without compromising shelf life",
+          "owner_role": "R&D / Quality / Procurement",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Qualify alternative packaging suppliers; run structural testing per ISTA/FEFCO standards; obtain retail and logistics sign-off",
+          "owner_role": "Supplier Quality / R&D",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Roll out optimised specifications; track packaging cost per SKU, waste % per pack, and EPR compliance status monthly",
+          "owner_role": "FP&A / Sustainability",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Packaging cost as % of COGS >8% for categories where packaging intensity is not driven by product fragility or regulatory requirement",
+          "evidence_source": "cogs_breakdown_by_sku",
+          "confirms": "Lightweighting and specification review will reduce packaging cost"
+        },
+        {
+          "signal": "Primary packaging weight per unit 15–25% above benchmarked competitors for same product category",
+          "evidence_source": "packaging_benchmarking",
+          "confirms": "Lightweighting to peer specification will reduce material cost"
+        },
+        {
+          "signal": "EPR (Extended Producer Responsibility) compliance cost growing due to non-recyclable or multi-layer packaging",
+          "evidence_source": "epr_filing_data",
+          "confirms": "Mono-material or recyclable substitution will reduce EPR liability"
+        }
+      ],
+      "required_data_fields": [
+        "Packaging specification and cost per SKU (material, weight, supplier, unit cost)",
+        "Packaging waste percentage and EPR filing data",
+        "Competitor packaging specification benchmarks by category",
+        "Structural integrity requirements by product type (fragility, shelf life)",
+        "Retailer and logistics packaging requirements"
       ]
     },
     {
@@ -324,6 +600,52 @@
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Conduct automation opportunity assessment: rank processes by labour intensity, repeatability, defect risk, and automation technology readiness",
+          "owner_role": "Manufacturing Engineering / Operations",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Build ROI model for top-5 automation investments (robotics, vision systems, AGVs, PLC automation); source vendor quotes and validate cycle-time improvement",
+          "owner_role": "Engineering / Finance",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Execute automation in phased deployment: pilot on one line, validate OEE improvement, then scale to remaining lines",
+          "owner_role": "Projects / Engineering",
+          "duration_weeks": 16
+        },
+        {
+          "step": "Track OEE improvement, direct labour reduction per unit, defect rate, and automation ROI monthly",
+          "owner_role": "FP&A / Manufacturing",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Direct labour cost per unit of production >15% above peer benchmark for comparable automation intensity",
+          "evidence_source": "cost_per_unit_benchmarking",
+          "confirms": "Automation investment will reduce direct labour cost per unit"
+        },
+        {
+          "signal": "Process defect rate >2% on manual assembly or inspection steps vs <0.5% for equivalent automated process at competitor",
+          "evidence_source": "quality_data",
+          "confirms": "Automation will improve quality and reduce rework cost"
+        },
+        {
+          "signal": "OEE <65% for key production lines due to changeover time, minor stoppages, and speed loss",
+          "evidence_source": "oee_data",
+          "confirms": "Automation of bottleneck steps will improve OEE and throughput"
+        }
+      ],
+      "required_data_fields": [
+        "Direct labour cost per unit by production line and shift",
+        "OEE data (availability, performance, quality) by line (12 months)",
+        "Defect rate and rework cost by process step",
+        "Automation vendor options and capital cost estimates",
+        "Production volume forecast for ROI model"
       ]
     },
     {
@@ -362,6 +684,40 @@
       "industry_sources": [
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Quality Defect & Waste Reduction (Six Sigma / Lean): validate baseline and stakeholders",
+          "owner_role": "Transformation Lead",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Design target process and RACI",
+          "owner_role": "Process Owner",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Pilot in one BU/geo and measure effort/cost delta",
+          "owner_role": "Operations",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Scale rollout and update SOPs/training",
+          "owner_role": "HR / Ops",
+          "duration_weeks": 8
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "High FTE effort or cycle time vs benchmark",
+          "evidence_source": "operating_metrics",
+          "confirms": "Process inefficiency is material"
+        }
+      ],
+      "required_data_fields": [
+        "Process volume metrics",
+        "FTE effort or cost allocation by process",
+        "Baseline cycle times"
       ]
     }
   ]

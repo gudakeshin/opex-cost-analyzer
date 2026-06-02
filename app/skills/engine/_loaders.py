@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -18,6 +19,7 @@ DPO_BENCHMARKS_PATH = ROOT_DIR / "skills" / "payment-terms-optimizer" / "referen
 SWITCHING_COST_PATH = ROOT_DIR / "skills" / "spend-profiler" / "references" / "switching_cost_benchmarks.json"
 REGULATORY_EXCLUSIONS_PATH = ROOT_DIR / "skills" / "spend-profiler" / "references" / "regulatory_exclusions.json"
 SECTOR_PACKS_DIR = ROOT_DIR / "skills" / "sector-packs"
+KEYWORD_FAMILIES_PATH = ROOT_DIR / "skills" / "savings-modeler" / "references" / "keyword_families.json"
 GST_RULES_PATH = ROOT_DIR / "skills" / "indian-tax-optimizer" / "references" / "gst_rules.json"
 
 # ---------------------------------------------------------------------------
@@ -196,6 +198,14 @@ def _get_regulatory_exclusions() -> Dict[str, Any]:
     if _REGULATORY_EXCLUSIONS is None:
         _REGULATORY_EXCLUSIONS = _read_json(REGULATORY_EXCLUSIONS_PATH)
     return _REGULATORY_EXCLUSIONS
+
+
+@lru_cache(maxsize=1)
+def _get_keyword_families() -> Dict[str, List[str]]:
+    if KEYWORD_FAMILIES_PATH.exists():
+        raw = _read_json(KEYWORD_FAMILIES_PATH)
+        return {str(k).lower(): [str(x) for x in v] for k, v in raw.get("families", raw).items()}
+    return {}
 
 
 def _get_sector_levers(pack_id: str) -> Dict[str, Any]:

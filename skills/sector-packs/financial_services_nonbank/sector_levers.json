@@ -84,6 +84,52 @@
         "SEBI — Annual Report 2023-24 (sebi.gov.in/reports-and-statistics/) — mutual fund industry cost ratios and TER benchmarks",
         "AMFI — Industry Data & Statistics (amfiindia.com/research-information) — fund administration cost trends in India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map current fund administration footprint: administrators, scope, AUM served, fee schedule, and contract term per fund",
+          "owner_role": "COO / Fund Operations",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Benchmark total administration cost (bps on AUM) vs industry median; identify consolidation candidates by administrator quality and cost",
+          "owner_role": "Finance / Operations",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Run competitive RFP for consolidated fund administration mandate; negotiate tiered fee schedule tied to AUM growth",
+          "owner_role": "Procurement / COO",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Execute migration in fund-by-fund waves; validate NAV accuracy and SEBI/AMFI reporting continuity throughout transition",
+          "owner_role": "Fund Operations / Compliance",
+          "duration_weeks": 12
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Fund administration cost (bps on AUM) >1.5× peer median for equivalent AUM scale and fund complexity",
+          "evidence_source": "cost_benchmarking",
+          "confirms": "Consolidation to a lower-cost administrator will reduce ongoing cost"
+        },
+        {
+          "signal": "Multiple fund administrators (>3) with duplicated onboarding, compliance, and reporting overhead",
+          "evidence_source": "fund_admin_inventory",
+          "confirms": "Consolidation will reduce fixed overhead and improve scale economics"
+        },
+        {
+          "signal": "NAV error rate or restatement events >2 per year with current administrator",
+          "evidence_source": "operations_quality_log",
+          "confirms": "Quality improvement case supports migration to higher-capability administrator"
+        }
+      ],
+      "required_data_fields": [
+        "Fund administration cost by fund and administrator (bps and absolute ₹)",
+        "AUM by fund and administrator",
+        "Contract terms, SLA, and break-clause provisions",
+        "NAV error/restatement history",
+        "SEBI/AMFI compliance requirement mapping"
       ]
     },
     {
@@ -125,6 +171,52 @@
         "SEBI — Market Infrastructure Institutions Report 2024 (sebi.gov.in) — trading technology regulatory requirements",
         "Gartner — Market Guide for Capital Markets Technology 2024 (gartner.com) — trading platform consolidation savings",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit trading technology stack: OMS, EMS, market data, connectivity, and co-location costs; map to actual usage and trading volume",
+          "owner_role": "CTO / Head of Trading",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Conduct broker TCA (Transaction Cost Analysis) for top-20 brokers; identify underperforming brokers vs execution cost",
+          "owner_role": "Trading / Finance",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Rationalise OMS/EMS platforms to single consolidated system; negotiate multi-asset market data contract vs single-feed providers",
+          "owner_role": "CTO / Procurement",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Optimise co-location and connectivity footprint; track commission spend per broker against execution quality metrics",
+          "owner_role": "Head of Trading / Finance",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Trading technology cost (OMS, market data, connectivity) >5 bps of AUM vs benchmark <3 bps",
+          "evidence_source": "technology_cost_report",
+          "confirms": "Platform rationalisation will reduce per-AUM technology cost"
+        },
+        {
+          "signal": "Redundant OMS/EMS platforms or market-data feeds for the same asset class",
+          "evidence_source": "technology_landscape_assessment",
+          "confirms": "Consolidation will eliminate duplication"
+        },
+        {
+          "signal": "Broker commission paid to bottom-5 brokers generating >20% of total commission with below-median execution quality",
+          "evidence_source": "broker_tca_report",
+          "confirms": "Broker panel rationalisation will improve cost and execution quality"
+        }
+      ],
+      "required_data_fields": [
+        "Trading technology cost inventory (OMS, EMS, market data, co-location, connectivity)",
+        "Broker commission data by broker (12 months) with execution quality metrics",
+        "Trading volume by asset class and broker",
+        "OMS/EMS vendor contracts and SLAs",
+        "TCA analysis output for top-20 brokers"
       ]
     },
     {
@@ -166,6 +258,57 @@
         "SEBI — Compliance Framework for Registered Entities (sebi.gov.in/legal/circulars/) — regulatory compliance automation requirements",
         "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/) — compliance process automation benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Inventory all SEBI/IRDAI/RBI regulatory obligations: return frequency, data source, FTE-hours, and manual touchpoints per obligation",
+          "owner_role": "Chief Compliance Officer",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Select RegTech platform for compliance workflow automation; confirm SEBI technical specifications for digital filing",
+          "owner_role": "Compliance / IT",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Automate high-frequency returns (daily/weekly NAV, portfolio disclosure, AUM reporting) in Phase 1; quarterly filings in Phase 2",
+          "owner_role": "IT Delivery / Compliance",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Run parallel filing for one quarter; obtain internal-audit sign-off and submit first automated return to SEBI/IRDAI",
+          "owner_role": "Compliance / IT",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Decommission manual filing process; track FTE release, error rate, and on-time submission rate",
+          "owner_role": "FP&A / Compliance",
+          "duration_weeks": 3
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Compliance team >10 FTEs with >60% of time on data extraction and regulatory report preparation",
+          "evidence_source": "compliance_ops_time_study",
+          "confirms": "Automation will release FTE capacity and reduce compliance cost"
+        },
+        {
+          "signal": "Late or restated regulatory filings ≥2 in the past year due to data or formatting errors",
+          "evidence_source": "regulatory_submission_log",
+          "confirms": "Automation will reduce compliance risk"
+        },
+        {
+          "signal": "Number of SEBI/IRDAI returns >20 with data sourced from ≥5 systems requiring manual reconciliation",
+          "evidence_source": "return_inventory",
+          "confirms": "Integration and automation investment is justified"
+        }
+      ],
+      "required_data_fields": [
+        "Regulatory return inventory (name, regulator, frequency, source systems, FTE-hours)",
+        "Compliance team FTE count and time allocation per return",
+        "RegTech vendor landscape and integration requirements",
+        "Late/restated filing history with root cause",
+        "SEBI/IRDAI technical specification for digital filing"
       ]
     },
     {
@@ -205,6 +348,52 @@
       ],
       "industry_sources": [
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit current performance attribution system: coverage (funds, asset classes), calculation frequency, and reporting latency",
+          "owner_role": "Head of Performance / Operations",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Benchmark attribution vendor options vs current system on cost, coverage, and integration capability with portfolio management system",
+          "owner_role": "IT / Finance",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Migrate to consolidated attribution platform; integrate with OMS and portfolio management system for automated data feed",
+          "owner_role": "IT Delivery",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Automate daily attribution report generation and distribution to portfolio managers and clients; decommission manual reporting",
+          "owner_role": "Performance / IT",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Performance attribution reporting prepared manually for >50% of funds, consuming >3 FTE-days per quarter",
+          "evidence_source": "performance_ops_time_study",
+          "confirms": "Automation will materially reduce performance reporting cost"
+        },
+        {
+          "signal": "Attribution system covers <80% of AUM by asset class (e.g., fixed income or alternatives not covered)",
+          "evidence_source": "attribution_coverage_assessment",
+          "confirms": "Expanded platform will close coverage gaps and improve reporting quality"
+        },
+        {
+          "signal": "Client or regulator queries on performance discrepancies >5/quarter due to attribution methodology inconsistencies",
+          "evidence_source": "client_service_log",
+          "confirms": "Standardised automated attribution will reduce exceptions and reputational risk"
+        }
+      ],
+      "required_data_fields": [
+        "AUM by fund and asset class with attribution coverage status",
+        "Current attribution system cost and FTE overhead",
+        "Performance attribution vendor options and pricing",
+        "OMS and portfolio management system integration architecture",
+        "Client reporting SLA requirements"
       ]
     },
     {
@@ -245,6 +434,52 @@
       "industry_sources": [
         "SEBI — Research Analyst Regulations 2014 & Amendments (sebi.gov.in) — unbundling framework for investment research",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit research consumption under MiFID II/SEBI framework: identify all research providers, vote allocation, and annual spend by fund",
+          "owner_role": "Head of Research / Compliance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Assess research quality and utilisation per provider using portfolio manager feedback and vote data; identify low-utilisation providers",
+          "owner_role": "Investment Team / Finance",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Rationalise research provider panel from bottom; consolidate budget to highest-value providers; negotiate direct pricing vs CSA",
+          "owner_role": "Procurement / Head of Research",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Implement research management platform to track consumption vs budget; enforce per-fund research budget allocation",
+          "owner_role": "Finance / IT",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Research budget per AUM >3 bps vs fund industry median for equivalent strategy complexity",
+          "evidence_source": "research_cost_report",
+          "confirms": "Research spend rationalisation will improve cost efficiency without compromising investment quality"
+        },
+        {
+          "signal": "Research provider panel >20 firms with bottom-5 providers receiving <5% of votes but same contract structure",
+          "evidence_source": "broker_vote_report",
+          "confirms": "Panel rationalisation will improve leverage and reduce admin overhead"
+        },
+        {
+          "signal": "Research consumption not systematically tracked per fund making budget accountability difficult",
+          "evidence_source": "research_management_review",
+          "confirms": "Implementing research management platform will improve cost governance"
+        }
+      ],
+      "required_data_fields": [
+        "Research cost by provider and fund (12 months)",
+        "Broker vote allocation data",
+        "Portfolio manager research utilisation and feedback by provider",
+        "MiFID II/SEBI compliance framework for research payments",
+        "Research management platform options and integration requirements"
       ]
     }
   ],

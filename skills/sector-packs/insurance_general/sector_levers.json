@@ -80,6 +80,52 @@
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map claims journey by product line: measure FNOL-to-settlement cycle time, manual touchpoints, and STP rate by claim type and value band",
+          "owner_role": "Claims Operations / Process Excellence",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Design STP pathway by claim type: auto-adjudication rules for low-value/low-complexity claims; integrate with surveyor and hospital network",
+          "owner_role": "Claims / IT",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Deploy FNOL automation (WhatsApp/IVR), triage scoring model, and digital document collection; eliminate manual data entry at intake",
+          "owner_role": "IT Delivery / Claims",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Track STP rate, claims processing cost per claim, and customer satisfaction (NPS/CSAT) by product line monthly",
+          "owner_role": "FP&A / Claims",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Claims STP rate <30% for product lines where IRDAI allows straight-through processing (motor own-damage, health cashless)",
+          "evidence_source": "claims_ops_report",
+          "confirms": "STP implementation will materially reduce cost per claim and settlement time"
+        },
+        {
+          "signal": "Claims processing cost per claim >₹800 for motor or >₹1,200 for health claims vs peer benchmark",
+          "evidence_source": "operational_cost_benchmarking",
+          "confirms": "Automation will reduce claims processing cost"
+        },
+        {
+          "signal": "Average claims settlement time >15 days for cashless health or >30 days for motor own-damage",
+          "evidence_source": "claims_tat_report",
+          "confirms": "Process automation will improve settlement speed and customer satisfaction"
+        }
+      ],
+      "required_data_fields": [
+        "Claims journey map with volume, STP rate, and TAT by product line and claim type",
+        "Claims processing cost per claim by product (FTE cost + surveyor + system)",
+        "FNOL data: channel mix (agent, digital, call centre) and data completeness at intake",
+        "Policy admin system and claims management system integration architecture",
+        "IRDAI compliance requirements for automated adjudication"
       ]
     },
     {
@@ -120,6 +166,52 @@
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map underwriting decision workflow by product line: measure time-to-quote, referral rate, and loss ratio by underwriting tier",
+          "owner_role": "Chief Underwriting Officer / Process Excellence",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Build rules-based auto-acceptance engine for standard risks; integrate external data (bureau, weather, geo-risk, IoT) for risk enrichment",
+          "owner_role": "Underwriting / IT",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Deploy AI risk scoring model for SME and commercial lines; run parallel with manual underwriting for validation",
+          "owner_role": "Underwriting / Data Science",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track auto-acceptance rate, referral rate, combined ratio by segment, and underwriting team productivity monthly",
+          "owner_role": "FP&A / Underwriting",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Underwriting referral rate >40% of new business quotes requiring senior underwriter review",
+          "evidence_source": "underwriting_ops_data",
+          "confirms": "Rules engine and AI scoring will reduce referral rate and speed up quote turnaround"
+        },
+        {
+          "signal": "Time-to-quote for standard commercial lines >5 days vs competitor benchmark of <24 hours",
+          "evidence_source": "sales_ops_data",
+          "confirms": "Automation will improve conversion rate through faster quote turnaround"
+        },
+        {
+          "signal": "Loss ratio variance >10 percentage points between auto-accepted and manually-underwritten risks of similar profile",
+          "evidence_source": "portfolio_analytics",
+          "confirms": "Data enrichment and AI scoring will improve risk selection quality"
+        }
+      ],
+      "required_data_fields": [
+        "Underwriting workflow data: quote volume, referral rate, TAT, and accept/decline rate",
+        "Loss ratio by product line, underwriting tier, and channel",
+        "External data availability for risk enrichment (bureau, geo-risk, IoT sensors)",
+        "Policy admin system architecture and API capability",
+        "IRDAI compliance requirements for automated underwriting"
       ]
     },
     {
@@ -159,6 +251,52 @@
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit policy lifecycle touchpoints: issuance, endorsement, renewal, and lapse processes; measure manual effort and error rate per transaction type",
+          "owner_role": "Policy Operations / Process Excellence",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Consolidate PAS (Policy Administration System) to single platform where multiple systems operate; map integration with CRM, billing, and regulatory reporting",
+          "owner_role": "CTO / IT Architecture",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Launch digital self-service for policyholders: endorsements, premium payment, and document download via app/portal; automate renewal trigger",
+          "owner_role": "Digital / IT Delivery",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Track digital self-service adoption rate, policy issuance TAT, and operations cost per policy in force monthly",
+          "owner_role": "FP&A / Policy Operations",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Policy issuance or endorsement TAT >24 hours for standard products vs digital-first insurer benchmark of <2 hours",
+          "evidence_source": "policy_ops_metrics",
+          "confirms": "Digitisation will improve speed and reduce manual cost per policy"
+        },
+        {
+          "signal": "Operations cost per policy in force >₹1,200/year vs peer benchmark <₹800, indicating manual-heavy model",
+          "evidence_source": "operational_cost_benchmarking",
+          "confirms": "Self-service and PAS consolidation will reduce unit cost"
+        },
+        {
+          "signal": "Multiple PAS platforms (>2) creating data inconsistency and integration overhead",
+          "evidence_source": "it_landscape",
+          "confirms": "PAS consolidation will reduce IT maintenance cost and data quality issues"
+        }
+      ],
+      "required_data_fields": [
+        "Policy lifecycle transaction volumes and TAT by type (issuance, endorsement, renewal, lapse)",
+        "Operations cost per policy by transaction type and product",
+        "PAS landscape and integration architecture",
+        "Digital channel adoption rate (app, web portal) by policyholder segment",
+        "IRDAI compliance requirements for digital policy issuance and documentation"
       ]
     },
     {
@@ -199,6 +337,52 @@
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Analyse historical claims for fraud indicators: claims made just after policy inception, late-reported high-value claims, and repeat claimants",
+          "owner_role": "Fraud Analytics / Claims",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Build ML fraud scoring model using claims, policy, and network data; validate precision and recall on holdout dataset",
+          "owner_role": "Data Science / Claims",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Integrate fraud score into claims triage workflow: flag high-risk claims for investigation before settlement; automate low-risk claims",
+          "owner_role": "Claims / IT",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track fraud detected as % of claims value, false-positive investigation rate, and fraud loss reduction quarterly",
+          "owner_role": "Fraud / FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Claims fraud loss >1% of net earned premium for motor or health lines, indicating inadequate detection",
+          "evidence_source": "fraud_loss_report",
+          "confirms": "AI fraud detection will improve detection rate and reduce fraud loss"
+        },
+        {
+          "signal": "Investigation team >20 FTEs investigating all flagged claims with high false-positive rate (>70%)",
+          "evidence_source": "fraud_investigation_metrics",
+          "confirms": "ML scoring will improve investigation efficiency and reduce false positives"
+        },
+        {
+          "signal": "No fraud scoring model—all fraud detection relies on adjuster judgment with no systematic analytics",
+          "evidence_source": "claims_ops_assessment",
+          "confirms": "AI model introduction will improve detection systematically"
+        }
+      ],
+      "required_data_fields": [
+        "Historical claims data with confirmed fraud labels (≥2 years, ≥5,000 confirmed fraud cases)",
+        "Policy, customer, and network data for feature engineering",
+        "Investigation case outcomes and false-positive rate",
+        "Claims management system architecture for scoring integration",
+        "IRDAI compliance requirements for AI-based fraud detection"
       ]
     },
     {
@@ -239,6 +423,52 @@
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Analyse distribution cost by channel (tied agents, brokers, bancassurance, digital, direct): commission, acquisition cost, and persistency by channel",
+          "owner_role": "Distribution / FP&A",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Build customer lifetime value model by channel: compare 13th and 25th month persistency, premium size, and claim frequency",
+          "owner_role": "Actuarial / Analytics",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Rebalance channel investment towards higher-CLV, lower-cost channels; renegotiate commission structures with brokers and banks",
+          "owner_role": "Distribution Head / Finance",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track new business premium by channel, cost per new policy, and persistency ratio monthly",
+          "owner_role": "FP&A / Distribution",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Distribution cost (commission + acquisition) >25% of first-year premium for retail life or >15% for general insurance",
+          "evidence_source": "distribution_cost_report",
+          "confirms": "Channel mix rebalancing towards lower-commission channels will improve expense ratio"
+        },
+        {
+          "signal": "13th month persistency ratio <70% for agent-sourced policies vs >85% for digital-sourced policies",
+          "evidence_source": "persistency_data",
+          "confirms": "Shifting channel mix towards digital will improve LTV and reduce policy lapse cost"
+        },
+        {
+          "signal": "Digital channel contributing <10% of new business despite comparable unit economics",
+          "evidence_source": "channel_mix_report",
+          "confirms": "Digital channel investment will improve acquisition cost without sacrificing quality"
+        }
+      ],
+      "required_data_fields": [
+        "New business premium and policy count by channel (12 months)",
+        "Commission rate and acquisition cost by channel and product",
+        "Persistency data (13th and 25th month) by channel",
+        "Claims frequency and loss ratio by channel",
+        "Digital channel funnel data (leads, conversion, policy issued)"
       ]
     },
     {
@@ -278,6 +508,52 @@
       "industry_sources": [
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Review treaty structure vs actual loss experience: compare cedant strategy (proportional vs XL), retention levels, and RI panel performance",
+          "owner_role": "Chief Actuary / Reinsurance",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Benchmark RI cost (net RI premium as % of gross) vs peer insurers; model optimised retention and treaty structure using stochastic loss model",
+          "owner_role": "Actuarial / Reinsurance",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Run competitive RI tender with shortlisted panel; negotiate improved terms for proportional treaties and aggregate XL covers",
+          "owner_role": "Reinsurance Head / Procurement",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track RI cost ratio, net combined ratio, and RI recovery rate by treaty annually; submit updated IRDAI filing",
+          "owner_role": "Finance / Actuarial",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "RI cost as % of gross premium >25% for lines where peer average is <18%, indicating over-cession",
+          "evidence_source": "irdai_annual_report_peer_comparison",
+          "confirms": "Retention optimisation and treaty restructuring will reduce RI cost"
+        },
+        {
+          "signal": "Proportional RI cession >40% for motor or fire where historical combined ratio supports higher self-retention",
+          "evidence_source": "loss_triangle_analysis",
+          "confirms": "Shifting to XL or higher retention will reduce cession cost on profitable lines"
+        },
+        {
+          "signal": "RI panel not reviewed for >3 years despite changes in company risk profile or reinsurer ratings",
+          "evidence_source": "reinsurance_contract_register",
+          "confirms": "Panel rationalisation will improve pricing and counterparty quality"
+        }
+      ],
+      "required_data_fields": [
+        "RI treaty register with cession rate, premium, and recovery data by treaty",
+        "Loss triangles and development factors by line of business",
+        "Reinsurer credit ratings and panel review history",
+        "Gross and net combined ratio by product line (3 years)",
+        "IRDAI reinsurance program filing requirements"
       ]
     },
     {
@@ -318,6 +594,52 @@
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit investment operations: measure settlement fails, reconciliation FTE-hours, custodian fees, and OMS/TMS integration gaps",
+          "owner_role": "CIO / Investment Operations",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Rationalise custodian and depository relationships: consolidate to ≤2 custodians per asset class; negotiate fee schedules based on AUM volume",
+          "owner_role": "Finance / Investment Ops",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Implement OMS-to-custodian STP for equity and fixed income trade settlement; automate NAV reconciliation and regulatory reporting to IRDAI",
+          "owner_role": "IT / Investment Ops",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track settlement fail rate, operations cost per portfolio, and regulatory reporting accuracy monthly",
+          "owner_role": "FP&A / Investment Ops",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Trade settlement fail rate >1% of settled trades, generating penalty and manual investigation cost",
+          "evidence_source": "settlement_data",
+          "confirms": "STP and OMS integration will reduce settlement failures"
+        },
+        {
+          "signal": "Investment operations FTE >20 with >50% of time on manual reconciliation and report preparation",
+          "evidence_source": "ops_time_study",
+          "confirms": "Automation will release FTE capacity and reduce operations cost"
+        },
+        {
+          "signal": "Custodian and depository fee spend >15 bps of AUM vs peer benchmark <10 bps",
+          "evidence_source": "custodian_fee_data",
+          "confirms": "Consolidation and renegotiation will reduce custody cost"
+        }
+      ],
+      "required_data_fields": [
+        "Investment operations FTE count and time allocation by activity",
+        "Custodian fee schedule and AUM by custodian",
+        "Settlement fail rate and penalty data",
+        "OMS and custodian integration architecture",
+        "IRDAI investment reporting requirements"
       ]
     },
     {
@@ -358,6 +680,52 @@
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Inventory actuarial models by type (reserving, pricing, capital modelling) and technology (Moses/Prophet/R/Excel); identify manual bottlenecks in production run",
+          "owner_role": "Chief Actuary",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Migrate legacy models from Excel to actuarial modelling platform (Prophet, R, Python); establish version control and model validation governance",
+          "owner_role": "Actuarial / IT",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Automate quarterly reserve production run and IRDAI reporting; implement parallel run for one cycle to validate output",
+          "owner_role": "Actuarial / IT",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track actuarial production run time, model error rate, and FTE release from automation monthly",
+          "owner_role": "FP&A / Actuarial",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Quarterly reserve production run takes >3 weeks of actuary time due to manual model execution and reconciliation",
+          "evidence_source": "actuarial_time_study",
+          "confirms": "Automation will accelerate close and free senior actuarial capacity"
+        },
+        {
+          "signal": "Actuarial models >50% in Excel with no version control or audit trail",
+          "evidence_source": "model_inventory",
+          "confirms": "Platform migration will reduce model risk and improve auditability"
+        },
+        {
+          "signal": "IRDAI actuarial filing requires manual preparation consuming >50 actuary-hours per quarter",
+          "evidence_source": "regulatory_reporting_time_study",
+          "confirms": "Automation will reduce compliance cost and risk of restatement"
+        }
+      ],
+      "required_data_fields": [
+        "Actuarial model inventory by type and technology",
+        "Production run timeline and FTE-hours by model type",
+        "IRDAI actuarial reporting requirements and schedule",
+        "IT infrastructure for actuarial modelling platform",
+        "Model validation and governance framework"
       ]
     }
   ]

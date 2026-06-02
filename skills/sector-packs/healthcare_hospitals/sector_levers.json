@@ -81,6 +81,52 @@
         "McKinsey & Company — The Future of Healthcare Workforce (mckinsey.com/industries/healthcare) — clinical staffing mix optimisation 8-18%",
         "MoHFW — National Health Workforce Account 2023-24 (mohfw.gov.in/) — nurse-to-doctor ratio and staffing benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Model clinical staffing ratios (nurse:bed, doctor:OP visit) by specialty vs NABH and peer hospital benchmarks; identify over/under-staffed departments",
+          "owner_role": "CMO / HR",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Redesign rosters to align staffing with patient volume patterns (peak vs off-peak hours, seasonality); reduce agency/locum dependency",
+          "owner_role": "Nursing Director / HR",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Implement workforce management software for demand-driven scheduling; integrate with HIS for real-time census data",
+          "owner_role": "IT / HR",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track agency locum spend, overtime %, and nurse turnover monthly; set targets for reduction",
+          "owner_role": "FP&A / HR",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Agency/locum spend >15% of total clinical payroll indicating chronic staffing-model dependency on high-cost contractors",
+          "evidence_source": "payroll_and_agency_spend",
+          "confirms": "Permanent staffing model and roster redesign will reduce cost per clinical FTE"
+        },
+        {
+          "signal": "Nurse-to-bed ratio >20% above NABH requirement in general wards during off-peak hours",
+          "evidence_source": "staffing_benchmarking",
+          "confirms": "Demand-linked rostering will reduce excess clinical labour cost"
+        },
+        {
+          "signal": "Clinical overtime as % of base payroll >12% for ≥3 consecutive quarters",
+          "evidence_source": "payroll_data",
+          "confirms": "Rostering and shift-pattern optimisation will reduce overtime premium"
+        }
+      ],
+      "required_data_fields": [
+        "Clinical FTE roster by specialty, shift, and employment type (permanent vs agency/locum)",
+        "Patient census data (ADC, OP visits) by department and time of day",
+        "Agency/locum spend by vendor and specialty (12 months)",
+        "NABH staffing norm requirements by bed type",
+        "Nurse turnover and tenure data"
       ]
     },
     {
@@ -122,6 +168,52 @@
         "NABH — Accreditation Standards for Hospitals 5th Edition (nabh.co/) — supply chain and materials management standards",
         "McKinsey & Company — Procurement in Healthcare (mckinsey.com/industries/healthcare) — GPO vs. direct sourcing savings 10-20%",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit formulary: map all consumables (sutures, gloves, IV fluids, implants) to category, vendor, unit price, and annual volume",
+          "owner_role": "Procurement / Materials Management",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Benchmark unit prices against NHA/CGHS rates and comparable hospital group purchases; identify price gaps by item",
+          "owner_role": "Procurement / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Consolidate vendors for top-20 spend categories; negotiate group purchasing agreements or join existing hospital GPO",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Mandate formulary compliance via HIS-linked requisition; track savings by category and vendor compliance monthly",
+          "owner_role": "Procurement / Clinical",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Medical consumable cost as % of revenue >18% vs peer benchmark of <15% for similar case mix",
+          "evidence_source": "cost_per_admission_data",
+          "confirms": "Procurement rationalisation will yield material cost reduction"
+        },
+        {
+          "signal": "Same consumable item purchased from >3 vendors at different unit prices (price spread >20%)",
+          "evidence_source": "vendor_master",
+          "confirms": "Consolidation will harmonise pricing and improve negotiating leverage"
+        },
+        {
+          "signal": "Implant cost >40% of procedure revenue for high-volume specialties (orthopaedics, cardiology)",
+          "evidence_source": "procedure_cost_data",
+          "confirms": "Implant vendor consolidation and consignment model will reduce working capital and purchase cost"
+        }
+      ],
+      "required_data_fields": [
+        "Formulary with item description, vendor, unit price, and annual consumption volume",
+        "NHA/CGHS benchmark prices for common consumables and implants",
+        "Spend by vendor and category (12 months)",
+        "HIS requisition and inventory management configuration",
+        "Existing GPO or group purchasing membership details"
       ]
     },
     {
@@ -163,6 +255,52 @@
         "NPPA — National List of Essential Medicines (NLEM) 2022 (pharmaceuticals.gov.in) — drug price control and generic substitution framework",
         "MoHFW — Jan Aushadhi Scheme Data 2024 (mohfw.gov.in/) — generic drug penetration benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit pharmacy formulary for therapeutic substitution opportunities: identify branded drugs with generic equivalents at >50% cost savings",
+          "owner_role": "Chief Pharmacist / CMO",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Evaluate empanelment with 340B/NHA tender pricing programs; renegotiate pricing with top-10 pharma vendors by spend",
+          "owner_role": "Pharmacy / Procurement",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Implement pharmacist-led formulary management: enforce generic substitution protocols with prescriber education",
+          "owner_role": "Chief Pharmacist / CMO",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track pharmacy cost per admission, generic substitution rate, and drug wastage monthly",
+          "owner_role": "FP&A / Pharmacy",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Pharmacy cost per admission >20% above peer benchmark for similar case mix index",
+          "evidence_source": "pharmacy_cost_benchmarking",
+          "confirms": "Formulary management and generic substitution will reduce cost"
+        },
+        {
+          "signal": "Generic substitution rate <60% where bio-equivalent generics are available and clinically appropriate",
+          "evidence_source": "formulary_analysis",
+          "confirms": "Systematic generic substitution will reduce drug cost without clinical compromise"
+        },
+        {
+          "signal": "Drug wastage and expiry write-off >2% of pharmacy procurement value annually",
+          "evidence_source": "pharmacy_write_off_data",
+          "confirms": "Formulary optimisation and demand-linked ordering will reduce waste"
+        }
+      ],
+      "required_data_fields": [
+        "Formulary with drug name, branded vs generic, unit cost, and annual consumption",
+        "Generic availability and bioequivalence data by therapeutic category",
+        "Pharmacy vendor contracts and pricing",
+        "Prescribing pattern data by physician and specialty",
+        "Drug expiry and wastage report (12 months)"
       ]
     },
     {
@@ -204,6 +342,52 @@
         "NABH — Clinical Establishment Standards 2023 (nabh.co/) — revenue cycle and billing standards",
         "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/) — process automation benchmarks applicable to revenue cycle",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Measure denial rate by payer, denial reason, and department; quantify revenue at risk from denials and late submissions",
+          "owner_role": "Revenue Cycle Head / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Implement RCM automation: eligibility verification, pre-authorisation, and coding audit tools integrated with HIS/billing system",
+          "owner_role": "IT / Revenue Cycle",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Automate claim submission and denial workflow with real-time payer response tracking; resolve top-3 denial reasons with system controls",
+          "owner_role": "Revenue Cycle / IT",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track denial rate, days in AR, net collection rate, and bad debt by payer monthly; set improvement targets",
+          "owner_role": "FP&A / Revenue Cycle",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Initial claim denial rate >10% of submitted claims, indicating billing or coding quality gap",
+          "evidence_source": "revenue_cycle_report",
+          "confirms": "RCM automation and coding improvement will recover revenue"
+        },
+        {
+          "signal": "Days in accounts receivable >45 days for insurance payers vs benchmark <30 days",
+          "evidence_source": "ar_aging_report",
+          "confirms": "Process automation will accelerate cash conversion"
+        },
+        {
+          "signal": "Revenue cycle team >15 FTEs with >60% of time on manual claim follow-up and denial management",
+          "evidence_source": "revenue_cycle_time_study",
+          "confirms": "Automation will release FTE capacity and reduce cost per claim processed"
+        }
+      ],
+      "required_data_fields": [
+        "Claim denial data by payer, denial reason, and department (12 months)",
+        "Accounts receivable aging by payer and bill type",
+        "Revenue cycle FTE count and time allocation by activity",
+        "HIS/billing system architecture and integration capability",
+        "Payer contract terms and adjudication rules by payer"
       ]
     },
     {
@@ -244,6 +428,52 @@
       "industry_sources": [
         "MoHFW — Health Facility Statistics 2023-24 (mohfw.gov.in/) — bed occupancy rates and OT utilisation benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Measure OT and procedure-room utilisation by specialty: scheduled hours, actual cases, and turnaround time (TAT) between cases",
+          "owner_role": "Operations / CMO",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Redesign OT scheduling: implement block scheduling with performance guarantees, reduce TAT through standardised turnover protocol",
+          "owner_role": "Nursing Director / OT Manager",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Reconfigure underutilised clinical space: convert low-utilisation OTs to day-surgery or procedure rooms; expand high-demand specialty",
+          "owner_role": "Operations / Finance / Facilities",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track OT utilisation rate, cases per OT per day, and revenue per OT hour monthly",
+          "owner_role": "FP&A / Operations",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "OT utilisation rate <70% of available hours with TAT between cases >30 minutes",
+          "evidence_source": "ot_scheduling_data",
+          "confirms": "Scheduling improvement and TAT reduction will increase cases per day without capital investment"
+        },
+        {
+          "signal": "Revenue per OT hour below peer benchmark for comparable case mix",
+          "evidence_source": "ot_revenue_report",
+          "confirms": "Optimised scheduling will improve OT revenue intensity"
+        },
+        {
+          "signal": "Underutilised clinical space (empty beds, unused OTs) contributing fixed cost without revenue",
+          "evidence_source": "occupancy_and_utilisation_data",
+          "confirms": "Reconfiguration will improve return on clinical assets"
+        }
+      ],
+      "required_data_fields": [
+        "OT scheduling data: planned vs actual cases, start times, TAT, and cancellations",
+        "Clinical space inventory with utilisation rates by room type",
+        "Revenue per procedure by OT room and specialty",
+        "Staffing model for OT and procedure rooms",
+        "Bed occupancy rate by ward and specialty"
       ]
     },
     {
@@ -284,6 +514,52 @@
       "industry_sources": [
         "NABH — Medical Equipment Management Standards (nabh.co/) — medical equipment lifecycle and maintenance benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Build equipment utilisation register: map every capital medical device to scheduled hours, actual usage, and age; flag equipment <40% utilised",
+          "owner_role": "Biomedical Engineering / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Evaluate pooling model for under-utilised equipment across departments or campuses; assess feasibility of shared scheduling",
+          "owner_role": "Operations / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Retire or dispose of equipment below utilisation threshold; negotiate performance-based service contracts (up-time SLA) replacing time-and-material AMCs",
+          "owner_role": "Procurement / Biomedical",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track equipment utilisation, AMC cost per equipment, and unplanned downtime quarterly",
+          "owner_role": "FP&A / Biomedical",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Capital medical equipment utilisation <50% for ≥30% of the installed base",
+          "evidence_source": "equipment_utilisation_register",
+          "confirms": "Pooling or disposal will reduce ownership cost"
+        },
+        {
+          "signal": "AMC spend as % of equipment value >8% for equipment >7 years old",
+          "evidence_source": "amc_spend_data",
+          "confirms": "Switching to performance-based or capex-refreshed model will reduce maintenance cost"
+        },
+        {
+          "signal": "Equipment downtime events >5/quarter causing case cancellations or delays",
+          "evidence_source": "biomedical_maintenance_log",
+          "confirms": "Performance-based SLA contract will improve uptime and reduce revenue loss"
+        }
+      ],
+      "required_data_fields": [
+        "Equipment inventory with age, capital value, utilisation rate, and AMC cost",
+        "Equipment downtime and maintenance log (12 months)",
+        "AMC contract terms by vendor and equipment type",
+        "Sharing feasibility assessment (location proximity, scheduling compatibility)",
+        "NABH and clinical requirement for dedicated vs shared equipment"
       ]
     }
   ],

@@ -79,6 +79,52 @@
         "DSIR — R&D Statistics and Indicators 2023-24 (dsir.gov.in/reports.htm) — India clinical trial landscape and CRO adoption",
         "OPPI — Indian Pharmaceutical Industry Report 2024 (oppiin.org) — clinical trial cost benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit active clinical trial portfolio: assess protocol complexity, site enrolment rate, CRO performance, and cost per patient enrolled vs benchmark",
+          "owner_role": "Clinical Operations / Finance",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Redesign protocol for top-3 delayed studies: simplify endpoints, adopt decentralised trial (DCT) elements (eConsent, remote monitoring), and use risk-based monitoring",
+          "owner_role": "Clinical Development / Medical Affairs",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Renegotiate CRO contracts: shift from FTE-based to milestone-based pricing; consolidate to preferred CRO panel (2–3 vendors)",
+          "owner_role": "Procurement / Clinical Ops",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track cost per patient enrolled, enrolment velocity, and protocol deviation rate by study monthly",
+          "owner_role": "FP&A / Clinical Ops",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Cost per patient enrolled >30% above CRO industry benchmark for comparable therapeutic area and Phase",
+          "evidence_source": "clinical_trial_cost_report",
+          "confirms": "Protocol simplification and CRO renegotiation will reduce per-patient cost"
+        },
+        {
+          "signal": "Average patient enrolment rate <80% of plan, extending study timelines and increasing fixed trial costs",
+          "evidence_source": "ctms_data",
+          "confirms": "Site optimisation and DCT elements will improve enrolment velocity"
+        },
+        {
+          "signal": "CRO panel >5 vendors with no preferred vendor agreement or performance benchmarking",
+          "evidence_source": "procurement_data",
+          "confirms": "CRO consolidation will improve pricing leverage and management efficiency"
+        }
+      ],
+      "required_data_fields": [
+        "Active clinical trial list with status, cost to date, and estimated cost to complete",
+        "Cost per patient enrolled vs industry benchmark by therapeutic area",
+        "CRO performance data (enrolment rate, protocol deviations, budget adherence)",
+        "CTMS data: site performance, screen fail rates, and enrolment milestones",
+        "DCT technology readiness assessment"
       ]
     },
     {
@@ -119,6 +165,52 @@
         "DPCO — Drug Price Control Order and NLEM (pharmaceuticals.gov.in/national-pharmaceutical-pricing-authority) — manufacturing cost benchmarks for regulated pricing",
         "McKinsey & Company — Productivity in Pharma Manufacturing (mckinsey.com/industries/life-sciences) — COGS reduction levers 8-18%",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Decompose COGS by component: API, excipients, packaging, manufacturing overhead, and quality cost; compare vs comparable product benchmark",
+          "owner_role": "Manufacturing / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Conduct yield analysis by manufacturing step: identify yield losses, batch failure rate, and OOS events for root-cause and correction",
+          "owner_role": "Manufacturing / QA",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Qualify alternate API/excipient suppliers under existing ANDA/NDA filings where permitted; negotiate on volume-based pricing",
+          "owner_role": "Procurement / Regulatory Affairs",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Track COGS per unit, batch failure rate, and API price variance monthly; rebaseline after each yield improvement project",
+          "owner_role": "FP&A / Manufacturing",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Manufacturing COGS as % of net sales >45% for branded formulations or >35% for generics vs peer benchmark",
+          "evidence_source": "cogs_breakdown",
+          "confirms": "Yield improvement and material cost reduction will improve gross margin"
+        },
+        {
+          "signal": "Batch failure or out-of-specification rate >2% for key products generating significant reprocessing and write-off cost",
+          "evidence_source": "batch_record_data",
+          "confirms": "Process optimisation will reduce failure cost and improve OEE"
+        },
+        {
+          "signal": "Single API supplier dependency for >50% of product portfolio creating price and supply vulnerability",
+          "evidence_source": "procurement_data",
+          "confirms": "Supplier diversification will reduce risk and restore competitive tension"
+        }
+      ],
+      "required_data_fields": [
+        "COGS breakdown by product and component (API, excipients, packaging, overhead)",
+        "Batch yield data by product and manufacturing site (12 months)",
+        "API price trends and supplier concentration data",
+        "ANDA/NDA site and supplier qualification status",
+        "Regulatory filing requirements for alternate supplier qualification"
       ]
     },
     {
@@ -158,6 +250,52 @@
       "industry_sources": [
         "OPPI — Indian Pharmaceutical Industry Report 2024 (oppiin.org) — field force productivity benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Analyse prescriber data (IMS/IQVIA) by territory: map TRx volume, rep call frequency, and call coverage ratio against yield per call",
+          "owner_role": "Sales Force Effectiveness / Commercial",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Build territory productivity model: rank territories by revenue opportunity vs current rep cost; identify over/under-covered territories",
+          "owner_role": "SFE / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Resize field force: consolidate under-productive territories, reassign or exit under-performing reps, redeploy to high-growth geographies",
+          "owner_role": "Sales Head / HR",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track rep productivity (TRx growth, net sales per rep), coverage index, and SFA compliance monthly",
+          "owner_role": "FP&A / SFE",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Rep productivity (net sales per rep) >20% below peer benchmark for comparable therapeutic area and market maturity",
+          "evidence_source": "sales_force_benchmarking",
+          "confirms": "Rightsizing and redeployment will improve revenue per rep without losing market share"
+        },
+        {
+          "signal": "Territory coverage index >120% for mature product with flat TRx trajectory (over-covered, diminishing returns)",
+          "evidence_source": "iqvia_sfe_data",
+          "confirms": "Territory consolidation will reduce field force cost without sales impact"
+        },
+        {
+          "signal": "Field force cost as % of net sales >20% vs specialty pharma benchmark of <15%",
+          "evidence_source": "cost_breakdown",
+          "confirms": "Salesforce optimisation will improve commercial efficiency"
+        }
+      ],
+      "required_data_fields": [
+        "Territory-level TRx data (IQVIA/IMS) and rep call activity (SFA reports)",
+        "Revenue per rep and per territory (12 months)",
+        "Rep cost by grade and territory (salary, travel, allowances)",
+        "Coverage index and call frequency benchmarks by specialty",
+        "Market share data by product and territory"
       ]
     },
     {
@@ -197,6 +335,52 @@
       "industry_sources": [
         "OPPI — Digital Health and Pharma Marketing Report 2024 (oppiin.org) — e-detailing adoption benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Segment HCP universe by digital adoption and prescribing behaviour; identify candidates for digital-first (e-detailing, remote) vs in-person engagement model",
+          "owner_role": "SFE / Marketing",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Launch e-detailing platform and remote rep capability for digital-preference HCPs; develop content library for digital channels",
+          "owner_role": "Digital / Commercial",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Shift field rep call mix: reduce in-person call frequency for digital-responsive HCPs; reallocate rep time to high-value non-digital prescribers",
+          "owner_role": "Sales Head / SFE",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track digital engagement metrics (e-detail views, content consumption), TRx impact by engagement channel, and rep cost-per-call monthly",
+          "owner_role": "FP&A / Commercial Analytics",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "In-person call frequency >8/month for HCPs with confirmed digital adoption and high e-detail engagement",
+          "evidence_source": "sfa_and_digital_engagement_data",
+          "confirms": "Digital channel shift will maintain TRx with lower cost per interaction"
+        },
+        {
+          "signal": "Cost per in-person detail call >₹800 vs e-detailing cost <₹200 for comparable reach and message delivery",
+          "evidence_source": "commercial_cost_analysis",
+          "confirms": "Digital model will reduce cost per interaction materially"
+        },
+        {
+          "signal": "HCP digital adoption >40% in target specialty (measured by telemedicine usage, conference attendance online, and social media activity)",
+          "evidence_source": "hcp_segmentation_data",
+          "confirms": "Sufficient HCP digital readiness to support engagement model shift"
+        }
+      ],
+      "required_data_fields": [
+        "HCP segmentation: digital adoption score, prescribing value, and current engagement frequency",
+        "E-detailing platform capability and content delivery metrics",
+        "Cost per interaction by channel (in-person vs digital vs virtual)",
+        "TRx correlation data by engagement channel for comparable HCP segments",
+        "Rep utilisation and call frequency data from SFA system"
       ]
     },
     {
@@ -236,6 +420,52 @@
       "industry_sources": [
         "NPPA — Price Monitoring and Resource Unit Data 2024 (pharmaceuticals.gov.in) — gross-to-net deduction benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map formulary and tender position by state, insurer, and hospital segment; identify coverage gaps vs competitor access and net price impact of rebates",
+          "owner_role": "Market Access / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Redesign rebate model: shift from volume-based to outcomes/adherence-based rebates where payers will support; model net realisation impact",
+          "owner_role": "Market Access / Legal",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Implement contract management system for rebate tracking; automate rebate accrual calculation in ERP to eliminate manual reconciliation",
+          "owner_role": "Finance / IT",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track gross-to-net waterfall by product, net realisation per unit, and formulary access score quarterly",
+          "owner_role": "FP&A / Market Access",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Gross-to-net discount >30% for hospital segment, driven primarily by volume rebates with weak clinical outcomes linkage",
+          "evidence_source": "gross_to_net_analysis",
+          "confirms": "Rebate redesign to outcomes basis will improve net realisation"
+        },
+        {
+          "signal": "Rebate accrual error or reversal events >3/quarter due to manual tracking without contract management system",
+          "evidence_source": "finance_audit_log",
+          "confirms": "Automation will reduce accrual errors and improve P&L accuracy"
+        },
+        {
+          "signal": "Formulary access gap in key state formularies or hospital tenders vs leading competitor",
+          "evidence_source": "formulary_coverage_map",
+          "confirms": "Market access strategy adjustment will improve revenue opportunity"
+        }
+      ],
+      "required_data_fields": [
+        "Formulary and tender status by state, insurer, and hospital segment",
+        "Gross-to-net waterfall by product and channel",
+        "Rebate contract terms and accrual data by customer",
+        "Contract management system capability assessment",
+        "Competitor pricing and formulary access data"
       ]
     },
     {
@@ -274,6 +504,52 @@
       "industry_sources": [
         "Gartner — Life Sciences IT Spending Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget) — pharma IT platform consolidation savings",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Inventory all commercial and clinical technology platforms (Veeva CRM, CTMS, QMS, PVG, LIMS, ERP); map to vendor, annual cost, and integration dependencies",
+          "owner_role": "IT / Business Analysts",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Identify rationalization opportunities: functional duplicates, underutilised licences, and platforms replaceable by existing modules in current stack",
+          "owner_role": "IT Architecture / Procurement",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Execute consolidation: migrate to single-vendor Veeva platform (CRM + Vault QMS + eTMF + PromoMats) where feasible; negotiate enterprise agreement",
+          "owner_role": "IT Delivery / Procurement",
+          "duration_weeks": 16
+        },
+        {
+          "step": "Decommission retired systems; track licence spend per user and system count monthly",
+          "owner_role": "IT Finance / FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Technology cost per employee in commercial or R&D function >₹2 L/year with >30% identified as duplicated capability",
+          "evidence_source": "it_cost_per_head_report",
+          "confirms": "Consolidation will reduce per-head technology cost"
+        },
+        {
+          "signal": "Veeva CRM deployed but Veeva Vault for QMS or eTMF not adopted, despite functionality overlap",
+          "evidence_source": "veeva_platform_assessment",
+          "confirms": "Expanding single-vendor platform will eliminate point-solution cost"
+        },
+        {
+          "signal": "Data integration costs high due to multiple system-to-system feeds between clinical and commercial platforms",
+          "evidence_source": "integration_architecture_review",
+          "confirms": "Platform consolidation will reduce integration maintenance cost"
+        }
+      ],
+      "required_data_fields": [
+        "Technology platform inventory with vendor, users, cost, and contract term",
+        "Functional overlap assessment across current platforms",
+        "Veeva or alternative enterprise platform capability map",
+        "Integration architecture and cost for current system-to-system feeds",
+        "Regulatory validation requirements (21 CFR Part 11, GAMP5) for platform changes"
       ]
     },
     {
@@ -312,6 +588,52 @@
       "industry_sources": [
         "CRISIL — Pharma Supply Chain Report 2024 (crisil.com) — inventory write-off rates for Indian pharma companies",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Build expiry risk dashboard: SKU-level inventory by batch, shelf-life remaining, and monthly consumption rate; flag high-risk batches (>30% risk of expiry)",
+          "owner_role": "Supply Chain / Regulatory",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Segment high-risk inventory: dose-form suitability for shelf-life extension, reprocessing under QA sign-off, or liquidation to institutional buyer at discount",
+          "owner_role": "Quality / Supply Chain / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Implement demand-driven production planning: set maximum production run length for slow-moving SKUs; reduce build-to-stock for short shelf-life products",
+          "owner_role": "Supply Chain / Operations",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track write-off rate (as % of procurement value), average remaining shelf life at shipment, and expiry waste monthly",
+          "owner_role": "FP&A / Supply Chain",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Expiry write-off >1.5% of total COGS annually, indicating structural overproduction or demand planning inaccuracy",
+          "evidence_source": "write_off_data",
+          "confirms": "Demand-led production planning and FEFO enforcement will reduce expiry risk"
+        },
+        {
+          "signal": "Inventory days-on-hand >120 days for products with ≤24-month shelf life",
+          "evidence_source": "inventory_aging_report",
+          "confirms": "Excess inventory with limited shelf life creates material expiry risk"
+        },
+        {
+          "signal": "Short-dated inventory (≤6 months shelf life) representing >10% of current stock value",
+          "evidence_source": "batch_master_data",
+          "confirms": "Proactive liquidation or shelf-life extension will recover value"
+        }
+      ],
+      "required_data_fields": [
+        "Batch-level inventory data: SKU, quantity, manufacture date, and expiry date",
+        "Monthly consumption data by SKU (12 months)",
+        "Historical write-off data by SKU and reason code",
+        "Production schedule and build-to-stock vs make-to-order split",
+        "Shelf-life extension regulatory feasibility by product"
       ]
     },
     {
@@ -351,6 +673,40 @@
       "industry_sources": [
         "CDSCO — Central Drugs Standard Control Organisation Annual Report 2023-24 (cdsco.gov.in) — regulatory submission timelines India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Regulatory Affairs Efficiency: validate baseline and stakeholders",
+          "owner_role": "Transformation Lead",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Design target process and RACI",
+          "owner_role": "Process Owner",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Pilot in one BU/geo and measure effort/cost delta",
+          "owner_role": "Operations",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Scale rollout and update SOPs/training",
+          "owner_role": "HR / Ops",
+          "duration_weeks": 8
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "High FTE effort or cycle time vs benchmark",
+          "evidence_source": "operating_metrics",
+          "confirms": "Process inefficiency is material"
+        }
+      ],
+      "required_data_fields": [
+        "Process volume metrics",
+        "FTE effort or cost allocation by process",
+        "Baseline cycle times"
       ]
     },
     {
@@ -390,6 +746,52 @@
       "industry_sources": [
         "CDSCO — Pharmacovigilance Programme of India (pvpi.gov.in) — PV reporting requirements and automation opportunities",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit ICSR (Individual Case Safety Report) processing workflow: measure intake volume by source, processing time per case, and FTE-hours by activity",
+          "owner_role": "Drug Safety / PV Operations",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Implement E2B gateway for electronic exchange with regulators (CDSCO, EMA, FDA); automate intake from digital channels (e-commerce, social media listening)",
+          "owner_role": "IT / Drug Safety",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Deploy AI-assisted medical coding (MedDRA) and narrative writing tool; run parallel with manual processing for 60 days before go-live",
+          "owner_role": "Drug Safety / IT",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track ICSR processing time, coding accuracy, and on-time submission rate to CDSCO monthly",
+          "owner_role": "FP&A / Drug Safety",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "ICSR processing volume growing >20% YoY with manual processing model causing backlog and on-time submission risk",
+          "evidence_source": "pv_operations_report",
+          "confirms": "Automation will absorb volume growth without proportionate FTE increase"
+        },
+        {
+          "signal": "Average ICSR processing time >3 days per case for non-serious or >8 days for serious reports vs automated benchmark",
+          "evidence_source": "pv_kpi_dashboard",
+          "confirms": "AI-assisted processing will reduce cycle time and regulatory risk"
+        },
+        {
+          "signal": "No E2B electronic gateway with CDSCO requiring manual PDF submission of safety reports",
+          "evidence_source": "regulatory_submission_method_audit",
+          "confirms": "E2B gateway will eliminate manual submission and reduce error risk"
+        }
+      ],
+      "required_data_fields": [
+        "ICSR volume by source (HCP, patient, literature, post-market surveillance) and month (12 months)",
+        "Processing time and FTE-hours per case by activity (intake, coding, medical review, submission)",
+        "CDSCO and ICH E2B compliance requirements for electronic submission",
+        "PV database (Argus/ArisG) and E2B gateway capability assessment",
+        "AI medical coding tool options and validation requirements"
       ]
     }
   ],

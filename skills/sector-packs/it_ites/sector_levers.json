@@ -83,6 +83,52 @@
         "Gartner — IT Key Metrics Data: Software Asset Management 2024 (gartner.com/en/information-technology/insights/it-budget) — licence utilisation and right-sizing savings 12-30%",
         "FinOps Foundation — State of FinOps 2025 (data.finops.org/2025-report/) — software licence cost management benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Deploy SAM (Software Asset Management) tool to scan all endpoints and servers; reconcile entitlements vs active usage over 90 days",
+          "owner_role": "IT Procurement / SAM",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Identify over-licensed users (named users with zero usage in 90 days) and tier mismatches (full licence where reader/viewer suffices)",
+          "owner_role": "SAM / IT Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Reclaim over-licensed seats before next renewal; right-size tier mix in renewal negotiation with vendor (Microsoft, Oracle, SAP, Salesforce)",
+          "owner_role": "IT Procurement",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Implement continuous licence monitoring; gate new seat requests through SAM tool; track licence spend per head monthly",
+          "owner_role": "IT Finance / FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Software licence spend per employee >₹80,000/year with >30% of seats showing zero or minimal usage in past 90 days",
+          "evidence_source": "sam_tool_report",
+          "confirms": "Rightsizing will yield direct licence spend reduction at next renewal"
+        },
+        {
+          "signal": "Full-access licences issued to users who only consume reports or dashboards, where cheaper viewer tier exists",
+          "evidence_source": "licence_entitlement_vs_usage",
+          "confirms": "Tier rationalisation will reduce per-seat cost without impacting productivity"
+        },
+        {
+          "signal": "Multi-year licence agreements expiring within 12 months with no renegotiation underway",
+          "evidence_source": "contract_register",
+          "confirms": "Renewal window is open for rightsizing negotiation"
+        }
+      ],
+      "required_data_fields": [
+        "Licence entitlement data by software title, user, and tier",
+        "Active usage data (logins, feature usage) by user over 90 days",
+        "Contract renewal dates and pricing tiers by vendor",
+        "Headcount forecast for planning period",
+        "Vendor audit exposure and licence true-up obligations"
       ]
     },
     {
@@ -123,6 +169,52 @@
         "FinOps Foundation — State of FinOps 2025 (data.finops.org/2025-report/) — cloud cost optimisation: reserved instances and savings plans 18-40%",
         "NASSCOM — Cloud Adoption in India Report 2024 (nasscom.in/knowledge-center/publications) — cloud spend benchmarks for Indian IT/ITES",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Enable cloud cost discovery: tag all resources by BU, project, and environment; implement cost allocation dashboard by AWS/Azure/GCP billing account",
+          "owner_role": "FinOps / Cloud Engineering",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Identify top-5 cost drivers: idle/underutilised resources, oversized instances, unattached volumes, and unused reserved instances",
+          "owner_role": "FinOps",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Right-size running instances and migrate to modern SKUs; purchase reserved instances or savings plans for steady-state workloads",
+          "owner_role": "Cloud Engineering / IT Finance",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Implement automated shutdown for non-prod environments outside business hours; enforce budget alerts and FinOps governance monthly",
+          "owner_role": "FinOps / IT Finance",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Cloud resources with CPU/memory utilisation <20% on average representing >30% of total cloud spend",
+          "evidence_source": "cloud_monitoring_data",
+          "confirms": "Rightsizing will reduce cloud spend without impacting workload performance"
+        },
+        {
+          "signal": "On-demand pricing paid for >60% of steady-state workloads (no reserved instances or savings plans)",
+          "evidence_source": "cloud_billing_report",
+          "confirms": "Commitment purchase will reduce on-demand premium by 30-40%"
+        },
+        {
+          "signal": "Non-production environments running 24/7 with weekend and off-hours utilisation <10%",
+          "evidence_source": "cloud_usage_data",
+          "confirms": "Automated shutdown will reduce non-prod cloud spend by 40-60%"
+        }
+      ],
+      "required_data_fields": [
+        "Cloud billing data by account, service, and resource (3 months)",
+        "Resource utilisation data (CPU, memory, storage) by instance",
+        "Tagging hygiene report and resource inventory",
+        "Reserved instance and savings plan coverage and utilisation",
+        "Non-production environment inventory and usage pattern"
       ]
     },
     {
@@ -162,6 +254,52 @@
         "NASSCOM — Annual Report 2024 (nasscom.in/knowledge-center/publications) — subcontracting and delivery cost structure in India IT services",
         "Everest Group — IT Services Pricing Trends 2024 (everestgrp.com) — rate card benchmarks for India-based delivery",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Classify all subcontractor spend: T&M vs fixed-price, offshore vs onshore, and vendor tier; calculate effective bill rate and margin by vendor",
+          "owner_role": "Delivery Head / Procurement",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Assess Statement of Work quality: identify T&M contracts that should be fixed-price given defined scope; convert and enforce milestone billing",
+          "owner_role": "Programme Management / Legal",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Rationalise vendor panel: concentrate volume in top-5 strategic partners for improved pricing and SLA leverage; exit tail vendors",
+          "owner_role": "Vendor Management / Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track subcontractor spend as % of project cost, effective bill rate by skill category, and vendor SLA compliance monthly",
+          "owner_role": "FP&A / Delivery",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Subcontractor spend >35% of total project cost with >60% on T&M basis for work with defined scope",
+          "evidence_source": "subcontractor_spend_data",
+          "confirms": "Fixed-price conversion and bill-rate renegotiation will reduce subcontractor cost"
+        },
+        {
+          "signal": "Effective bill rate for subcontractor roles 20% above internal FTE equivalent cost for similar skills",
+          "evidence_source": "cost_comparison_analysis",
+          "confirms": "Renegotiation or in-house replacement will reduce cost per skilled FTE"
+        },
+        {
+          "signal": "Vendor panel >30 subcontractors with bottom-half contributing <10% of project delivery",
+          "evidence_source": "vendor_performance_data",
+          "confirms": "Consolidation will improve pricing leverage and reduce vendor management overhead"
+        }
+      ],
+      "required_data_fields": [
+        "Subcontractor spend by vendor, project, and contract type (T&M vs fixed-price)",
+        "Bill rate by vendor and skill category vs internal FTE cost equivalent",
+        "Vendor performance data (SLA compliance, defect rate, on-time delivery)",
+        "Statement of Work quality assessment by contract",
+        "Internal bench vs subcontractor skills overlap analysis"
       ]
     },
     {
@@ -202,6 +340,52 @@
         "McKinsey & Company — Demystifying the Real Cost of Technical Debt (mckinsey.com/capabilities/mckinsey-digital) — tech debt productivity drag and remediation ROI",
         "Gartner — Technical Debt Management 2024 (gartner.com) — BAU cost reduction from tech debt reduction 15-40%",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Conduct tech debt inventory: assess each system for code quality (cyclomatic complexity, test coverage), operational risk, and business cost (incident rate, manual workarounds)",
+          "owner_role": "Engineering Leadership / Architecture",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Prioritise debt by business impact × remediation effort matrix; build business case for top-5 debt items using incident cost and velocity impact data",
+          "owner_role": "CTO / FP&A",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Allocate dedicated tech debt sprint capacity (20% of engineering velocity); execute refactoring roadmap with measurable quality gates",
+          "owner_role": "Engineering / Product",
+          "duration_weeks": 16
+        },
+        {
+          "step": "Track DORA metrics (deployment frequency, lead time, change failure rate, MTTR) and incident cost monthly; report velocity improvement to CTO",
+          "owner_role": "Engineering / FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Change failure rate >15% or MTTR >4 hours for production incidents on core systems indicating high tech debt",
+          "evidence_source": "dora_metrics",
+          "confirms": "Tech debt payoff will reduce incident frequency and recovery cost"
+        },
+        {
+          "signal": "Engineering velocity declining or stagnating despite headcount growth due to maintenance overhead",
+          "evidence_source": "delivery_metrics",
+          "confirms": "Tech debt is consuming engineering capacity at the expense of new capability"
+        },
+        {
+          "signal": "Incident cost (engineering time + business impact) >5% of total engineering budget annually",
+          "evidence_source": "incident_management_data",
+          "confirms": "Tech debt reduction ROI is positive on 18-month payback horizon"
+        }
+      ],
+      "required_data_fields": [
+        "Tech debt inventory by system with business impact and remediation effort estimates",
+        "DORA metrics history (deployment frequency, lead time, change failure rate, MTTR)",
+        "Incident log with engineering resolution time and business cost",
+        "Engineering velocity trend (story points delivered per sprint over 12 months)",
+        "System architecture assessment for highest-debt components"
       ]
     },
     {
@@ -242,6 +426,52 @@
         "Gartner — Market Guide for SaaS Management Platforms 2024 (gartner.com) — shadow IT elimination and SaaS consolidation savings",
         "FinOps Foundation — State of FinOps 2025 (data.finops.org/2025-report/) — platform rationalisation benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Build application portfolio inventory: map all active applications to business function, technology, cost, and user base; flag functional duplicates",
+          "owner_role": "IT Architecture / SAM",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Apply rationalization criteria (keep, consolidate, migrate, retire) to each application; develop migration sequencing based on dependencies and risk",
+          "owner_role": "CTO / Enterprise Architecture",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Execute migration in waves starting with lowest-risk applications; decommission retired systems and reclaim licences",
+          "owner_role": "IT Delivery / Programme",
+          "duration_weeks": 16
+        },
+        {
+          "step": "Track application count, annual maintenance cost per app, and licence spend reduction monthly",
+          "owner_role": "IT Finance / FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Application portfolio >200 applications with >30% estimated as candidates for consolidation or retirement",
+          "evidence_source": "application_portfolio_assessment",
+          "confirms": "Rationalization will reduce maintenance cost and complexity"
+        },
+        {
+          "signal": "Annual maintenance and support cost for legacy applications >40% of total IT spend",
+          "evidence_source": "it_cost_breakdown",
+          "confirms": "Migrating off legacy will redirect spend to value-adding capability"
+        },
+        {
+          "signal": "Functional duplicate applications in >3 business domains (e.g., multiple CRMs, 2+ ERP instances)",
+          "evidence_source": "application_landscape_review",
+          "confirms": "Consolidation to single platform will reduce per-function technology cost"
+        }
+      ],
+      "required_data_fields": [
+        "Application inventory with business owner, user count, annual cost, and age",
+        "Functional overlap assessment (capability map vs application coverage)",
+        "Technical debt and supportability rating by application",
+        "Migration complexity and estimated effort by application",
+        "Contract terms and licence obligations for applications under consideration"
       ]
     },
     {
@@ -282,6 +512,52 @@
         "WEF — Future of Jobs Report 2025 (weforum.org/publications/the-future-of-jobs-report-2025/) — AI productivity gains in technology roles",
         "McKinsey & Company — The Economic Potential of Generative AI (mckinsey.com/capabilities/mckinsey-digital) — 10-30% developer productivity improvement from AI coding assistants",
         "NASSCOM — Generative AI Readiness in Indian IT 2024 (nasscom.in/knowledge-center/publications)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Identify top-5 GenAI use cases by engineering function: code generation (Copilot), test automation, documentation, code review, and incident summarisation",
+          "owner_role": "Engineering Leadership / Innovation",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Pilot with volunteer engineering squads; measure code acceptance rate, PR cycle time, and defect density vs non-pilot baseline",
+          "owner_role": "Engineering / Pilot Teams",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Scale proven use cases organisation-wide: standardise tool choice, establish prompt library, and integrate into IDE and CI/CD pipeline",
+          "owner_role": "CTO / DevOps",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track engineering throughput (features delivered per sprint), time-to-merge, and GenAI tool adoption rate monthly",
+          "owner_role": "FP&A / Engineering",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Developer time on boilerplate code, test writing, and documentation >40% of sprint capacity",
+          "evidence_source": "engineering_time_allocation_survey",
+          "confirms": "GenAI code assistance will free developer time for higher-value engineering work"
+        },
+        {
+          "signal": "Engineering throughput (features per sprint) flat or declining despite headcount growth",
+          "evidence_source": "delivery_metrics",
+          "confirms": "Productivity augmentation tool will improve output per engineer"
+        },
+        {
+          "signal": "Existing GenAI tool licences (Copilot, etc.) paid but active usage <40% of eligible developers",
+          "evidence_source": "tool_usage_analytics",
+          "confirms": "Driving adoption of existing tools will improve ROI without incremental cost"
+        }
+      ],
+      "required_data_fields": [
+        "Engineering time allocation by activity type (feature dev, testing, docs, review, bugs)",
+        "GenAI tool adoption data (active users vs licences) by tool and team",
+        "Engineering throughput metrics (velocity, PR cycle time, deployment frequency)",
+        "Test coverage and defect density baseline data",
+        "Cost per engineer (fully loaded) by band and location"
       ]
     },
     {
@@ -322,6 +598,52 @@
         "JLL India — India Office Market Report 2024 (jll.com/en-in/research/india-office-market-report) — office space utilisation rates post-pandemic",
         "NASSCOM — IT/ITES Work-from-Home Policy Benchmarks 2024 (nasscom.in/knowledge-center/publications) — remote work adoption in Indian IT sector",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Measure actual office utilisation using badge data, Wi-Fi heatmap, or booking system; establish utilisation baseline by building and floor",
+          "owner_role": "Facilities / HR",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Define remote-first policy aligned with engineering productivity data; set target seat-to-employee ratio (1:1.5 for hybrid, 1:2 for remote-first)",
+          "owner_role": "CHRO / CTO",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Identify consolidation and exit opportunities at next lease break or expiry; negotiate surrender or sublease for excess space",
+          "owner_role": "Real Estate / Legal / Finance",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Track cost-per-seat, utilisation rate, and real estate cost as % of payroll quarterly",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Average office utilisation <55% of peak capacity post-implementation of hybrid work policy",
+          "evidence_source": "occupancy_sensing_data",
+          "confirms": "Space consolidation and sublease will reduce real estate cost"
+        },
+        {
+          "signal": "Real estate cost >8% of total operating cost vs IT/ITES peer benchmark of <5% in remote-first models",
+          "evidence_source": "cost_breakdown",
+          "confirms": "Real estate rationalisation will materially improve margin"
+        },
+        {
+          "signal": "Engineering team productivity (output per developer) equal or higher for remote vs office developers in prior assessment",
+          "evidence_source": "productivity_analysis",
+          "confirms": "Remote-first model will not compromise engineering output while reducing facility cost"
+        }
+      ],
+      "required_data_fields": [
+        "Office occupancy data by floor and building (badge, Wi-Fi, booking system)",
+        "Engineering team distribution (office vs remote vs hybrid) by headcount",
+        "Real estate cost per sq ft and per seat by location",
+        "Lease terms, break-clause dates, and sublease market rates",
+        "Engineering productivity data by location and work model"
       ]
     },
     {
@@ -361,6 +683,52 @@
       "industry_sources": [
         "Gartner — Build vs. Buy Decision Framework 2024 (gartner.com/en/information-technology) — TCO analysis for build vs. buy in enterprise software",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Inventory all custom-built applications: business function, cost to build, annual maintenance, and strategic differentiation assessment",
+          "owner_role": "CTO / Product Management",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Apply build/buy/borrow decision framework: evaluate commercial alternatives for non-differentiating capabilities; calculate TCO over 5 years",
+          "owner_role": "Architecture / Procurement",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Vendor market scan for shortlisted 'buy' candidates; negotiate proof-of-concept or pilot agreements before full commitment",
+          "owner_role": "IT Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Execute migration for validated 'buy' decisions; decommission custom build; track engineering capacity released and TCO savings",
+          "owner_role": "IT Delivery / FP&A",
+          "duration_weeks": 12
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Engineering teams spending >30% of capacity on maintaining non-differentiating internal tools vs building customer-facing features",
+          "evidence_source": "engineering_capacity_allocation",
+          "confirms": "Replacing with commercial alternatives will free engineering capacity for value-creation"
+        },
+        {
+          "signal": "Custom-built capability available as proven SaaS at <50% of annual maintenance cost of internal equivalent",
+          "evidence_source": "market_scan_tco_analysis",
+          "confirms": "Buy decision will reduce cost and shift maintenance risk to vendor"
+        },
+        {
+          "signal": "Custom application defect rate or downtime significantly above commercial equivalent benchmark",
+          "evidence_source": "incident_and_quality_data",
+          "confirms": "Commercial alternative will improve quality alongside cost reduction"
+        }
+      ],
+      "required_data_fields": [
+        "Custom application inventory with annual maintenance cost and engineering headcount",
+        "Business capability map with strategic differentiation classification",
+        "Commercial vendor alternatives and indicative pricing for shortlisted capabilities",
+        "5-year TCO comparison model for build vs buy by application",
+        "Engineering capacity allocation by application and feature type"
       ]
     },
     {
@@ -401,6 +769,52 @@
         "NASSCOM — DevOps Maturity in India IT 2024 (nasscom.in/knowledge-center/publications) — CI/CD automation adoption benchmarks",
         "Gartner — DevOps Platform Market Guide 2024 (gartner.com) — deployment frequency and cost reduction benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Baseline DORA metrics and SDLC process: measure lead time, deployment frequency, change failure rate, and MTTR for all production services",
+          "owner_role": "Engineering / DevOps",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Implement CI/CD pipeline automation for top-5 critical services: automated testing, container build, and deployment gates",
+          "owner_role": "DevOps / Platform Engineering",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Automate infrastructure provisioning (IaC using Terraform/Pulumi) and environment management; standardise on container orchestration (Kubernetes)",
+          "owner_role": "Platform Engineering",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track DORA metrics monthly; set targets for deployment frequency (daily) and change failure rate (<5%); reward teams against metric improvement",
+          "owner_role": "CTO / FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Deployment frequency <1/week for production services where business needs faster release cycle",
+          "evidence_source": "dora_metrics",
+          "confirms": "CI/CD pipeline automation will dramatically increase deployment frequency"
+        },
+        {
+          "signal": "Lead time from code commit to production >2 weeks due to manual testing and approval gates",
+          "evidence_source": "sdlc_cycle_time_data",
+          "confirms": "Pipeline automation will reduce lead time and engineering opportunity cost"
+        },
+        {
+          "signal": "Infrastructure provisioning takes >2 days due to manual ticketing and configuration",
+          "evidence_source": "infrastructure_request_log",
+          "confirms": "IaC and automated provisioning will reduce developer waiting time and improve throughput"
+        }
+      ],
+      "required_data_fields": [
+        "DORA metrics baseline (deployment frequency, lead time, change failure rate, MTTR)",
+        "Current CI/CD pipeline maturity assessment by service",
+        "Infrastructure provisioning time and method (manual vs automated) by environment",
+        "Engineering time allocation: feature work vs operational and deployment overhead",
+        "Cloud and container platform capabilities and current adoption level"
       ]
     }
   ],

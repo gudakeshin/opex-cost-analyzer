@@ -98,6 +98,8 @@ def run_core_pipeline(
         spend_profile=profile,
         headcount=float(headcount or 0.0),
         annual_revenue=annual_revenue,
+        document_context=context,
+        spend_lines=lines,
     )
     bridge = engine.value_bridge_calculator(benchmarks, internal, heuristics, profile["total_spend"], savings_model=savings_model)
     validation = engine.data_validator(bridge)

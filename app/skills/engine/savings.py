@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from app.models import NormalizedSpendLine
 
 from ._loaders import _get_model_params
+from .lever_rules import build_line_flags, build_signal_corpus
 from .profiler import resolve_eligible_levers
 
 
@@ -61,6 +62,8 @@ def savings_modeler(
     headcount: float = 0.0,
     annual_revenue: float = 0.0,
     tco_inputs: Optional[Dict[str, Dict[str, float]]] = None,
+    document_context: Dict[str, Any] | None = None,
+    spend_lines: List[NormalizedSpendLine] | None = None,
 ) -> Dict[str, Any]:
     params = _get_model_params()
     defaults = params.get("defaults", {})
@@ -77,12 +80,17 @@ def savings_modeler(
     root_by_cat = {x["category_id"]: x for x in root_cause_outputs.get("root_cause_findings", [])}
 
     root_cause_list = root_cause_outputs.get("root_cause_findings", [])
+    profile = spend_profile or {}
+    signal_corpus = build_signal_corpus(profile, document_context)
+    line_flags = build_line_flags(spend_lines) if spend_lines else None
     eligible_levers = resolve_eligible_levers(
         industry=industry,
-        spend_profile=spend_profile or {},
+        spend_profile=profile,
         headcount=headcount,
         annual_revenue=annual_revenue,
         root_causes=root_cause_list,
+        signal_corpus=signal_corpus,
+        line_flags=line_flags,
     )
     lever_meta_by_id: Dict[str, Dict[str, Any]] = {lv["lever_id"]: lv for lv in reversed(eligible_levers)}
     best_lever_for_category: Dict[str, str] = {}
@@ -223,6 +231,9 @@ def savings_modeler(
             "bounce_back_risk": bounce_back_risk,
             "condition_precedents": condition_precedents,
             "assumptions": condition_precedents,
+            "execution_playbook": lv_meta.get("execution_playbook") or [],
+            "diagnostic_signals": lv_meta.get("diagnostic_signals") or [],
+            "required_data_fields": lv_meta.get("required_data_fields") or [],
             "base_execution_probability": round(float(base_execution_probability), 2),
             "tco_adjusted": tco_adjusted,
             "gross_savings": {"y1": y1, "y2": y2, "y3": y3, "total_3yr": y1 + y2 + y3},

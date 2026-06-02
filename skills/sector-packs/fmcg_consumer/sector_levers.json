@@ -81,6 +81,52 @@
         "FICCI — FMCG India Report 2024 (ficci.in/sector/61/) — raw material cost as % of FMCG revenue and procurement benchmarks",
         "McKinsey & Company — Unlocking Value in FMCG Supply Chains (mckinsey.com/industries/consumer-packaged-goods) — COGS reduction levers 5-15%",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Conduct BOM review for top-20 SKUs by revenue: map every material input to specification, supplier, price, and YoY cost trend",
+          "owner_role": "Supply Chain / Procurement",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Build should-cost models for primary material categories using commodity indices and benchmark specs; identify formulation trade-offs",
+          "owner_role": "R&D / Strategic Sourcing",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Qualify 1–2 alternative suppliers per key material; run competitive RFQ with incumbent vs alternative to establish negotiation tension",
+          "owner_role": "Procurement / Supplier Quality",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Lock 12–18 month pricing agreements with indexed reopeners; implement material cost variance reporting in monthly S&OP",
+          "owner_role": "Procurement / FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Key material cost as % of net sales >45% vs category benchmark indicating formulation or procurement gap",
+          "evidence_source": "cogs_breakdown",
+          "confirms": "Direct materials savings pool is material"
+        },
+        {
+          "signal": "Single-source supply dependency for >30% of material value creating pricing leverage for supplier",
+          "evidence_source": "supply_risk_assessment",
+          "confirms": "Dual-sourcing will restore competitive tension and reduce cost"
+        },
+        {
+          "signal": "Material price variance unfavourable >5% for ≥3 consecutive quarters vs plan",
+          "evidence_source": "material_price_variance_report",
+          "confirms": "Procurement strategy or hedging requires reset"
+        }
+      ],
+      "required_data_fields": [
+        "Bill of materials for top-20 revenue SKUs with quantity per unit and unit prices",
+        "Material cost trend data (24 months) by input category",
+        "Supplier concentration data (number of qualified sources per key material)",
+        "Commodity price indices for key materials",
+        "Formulation specification constraints from R&D"
       ]
     },
     {
@@ -121,6 +167,52 @@
         "FICCI — FMCG India Industry Survey 2024 (ficci.in) — SKU complexity and tail rationalization data",
         "McKinsey & Company — SKU Rationalization in CPG (mckinsey.com/industries/consumer-packaged-goods) — 10-20% SKU reduction improving margins 2-4%",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Build SKU-level P&L for all active SKUs: net revenue, variable COGS, and contribution margin; flag SKUs with margin <5% or volume <5 units/day",
+          "owner_role": "FP&A / Category Management",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Validate rationalization candidates against consumer need (cover unique consumption occasion) and retailer requirements before delisting",
+          "owner_role": "Category / Sales / Marketing",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Develop delisting plan with retailer communication, inventory liquidation, and production run-out schedule",
+          "owner_role": "Sales / Supply Chain",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track manufacturing complexity reduction (changeover time, run length), working capital improvement, and margin uplift post-rationalisation",
+          "owner_role": "FP&A / Operations",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "SKU count in category >2× nearest competitor with ≥20% of SKUs contributing <2% of category revenue",
+          "evidence_source": "sku_revenue_report",
+          "confirms": "Long-tail SKUs are adding complexity cost without proportionate revenue contribution"
+        },
+        {
+          "signal": "Average production run length <50% of minimum economic run due to SKU proliferation-driven changeovers",
+          "evidence_source": "manufacturing_schedule_data",
+          "confirms": "SKU rationalisation will improve manufacturing efficiency"
+        },
+        {
+          "signal": "New SKU launch success rate <40% (measured 12 months post-launch vs plan), indicating proliferation is not creating value",
+          "evidence_source": "innovation_tracker",
+          "confirms": "Focused portfolio strategy will improve ROII"
+        }
+      ],
+      "required_data_fields": [
+        "SKU-level net revenue, volume, and contribution margin (12 months)",
+        "Manufacturing setup/changeover data by SKU and line",
+        "Retailer ranging and space allocation by SKU",
+        "Consumer research on SKU redundancy within portfolio",
+        "Inventory level and days-on-hand by SKU"
       ]
     },
     {
@@ -159,6 +251,52 @@
       "industry_sources": [
         "Nielsen — India FMCG Market Pulse 2024 (nielsen.com/insights/) — price-pack architecture and value tier benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Build price-value waterfall by SKU and channel: map RSP → distributor margin → trade promotion → net realisation → contribution",
+          "owner_role": "Revenue Management / FP&A",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Identify price-pack architecture gaps vs competition; model consumer price elasticity by segment and channel",
+          "owner_role": "Revenue Management / Marketing",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Redesign pricing architecture with clear price-pack ladders; eliminate value-destructive promotions with <80% efficiency",
+          "owner_role": "Revenue Management / Sales",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Implement pricing governance: price realisation dashboard, promotion approval threshold, and monthly price-mix bridge",
+          "owner_role": "FP&A / Revenue Management",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Net price realisation declining despite list-price increases due to growing trade promotion as % of gross sales",
+          "evidence_source": "revenue_waterfall",
+          "confirms": "Promotion efficiency and architecture review will improve net price"
+        },
+        {
+          "signal": "Promotion return on investment <80 paise per rupee of investment for >30% of trade promotions",
+          "evidence_source": "trade_promotion_analytics",
+          "confirms": "Eliminating/redesigning low-ROI promotions will improve contribution"
+        },
+        {
+          "signal": "Price gaps vs key competitors narrowing in premium segments where brand premiumisation is the strategy",
+          "evidence_source": "market_pricing_data",
+          "confirms": "Pricing architecture adjustment will protect premiumisation strategy"
+        }
+      ],
+      "required_data_fields": [
+        "SKU-level gross sales, trade promotion, and net sales waterfall by channel",
+        "Promotion ROI data by promotion type and channel",
+        "Competitor RSP and price-pack architecture by segment",
+        "Consumer price sensitivity research by segment",
+        "Channel margin structure (distributor, retailer) by format"
       ]
     },
     {
@@ -197,6 +335,52 @@
       "industry_sources": [
         "FICCI — Trade and Distribution Policy Report 2024 (ficci.in) — GTM cost benchmarks for FMCG India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit current trade terms by channel and distributor class: primary discount, secondary schemes, credit period, and total trade spend %",
+          "owner_role": "Sales Finance / FP&A",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Benchmark trade terms against category norms and key account negotiation data; build terms simplification model",
+          "owner_role": "Key Accounts / Sales Finance",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Redesign trade terms with fewer schemes, performance-linked payouts, and shorter credit periods; pilot with mid-tier distributors first",
+          "owner_role": "National Sales Head / Finance",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Roll out new terms structure; track trade spend as % of net sales, DSO, and distributor profitability quarterly",
+          "owner_role": "FP&A / Sales Operations",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Total trade spend (primary + secondary schemes) >12% of gross sales vs FMCG benchmark of <10%",
+          "evidence_source": "trade_spend_report",
+          "confirms": "Trade terms rationalisation will improve net realisation"
+        },
+        {
+          "signal": "Number of active trade schemes >20 per quarter creating complexity and leakage",
+          "evidence_source": "scheme_master",
+          "confirms": "Scheme simplification will reduce administrative cost and misclassification risk"
+        },
+        {
+          "signal": "Distributor credit period >45 days with receivables overdue >30 days representing >10% of outstanding",
+          "evidence_source": "accounts_receivable_aging",
+          "confirms": "Credit term tightening will improve working capital and bad-debt risk"
+        }
+      ],
+      "required_data_fields": [
+        "Trade spend breakdown by channel and scheme type (primary/secondary)",
+        "Distributor margin structure and credit terms by class of trade",
+        "Days Sales Outstanding (DSO) by channel and key account",
+        "Scheme ROI data (sales lift vs scheme cost)",
+        "Competitor trade terms benchmark (qualitative/channel insights)"
       ]
     },
     {
@@ -237,6 +421,52 @@
         "CRISIL — India Logistics and Warehousing Report 2024 (crisil.com) — warehouse automation adoption and cost savings benchmarks",
         "McKinsey & Company — Automation in Warehouse Operations (mckinsey.com/capabilities/operations) — 15-30% labour cost reduction through automation",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map current warehouse operations: inbound, storage, pick-pack, and outbound; measure labour hours, error rate, and cost per case picked",
+          "owner_role": "Supply Chain / Warehouse Ops",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Build automation ROI model (ASRS, conveyor, sorting, WMS) based on volume, SKU count, and labour cost; compare against greenfield vs retrofit",
+          "owner_role": "Supply Chain Strategy / Finance",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Select technology vendor; execute WMS upgrade and automation equipment deployment in waves starting with highest-volume fulfilment centre",
+          "owner_role": "Supply Chain / IT / Projects",
+          "duration_weeks": 16
+        },
+        {
+          "step": "Track throughput per hour, error rate (pick accuracy), and cost per case picked post-automation; rebaseline annually",
+          "owner_role": "FP&A / Operations",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Labour cost as % of total warehouse cost >50% with cost per case picked >₹8 vs automated benchmark <₹4",
+          "evidence_source": "warehouse_cost_report",
+          "confirms": "Automation ROI is positive on 3-year DCF basis"
+        },
+        {
+          "signal": "Pick error rate >0.5% generating downstream returns and customer service cost",
+          "evidence_source": "warehouse_quality_report",
+          "confirms": "Automation will reduce error-related cost and improve service level"
+        },
+        {
+          "signal": "Warehouse capacity utilisation >90% seasonally constraining fulfilment throughput",
+          "evidence_source": "warehouse_capacity_report",
+          "confirms": "Automation and space optimisation will extend throughput without additional sq ft"
+        }
+      ],
+      "required_data_fields": [
+        "Warehouse labour cost and FTE count by facility and operation type",
+        "Throughput data: orders per day, cases per picker-hour, and peak vs average volume",
+        "Pick error and returns rate by SKU category",
+        "Warehouse footprint and lease terms by facility",
+        "Automation technology vendor options and capex estimates"
       ]
     },
     {
@@ -277,6 +507,52 @@
         "DPIIT — Logistics Ease Across Different States (LEADS) Report 2023 (dpiit.gov.in) — modal mix and freight cost benchmarks India",
         "CRISIL — India Logistics Report 2024 (crisil.com) — road vs. rail freight cost differential",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Baseline freight spend by mode (road, rail, air, sea) and lane; calculate cost per tonne-km and transit time by mode",
+          "owner_role": "Logistics / Procurement",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Model modal shift feasibility by lane: rail vs road for >800 km lanes, coastal shipping for port-to-port, air-to-surface for non-urgent loads",
+          "owner_role": "Supply Chain / Finance",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Negotiate long-term contracts with rail (CONCOR/private) and coastal shipping operators; optimise carrier mix per lane",
+          "owner_role": "Logistics Procurement",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track freight cost per tonne-km, modal split, transit time, and OTIF by lane monthly",
+          "owner_role": "FP&A / Logistics",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Air or premium express freight >10% of total freight spend for non-time-sensitive loads",
+          "evidence_source": "freight_spend_by_mode",
+          "confirms": "Mode shift to surface/rail will reduce freight cost without impacting service"
+        },
+        {
+          "signal": "Road freight on lanes >800 km where rail alternative exists and service level is acceptable",
+          "evidence_source": "lane_analysis",
+          "confirms": "Rail or coastal modal shift will reduce cost per tonne-km by 30-50%"
+        },
+        {
+          "signal": "Freight cost as % of net sales trending upward for ≥3 consecutive quarters",
+          "evidence_source": "freight_cost_trend",
+          "confirms": "Structural review of logistics network and mode mix is required"
+        }
+      ],
+      "required_data_fields": [
+        "Freight spend by mode, lane, and carrier (12 months)",
+        "Volume (tonnes) and transit time by lane and mode",
+        "Rail/coastal shipping network connectivity to key origin-destination pairs",
+        "Carrier rate cards and contract terms by mode",
+        "Inventory holding cost and service-level trade-off data"
       ]
     },
     {
@@ -316,6 +592,52 @@
       "industry_sources": [
         "RAI — India Retail Report 2024 (rai.net.in/) — private label penetration and margin benchmarks for Indian organized retail",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map category white space: identify segments where private label penetration <10% and competitor PL or NBD is gaining share",
+          "owner_role": "Category Management / Marketing",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Qualify manufacturers for PL production: supplier audit, GMP compliance, formulation capability, and exclusivity terms",
+          "owner_role": "Procurement / Quality",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Launch PL range in pilot stores (>20 stores) with consumer testing panel; track consumer acceptance vs brand alternative",
+          "owner_role": "Category / Supply Chain",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Scale to full chain; track PL penetration, category margin uplift, and branded manufacturer response",
+          "owner_role": "Category / FP&A",
+          "duration_weeks": 6
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category gross margin <25% with private label equivalent achievable at >35% margin on same shelf",
+          "evidence_source": "category_margin_report",
+          "confirms": "Private label will structurally improve category margin mix"
+        },
+        {
+          "signal": "Private label penetration in category <15% vs modern trade benchmark of >25% in comparable markets",
+          "evidence_source": "category_benchmarking",
+          "confirms": "PL expansion headroom is material"
+        },
+        {
+          "signal": "Consumer willingness to trade down confirmed by market research for this category",
+          "evidence_source": "consumer_research",
+          "confirms": "PL launch risk is manageable"
+        }
+      ],
+      "required_data_fields": [
+        "Category margin data by brand and pack size",
+        "Private label penetration by category and store format",
+        "Consumer research on PL acceptance by category",
+        "Manufacturer shortlist with capacity and compliance data",
+        "Competitor PL pricing and ranging data"
       ]
     },
     {
@@ -354,6 +676,52 @@
       "industry_sources": [
         "Gartner — Supply Chain Top 25 2024 (gartner.com/en/supply-chain/insights/supply-chain-top-25-research) — demand planning accuracy and inventory reduction benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Measure current forecast accuracy (MAPE, bias) by SKU and channel vs benchmark; identify root causes of forecast error",
+          "owner_role": "Supply Chain / Demand Planning",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Implement statistical forecasting model (ARIMA/ML) for top-80% revenue SKUs; integrate sell-in and sell-out data from key retailers",
+          "owner_role": "Supply Chain IT / Analytics",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Redesign S&OP process: weekly demand review with commercial inputs, 13-week rolling forecast, and agreed consensus number",
+          "owner_role": "Supply Chain / Sales / Finance",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Track MAPE improvement, excess inventory reduction, and OTIF; reward commercial team on forecast accuracy alongside volume",
+          "owner_role": "FP&A / Supply Chain",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Weighted MAPE >30% for top-50 SKUs indicating significant forecast error and resulting inventory/service trade-off",
+          "evidence_source": "demand_planning_metrics",
+          "confirms": "Improved forecasting will reduce safety stock requirement and excess inventory write-off"
+        },
+        {
+          "signal": "Excess and obsolete inventory write-off >1% of net sales annually due to overforecasting",
+          "evidence_source": "inventory_write_off_data",
+          "confirms": "Forecast improvement will directly reduce write-off cost"
+        },
+        {
+          "signal": "OTIF (On Time In Full) <95% due to demand-supply mismatch driven by poor forecast accuracy",
+          "evidence_source": "customer_service_data",
+          "confirms": "Better planning will improve service level without incremental inventory"
+        }
+      ],
+      "required_data_fields": [
+        "SKU-level forecast vs actual data (12 months) with MAPE and bias calculation",
+        "Excess and obsolete inventory write-off by SKU and cause",
+        "Sell-out data from key retail accounts or Nielsen/IRI",
+        "S&OP meeting cadence and consensus forecast process description",
+        "Safety stock policy and inventory days-on-hand by SKU"
       ]
     },
     {
@@ -393,6 +761,52 @@
       "industry_sources": [
         "Nielsen — Assortment Optimisation in Retail 2024 (nielsen.com/insights/) — tail elimination and shelf productivity benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Build planogram analysis for top-20% stores by revenue: map space allocation vs space-to-sales ratio by SKU and category",
+          "owner_role": "Category Management / Sales",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Identify ranging inefficiencies: under-ranged high-demand SKUs and over-spaced slow-movers; model impact of rebalancing",
+          "owner_role": "Category / Supply Chain",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Negotiate category captain agreements with key suppliers for planogram execution support; implement ranging decisions by store format",
+          "owner_role": "Key Accounts / Category",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track sales per sq ft uplift, in-stock rate, and category profitability improvement post-range change",
+          "owner_role": "FP&A / Category",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Sales per sq ft below category benchmark for ≥30% of floor space allocation",
+          "evidence_source": "planogram_data_and_sales",
+          "confirms": "Space rebalancing will improve category return per sq ft"
+        },
+        {
+          "signal": "Out-of-stock rate >5% for top-50 SKUs while slow-movers occupy allocated space",
+          "evidence_source": "in_stock_monitoring",
+          "confirms": "Assortment rebalancing will improve in-stock rate and consumer basket value"
+        },
+        {
+          "signal": "Category profitability below retailer target for ≥2 consecutive quarters despite adequate sales",
+          "evidence_source": "category_review_data",
+          "confirms": "Assortment mix shift to higher-margin SKUs will improve category profit"
+        }
+      ],
+      "required_data_fields": [
+        "SKU-level sales per sq ft by store format and location",
+        "Planogram space allocation by SKU and category",
+        "In-stock (OSA) monitoring data by SKU and store",
+        "Category margin by SKU and pack size",
+        "Consumer basket composition and cross-purchase data"
       ]
     }
   ],

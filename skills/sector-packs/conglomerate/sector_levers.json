@@ -79,6 +79,52 @@
         "Deloitte — Global Shared Services & Outsourcing Survey 2024 (deloitte.com/content/dam/Deloitte/global/Documents/Tax/dttl-tax-global-shared-services-survey.pdf) — 25-50% cost reduction benchmarks for SSC migration",
         "McKinsey & Company — Transforming the Back Office (mckinsey.com/capabilities/operations/our-insights) — shared services ROI studies across large conglomerates",
         "Hackett Group — World-Class Shared Services Performance 2024 (thehackettgroup.com/research/) — G&A cost reduction through SSC"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Assess process maturity and standardisation readiness across F&A, HR, and IT sub-processes; identify SSC candidate scope by BU",
+          "owner_role": "Group Transformation / FP&A",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Design SSC operating model: location, governance charter, SLA framework, and chargeback model",
+          "owner_role": "SSC Design Lead",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Execute migration in waves—Wave 1 transactional F&A (AP/AR/GL), Wave 2 HR operations, Wave 3 IT service desk",
+          "owner_role": "SSC Operations",
+          "duration_weeks": 16
+        },
+        {
+          "step": "Stabilise SSC with SLA monitoring dashboard; enforce chargeback to business units to drive demand discipline",
+          "owner_role": "SSC Head / FP&A",
+          "duration_weeks": 6
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Duplicate F&A or HR back-office teams across >3 business units performing identical transactional processes",
+          "evidence_source": "org_chart_and_cost_center_data",
+          "confirms": "Consolidation will eliminate redundancy and reduce per-transaction cost"
+        },
+        {
+          "signal": "Cost per transaction (e.g., cost per invoice processed) >2× SSC benchmark for same process",
+          "evidence_source": "process_benchmarking",
+          "confirms": "Scale economies from SSC are material"
+        },
+        {
+          "signal": "Multiple ERP instances or process variants across BUs for the same transactional process",
+          "evidence_source": "it_application_landscape",
+          "confirms": "SSC standardisation will reduce technology and training cost"
+        }
+      ],
+      "required_data_fields": [
+        "F&A, HR, and IT process inventory with volume, FTE, and cost per BU",
+        "Current cost-per-transaction benchmarks by process",
+        "ERP/technology landscape across business units",
+        "Chargeback/recharge model and inter-company billing data",
+        "Location analysis for SSC hub (cost, talent, infrastructure)"
       ]
     },
     {
@@ -119,6 +165,52 @@
         "Hackett Group — World-Class Procurement Performance Study 2024 (thehackettgroup.com/research/) — group procurement aggregation savings 8-20%",
         "CAPS Research — Group Purchasing & Consortium Benchmarks (capsresearch.org/benchmarking/) — spend aggregation leverage benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Aggregate spend data across all group entities; identify categories with >₹10 Cr combined spend and multiple BU buyers",
+          "owner_role": "Group Procurement Lead",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Establish cross-BU category councils for top-5 common categories; align specifications and demand volumes",
+          "owner_role": "Category Council Chairs",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Run group-level RFPs and negotiate master vendor agreements; commit total volume in exchange for tiered pricing",
+          "owner_role": "Strategic Sourcing",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Mandate compliance to group contracts via P2P system controls; track savings by BU monthly",
+          "owner_role": "Group Procurement / IT",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Same vendor supplying multiple group BUs at different unit prices—price spread >15%",
+          "evidence_source": "consolidated_vendor_master",
+          "confirms": "Group aggregation will capture price harmonisation savings"
+        },
+        {
+          "signal": "Category spend above market benchmark across ≥3 BUs with no group-level contract in place",
+          "evidence_source": "spend_profile_consolidated",
+          "confirms": "Group RFP will yield material savings"
+        },
+        {
+          "signal": "Tail vendor count >500 across group for categories with <10 suitable suppliers in market",
+          "evidence_source": "group_vendor_master",
+          "confirms": "Supplier rationalisation will reduce admin and negotiating leverage fragmentation"
+        }
+      ],
+      "required_data_fields": [
+        "Consolidated spend data across all group entities by category and vendor",
+        "Vendor master with prices by BU for common categories",
+        "Existing contracts by BU with term and pricing details",
+        "Demand forecast by category for next 12 months across group",
+        "Specification alignment assessment for common categories"
       ]
     },
     {
@@ -159,6 +251,57 @@
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again) — 10-25% corporate overhead reduction",
         "CII — India Inc. Cost Competitiveness Report 2024 (cii.in) — corporate overhead benchmarks for Indian conglomerates",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Build ZBB baseline for all corporate overhead cost lines; map every FTE and spend item to business-justification owner",
+          "owner_role": "Group FP&A / CFO",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Benchmark corporate overhead as % of group revenue against listed-peer conglomerates; identify gap to top-quartile",
+          "owner_role": "Strategy / FP&A",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Define elimination and reduction targets by function; model span-of-control and layer count vs benchmark",
+          "owner_role": "CHRO / CFO",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Execute reduction plan with HR/legal review; enforce new span and layer guardrails in org design",
+          "owner_role": "HR Operations",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track overhead cost as % of revenue quarterly; gate new corporate hiring against overhead budget",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Corporate overhead as % of group revenue >3% vs peer conglomerate median of <2%",
+          "evidence_source": "peer_benchmarking",
+          "confirms": "Structural overhead reduction opportunity is material"
+        },
+        {
+          "signal": "Corporate headcount growing faster than group revenue over past 3 years",
+          "evidence_source": "hr_headcount_data",
+          "confirms": "Overhead creep requires reset"
+        },
+        {
+          "signal": "Management layers at group HQ >6 from CEO to first-line manager",
+          "evidence_source": "org_chart",
+          "confirms": "De-layering opportunity exists"
+        }
+      ],
+      "required_data_fields": [
+        "Full corporate overhead P&L by function and cost line",
+        "Headcount by function and layer at group HQ",
+        "Peer benchmark: corporate overhead % of revenue for listed conglomerates",
+        "Group revenue and EBITDA trend (3 years)",
+        "Org chart with span-of-control data by function"
       ]
     },
     {
@@ -198,6 +341,52 @@
       "industry_sources": [
         "McKinsey & Company — The Five Traps of Portfolio Rationalisation (mckinsey.com/capabilities/strategy-and-corporate-finance) — divestiture impact on EBITDA margins",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Score all group businesses on two dimensions: strategic fit (core vs adjacency) and financial performance (ROCE vs WACC)",
+          "owner_role": "Group Strategy",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Develop divestiture/exit business cases for bottom-quartile businesses; size value at stake vs holding cost",
+          "owner_role": "Group M&A / FP&A",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Engage advisors and run structured M&A/divestiture process for targeted exits; manage data room and buyer due diligence",
+          "owner_role": "Group M&A",
+          "duration_weeks": 20
+        },
+        {
+          "step": "Redeploy capital from exits to high-ROCE businesses; track holding cost elimination and capital reallocation",
+          "owner_role": "Group CFO / FP&A",
+          "duration_weeks": 8
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "≥2 portfolio businesses with ROCE below WACC for ≥3 consecutive years",
+          "evidence_source": "business_unit_pl_and_roce",
+          "confirms": "Value destruction is ongoing and exit/restructure is economically justified"
+        },
+        {
+          "signal": "Corporate holding cost (HQ allocation + intercompany service charges) >5% of revenue for sub-scale businesses",
+          "evidence_source": "recharge_data",
+          "confirms": "Holding cost drag compounds the underperformance"
+        },
+        {
+          "signal": "Capital tied in non-core businesses restricting investment in strategic growth engines",
+          "evidence_source": "capital_allocation_review",
+          "confirms": "Portfolio rationalisation will free capital for redeployment"
+        }
+      ],
+      "required_data_fields": [
+        "Business-unit P&L, ROCE, and capital employed (3-year history)",
+        "Strategic classification of each business (core / adjacency / non-core)",
+        "WACC by business unit and group level",
+        "Holding cost allocation (HQ charges, intercompany services) by business",
+        "M&A market conditions and indicative valuation for exit candidates"
       ]
     },
     {
@@ -237,6 +426,52 @@
       "industry_sources": [
         "Aon — Global Insurance Market Conditions Report 2024 (aon.com/risk-services/risk-consulting/insurance-market-update.jsp) — group pooling discount benchmarks 10-25%",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Consolidate insurance inventory across all group entities: policy type, sum insured, premium, insurer, and renewal date",
+          "owner_role": "Group Risk / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Design group master policy (Property All Risk, Group Health, D&O, Marine) with combined limits and aggregation clauses",
+          "owner_role": "Insurance Broker / Group Risk",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Run group tender (broker RFP); negotiate combined premium with top-3 insurers using full group exposure data",
+          "owner_role": "Group Procurement / Risk",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Consolidate all entities onto group master policy at renewal; track premium savings and claims ratio annually",
+          "owner_role": "Group Finance / Risk",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Same risk class (e.g., property, group health) insured by different insurers across ≥3 group entities at different rates",
+          "evidence_source": "insurance_inventory",
+          "confirms": "Pooling and combined negotiation will capture volume discount"
+        },
+        {
+          "signal": "Average group health or property insurance premium >10% above market benchmark for same risk profile",
+          "evidence_source": "broker_benchmarking",
+          "confirms": "Market comparison confirms over-payment"
+        },
+        {
+          "signal": "No group-level insurance broker or procurement structure in place",
+          "evidence_source": "insurance_contracts",
+          "confirms": "Centralised procurement will immediately improve negotiating position"
+        }
+      ],
+      "required_data_fields": [
+        "Insurance policy inventory across all group entities (type, sum insured, premium, insurer, renewal)",
+        "Claims history by entity and policy type (3 years)",
+        "Broker arrangement and brokerage fee disclosure",
+        "Benchmark premium rates for equivalent risk profiles from market survey",
+        "Group risk register for key insured assets and liabilities"
       ]
     },
     {
@@ -277,6 +512,52 @@
         "OECD — Transfer Pricing Guidelines for Multinational Enterprises 2022 (oecd.org/tax/transfer-pricing/) — arm's length principle for intercompany pricing",
         "PwC — International Transfer Pricing 2024 (pwc.com/gx/en/services/tax/international-tax/transfer-pricing.html) — transfer pricing optimisation frameworks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map all intercompany transactions by BU pair: type (services, goods, IP royalty), volume, and current transfer price",
+          "owner_role": "Group Tax / Transfer Pricing",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Benchmark each transaction category against arm's-length range using comparable uncontrolled pricing or TNMM method",
+          "owner_role": "Transfer Pricing Advisor",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Redesign TP policy to comply with Ind AS 115 and OECD BEPS Action 13; update intercompany agreements",
+          "owner_role": "Group Tax / Legal",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Update ERP intercompany billing configuration to enforce new TP policy; file Form 3CEB and TP documentation",
+          "owner_role": "Group Finance / IT",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Intercompany service charges as % of BU revenue >8% for non-core shared services",
+          "evidence_source": "intercompany_recharge_data",
+          "confirms": "Repricing or scope reduction will reduce cost at receiving BU"
+        },
+        {
+          "signal": "Transfer prices not reviewed for >2 years despite changes in group structure or market rates",
+          "evidence_source": "tp_documentation",
+          "confirms": "Benchmarking gap creates TP risk and potential over/under-charging"
+        },
+        {
+          "signal": "Tax authority transfer-pricing adjustment or notice in past 3 years",
+          "evidence_source": "tax_compliance_records",
+          "confirms": "TP policy documentation and defence gap is material"
+        }
+      ],
+      "required_data_fields": [
+        "Intercompany transaction register by BU pair (type, volume, price, currency)",
+        "Existing intercompany service agreements and royalty agreements",
+        "Comparable market benchmarks for each service/IP category",
+        "Group structure chart with ownership percentages and jurisdictions",
+        "Prior-year Form 3CEB and TP documentation"
       ]
     },
     {
@@ -317,6 +598,57 @@
         "JLL India — India Office Market Report 2024 (jll.com/en-in/research/india-office-market-report) — office space rationalisation benchmarks",
         "CBRE — India Real Estate Market Outlook 2024 (cbre.com/insights/reports/india-real-estate-market-outlook) — real estate portfolio optimisation",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Build group real estate inventory: location, area (sq ft), occupancy, lease terms, WALE, and annual rent/depreciation",
+          "owner_role": "Group Real Estate / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Run space-utilisation sensing (badge/Wi-Fi data or manual survey) to measure actual vs designed occupancy",
+          "owner_role": "Facilities / HR",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Prioritise lease exits, subleases, and format changes for under-utilised spaces; target WALE reduction in high-cost locations",
+          "owner_role": "Real Estate / Legal",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Execute exits, consolidations, and renegotiations at lease-break or expiry events; implement hybrid-work policy to reduce seat demand",
+          "owner_role": "Group Real Estate",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Track cost-per-seat, utilisation rate, and occupancy cost as % of revenue quarterly",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Office occupancy rate <60% of designed capacity for ≥6 months post-pandemic baseline",
+          "evidence_source": "space_utilisation_sensing",
+          "confirms": "Consolidation and sublease opportunity is material"
+        },
+        {
+          "signal": "Occupancy cost (rent + depreciation) as % of group revenue >2% vs peer benchmark <1.5%",
+          "evidence_source": "gl_by_facility",
+          "confirms": "Real estate cost reduction will materially improve margin"
+        },
+        {
+          "signal": "Lease WALE >4 years in locations where headcount has declined >20% over 3 years",
+          "evidence_source": "lease_register_and_headcount_data",
+          "confirms": "Lease-break or sublease strategy will reduce long-term commitment"
+        }
+      ],
+      "required_data_fields": [
+        "Group real estate inventory (location, area, occupancy rate, lease terms, WALE, annual cost)",
+        "Space utilisation data by floor/building (badge, Wi-Fi, or survey-based)",
+        "Headcount trend by location (3 years)",
+        "Lease contracts with break-clause and expiry dates",
+        "Sublease market rate benchmarks for key locations"
       ]
     },
     {
@@ -357,6 +689,52 @@
         "Atradius — Payment Practices Barometer Asia-Pacific 2024 (atradius.us/knowledge-and-research/reports/payment-practices-barometer-asia-pacific.html) — working capital benchmarks",
         "Hackett Group — Working Capital Management 2024 (thehackettgroup.com/working-capital-management-hackett/) — cash pooling and netting benefits",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map all intra-group cash flows by currency, BU pair, and frequency; calculate gross vs net settlement requirements",
+          "owner_role": "Group Treasury",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Design multi-currency netting centre structure; select netting platform (bank-hosted or in-house); confirm FEMA and RBI compliance",
+          "owner_role": "Group Treasury / Legal / Compliance",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Rationalise banking panel—retain top-tier banks for netting hub; close low-volume subsidiary accounts",
+          "owner_role": "Group Treasury / Banking Relations",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Go live on netting platform; automate settlement runs (weekly/monthly); track bank fee and FX cost reduction",
+          "owner_role": "Treasury Operations",
+          "duration_weeks": 6
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Gross intra-group cross-currency settlements >10× net exposure, indicating large gross-to-net compression opportunity",
+          "evidence_source": "treasury_cash_flow_data",
+          "confirms": "Netting will materially reduce FX conversion and bank fees"
+        },
+        {
+          "signal": "Number of group bank accounts >50 across entities in same country with separate settlement cycles",
+          "evidence_source": "bank_account_register",
+          "confirms": "Account rationalisation will reduce bank fees and treasury overhead"
+        },
+        {
+          "signal": "Bank transaction fees for intra-group transfers >₹1 Cr/year",
+          "evidence_source": "bank_fee_statements",
+          "confirms": "Netting will eliminate most of these fees"
+        }
+      ],
+      "required_data_fields": [
+        "Intra-group cash flow register by BU pair, currency, and frequency (12 months)",
+        "Group bank account register with balances, fees, and transaction volumes",
+        "FEMA and RBI compliance checklist for netting/pooling structures",
+        "FX conversion costs by currency pair and BU",
+        "Netting platform vendor options and integration requirements"
       ]
     }
   ],

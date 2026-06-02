@@ -81,6 +81,52 @@
         "RAI — India Retail Report 2024 (rai.net.in/) — store labour productivity benchmarks (sales per FTE)",
         "McKinsey & Company — Reimagining the Store (mckinsey.com/industries/retail) — labour scheduling optimisation 8-18%",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Conduct time-and-motion study at representative stores: measure labour hours by department (cashier, replenishment, customer service) vs transaction volume",
+          "owner_role": "Operations / HR",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Implement workforce management software with footfall-linked demand forecasting and automated shift generation by store",
+          "owner_role": "IT / HR",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Convert fixed-schedule staff to flexible/part-time model in high-footfall-variance stores; negotiate new employment terms with union where applicable",
+          "owner_role": "HR / Operations",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track labour cost as % of store revenue, transactions per labour hour, and overtime % monthly by store format",
+          "owner_role": "FP&A / Operations",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Labour cost as % of store revenue >12% vs organised retail benchmark of <9% for similar format",
+          "evidence_source": "store_p_and_l",
+          "confirms": "Demand-linked scheduling will reduce excess labour cost"
+        },
+        {
+          "signal": "Labour hours in low-footfall hours (weekday mornings, late evenings) scheduled at same staffing as peak hours",
+          "evidence_source": "workforce_management_data",
+          "confirms": "Footfall-linked scheduling will reduce wasted labour hours"
+        },
+        {
+          "signal": "Overtime as % of total labour cost >10% consistently, indicating demand forecasting gap",
+          "evidence_source": "payroll_data",
+          "confirms": "Improved scheduling will reduce overtime premium"
+        }
+      ],
+      "required_data_fields": [
+        "Hourly footfall data by store and day type (weekday, weekend, festival)",
+        "Labour hours by department and shift pattern",
+        "Labour cost per store (permanent, part-time, casual)",
+        "Transactions per hour by department and store format",
+        "Union contract terms and flexibility provisions"
       ]
     },
     {
@@ -121,6 +167,52 @@
         "RAI — India Retail Report 2024 (rai.net.in/) — vendor funding and category management benchmarks India",
         "Nielsen — Retail Execution Excellence 2024 (nielsen.com/insights/) — category management ROI",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Build category P&L for top-20 categories: map gross margin, shrinkage, markdown, and space cost; rank by profit per sq ft",
+          "owner_role": "Category Management / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Conduct planogram audit for top-10 revenue categories: identify space allocation misalignment vs sales velocity and margin contribution",
+          "owner_role": "Category / Visual Merchandising",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Negotiate category captain or co-management agreements with top-3 suppliers per category for planogram and ranging support",
+          "owner_role": "Key Accounts / Category",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Implement ranging decisions and planogram changes; track sales per sq ft, in-stock rate, and category margin quarterly",
+          "owner_role": "FP&A / Category",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Profit per sq ft below company average for ≥30% of category space allocation",
+          "evidence_source": "category_pl_data",
+          "confirms": "Category management and space reallocation will improve profit density"
+        },
+        {
+          "signal": "Supplier co-investment (in-store activation, planogram compliance) <50% of category leader peer benchmark",
+          "evidence_source": "vendor_investment_data",
+          "confirms": "Category captain engagement will increase supplier investment and reduce category cost"
+        },
+        {
+          "signal": "Out-of-stock rate >5% for top-50 SKUs in high-velocity categories",
+          "evidence_source": "osa_monitoring",
+          "confirms": "Improved planogram and range clarity will reduce lost sales from stockouts"
+        }
+      ],
+      "required_data_fields": [
+        "Category P&L by category (gross margin, shrinkage, markdown, space cost)",
+        "Space allocation (sq ft) vs sales per sq ft by category",
+        "Supplier co-investment and trade terms by category",
+        "In-stock (OSA) data by category and SKU",
+        "Planogram compliance monitoring data"
       ]
     },
     {
@@ -160,6 +252,52 @@
         "RAI — India Retail Report 2024 (rai.net.in/) — shrinkage rates for Indian organised retail",
         "FICCI — India Retail Summit Report 2024 (ficci.in) — loss prevention and shrinkage benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Decompose total shrinkage by root cause: known theft (internal/external), unknown loss, and administrative errors; estimate % contribution by store",
+          "owner_role": "Loss Prevention / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Deploy EAS (Electronic Article Surveillance) and RFID for high-shrink categories; install AI-powered CCTV at self-checkout and high-risk zones",
+          "owner_role": "Loss Prevention / IT",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Implement exception-based reporting for POS anomalies (voids, refunds, no-sales) to surface internal theft patterns",
+          "owner_role": "Loss Prevention / IT",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Track shrinkage % by store and category monthly; benchmark against FICCI/retail association benchmark; reward LP performance",
+          "owner_role": "FP&A / Loss Prevention",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Shrinkage >1.5% of net sales vs organised retail benchmark of <1.0%, indicating structural loss prevention gap",
+          "evidence_source": "inventory_count_data",
+          "confirms": "LP investment will yield positive ROI through shrinkage reduction"
+        },
+        {
+          "signal": "Unknown loss (book to physical gap) >70% of total shrinkage with no root-cause visibility",
+          "evidence_source": "shrinkage_audit_data",
+          "confirms": "RFID and cycle counting will improve visibility and enable targeted intervention"
+        },
+        {
+          "signal": "High-risk categories (electronics, cosmetics, apparel) contributing >50% of shrinkage without dedicated LP coverage",
+          "evidence_source": "shrinkage_by_category",
+          "confirms": "EAS and enhanced surveillance for high-risk categories will reduce loss"
+        }
+      ],
+      "required_data_fields": [
+        "Shrinkage data by store, category, and loss cause (known theft, unknown, admin error)",
+        "Current loss prevention technology by store format",
+        "POS exception data (voids, refunds, no-sales by cashier)",
+        "RFID and EAS coverage map by store",
+        "Historical LP investment vs shrinkage reduction correlation"
       ]
     },
     {
@@ -199,6 +337,52 @@
       "industry_sources": [
         "RAI — India Retail Report 2024 (rai.net.in/) — private label penetration and margin premium benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map category white space: identify segments where retailer private label penetration <10% and competitor PL or NBD is gaining share",
+          "owner_role": "Category Management / Merchandising",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Qualify manufacturers for PL production: supplier audit, GMP/FSSAI compliance, formulation capability, and exclusivity terms",
+          "owner_role": "Procurement / Quality",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Launch PL range in pilot stores (>20 stores) with consumer testing; track consumer acceptance vs branded alternative",
+          "owner_role": "Category / Supply Chain",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Scale to full chain; track PL penetration, category margin uplift, and branded manufacturer response",
+          "owner_role": "Category / FP&A",
+          "duration_weeks": 6
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category gross margin <25% with retailer private label equivalent achievable at >35% margin on same shelf",
+          "evidence_source": "category_margin_report",
+          "confirms": "Private label will structurally improve category margin mix"
+        },
+        {
+          "signal": "Private label penetration in category <15% vs modern trade benchmark of >25% in comparable markets",
+          "evidence_source": "category_benchmarking",
+          "confirms": "PL expansion headroom is material"
+        },
+        {
+          "signal": "Consumer willingness to trade down confirmed by market research for this category",
+          "evidence_source": "consumer_research",
+          "confirms": "PL launch risk is manageable"
+        }
+      ],
+      "required_data_fields": [
+        "Category margin data by brand, pack size, and store format",
+        "Private label penetration by category and store format",
+        "Consumer research on PL acceptance by category",
+        "Manufacturer shortlist with production capacity and compliance data",
+        "Competitor PL pricing and ranging data"
       ]
     },
     {
@@ -238,6 +422,52 @@
       "industry_sources": [
         "CRISIL — India E-Commerce and Logistics Report 2024 (crisil.com) — last-mile delivery cost benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map current fulfilment flow for online orders: DC-to-home, store-to-home, and click-and-collect; measure cost per order and SLA by fulfilment path",
+          "owner_role": "Supply Chain / E-commerce",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Model dark store feasibility for top-5 urban clusters by order density; build order routing algorithm to minimise cost per order by zone",
+          "owner_role": "Supply Chain / Analytics",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Deploy OMS with real-time inventory visibility across DC and store; automate order routing based on proximity, stock, and SLA",
+          "owner_role": "IT / Supply Chain",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Track cost per order by fulfilment path, on-time delivery rate, and returns rate monthly",
+          "owner_role": "FP&A / E-commerce",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Online order fulfilment cost >18% of order value vs benchmark <12% for comparable basket size and geography",
+          "evidence_source": "ecommerce_cost_report",
+          "confirms": "Fulfilment optimisation (dark store, order routing) will reduce unit fulfilment cost"
+        },
+        {
+          "signal": "DC-to-home fulfilment contributing >60% of orders in high-density urban areas where store-based fulfilment is cheaper",
+          "evidence_source": "order_routing_data",
+          "confirms": "OMS-driven smart routing will shift volume to lower-cost local fulfilment"
+        },
+        {
+          "signal": "Returns rate >12% of orders due to late delivery or wrong-item fulfilment issues",
+          "evidence_source": "ecommerce_returns_data",
+          "confirms": "Fulfilment accuracy improvement will reduce reverse logistics cost"
+        }
+      ],
+      "required_data_fields": [
+        "Online order data by fulfilment path, cost, and SLA performance",
+        "Store and DC inventory position (real-time) by SKU",
+        "Customer geography and order density by pin code",
+        "OMS capability assessment for real-time routing",
+        "Dark store operational model and capex/opex estimate"
       ]
     },
     {
@@ -276,6 +506,52 @@
       "industry_sources": [
         "Nielsen — Retail Inventory Management 2024 (nielsen.com/insights/) — markdown optimisation and clearance benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Analyse markdown pattern by category: measure markdown rate (% of sales at discount), depth (average discount %), and clearance velocity",
+          "owner_role": "Category / FP&A",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Build AI-driven markdown optimisation model: predict optimal timing and depth of markdown to maximise margin × volume vs clearance deadline",
+          "owner_role": "Analytics / Category",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Pilot model in 2 high-markdown categories (fashion, seasonal); measure margin improvement vs historical average; refine before scale",
+          "owner_role": "Category / Analytics",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Roll out to all seasonal and fashion categories; track markdown as % of sales and gross margin improvement monthly",
+          "owner_role": "FP&A / Category",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Markdown as % of gross sales >8% for seasonal categories with unpredictable demand (fashion, festive, seasonal food)",
+          "evidence_source": "markdown_report",
+          "confirms": "AI-driven markdown optimisation will reduce excess clearance discount"
+        },
+        {
+          "signal": "Average markdown depth increasing YoY (clearance discount deepening) despite similar sell-through rate",
+          "evidence_source": "markdown_trend_data",
+          "confirms": "Earlier and more targeted markdown will improve margin per unit cleared"
+        },
+        {
+          "signal": "End-of-season inventory >15% of season-opening stock requiring clearance at >50% discount",
+          "evidence_source": "end_of_season_inventory_report",
+          "confirms": "Demand planning and markdown model improvement will reduce clearance overhang"
+        }
+      ],
+      "required_data_fields": [
+        "SKU-level markdown data: timing, depth, and volume cleared by discount band",
+        "Season-end inventory and clearance sell-through rate",
+        "Demand forecast accuracy for seasonal categories",
+        "Category margin (with and without markdown) by season",
+        "Clearance deadline requirements by category"
       ]
     },
     {
@@ -315,6 +591,52 @@
       "industry_sources": [
         "RAI — India Retail Report 2024 (rai.net.in/) — loyalty programme cost as % of sales and redemption benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit loyalty program economics: measure member acquisition cost, active member rate, redemption rate, and incremental spend uplift vs non-member baseline",
+          "owner_role": "Marketing / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Rationalise point structure: model break-even point earn/burn ratio; eliminate no-value redemption categories; simplify tier structure",
+          "owner_role": "Loyalty / Marketing",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Improve personalisation: use member purchase data for targeted offers; shift from mass discount to 1:1 relevant reward to improve redemption ROI",
+          "owner_role": "CRM / Analytics / Marketing",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track loyalty breakage rate, active member %, incremental basket value, and loyalty cost as % of revenue monthly",
+          "owner_role": "FP&A / Marketing",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Loyalty program cost (points liability + admin) >3% of revenue with incremental basket uplift <2% vs non-member",
+          "evidence_source": "loyalty_economics_report",
+          "confirms": "Program rationalisation and personalisation will improve ROI on loyalty investment"
+        },
+        {
+          "signal": "Active member rate <30% of enrolled members, indicating poor engagement and wasted enrolment cost",
+          "evidence_source": "crm_data",
+          "confirms": "Improving personalisation and offer relevance will increase active member rate"
+        },
+        {
+          "signal": "Breakage rate <10% indicating high redemption liability relative to margin benefit",
+          "evidence_source": "points_accounting",
+          "confirms": "Adjusting earn/burn ratio will reduce points liability without impacting retention"
+        }
+      ],
+      "required_data_fields": [
+        "Loyalty program P&L: enrolment cost, points issued, redemption cost, and program administration",
+        "Active member rate and purchase frequency vs non-member",
+        "Points earn/burn ratio and breakage rate",
+        "Member segmentation by spend tier and redemption behaviour",
+        "Basket size uplift data: member vs non-member by category"
       ]
     },
     {
@@ -354,6 +676,52 @@
       "industry_sources": [
         "FICCI — India Retail Supply Chain Report 2024 (ficci.in) — direct sourcing penetration and margin improvement",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map supply chain for top-5 fresh/produce categories: identify intermediaries (commission agents, wholesalers) and their margin take per unit",
+          "owner_role": "Procurement / Supply Chain",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Identify and qualify direct farm/manufacturer suppliers: assess volume capability, quality standards, and logistic connectivity to DC",
+          "owner_role": "Procurement / Supplier Quality",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Pilot direct procurement for 1–2 categories with contract farming agreements or direct manufacturer supply; track quality and cost vs current supply chain",
+          "owner_role": "Procurement / Supply Chain",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Scale to all shortlisted categories; track cost per unit (farm gate vs current landed cost), quality compliance, and fill rate monthly",
+          "owner_role": "FP&A / Procurement",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Intermediary margin >25% of landed cost for categories where direct sourcing is physically and quality-feasibly achievable",
+          "evidence_source": "supply_chain_margin_map",
+          "confirms": "Direct sourcing will eliminate intermediary margin and improve price competitiveness"
+        },
+        {
+          "signal": "Product quality or freshness complaints from customers >5% of category revenue, indicating supply chain length impact on quality",
+          "evidence_source": "customer_complaint_data",
+          "confirms": "Shorter supply chain will improve freshness and reduce quality-related returns"
+        },
+        {
+          "signal": "Own-label or private-label strategy requiring assured supply that is not available through spot market",
+          "evidence_source": "category_strategy_document",
+          "confirms": "Direct supply agreement will secure volume commitment and quality consistency"
+        }
+      ],
+      "required_data_fields": [
+        "Current supply chain map: intermediary count, margin by tier, and landed cost by category",
+        "Supplier qualification criteria and MOQ for direct sourcing",
+        "Quality specifications and cold chain requirements by category",
+        "DC logistics connectivity to potential direct sourcing locations",
+        "Contract farming regulatory requirements and templates"
       ]
     },
     {
@@ -394,6 +762,52 @@
         "RAI — India Retail Report 2024 (rai.net.in/) — retail store productivity and breakeven benchmarks India",
         "JLL India — India Retail Real Estate Report 2024 (jll.com/en-in/research) — rental benchmarks and store network optimisation",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "execution_playbook": [
+        {
+          "step": "Build store-level unit economics: revenue per sq ft, four-wall EBITDA, and payback period by store age, format, and location tier",
+          "owner_role": "FP&A / Real Estate",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Conduct catchment analysis for under-performing stores: assess cannibalisation, population density, and competitive intensity to distinguish structural vs temporary underperformance",
+          "owner_role": "Strategy / Real Estate / Analytics",
+          "duration_weeks": 4
+        },
+        {
+          "step": "For close/exit candidates: negotiate lease exit or surrender at break clause; for under-performing stores: implement format change or rightsizing",
+          "owner_role": "Real Estate / Operations / Legal",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Track four-wall EBITDA margin, revenue per sq ft, and lease-adjusted payback by store monthly; gate new store investments against updated return hurdles",
+          "owner_role": "FP&A / Real Estate",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "≥15% of stores with negative four-wall EBITDA for ≥2 consecutive years",
+          "evidence_source": "store_pl_data",
+          "confirms": "Exit or format change for loss-making stores will remove P&L drag"
+        },
+        {
+          "signal": "New store payback period >4 years for recent openings vs investment hurdle of ≤3 years",
+          "evidence_source": "store_investment_tracker",
+          "confirms": "Network strategy review will tighten store quality and return on capital"
+        },
+        {
+          "signal": "Lease WALE >3 years in locations where store has not reached breakeven, creating exit cost",
+          "evidence_source": "lease_register",
+          "confirms": "Proactive negotiation at lease break will reduce exit cost"
+        }
+      ],
+      "required_data_fields": [
+        "Store P&L: revenue, four-wall EBITDA, and payback period by store",
+        "Catchment analysis data: population, demographics, and competitive landscape by store",
+        "Lease terms: WALE, break-clause dates, and exit cost by store",
+        "Store age and format classification",
+        "New store investment return hurdles and pipeline"
       ]
     }
   ],
