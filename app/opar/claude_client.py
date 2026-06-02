@@ -8,7 +8,7 @@ import re
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from typing import Any, Dict, List, Tuple
 
-from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED
+from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED, LLM_PROVIDER
 from app.opar.models import ObserveContext
 
 INTENT_CLASSIFY_PROMPT = """Classify the user's intent for an OpEx cost analysis platform.
@@ -177,7 +177,11 @@ def _call_claude(
     max_tokens: int = 512,
     model: str = "claude-sonnet-4-5-20250929",
 ) -> str:
-    """Call Claude Messages API. Returns raw text response."""
+    """Call LLM. Routes to Gemini when LLM_PROVIDER=gemini, else Anthropic."""
+    if LLM_PROVIDER == "gemini" and GEMINI_ENABLED:
+        from app.opar.gemini_client import call_gemini
+        return call_gemini(system=system, user_content=user_content, max_tokens=max_tokens)
+
     # Keep local/unit tests deterministic and offline.
     if os.getenv("PYTEST_CURRENT_TEST"):
         raise RuntimeError("Claude calls disabled during pytest runs")
@@ -206,7 +210,11 @@ def _call_claude_with_thinking(
     model: str = "claude-sonnet-4-5-20250929",
     budget_tokens: int = 8000,
 ) -> Tuple[str, str | None]:
-    """Call Claude with extended thinking enabled. Returns (response_text, thinking_text)."""
+    """Call LLM with extended thinking. Gemini Flash-Lite has no thinking — falls back to plain call."""
+    if LLM_PROVIDER == "gemini" and GEMINI_ENABLED:
+        from app.opar.gemini_client import call_gemini_with_thinking
+        return call_gemini_with_thinking(system=system, user_content=user_content, max_tokens=max_tokens)
+
     if os.getenv("PYTEST_CURRENT_TEST"):
         raise RuntimeError("Claude calls disabled during pytest runs")
     if not ANTHROPIC_ENABLED or not ANTHROPIC_API_KEY:

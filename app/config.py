@@ -74,6 +74,13 @@ MAX_UPLOAD_MB = int(os.getenv("MAX_UPLOAD_MB", "50"))
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 ANTHROPIC_ENABLED = bool(ANTHROPIC_API_KEY)
 
+# Gemini provider — set LLM_PROVIDER=gemini to route all LLM calls through Gemini.
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GEMINI_ENABLED = bool(GEMINI_API_KEY)
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
+# "gemini" (default when key present) | "anthropic"
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini" if bool(os.getenv("GEMINI_API_KEY", "")) else "anthropic")
+
 # Qdrant vector memory (replaces Mem0; self-hosted, no external SaaS dependency)
 QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
 QDRANT_PORT = int(os.getenv("QDRANT_PORT", "6333"))

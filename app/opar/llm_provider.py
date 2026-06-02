@@ -22,7 +22,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
-from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, ROOT_DIR, logger
+from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED, LLM_PROVIDER, ROOT_DIR, logger
 
 # ---------------------------------------------------------------------------
 # Mode resolution
@@ -144,10 +144,19 @@ def _call_m2(
     max_tokens: int,
     skill_name: str,
 ) -> Optional[str]:
-    """Call Anthropic Claude (M2 — Managed regional LLM)."""
-    if not ANTHROPIC_ENABLED or not ANTHROPIC_API_KEY:
-        return None
+    """Call M2 LLM — Gemini when configured, else Anthropic Claude."""
     if os.getenv("PYTEST_CURRENT_TEST"):
+        return None
+
+    if LLM_PROVIDER == "gemini" and GEMINI_ENABLED:
+        try:
+            from app.opar.gemini_client import call_gemini
+            return call_gemini(system=system, user_content=user_content, max_tokens=max_tokens)
+        except Exception as exc:
+            logger.warning('"llm_provider M2 Gemini call failed: %s"', exc)
+            return None
+
+    if not ANTHROPIC_ENABLED or not ANTHROPIC_API_KEY:
         return None
     try:
         import anthropic  # type: ignore

@@ -16,7 +16,29 @@ import os
 from dataclasses import dataclass, field
 from typing import Any, Dict, List
 
+from app.config import GEMINI_ENABLED, LLM_PROVIDER
 from app.opar.models import EvalTrace
+
+
+def _call_judge_llm(system: str, user_content: str, max_tokens: int = 512) -> str:
+    """Route judge LLM call to Gemini or Anthropic based on LLM_PROVIDER."""
+    if LLM_PROVIDER == "gemini" and GEMINI_ENABLED:
+        from app.opar.gemini_client import call_judge_llm
+        return call_judge_llm(system=system, user_content=user_content, max_tokens=max_tokens)
+
+    try:
+        import anthropic
+    except ImportError:
+        raise RuntimeError("anthropic package required for LLM judge. pip install anthropic")
+    import os
+    client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+    msg = client.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=max_tokens,
+        system=system,
+        messages=[{"role": "user", "content": user_content}],
+    )
+    return msg.content[0].text
 
 # ---------------------------------------------------------------------------
 # Result data classes
@@ -94,25 +116,13 @@ Respond with this JSON schema:
         input_data: Dict[str, Any],
         output_text: str,
     ) -> FaithfulnessResult:
-        try:
-            import anthropic
-        except ImportError:
-            raise RuntimeError("anthropic package required for LLM judge. pip install anthropic")
-
-        client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
         input_summary = json.dumps(input_data, default=str)[:3000]
         prompt = self._PROMPT_TEMPLATE.format(
             skill_name=skill_name,
             input_summary=input_summary,
             output_text=output_text[:4000],
         )
-        msg = client.messages.create(
-            model=self.MODEL,
-            max_tokens=512,
-            system=self._SYSTEM,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        raw = msg.content[0].text
+        raw = _call_judge_llm(system=self._SYSTEM, user_content=prompt)
         try:
             parsed = json.loads(raw)
             return FaithfulnessResult(
@@ -164,26 +174,14 @@ Respond with this JSON schema:
 }}"""
 
     def score(self, response_text: str, trace: EvalTrace) -> TraceGroundingResult:
-        try:
-            import anthropic
-        except ImportError:
-            raise RuntimeError("anthropic package required for LLM judge. pip install anthropic")
-
         from app.eval.trace import summarize_trace
 
-        client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
         trace_summary = summarize_trace(trace)
         prompt = self._PROMPT_TEMPLATE.format(
             response_text=response_text[:3000],
             trace_summary=trace_summary[:4000],
         )
-        msg = client.messages.create(
-            model=self.MODEL,
-            max_tokens=512,
-            system=self._SYSTEM,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        raw = msg.content[0].text
+        raw = _call_judge_llm(system=self._SYSTEM, user_content=prompt)
         try:
             parsed = json.loads(raw)
             return TraceGroundingResult(
