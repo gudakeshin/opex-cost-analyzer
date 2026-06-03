@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { Button } from '../components/Common/Button';
@@ -8,14 +8,29 @@ import { Select } from '../components/Common/Select';
 import { Loader } from '../components/Common/Loader';
 import { Alert } from '../components/Common/Alert';
 import { PageHeader } from '../components/Common/PageHeader';
-import { FactVsInferenceLabel } from '../components/Common/FactVsInferenceLabel';
 import { DiagnosticScorecard } from '../components/PageComponents/Diagnostic/DiagnosticScorecard';
 import { FindingCards } from '../components/PageComponents/Diagnostic/FindingCards';
+import {
+  BenchmarkGapsTable,
+  ValueAtTableTable,
+  diagnosticTablesFromResult,
+} from '../components/PageComponents/Diagnostic/DiagnosticTables';
 import { DeepResearchSection } from '../components/PageComponents/Diagnostic/DeepResearchSection';
-import { apiPatch, apiPost, getApiErrorMessage } from '../hooks/useApi';
+import { apiGet, apiPatch, apiPost, getApiErrorMessage } from '../hooks/useApi';
 import { friendlyErrorMessage } from '../utils/errorMessages';
 import { useSession } from '../context/SessionContext';
-import type { DiagnosticContextPatch, DiagnosticRequest, DiagnosticResponse } from '../types';
+import {
+  buildDiagnosticContextPatch,
+  formStateFromManifest,
+  isDiagnosticResponse,
+  parseUrlsText,
+} from '../utils/diagnosticPersistence';
+import type {
+  DiagnosticContextPatch,
+  DiagnosticRequest,
+  DiagnosticResponse,
+  SessionManifest,
+} from '../types';
 
 const SECTOR_OPTIONS = [
   { value: 'bfsi_banks', label: 'BFSI / Banks' },
@@ -35,9 +50,14 @@ const SECTOR_OPTIONS = [
   { value: 'telecom_infra', label: 'Telecom & Infrastructure' },
 ];
 
+const FORM_SAVE_DEBOUNCE_MS = 500;
+
 export const Diagnostic: React.FC = () => {
   const navigate = useNavigate();
-  const { sessionId, ensureSession } = useSession();
+  const { sessionId, ensureSession, refreshEngagement, engagement } = useSession();
+  const [activeSid, setActiveSid] = useState<string | null>(sessionId);
+  const [hydrating, setHydrating] = useState(true);
+  const [manifest, setManifest] = useState<SessionManifest | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState('');
@@ -47,26 +67,129 @@ export const Diagnostic: React.FC = () => {
   const [result, setResult] = useState<DiagnosticResponse | null>(null);
   const [deepResearchSummary, setDeepResearchSummary] = useState<string | null>(null);
   const [handoffLoading, setHandoffLoading] = useState(false);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const skipFormSaveRef = useRef(true);
+
+  const formState = useCallback(
+    () => ({ companyName, industry, revenueCr, urlsText }),
+    [companyName, industry, revenueCr, urlsText],
+  );
+
+  const persistContext = useCallback(
+    async (
+      sid: string,
+      options?: {
+        diagnosticResult?: DiagnosticResponse | null;
+        markDiagnosticComplete?: boolean;
+        includeDeepResearch?: boolean;
+      },
+    ) => {
+      const patch = buildDiagnosticContextPatch(formState(), {
+        diagnosticResult: options?.diagnosticResult,
+        markDiagnosticComplete: options?.markDiagnosticComplete,
+        deepResearchSummary:
+          options?.includeDeepResearch ? deepResearchSummary : undefined,
+      });
+      await apiPatch(`/api/v1/sessions/${sid}/diagnostic-context`, patch);
+    },
+    [formState, deepResearchSummary],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      setHydrating(true);
+      skipFormSaveRef.current = true;
+      try {
+        const sid = await ensureSession();
+        if (cancelled) return;
+        setActiveSid(sid);
+
+        const m = await apiGet<SessionManifest>(`/api/v1/sessions/${sid}/manifest`);
+        if (cancelled) return;
+        setManifest(m);
+
+        const form = formStateFromManifest(m, engagement);
+        setCompanyName(form.companyName);
+        setIndustry(form.industry);
+        setRevenueCr(form.revenueCr);
+        setUrlsText(form.urlsText);
+
+        if (m.diagnostic_result && isDiagnosticResponse(m.diagnostic_result)) {
+          setResult(m.diagnostic_result);
+        } else {
+          setResult(null);
+        }
+
+        setDeepResearchSummary(m.deep_research_summary ?? null);
+      } catch {
+        if (!cancelled) {
+          setManifest(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setHydrating(false);
+          skipFormSaveRef.current = false;
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionId, ensureSession]);
+
+  useEffect(() => {
+    if (!activeSid || hydrating || skipFormSaveRef.current) return;
+
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      persistContext(activeSid).catch(() => {});
+    }, FORM_SAVE_DEBOUNCE_MS);
+
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, [activeSid, hydrating, companyName, industry, revenueCr, urlsText, persistContext]);
+
+  useEffect(() => {
+    return () => {
+      if (!activeSid || skipFormSaveRef.current) return;
+      const patch = buildDiagnosticContextPatch(formState());
+      apiPatch(`/api/v1/sessions/${activeSid}/diagnostic-context`, patch).catch(() => {});
+    };
+  }, [activeSid, formState]);
 
   const friendlyError = error ? friendlyErrorMessage(error) : null;
 
   const handleDeepResearchReady = (summary: string) => {
     setDeepResearchSummary(summary);
+    if (activeSid) {
+      const patch: DiagnosticContextPatch = { deep_research_summary: summary };
+      apiPatch(`/api/v1/sessions/${activeSid}/diagnostic-context`, patch).catch(() => {});
+    }
   };
 
   const handleStartSession = async () => {
     setHandoffLoading(true);
     try {
-      const sid = await ensureSession();
+      const sid = activeSid ?? (await ensureSession());
       const patch: DiagnosticContextPatch = {
         company_name: companyName.trim() || undefined,
         industry,
         annual_revenue_cr: parseFloat(revenueCr) || 5000,
+        diagnostic_urls: parseUrlsText(urlsText),
       };
+      if (result) {
+        patch.diagnostic_result = result;
+        patch.diagnostic_completed_at = manifest?.diagnostic_completed_at ?? new Date().toISOString();
+      }
       if (deepResearchSummary) {
         patch.deep_research_summary = deepResearchSummary;
       }
       await apiPatch(`/api/v1/sessions/${sid}/diagnostic-context`, patch);
+      await refreshEngagement();
       navigate('/');
     } catch {
       navigate('/');
@@ -80,19 +203,30 @@ export const Diagnostic: React.FC = () => {
     if (!companyName.trim()) return;
     setLoading(true);
     setError(null);
-    setResult(null);
     try {
+      const sid = activeSid ?? (await ensureSession());
+      setActiveSid(sid);
+
       const payload: DiagnosticRequest = {
         company_name: companyName.trim(),
         industry,
         annual_revenue_cr: parseFloat(revenueCr) || 5000,
-        urls: urlsText
-          .split('\n')
-          .map((u) => u.trim())
-          .filter((u) => u.startsWith('http')),
+        urls: parseUrlsText(urlsText),
       };
-      const res = await apiPost<DiagnosticResponse>('/api/v1/diagnostic/company-research', payload);
+      const res = await apiPost<DiagnosticResponse>(
+        '/api/v1/diagnostic/company-research',
+        payload,
+      );
       setResult(res);
+      skipFormSaveRef.current = true;
+      await persistContext(sid, {
+        diagnosticResult: res,
+        markDiagnosticComplete: true,
+      });
+      const updated = await apiGet<SessionManifest>(`/api/v1/sessions/${sid}/manifest`);
+      setManifest(updated);
+      await refreshEngagement();
+      skipFormSaveRef.current = false;
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {
@@ -100,11 +234,26 @@ export const Diagnostic: React.FC = () => {
     }
   };
 
-  const sortedGaps = [...(result?.benchmark_gaps ?? [])].sort((a, b) => {
-    const ha = Number(a.headroom_to_p25_cr ?? 0);
-    const hb = Number(b.headroom_to_p25_cr ?? 0);
-    return hb - ha;
-  });
+  const tableData = result ? diagnosticTablesFromResult(result) : null;
+
+  const showDeepResearch =
+    !!result ||
+    !!manifest?.deep_research_interaction_id ||
+    !!manifest?.deep_research_summary;
+
+  if (hydrating) {
+    return (
+      <MainLayout hideHeader>
+        <PageHeader
+          title="Company Diagnostic"
+          subtitle="Benchmark-backed research and value-at-table"
+        />
+        <div className="max-w-5xl mx-auto py-12">
+          <Loader label="Loading diagnostic session…" />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout hideHeader>
@@ -115,7 +264,12 @@ export const Diagnostic: React.FC = () => {
 
       <div className="max-w-5xl mx-auto space-y-6">
         {friendlyError && (
-          <Alert variant="error" title={friendlyError.title} recovery={friendlyError.recovery} onDismiss={() => setError(null)}>
+          <Alert
+            variant="error"
+            title={friendlyError.title}
+            recovery={friendlyError.recovery}
+            onDismiss={() => setError(null)}
+          >
             {friendlyError.detail}
           </Alert>
         )}
@@ -176,76 +330,35 @@ export const Diagnostic: React.FC = () => {
               )}
             </Card>
 
-            <DeepResearchSection
-              companyName={companyName}
-              industry={industry}
-              revenueCr={parseFloat(revenueCr) || 5000}
-              sessionId={sessionId}
-              onSummaryReady={handleDeepResearchReady}
+            {showDeepResearch && (
+              <DeepResearchSection
+                key={`${activeSid ?? ''}-${manifest?.deep_research_interaction_id ?? 'none'}`}
+                companyName={companyName}
+                industry={industry}
+                revenueCr={parseFloat(revenueCr) || 5000}
+                sessionId={activeSid}
+                onSummaryReady={handleDeepResearchReady}
+                initialInteractionId={manifest?.deep_research_interaction_id}
+                initialSummary={manifest?.deep_research_summary ?? deepResearchSummary}
+                initialFullReport={manifest?.deep_research_full_report}
+                initialPrompt={manifest?.deep_research_prompt}
+                hydrateReady={!hydrating}
+              />
+            )}
+
+            <BenchmarkGapsTable
+              gaps={tableData?.benchmarkGaps ?? []}
+              dataNote={result.data_note}
+              percentileLegend={result.percentile_legend}
             />
 
-            <Card title="Benchmark gaps (ranked)" className="border-brand-border bg-white">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-xs uppercase text-brand-muted border-b border-brand-border">
-                      <th scope="col" className="py-2">Category</th>
-                      <th scope="col" className="py-2">P50 %</th>
-                      <th scope="col" className="py-2">Headroom (₹ Cr)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sortedGaps.slice(0, 10).map((g, i) => {
-                      const headroom = Number(g.headroom_to_p25_cr ?? 0);
-                      const hot = headroom > 50;
-                      return (
-                        <tr
-                          key={i}
-                          className={`border-b border-brand-border ${hot ? 'bg-amber-50/60' : ''}`}
-                        >
-                          <td className="py-2 font-medium text-brand-ink">
-                            {String(g.category_name || g.category)}
-                          </td>
-                          <td className="py-2 tabular-nums">{String(g.p50_pct ?? '—')}</td>
-                          <td className="py-2 tabular-nums">{String(g.headroom_to_p25_cr ?? '—')}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-
-            <Card title="Value at table" className="border-brand-border bg-white">
-              <div className="flex items-center gap-2 mb-4">
-                <FactVsInferenceLabel kind="inference" />
-                <span className="text-xs text-brand-muted">P10 / P50 / P90 bands</span>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-xs uppercase text-brand-muted border-b border-brand-border">
-                      <th scope="col" className="py-2">Lever</th>
-                      <th scope="col" className="py-2">P10</th>
-                      <th scope="col" className="py-2">P50</th>
-                      <th scope="col" className="py-2">P90</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {result.value_at_table?.map((v, i) => (
-                      <tr key={i} className="border-b border-brand-border">
-                        <td className="py-2">{String(v.lever_name)}</td>
-                        <td className="py-2 tabular-nums">{String(v.p10_cr)}</td>
-                        <td className="py-2 tabular-nums font-semibold text-brand-green">
-                          {String(v.p50_cr)}
-                        </td>
-                        <td className="py-2 tabular-nums">{String(v.p90_cr)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+            <ValueAtTableTable
+              rows={tableData?.valueAtTable ?? []}
+              totalP50Cr={tableData?.totalP50}
+              annualRevenueCr={result.annual_revenue_cr}
+              percentileLegend={result.percentile_legend}
+              methodology={result.value_at_table_methodology}
+            />
 
             <Button
               onClick={handleStartSession}
@@ -261,6 +374,22 @@ export const Diagnostic: React.FC = () => {
               )}
             </Button>
           </>
+        )}
+
+        {!result && showDeepResearch && (
+          <DeepResearchSection
+            key={`${activeSid ?? ''}-${manifest?.deep_research_interaction_id ?? 'none'}`}
+            companyName={companyName}
+            industry={industry}
+            revenueCr={parseFloat(revenueCr) || 5000}
+            sessionId={activeSid}
+            onSummaryReady={handleDeepResearchReady}
+            initialInteractionId={manifest?.deep_research_interaction_id}
+            initialSummary={manifest?.deep_research_summary ?? deepResearchSummary}
+            initialFullReport={manifest?.deep_research_full_report}
+            initialPrompt={manifest?.deep_research_prompt}
+            hydrateReady={!hydrating}
+          />
         )}
       </div>
     </MainLayout>

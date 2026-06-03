@@ -1,0 +1,724 @@
+{
+  "eval_name": "Diagnostic Feature Eval",
+  "eval_date": "2026-06-03",
+  "platform_version": "v2.1",
+  "overall_score": 9.5,
+  "passed": true,
+  "scenario_run_count": 5,
+  "scenario_pass_count": 5,
+  "domains": [
+    {
+      "name": "data_integrity",
+      "display": "Data Integrity",
+      "weight": 0.3,
+      "score": 10.0,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "DG-01",
+          "name": "Synthetic Profile Arithmetic",
+          "weight": 0.3,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 5,
+          "scenarios_below_threshold": 0,
+          "finding_summary": "50/50 arithmetic checks passed across 5 scenarios",
+          "remediation": "Check floating-point accumulation at enterprise.py:301. Verify total_implied = sum(category_profile[*].spend).",
+          "evidence": {
+            "S01": {
+              "checks": {
+                "total_spend_matches_category_sum": true,
+                "cat_IT_positive": true,
+                "cat_IT_pct_lt_100": true,
+                "cat_PROF_SVCS_positive": true,
+                "cat_PROF_SVCS_pct_lt_100": true,
+                "cat_FACILITIES_positive": true,
+                "cat_FACILITIES_pct_lt_100": true,
+                "cat_TRAVEL_positive": true,
+                "cat_TRAVEL_pct_lt_100": true,
+                "cat_MARKETING_positive": true,
+                "cat_MARKETING_pct_lt_100": true,
+                "no_category_exceeds_revenue": true
+              },
+              "passed": 12,
+              "total": 12,
+              "mismatches": []
+            },
+            "S02": {
+              "checks": {
+                "total_spend_matches_category_sum": true,
+                "cat_IT_positive": true,
+                "cat_IT_pct_lt_100": true,
+                "cat_PROF_SVCS_positive": true,
+                "cat_PROF_SVCS_pct_lt_100": true,
+                "cat_FACILITIES_positive": true,
+                "cat_FACILITIES_pct_lt_100": true,
+                "cat_TRAVEL_positive": true,
+                "cat_TRAVEL_pct_lt_100": true,
+                "cat_MARKETING_positive": true,
+                "cat_MARKETING_pct_lt_100": true,
+                "no_category_exceeds_revenue": true
+              },
+              "passed": 12,
+              "total": 12,
+              "mismatches": []
+            },
+            "S03": {
+              "checks": {
+                "total_spend_matches_category_sum": true,
+                "cat_IT_positive": true,
+                "cat_IT_pct_lt_100": true,
+                "cat_PROF_SVCS_positive": true,
+                "cat_PROF_SVCS_pct_lt_100": true,
+                "cat_FACILITIES_positive": true,
+                "cat_FACILITIES_pct_lt_100": true,
+                "cat_TRAVEL_positive": true,
+                "cat_TRAVEL_pct_lt_100": true,
+                "cat_MARKETING_positive": true,
+                "cat_MARKETING_pct_lt_100": true,
+                "no_category_exceeds_revenue": true
+              },
+              "passed": 12,
+              "total": 12,
+              "mismatches": []
+            },
+            "S04": {
+              "checks": {
+                "total_spend_matches_category_sum": true,
+                "no_category_exceeds_revenue": true
+              },
+              "passed": 2,
+              "total": 2,
+              "mismatches": []
+            },
+            "S05": {
+              "checks": {
+                "total_spend_matches_category_sum": true,
+                "cat_IT_positive": true,
+                "cat_IT_pct_lt_100": true,
+                "cat_PROF_SVCS_positive": true,
+                "cat_PROF_SVCS_pct_lt_100": true,
+                "cat_FACILITIES_positive": true,
+                "cat_FACILITIES_pct_lt_100": true,
+                "cat_TRAVEL_positive": true,
+                "cat_TRAVEL_pct_lt_100": true,
+                "cat_MARKETING_positive": true,
+                "cat_MARKETING_pct_lt_100": true,
+                "no_category_exceeds_revenue": true
+              },
+              "passed": 12,
+              "total": 12,
+              "mismatches": []
+            }
+          }
+        },
+        {
+          "id": "DG-02",
+          "name": "Benchmark Gap Field Consistency",
+          "weight": 0.3,
+          "threshold": 8.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 5,
+          "scenarios_below_threshold": 0,
+          "finding_summary": "25/25 field consistency checks passed.",
+          "remediation": "gap_pct should equal (p50_pct - p25_pct); benchmark_p50_to_p25_band_cr should be present; percentile_band should be 'synthetic_P50'.",
+          "evidence": {
+            "S01": {
+              "checks": {
+                "actual_pct_equals_p50_pct": true,
+                "gap_pct_equals_p50_minus_p25": true,
+                "gap_cr_non_negative": true,
+                "sorted_desc_by_implied_p50": true,
+                "headroom_field_renamed": true,
+                "percentile_band_informative": true
+              },
+              "passed": 6,
+              "total": 6,
+              "gap_count": 20
+            },
+            "S02": {
+              "checks": {
+                "actual_pct_equals_p50_pct": true,
+                "gap_pct_equals_p50_minus_p25": true,
+                "gap_cr_non_negative": true,
+                "sorted_desc_by_implied_p50": true,
+                "headroom_field_renamed": true,
+                "percentile_band_informative": true
+              },
+              "passed": 6,
+              "total": 6,
+              "gap_count": 20
+            },
+            "S03": {
+              "checks": {
+                "actual_pct_equals_p50_pct": true,
+                "gap_pct_equals_p50_minus_p25": true,
+                "gap_cr_non_negative": true,
+                "sorted_desc_by_implied_p50": true,
+                "headroom_field_renamed": true,
+                "percentile_band_informative": true
+              },
+              "passed": 6,
+              "total": 6,
+              "gap_count": 18
+            },
+            "S04": {
+              "checks": {
+                "has_gaps_or_unmapped": true
+              },
+              "passed": 1,
+              "total": 1,
+              "gap_count": 0
+            },
+            "S05": {
+              "checks": {
+                "actual_pct_equals_p50_pct": true,
+                "gap_pct_equals_p50_minus_p25": true,
+                "gap_cr_non_negative": true,
+                "sorted_desc_by_implied_p50": true,
+                "headroom_field_renamed": true,
+                "percentile_band_informative": true
+              },
+              "passed": 6,
+              "total": 6,
+              "gap_count": 19
+            }
+          }
+        },
+        {
+          "id": "DG-03",
+          "name": "Value-at-Table Arithmetic",
+          "weight": 0.4,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 5,
+          "scenarios_below_threshold": 0,
+          "finding_summary": "17/17 arithmetic checks passed across 5 scenarios",
+          "remediation": "Verify savings_range_pct.p10 <= p50 <= p90 in all sector_levers.json files. Review rounding at enterprise.py:359-368.",
+          "evidence": {
+            "S01": {
+              "checks": {
+                "total_p50_matches_sum": true,
+                "p10_le_p50_le_p90": true,
+                "no_lever_below_min_threshold": true,
+                "max_12_levers": true
+              },
+              "lever_count": 9,
+              "computed_sum": 210.0,
+              "reported_total": 210.0,
+              "monotone_violations": [],
+              "below_floor": []
+            },
+            "S02": {
+              "checks": {
+                "total_p50_matches_sum": true,
+                "p10_le_p50_le_p90": true,
+                "no_lever_below_min_threshold": true,
+                "max_12_levers": true
+              },
+              "lever_count": 8,
+              "computed_sum": 4344.0,
+              "reported_total": 4344.0,
+              "monotone_violations": [],
+              "below_floor": []
+            },
+            "S03": {
+              "checks": {
+                "total_p50_matches_sum": true,
+                "p10_le_p50_le_p90": true,
+                "no_lever_below_min_threshold": true,
+                "max_12_levers": true
+              },
+              "lever_count": 9,
+              "computed_sum": 29.2,
+              "reported_total": 29.2,
+              "monotone_violations": [],
+              "below_floor": []
+            },
+            "S04": {
+              "checks": {
+                "empty_table_acceptable": true
+              },
+              "lever_count": 0
+            },
+            "S05": {
+              "checks": {
+                "total_p50_matches_sum": true,
+                "p10_le_p50_le_p90": true,
+                "no_lever_below_min_threshold": true,
+                "max_12_levers": true
+              },
+              "lever_count": 9,
+              "computed_sum": 230.6,
+              "reported_total": 230.6,
+              "monotone_violations": [],
+              "below_floor": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "analysis_completeness",
+      "display": "Analysis Completeness",
+      "weight": 0.35,
+      "score": 9.91,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "DG-04",
+          "name": "Stub Field Detection",
+          "weight": 0.35,
+          "threshold": 4.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 5,
+          "scenarios_below_threshold": 0,
+          "finding_summary": "0/6 stubs confirmed: []",
+          "remediation": "Priority order: 1) NPV: add wacc param, compute sum(p50_cr/(1+wacc)^t for t in 1..3). 2) category: populate from first matched trigger_signal category ID. 3) headcount: add to CompanyResearchRequest schema and pass through. 4) root_causes: run root_cause_analyzer on synthetic profile first. 5) label: rename to 'annual savings estimate'.",
+          "evidence": {
+            "stub_checks": {
+              "npv_always_zero": false,
+              "category_always_empty": false,
+              "gap_pct_always_zero": false,
+              "hardcoded_headcount_500": false,
+              "root_causes_not_derived": false,
+              "label_3yr_no_multiplier": false
+            },
+            "stubs_confirmed": 0,
+            "confirmed_stubs": [],
+            "not_confirmed": [
+              "npv_always_zero",
+              "category_always_empty",
+              "gap_pct_always_zero",
+              "hardcoded_headcount_500",
+              "root_causes_not_derived",
+              "label_3yr_no_multiplier"
+            ],
+            "lever_npv_values_sampled": [
+              83.3,
+              65.6,
+              65.6,
+              64.6,
+              59.6,
+              53.6,
+              41.8,
+              38.7,
+              31.7,
+              2245.7
+            ],
+            "lever_category_values_sampled": [
+              "IT",
+              "IT",
+              "IT",
+              "FACILITIES",
+              "IT",
+              "IT",
+              "IT",
+              "IT",
+              "CONTINGENT",
+              "IT"
+            ]
+          }
+        },
+        {
+          "id": "DG-05",
+          "name": "Lever Base Spend Coverage",
+          "weight": 0.3,
+          "threshold": 6.0,
+          "score": 9.71,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 5,
+          "scenarios_below_threshold": 0,
+          "finding_summary": "34/35 levers resolved a category spend (97%); 1 fell back to 10% floor",
+          "remediation": "Review trigger_signals in sector_levers.json \u2014 ensure category IDs match those returned by resolve_benchmark_payload. Consider a multi-signal resolver (not just first match). Also ensure category keys in cat_spend_cr are case-consistently matched.",
+          "evidence": {
+            "per_scenario": {
+              "S01": {
+                "levers_with_category_match": 9,
+                "levers_using_floor": 0,
+                "total_eligible": 9,
+                "category_match_ratio": 1.0
+              },
+              "S02": {
+                "levers_with_category_match": 8,
+                "levers_using_floor": 0,
+                "total_eligible": 8,
+                "category_match_ratio": 1.0
+              },
+              "S03": {
+                "levers_with_category_match": 8,
+                "levers_using_floor": 1,
+                "total_eligible": 9,
+                "category_match_ratio": 0.889
+              },
+              "S04": {
+                "levers_with_category_match": 0,
+                "levers_using_floor": 0,
+                "total_eligible": 0,
+                "category_match_ratio": 0.0
+              },
+              "S05": {
+                "levers_with_category_match": 9,
+                "levers_using_floor": 0,
+                "total_eligible": 9,
+                "category_match_ratio": 1.0
+              }
+            },
+            "total_category_matched": 34,
+            "total_floor_fallback": 1,
+            "overall_match_ratio": 0.971
+          }
+        },
+        {
+          "id": "DG-06",
+          "name": "Key Findings Completeness",
+          "weight": 0.35,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 5,
+          "scenarios_below_threshold": 0,
+          "finding_summary": "15/15 completeness checks passed. '3-year' label inconsistency flagged in 0 scenarios.",
+          "remediation": "Fix '3-year savings' label at enterprise.py:387 \u2014 multiply p50_cr by 3 for a true 3-year estimate, or relabel as 'annual savings estimate (P50)'.",
+          "evidence": {
+            "per_scenario": {
+              "S01": {
+                "checks": {
+                  "min_findings_present": true,
+                  "total_value_finding_present": true,
+                  "lever_finding_present": true
+                },
+                "findings_count": 3,
+                "passed": 3,
+                "total": 3,
+                "label_3yr_inconsistency": false,
+                "note": "3-year label used without 3x multiplier \u2014 informational flag, no score deduction"
+              },
+              "S02": {
+                "checks": {
+                  "min_findings_present": true,
+                  "total_value_finding_present": true,
+                  "lever_finding_present": true
+                },
+                "findings_count": 3,
+                "passed": 3,
+                "total": 3,
+                "label_3yr_inconsistency": false,
+                "note": "3-year label used without 3x multiplier \u2014 informational flag, no score deduction"
+              },
+              "S03": {
+                "checks": {
+                  "min_findings_present": true,
+                  "total_value_finding_present": true,
+                  "lever_finding_present": true
+                },
+                "findings_count": 3,
+                "passed": 3,
+                "total": 3,
+                "label_3yr_inconsistency": false,
+                "note": "3-year label used without 3x multiplier \u2014 informational flag, no score deduction"
+              },
+              "S04": {
+                "checks": {
+                  "min_findings_present": true,
+                  "total_value_finding_present": true,
+                  "lever_finding_present": true
+                },
+                "findings_count": 1,
+                "passed": 3,
+                "total": 3,
+                "label_3yr_inconsistency": false,
+                "note": "3-year label used without 3x multiplier \u2014 informational flag, no score deduction"
+              },
+              "S05": {
+                "checks": {
+                  "min_findings_present": true,
+                  "total_value_finding_present": true,
+                  "lever_finding_present": true
+                },
+                "findings_count": 3,
+                "passed": 3,
+                "total": 3,
+                "label_3yr_inconsistency": false,
+                "note": "3-year label used without 3x multiplier \u2014 informational flag, no score deduction"
+              }
+            },
+            "three_yr_label_flagged_in_n_scenarios": 0,
+            "known_issue": "'3-year savings' label appears but p50_cr is not multiplied by 3 (enterprise.py:387). Fix: either multiply p50_cr * 3 in key_findings or rename to 'annual savings estimate'."
+          }
+        }
+      ]
+    },
+    {
+      "name": "schema_signal_integrity",
+      "display": "Schema & Signal Integrity",
+      "weight": 0.15,
+      "score": 10.0,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "DG-07",
+          "name": "Diagnostic Signal Schema",
+          "weight": 0.4,
+          "threshold": 9.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 0,
+          "scenarios_below_threshold": 0,
+          "finding_summary": "127 levers checked, 369 signals validated, 0 violations",
+          "remediation": "For each violation, add/fix diagnostic_signals in the corresponding sector_levers.json. Required schema: [{signal, evidence_source, confirms}].",
+          "evidence": {
+            "total_levers_checked": 127,
+            "total_signals_found": 369,
+            "violation_count": 0,
+            "violations": []
+          }
+        },
+        {
+          "id": "DG-08",
+          "name": "Sector Pack Mapping Coverage",
+          "weight": 0.6,
+          "threshold": 8.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 0,
+          "scenarios_below_threshold": 0,
+          "finding_summary": "15/15 sector packs mapped (100%). Missing: []",
+          "remediation": "Add the following to _PACK_TO_BENCH in app/routers/enterprise.py: . Suggested mappings: financial_services_nonbank\u2192financial_services, gcc_capability_centers\u2192technology, healthcare_hospitals\u2192healthcare, hospitality_travel\u2192retail_consumer.",
+          "evidence": {
+            "discovered_packs": [
+              "bfsi_banks",
+              "conglomerate",
+              "energy_utilities",
+              "financial_services_nonbank",
+              "fmcg_consumer",
+              "gcc_capability_centers",
+              "healthcare_hospitals",
+              "hospitality_travel",
+              "insurance_general",
+              "it_ites",
+              "manufacturing_diversified",
+              "pharma_lifesciences",
+              "psu_cpse",
+              "retail_organized",
+              "telecom_infra"
+            ],
+            "mapped_in_pack_to_bench": [
+              "bfsi_banks",
+              "conglomerate",
+              "energy_utilities",
+              "financial_services_nonbank",
+              "fmcg_consumer",
+              "gcc_capability_centers",
+              "healthcare_hospitals",
+              "hospitality_travel",
+              "insurance_general",
+              "it_ites",
+              "manufacturing_diversified",
+              "pharma_lifesciences",
+              "psu_cpse",
+              "retail_organized",
+              "telecom_infra"
+            ],
+            "covered": [
+              "bfsi_banks",
+              "conglomerate",
+              "energy_utilities",
+              "financial_services_nonbank",
+              "fmcg_consumer",
+              "gcc_capability_centers",
+              "healthcare_hospitals",
+              "hospitality_travel",
+              "insurance_general",
+              "it_ites",
+              "manufacturing_diversified",
+              "pharma_lifesciences",
+              "psu_cpse",
+              "retail_organized",
+              "telecom_infra"
+            ],
+            "missing_from_mapping": [],
+            "phantom_keys_in_dict": [],
+            "coverage_ratio": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "input_signal_quality",
+      "display": "Input Signal Quality",
+      "weight": 0.2,
+      "score": 7.65,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "DG-09",
+          "name": "Document Contextualizer Signal Quality",
+          "weight": 0.4,
+          "threshold": 4.0,
+          "score": 6.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 0,
+          "scenarios_below_threshold": 0,
+          "finding_summary": "2/5 quality issues confirmed in document_contextualizer(): ['empty_input_always_no_inference', 'substring_false_positive_industry']",
+          "remediation": "1) Empty-input path: return structured 'no_url_provided' signal when texts=[]. 2) Substring matching: use \\b word-boundary regex instead of 'kw in lowered'. 3) Remove/qualify ambiguous \u22643-char keywords (ran, gcc, nav, pms). 4) Tie-breaking: add secondary sort by pack_id (alphabetical). 5) context_summary: replace raw slice with a structured excerpt or LLM-generated abstract.",
+          "evidence": {
+            "issue_checks": {
+              "empty_input_always_no_inference": true,
+              "substring_false_positive_constraints": false,
+              "substring_false_positive_industry": true,
+              "ambiguous_short_keywords_present": false,
+              "nondeterministic_tiebreaking": false,
+              "context_summary_is_raw_concat": false
+            },
+            "confirmed_issues": [
+              "empty_input_always_no_inference",
+              "substring_false_positive_industry"
+            ],
+            "empty_input_result": {
+              "inferred_industry": "",
+              "constraints": [],
+              "context_summary_len": 0,
+              "note": "document_contextualizer([]) always returns empty inferred_industry \u2014 URL analysis is dead code when no URLs provided"
+            },
+            "false_positive_tests": {
+              "text_contractor": "Our contractor agreement was signed.",
+              "constraints_triggered": [],
+              "contract_triggered_erroneously": false,
+              "text_ran_grid": "The program ran successfully in the electrical grid.",
+              "inferred_industry": "energy_utilities",
+              "ran_triggered_telecom": false,
+              "grid_triggered_energy": true
+            },
+            "ambiguous_short_keyword_check": {
+              "short_keywords_found_le3_chars": [],
+              "flagged_as_ambiguous": [],
+              "note": "'ran' matches English past tense; 'gcc' matches GNU Compiler Collection; 'nav' matches 'navigation'; 'pms' matches project-management-system. These will false-positive on generic company web pages."
+            },
+            "tiebreaking_check": {
+              "uses_plain_max": false,
+              "has_secondary_sort": false,
+              "note": "max() on dict keys with equal values returns unpredictable result (CPython dict insertion order, not alphabetical)"
+            },
+            "context_summary_check": {
+              "is_raw_text_slice": false,
+              "note": "context_summary is joined[:2500] \u2014 raw stripped HTML text, not an actual summary. Should be replaced with a structured excerpt or LLM-generated summary."
+            }
+          }
+        },
+        {
+          "id": "DG-10",
+          "name": "Circular Benchmark Derivation Disclosure",
+          "weight": 0.3,
+          "threshold": 5.0,
+          "score": 7.5,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 5,
+          "scenarios_below_threshold": 0,
+          "finding_summary": "1/4 disclosure issues confirmed. Circularity present in: ['S01', 'S02', 'S03']. data_note present: True.",
+          "remediation": "1) Rename headroom_to_p25_cr \u2192 benchmark_p50_to_p25_band_cr to clarify it is a benchmark range width. 2) Change percentile_band from hardcoded 'Reference' to 'synthetic_P50' to make derivation explicit. 3) Add top-level field 'profile_basis': 'benchmark_proxy' in addition to data_note. Structural fix: when session has uploaded spend data, use actual spend profile instead of synthetic.",
+          "evidence": {
+            "issue_checks": {
+              "circular_derivation_confirmed": true,
+              "percentile_band_hardcoded_reference": false,
+              "data_note_missing_or_inaccurate": false,
+              "headroom_field_name_misleading": false
+            },
+            "confirmed_issues": [
+              "circular_derivation_confirmed"
+            ],
+            "per_scenario_circularity": {
+              "S01": {
+                "total_gaps": 20,
+                "gaps_where_actual_eq_p50": 20,
+                "circularity_ratio": 1.0,
+                "circular": true
+              },
+              "S02": {
+                "total_gaps": 20,
+                "gaps_where_actual_eq_p50": 20,
+                "circularity_ratio": 1.0,
+                "circular": true
+              },
+              "S03": {
+                "total_gaps": 18,
+                "gaps_where_actual_eq_p50": 18,
+                "circularity_ratio": 1.0,
+                "circular": true
+              },
+              "S04": {
+                "skipped": "unmapped industry or run failed"
+              },
+              "S05": {
+                "skipped": "unmapped industry or run failed"
+              }
+            },
+            "all_percentile_bands_reference": false,
+            "data_note_present_and_accurate": true,
+            "circularity_scenarios": [
+              "S01",
+              "S02",
+              "S03"
+            ],
+            "explanation": "Synthetic profile is built as: implied_spend = P50_pct/100 * revenue. peer_benchmarker then computes actual_pct = spend/revenue*100 = P50_pct. Benchmark gap analysis therefore benchmarks the benchmark against itself."
+          }
+        },
+        {
+          "id": "DG-11",
+          "name": "Silent Parameter Defaulting",
+          "weight": 0.3,
+          "threshold": 4.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "scenarios_run": 0,
+          "scenarios_below_threshold": 0,
+          "finding_summary": "0/4 silent-defaulting issues confirmed: []",
+          "remediation": "1) Add headcount (int, default=500) to CompanyResearchRequest schema and pass through. 2) Build signal_corpus from synthetic profile before calling resolve_eligible_levers. 3) Derive line_flags from company_signals.constraints before lever resolution. 4) Generate engagement_id = f'diag-{company_name}-{timestamp}' for audit traceability. 5) Document in API response that benchmark payload covers all categories by design.",
+          "evidence": {
+            "issue_checks": {
+              "headcount_missing_from_request_schema": false,
+              "signal_corpus_always_none": false,
+              "line_flags_always_none": false,
+              "engagement_id_not_passed": false
+            },
+            "confirmed_issues": [],
+            "schema_fields": {
+              "CompanyResearchRequest_has_headcount": true,
+              "note": "headcount=500.0 hardcoded in endpoint; caller cannot override it"
+            },
+            "signal_corpus_check": {
+              "passed_in_lever_call": true,
+              "note": "signal_corpus=None means signal corpus rebuilt from scratch every call"
+            },
+            "line_flags_check": {
+              "passed_in_lever_call": true,
+              "note": "line_flags=None disables flag-based lever filtering"
+            },
+            "engagement_id_check": {
+              "passed_in_lever_call": true,
+              "note": "engagement_id=None orphans diagnostic runs from audit trail"
+            },
+            "categories_filter_note": "By design: resolve_benchmark_payload passes categories to select_best_dataset() for dataset selection scoring only. Payload covers all categories. Not a bug."
+          }
+        }
+      ]
+    }
+  ],
+  "top_gaps": [],
+  "remediation_roadmap": []
+}

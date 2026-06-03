@@ -18,6 +18,7 @@ from app.schemas import (
     DeepResearchStatusResponse,
     SectorPackOverrideRequest,
 )
+from app.services.analysis import load_taxonomy
 from app.services.benchmarks import resolve_benchmark_payload
 from app.services.compliance import append_audit_event
 from app.services.sector_packs import (
@@ -267,6 +268,137 @@ _PERCENTILE_LEGEND: Dict[str, str] = {
     "p90": "lagging quartile",
 }
 
+_TAXONOMY_NAMES: Dict[str, str] | None = None
+
+
+def _category_display_name(category_id: str) -> str:
+    global _TAXONOMY_NAMES
+    if _TAXONOMY_NAMES is None:
+        taxonomy = load_taxonomy()
+        _TAXONOMY_NAMES = {
+            str(cat.get("id", "")): str(cat.get("name", ""))
+            for cat in taxonomy.get("categories", [])
+            if cat.get("id")
+        }
+    return _TAXONOMY_NAMES.get(category_id) or category_id.replace("_", " ").title()
+
+
+def _humanize_trigger_signal(signal: str) -> str:
+    if signal == "universal_lever":
+        return "applies as a standard cost lever for this sector"
+    if signal == "no_restriction":
+        return "no sector-specific restriction"
+    if signal.startswith("category:") and signal.endswith("_present"):
+        cid = signal.split(":")[1].replace("_present", "")
+        return f"{_category_display_name(cid)} spend is material in the benchmark profile"
+    cleaned = signal.replace("_", " ").strip()
+    if "keywords detected" in cleaned.lower():
+        return cleaned
+    return cleaned
+
+
+def _benchmark_gap_commentary(
+    *,
+    category_name: str,
+    p25_pct: float,
+    p50_pct: float,
+    band_cr: float,
+    source: str,
+) -> str:
+    parts = [
+        f"{category_name} is modelled at {p50_pct:g}% of revenue (industry median P50); "
+        f"{_fmt_cr(band_cr)} savings potential if spend moves to P25 best-in-class ({p25_pct:g}%).",
+    ]
+    if source:
+        parts.append(f"Benchmark: {source}.")
+    parts.append("Based on sector benchmark proxy — upload actual spend for company-specific gaps.")
+    return " ".join(parts)
+
+
+def _lever_rationale(lv: Dict[str, Any], matched_category_id: str) -> str:
+    signals = lv.get("trigger_signals") or []
+    phrases = [_humanize_trigger_signal(s) for s in signals[:4] if s != "universal_lever"]
+    if not phrases and "universal_lever" in signals:
+        phrases = [_humanize_trigger_signal("universal_lever")]
+
+    parts: List[str] = []
+    if phrases:
+        parts.append("Selected because " + "; ".join(phrases) + ".")
+    if lv.get("root_cause_match"):
+        parts.append("Supported by root-cause analysis on the spend profile.")
+
+    complexity = _COMPLEXITY_LABELS.get(str(lv.get("complexity_tier", "medium")), "medium complexity")
+    savings_key = str(lv.get("savings_type", "run_rate"))
+    savings_label = _SAVINGS_TYPE_LABELS.get(savings_key, savings_key.replace("_", " ").title())
+    parts.append(f"{savings_label} · {complexity.capitalize()}.")
+    return " ".join(parts)
+
+
+def _build_lever_value_derivation(
+    *,
+    base_spend_cr: float,
+    matched_category_id: str,
+    used_portfolio_proxy: bool,
+    p10_pct: float,
+    p50_pct: float,
+    p90_pct: float,
+    p10_cr: float,
+    p50_cr: float,
+    p90_cr: float,
+) -> Dict[str, Any]:
+    if matched_category_id and not used_portfolio_proxy:
+        pool_label = _category_display_name(matched_category_id)
+        pool_source = "category_benchmark_proxy"
+        pool_note = (
+            f"{pool_label} addressable pool from sector benchmark P50 spend profile "
+            "(proxy until actual spend is uploaded)"
+        )
+    else:
+        pool_label = "Portfolio (proxy)"
+        pool_source = "portfolio_proxy_10pct"
+        pool_note = (
+            "No single category pool matched — 10% of total implied OpEx used as addressable proxy"
+        )
+
+    pool_fmt = _fmt_cr(base_spend_cr)
+    return {
+        "base_spend_cr": round(base_spend_cr, 1),
+        "base_spend_label": pool_label,
+        "base_spend_source": pool_source,
+        "base_spend_note": pool_note,
+        "savings_rate_p10_pct": round(p10_pct, 1),
+        "savings_rate_p50_pct": round(p50_pct, 1),
+        "savings_rate_p90_pct": round(p90_pct, 1),
+        "calculation_p10": f"Conservative (P10) = {p10_pct:g}% × {pool_fmt} = {_fmt_cr(p10_cr)}",
+        "calculation_p50": f"Expected (P50) = {p50_pct:g}% × {pool_fmt} = {_fmt_cr(p50_cr)}",
+        "calculation_p90": f"Stretch (P90) = {p90_pct:g}% × {pool_fmt} = {_fmt_cr(p90_cr)}",
+    }
+
+
+def _lever_calculation_note(derivation: Dict[str, Any]) -> str:
+    return (
+        f"{derivation['calculation_p50']}. "
+        f"Pool: {_fmt_cr(derivation['base_spend_cr'])} — {derivation['base_spend_note']}. "
+        f"Capture rates from sector lever playbook "
+        f"(P10 {derivation['savings_rate_p10_pct']:g}% / "
+        f"P50 {derivation['savings_rate_p50_pct']:g}% / "
+        f"P90 {derivation['savings_rate_p90_pct']:g}%)."
+    )
+
+
+_VALUE_AT_TABLE_METHODOLOGY: Dict[str, Any] = {
+    "summary": (
+        "Value at table estimates annual run-rate savings as "
+        "sector capture rate × addressable spend pool for each eligible lever."
+    ),
+    "steps": [
+        "Eligible levers are chosen from the sector playbook when spend signals and industry context match.",
+        "Each lever applies P10 / P50 / P90 capture rates from the playbook to an addressable spend pool.",
+        "Spend pool = benchmark-proxy category spend when a category matches; otherwise 10% of total implied OpEx.",
+        "Top 12 levers by expected (P50) value are shown. Row totals are not deduplicated across levers.",
+    ],
+}
+
 _FINDINGS_SYSTEM_PROMPT = """You are a senior FP&A analyst writing a diagnostic findings summary for a CFO audience.
 You will receive structured diagnostic data about a company's OpEx benchmark profile.
 
@@ -465,7 +597,7 @@ async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
         if implied_spend > 0:
             category_profile.append({
                 "category_id": cat_id,
-                "category_name": cat_id.replace("_", " ").title(),
+                "category_name": _category_display_name(cat_id),
                 "spend": implied_spend,
                 "supplier_count": 5,
                 "transaction_count": 50,
@@ -489,9 +621,10 @@ async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
         implied_p50_cr = round(p50_pct / 100.0 * req.annual_revenue_cr, 1)
         implied_p25_cr = round(p25_pct / 100.0 * req.annual_revenue_cr, 1)
         band_cr = round((p50_pct - p25_pct) / 100.0 * req.annual_revenue_cr, 1)
+        cat_name = row.get("category_name", row.get("category_id", ""))
         benchmark_gaps.append({
             "category": row.get("category_id", ""),
-            "category_name": row.get("category_name", row.get("category_id", "")),
+            "category_name": cat_name,
             "p25_pct": round(p25_pct, 2),
             "p50_pct": round(p50_pct, 2),
             "proxy_pct": round(p50_pct, 2),
@@ -500,7 +633,15 @@ async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
             "implied_p50_cr": implied_p50_cr,
             "implied_p25_cr": implied_p25_cr,
             "benchmark_p50_to_p25_band_cr": band_cr,
+            "headroom_to_p25_cr": band_cr,
             "percentile_band": "P50 industry benchmark (proxy)",
+            "commentary": _benchmark_gap_commentary(
+                category_name=str(cat_name),
+                p25_pct=p25_pct,
+                p50_pct=p50_pct,
+                band_cr=band_cr,
+                source=str(row.get("source") or ""),
+            ),
         })
     benchmark_gaps.sort(key=lambda x: x["implied_p50_cr"], reverse=True)
 
@@ -547,21 +688,43 @@ async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
                 matched_category_id = cid
                 break
         base_spend_cr = primary_cat_spend_cr if primary_cat_spend_cr > 0 else total_spend_cr * 0.10
+        used_portfolio_proxy = primary_cat_spend_cr <= 0
+        p10_cr = round(p10_rate * base_spend_cr, 1)
         p50_cr = round(p50_rate * base_spend_cr, 1)
+        p90_cr = round(p90_rate * base_spend_cr, 1)
         if p50_cr < 0.1:
             continue
         npv = round(sum(p50_cr / (1.0 + req.wacc) ** t for t in range(1, 4)), 1)
+        rng_p10 = float(rng.get("p10", 0))
+        rng_p50 = float(rng.get("p50", 0))
+        rng_p90 = float(rng.get("p90", 0))
+        value_derivation = _build_lever_value_derivation(
+            base_spend_cr=base_spend_cr,
+            matched_category_id=matched_category_id,
+            used_portfolio_proxy=used_portfolio_proxy,
+            p10_pct=rng_p10,
+            p50_pct=rng_p50,
+            p90_pct=rng_p90,
+            p10_cr=p10_cr,
+            p50_cr=p50_cr,
+            p90_cr=p90_cr,
+        )
         value_at_table.append({
             "lever_id": lv["lever_id"],
             "lever_name": lv["lever_name"],
             "category": matched_category_id,
-            "p10_cr": round(p10_rate * base_spend_cr, 1),
+            "base_spend_cr": value_derivation["base_spend_cr"],
+            "base_spend_label": value_derivation["base_spend_label"],
+            "p10_cr": p10_cr,
             "p50_cr": p50_cr,
-            "p90_cr": round(p90_rate * base_spend_cr, 1),
+            "p90_cr": p90_cr,
             "npv": npv,
             "savings_type": lv.get("savings_type", "run_rate"),
             "savings_type_label": _SAVINGS_TYPE_LABELS.get(lv.get("savings_type", "run_rate"), lv.get("savings_type", "run_rate").replace("_", " ").title()),
             "complexity_tier": lv.get("complexity_tier", "medium"),
+            "rationale": _lever_rationale(lv, matched_category_id),
+            "calculation_note": _lever_calculation_note(value_derivation),
+            "value_derivation": value_derivation,
         })
     value_at_table.sort(key=lambda x: x["p50_cr"], reverse=True)
     value_at_table = value_at_table[:12]
@@ -649,6 +812,11 @@ async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
         "company_signals": company_signals,
         "benchmark_gaps": benchmark_gaps,
         "value_at_table": value_at_table,
+        "value_at_table_methodology": {
+            **_VALUE_AT_TABLE_METHODOLOGY,
+            "eligible_levers_total": len(eligible_levers),
+            "shown_levers": len(value_at_table),
+        },
         "eligible_levers_total": len(eligible_levers),
         "total_p50_value_cr": total_p50,
         "key_findings": key_findings,
@@ -687,13 +855,12 @@ def start_deep_research_endpoint(req: DeepResearchStartRequest) -> Dict[str, Any
             detail="Deep Research is not configured — set GEMINI_API_KEY",
         )
     from app.opar.deep_research_client import start_deep_research
+    from app.services.deep_research_prompt import build_default_deep_research_prompt
 
-    query = (
-        f"OpEx cost benchmarks, procurement maturity, and savings opportunities for "
-        f"{req.company_name} in the {req.industry} sector. "
-        f"Annual revenue approximately ₹{req.annual_revenue_cr} Cr. "
-        f"Focus on: top cost categories, industry peer benchmarks, typical cost-reduction "
-        f"levers, and key risk factors."
+    query = (req.research_prompt or "").strip() or build_default_deep_research_prompt(
+        req.company_name,
+        req.industry,
+        req.annual_revenue_cr,
     )
     try:
         interaction_id = start_deep_research(query)
@@ -705,6 +872,8 @@ def start_deep_research_endpoint(req: DeepResearchStartRequest) -> Dict[str, Any
         try:
             manifest = read_manifest(req.session_id)
             manifest["deep_research_interaction_id"] = interaction_id
+            if req.research_prompt:
+                manifest["deep_research_prompt"] = req.research_prompt.strip()
             write_manifest(req.session_id, manifest)
         except Exception:
             pass  # Non-fatal — main job is already started

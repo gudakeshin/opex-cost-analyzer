@@ -1,6 +1,6 @@
 """Layer 2: LLM-as-judge faithfulness and trace-grounding scorers.
 
-These classes require a live Anthropic API key and are NOT run in standard CI.
+These classes require a live Gemini API key and are NOT run in standard CI.
 Gate with:  pytest.mark.llm_judge  +  RUN_LLM_JUDGE=1 env var.
 
 FaithfulnessJudge  — scores whether a skill's output contains unsupported claims
@@ -12,33 +12,16 @@ TraceGroundedJudge — scores whether claims in the final response_text can be
 from __future__ import annotations
 
 import json
-import os
 from dataclasses import dataclass, field
 from typing import Any, Dict, List
 
-from app.config import GEMINI_ENABLED, LLM_PROVIDER
 from app.opar.models import EvalTrace
 
 
 def _call_judge_llm(system: str, user_content: str, max_tokens: int = 512) -> str:
-    """Route judge LLM call to Gemini or Anthropic based on LLM_PROVIDER."""
-    if LLM_PROVIDER == "gemini" and GEMINI_ENABLED:
-        from app.opar.gemini_client import call_judge_llm
-        return call_judge_llm(system=system, user_content=user_content, max_tokens=max_tokens)
-
-    try:
-        import anthropic
-    except ImportError:
-        raise RuntimeError("anthropic package required for LLM judge. pip install anthropic")
-    import os
-    client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
-    msg = client.messages.create(
-        model="claude-haiku-4-5",
-        max_tokens=max_tokens,
-        system=system,
-        messages=[{"role": "user", "content": user_content}],
-    )
-    return msg.content[0].text
+    """Route judge LLM calls through Gemini Flash-Lite."""
+    from app.opar.gemini_client import call_judge_llm
+    return call_judge_llm(system=system, user_content=user_content, max_tokens=max_tokens)
 
 # ---------------------------------------------------------------------------
 # Result data classes
@@ -78,8 +61,6 @@ class FaithfulnessJudge:
         )
         assert result.score >= 0.75
     """
-
-    MODEL = "claude-haiku-4-5"  # fast + cheap for eval runs
 
     _SYSTEM = (
         "You are an FP&A audit assistant. You evaluate whether a financial analysis "
@@ -146,8 +127,6 @@ class TraceGroundedJudge:
     For each numerical claim in response_text, asks Claude to identify which
     SkillTrace's input_snapshot (raw spend lines) supports the claim.
     """
-
-    MODEL = "claude-haiku-4-5"
 
     _SYSTEM = (
         "You are a financial audit assistant verifying that an executive brief "

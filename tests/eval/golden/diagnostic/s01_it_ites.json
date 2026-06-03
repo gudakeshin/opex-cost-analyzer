@@ -1,0 +1,23 @@
+{
+  "scenario_id": "S01",
+  "description": "IT/ITES industry, ₹2,000 Cr revenue — baseline arithmetic scenario. Known mapped sector, normal company size. Expect non-empty benchmark_gaps and value_at_table, correct total_p50 arithmetic, and stub fields (npv=0, category='') to be present.",
+  "request": {
+    "company_name": "TechCorp India Pvt Ltd",
+    "industry": "it_ites",
+    "annual_revenue_cr": 2000.0,
+    "urls": []
+  },
+  "scoring_hints": {
+    "expect_value_at_table_nonempty": true,
+    "expect_benchmark_gaps_nonempty": true,
+    "expect_total_p50_matches_sum": true,
+    "expect_stub_npv_zero": true,
+    "expect_stub_category_empty": true,
+    "expect_gap_pct_zero": true,
+    "expect_gap_cr_zero": true,
+    "expect_actual_pct_equals_p50_pct": true,
+    "expect_key_findings_min_count": 2,
+    "industry_mapped": true,
+    "expected_bench_industry": "technology"
+  }
+}

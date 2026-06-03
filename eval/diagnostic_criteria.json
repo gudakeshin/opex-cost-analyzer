@@ -1,0 +1,123 @@
+{
+  "eval_name": "Diagnostic Feature Eval",
+  "version": "1.0",
+  "description": "Evaluates /api/v1/diagnostic/company-research endpoint across data integrity, analysis completeness, and schema/signal integrity dimensions.",
+  "domains": [
+    {
+      "name": "data_integrity",
+      "display": "Data Integrity",
+      "weight": 0.35,
+      "dimensions": [
+        {
+          "id": "DG-01",
+          "name": "Synthetic Profile Arithmetic",
+          "weight": 0.30,
+          "threshold": 7.0,
+          "description": "total_spend matches sum of category_profile spends within 1%; implied spend = P50_pct/100 * revenue within rounding tolerance.",
+          "remediation": "Recompute total_implied after building category_profile. Verify P50 percentage loading from benchmark JSON. Check floating-point accumulation in the loop at enterprise.py:301."
+        },
+        {
+          "id": "DG-02",
+          "name": "Benchmark Gap Field Consistency",
+          "weight": 0.30,
+          "threshold": 8.0,
+          "description": "Since actual spend is synthetic (= P50 benchmark), actual_pct must equal p50_pct, gap_pct and gap_cr must always be 0.0. benchmark_gaps must be sorted descending by implied_p50_cr.",
+          "remediation": "This is structural: the fields gap_pct/gap_cr are meaningless for synthetic profiles. Either remove them, rename them (e.g. potential_savings_cr), or compute them relative to the P25 target. Fix sort assertion by verifying benchmark_gaps ordering in tests."
+        },
+        {
+          "id": "DG-03",
+          "name": "Value-at-Table Arithmetic",
+          "weight": 0.40,
+          "threshold": 7.0,
+          "description": "total_p50_value_cr == round(sum(value_at_table[*].p50_cr), 1) within 1%; for every lever p10_cr <= p50_cr <= p90_cr (monotonicity); no lever has p50_cr < 0.1 (filter applied).",
+          "remediation": "Review summation at enterprise.py:375. Verify savings_range_pct p10<=p50<=p90 in lever JSON files. If any lever violates monotonicity in its source JSON, fix that lever definition."
+        }
+      ]
+    },
+    {
+      "name": "analysis_completeness",
+      "display": "Analysis Completeness",
+      "weight": 0.40,
+      "dimensions": [
+        {
+          "id": "DG-04",
+          "name": "Stub Field Detection",
+          "weight": 0.35,
+          "threshold": 4.0,
+          "description": "Detects known stub fields: npv always 0.0, category always empty string in value_at_table entries, gap_pct/gap_cr always 0.0. Score = 10 - (2.5 * stubs_confirmed). A score below threshold means >= 3 stubs confirmed. This dimension intentionally starts low; higher scores are possible after fixes.",
+          "remediation": "1) NPV: Add wacc param to CompanyResearchRequest (default 0.12); compute NPV as sum(p50_cr/(1+wacc)^t for t in 1..3). 2) category: Populate from the first matched trigger_signal category ID. 3) gap_pct/gap_cr: Compute as headroom_to_p25 expressed as pct/cr. Priority: NPV > category > gap fields."
+        },
+        {
+          "id": "DG-05",
+          "name": "Lever Base Spend Coverage",
+          "weight": 0.30,
+          "threshold": 6.0,
+          "description": "What fraction of shortlisted levers resolve a non-zero primary_cat_spend_cr from their trigger_signals (vs. falling back to 10% of total_spend). High floor-fallback rate degrades savings accuracy. Score = (levers_with_category_match / total_levers) * 10.",
+          "remediation": "Review trigger_signal format in sector lever JSONs. Ensure category IDs in trigger_signals match category_ids produced by resolve_benchmark_payload. Consider adding a multi-category signal resolver instead of taking only the first match."
+        },
+        {
+          "id": "DG-06",
+          "name": "Key Findings Completeness",
+          "weight": 0.35,
+          "threshold": 7.0,
+          "description": "All 4 expected finding types present (largest category, highest-value lever, document flags if constraints exist, total value summary). Also checks: '3-year savings' label in key_findings vs. actual time horizon multiplication (flags as known inconsistency in evidence but does not deduct score).",
+          "remediation": "Ensure key_findings always appends the total value finding even when value_at_table is empty (currently it always appends it, but verify for edge cases). Fix the '3-year savings' label by either: (a) multiplying p50_cr by 3 in key findings, or (b) changing the label to 'annual savings estimate'."
+        }
+      ]
+    },
+    {
+      "name": "schema_signal_integrity",
+      "display": "Schema & Signal Integrity",
+      "weight": 0.25,
+      "dimensions": [
+        {
+          "id": "DG-07",
+          "name": "Diagnostic Signal Schema",
+          "weight": 0.40,
+          "threshold": 9.0,
+          "description": "Every lever in every sector pack JSON and in the universal levers file must have a diagnostic_signals array. Each element must contain: signal (str), evidence_source (str), confirms (str). Empty arrays are flagged.",
+          "remediation": "For any lever missing diagnostic_signals or with incomplete signal objects, add them to the lever JSON file under skills/sector-packs/<pack>/sector_levers.json. Use the schema: [{signal, evidence_source, confirms}]. Also add to universal levers if missing."
+        },
+        {
+          "id": "DG-08",
+          "name": "Sector Pack Mapping Coverage",
+          "weight": 0.60,
+          "threshold": 8.0,
+          "description": "All sector pack directories discovered under skills/sector-packs/ must have a corresponding entry in the _PACK_TO_BENCH dict in enterprise.py. Missing mappings cause silent benchmark lookup failures.",
+          "remediation": "Add the following to _PACK_TO_BENCH in app/routers/enterprise.py: financial_services_nonbank -> financial_services, gcc_capability_centers -> technology, healthcare_hospitals -> healthcare, hospitality_travel -> retail_consumer (or add a hospitality benchmark category). Also add any newly created sector packs."
+        }
+      ]
+    },
+    {
+      "name": "input_signal_quality",
+      "display": "Input Signal Quality",
+      "weight": 0.20,
+      "dimensions": [
+        {
+          "id": "DG-09",
+          "name": "Document Contextualizer Signal Quality",
+          "weight": 0.40,
+          "threshold": 4.0,
+          "description": "Audits document_contextualizer() for stub/quality issues: (1) empty-input dead-code path always returns no inference when urls=[], making URL analysis useless in the common case; (2) naive substring matching causes false positives — 'contract' matches 'contractor', 'ran' (Radio Access Network) matches past tense of 'run'; (3) ambiguous ultra-short keywords (<=3 chars: 'ran', 'rpu', 'gcc', 'nav', 'oee') that are common English words or multi-industry acronyms; (4) nondeterministic tie-breaking via plain max() with no secondary sort; (5) context_summary is raw stripped HTML text, not an actual summary. Score = 10 - (2 * issues_confirmed).",
+          "remediation": "1) Add meaningful default when urls=[]: either skip contextualizer or return a structured 'no_url_data' signal. 2) Replace substring matching with word-boundary regex (\\bkeyword\\b). 3) Remove or qualify ambiguous short keywords (ran, rpu, gcc, nav). 4) Add deterministic tie-breaking (e.g. sort by pack_id). 5) Replace context_summary raw concat with a structured excerpt or LLM-generated summary."
+        },
+        {
+          "id": "DG-10",
+          "name": "Circular Benchmark Derivation Disclosure",
+          "weight": 0.30,
+          "threshold": 5.0,
+          "description": "The synthetic profile is built from P50 benchmark percentages (implied_spend = P50/100 * revenue), then peer_benchmarker compares it against the same benchmarks — making actual_pct ≈ p50_pct by construction. This creates circular data: the 'gap' analysis is benchmarking the benchmark against itself. Three disclosure checks: (a) data_note must be present and accurate, (b) percentile_band should not be hardcoded 'Reference' (hides circularity from consumer), (c) headroom_to_p25_cr is P50→P25 band width, not actual company headroom — field name is misleading.",
+          "remediation": "1) Rename headroom_to_p25_cr to benchmark_p50_to_p25_band_cr to clarify it is a benchmark range, not the company's actual savings headroom. 2) Change percentile_band from 'Reference' to 'synthetic_P50' to make the synthetic derivation explicit. 3) Add a top-level field 'profile_basis': 'benchmark_proxy' to the output (beyond data_note). Actual fix: use uploaded spend data when available before falling back to synthetic."
+        },
+        {
+          "id": "DG-11",
+          "name": "Silent Parameter Defaulting",
+          "weight": 0.30,
+          "threshold": 4.0,
+          "description": "Several parameters that affect analysis quality are silently hardcoded or defaulted in the endpoint without any way for the caller to override them: (1) headcount=500 hardcoded, not in request schema; (2) signal_corpus=None always — prevents pre-built signal reuse; (3) line_flags=None always — skips flag-based lever filtering; (4) engagement_id not passed — orphans audit trail; (5) categories param to resolve_benchmark_payload is used only for dataset selection, not payload filtering — all benchmark categories returned regardless of request. Score = 10 - (2 * params_silently_defaulted).",
+          "remediation": "1) Add headcount (int, default=500) to CompanyResearchRequest schema and pass through. 2) Build signal_corpus from synthetic profile before calling resolve_eligible_levers. 3) Derive line_flags from company_signals constraints before calling resolve_eligible_levers. 4) Generate an engagement_id from company_name+timestamp and pass to resolve_eligible_levers for audit traceability. 5) Document in API response that benchmark payload covers all categories (this is by design for dataset selection)."
+        }
+      ]
+    }
+  ]
+}

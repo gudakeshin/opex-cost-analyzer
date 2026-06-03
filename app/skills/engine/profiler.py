@@ -35,20 +35,19 @@ _DOC_INDUSTRY_SIGNALS: Dict[str, List[str]] = {
     "it_ites": ["software license", "cloud infrastructure", "saas", "bpo", "ites", "data centre", "devops"],
     "fmcg_consumer": ["sku", "distributor", "trade promotion", "shelf space", "fmcg", "consumer goods", "retail chain"],
     "pharma_lifesciences": ["clinical trial", "regulatory submission", "api manufacturing", "pharmacovigilance", "drug master file"],
-    "energy_utilities": ["power plant", "generation capacity", "transmission", "at&c loss", "renewable energy", "grid"],
+    "energy_utilities": ["power plant", "generation capacity", "transmission", "at&c loss", "renewable energy", "electrical grid"],
     "insurance_general": ["claims ratio", "loss ratio", "underwriting", "reinsurance", "actuarial", "premium income"],
     "retail_organized": ["same store sales", "square footage", "footfall", "inventory turnover", "shrinkage"],
-    "telecom_infra": ["spectrum", "rpu", "arpu", "tower", "ran", "5g", "telecom"],
+    "telecom_infra": ["spectrum", "rpu", "arpu", "tower", "radio access network", "5g rollout", "telecom"],
     "manufacturing_diversified": ["plant maintenance", "oee", "downtime", "production capacity", "raw material", "packaging material"],
-    "psu_cpse": ["psu", "cpse", "public sector", "gem portal", "dgs&d", "pat cycle"],
+    "psu_cpse": ["psu", "cpse", "public sector undertaking", "gem portal", "dgs&d", "pat cycle"],
     "conglomerate": ["holding company", "subsidiary", "group revenue", "inter-company", "conglomerate"],
     "healthcare_hospitals": ["bed capacity", "nabh", "ot utilization", "inpatient", "outpatient", "clinical staff", "occupancy rate", "nurse", "physician", "pharmacy formulary", "revenue cycle", "denial rate"],
-    "hospitality_travel": ["revpar", "adr", "ota commission", "food and beverage", "room nights", "channel manager", "pms", "housekeeping", "occupancy rate", "booking engine"],
-    "financial_services_nonbank": ["aum", "fund management", "asset management", "fintech", "mifid", "sebi amc", "nav", "portfolio management", "broker vote", "custody fee", "performance attribution"],
+    "hospitality_travel": ["revpar", "average daily rate", "ota commission", "food and beverage", "room nights", "channel manager", "property management system", "housekeeping", "booking engine"],
+    "financial_services_nonbank": ["aum", "fund management", "asset management", "fintech", "mifid", "sebi amc", "net asset value", "portfolio management", "broker vote", "custody fee", "performance attribution"],
     "gcc_capability_centers": [
-        "global capability center", "gcc", "captive center", "shared service center", "ssc",
-        "center of excellence", "coe", "offshore delivery", "captive unit", "nasscom gcc",
-        "fte cost", "seat cost", "attrition", "bench management", "automation ops",
+        "global capability center", "captive center", "captive centre", "shared service center", "offshore delivery",
+        "captive unit", "nasscom gcc", "fte cost", "seat cost", "attrition", "bench management", "automation ops",
     ],
 }
 
@@ -783,29 +782,124 @@ def chart_builder(profile: Dict[str, Any], user_message: str | None = None) -> D
 # Document contextualizer
 # ---------------------------------------------------------------------------
 
-def document_contextualizer(texts: List[str]) -> Dict[str, Any]:
+_DOC_CONTEXTUALIZER_SYSTEM_PROMPT = """You are an expert procurement and FP&A analyst. Extract structured signals from company documents.
+
+Return ONLY a valid JSON object with these exact keys:
+{
+  "inferred_industry": "<pack_id or empty string>",
+  "growth_phase": "<scaling|steady_state|restructuring|decline|unknown>",
+  "financial_stress_signals": ["<signal>", ...],
+  "procurement_maturity": "<low|medium|high>",
+  "constraints": ["<constraint phrase>", ...],
+  "positive_signals": ["<signal>", ...]
+}
+
+inferred_industry must be one of these exact values or empty string:
+bfsi_banks, it_ites, fmcg_consumer, pharma_lifesciences, energy_utilities, insurance_general,
+retail_organized, telecom_infra, manufacturing_diversified, psu_cpse, conglomerate,
+financial_services_nonbank, gcc_capability_centers, healthcare_hospitals, hospitality_travel
+
+constraints: explicit blockers to cost optimization (union agreements, regulatory mandates,
+active long-term contracts, hiring freeze, compliance requirements). Max 3 items.
+
+positive_signals: signals that help (digitization initiative, vendor consolidation underway,
+low procurement maturity = high upside, etc.). Max 3 items.
+
+financial_stress_signals: signals of cost pressure (margin compression mentioned, cost targets cited,
+headcount reduction program, capex freeze, etc.). Max 3 items.
+
+procurement_maturity: low = fragmented/manual/catalog-free, medium = some sourcing discipline,
+high = category management, SRM, advanced analytics.
+
+Return only the JSON object. No explanation. No markdown.
+"""
+
+
+def _keyword_fallback_contextualizer(texts: List[str]) -> Dict[str, Any]:
+    """Keyword-based fallback for when LLM is unavailable."""
+    import re as _re
     joined = "\n".join([t for t in texts if t.strip()])
     lowered = joined.lower()
     constraints = []
-    if "contract" in lowered:
+    if _re.search(r"\bcontract\b", lowered):
         constraints.append("Existing contract commitments detected")
-    if "compliance" in lowered or "policy" in lowered:
+    if _re.search(r"\bcompliance\b|\bpolicy\b", lowered):
         constraints.append("Policy/compliance constraints detected")
-    if "hiring freeze" in lowered or "headcount freeze" in lowered:
+    if _re.search(r"\bhiring freeze\b|\bheadcount freeze\b", lowered):
         constraints.append("Headcount constraints may limit optimization options")
-
     industry_hit_counts: Dict[str, int] = {}
     for pack_id, keywords in _DOC_INDUSTRY_SIGNALS.items():
-        hits = sum(1 for kw in keywords if kw in lowered)
+        hits = sum(
+            1 for kw in keywords
+            if _re.search(r"\b" + _re.escape(kw) + r"\b", lowered)
+        )
         if hits > 0:
             industry_hit_counts[pack_id] = hits
     inferred_industry = ""
     if industry_hit_counts:
-        inferred_industry = max(industry_hit_counts, key=lambda k: industry_hit_counts[k])
-
+        inferred_industry = max(
+            sorted(industry_hit_counts.keys()),
+            key=lambda k: industry_hit_counts[k],
+        )
     return {
         "context_summary": joined[:2500],
         "constraints": constraints,
         "inferred_industry": inferred_industry,
         "industry_signals": industry_hit_counts,
+        "url_data_available": True,
+        "extraction_method": "keyword_fallback",
     }
+
+
+def document_contextualizer(texts: List[str]) -> Dict[str, Any]:
+    url_data_available = len(texts) > 0
+
+    if not url_data_available:
+        return {
+            "context_summary": "",
+            "constraints": [],
+            "inferred_industry": "",
+            "industry_signals": {},
+            "url_data_available": False,
+            "extraction_method": "no_url_provided",
+        }
+
+    # Semantic LLM extraction — only when URL content is available
+    joined = "\n".join([t for t in texts if t.strip()])
+    excerpt = joined[:12_000]
+
+    try:
+        import json as _json
+        from app.opar.gemini_client import call_gemini
+
+        raw = call_gemini(
+            system=_DOC_CONTEXTUALIZER_SYSTEM_PROMPT,
+            user_content=f"Extract structured signals from the following company document text:\n\n{excerpt}",
+            max_tokens=600,
+        )
+        raw = raw.strip()
+        if raw.startswith("```"):
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+        extracted = _json.loads(raw)
+
+        valid_pack_ids = set(_DOC_INDUSTRY_SIGNALS.keys()) | {""}
+        inferred = extracted.get("inferred_industry", "")
+        if inferred not in valid_pack_ids:
+            inferred = ""
+
+        return {
+            "context_summary": excerpt[:2500],
+            "constraints": extracted.get("constraints", [])[:3],
+            "inferred_industry": inferred,
+            "growth_phase": extracted.get("growth_phase", "unknown"),
+            "financial_stress_signals": extracted.get("financial_stress_signals", [])[:3],
+            "procurement_maturity": extracted.get("procurement_maturity", "medium"),
+            "positive_signals": extracted.get("positive_signals", [])[:3],
+            "industry_signals": {},
+            "url_data_available": True,
+            "extraction_method": "llm_semantic",
+        }
+    except Exception:
+        return _keyword_fallback_contextualizer(texts)

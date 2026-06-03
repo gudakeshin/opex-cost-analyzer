@@ -12,7 +12,7 @@ export const DiagnosticScorecard: React.FC<DiagnosticScorecardProps> = ({ result
   const totalP50 =
     result.total_p50_value_cr ??
     (result.value_at_table ?? []).reduce((sum, row) => {
-      const v = Number(row.p50_value_cr ?? row.p50 ?? 0);
+      const v = Number(row.p50_cr ?? 0);
       return sum + (Number.isFinite(v) ? v : 0);
     }, 0);
 

@@ -214,6 +214,7 @@ class DeepResearchStartRequest(BaseModel):
     industry: str
     annual_revenue_cr: float = 5000.0
     session_id: str | None = None
+    research_prompt: str | None = None
 
 
 class DeepResearchStartResponse(BaseModel):
@@ -234,3 +235,6 @@ class DiagnosticContextPatch(BaseModel):
     annual_revenue_cr: float | None = None
     deep_research_summary: str | None = None
     deep_research_interaction_id: str | None = None
+    diagnostic_urls: List[str] | None = None
+    diagnostic_result: Dict[str, Any] | None = None
+    diagnostic_completed_at: str | None = None

@@ -1,0 +1,23 @@
+{
+  "scenario_id": "S03",
+  "description": "Pharma/Life-sciences, ₹500 Cr revenue — small company. Tests healthcare benchmark mapping, that p50_cr values are scaled correctly at lower revenue, and that the 10% floor fallback for base_spend is exercised for levers without a trigger-signal category match.",
+  "request": {
+    "company_name": "BioMed Pharma Ltd",
+    "industry": "pharma_lifesciences",
+    "annual_revenue_cr": 500.0,
+    "urls": []
+  },
+  "scoring_hints": {
+    "expect_value_at_table_nonempty": true,
+    "expect_benchmark_gaps_nonempty": true,
+    "expect_total_p50_matches_sum": true,
+    "expect_stub_npv_zero": true,
+    "expect_stub_category_empty": true,
+    "expect_gap_pct_zero": true,
+    "expect_gap_cr_zero": true,
+    "expect_actual_pct_equals_p50_pct": true,
+    "expect_key_findings_min_count": 2,
+    "industry_mapped": true,
+    "expected_bench_industry": "healthcare"
+  }
+}

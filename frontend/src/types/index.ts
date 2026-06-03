@@ -125,6 +125,14 @@ export interface SessionManifest {
   files?: ManifestFileEntry[];
   model_manifest?: ModelManifest;
   ingestion_report?: IngestionReport;
+  diagnostic_urls?: string[];
+  diagnostic_result?: DiagnosticResponse;
+  diagnostic_completed_at?: string;
+  deep_research_interaction_id?: string;
+  deep_research_prompt?: string;
+  deep_research_summary?: string;
+  deep_research_full_report?: string;
+  deep_research_completed_at?: string;
 }
 
 export interface ChatProgressResponse {
@@ -224,17 +232,77 @@ export interface DiagnosticRequest {
   urls: string[];
 }
 
+export interface BenchmarkGapRow {
+  category?: string;
+  category_id?: string;
+  category_name?: string;
+  p25_pct?: number;
+  p50_pct?: number;
+  gap_cr?: number;
+  implied_p50_cr?: number;
+  benchmark_p50_to_p25_band_cr?: number;
+  headroom_to_p25_cr?: number;
+  percentile_band?: string;
+  commentary?: string;
+  [key: string]: unknown;
+}
+
+export interface ValueDerivation {
+  base_spend_cr?: number;
+  base_spend_label?: string;
+  base_spend_source?: string;
+  base_spend_note?: string;
+  savings_rate_p10_pct?: number;
+  savings_rate_p50_pct?: number;
+  savings_rate_p90_pct?: number;
+  calculation_p10?: string;
+  calculation_p50?: string;
+  calculation_p90?: string;
+}
+
+export interface ValueAtTableRow {
+  lever_id?: string;
+  lever_name?: string;
+  category?: string;
+  base_spend_cr?: number;
+  base_spend_label?: string;
+  p10_cr?: number;
+  p50_cr?: number;
+  p90_cr?: number;
+  npv?: number;
+  savings_type?: string;
+  savings_type_label?: string;
+  complexity_tier?: string;
+  rationale?: string;
+  calculation_note?: string;
+  value_derivation?: ValueDerivation;
+  [key: string]: unknown;
+}
+
+export interface ValueAtTableMethodology {
+  summary?: string;
+  steps?: string[];
+  eligible_levers_total?: number;
+  shown_levers?: number;
+}
+
 export interface DiagnosticResponse {
   company_name: string;
   industry_used: string;
   annual_revenue_cr: number;
   key_findings: string[];
-  benchmark_gaps: Array<Record<string, unknown>>;
-  value_at_table: Array<Record<string, unknown>>;
+  benchmark_gaps: BenchmarkGapRow[];
+  value_at_table: ValueAtTableRow[];
   company_signals: Record<string, unknown>;
   data_note?: string;
   url_errors?: Array<Record<string, string>>;
   total_p50_value_cr?: number;
+  percentile_legend?: Record<string, string>;
+  assumptions?: Record<string, unknown>;
+  executive_summary?: string;
+  eligible_levers_total?: number;
+  profile_basis?: string;
+  value_at_table_methodology?: ValueAtTableMethodology;
 }
 
 export interface SkillMeta {
@@ -332,4 +400,7 @@ export interface DiagnosticContextPatch {
   annual_revenue_cr?: number;
   deep_research_summary?: string;
   deep_research_interaction_id?: string;
+  diagnostic_urls?: string[];
+  diagnostic_result?: DiagnosticResponse;
+  diagnostic_completed_at?: string;
 }

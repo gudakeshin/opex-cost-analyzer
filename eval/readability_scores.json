@@ -1,0 +1,741 @@
+{
+  "eval_name": "Diagnostic Readability Eval",
+  "eval_date": "2026-06-03",
+  "platform_version": "v2.1",
+  "overall_score": 10.0,
+  "passed": true,
+  "scenario_run_count": 5,
+  "scenario_pass_count": 5,
+  "domains": [
+    {
+      "name": "financial_formatting",
+      "display": "Financial Number Formatting",
+      "weight": 0.25,
+      "score": 10.0,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "RD-01",
+          "name": "Comma Separators in Findings",
+          "weight": 0.35,
+          "threshold": 8.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "finding_summary": "6/6 large numbers use comma formatting",
+          "remediation": "In enterprise.py key_findings assembly, replace :.0f with a helper: def _fmt_cr(n): return f'\u20b9{n:,.0f} Cr'. Apply to all findings strings (top-gap, top-lever, total-value findings).",
+          "evidence": {
+            "scenario_evidence": {
+              "S01": {
+                "revenue_cr": 2000.0,
+                "findings_count": 4,
+                "violations": []
+              },
+              "S02": {
+                "revenue_cr": 50000.0,
+                "findings_count": 4,
+                "violations": []
+              },
+              "S03": {
+                "revenue_cr": 500.0,
+                "findings_count": 4,
+                "violations": []
+              },
+              "S04": {
+                "revenue_cr": 5000.0,
+                "findings_count": 1,
+                "violations": []
+              },
+              "S05": {
+                "revenue_cr": 3000.0,
+                "findings_count": 4,
+                "violations": []
+              }
+            },
+            "violations": []
+          }
+        },
+        {
+          "id": "RD-02",
+          "name": "NPV Time Horizon Disclosure",
+          "weight": 0.35,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "finding_summary": "3/3 mapped scenarios disclose NPV time horizon",
+          "remediation": "In enterprise.py top-lever finding, append '3-year NPV' label: f'{lever_name} \u2014 {_fmt_cr(p50_cr)} annual savings; {_fmt_cr(npv)} 3-year NPV (P50 estimate)'. Alternatively add to assumptions dict: {npv_horizon_years: 3}.",
+          "evidence": {
+            "S01": {
+              "has_horizon_disclosure": true,
+              "npv_values": [
+                83.3,
+                65.6,
+                65.6
+              ],
+              "searched_in": "key_findings + data_note"
+            },
+            "S02": {
+              "has_horizon_disclosure": true,
+              "npv_values": [
+                2245.7,
+                1801.4,
+                1735.3
+              ],
+              "searched_in": "key_findings + data_note"
+            },
+            "S03": {
+              "has_horizon_disclosure": true,
+              "npv_values": [
+                28.8,
+                9.6,
+                8.6
+              ],
+              "searched_in": "key_findings + data_note"
+            },
+            "S04": {
+              "skipped": "unmapped sector \u2014 NPV may be absent by design"
+            },
+            "S05": {
+              "skipped": "unmapped sector \u2014 NPV may be absent by design"
+            }
+          }
+        },
+        {
+          "id": "RD-03",
+          "name": "WACC / Discount Rate Visible",
+          "weight": 0.3,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "finding_summary": "5/5 scenarios expose WACC in response payload",
+          "remediation": "Add 'assumptions' object to enterprise.py return dict: {'wacc_pct': round(req.wacc * 100, 1), 'headcount': req.headcount, 'npv_horizon_years': 3, 'profile_basis': 'benchmark_proxy'}.",
+          "evidence": {
+            "S01": {
+              "wacc_used": 0.12,
+              "wacc_disclosed_in_response": true,
+              "npv_computed": true
+            },
+            "S02": {
+              "wacc_used": 0.12,
+              "wacc_disclosed_in_response": true,
+              "npv_computed": true
+            },
+            "S03": {
+              "wacc_used": 0.12,
+              "wacc_disclosed_in_response": true,
+              "npv_computed": true
+            },
+            "S04": {
+              "wacc_used": 0.12,
+              "wacc_disclosed_in_response": true,
+              "npv_computed": false
+            },
+            "S05": {
+              "wacc_used": 0.12,
+              "wacc_disclosed_in_response": true,
+              "npv_computed": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "label_accuracy",
+      "display": "Label Accuracy & Terminology",
+      "weight": 0.25,
+      "score": 10.0,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "RD-04",
+          "name": "actual_pct Misnomer Detection",
+          "weight": 0.3,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "finding_summary": "0/4 scenarios have 'actual_pct' field equal to p50_pct (implying real company data when using benchmark proxy)",
+          "remediation": "In enterprise.py benchmark_gaps assembly (line ~328), rename 'actual_pct' \u2192 'proxy_pct'. Or add profile_note field per row: 'profile_note': 'derived from benchmark P50 \u2014 not actual spend'.",
+          "evidence": {
+            "S01": {
+              "has_actual_pct_field": false,
+              "actual_pct_equals_p50_pct": true,
+              "has_proxy_pct_alternative": true,
+              "has_proxy_disclaimer_in_data_note": true,
+              "is_misnomer": false,
+              "gap_count": 20
+            },
+            "S02": {
+              "has_actual_pct_field": false,
+              "actual_pct_equals_p50_pct": true,
+              "has_proxy_pct_alternative": true,
+              "has_proxy_disclaimer_in_data_note": true,
+              "is_misnomer": false,
+              "gap_count": 20
+            },
+            "S03": {
+              "has_actual_pct_field": false,
+              "actual_pct_equals_p50_pct": true,
+              "has_proxy_pct_alternative": true,
+              "has_proxy_disclaimer_in_data_note": true,
+              "is_misnomer": false,
+              "gap_count": 18
+            },
+            "S04": {
+              "skipped": "no benchmark gaps \u2014 unmapped sector"
+            },
+            "S05": {
+              "has_actual_pct_field": false,
+              "actual_pct_equals_p50_pct": true,
+              "has_proxy_pct_alternative": true,
+              "has_proxy_disclaimer_in_data_note": true,
+              "is_misnomer": false,
+              "gap_count": 19
+            }
+          }
+        },
+        {
+          "id": "RD-05",
+          "name": "percentile_band Jargon Removal",
+          "weight": 0.25,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "finding_summary": "0/4 scenarios expose 'synthetic_P50' jargon in percentile_band",
+          "remediation": "In enterprise.py line ~334, change: 'percentile_band': 'synthetic_P50' \u2192 'percentile_band': 'P50 industry benchmark (proxy)'",
+          "evidence": {
+            "S01": {
+              "percentile_band_values": [
+                "P50 industry benchmark (proxy)"
+              ],
+              "has_synthetic_P50_jargon": false,
+              "gap_count": 20
+            },
+            "S02": {
+              "percentile_band_values": [
+                "P50 industry benchmark (proxy)"
+              ],
+              "has_synthetic_P50_jargon": false,
+              "gap_count": 20
+            },
+            "S03": {
+              "percentile_band_values": [
+                "P50 industry benchmark (proxy)"
+              ],
+              "has_synthetic_P50_jargon": false,
+              "gap_count": 18
+            },
+            "S04": {
+              "skipped": "no benchmark gaps"
+            },
+            "S05": {
+              "percentile_band_values": [
+                "P50 industry benchmark (proxy)"
+              ],
+              "has_synthetic_P50_jargon": false,
+              "gap_count": 19
+            }
+          }
+        },
+        {
+          "id": "RD-06",
+          "name": "savings_type Display Format",
+          "weight": 0.25,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "finding_summary": "0/4 scenarios expose snake_case savings_type without readable label",
+          "remediation": "In enterprise.py value_at_table assembly (line ~393), add: _SAVINGS_LABELS = {'run_rate': 'Run Rate', 'one_time': 'One-Time', 'mixed': 'Mixed'} then 'savings_type_label': _SAVINGS_LABELS.get(savings_type, savings_type.replace('_', ' ').title())",
+          "evidence": {
+            "S01": {
+              "unique_savings_types": [
+                "run_rate"
+              ],
+              "has_savings_type_label": true,
+              "snake_case_values_found": [
+                "run_rate"
+              ],
+              "readable_format_issue": false
+            },
+            "S02": {
+              "unique_savings_types": [
+                "run_rate"
+              ],
+              "has_savings_type_label": true,
+              "snake_case_values_found": [
+                "run_rate"
+              ],
+              "readable_format_issue": false
+            },
+            "S03": {
+              "unique_savings_types": [
+                "run_rate"
+              ],
+              "has_savings_type_label": true,
+              "snake_case_values_found": [
+                "run_rate"
+              ],
+              "readable_format_issue": false
+            },
+            "S04": {
+              "skipped": "no levers in value_at_table"
+            },
+            "S05": {
+              "unique_savings_types": [
+                "run_rate"
+              ],
+              "has_savings_type_label": true,
+              "snake_case_values_found": [
+                "run_rate"
+              ],
+              "readable_format_issue": false
+            }
+          }
+        },
+        {
+          "id": "RD-07",
+          "name": "Debug Fields Nested (not top-level)",
+          "weight": 0.2,
+          "threshold": 6.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "finding_summary": "0/5 scenarios expose url_count/url_errors at top level",
+          "remediation": "In enterprise.py return dict, replace top-level url_count/url_errors with: '_meta': {'url_count': len(texts), 'url_errors': url_errors, 'bench_industry': bench_industry}",
+          "evidence": {
+            "S01": {
+              "debug_fields_at_top_level": [],
+              "has_meta_nesting": true,
+              "top_level_key_count": 14
+            },
+            "S02": {
+              "debug_fields_at_top_level": [],
+              "has_meta_nesting": true,
+              "top_level_key_count": 14
+            },
+            "S03": {
+              "debug_fields_at_top_level": [],
+              "has_meta_nesting": true,
+              "top_level_key_count": 14
+            },
+            "S04": {
+              "debug_fields_at_top_level": [],
+              "has_meta_nesting": true,
+              "top_level_key_count": 14
+            },
+            "S05": {
+              "debug_fields_at_top_level": [],
+              "has_meta_nesting": true,
+              "top_level_key_count": 14
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "findings_narrative",
+      "display": "Key Findings Narrative Quality",
+      "weight": 0.3,
+      "score": 10.0,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "RD-08",
+          "name": "Revenue-% Framing in Findings",
+          "weight": 0.35,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "finding_summary": "5/5 scenarios include % of revenue context in findings",
+          "remediation": "In enterprise.py top-gap finding, add revenue_pct: revenue_pct = round(implied_p50_cr / req.annual_revenue_cr * 100, 1); f'Largest category: {name} \u2014 {_fmt_cr(implied_p50_cr)} ({revenue_pct}% of revenue); ...' Similarly for total-value finding: total_pct = round(total_p50 / req.annual_revenue_cr * 100, 1)",
+          "evidence": {
+            "S01": {
+              "has_revenue_pct_framing": true,
+              "findings": [
+                "Largest category: Rnd \u2014 \u20b9200 Cr (10.0% of revenue) at P50 benchmark; \u20b9100 Cr headroom to P25 best-in-class",
+                "Highest-value lever: Cloud FinOps / Reserved Instance Optimisation (medium complexity) \u2014 \u20b935 Cr annual savings; \u20b983 Cr 3-year NPV (P50 estimate)",
+                "Savings range (P10\u2013P90): \u20b9122 Cr to \u20b9302 Cr across 9 levers",
+                "Total value at table (P50 annual): \u20b9210 Cr (10.5% of revenue) across 9 levers"
+              ],
+              "annual_revenue_cr": 2000.0
+            },
+            "S02": {
+              "has_revenue_pct_framing": true,
+              "findings": [
+                "Largest category: Outsourced \u2014 \u20b95,000 Cr (10.0% of revenue) at P50 benchmark; \u20b92,000 Cr headroom to P25 best-in-class",
+                "Highest-value lever: IT Vendor & Core Banking Platform Consolidation (high complexity) \u2014 \u20b9935 Cr annual savings; \u20b92,246 Cr 3-year NPV (P50 estimate)",
+                "Savings range (P10\u2013P90): \u20b92,424 Cr to \u20b96,649 Cr across 8 levers",
+                "Total value at table (P50 annual): \u20b94,344 Cr (8.7% of revenue) across 8 levers"
+              ],
+              "annual_revenue_cr": 50000.0
+            },
+            "S03": {
+              "has_revenue_pct_framing": true,
+              "findings": [
+                "Largest category: Rnd \u2014 \u20b960 Cr (12.0% of revenue) at P50 benchmark; \u20b935 Cr headroom to P25 best-in-class",
+                "Highest-value lever: Clinical Trial Efficiency & CRO Optimisation (high complexity) \u2014 \u20b912 Cr annual savings; \u20b929 Cr 3-year NPV (P50 estimate)",
+                "Savings range (P10\u2013P90): \u20b917 Cr to \u20b942 Cr across 9 levers",
+                "Total value at table (P50 annual): \u20b929 Cr (5.8% of revenue) across 9 levers"
+              ],
+              "annual_revenue_cr": 500.0
+            },
+            "S04": {
+              "has_revenue_pct_framing": true,
+              "findings": [
+                "Total value at table (P50 annual): \u20b90 Cr (0.0% of revenue) across 0 levers"
+              ],
+              "annual_revenue_cr": 5000.0
+            },
+            "S05": {
+              "has_revenue_pct_framing": true,
+              "findings": [
+                "Largest category: Facilities \u2014 \u20b9240 Cr (8.0% of revenue) at P50 benchmark; \u20b990 Cr headroom to P25 best-in-class",
+                "Highest-value lever: Remote-First Real Estate Optimisation (medium complexity) \u2014 \u20b9115 Cr annual savings; \u20b9277 Cr 3-year NPV (P50 estimate)",
+                "Savings range (P10\u2013P90): \u20b9139 Cr to \u20b9323 Cr across 9 levers",
+                "Total value at table (P50 annual): \u20b9231 Cr (7.7% of revenue) across 9 levers"
+              ],
+              "annual_revenue_cr": 3000.0
+            }
+          }
+        },
+        {
+          "id": "RD-09",
+          "name": "Actionability Signal in Findings",
+          "weight": 0.25,
+          "threshold": 6.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "finding_summary": "4/4 scenarios with levers include actionability signal in findings",
+          "remediation": "In enterprise.py top-lever finding, include complexity_tier: _COMPLEXITY = {'low': 'low complexity', 'medium': 'medium complexity', 'high': 'high complexity'}; f'{lever_name} ({_COMPLEXITY.get(top_lever[\"complexity_tier\"], \"medium complexity\")}) \u2014 ...'",
+          "evidence": {
+            "S01": {
+              "has_actionability_signal": true,
+              "matched_keyword": "medium complexity",
+              "complexity_tiers_in_vat": [
+                "high",
+                "medium"
+              ],
+              "findings_preview": [
+                "Largest category: Rnd \u2014 \u20b9200 Cr (10.0% of revenue) at P50 benchmark; \u20b9100 Cr headroom to P25 best-in-class",
+                "Highest-value lever: Cloud FinOps / Reserved Instance Optimisation (medium complexity) \u2014 \u20b935 Cr annual savings; \u20b983 Cr 3-year NPV (P50 estimate)"
+              ]
+            },
+            "S02": {
+              "has_actionability_signal": true,
+              "matched_keyword": "high complexity",
+              "complexity_tiers_in_vat": [
+                "high",
+                "medium"
+              ],
+              "findings_preview": [
+                "Largest category: Outsourced \u2014 \u20b95,000 Cr (10.0% of revenue) at P50 benchmark; \u20b92,000 Cr headroom to P25 best-in-class",
+                "Highest-value lever: IT Vendor & Core Banking Platform Consolidation (high complexity) \u2014 \u20b9935 Cr annual savings; \u20b92,246 Cr 3-year NPV (P50 estimate)"
+              ]
+            },
+            "S03": {
+              "has_actionability_signal": true,
+              "matched_keyword": "high complexity",
+              "complexity_tiers_in_vat": [
+                "high",
+                "medium"
+              ],
+              "findings_preview": [
+                "Largest category: Rnd \u2014 \u20b960 Cr (12.0% of revenue) at P50 benchmark; \u20b935 Cr headroom to P25 best-in-class",
+                "Highest-value lever: Clinical Trial Efficiency & CRO Optimisation (high complexity) \u2014 \u20b912 Cr annual savings; \u20b929 Cr 3-year NPV (P50 estimate)"
+              ]
+            },
+            "S04": {
+              "skipped": "no levers"
+            },
+            "S05": {
+              "has_actionability_signal": true,
+              "matched_keyword": "medium complexity",
+              "complexity_tiers_in_vat": [
+                "high",
+                "medium"
+              ],
+              "findings_preview": [
+                "Largest category: Facilities \u2014 \u20b9240 Cr (8.0% of revenue) at P50 benchmark; \u20b990 Cr headroom to P25 best-in-class",
+                "Highest-value lever: Remote-First Real Estate Optimisation (medium complexity) \u2014 \u20b9115 Cr annual savings; \u20b9277 Cr 3-year NPV (P50 estimate)"
+              ]
+            }
+          }
+        },
+        {
+          "id": "RD-10",
+          "name": "Savings Confidence Range Surfaced",
+          "weight": 0.2,
+          "threshold": 6.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "finding_summary": "4/4 scenarios surface P10/P90 savings range",
+          "remediation": "In enterprise.py key_findings assembly, add: total_p10 = sum(v['p10_cr'] for v in value_at_table); total_p90 = sum(v['p90_cr'] for v in value_at_table); key_findings.append(f'Savings range (P10\u2013P90): {_fmt_cr(total_p10)} to {_fmt_cr(total_p90)}')",
+          "evidence": {
+            "S01": {
+              "has_range_disclosure": true,
+              "total_p10_cr": 122.3,
+              "total_p50_cr": 210.0,
+              "total_p90_cr": 301.7,
+              "p10_to_p90_multiplier": 2.5
+            },
+            "S02": {
+              "has_range_disclosure": true,
+              "total_p10_cr": 2423.5,
+              "total_p50_cr": 4344.0,
+              "total_p90_cr": 6649.0,
+              "p10_to_p90_multiplier": 2.7
+            },
+            "S03": {
+              "has_range_disclosure": true,
+              "total_p10_cr": 17.1,
+              "total_p50_cr": 29.2,
+              "total_p90_cr": 41.7,
+              "p10_to_p90_multiplier": 2.4
+            },
+            "S04": {
+              "skipped": "no levers"
+            },
+            "S05": {
+              "has_range_disclosure": true,
+              "total_p10_cr": 138.9,
+              "total_p50_cr": 230.6,
+              "total_p90_cr": 323.4,
+              "p10_to_p90_multiplier": 2.3
+            }
+          }
+        },
+        {
+          "id": "RD-11",
+          "name": "Assumption Disclosure (WACC, headcount, horizon)",
+          "weight": 0.2,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "finding_summary": "5/5 scenarios disclose \u22652/3 key assumptions",
+          "remediation": "Add 'assumptions' object to enterprise.py return dict: {'wacc_pct': round(req.wacc * 100, 1), 'headcount': req.headcount, 'npv_horizon_years': 3, 'profile_basis': 'benchmark_proxy'}. This one change resolves RD-03, RD-11, and partially RD-02.",
+          "evidence": {
+            "S01": {
+              "wacc_disclosed": true,
+              "headcount_disclosed": true,
+              "npv_horizon_disclosed": true,
+              "has_assumptions_object": true,
+              "disclosure_count": 3,
+              "scenario_score": 10.0
+            },
+            "S02": {
+              "wacc_disclosed": true,
+              "headcount_disclosed": true,
+              "npv_horizon_disclosed": true,
+              "has_assumptions_object": true,
+              "disclosure_count": 3,
+              "scenario_score": 10.0
+            },
+            "S03": {
+              "wacc_disclosed": true,
+              "headcount_disclosed": true,
+              "npv_horizon_disclosed": true,
+              "has_assumptions_object": true,
+              "disclosure_count": 3,
+              "scenario_score": 10.0
+            },
+            "S04": {
+              "wacc_disclosed": true,
+              "headcount_disclosed": true,
+              "npv_horizon_disclosed": true,
+              "has_assumptions_object": true,
+              "disclosure_count": 3,
+              "scenario_score": 10.0
+            },
+            "S05": {
+              "wacc_disclosed": true,
+              "headcount_disclosed": true,
+              "npv_horizon_disclosed": true,
+              "has_assumptions_object": true,
+              "disclosure_count": 3,
+              "scenario_score": 10.0
+            }
+          }
+        },
+        {
+          "id": "RD-12",
+          "name": "Document Flags Interpretability",
+          "weight": 0.2,
+          "threshold": 6.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "finding_summary": "No scenarios with constraints found \u2014 dimension not exercised",
+          "remediation": "In enterprise.py key_findings assembly (line ~414), replace: 'Document flags: ' + ... with: 'Identified constraints (may affect lever eligibility): ' + ...",
+          "evidence": {
+            "S01": {
+              "skipped": "no constraints in company_signals"
+            },
+            "S02": {
+              "skipped": "no constraints in company_signals"
+            },
+            "S03": {
+              "skipped": "no constraints in company_signals"
+            },
+            "S04": {
+              "skipped": "no constraints in company_signals"
+            },
+            "S05": {
+              "skipped": "no constraints in company_signals"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "context_completeness",
+      "display": "Context Completeness",
+      "weight": 0.2,
+      "score": 10.0,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "RD-13",
+          "name": "data_note Specificity",
+          "weight": 0.25,
+          "threshold": 6.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "finding_summary": "data_note varies between mapped/unmapped: True",
+          "remediation": "In enterprise.py return dict (line ~431), make data_note conditional: if bench_resolved.get('selected_dataset'): data_note = 'Spend profile derived from ...' else: data_note = f'No benchmark data found for sector {effective_industry!r}; nearest-proxy estimates used. Treat as directional only.'",
+          "evidence": {
+            "unique_note_count": 5,
+            "all_identical": false,
+            "mapped_scenarios": [
+              "S01",
+              "S02",
+              "S03"
+            ],
+            "unmapped_scenarios": [
+              "S04",
+              "S05"
+            ],
+            "scenario_evidence": {
+              "S01": {
+                "industry_mapped": true,
+                "data_note": "Spend profile derived from technology benchmark P50 values \u2014 upload actual spend data for company-specific analysis.",
+                "note_length": 116
+              },
+              "S02": {
+                "industry_mapped": true,
+                "data_note": "Spend profile derived from financial_services benchmark P50 values \u2014 upload actual spend data for company-specific analysis.",
+                "note_length": 124
+              },
+              "S03": {
+                "industry_mapped": true,
+                "data_note": "Spend profile derived from healthcare benchmark P50 values \u2014 upload actual spend data for company-specific analysis.",
+                "note_length": 116
+              },
+              "S04": {
+                "industry_mapped": false,
+                "data_note": "Spend profile derived from real_estate_devco benchmark P50 values \u2014 upload actual spend data for company-specific analysis.",
+                "note_length": 123
+              },
+              "S05": {
+                "industry_mapped": false,
+                "data_note": "Spend profile derived from retail_consumer benchmark P50 values \u2014 upload actual spend data for company-specific analysis.",
+                "note_length": 121
+              }
+            }
+          }
+        },
+        {
+          "id": "RD-14",
+          "name": "Eligible Levers Total Disclosed",
+          "weight": 0.25,
+          "threshold": 6.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "finding_summary": "5/5 scenarios include eligible_levers_total in response",
+          "remediation": "In enterprise.py return dict, add: 'eligible_levers_total': len(eligible_levers). This is already tracked internally as _eligible_levers_total \u2014 just expose it.",
+          "evidence": {
+            "S01": {
+              "value_at_table_count": 9,
+              "eligible_levers_total_internal": 36,
+              "eligible_levers_total_in_response": true,
+              "truncated": false
+            },
+            "S02": {
+              "value_at_table_count": 8,
+              "eligible_levers_total_internal": 34,
+              "eligible_levers_total_in_response": true,
+              "truncated": false
+            },
+            "S03": {
+              "value_at_table_count": 9,
+              "eligible_levers_total_internal": 32,
+              "eligible_levers_total_in_response": true,
+              "truncated": false
+            },
+            "S04": {
+              "value_at_table_count": 0,
+              "eligible_levers_total_internal": 0,
+              "eligible_levers_total_in_response": true,
+              "truncated": false
+            },
+            "S05": {
+              "value_at_table_count": 9,
+              "eligible_levers_total_internal": 36,
+              "eligible_levers_total_in_response": true,
+              "truncated": false
+            }
+          }
+        },
+        {
+          "id": "RD-15",
+          "name": "Percentile Legend (P25/P50 definitions)",
+          "weight": 0.2,
+          "threshold": 5.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
+          "finding_summary": "5/5 scenarios include percentile legend",
+          "remediation": "In enterprise.py return dict, add: 'percentile_legend': {'p10': 'top-decile benchmark (stretch target)', 'p25': 'best-in-class quartile', 'p50': 'industry median', 'p90': 'lagging quartile'}",
+          "evidence": {
+            "S01": {
+              "has_legend_key": true,
+              "has_legend_keyword": true,
+              "has_legend": true
+            },
+            "S02": {
+              "has_legend_key": true,
+              "has_legend_keyword": true,
+              "has_legend": true
+            },
+            "S03": {
+              "has_legend_key": true,
+              "has_legend_keyword": true,
+              "has_legend": true
+            },
+            "S04": {
+              "has_legend_key": true,
+              "has_legend_keyword": true,
+              "has_legend": true
+            },
+            "S05": {
+              "has_legend_key": true,
+              "has_legend_keyword": true,
+              "has_legend": true
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "top_gaps": [],
+  "remediation_roadmap": []
+}

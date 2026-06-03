@@ -418,9 +418,19 @@ def patch_diagnostic_context(session_id: str, patch: DiagnosticContextPatch) -> 
         manifest["deep_research_summary"] = patch.deep_research_summary
     if patch.deep_research_interaction_id is not None:
         manifest["deep_research_interaction_id"] = patch.deep_research_interaction_id
+    if patch.diagnostic_urls is not None:
+        manifest["diagnostic_urls"] = patch.diagnostic_urls
+    if patch.diagnostic_result is not None:
+        manifest["diagnostic_result"] = patch.diagnostic_result
+    if patch.diagnostic_completed_at is not None:
+        manifest["diagnostic_completed_at"] = patch.diagnostic_completed_at
     write_manifest(session_id, manifest)
     append_audit_event(
         "diagnostic_context_patched",
-        data={"session_id": session_id, "has_deep_research": patch.deep_research_summary is not None},
+        data={
+            "session_id": session_id,
+            "has_deep_research": patch.deep_research_summary is not None,
+            "has_diagnostic_result": patch.diagnostic_result is not None,
+        },
     )
     return {"ok": True, "session_id": session_id}

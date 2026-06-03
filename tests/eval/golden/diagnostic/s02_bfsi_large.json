@@ -1,0 +1,24 @@
+{
+  "scenario_id": "S02",
+  "description": "BFSI/Banks industry, ₹50,000 Cr revenue — large company with rich sector lever pack. Tests that value_at_table respects the 12-lever cap, p10<=p50<=p90 holds at large revenue scale, and total_p50 sums correctly.",
+  "request": {
+    "company_name": "National Bank of India Ltd",
+    "industry": "bfsi_banks",
+    "annual_revenue_cr": 50000.0,
+    "urls": []
+  },
+  "scoring_hints": {
+    "expect_value_at_table_nonempty": true,
+    "expect_benchmark_gaps_nonempty": true,
+    "expect_total_p50_matches_sum": true,
+    "expect_stub_npv_zero": true,
+    "expect_stub_category_empty": true,
+    "expect_gap_pct_zero": true,
+    "expect_gap_cr_zero": true,
+    "expect_actual_pct_equals_p50_pct": true,
+    "expect_key_findings_min_count": 2,
+    "expect_value_at_table_max": 12,
+    "industry_mapped": true,
+    "expected_bench_industry": "financial_services"
+  }
+}

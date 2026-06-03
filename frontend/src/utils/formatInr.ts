@@ -2,7 +2,7 @@
 
 export function formatCr(
   value: number,
-  opts?: { perYear?: boolean; decimals?: number; currency?: string },
+  opts?: { perYear?: boolean; decimals?: number; currency?: string; bare?: boolean },
 ): string {
   const currency = (opts?.currency ?? 'INR').toUpperCase();
   const sym = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '₹';
@@ -12,9 +12,11 @@ export function formatCr(
   const suffix = opts?.perYear ? '/yr' : '';
   if (currency === 'INR') {
     const formatted = n.toLocaleString('en-IN', { maximumFractionDigits: decimals, minimumFractionDigits: 0 });
+    if (opts?.bare) return `${sym}${formatted}`;
     return `${sym}${formatted} Cr${suffix}`;
   }
   const formatted = n.toLocaleString('en-US', { maximumFractionDigits: decimals, minimumFractionDigits: 0 });
+  if (opts?.bare) return `${sym}${formatted}`;
   return `${sym}${formatted} M${suffix}`;
 }
 

@@ -4,6 +4,7 @@ import { Button } from '../../Common/Button';
 import { Card } from '../../Common/Card';
 import { Loader } from '../../Common/Loader';
 import { apiGet, apiPost, getApiErrorMessage } from '../../../hooks/useApi';
+import { buildDefaultDeepResearchPrompt } from '../../../utils/deepResearchPrompt';
 import type {
   DeepResearchSource,
   DeepResearchStartResponse,
@@ -20,6 +21,11 @@ interface Props {
   revenueCr: number;
   sessionId?: string | null;
   onSummaryReady: (summary: string) => void;
+  initialInteractionId?: string;
+  initialSummary?: string | null;
+  initialFullReport?: string;
+  initialPrompt?: string;
+  hydrateReady?: boolean;
 }
 
 export const DeepResearchSection: React.FC<Props> = ({
@@ -28,7 +34,19 @@ export const DeepResearchSection: React.FC<Props> = ({
   revenueCr,
   sessionId,
   onSummaryReady,
+  initialInteractionId,
+  initialSummary,
+  initialFullReport,
+  initialPrompt,
+  hydrateReady = true,
 }) => {
+  const defaultPrompt = buildDefaultDeepResearchPrompt(companyName, industry, revenueCr);
+  const [researchPrompt, setResearchPrompt] = useState(
+    () => initialPrompt?.trim() || defaultPrompt,
+  );
+  const [promptCustomized, setPromptCustomized] = useState(
+    () => !!(initialPrompt?.trim() && initialPrompt.trim() !== defaultPrompt),
+  );
   const [phase, setPhase] = useState<Phase>('idle');
   const [interactionId, setInteractionId] = useState<string | null>(null);
   const [summary, setSummary] = useState<string | null>(null);
@@ -39,6 +57,7 @@ export const DeepResearchSection: React.FC<Props> = ({
   const [error, setError] = useState<string | null>(null);
   const [savedToSession, setSavedToSession] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const restoredRef = useRef(false);
 
   const stopPolling = useCallback(() => {
     if (pollRef.current !== null) {
@@ -48,6 +67,21 @@ export const DeepResearchSection: React.FC<Props> = ({
   }, []);
 
   useEffect(() => () => stopPolling(), [stopPolling]);
+
+  useEffect(() => {
+    if (promptCustomized) return;
+    setResearchPrompt(buildDefaultDeepResearchPrompt(companyName, industry, revenueCr));
+  }, [companyName, industry, revenueCr, promptCustomized]);
+
+  const handlePromptChange = (value: string) => {
+    setResearchPrompt(value);
+    setPromptCustomized(true);
+  };
+
+  const handleResetPrompt = () => {
+    setResearchPrompt(buildDefaultDeepResearchPrompt(companyName, industry, revenueCr));
+    setPromptCustomized(false);
+  };
 
   const handlePollResult = useCallback(
     (data: DeepResearchStatusResponse) => {
@@ -65,8 +99,9 @@ export const DeepResearchSection: React.FC<Props> = ({
         stopPolling();
         setError('Deep research job failed. Please try again.');
         setPhase('failed');
+      } else if (data.status === 'in_progress') {
+        setPhase('polling');
       }
-      // in_progress: keep polling
     },
     [stopPolling, onSummaryReady, sessionId],
   );
@@ -79,10 +114,12 @@ export const DeepResearchSection: React.FC<Props> = ({
           `/api/v1/diagnostic/deep-research/${id}${sessionParam}`,
         );
         handlePollResult(data);
+        return data;
       } catch (err) {
         stopPolling();
         setError(getApiErrorMessage(err));
         setPhase('failed');
+        return null;
       }
     },
     [sessionId, handlePollResult, stopPolling],
@@ -90,16 +127,52 @@ export const DeepResearchSection: React.FC<Props> = ({
 
   const startPolling = useCallback(
     (id: string) => {
+      setInteractionId(id);
       setPhase('polling');
-      // Immediate first poll after a short delay to catch fast completions
       setTimeout(() => pollOnce(id), 5_000);
       pollRef.current = setInterval(() => pollOnce(id), POLL_INTERVAL_MS);
     },
     [pollOnce],
   );
 
+  useEffect(() => {
+    if (!hydrateReady || restoredRef.current) return;
+
+    if (initialSummary) {
+      restoredRef.current = true;
+      setSummary(initialSummary);
+      setFullReport(initialFullReport ?? null);
+      setPhase('done');
+      setSavedToSession(!!sessionId);
+      onSummaryReady(initialSummary);
+      return;
+    }
+
+    if (initialInteractionId && sessionId) {
+      restoredRef.current = true;
+      setInteractionId(initialInteractionId);
+      (async () => {
+        const data = await pollOnce(initialInteractionId);
+        if (data?.status === 'in_progress') {
+          startPolling(initialInteractionId);
+        }
+      })();
+    }
+  }, [
+    hydrateReady,
+    initialSummary,
+    initialFullReport,
+    initialInteractionId,
+    sessionId,
+    onSummaryReady,
+    pollOnce,
+    startPolling,
+  ]);
+
   const handleStart = async () => {
     if (!companyName.trim()) return;
+    stopPolling();
+    restoredRef.current = true;
     setError(null);
     setPhase('starting');
     try {
@@ -110,9 +183,9 @@ export const DeepResearchSection: React.FC<Props> = ({
           industry,
           annual_revenue_cr: revenueCr,
           session_id: sessionId ?? null,
+          research_prompt: researchPrompt.trim(),
         },
       );
-      setInteractionId(res.interaction_id);
       startPolling(res.interaction_id);
     } catch (err) {
       setError(getApiErrorMessage(err));
@@ -121,6 +194,8 @@ export const DeepResearchSection: React.FC<Props> = ({
   };
 
   const handleRetry = () => {
+    stopPolling();
+    restoredRef.current = false;
     setPhase('idle');
     setError(null);
     setInteractionId(null);
@@ -136,10 +211,39 @@ export const DeepResearchSection: React.FC<Props> = ({
         <div className="space-y-3">
           <p className="text-sm text-brand-muted">
             Run Google&apos;s agentic Deep Research on{' '}
-            <span className="font-medium text-brand-ink">{companyName}</span> to surface
-            independent benchmark data, cost-reduction levers, and peer comparisons. Results are
-            saved to your session as analysis context.
+            <span className="font-medium text-brand-ink">{companyName}</span> to gather recent
+            market news on the company, its peers, and the broader sector. Results are saved to
+            your session as analysis context.
           </p>
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label
+                htmlFor="deep-research-prompt"
+                className="block text-sm font-medium text-brand-ink"
+              >
+                Research prompt
+              </label>
+              {promptCustomized && (
+                <button
+                  type="button"
+                  onClick={handleResetPrompt}
+                  className="text-xs font-medium text-brand-navy hover:text-brand-green"
+                >
+                  Reset to default
+                </button>
+              )}
+            </div>
+            <textarea
+              id="deep-research-prompt"
+              value={researchPrompt}
+              onChange={(e) => handlePromptChange(e.target.value)}
+              rows={14}
+              className="w-full px-4 py-3 border border-brand-border rounded-lg text-sm bg-white text-brand-ink leading-relaxed"
+            />
+            <p className="mt-1.5 text-xs text-brand-muted">
+              Edit the prompt before running — focus areas, peers, or time horizon.
+            </p>
+          </div>
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-xs text-amber-800 font-medium">
               ~$1–3 per run
@@ -148,7 +252,11 @@ export const DeepResearchSection: React.FC<Props> = ({
               up to 20 min
             </span>
           </div>
-          <Button onClick={handleStart} className="w-full sm:w-auto">
+          <Button
+            onClick={handleStart}
+            disabled={!researchPrompt.trim()}
+            className="w-full sm:w-auto"
+          >
             Run Deep Research
           </Button>
         </div>
@@ -187,7 +295,6 @@ export const DeepResearchSection: React.FC<Props> = ({
 
       {phase === 'done' && summary && (
         <div className="space-y-4">
-          {/* Summary — always visible */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-sm font-semibold text-brand-ink">Research Summary</h4>
@@ -202,10 +309,10 @@ export const DeepResearchSection: React.FC<Props> = ({
             <p className="text-sm text-brand-ink leading-relaxed whitespace-pre-wrap">{summary}</p>
           </div>
 
-          {/* Full report — expandable */}
           {fullReport && (
             <div>
               <button
+                type="button"
                 onClick={() => setExpanded((v) => !v)}
                 className="text-sm font-medium text-brand-navy hover:text-brand-green flex items-center gap-1"
               >
@@ -222,10 +329,10 @@ export const DeepResearchSection: React.FC<Props> = ({
             </div>
           )}
 
-          {/* Sources */}
           {sources.length > 0 && (
             <div>
               <button
+                type="button"
                 onClick={() => setSourcesExpanded((v) => !v)}
                 className="text-sm font-medium text-brand-navy hover:text-brand-green flex items-center gap-1"
               >

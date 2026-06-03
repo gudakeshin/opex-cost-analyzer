@@ -1,0 +1,23 @@
+{
+  "scenario_id": "S05",
+  "description": "Hospitality/Travel sector — this sector pack EXISTS in skills/sector-packs/hospitality_travel/ but is NOT mapped in _PACK_TO_BENCH. Tests that DG-08 catches this real missing-mapping case. Revenue is mid-size ₹3,000 Cr.",
+  "request": {
+    "company_name": "Indian Hotels & Resorts Ltd",
+    "industry": "hospitality_travel",
+    "annual_revenue_cr": 3000.0,
+    "urls": []
+  },
+  "scoring_hints": {
+    "expect_value_at_table_nonempty": false,
+    "expect_benchmark_gaps_nonempty": false,
+    "expect_total_p50_matches_sum": true,
+    "expect_stub_npv_zero": true,
+    "expect_stub_category_empty": true,
+    "expect_gap_pct_zero": true,
+    "expect_gap_cr_zero": true,
+    "expect_actual_pct_equals_p50_pct": true,
+    "expect_key_findings_min_count": 1,
+    "industry_mapped": false,
+    "expected_bench_industry": "hospitality_travel"
+  }
+}
