@@ -500,6 +500,7 @@ def _generate_llm_advisory_sections(
                 strict_mode=strict_mode,
                 thinking_enabled=thinking_enabled,
                 thinking_budget_tokens=thinking_budget_tokens,
+                deep_research_summary=ctx.deep_research_summary,
             )
         except Exception:
             raw, thinking_text = None, None

@@ -325,6 +325,7 @@ def _analysis_synthesizer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None
             skill_outputs=ctx.prior_results,
             docs_text=ctx.docs_text,
             transaction_examples=_build_transaction_examples(ctx.lines),
+            deep_research_summary=ctx.manifest.get("deep_research_summary") or None,
         )
         return (synthesized or {}), degraded_reason
     except Exception:

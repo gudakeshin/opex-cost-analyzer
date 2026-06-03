@@ -601,4 +601,5 @@ def observe(
         unresolved_conflict_count=conflict_signals["unresolved_conflict_count"],
         has_intercompany_lines=conflict_signals["has_intercompany_lines"],
         conflict_summary=conflict_signals["conflict_summary"],
+        deep_research_summary=manifest.get("deep_research_summary") or None,
     )

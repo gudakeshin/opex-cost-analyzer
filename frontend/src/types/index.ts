@@ -308,3 +308,28 @@ export interface AuditLogEntry {
   message: string;
   source?: 'local' | 'server';
 }
+
+export interface DeepResearchStartResponse {
+  interaction_id: string;
+  status: string;
+}
+
+export interface DeepResearchSource {
+  title?: string;
+  url?: string;
+}
+
+export interface DeepResearchStatusResponse {
+  status: 'in_progress' | 'completed' | 'failed';
+  summary?: string;
+  full_report?: string;
+  sources?: DeepResearchSource[];
+}
+
+export interface DiagnosticContextPatch {
+  company_name?: string;
+  industry?: string;
+  annual_revenue_cr?: number;
+  deep_research_summary?: string;
+  deep_research_interaction_id?: string;
+}

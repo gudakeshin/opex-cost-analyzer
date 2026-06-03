@@ -136,6 +136,7 @@ Constraints:
   - Do NOT duplicate this narrative into executive_takeaway; executive_takeaway should be brief context when category_focus_section is populated.
 - When NOT category-focused, leave `category_focus_section` as an empty string.
 - Avoid section headers like "Top recommendations" for category-focused asks; frame as focused category actions.
+- If `deep_research_context` is present in the input, treat it as verified background research on this company/industry. Use it to strengthen evidence citations and benchmark references — do not contradict it.
 """
 
 EXECUTIVE_COMMUNICATION_SYSTEM_PROMPT = """You are a Finance Business Partner communicating to CFO/leadership.
@@ -529,6 +530,7 @@ def synthesize_analysis_claude(
     strict_mode: bool = False,
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
+    deep_research_summary: str | None = None,
 ) -> Tuple[Dict[str, Any] | None, str | None]:
     """Synthesize executive recommendations from deterministic skill outputs.
 
@@ -549,6 +551,8 @@ def synthesize_analysis_claude(
         "document_chunks": _truncate_doc_chunks(docs_text, max_chunks=2),
         "transaction_examples_by_category": _slim_transaction_examples(transaction_examples),
     }
+    if deep_research_summary:
+        payload["deep_research_context"] = deep_research_summary
     strict_hint = ""
     if strict_mode:
         strict_hint = (
@@ -626,6 +630,7 @@ def synthesize_analysis_claude_with_meta(
     docs_text: List[str],
     transaction_examples: Dict[str, List[Dict[str, Any]]] | None = None,
     strict_mode: bool = False,
+    deep_research_summary: str | None = None,
 ) -> Tuple[Dict[str, Any] | None, str | None]:
     if not ANTHROPIC_ENABLED:
         return None, "provider_disabled"
@@ -642,6 +647,8 @@ def synthesize_analysis_claude_with_meta(
         "document_chunks": _truncate_doc_chunks(docs_text, max_chunks=2),
         "transaction_examples_by_category": _slim_transaction_examples(transaction_examples),
     }
+    if deep_research_summary:
+        payload["deep_research_context"] = deep_research_summary
     strict_hint = ""
     if strict_mode:
         strict_hint = (
@@ -777,11 +784,12 @@ def interpret_workbook_structure_claude_with_meta(
     structural_summary: Dict[str, Any],
 ) -> Tuple[Dict[str, Any] | None, str | None]:
     """Run lightweight structural interpretation for planning-model workbooks."""
-    if not ANTHROPIC_ENABLED:
+    if not GEMINI_ENABLED and not ANTHROPIC_ENABLED:
         return None, "provider_disabled"
     try:
         payload = json.dumps(structural_summary, ensure_ascii=False)
-        raw = _call_claude(
+        from app.opar.gemini_client import call_gemini
+        raw = call_gemini(
             system=(
                 "You are a financial model architect. "
                 "Return only valid JSON that matches the WorkbookManifest schema. "
@@ -792,7 +800,6 @@ def interpret_workbook_structure_claude_with_meta(
                 f"{payload}"
             ),
             max_tokens=900,
-            model="claude-haiku-4-5-20251001",
         )
         data = _extract_json(raw)
         if isinstance(data, dict):

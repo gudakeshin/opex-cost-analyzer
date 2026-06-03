@@ -95,6 +95,9 @@ class ObserveContext(BaseModel):
     has_intercompany_lines: bool = False        # True when related_party/intercompany lines found
     conflict_summary: Dict[str, Any] = Field(default_factory=dict)
 
+    # Deep research context — populated from session manifest when available
+    deep_research_summary: str | None = None
+
 
 class SkillTask(BaseModel):
     skill_name: str

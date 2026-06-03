@@ -16,6 +16,7 @@ interface SessionContextValue {
   hasAnalysis: boolean;
   refreshAnalysisStatus: () => Promise<void>;
   syncEngagementFromAnalysis: () => Promise<void>;
+  deepResearchSummary: string | null;
 }
 
 const defaultEngagement: EngagementMeta = {
@@ -58,6 +59,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [engagement, setEngagement] = useState<EngagementMeta>(defaultEngagement);
   const [loadingEngagement, setLoadingEngagement] = useState(false);
   const [hasAnalysis, setHasAnalysis] = useState(false);
+  const [deepResearchSummary, setDeepResearchSummary] = useState<string | null>(null);
 
   useEffect(() => {
     if (sessionId) localStorage.setItem(STORAGE_KEY, sessionId);
@@ -68,10 +70,13 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!sessionId) return;
     setLoadingEngagement(true);
     try {
-      const manifest = await apiGet<SessionManifest>(`/api/v1/sessions/${sessionId}/manifest`);
+      const manifest = await apiGet<SessionManifest & { deep_research_summary?: string }>(
+        `/api/v1/sessions/${sessionId}/manifest`,
+      );
       setEngagement(engagementFromManifest(manifest));
       const mode = manifestAudienceToMode(manifest.audience);
       if (mode) setAudience(mode);
+      setDeepResearchSummary(manifest.deep_research_summary ?? null);
     } catch (err) {
       // Session directory no longer exists — clear stale ID so pages don't keep hitting 404
       if ((err as { response?: { status?: number } })?.response?.status === 404) {
@@ -133,6 +138,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!id) {
       setHasAnalysis(false);
       setEngagement(defaultEngagement);
+      setDeepResearchSummary(null);
     }
   }, []);
 
@@ -160,6 +166,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       hasAnalysis,
       refreshAnalysisStatus,
       syncEngagementFromAnalysis,
+      deepResearchSummary,
     }),
     [
       sessionId,
@@ -171,6 +178,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       hasAnalysis,
       refreshAnalysisStatus,
       syncEngagementFromAnalysis,
+      deepResearchSummary,
     ],
   );
 

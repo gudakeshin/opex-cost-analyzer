@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { Button } from '../components/Common/Button';
 import { Card } from '../components/Common/Card';
@@ -11,9 +11,11 @@ import { PageHeader } from '../components/Common/PageHeader';
 import { FactVsInferenceLabel } from '../components/Common/FactVsInferenceLabel';
 import { DiagnosticScorecard } from '../components/PageComponents/Diagnostic/DiagnosticScorecard';
 import { FindingCards } from '../components/PageComponents/Diagnostic/FindingCards';
-import { apiPost, getApiErrorMessage } from '../hooks/useApi';
+import { DeepResearchSection } from '../components/PageComponents/Diagnostic/DeepResearchSection';
+import { apiPatch, apiPost, getApiErrorMessage } from '../hooks/useApi';
 import { friendlyErrorMessage } from '../utils/errorMessages';
-import type { DiagnosticRequest, DiagnosticResponse } from '../types';
+import { useSession } from '../context/SessionContext';
+import type { DiagnosticContextPatch, DiagnosticRequest, DiagnosticResponse } from '../types';
 
 const SECTOR_OPTIONS = [
   { value: 'bfsi_banks', label: 'BFSI / Banks' },
@@ -34,6 +36,8 @@ const SECTOR_OPTIONS = [
 ];
 
 export const Diagnostic: React.FC = () => {
+  const navigate = useNavigate();
+  const { sessionId, ensureSession } = useSession();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState('');
@@ -41,8 +45,35 @@ export const Diagnostic: React.FC = () => {
   const [revenueCr, setRevenueCr] = useState('5000');
   const [urlsText, setUrlsText] = useState('');
   const [result, setResult] = useState<DiagnosticResponse | null>(null);
+  const [deepResearchSummary, setDeepResearchSummary] = useState<string | null>(null);
+  const [handoffLoading, setHandoffLoading] = useState(false);
 
   const friendlyError = error ? friendlyErrorMessage(error) : null;
+
+  const handleDeepResearchReady = (summary: string) => {
+    setDeepResearchSummary(summary);
+  };
+
+  const handleStartSession = async () => {
+    setHandoffLoading(true);
+    try {
+      const sid = await ensureSession();
+      const patch: DiagnosticContextPatch = {
+        company_name: companyName.trim() || undefined,
+        industry,
+        annual_revenue_cr: parseFloat(revenueCr) || 5000,
+      };
+      if (deepResearchSummary) {
+        patch.deep_research_summary = deepResearchSummary;
+      }
+      await apiPatch(`/api/v1/sessions/${sid}/diagnostic-context`, patch);
+      navigate('/');
+    } catch {
+      navigate('/');
+    } finally {
+      setHandoffLoading(false);
+    }
+  };
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,6 +176,14 @@ export const Diagnostic: React.FC = () => {
               )}
             </Card>
 
+            <DeepResearchSection
+              companyName={companyName}
+              industry={industry}
+              revenueCr={parseFloat(revenueCr) || 5000}
+              sessionId={sessionId}
+              onSummaryReady={handleDeepResearchReady}
+            />
+
             <Card title="Benchmark gaps (ranked)" className="border-brand-border bg-white">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -208,12 +247,19 @@ export const Diagnostic: React.FC = () => {
               </div>
             </Card>
 
-            <Link
-              to="/"
-              className="inline-flex text-sm font-semibold text-brand-navy hover:text-brand-green"
+            <Button
+              onClick={handleStartSession}
+              loading={handoffLoading}
+              disabled={handoffLoading}
+              className="text-sm font-semibold"
             >
               Start procurement session from diagnostic →
-            </Link>
+              {deepResearchSummary && (
+                <span className="ml-2 inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800 font-medium">
+                  + deep research context
+                </span>
+              )}
+            </Button>
           </>
         )}
       </div>

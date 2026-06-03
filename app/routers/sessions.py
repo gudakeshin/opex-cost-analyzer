@@ -20,7 +20,7 @@ from app.routers._shared import (
     validate_session_id,
     write_manifest,
 )
-from app.schemas import AnalyzeRequest, SessionCreateRequest, SessionManifestPatch
+from app.schemas import AnalyzeRequest, DiagnosticContextPatch, SessionCreateRequest, SessionManifestPatch
 from app.services.analysis import load_taxonomy, run_core_pipeline
 from app.services.compliance import append_audit_event
 from app.services.ingestion import infer_tabular_schema, parse_document, parse_spend_file_with_report
@@ -401,3 +401,26 @@ async def incremental_analyze(session_id: str, files: List[UploadFile] = File(de
         raise HTTPException(status_code=404, detail=str(exc))
     append_audit_event(f"incremental_analysis session_id={session_id} lines_added={result.get('lines_added', 0)}")
     return result
+
+
+@router.patch("/api/v1/sessions/{session_id}/diagnostic-context")
+def patch_diagnostic_context(session_id: str, patch: DiagnosticContextPatch) -> dict:
+    """Sync company/industry/revenue and deep research context from the Diagnostic page."""
+    validate_session_id(session_id)
+    manifest = read_manifest(session_id)
+    if patch.company_name is not None:
+        manifest["company_name"] = patch.company_name
+    if patch.industry is not None:
+        manifest["industry"] = patch.industry
+    if patch.annual_revenue_cr is not None:
+        manifest["annual_revenue"] = patch.annual_revenue_cr * 10_000_000  # Cr → rupees
+    if patch.deep_research_summary is not None:
+        manifest["deep_research_summary"] = patch.deep_research_summary
+    if patch.deep_research_interaction_id is not None:
+        manifest["deep_research_interaction_id"] = patch.deep_research_interaction_id
+    write_manifest(session_id, manifest)
+    append_audit_event(
+        "diagnostic_context_patched",
+        data={"session_id": session_id, "has_deep_research": patch.deep_research_summary is not None},
+    )
+    return {"ok": True, "session_id": session_id}

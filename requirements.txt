@@ -9,6 +9,7 @@ pypdf==6.7.1
 pytest==8.4.1
 anthropic==0.83.0
 google-generativeai>=0.8  # Gemini provider — optional if using Anthropic only
+google-genai>=1.0        # Google Interactions API for Deep Research feature
 slowapi==0.1.9
 qdrant-client==1.9.2
 sentence-transformers==3.0.1

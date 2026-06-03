@@ -38,6 +38,19 @@ import type {
   V1ChatResponse,
 } from '../types';
 
+const DeepResearchBanner: React.FC<{ companyName: string; onDismiss: () => void }> = ({
+  companyName,
+}) => (
+  <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border-b border-blue-200 text-xs text-blue-800">
+    <span className="font-semibold">Deep research context loaded</span>
+    <span className="text-blue-600">·</span>
+    <span>
+      Google Deep Research findings for{' '}
+      <span className="font-medium">{companyName}</span> are active as analysis context.
+    </span>
+  </div>
+);
+
 const ANALYZE_PIPELINE_STEPS: ProgressStep[] = [
   { phase: 'act', message: 'Running spend-profiler…' },
   { phase: 'act', message: 'Running document-contextualizer & peer-benchmarker…' },
@@ -107,6 +120,7 @@ export const ProcurementAnalysis: React.FC = () => {
     refreshEngagement,
     syncEngagementFromAnalysis,
     refreshAnalysisStatus,
+    deepResearchSummary,
   } = useSession();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -589,6 +603,12 @@ export const ProcurementAnalysis: React.FC = () => {
 
         <div className="flex flex-1 min-h-0 overflow-hidden">
           <section className="flex flex-col flex-1 min-w-0 bg-brand-surface">
+            {deepResearchSummary && (
+              <DeepResearchBanner
+                companyName={engagement.company_name}
+                onDismiss={() => {/* banner is informational — no dismiss needed for now */}}
+              />
+            )}
             <div className="flex-1 overflow-y-auto">
               <div className="max-w-3xl mx-auto w-full px-4 py-8 space-y-6">
                 {messages.length === 0 && !loading ? (

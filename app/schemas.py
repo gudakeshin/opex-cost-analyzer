@@ -205,3 +205,32 @@ class CompanyResearchRequest(BaseModel):
     industry: str
     annual_revenue_cr: float = 5000.0
     urls: List[str] = []
+    headcount: int = 500
+    wacc: float = 0.12
+
+
+class DeepResearchStartRequest(BaseModel):
+    company_name: str
+    industry: str
+    annual_revenue_cr: float = 5000.0
+    session_id: str | None = None
+
+
+class DeepResearchStartResponse(BaseModel):
+    interaction_id: str
+    status: str  # "in_progress"
+
+
+class DeepResearchStatusResponse(BaseModel):
+    status: str  # "in_progress" | "completed" | "failed"
+    summary: str | None = None      # LLM-condensed ≤400 words
+    full_report: str | None = None  # raw output_text
+    sources: List[Any] = []
+
+
+class DiagnosticContextPatch(BaseModel):
+    company_name: str | None = None
+    industry: str | None = None
+    annual_revenue_cr: float | None = None
+    deep_research_summary: str | None = None
+    deep_research_interaction_id: str | None = None

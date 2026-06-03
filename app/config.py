@@ -90,3 +90,6 @@ QDRANT_ENABLED = os.getenv("QDRANT_ENABLED", "true").lower() not in ("false", "0
 # Sentence-transformers embedding model used for Qdrant semantic search (runs locally, no API cost)
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 
+# Deep Research — uses Google Interactions API (same GEMINI_API_KEY, requires google-genai package)
+DEEP_RESEARCH_ENABLED = bool(GEMINI_API_KEY)
+
