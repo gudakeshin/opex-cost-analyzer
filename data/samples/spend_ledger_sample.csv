@@ -1,0 +1,11 @@
+supplier,description,amount,currency,business_unit,country
+Infosys Ltd,Cloud infrastructure services,5000000,INR,Engineering,India
+Deloitte India,Management consulting FY25,3200000,INR,Finance,India
+Amazon Web Services,AWS production workloads,2100000,INR,Engineering,India
+Blue Dart Express Ltd,Inbound logistics Q1-Q4,1850000,INR,Supply Chain,India
+Tata Power,Plant electricity FY25,980000,INR,Manufacturing,India
+ManpowerGroup,Contract staffing pool,750000,INR,Operations,India
+Microsoft India,Office 365 & Azure dev/test,620000,INR,IT,India
+JLL India,Facilities management Pune hub,540000,INR,Real Estate,India
+Wipro Ltd,Application support AMS,480000,INR,IT,India
+FedEx Express,Export freight charges,410000,INR,Supply Chain,India
