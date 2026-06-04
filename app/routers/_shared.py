@@ -15,6 +15,9 @@ from typing import Any, Dict
 from fastapi import HTTPException
 
 from app.config import UPLOAD_DIR, logger
+from app.services.engagements_store import engagement_dir as _engagement_dir
+from app.services.engagements_store import engagement_manifest_path as _engagement_manifest_path
+from app.services.engagements_store import read_engagement_manifest, write_engagement_manifest
 from app.memory import MemoryStore
 from app.storage import read_json, write_json
 
@@ -35,6 +38,24 @@ _UUID_RE = re.compile(
 def validate_session_id(session_id: str) -> None:
     if not _UUID_RE.match(session_id):
         raise HTTPException(status_code=400, detail="Invalid session_id format")
+
+
+def validate_engagement_id(engagement_id: str) -> None:
+    if not _UUID_RE.match(engagement_id):
+        raise HTTPException(status_code=400, detail="Invalid engagement_id format")
+
+
+def validate_document_id(document_id: str) -> None:
+    if not _UUID_RE.match(document_id):
+        raise HTTPException(status_code=400, detail="Invalid document_id format")
+
+
+def engagement_dir(engagement_id: str) -> Path:
+    return _engagement_dir(engagement_id)
+
+
+def engagement_manifest_path(engagement_id: str) -> Path:
+    return _engagement_manifest_path(engagement_id)
 
 
 def utc_now_iso() -> str:
@@ -128,6 +149,11 @@ _session_lock_backend = _SessionLockBackend()
 def session_lock(session_id: str):
     """Async context manager for per-session locking (distributed when Redis is configured)."""
     return _session_lock_backend.acquire(session_id)
+
+
+def engagement_lock(engagement_id: str):
+    """Reuse session lock backend keyed by engagement_id."""
+    return _session_lock_backend.acquire(engagement_id)
 
 
 def merge_context_into_manifest(

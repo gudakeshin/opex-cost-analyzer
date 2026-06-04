@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import io
+import json
 import re
 from datetime import datetime
 from pathlib import Path
@@ -295,13 +296,108 @@ _AMOUNT_NEGATIVE_TOKENS = (
 )
 
 
+def _numeric_valid_ratio(series: pd.Series) -> float:
+    """Share of cells that coerce to a finite number."""
+    if series is None or len(series) == 0:
+        return 0.0
+    numeric = pd.to_numeric(
+        series.astype(str).str.replace(",", "", regex=False), errors="coerce"
+    )
+    return float(numeric.notna().sum()) / max(len(series), 1)
+
+
+def _column_has_negative_amount_token(col: str, has_amount_token: bool) -> bool:
+    """True when column name looks like metadata, not a monetary field."""
+    if has_amount_token:
+        return False
+    low = col.lower().strip().replace("_", " ")
+    if low.startswith("unnamed"):
+        return False
+    for token in _AMOUNT_NEGATIVE_TOKENS:
+        if re.search(rf"\b{re.escape(token)}\b", low):
+            return True
+    return False
+
+
+def _best_numeric_amount_column(
+    columns: List[str],
+    frame: pd.DataFrame,
+    exclude: Optional[set[str]] = None,
+    min_ratio: float = 0.25,
+) -> str:
+    """Pick the column with the strongest numeric density (P&L period columns)."""
+    skip = exclude or set()
+    best_col = ""
+    best_ratio = 0.0
+    for col in columns:
+        if col in skip or col not in frame.columns:
+            continue
+        ratio = _numeric_valid_ratio(frame[col])
+        if ratio > best_ratio:
+            best_ratio = ratio
+            best_col = col
+    return best_col if best_ratio >= min_ratio else ""
+
+
+def _best_pl_description_column(
+    columns: List[str],
+    frame: pd.DataFrame,
+    exclude: Optional[set[str]] = None,
+) -> str:
+    """Pick a line-item label column for hierarchical expense / P&L tables."""
+    skip = exclude or set()
+    best_col = ""
+    best_score = 0.0
+    for col in columns:
+        if col in skip or col not in frame.columns:
+            continue
+        series = frame[col]
+        if _numeric_valid_ratio(series) > 0.3:
+            continue
+        non_empty = series.dropna().astype(str).str.strip()
+        non_empty = non_empty[(non_empty != "") & (non_empty.str.lower() != "nan")]
+        if len(non_empty) < 2:
+            continue
+        fill_ratio = len(non_empty) / max(len(series), 1)
+        avg_len = float(non_empty.str.len().mean())
+        score = fill_ratio * 5.0 + min(avg_len / 20.0, 3.0)
+        if score > best_score:
+            best_score = score
+            best_col = col
+    return best_col
+
+
+def _apply_hierarchical_expense_column_mapping(
+    columns: List[str],
+    frame: pd.DataFrame,
+    amount_col: str,
+    desc_col: str,
+) -> Tuple[str, str, Optional[str]]:
+    """Repair amount/description mapping for P&L-style sheets (labels + period amounts)."""
+    amount_ratio = _numeric_valid_ratio(frame[amount_col]) if amount_col and amount_col in frame.columns else 0.0
+    numeric_col = _best_numeric_amount_column(columns, frame)
+    numeric_ratio = _numeric_valid_ratio(frame[numeric_col]) if numeric_col else 0.0
+
+    if not numeric_col or numeric_ratio < 0.25:
+        return amount_col, desc_col, None
+    if numeric_ratio <= amount_ratio + 0.15:
+        return amount_col, desc_col, None
+
+    label_col = _best_pl_description_column(columns, frame, exclude={numeric_col})
+    note = (
+        f"Hierarchical expense layout: amounts from '{numeric_col}'"
+        + (f", line items from '{label_col}'." if label_col else ".")
+    )
+    return numeric_col, label_col or desc_col, note
+
+
 def _column_amount_score(col: str, series: Optional[pd.Series] = None) -> float:
     """Score how likely a column holds numeric spend amounts (higher = better)."""
     low = col.lower().strip().replace("_", " ")
     if "spend" in low and any(t in low for t in ("category", "cat", "class", "type")):
         return -1.0
     has_amount_token = any(t in low for t in ("amount", "value", "total", "cost", "price", "fee"))
-    if any(t in low for t in _AMOUNT_NEGATIVE_TOKENS) and not has_amount_token:
+    if _column_has_negative_amount_token(col, has_amount_token):
         return -1.0
 
     score = 0.0
@@ -323,14 +419,19 @@ def _column_amount_score(col: str, series: Optional[pd.Series] = None) -> float:
         score += 2.0
 
     if series is not None and len(series) > 0:
-        numeric = pd.to_numeric(
-            series.astype(str).str.replace(",", "", regex=False), errors="coerce"
-        )
-        valid_ratio = float(numeric.notna().sum()) / max(len(series), 1)
+        valid_ratio = _numeric_valid_ratio(series)
+        if has_amount_token and valid_ratio < 0.2:
+            # e.g. "Cost of Goods Sold" column holding line-item labels, not amounts
+            return valid_ratio * 12.0
         if valid_ratio > 0.8:
             score += 8.0
         elif valid_ratio > 0.5:
             score += 4.0
+        elif valid_ratio > 0.25:
+            score += 2.0
+        numeric = pd.to_numeric(
+            series.astype(str).str.replace(",", "", regex=False), errors="coerce"
+        )
         if numeric.notna().any() and float(numeric.fillna(0).median()) > 0:
             score += 2.0
     return score
@@ -837,7 +938,7 @@ def _dataframe_to_spend_lines(
     reporting_currency: str = "INR",
     source_system_id: Optional[str] = None,
     row_id_start: int = 1,
-) -> List[NormalizedSpendLine]:
+) -> Tuple[List[NormalizedSpendLine], Optional[str]]:
     file_hash = _compute_file_hash(file_path)
 
     # --- Row-count guardrails ---
@@ -860,12 +961,32 @@ def _dataframe_to_spend_lines(
     amount_col = _best_amount_column_match(cols, frame)
     supplier_col = _best_column_match(cols, ["supplier", "vendor", "payee"], "")
     desc_col = _best_column_match(cols, ["description", "memo", "line item", "item"], "")
+    amount_col, desc_col, pl_note = _apply_hierarchical_expense_column_mapping(
+        cols, frame, amount_col, desc_col
+    )
+    mapping_note = pl_note
+    # Prefer an explicit spend-category column as the line label before the
+    # generic "longest text column" heuristic. Otherwise a Region or Department
+    # column can shadow Spend_Category as the description on a normal ledger.
     if not desc_col:
         desc_col = _best_column_match(
             cols,
             ["spend category", "spend_category", "expense category", "category"],
             "",
         )
+    label_col = _best_pl_description_column(
+        cols, frame, exclude={amount_col} if amount_col else set()
+    )
+    if label_col:
+        use_label = not desc_col
+        if desc_col and desc_col in frame.columns:
+            filled = frame[desc_col].dropna().astype(str).str.strip()
+            filled = filled[(filled != "") & (filled.str.lower() != "nan")]
+            use_label = len(filled) < max(2, int(len(frame) * 0.15))
+        if use_label:
+            desc_col = label_col
+            if not mapping_note:
+                mapping_note = f"Hierarchical expense layout: line items from '{label_col}'."
     amount_currency_hint = _infer_currency_from_column_name(amount_col) if amount_col else None
     bu_col = _best_column_match(cols, ["bu", "business unit", "department"], "")
     geo_col = _best_column_match(cols, ["country", "geo", "region", "location"], "")
@@ -931,6 +1052,8 @@ def _dataframe_to_spend_lines(
     out: List[NormalizedSpendLine] = []
     for i in range(len(frame)):
         amount = float(_amount_numeric.iloc[i])
+        if amount == 0.0:
+            continue
 
         supplier = str(supplier_s.iloc[i]).strip()
         description = str(desc_s.iloc[i]).strip()
@@ -1028,7 +1151,33 @@ def _dataframe_to_spend_lines(
                 is_addressable=is_addressable,
             )
         )
-    return out
+    return out, mapping_note
+
+
+def _enrich_ingestion_report(
+    report: Dict[str, Any],
+    lines: List[NormalizedSpendLine],
+    mapping_note: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Attach spend-quality flags so the UI can warn on zero-total ingests."""
+    total_amount = sum(float(line.amount) for line in lines)
+    rows_with_amount = sum(1 for line in lines if float(line.amount) != 0.0)
+    quality: Dict[str, Any] = {
+        "rows_parsed": len(lines),
+        "rows_with_amount": rows_with_amount,
+        "total_amount": round(total_amount, 2),
+        "zero_spend_warning": total_amount == 0.0
+        and (len(lines) > 0 or int(report.pop("_empty_parse_rows", 0) or 0) > 0),
+    }
+    if mapping_note:
+        quality["column_mapping_note"] = mapping_note
+    report["quality"] = quality
+    if quality["zero_spend_warning"]:
+        report["warnings"] = [
+            "Rows were read from the file but all parsed amounts are zero. "
+            "Check that amount columns contain numbers (not only line-item labels)."
+        ]
+    return report
 
 
 def _ledger_sheets_from_manifest(workbook_manifest: Dict[str, Any] | None) -> List[str]:
@@ -1108,10 +1257,11 @@ def parse_spend_file_with_report(
             report["sheets_skipped"] = _build_ingestion_skip_list(
                 file_path, [x["sheet"] for x in report["sheets_ingested"] if x.get("sheet")]
             )
-            return planning_lines, report
+            return planning_lines, _enrich_ingestion_report(report, planning_lines)
 
     all_lines: List[NormalizedSpendLine] = []
     ingested_names: List[str] = []
+    mapping_notes: List[str] = []
 
     def _parse_one_sheet(sheet_name: str, strategy_label: str) -> int:
         sc = score_by_name.get(sheet_name)
@@ -1123,7 +1273,7 @@ def parse_spend_file_with_report(
                 f"{file_path.name} sheet '{sheet_name}' has {n_rows:,} rows (limit: {_ROW_MAX:,})."
             )
         sid = source_system_id or sheet_name
-        lines = _dataframe_to_spend_lines(
+        lines, mapping_note = _dataframe_to_spend_lines(
             frame,
             file_path,
             taxonomy,
@@ -1132,6 +1282,11 @@ def parse_spend_file_with_report(
             source_system_id=sid,
             row_id_start=len(all_lines) + 1,
         )
+        if mapping_note:
+            mapping_notes.append(mapping_note)
+            report["layout"] = "hierarchical_expense"
+        if not lines and n_rows > 0:
+            report["_empty_parse_rows"] = int(report.get("_empty_parse_rows", 0)) + n_rows
         if lines:
             all_lines.extend(lines)
             ingested_names.append(sheet_name)
@@ -1159,7 +1314,8 @@ def parse_spend_file_with_report(
 
         if all_lines:
             report["sheets_skipped"] = _build_ingestion_skip_list(file_path, ingested_names)
-            return all_lines, report
+            note = mapping_notes[0] if mapping_notes else None
+            return all_lines, _enrich_ingestion_report(report, all_lines, note)
 
     sc = ranked[0] if ranked else None
     if suffix in (".xlsx", ".xls") and sc:
@@ -1172,7 +1328,7 @@ def parse_spend_file_with_report(
                 f"{file_path.name} has {n_rows:,} rows (limit: {_ROW_MAX:,}). "
                 "Split by entity or fiscal year and upload each part separately."
             )
-        lines = _dataframe_to_spend_lines(
+        lines, mapping_note = _dataframe_to_spend_lines(
             frame,
             file_path,
             taxonomy,
@@ -1180,6 +1336,11 @@ def parse_spend_file_with_report(
             reporting_currency=reporting_currency,
             source_system_id=source_system_id,
         )
+        if mapping_note:
+            mapping_notes.append(mapping_note)
+            report["layout"] = "hierarchical_expense"
+        if not lines and n_rows > 0:
+            report["_empty_parse_rows"] = int(report.get("_empty_parse_rows", 0)) + n_rows
         if lines:
             sheet_label = sc.sheet_name if sc else file_path.stem
             all_lines.extend(lines)
@@ -1190,7 +1351,8 @@ def parse_spend_file_with_report(
 
     if suffix in (".xlsx", ".xls"):
         report["sheets_skipped"] = _build_ingestion_skip_list(file_path, ingested_names)
-    return all_lines, report
+    note = mapping_notes[0] if mapping_notes else None
+    return all_lines, _enrich_ingestion_report(report, all_lines, note)
 
 
 def parse_spend_file(
@@ -1207,6 +1369,65 @@ def parse_spend_file(
         default_amount_type=default_amount_type,
         reporting_currency=reporting_currency,
         workbook_manifest=workbook_manifest,
+        source_system_id=source_system_id,
+    )
+    return lines
+
+
+def _load_json_records(file_path: Path) -> List[Dict[str, Any]]:
+    raw = json.loads(file_path.read_text(encoding="utf-8"))
+    if isinstance(raw, list):
+        return [x for x in raw if isinstance(x, dict)]
+    if isinstance(raw, dict):
+        for key in ("data", "records", "rows", "lines", "spend", "transactions"):
+            val = raw.get(key)
+            if isinstance(val, list):
+                return [x for x in val if isinstance(x, dict)]
+        if all(isinstance(v, dict) for v in raw.values()):
+            return list(raw.values())
+    raise ValueError(f"{file_path.name}: JSON must be an array of objects or contain a data/records array")
+
+
+def parse_spend_json_with_report(
+    file_path: Path,
+    taxonomy: Dict,
+    default_amount_type: str = "actual",
+    reporting_currency: str = "INR",
+    source_system_id: Optional[str] = None,
+) -> Tuple[List[NormalizedSpendLine], Dict[str, Any]]:
+    records = _load_json_records(file_path)
+    if not records:
+        raise ValueError(f"{file_path.name}: no spend records found in JSON")
+    frame = pd.DataFrame(records)
+    lines, note = _dataframe_to_spend_lines(
+        frame,
+        file_path,
+        taxonomy,
+        default_amount_type=default_amount_type,
+        reporting_currency=reporting_currency,
+        source_system_id=source_system_id,
+    )
+    report: Dict[str, Any] = {
+        "source_file": file_path.name,
+        "format": "json",
+        "rows_parsed": len(lines),
+        "column_mapping_note": note,
+    }
+    return lines, report
+
+
+def parse_spend_json(
+    file_path: Path,
+    taxonomy: Dict,
+    default_amount_type: str = "actual",
+    reporting_currency: str = "INR",
+    source_system_id: Optional[str] = None,
+) -> List[NormalizedSpendLine]:
+    lines, _ = parse_spend_json_with_report(
+        file_path,
+        taxonomy,
+        default_amount_type=default_amount_type,
+        reporting_currency=reporting_currency,
         source_system_id=source_system_id,
     )
     return lines

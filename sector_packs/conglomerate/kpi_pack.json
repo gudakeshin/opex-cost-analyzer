@@ -1,0 +1,58 @@
+[
+  {
+    "kpi_id": "consolidated_ebitda_margin",
+    "kpi_name": "Consolidated EBITDA Margin (%)",
+    "unit": "pct",
+    "formula": "consolidated_ebitda / consolidated_revenue * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 22.0,
+    "p50_benchmark_pct": 15.0,
+    "p75_benchmark_pct": 9.0,
+    "source": "M&M FY25 consolidated EBITDA: ~15%, Aditya Birla (Grasim) FY25: ~18%, Tata Sons group-level. SEBI BRSR: top conglomerates (BSE100) median EBITDA ~14-18%."
+  },
+  {
+    "kpi_id": "employee_cost_pct",
+    "kpi_name": "Consolidated Employee Cost % of Revenue",
+    "unit": "pct",
+    "formula": "consolidated_employee_cost / consolidated_revenue * 100",
+    "target_direction": "context_dependent",
+    "p50_benchmark_pct": 13.0,
+    "source": "M&M FY25: 11.6%, Aditya Birla Group: 8-15% (segment-mix dependent). Reliance FY25: ~3-4% (O2C-dominated). Conglomerate ratio heavily influenced by business mix."
+  },
+  {
+    "kpi_id": "holding_company_cost_pct",
+    "kpi_name": "Holding Company / Corporate HQ Cost % of Revenue",
+    "unit": "pct",
+    "formula": "holdco_standalone_opex / consolidated_revenue * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 0.8,
+    "source": "Hackett Group G&A 2024: world-class group holding cost 0.5-1% of consolidated revenue. Tata Sons, Aditya Birla Group management fees/corporate overhead disclosed in related-party notes."
+  },
+  {
+    "kpi_id": "inter_segment_efficiency",
+    "kpi_name": "Inter-Segment Transfer Pricing Efficiency (RELATED_PARTY % of Revenue)",
+    "unit": "pct",
+    "formula": "related_party_transactions / consolidated_revenue * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 8.0,
+    "source": "SEBI LODR: related-party transactions disclosed in annual reports. M&M FY25: significant inter-company transactions (TechM, Mahindra Finance). SEBI BRSR Core: RPT benchmark."
+  },
+  {
+    "kpi_id": "dividend_yield",
+    "kpi_name": "Dividend Yield (%) — Shareholder Return Indicator",
+    "unit": "pct",
+    "formula": "dps / share_price * 100",
+    "target_direction": "higher",
+    "p50_benchmark_pct": 1.5,
+    "source": "M&M FY25 dividend yield: ~1.2%, Hindalco: ~0.8%, UltraTech: ~0.5%. BSE100 conglomerates median dividend yield ~1-2%. DPE CPSEs: typically higher dividend to GoI."
+  },
+  {
+    "kpi_id": "csr_spend_cr",
+    "kpi_name": "CSR Spend % of PAT",
+    "unit": "pct",
+    "formula": "csr_spend / profit_after_tax * 100",
+    "target_direction": "context_dependent",
+    "p50_benchmark_pct": 2.0,
+    "source": "Companies Act Section 135: mandatory 2% of average net profit. M&M FY25: ₹1,800 Cr CSR. SEBI BRSR Core: mandatory assurance of CSR disclosures for top-1000 listed entities."
+  }
+]

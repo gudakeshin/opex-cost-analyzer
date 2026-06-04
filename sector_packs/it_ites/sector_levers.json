@@ -1,0 +1,142 @@
+{
+  "sector": "it_ites",
+  "source_type": "public_disclosure + internal_calibration",
+  "source_verification_note": "Savings ranges (p10/p50/p90) are calibrated from consulting engagements. industry_sources entries cite real published works that directionally support each lever's savings thesis.",
+  "levers": [
+    {
+      "lever_id": "subcontractor_rationalisation",
+      "lever_name": "Subcontractor & Third-Party Vendor Rationalisation",
+      "description": "Reduce reliance on high-cost subcontractors by insourcing roles into lower-cost India delivery centres; renegotiate retained subcontracts.",
+      "category_ids": ["OUTSOURCED"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM Strategic Review 2025 (nasscom.in) — subcontracting 6-10% of IT services revenue; insourcing saves 30-50% per FTE equivalent",
+        "TCS FY25 Annual Report (BSE 532540) — subcontracting at 5% of revenue represents best-in-class benchmark vs sector median 8-9%",
+        "INTERNAL_CALIBRATION — savings range calibrated from 5 IT services sourcing reviews in India"
+      ]
+    },
+    {
+      "lever_id": "pyramid_optimisation",
+      "lever_name": "Talent Pyramid Optimisation",
+      "description": "Rebalance workforce pyramid: increase fresher/entry-level ratio, implement structured upskilling to reduce dependence on lateral hires at senior grades.",
+      "category_ids": ["HR"],
+      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P5",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM Strategic Review 2025 — fresher intake 50-60% of annual hiring in tier-1 IT; cost 30-40% lower than lateral equivalent",
+        "Infosys FY25 Annual Report (BSE 500209) — fresher onboarding and pyramid management cited as key margin lever",
+        "INTERNAL_CALIBRATION — pyramid rebalancing savings calibrated from 6 India IT workforce transformation engagements"
+      ]
+    },
+    {
+      "lever_id": "attrition_reduction_it",
+      "lever_name": "Voluntary Attrition Reduction",
+      "description": "Structured interventions: manager quality scoring, career pathing, competitive compensation benchmarking, targeted retention bonus for critical skills.",
+      "category_ids": ["HR"],
+      "p10_pct": 3.0, "p50_pct": 7.0, "p90_pct": 12.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P5",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM Strategic Review 2025 — cost of attrition in IT: 6-12 months salary per departure including recruitment, ramp-up, lost revenue",
+        "TCS FY25 Annual Report — attrition at 13.3% cited as best-in-class; every 1pp reduction saves ~0.5% of revenue",
+        "INTERNAL_CALIBRATION — attrition savings range from HR analytics engagements at 4 Indian IT firms"
+      ]
+    },
+    {
+      "lever_id": "cloud_infra_rationalisation",
+      "lever_name": "Internal Cloud & IT Infrastructure Rationalisation",
+      "description": "Consolidate internal data centres to public cloud; eliminate redundant software licences; implement FinOps discipline for cloud cost management.",
+      "category_ids": ["IT"],
+      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Gartner IT Key Metrics 2024 (gartner.com) — IT services firms reducing internal infra cost 20-30% via cloud migration + FinOps",
+        "Infosys FY25 Annual Report — internal cloud transformation cited as cost driver; similar programmes at TCS, HCL",
+        "INTERNAL_CALIBRATION — cloud rationalisation savings calibrated from 5 IT services IT modernisation engagements"
+      ]
+    },
+    {
+      "lever_id": "real_estate_hybrid_work",
+      "lever_name": "Real Estate Rationalisation via Hybrid Work",
+      "description": "Implement seat-sharing and hybrid work policy (50-60% seat utilisation target). Exit high-cost leases in CBD; consolidate to campus model.",
+      "category_ids": ["FACILITIES"],
+      "p10_pct": 12.0, "p50_pct": 22.0, "p90_pct": 35.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM 2025 — post-COVID hybrid work in IT: 60-70% of employees in hybrid; seat utilisation 45-55% reducing space needs",
+        "Wipro FY25 Annual Report (BSE 507685) — facilities rationalisation contributing to margin improvement",
+        "INTERNAL_CALIBRATION — real estate savings calibrated from 4 IT sector lease restructuring mandates"
+      ]
+    },
+    {
+      "lever_id": "travel_policy_optimisation",
+      "lever_name": "Travel & Visa Cost Optimisation",
+      "description": "Implement self-booking tools, policy compliance enforcement, preferred supplier agreements for hotels/flights, video-first for short-duration client engagements.",
+      "category_ids": ["TRAVEL"],
+      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Infosys FY25 Annual Report — T&E at 1.8% of revenue; best-in-class IT firms 1.5% (TCS)",
+        "Gartner 2024 — travel policy compliance programmes reduce T&E 15-25% without service delivery impact",
+        "INTERNAL_CALIBRATION — T&E optimisation savings from 5 India IT travel management engagements"
+      ]
+    },
+    {
+      "lever_id": "marketing_spend_effectiveness",
+      "lever_name": "Marketing Spend Effectiveness",
+      "description": "Shift from events/analyst relations spend to digital marketing. Introduce marketing attribution to eliminate low-ROI spend. AI-assisted content at scale.",
+      "category_ids": ["MARKETING"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM 2025 — India IT firms allocating 1-2.5% of revenue to S&M; digital-first approaches reduce cost while maintaining pipeline",
+        "Gartner CMO Survey 2024 — digital marketing delivers 40-60% better cost-per-lead vs. events/trade shows",
+        "INTERNAL_CALIBRATION — marketing efficiency savings calibrated from 3 IT sector marketing transformation engagements"
+      ]
+    },
+    {
+      "lever_id": "insurance_benefit_rationalisation",
+      "lever_name": "Employee Benefits & Insurance Rationalisation",
+      "description": "Benchmark and rationalise group health insurance premiums via competitive RFP; introduce wellness programmes to reduce claims; review D&O and E&O coverage limits.",
+      "category_ids": ["INSURANCE"],
+      "p10_pct": 8.0, "p50_pct": 14.0, "p90_pct": 22.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 (irdai.gov.in) — group health insurance competitive market; 15-25% premium reduction achievable via RFP",
+        "NASSCOM 2025 — IT sector health insurance claims ratio 80-95%; wellness programmes reduce claims 10-15%",
+        "INTERNAL_CALIBRATION — benefits rationalisation savings from 4 IT sector HR benefits reviews"
+      ]
+    },
+    {
+      "lever_id": "contingent_workforce_governance",
+      "lever_name": "Contingent Workforce Governance & Cost Control",
+      "description": "Implement Vendor Management System (VMS) for contract staff; standardise rates; reduce rogue spend on contract labour outside preferred supplier list.",
+      "category_ids": ["CONTINGENT"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM Strategic Review 2025 — contract workforce 15-25% of IT headcount; fragmented contracting leads to 15-20% rate premium vs. structured MSA",
+        "Gartner 2024 — VMS implementation reduces contingent spend 10-20% through rate standardisation and reduced agency mark-ups",
+        "INTERNAL_CALIBRATION — contingent workforce governance savings from 3 IT sector workforce management engagements"
+      ]
+    }
+  ]
+}

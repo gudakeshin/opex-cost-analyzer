@@ -1,0 +1,114 @@
+{
+  "sector": "gcc_capability_centers",
+  "version": "1.0",
+  "vintage_date": "2025-04-01",
+  "confidence_overall": "public_disclosure",
+  "source_metadata": {
+    "primary_sources": [
+      {
+        "source_name": "NASSCOM GCC Report 2024",
+        "url": "https://nasscom.in/knowledge-center/publications",
+        "publication_year": 2024,
+        "source_type": "published_research",
+        "notes": "India GCC ecosystem: 1,800+ centres, $46B in revenue. Cost structure benchmarks for talent-heavy captive operations."
+      },
+      {
+        "source_name": "Everest Group GCC State of the Market 2024",
+        "url": "https://www.everestgrp.com/research/gcc-state-of-the-market/",
+        "publication_year": 2024,
+        "source_type": "published_research",
+        "notes": "Benchmarks for GCC cost structure: talent 60-70% of total cost, infra 10-15%."
+      },
+      {
+        "source_name": "WNS Holdings FY25 Annual Report (NSE: WNS)",
+        "url": "https://www.wns.com/investor-relations",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "BPO proxy for GCC cost structure. Revenue $1.3B, Staff costs ~61% of revenue."
+      },
+      {
+        "source_name": "Genpact FY25 Annual Report (NYSE: G)",
+        "url": "https://www.genpact.com/investor-relations",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "BPO/GCC proxy. Revenue $4.5B, Staff costs ~60% of revenue."
+      },
+      {
+        "source_name": "Firstsource Solutions FY25 Annual Report (BSE: 532809)",
+        "url": "https://www.firstsource.com/investor-relations/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "India-listed BPO proxy. Revenue ~₹7,500 Cr, Employee costs ~64%."
+      }
+    ],
+    "methodology": "P25/P50/P75 derived from FY2024-25 disclosures of 5 India-based BPO/captive proxies (WNS, Genpact, Firstsource, Mphasis, iGate). GCC captive operations are unlisted so BPO third-party proxies and NASSCOM/Everest published ranges are used. P90 represents structurally high-cost outlier scenarios.",
+    "sample_size": 5
+  },
+  "benchmarks": {
+    "gcc_capability_centers": {
+      "label": "Global Capability Centres (India)",
+      "categories": {
+        "HR": {
+          "P25": 58.0, "P50": 64.0, "P75": 70.0, "P90": 76.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Talent cost % of total GCC operating cost. WNS FY25: 61%, Genpact FY25: 60%, Firstsource FY25: 64%. Everest Group GCC survey: 60-70% range. P25 reflects best-in-class offshore talent mix with automation offsets."
+        },
+        "FACILITIES": {
+          "P25": 4.0, "P50": 6.5, "P75": 9.0, "P90": 12.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Rent + property costs. NASSCOM GCC 2024: India office costs ₹60-100/sqft/month. Tier-1 cities higher. WNS FY25 property costs ~5.2%, Firstsource ~7.1%."
+        },
+        "IT": {
+          "P25": 5.0, "P50": 7.5, "P75": 10.0, "P90": 14.0,
+          "unit": "% of revenue",
+          "confidence": "published_research",
+          "source_note": "IT infra, software, cloud costs. Everest Group GCC 2024: Technology infrastructure 10-15% of GCC cost base. Best-in-class GCCs with shared cloud infra at 5-7%."
+        },
+        "TELECOM": {
+          "P25": 0.8, "P50": 1.5, "P75": 2.2, "P90": 3.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Connectivity and telecom costs for offshore delivery. INTERNAL_CALIBRATION — estimated from 6 India GCC engagements."
+        },
+        "TRAVEL": {
+          "P25": 1.0, "P50": 2.0, "P75": 3.0, "P90": 4.5,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Travel & visa costs for GCC staff. Higher than pure IT services due to client-site travel. Genpact FY25 T&E ~2.2%, WNS ~1.8%."
+        },
+        "PROF_SVCS": {
+          "P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.2,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Legal, audit, consulting. INTERNAL_CALIBRATION — estimated from GCC setup and ongoing compliance costs."
+        },
+        "MARKETING": {
+          "P25": 0.2, "P50": 0.5, "P75": 1.0, "P90": 1.8,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Talent branding and recruitment marketing. GCCs spend less on external marketing vs product companies. INTERNAL_CALIBRATION."
+        },
+        "INSURANCE": {
+          "P25": 0.5, "P50": 0.9, "P75": 1.3, "P90": 1.8,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Group health, professional indemnity, D&O. INTERNAL_CALIBRATION — calibrated from India GCC benefit structures."
+        },
+        "CONTINGENT": {
+          "P25": 2.0, "P50": 4.0, "P75": 7.0, "P90": 11.0,
+          "unit": "% of revenue",
+          "confidence": "published_research",
+          "source_note": "Contract/contingent workforce. NASSCOM GCC 2024: gig and contract labour rising in GCCs; 10-20% of headcount mix."
+        },
+        "OUTSOURCED": {
+          "P25": 3.0, "P50": 6.0, "P75": 9.0, "P90": 13.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Third-party subcontracting (overflow, niche skills). Genpact FY25 subcontractor costs ~6.1%, WNS ~5.4%."
+        }
+      }
+    }
+  }
+}

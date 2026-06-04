@@ -1,0 +1,102 @@
+{
+  "sector": "healthcare_hospitals",
+  "version": "1.0",
+  "vintage_date": "2025-04-01",
+  "confidence_overall": "public_disclosure",
+  "source_metadata": {
+    "primary_sources": [
+      {
+        "source_name": "Apollo Hospitals FY25 Annual Report (BSE: 508869)",
+        "url": "https://www.apollohospitals.com/investor-relations/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹19,000 Cr. Employee costs ~₹5,700 Cr (30%), Medical consumables ~₹5,300 Cr (28%), Power & utilities ~₹950 Cr (5%)."
+      },
+      {
+        "source_name": "Fortis Healthcare FY25 Annual Report (BSE: 532843)",
+        "url": "https://www.fortishealthcare.com/investor-relations/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹8,000 Cr. Employee costs ~31%, Medical consumables ~25%, Utilities ~5%."
+      },
+      {
+        "source_name": "Narayana Health FY25 Annual Report (BSE: 539551)",
+        "url": "https://www.narayanahealth.org/investor-relations/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹5,500 Cr. Employee ~28%, Consumables ~27%, Utilities ~4.5%. Low-cost model with strong clinical outcomes."
+      },
+      {
+        "source_name": "NABH (National Accreditation Board for Hospitals) Quality Benchmarks 2024",
+        "url": "https://www.nabh.co/nabh-standards",
+        "publication_year": 2024,
+        "source_type": "published_research",
+        "notes": "NABH accreditation standards include operational benchmarks for bed utilisation, nurse-patient ratios, and quality metrics."
+      },
+      {
+        "source_name": "National Health Authority (NHA) Hospital Cost Survey 2023-24",
+        "url": "https://nha.gov.in/PM-JAY",
+        "publication_year": 2024,
+        "source_type": "public_disclosure",
+        "notes": "NHA empanelled hospital cost structure data used for PM-JAY rate setting. Employee 25-35%, consumables 22-28%, overhead 15-20%."
+      }
+    ],
+    "methodology": "P25/P50/P75 derived from FY24-25 annual reports of 3 listed India hospital chains (Apollo, Fortis, Narayana). NHA cost survey and NABH benchmarks used for cross-validation. Categories as % of net revenue (total hospital revenue). P25 reflects Narayana's low-cost high-efficiency model; P90 reflects high-cost quaternary facilities.",
+    "sample_size": 3
+  },
+  "benchmarks": {
+    "healthcare_hospitals": {
+      "label": "Healthcare & Hospitals (India)",
+      "categories": {
+        "HR": {
+          "P25": 27.0, "P50": 30.0, "P75": 35.0, "P90": 42.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Employee costs % of revenue. Narayana FY25: 28%, Apollo FY25: 30%, Fortis FY25: 31%. NHA survey: 25-35% range. Low-cost Indian hospital chains are at P25; quaternary/super-specialty at P75-P90."
+        },
+        "OUTSOURCED": {
+          "P25": 22.0, "P50": 27.0, "P75": 32.0, "P90": 38.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Medical consumables, implants, pharmaceuticals, blood products. Apollo FY25: 28%, Fortis FY25: 25%, Narayana: 27%. NHA: 22-28% range. High-end tertiary with complex surgery higher."
+        },
+        "POWER_ENERGY": {
+          "P25": 3.5, "P50": 5.0, "P75": 7.0, "P90": 10.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Power, utilities, medical gases. Apollo FY25: ~5%, Narayana: ~4.5%, Fortis: ~5%. NABH: energy intensity 4-7% of revenue typical."
+        },
+        "FACILITIES": {
+          "P25": 2.0, "P50": 4.0, "P75": 7.0, "P90": 12.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Rent, lease, occupancy. Apollo: lower (owns most properties). Fortis: higher (leased locations). New entrants / franchise model: 10-14%."
+        },
+        "IT": {
+          "P25": 1.5, "P50": 2.5, "P75": 3.8, "P90": 6.0,
+          "unit": "% of revenue",
+          "confidence": "published_research",
+          "source_note": "Hospital information systems (HIS), EMR, radiology PACS, lab systems. Gartner Healthcare IT 2024: 2-4% of revenue. Telemedicine integration adds 1pp."
+        },
+        "PLANT_MAINTENANCE": {
+          "P25": 1.5, "P50": 2.5, "P75": 4.0, "P90": 6.0,
+          "unit": "% of revenue",
+          "confidence": "published_research",
+          "source_note": "Medical equipment maintenance, biomedical engineering, building maintenance. NABH: hospitals spend 2-4% on maintenance; high-tech diagnostic centres higher."
+        },
+        "MARKETING": {
+          "P25": 1.0, "P50": 2.5, "P75": 4.5, "P90": 7.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Marketing, patient acquisition, OPD promotion. Apollo FY25: ~2.5% (brand + digital). Narayana: minimal marketing (referral model). Standalone multispecialty: 4-7%."
+        },
+        "PROF_SVCS": {
+          "P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Regulatory compliance, accreditation, legal, audit. NABH/NABL accreditation costs. INTERNAL_CALIBRATION."
+        }
+      }
+    }
+  }
+}

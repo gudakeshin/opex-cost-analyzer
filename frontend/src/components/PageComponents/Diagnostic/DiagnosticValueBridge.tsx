@@ -26,6 +26,7 @@ interface DiagnosticValueBridgeProps {
   rows: ValueAtTableRow[];
   totalP50Cr?: number;
   annualRevenueCr?: number;
+  showProxyDisclaimer?: boolean;
 }
 
 const TH_CLASS =
@@ -153,6 +154,7 @@ export const DiagnosticValueBridge: React.FC<DiagnosticValueBridgeProps> = ({
   rows,
   totalP50Cr,
   annualRevenueCr,
+  showProxyDisclaimer = false,
 }) => {
   const [percentilesByLever, setPercentilesByLever] = useState(() =>
     buildDefaultPercentilesByLever(rows),
@@ -206,6 +208,9 @@ export const DiagnosticValueBridge: React.FC<DiagnosticValueBridgeProps> = ({
   return (
     <section aria-label="Value at table bridge" className="mb-4 space-y-5">
       <p className="text-sm text-brand-muted leading-relaxed">
+        {showProxyDisclaimer
+          ? 'Pools and capture rates come from sector benchmarks applied to a synthetic spend profile—not your uploaded spend. '
+          : null}
         Each lever has its own uncertainty slider (P10 conservative → P90 stretch, default P50).
         Portfolio totals reflect your per-lever choices.
       </p>
@@ -287,7 +292,7 @@ export const DiagnosticValueBridge: React.FC<DiagnosticValueBridgeProps> = ({
                 Lever
               </th>
               <th scope="col" className={TH_CLASS}>
-                Valuation basis
+                Proxy valuation basis
               </th>
               <th scope="col" className={`${TH_CLASS} min-w-[180px]`}>
                 Uncertainty (per lever)

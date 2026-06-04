@@ -1,0 +1,66 @@
+[
+  {
+    "kpi_id": "plant_load_factor",
+    "kpi_name": "Plant Load Factor / Capacity Utilisation (%)",
+    "unit": "pct",
+    "formula": "actual_generation_units / installed_capacity_mw / 8760 * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 80.0,
+    "p50_benchmark_pct": 68.0,
+    "p75_benchmark_pct": 55.0,
+    "source": "CEA Annual Report 2023-24: India average thermal PLF 64.4%, NTPC fleet PLF ~73%. Best-in-class thermal units: 80%+. Renewables: CUF (capacity utilisation factor) 22-27% for solar, 28-38% for wind."
+  },
+  {
+    "kpi_id": "om_cost_per_mw",
+    "kpi_name": "O&M Cost per MW (₹ Lakh/year)",
+    "unit": "INR_lakh",
+    "formula": "total_om_cost / installed_capacity_mw",
+    "target_direction": "lower",
+    "p25_benchmark_lakh": 10.0,
+    "p50_benchmark_lakh": 15.0,
+    "p75_benchmark_lakh": 22.0,
+    "source": "CEA 2023-24: O&M norms ₹14-18 Lakh/MW/year for thermal generation. NTPC FY25 R&M: ~₹10.5 Lakh/MW. Renewables: ₹5-8 Lakh/MW for solar."
+  },
+  {
+    "kpi_id": "employee_cost_pct",
+    "kpi_name": "Employee Cost % of Revenue",
+    "unit": "pct",
+    "formula": "employee_cost / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 4.5,
+    "p50_benchmark_pct": 8.0,
+    "p75_benchmark_pct": 13.0,
+    "source": "NTPC FY25: 5.6%, Adani Green FY25: 4.5%, PowerGrid FY25: 10%. DPE CPSE Survey: energy sector employee cost 5-12%."
+  },
+  {
+    "kpi_id": "ebitda_margin",
+    "kpi_name": "EBITDA Margin (%)",
+    "unit": "pct",
+    "formula": "ebitda / revenue * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 35.0,
+    "p50_benchmark_pct": 25.0,
+    "p75_benchmark_pct": 15.0,
+    "source": "NTPC FY25 EBITDA margin: ~24% (regulated return). PowerGrid: ~75% (transmission — very high margin). Adani Green: ~84% (renewables EBITDA). Upstream O&G (ONGC): ~30%."
+  },
+  {
+    "kpi_id": "at_c_losses",
+    "kpi_name": "AT&C Losses (Aggregate Technical & Commercial) %",
+    "unit": "pct",
+    "formula": "energy_billed_and_collected / energy_input * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 12.0,
+    "p50_benchmark_pct": 18.0,
+    "p75_benchmark_pct": 28.0,
+    "source": "MoPNG/CEA Annual Report 2023-24: India average AT&C losses ~17-18%. Best state DISCOMs: 10-12%. Worst: 30-40%. UDAY scheme targets <15% nationally."
+  },
+  {
+    "kpi_id": "renewable_mix_pct",
+    "kpi_name": "Renewable Energy % of Total Generation Portfolio",
+    "unit": "pct",
+    "formula": "renewable_capacity_mw / total_capacity_mw * 100",
+    "target_direction": "higher",
+    "p50_benchmark_pct": 30.0,
+    "source": "CEA Annual Report 2023-24: India total installed RE capacity ~44% of total as of March 2024. Government target: 500 GW RE by 2030. NTPC RE capacity: growing to 60 GW by 2032."
+  }
+]

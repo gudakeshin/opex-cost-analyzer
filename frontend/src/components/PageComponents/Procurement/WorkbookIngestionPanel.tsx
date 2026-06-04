@@ -19,10 +19,21 @@ interface SkippedSheet {
   reason?: string;
 }
 
+interface IngestionQuality {
+  rows_parsed?: number;
+  rows_with_amount?: number;
+  total_amount?: number;
+  zero_spend_warning?: boolean;
+  column_mapping_note?: string;
+}
+
 interface IngestionReport {
   source_file?: string;
   sheets_ingested?: IngestedSheet[];
   sheets_skipped?: SkippedSheet[];
+  warnings?: string[];
+  quality?: IngestionQuality;
+  layout?: string;
   files?: IngestionReport[];
 }
 
@@ -56,6 +67,10 @@ export const WorkbookIngestionPanel: React.FC<WorkbookIngestionPanelProps> = ({
   const reports = normalizeReports(ingestionReport ?? undefined);
   const graph = modelManifest?.sheet_graph ?? [];
   const confidence = modelManifest?.confidence;
+  const primary = reports[0];
+  const warnings = reports.flatMap((r) => r.warnings ?? []);
+  const zeroSpend = reports.some((r) => r.quality?.zero_spend_warning);
+  const mappingNote = reports.map((r) => r.quality?.column_mapping_note).find(Boolean);
 
   if (!reports.length && !graph.length) return null;
 
@@ -95,6 +110,32 @@ export const WorkbookIngestionPanel: React.FC<WorkbookIngestionPanelProps> = ({
         <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">
           No spend lines were parsed. Check that a transactional sheet (supplier + amount columns) exists
           and is not named only as a dashboard tab.
+        </p>
+      )}
+
+      {zeroSpend && (
+        <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">
+          Rows were ingested but parsed spend totals are zero. Re-run analysis after fixing column layout,
+          or use a flat file with explicit Amount and Description columns (see data/samples/).
+        </p>
+      )}
+
+      {warnings.map((w) => (
+        <p
+          key={w}
+          className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5"
+        >
+          {w}
+        </p>
+      ))}
+
+      {mappingNote && (
+        <p className="text-xs text-brand-muted border-l-2 border-deloitte-green pl-2">{mappingNote}</p>
+      )}
+
+      {primary?.layout === 'hierarchical_expense' && (
+        <p className="text-xs text-brand-muted">
+          Detected hierarchical expense / P&L layout (line items + period amount columns).
         </p>
       )}
 

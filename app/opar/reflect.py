@@ -8,6 +8,7 @@ import pandas as pd
 from app.config import ANTHROPIC_ENABLED, UPLOAD_DIR
 from app.memory import MemoryStore
 from app.opar.memory_adapter import get_memory_adapter
+from app.utils.inr_format import format_money
 from app.opar.quality import assumptions_from_initiative, check_gate2
 from app.opar.provenance import record_llm_narrative
 from app.services.reg_watcher import surface_at_reflect_gate
@@ -28,7 +29,18 @@ from app.skills.contracts import (
     validate_executive_communication_output,
     validate_peer_benchmarker_output,
 )
-from app.storage import read_json
+from app.storage import read_json, write_json
+
+_CONFLICT_TYPE_LABELS: Dict[str, str] = {
+    "tds_mismatch": "TDS mismatch",
+    "gst_mismatch": "GST mismatch",
+    "vendor_duplicate": "Duplicate vendor (GSTIN/name)",
+    "intercompany_inflation": "Intercompany inflation",
+    "fx_mismatch": "FX rate mismatch",
+    "benchmark_disagreement": "Benchmark disagreement",
+    "amount_mismatch": "Amount mismatch across sources",
+    "cost_center_lag": "Cost centre mapping lag",
+}
 
 
 def _tokenize(text: str) -> list[str]:
@@ -301,6 +313,7 @@ def _normalize_advisory_sections(raw: Dict[str, Any]) -> AdvisorySections | None
         "business_levers": raw.get("business_levers", []),
         "executive_callouts": raw.get("executive_callouts", []),
         "priority_actions_30_60_90": raw.get("priority_actions_30_60_90", []),
+        "sme_qualification_narrative": raw.get("sme_qualification_narrative", ""),
     }
     try:
         return AdvisorySections.model_validate(payload)
@@ -821,6 +834,10 @@ def reflect(
     _layer2_coherence_checks(validated, failed, confidence_scores)
     _layer3_domain_confidence(validated, ctx, confidence_scores)
 
+    # Layer 4: SME critique — extract probe questions for next_options
+    _sme_critique = validated.get("sme-critique", {})
+    _sme_top_probes: List[Dict[str, str]] = _sme_critique.get("top_probes", []) if isinstance(_sme_critique, dict) else []
+
     dedup_factor = _compute_dedup_factor(validated)
     value_bridge_matrix = _build_value_bridge_matrix(validated, dedup_factor)
 
@@ -843,6 +860,16 @@ def reflect(
     loop_complete, next_trigger = _determine_loop_control(validated, failed, ctx, plan)
     manifest_path = UPLOAD_DIR / ctx.session_id / "manifest.json"
     manifest = read_json(manifest_path, {}) if manifest_path.exists() else {}
+
+    # Resolve session currency before any response text is built so that
+    # _format_currency uses ₹ Cr for INR sessions instead of hardcoded $.
+    global _REFLECT_CURRENCY
+    _early_analysis = _memory.get("session", ctx.session_id)
+    _REFLECT_CURRENCY = str(
+        (_early_analysis or {}).get("reporting_currency")
+        or manifest.get("currency")
+        or "INR"
+    )
 
     advisory_sections, thinking_text = _generate_llm_advisory_sections(
         ctx, manifest, validated,
@@ -890,11 +917,23 @@ def reflect(
             "company_name": manifest.get("company_name"),
             "industry": manifest.get("industry") or "",
             "annual_revenue": float(manifest.get("annual_revenue") or 0),
+            "reporting_currency": _REFLECT_CURRENCY,
             "skill_outputs": merged_outputs,
             "advisory_sections": advisory_sections.model_dump() if advisory_sections else {},
             "response_artefacts": act_result.response_artefacts if hasattr(act_result, "response_artefacts") else [],
         }
         _memory.put("session", ctx.session_id, analysis_snapshot)
+
+    if "conflict-detector" in validated and manifest_path.parent.exists():
+        cd = validated["conflict-detector"]
+        if isinstance(cd, dict):
+            manifest["conflict_state"] = {
+                "total": int(cd.get("conflict_count") or cd.get("total") or 0),
+                "unresolved": int(cd.get("unresolved") or 0),
+                "by_type": cd.get("by_type") or {},
+                "has_intercompany": bool((cd.get("by_type") or {}).get("intercompany_inflation")),
+            }
+            write_json(manifest_path, manifest)
 
     # Business case: show in chat only; do NOT auto-create docx. User must ask to export.
     if "business-case-builder" in validated:
@@ -903,6 +942,18 @@ def reflect(
     # Value bridge done, suggest business case
     if "value-bridge-calculator" in validated and "business-case-builder" not in validated:
         next_options.append({"label": "Generate business case", "message": "Generate business case"})
+
+    # SME probe CTAs — prepend the top probe questions so user's first action
+    # is to answer the critical assumption, not jump to a business case.
+    if _sme_top_probes:
+        probe_ctas: list[Dict[str, str]] = []
+        for probe in _sme_top_probes[:3]:
+            label = str(probe.get("chat_cta") or probe.get("question", ""))[:60]
+            question = str(probe.get("question") or "")
+            if label and question:
+                probe_ctas.append({"label": label, "message": question})
+        # Insert before the first next_option so probes appear at the top
+        next_options = probe_ctas + next_options
 
     chart_url = validated.get("chart-builder", {}).get("chart_url")
     if chart_url:
@@ -1030,8 +1081,13 @@ def _format_business_case_for_chat(bc: Dict[str, Any]) -> str:
     return "\n".join(lines).strip()
 
 
+# Set by reflect() before building any response text so all _format_currency
+# calls use the session's actual reporting currency instead of a hardcoded $.
+_REFLECT_CURRENCY: str = "INR"
+
+
 def _format_currency(value: float) -> str:
-    return f"${float(value or 0):,.0f}"
+    return format_money(float(value or 0), _REFLECT_CURRENCY)
 
 
 def _business_lever_label(lever: str) -> str:
@@ -1204,12 +1260,95 @@ def _recommendation_rows(validated: Dict[str, Dict[str, Any]], max_items: int = 
     return out
 
 
+def _format_conflict_line(conflict: Dict[str, Any]) -> str:
+    ctype = str(conflict.get("conflict_type") or "unknown")
+    label = _CONFLICT_TYPE_LABELS.get(ctype, ctype.replace("_", " ").title())
+    severity = str(conflict.get("severity") or "medium")
+    source_a = conflict.get("source_a") or "source A"
+    source_b = conflict.get("source_b") or "source B"
+    parts = [f"**{label}** ({severity}): {source_a} vs {source_b}"]
+    amount_a = conflict.get("amount_a")
+    amount_b = conflict.get("amount_b")
+    if amount_a is not None and amount_b is not None:
+        parts.append(
+            f"amounts {_format_currency(float(amount_a))} vs {_format_currency(float(amount_b))}"
+        )
+    delta = conflict.get("delta_pct")
+    if delta is not None:
+        try:
+            parts.append(f"delta {float(delta):+.1f}%")
+        except (TypeError, ValueError):
+            pass
+    notes = conflict.get("resolution_notes")
+    if notes:
+        parts.append(str(notes))
+    return "- " + " — ".join(parts)
+
+
+def _format_conflict_detection_response(conflict_data: Dict[str, Any]) -> str:
+    total = int(conflict_data.get("conflict_count") or conflict_data.get("total") or 0)
+    unresolved = int(conflict_data.get("unresolved") or 0)
+    by_type = conflict_data.get("by_type") or {}
+    conflicts = conflict_data.get("conflicts") or []
+
+    if total <= 0:
+        return (
+            "**Cross-source check complete** — no TDS, GST, or vendor conflicts detected "
+            "across the uploaded sources in this session."
+        )
+
+    lines = [
+        f"**Cross-source conflicts: {total} found**"
+        + (f" ({unresolved} unresolved)" if unresolved else ""),
+    ]
+    if by_type:
+        type_bits = [
+            f"{_CONFLICT_TYPE_LABELS.get(k, k.replace('_', ' '))}: {v}"
+            for k, v in sorted(by_type.items(), key=lambda x: -x[1])
+        ]
+        lines.append("By type: " + "; ".join(type_bits) + ".")
+    lines.append("")
+    lines.append("**Findings**")
+    for conflict in conflicts[:12]:
+        if isinstance(conflict, dict):
+            lines.append(_format_conflict_line(conflict))
+    if len(conflicts) > 12:
+        lines.append(f"- …and {len(conflicts) - 12} more (open Cost Room or ask to resolve).")
+    auto = int(conflict_data.get("auto_resolvable") or 0)
+    escalate = int(conflict_data.get("requires_escalation") or 0)
+    if auto or escalate:
+        lines.append("")
+        lines.append(
+            f"Resolution: {auto} auto-resolvable, {escalate} need controller/CFO review."
+        )
+    return "\n".join(lines)
+
+
 def _build_response_text(
     validated: Dict[str, Dict],
     failed: Dict[str, str],
     plan: ExecutionPlan,
     ctx: ObserveContext | None = None,
 ) -> str:
+    conflict_data = validated.get("conflict-detector")
+    if conflict_data and isinstance(conflict_data, dict):
+        conflict_text = _format_conflict_detection_response(conflict_data)
+        if ctx and ctx.intent_class == "conflict_review":
+            prefix_parts: list[str] = []
+            profiler = validated.get("spend-profiler", {})
+            if profiler:
+                prefix_parts.append(
+                    f"Scanned uploaded sources — {len(profiler.get('category_profile', []))} categories, "
+                    f"total {_format_currency(profiler.get('total_spend', 0))}."
+                )
+            if failed:
+                prefix_parts.append(
+                    f"Errors: {', '.join(f'{k}: {v}' for k, v in failed.items())}."
+                )
+            if prefix_parts:
+                return "\n\n".join(prefix_parts) + "\n\n" + conflict_text
+            return conflict_text
+
     category_focused = _is_category_focused_request(ctx, validated)
     communication = validated.get("executive-communication", {})
     if communication and communication.get("message"):
@@ -1341,9 +1480,11 @@ def _build_response_text(
             return "\n".join(lines).strip()
 
     parts = []
+    if conflict_data and isinstance(conflict_data, dict):
+        parts.append(_format_conflict_detection_response(conflict_data))
     if validated.get("spend-profiler"):
         p = validated["spend-profiler"]
-        parts.append(f"Spend profile: {len(p.get('category_profile', []))} categories, total ${p.get('total_spend', 0):,.0f}.")
+        parts.append(f"Spend profile: {len(p.get('category_profile', []))} categories, total {_format_currency(p.get('total_spend', 0))}.")
         chart = validated.get("chart-builder", {})
         if chart:
             chart_lines: list[str] = ["**Spend Profile Chart View**"]

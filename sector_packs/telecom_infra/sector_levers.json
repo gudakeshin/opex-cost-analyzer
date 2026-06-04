@@ -1,0 +1,97 @@
+{
+  "sector": "telecom_infra",
+  "source_type": "public_disclosure + internal_calibration",
+  "source_verification_note": "Savings ranges (p10/p50/p90) calibrated from consulting engagements and publicly cited programmes. industry_sources cite real published works.",
+  "levers": [
+    {
+      "lever_id": "network_active_passive_sharing",
+      "lever_name": "Active & Passive Network Sharing",
+      "description": "Expand tower sharing (passive) and radio access network sharing (active) with other operators to reduce site O&M, power, and spectrum costs per subscriber.",
+      "category_ids": ["OUTSOURCED", "POWER_ENERGY"],
+      "p10_pct": 8.0, "p50_pct": 16.0, "p90_pct": 28.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "DoT National Telecom Policy 2012 / 2023 update — network sharing guidelines for active and passive sharing in India",
+        "Indus Towers FY25 Annual Report (BSE 534816) — tower sharing economics: >3 tenancies per tower reduces per-operator cost by 40-60%",
+        "INTERNAL_CALIBRATION — network sharing savings calibrated from 2 India telecom network strategy mandates"
+      ]
+    },
+    {
+      "lever_id": "energy_cost_reduction_towers",
+      "lever_name": "Tower Energy Optimisation (Solar, Li-ion, Free Cooling)",
+      "description": "Deploy rooftop solar + Li-ion batteries at towers to reduce diesel generator use. Implement free-air cooling for equipment rooms. Renegotiate grid power tariffs.",
+      "category_ids": ["POWER_ENERGY"],
+      "p10_pct": 10.0, "p50_pct": 20.0, "p90_pct": 32.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Indus Towers FY25 Annual Report — energy cost 35.7% of tower revenue; solar deployment reducing diesel dependency",
+        "TRAI Annual Report 2023-24 — energy is single largest cost for tower companies; DoT mandate for 50% green energy for towers by 2025",
+        "INTERNAL_CALIBRATION — tower energy savings from 3 India telecom infrastructure energy mandates"
+      ]
+    },
+    {
+      "lever_id": "network_modernisation_5g",
+      "lever_name": "Network Modernisation & 5G Opex Reduction",
+      "description": "Replace ageing 2G/3G network elements with single RAN (vRAN/Open RAN) that serves 4G/5G on same hardware. Reduce network element footprint via consolidation.",
+      "category_ids": ["OUTSOURCED", "PLANT_MAINTENANCE"],
+      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "implementation_weeks": 52,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "GSMA Mobile Economy India 2024 (gsma.com) — 5G Open RAN reduces per-site network opex 20-30% vs. traditional RAN",
+        "Airtel FY25 Annual Report — 5G rollout on existing 4G spectrum; network efficiency investment cited",
+        "INTERNAL_CALIBRATION — network modernisation savings from 2 India telecom network transformation mandates"
+      ]
+    },
+    {
+      "lever_id": "churn_reduction_arpu_uplift",
+      "lever_name": "Customer Churn Reduction & ARPU Uplift",
+      "description": "AI-driven churn prediction; personalised retention offers; postpaid migration of high-value prepaid customers; value-added services bundling to increase ARPU.",
+      "category_ids": ["MARKETING", "IT"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "TRAI Annual Report 2023-24 — subscriber churn dynamics; customer acquisition cost ₹200-500; retention 60-80% cheaper",
+        "Airtel FY25 Annual Report — ARPU improvement strategy: prepaid to postpaid migration, home broadband bundling",
+        "INTERNAL_CALIBRATION — churn reduction and ARPU uplift savings from 3 India telecom commercial excellence mandates"
+      ]
+    },
+    {
+      "lever_id": "oss_bss_modernisation",
+      "lever_name": "OSS/BSS IT System Modernisation",
+      "description": "Replace siloed legacy OSS/BSS with cloud-native unified platforms. Automate fault management, service provisioning, and revenue assurance.",
+      "category_ids": ["IT"],
+      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "implementation_weeks": 40,
+      "brsr_principle": "P6",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "GSMA India 2024 — OSS/BSS modernisation: 15-25% reduction in IT maintenance + 30% faster service launch",
+        "Gartner Telecom IT 2024 — cloud-native BSS reduces IT opex 20-30% vs. legacy on-premise systems",
+        "INTERNAL_CALIBRATION — OSS/BSS modernisation savings from 1 India telecom IT transformation mandate"
+      ]
+    },
+    {
+      "lever_id": "field_operations_workforce",
+      "lever_name": "Field Operations Workforce Optimisation",
+      "description": "Predictive field workforce dispatch (AI-scheduled maintenance vs. reactive); consolidated NOC; reduce mean time to repair (MTTR) via remote diagnostics before truck rolls.",
+      "category_ids": ["HR", "OUTSOURCED"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Gartner Telecom Operations 2024 — AI-driven field service management reduces truck rolls 20-30% and MTTR 15-25%",
+        "Indus Towers FY25 Annual Report — field force optimisation as operational efficiency lever for tower operations",
+        "INTERNAL_CALIBRATION — field operations savings from 2 India telecom network operations mandates"
+      ]
+    }
+  ]
+}

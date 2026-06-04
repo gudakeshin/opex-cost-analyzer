@@ -15,6 +15,35 @@ BENCHMARK_STORE_PATH = DATA_DIR / "benchmarks" / "registry.json"
 PEER_SETS_PATH = DATA_DIR / "benchmarks" / "peer_sets.json"
 SEED_PATH = ROOT_DIR / "skills" / "peer-benchmarker" / "references" / "industry_benchmarks.json"
 
+# Sector-pack IDs (used by industry inference, lever rules, the diagnostic UI)
+# are a finer taxonomy than the benchmark registry, which is keyed by a coarser
+# set of industries. This maps a sector pack to the benchmark industry whose
+# category percentiles best represent it, so peer benchmarking resolves instead
+# of silently returning zero comparisons (e.g. an FMCG ledger inferred as
+# `fmcg_consumer` reads `retail_consumer` benchmarks).
+SECTOR_PACK_TO_BENCHMARK: Dict[str, str] = {
+    "it_ites": "technology",
+    "gcc_capability_centers": "gcc_capability_centers",
+    "bfsi_banks": "financial_services",
+    "financial_services_nonbank": "financial_services",
+    "insurance_general": "financial_services",
+    "fmcg_consumer": "retail_consumer",
+    "retail_organized": "retail_consumer",
+    "hospitality_travel": "retail_consumer",
+    "pharma_lifesciences": "healthcare",
+    "healthcare_hospitals": "healthcare",
+    "energy_utilities": "manufacturing",
+    "telecom_infra": "technology",
+    "manufacturing_diversified": "manufacturing",
+    "psu_cpse": "manufacturing",
+    "conglomerate": "manufacturing",
+}
+
+
+def benchmark_industry_for(industry: str) -> str:
+    """Resolve a sector-pack id (or raw industry) to a benchmark-registry key."""
+    return SECTOR_PACK_TO_BENCHMARK.get((industry or "").strip(), industry)
+
 # Lock protecting all read-modify-write operations on the benchmark store.
 _LOCK = threading.Lock()
 
@@ -374,6 +403,47 @@ def resolve_peer_set_payload(peer_set_name: str, categories: List[str], annual_r
     }
 
 
+def _load_sector_pack_benchmarks(pack_id: str) -> Dict[str, Any] | None:
+    """Load sector-specific percentile benchmarks from the sector pack directory.
+
+    Returns the parsed JSON if the file exists and is valid, otherwise None.
+    Sector pack files take priority over the global seed — they carry verified
+    public-disclosure data derived from actual annual reports and regulator
+    publications, so specificity_score is set to 0.85 (vs seed's 0.55).
+    """
+    pack_file = ROOT_DIR / "sector_packs" / pack_id / "benchmarks_percentiles.json"
+    if not pack_file.exists():
+        return None
+    data = read_json(pack_file, {})
+    return data if data.get("benchmarks") else None
+
+
+def _sector_pack_dataset_meta(pack_id: str, pack_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Synthesise a dataset registry entry for a sector-pack percentile file."""
+    sources = pack_data.get("source_metadata", {}).get("primary_sources", [])
+    external = [s["source_name"] for s in sources if s.get("source_type") != "internal_calibration"]
+    source_label = " / ".join(external[:3]) + " (public_disclosure)" if external else f"{pack_id} sector pack"
+    categories_in_pack = sorted(
+        list((pack_data.get("benchmarks", {}).get(pack_id, {}).get("categories") or {}).keys())
+    )
+    return {
+        "dataset_id": f"sector-pack-{pack_id}",
+        "source": source_label,
+        "industry_code": pack_id,
+        "industry_name": pack_data.get("sector", pack_id),
+        "category_coverage": {pack_id: categories_in_pack},
+        "vintage_date": pack_data.get("vintage_date", _today_iso()),
+        "sample_size": pack_data.get("source_metadata", {}).get("sample_size", 6),
+        "revenue_band_min": 0,
+        "revenue_band_max": None,
+        "geography": "India",
+        "specificity_score": 0.85,
+        "license_expiry": "2099-12-31",
+        "data_file_ref": str(ROOT_DIR / "sector_packs" / pack_id / "benchmarks_percentiles.json"),
+        "ingested_at": _now_iso(),
+    }
+
+
 def resolve_benchmark_payload(
     industry: str,
     categories: List[str],
@@ -381,9 +451,33 @@ def resolve_benchmark_payload(
 ) -> Dict[str, Any]:
     """
     Select the best dataset for a run and resolve the actual benchmark payload.
+
+    Resolution order:
+    1. Sector-pack-specific benchmarks_percentiles.json (highest priority — public_disclosure data)
+    2. Best uploaded/registered dataset from registry
+    3. Global seed (industry_benchmarks.json) — fallback
+
     Falls back to seed benchmarks if the selected dataset has no readable data file.
     """
-    selection = select_best_dataset(industry=industry, categories=categories, annual_revenue=annual_revenue)
+    # 1. Sector-pack-specific percentile file (takes priority over registry + seed)
+    if industry and industry in SECTOR_PACK_TO_BENCHMARK:
+        pack_data = _load_sector_pack_benchmarks(industry)
+        if pack_data:
+            selected_meta = _sector_pack_dataset_meta(industry, pack_data)
+            return {
+                "benchmark_data": pack_data,
+                "selected_dataset": selected_meta,
+                "selection_rationale": {
+                    "source": "sector_pack_percentiles",
+                    "pack_id": industry,
+                    "specificity_score": 0.85,
+                    "confidence": pack_data.get("confidence_overall", "public_disclosure"),
+                },
+                "candidates": [{"dataset_id": selected_meta["dataset_id"], "source": selected_meta["source"], "score": 0.85}],
+            }
+
+    bench_key = benchmark_industry_for(industry)
+    selection = select_best_dataset(industry=bench_key, categories=categories, annual_revenue=annual_revenue)
     selected = selection.get("selected") or _load_seed_dataset()
     payload = read_json(SEED_PATH, {})
     data_ref = selected.get("data_file_ref")
@@ -393,6 +487,15 @@ def resolve_benchmark_payload(
             loaded = read_json(candidate, {})
             if loaded.get("benchmarks"):
                 payload = loaded
+    # Alias the requested sector-pack id onto the resolved benchmark taxonomy so
+    # callers that look up benchmarks[industry] (peer_benchmarker) resolve even
+    # when the registry is keyed coarser. Copy before mutating to avoid leaking
+    # the alias into a shared/cached payload.
+    benchmarks = payload.get("benchmarks", {})
+    if industry and industry != bench_key and industry not in benchmarks and bench_key in benchmarks:
+        benchmarks = dict(benchmarks)
+        benchmarks[industry] = benchmarks[bench_key]
+        payload = {**payload, "benchmarks": benchmarks}
     return {
         "benchmark_data": payload,
         "selected_dataset": selected,

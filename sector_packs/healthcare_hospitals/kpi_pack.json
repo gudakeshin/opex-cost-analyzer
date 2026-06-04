@@ -1,0 +1,68 @@
+[
+  {
+    "kpi_id": "alos",
+    "kpi_name": "Average Length of Stay (ALOS, days)",
+    "unit": "days",
+    "formula": "total_inpatient_days / total_discharges",
+    "target_direction": "lower",
+    "p25_benchmark_days": 3.2,
+    "p50_benchmark_days": 4.5,
+    "p75_benchmark_days": 6.0,
+    "source": "NHA hospital cost survey 2023-24: ALOS 3-5 days for NABH-accredited hospitals. Apollo FY25 reported ALOS ~4.2 days. Narayana: ~3.5 days (efficient clinical pathways)."
+  },
+  {
+    "kpi_id": "bed_occupancy_rate",
+    "kpi_name": "Bed Occupancy Rate (%)",
+    "unit": "pct",
+    "formula": "inpatient_days / (beds * 365) * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 72.0,
+    "p50_benchmark_pct": 60.0,
+    "p75_benchmark_pct": 48.0,
+    "source": "NABH standards: target occupancy 60-75% for balanced throughput vs. quality. Apollo FY25: ~70%, Narayana: ~68%, Fortis: ~62%."
+  },
+  {
+    "kpi_id": "employee_cost_pct",
+    "kpi_name": "Employee Cost % of Revenue",
+    "unit": "pct",
+    "formula": "employee_cost / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 27.0,
+    "p50_benchmark_pct": 30.0,
+    "p75_benchmark_pct": 35.0,
+    "source": "Narayana FY25: 28%, Apollo FY25: 30%, Fortis FY25: 31%. NHA survey: 25-35% range."
+  },
+  {
+    "kpi_id": "consumable_cost_pct",
+    "kpi_name": "Medical Consumables % of Revenue",
+    "unit": "pct",
+    "formula": "medical_consumables_cost / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 22.0,
+    "p50_benchmark_pct": 27.0,
+    "p75_benchmark_pct": 32.0,
+    "source": "Apollo FY25: 28%, Fortis FY25: 25%, Narayana FY25: 27%. NHA: 22-28% range for tertiary care. Implant-heavy centres higher."
+  },
+  {
+    "kpi_id": "ebitda_margin",
+    "kpi_name": "EBITDA Margin (%)",
+    "unit": "pct",
+    "formula": "ebitda / revenue * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 20.0,
+    "p50_benchmark_pct": 14.0,
+    "p75_benchmark_pct": 8.0,
+    "source": "Apollo FY25 EBITDA margin: ~20% (healthcare vertical). Narayana FY25: ~18%. Fortis FY25: ~14%. New entrant multispecialty: 5-10%."
+  },
+  {
+    "kpi_id": "revenue_per_occupied_bed",
+    "kpi_name": "Revenue per Occupied Bed per Day (₹)",
+    "unit": "INR",
+    "formula": "total_inpatient_revenue / inpatient_days",
+    "target_direction": "higher",
+    "p25_benchmark_inr": 28000,
+    "p50_benchmark_inr": 18000,
+    "p75_benchmark_inr": 10000,
+    "source": "Apollo FY25: ~₹28,000/bed/day (tertiary, metro). Narayana: ~₹15,000 (value model). NHA PM-JAY rates: ₹5,000-₹15,000 for empanelled procedures."
+  }
+]

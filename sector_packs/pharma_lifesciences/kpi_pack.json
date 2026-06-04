@@ -1,0 +1,66 @@
+[
+  {
+    "kpi_id": "rd_intensity",
+    "kpi_name": "R&D Intensity (% of Revenue)",
+    "unit": "pct",
+    "formula": "rd_spend / revenue * 100",
+    "target_direction": "context_dependent",
+    "p25_benchmark_pct": 5.0,
+    "p50_benchmark_pct": 6.5,
+    "p75_benchmark_pct": 9.0,
+    "source": "Sun Pharma FY25: 7%, Cipla FY25: 5.5%, Dr. Reddy's FY25: 6%. OPPI India Pharma Review 2024: R&D 5-10% for innovator-oriented; <3% for generics-only."
+  },
+  {
+    "kpi_id": "selling_distribution_pct",
+    "kpi_name": "Selling & Distribution Cost % of Revenue",
+    "unit": "pct",
+    "formula": "selling_distribution_cost / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 12.0,
+    "p50_benchmark_pct": 16.0,
+    "p75_benchmark_pct": 21.0,
+    "source": "Dr. Reddy's FY25: ~12%, Cipla FY25: ~14%, Sun Pharma FY25: ~17%. OPPI: domestic-oriented companies 18-24%."
+  },
+  {
+    "kpi_id": "ebitda_margin",
+    "kpi_name": "EBITDA Margin (%)",
+    "unit": "pct",
+    "formula": "ebitda / revenue * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 26.0,
+    "p50_benchmark_pct": 21.0,
+    "p75_benchmark_pct": 15.0,
+    "source": "Sun Pharma FY25 EBITDA: ~27%, Cipla FY25: ~24%, Dr. Reddy's FY25: ~22%. IQVIA India 2024: industry median ~18-22%."
+  },
+  {
+    "kpi_id": "employee_cost_pct",
+    "kpi_name": "Employee Cost % of Revenue",
+    "unit": "pct",
+    "formula": "employee_cost / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 13.0,
+    "p50_benchmark_pct": 16.0,
+    "p75_benchmark_pct": 20.0,
+    "source": "Sun Pharma FY25: ~14%, Cipla FY25: ~16%, Dr. Reddy's FY25: ~18%. OPPI pharma survey 2024."
+  },
+  {
+    "kpi_id": "anda_approvals_per_year",
+    "kpi_name": "ANDA/NDA Approvals per Year",
+    "unit": "count",
+    "formula": "total_anda_nda_approvals / year",
+    "target_direction": "higher",
+    "p50_benchmark": 20,
+    "source": "USFDA Orange Book + Indian pharma company disclosures FY25: Sun Pharma ~30+ ANDA approvals/year, Dr. Reddy's ~25, Cipla ~20. NPPA drug approval data for India."
+  },
+  {
+    "kpi_id": "cogs_pct",
+    "kpi_name": "Cost of Goods Sold % of Revenue",
+    "unit": "pct",
+    "formula": "cogs / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 35.0,
+    "p50_benchmark_pct": 42.0,
+    "p75_benchmark_pct": 52.0,
+    "source": "Sun Pharma FY25: ~35% (branded generics premium), Cipla FY25: ~40%, Dr. Reddy's FY25: ~42%. Domestic generics-only: 45-55%."
+  }
+]

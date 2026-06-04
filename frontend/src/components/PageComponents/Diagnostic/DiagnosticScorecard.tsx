@@ -23,11 +23,15 @@ export const DiagnosticScorecard: React.FC<DiagnosticScorecardProps> = ({ result
         value={`₹${totalP50.toLocaleString('en-IN', { maximumFractionDigits: 1 })} Cr`}
         highlight
       />
-      <MetricTile label="Benchmark gaps" value={String(gapCount)} change="Top material gaps ranked below" />
+      <MetricTile
+        label="Benchmark gaps"
+        value={String(gapCount)}
+        change="Sector proxy — not your spend"
+      />
       <MetricTile
         label="Value levers"
         value={String(valueRows)}
-        change={result.data_note || 'Model + benchmark backed'}
+        change="Sector playbook on proxy pools"
       />
     </div>
   );

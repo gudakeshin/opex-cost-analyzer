@@ -2,14 +2,25 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { apiGet, apiPost } from '../hooks/useApi';
 import { manifestAudienceToMode, useAudience } from './AudienceContext';
 import { isPlaceholderCompanyName } from '../utils/engagement';
-import type { EngagementMeta, SessionManifest } from '../types';
+import type { EngagementMeta, EngagementSummary, SessionManifest } from '../types';
 
 const STORAGE_KEY = 'opex_session_id';
+const ENGAGEMENT_STORAGE_KEY = 'opex_engagement_id';
 
 interface SessionContextValue {
   sessionId: string | null;
+  engagementId: string | null;
   setSessionId: (id: string | null) => void;
+  setEngagementId: (id: string | null) => void;
   ensureSession: () => Promise<string>;
+  ensureEngagement: () => Promise<string>;
+  listEngagements: () => Promise<EngagementSummary[]>;
+  createEngagement: (payload?: {
+    company_name?: string;
+    industry?: string;
+    annual_revenue?: number;
+    currency?: string;
+  }) => Promise<string>;
   engagement: EngagementMeta;
   refreshEngagement: () => Promise<void>;
   loadingEngagement: boolean;
@@ -56,6 +67,9 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [sessionId, setSessionIdState] = useState<string | null>(() =>
     localStorage.getItem(STORAGE_KEY),
   );
+  const [engagementId, setEngagementIdState] = useState<string | null>(() =>
+    localStorage.getItem(ENGAGEMENT_STORAGE_KEY),
+  );
   const [engagement, setEngagement] = useState<EngagementMeta>(defaultEngagement);
   const [loadingEngagement, setLoadingEngagement] = useState(false);
   const [hasAnalysis, setHasAnalysis] = useState(false);
@@ -66,21 +80,60 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     else localStorage.removeItem(STORAGE_KEY);
   }, [sessionId]);
 
+  useEffect(() => {
+    if (engagementId) localStorage.setItem(ENGAGEMENT_STORAGE_KEY, engagementId);
+    else localStorage.removeItem(ENGAGEMENT_STORAGE_KEY);
+  }, [engagementId]);
+
+  const refreshEngagementMeta = useCallback(async (eid: string) => {
+    const detail = await apiGet<{
+      company_name?: string;
+      industry?: string;
+      currency?: string;
+      annual_revenue?: number;
+    }>(`/api/v1/engagements/${eid}`);
+    const revenue = detail.annual_revenue;
+    setEngagement({
+      company_name: detail.company_name || defaultEngagement.company_name,
+      industry: detail.industry || defaultEngagement.industry,
+      currency: detail.currency || 'INR',
+      engagement_week: 1,
+      engagement_weeks_total: 12,
+      gate_label: defaultEngagement.gate_label,
+      annual_revenue_cr:
+        revenue != null && revenue > 1_000_000 ? revenue / 10_000_000 : revenue,
+    });
+  }, []);
+
   const refreshEngagement = useCallback(async () => {
     if (!sessionId) return;
     setLoadingEngagement(true);
     try {
+      const status = await apiGet<{
+        session_exists?: boolean;
+        has_analysis?: boolean;
+      }>(`/api/v1/sessions/${sessionId}/status`);
+      if (!status.session_exists) {
+        setSessionIdState(null);
+        setHasAnalysis(false);
+        return;
+      }
+      setHasAnalysis(!!status.has_analysis);
+
       const manifest = await apiGet<SessionManifest & { deep_research_summary?: string }>(
         `/api/v1/sessions/${sessionId}/manifest`,
       );
+      if (manifest.engagement_id) {
+        setEngagementIdState(manifest.engagement_id);
+      }
       setEngagement(engagementFromManifest(manifest));
       const mode = manifestAudienceToMode(manifest.audience);
       if (mode) setAudience(mode);
       setDeepResearchSummary(manifest.deep_research_summary ?? null);
     } catch (err) {
-      // Session directory no longer exists — clear stale ID so pages don't keep hitting 404
       if ((err as { response?: { status?: number } })?.response?.status === 404) {
         setSessionIdState(null);
+        setHasAnalysis(false);
       }
     } finally {
       setLoadingEngagement(false);
@@ -93,8 +146,16 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return;
     }
     try {
-      await apiGet(`/api/v1/sessions/${sessionId}`);
-      setHasAnalysis(true);
+      const status = await apiGet<{
+        session_exists?: boolean;
+        has_analysis?: boolean;
+      }>(`/api/v1/sessions/${sessionId}/status`);
+      if (!status.session_exists) {
+        setSessionIdState(null);
+        setHasAnalysis(false);
+        return;
+      }
+      setHasAnalysis(!!status.has_analysis);
     } catch {
       setHasAnalysis(false);
     }
@@ -103,6 +164,14 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const syncEngagementFromAnalysis = useCallback(async () => {
     if (!sessionId) return;
     try {
+      const status = await apiGet<{
+        session_exists?: boolean;
+        has_analysis?: boolean;
+      }>(`/api/v1/sessions/${sessionId}/status`);
+      if (!status.session_exists || !status.has_analysis) {
+        setHasAnalysis(false);
+        return;
+      }
       const analysis = await apiGet<{
         company_name?: string;
         industry?: string;
@@ -137,29 +206,77 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setSessionIdState(id);
     if (!id) {
       setHasAnalysis(false);
-      setEngagement(defaultEngagement);
       setDeepResearchSummary(null);
     }
   }, []);
 
+  const setEngagementId = useCallback(
+    (id: string | null) => {
+      setEngagementIdState(id);
+      if (id) {
+        refreshEngagementMeta(id).catch(() => undefined);
+      } else {
+        setEngagement(defaultEngagement);
+      }
+    },
+    [refreshEngagementMeta],
+  );
+
+  const listEngagements = useCallback(async () => {
+    return apiGet<EngagementSummary[]>('/api/v1/engagements');
+  }, []);
+
+  const createEngagement = useCallback(
+    async (payload?: {
+      company_name?: string;
+      industry?: string;
+      annual_revenue?: number;
+      currency?: string;
+    }) => {
+      const res = await apiPost<{ engagement_id: string }>('/api/v1/engagements', {
+        company_name: payload?.company_name ?? 'New engagement',
+        industry: payload?.industry ?? '',
+        annual_revenue: payload?.annual_revenue ?? 0,
+        currency: payload?.currency ?? 'INR',
+      });
+      setEngagementIdState(res.engagement_id);
+      await refreshEngagementMeta(res.engagement_id);
+      return res.engagement_id;
+    },
+    [refreshEngagementMeta],
+  );
+
+  const ensureEngagement = useCallback(async (): Promise<string> => {
+    if (engagementId) return engagementId;
+    return createEngagement();
+  }, [engagementId, createEngagement]);
+
   const ensureSession = useCallback(async (): Promise<string> => {
     if (sessionId) return sessionId;
+    const eid = await ensureEngagement();
     const res = await apiPost<SessionManifest>('/api/v1/sessions', {
-      company_name: 'New engagement',
-      industry: '',
-      currency: 'INR',
+      company_name: engagement.company_name,
+      industry: engagement.industry,
+      currency: engagement.currency || 'INR',
       audience: 'consultant',
+      engagement_id: eid,
     });
     setSessionIdState(res.session_id);
+    if (res.engagement_id) setEngagementIdState(res.engagement_id);
     setEngagement(engagementFromManifest(res));
     return res.session_id;
-  }, [sessionId]);
+  }, [sessionId, ensureEngagement, engagement.company_name, engagement.industry, engagement.currency]);
 
   const value = useMemo(
     () => ({
       sessionId,
+      engagementId,
       setSessionId,
+      setEngagementId,
       ensureSession,
+      ensureEngagement,
+      listEngagements,
+      createEngagement,
       engagement,
       refreshEngagement,
       loadingEngagement,
@@ -170,8 +287,13 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }),
     [
       sessionId,
+      engagementId,
       setSessionId,
+      setEngagementId,
       ensureSession,
+      ensureEngagement,
+      listEngagements,
+      createEngagement,
       engagement,
       refreshEngagement,
       loadingEngagement,

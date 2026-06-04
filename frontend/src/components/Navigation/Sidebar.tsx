@@ -4,7 +4,7 @@ import { NavLink } from './NavLink';
 import { useSidebar } from '../../context/SidebarContext';
 import { useAudience } from '../../context/AudienceContext';
 import { useSession } from '../../context/SessionContext';
-import { ChartIcon, SearchIcon, CostRoomIcon } from './NavIcons';
+import { ChartIcon, SearchIcon, CostRoomIcon, GuidebookIcon, DocumentsIcon } from './NavIcons';
 import { useExceptions } from '../../context/ExceptionContext';
 import { DeloitteLogo } from '../Brand/DeloitteLogo';
 import { isClientEngagementReady } from '../../utils/engagement';
@@ -14,6 +14,8 @@ const CONSULTANT_LINKS = [
   { to: '/', label: 'Analysis', icon: <ChartIcon /> },
   { to: '/diagnostic', label: 'Diagnostic', icon: <SearchIcon /> },
   { to: '/cost-room', label: 'Cost Room', icon: <CostRoomIcon /> },
+  { to: '/documents', label: 'Documents', icon: <DocumentsIcon /> },
+  { to: '/guidebook', label: 'Guidebook', icon: <GuidebookIcon /> },
   { to: '/history', label: 'History', icon: <HistoryIcon /> },
 ];
 

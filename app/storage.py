@@ -4,11 +4,11 @@ import json
 from pathlib import Path
 from typing import Any, Dict
 
-from app.config import DATA_DIR, MEMORY_DIR, OUTPUT_DIR, UPLOAD_DIR
+from app.config import DATA_DIR, ENGAGEMENTS_DIR, MEMORY_DIR, OUTPUT_DIR, UPLOAD_DIR
 
 
 def ensure_dirs() -> None:
-    for path in (DATA_DIR, MEMORY_DIR, OUTPUT_DIR, UPLOAD_DIR):
+    for path in (DATA_DIR, MEMORY_DIR, OUTPUT_DIR, UPLOAD_DIR, ENGAGEMENTS_DIR):
         path.mkdir(parents=True, exist_ok=True)
 
 

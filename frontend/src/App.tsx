@@ -5,6 +5,8 @@ import CostRoom from './pages/CostRoom';
 import { SkillsManagement } from './pages/SkillsManagement';
 import { SessionHistory } from './pages/SessionHistory';
 import { Benchmarks } from './pages/Benchmarks';
+import { Guidebook } from './pages/Guidebook';
+import { EngagementDocuments } from './pages/EngagementDocuments';
 import { ExecutiveRouteGuard } from './components/Routing/ExecutiveRouteGuard';
 import { ErrorBoundary } from './components/Common/ErrorBoundary';
 import { useAudience } from './context/AudienceContext';
@@ -27,6 +29,8 @@ function App() {
             <Route path="/skills" element={<SkillsManagement />} />
             <Route path="/history" element={<SessionHistory />} />
             <Route path="/benchmarks" element={<Benchmarks />} />
+            <Route path="/guidebook" element={<Guidebook />} />
+            <Route path="/documents" element={<EngagementDocuments />} />
           </Routes>
         </ExecutiveRouteGuard>
       </Router>

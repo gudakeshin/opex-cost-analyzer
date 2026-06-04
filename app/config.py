@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT_DIR / "data"
 UPLOAD_DIR = DATA_DIR / "uploads"
+ENGAGEMENTS_DIR = DATA_DIR / "engagements"
 OUTPUT_DIR = DATA_DIR / "outputs"
 MEMORY_DIR = DATA_DIR / "memory"
 SKILLS_DIR = ROOT_DIR / "skills"
@@ -92,4 +93,10 @@ EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 
 # Deep Research — uses Google Interactions API (same GEMINI_API_KEY, requires google-genai package)
 DEEP_RESEARCH_ENABLED = bool(GEMINI_API_KEY)
+
+# LlamaParse — multimodal document parsing (https://cloud.llamaindex.ai/)
+LLAMA_CLOUD_API_KEY = os.getenv("LLAMA_CLOUD_API_KEY", "") or os.getenv("LLAMAPARSE_API_KEY", "")
+LLAMAPARSE_ENABLED = os.getenv("LLAMAPARSE_ENABLED", "true").lower() not in ("false", "0", "no") and bool(LLAMA_CLOUD_API_KEY)
+LLAMAPARSE_RESULT_TYPE = os.getenv("LLAMAPARSE_RESULT_TYPE", "markdown")
+LLAMAPARSE_PREMIUM_MODE = os.getenv("LLAMAPARSE_PREMIUM_MODE", "false").lower() in ("true", "1", "yes")
 

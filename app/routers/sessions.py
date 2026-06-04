@@ -9,7 +9,7 @@ from typing import Any, Dict, List
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 from fastapi.responses import Response
 
-from app.config import MAX_UPLOAD_MB, UPLOAD_DIR, logger
+from app.config import DATA_DIR, MAX_UPLOAD_MB, UPLOAD_DIR, logger
 from app.routers._shared import (
     _memory,
     merge_context_into_manifest,
@@ -23,6 +23,12 @@ from app.routers._shared import (
 from app.schemas import AnalyzeRequest, DiagnosticContextPatch, SessionCreateRequest, SessionManifestPatch
 from app.services.analysis import load_taxonomy, run_core_pipeline
 from app.services.compliance import append_audit_event
+from app.services.engagement_sanity import apply_engagement_sanity_to_manifest
+from app.services.engagement_corpus import load_analysis_corpus
+from app.services.engagements_store import (
+    create_engagement_manifest,
+    register_session_on_engagement,
+)
 from app.services.ingestion import infer_tabular_schema, parse_document, parse_spend_file_with_report
 from app.skills.model_contextualizer import (
     build_workbook_manifest,
@@ -32,6 +38,95 @@ from app.skills.model_contextualizer import (
 )
 
 router = APIRouter()
+
+SAMPLES_DIR = DATA_DIR / "samples"
+
+_SAMPLE_FILES: Dict[str, Dict[str, str]] = {
+    "spend-ledger.csv": {
+        "path": "spend_ledger_sample.csv",
+        "media_type": "text/csv",
+        "download_name": "spend_ledger_sample.csv",
+        "description": "Transactional spend ledger (supplier, description, amount)",
+    },
+    "pnl-expense.csv": {
+        "path": "pnl_expense_summary_sample.csv",
+        "media_type": "text/csv",
+        "download_name": "pnl_expense_summary_sample.csv",
+        "description": "Hierarchical P&L-style expense table (CSV)",
+    },
+    "pnl-expense.xlsx": {
+        "path": "pnl_expense_summary_sample.xlsx",
+        "media_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "download_name": "pnl_expense_summary_sample.xlsx",
+        "description": "Hierarchical P&L-style expense table (Excel, offset header row)",
+    },
+    "hul-spend-ledger.csv": {
+        "path": "hul_india_spend_ledger_fy25.csv",
+        "media_type": "text/csv",
+        "download_name": "hul_india_spend_ledger_fy25.csv",
+        "description": "HUL India FY25 synthetic spend ledger (FMCG test)",
+    },
+    "hul-pnl-expense.csv": {
+        "path": "hul_india_pnl_expense_fy25.csv",
+        "media_type": "text/csv",
+        "download_name": "hul_india_pnl_expense_fy25.csv",
+        "description": "HUL India FY25 synthetic P&L OpEx extract (lakhs)",
+    },
+}
+
+
+@router.get("/api/v1/samples")
+def list_sample_files() -> Dict[str, Any]:
+    """List downloadable sample spend files for testing uploads."""
+    items = []
+    for slug, meta in _SAMPLE_FILES.items():
+        path = SAMPLES_DIR / meta["path"]
+        items.append(
+            {
+                "id": slug,
+                "filename": meta["download_name"],
+                "description": meta["description"],
+                "download_url": f"/api/v1/samples/{slug}",
+                "available": path.is_file(),
+            }
+        )
+    return {"samples": items, "readme": "See data/samples/README.md for layout guidance."}
+
+
+@router.get("/api/v1/samples/{sample_id}")
+def download_sample_file(sample_id: str) -> Response:
+    meta = _SAMPLE_FILES.get(sample_id)
+    if not meta:
+        raise HTTPException(status_code=404, detail="Sample not found")
+    path = SAMPLES_DIR / meta["path"]
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="Sample file missing on server")
+    content = path.read_bytes()
+    return Response(
+        content=content,
+        media_type=meta["media_type"],
+        headers={"Content-Disposition": f'attachment; filename="{meta["download_name"]}"'},
+    )
+
+
+def _dominant_currency(lines: List[Any]) -> str | None:
+    """Currency carrying the largest share of native spend across parsed lines.
+
+    Used to anchor the engagement reporting currency to what the data is
+    actually denominated in, instead of falling back to a hard-coded default.
+    """
+    totals: Dict[str, float] = {}
+    for ln in lines:
+        ccy = str(getattr(ln, "currency", "") or "").upper().strip()
+        if not ccy:
+            continue
+        try:
+            totals[ccy] = totals.get(ccy, 0.0) + abs(float(getattr(ln, "amount", 0.0) or 0.0))
+        except (TypeError, ValueError):
+            continue
+    if not totals:
+        return None
+    return max(totals, key=totals.__getitem__)
 
 
 def _format_ingestion_summary(report: Dict[str, Any]) -> str:
@@ -81,21 +176,53 @@ def download_spend_template() -> Response:
 def create_session(payload: SessionCreateRequest) -> Dict[str, Any]:
     session_id = str(uuid.uuid4())
     session_dir(session_id).mkdir(parents=True, exist_ok=True)
+
+    engagement_id = (payload.engagement_id or "").strip()
+    if engagement_id:
+        from app.routers._shared import validate_engagement_id
+        from app.services.engagements_store import ensure_engagement_exists
+
+        validate_engagement_id(engagement_id)
+        eng = ensure_engagement_exists(engagement_id)
+        company_name = payload.company_name or eng.get("company_name")
+        industry = payload.industry or eng.get("industry") or ""
+        annual_revenue = payload.annual_revenue or float(eng.get("annual_revenue") or 0.0)
+        currency = payload.currency or eng.get("currency")
+        headcount = payload.headcount if payload.headcount is not None else eng.get("headcount")
+    else:
+        eng_manifest = create_engagement_manifest(
+            company_name=payload.company_name,
+            industry=payload.industry,
+            annual_revenue=payload.annual_revenue,
+            currency=payload.currency or "INR",
+            headcount=payload.headcount,
+        )
+        engagement_id = eng_manifest["engagement_id"]
+        company_name = payload.company_name
+        industry = payload.industry or ""
+        annual_revenue = payload.annual_revenue
+        currency = payload.currency
+        headcount = payload.headcount
+
     manifest = {
         "session_id": session_id,
-        "company_name": payload.company_name,
-        "industry": payload.industry or "",
-        "annual_revenue": payload.annual_revenue,
-        "currency": payload.currency,
+        "engagement_id": engagement_id,
+        "company_name": company_name,
+        "industry": industry or "",
+        "annual_revenue": annual_revenue,
+        "currency": currency,
         "audience": payload.audience or "cfo",
-        "headcount": payload.headcount,
+        "headcount": headcount,
         "wacc": payload.wacc,
         "effective_tax_rate": payload.effective_tax_rate,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "files": [],
     }
     write_manifest(session_id, manifest)
-    append_audit_event(f"session_created session_id={session_id}")
+    register_session_on_engagement(engagement_id, session_id)
+    append_audit_event(
+        f"session_created session_id={session_id} engagement_id={engagement_id}"
+    )
     return manifest
 
 
@@ -114,7 +241,7 @@ async def upload_file(session_id: str, request: Request, file: UploadFile = File
                 "company_name": analysis.get("company_name", ""),
                 "industry": analysis.get("industry", ""),
                 "annual_revenue": analysis.get("annual_revenue"),
-                "currency": analysis.get("reporting_currency", "USD"),
+                "currency": analysis.get("reporting_currency", "INR"),
                 "audience": "consultant",
                 "created_at": datetime.now(timezone.utc).isoformat(),
                 "files": [],
@@ -140,6 +267,8 @@ async def upload_file(session_id: str, request: Request, file: UploadFile = File
     }
     if out_path.suffix.lower() in (".csv", ".xlsx", ".xls"):
         entry["schema"] = await asyncio.to_thread(infer_tabular_schema, out_path)
+    elif out_path.suffix.lower() == ".json":
+        entry["schema"] = {"format": "json"}
     async with session_lock(session_id):
         manifest = read_manifest(session_id)
         manifest["files"].append(entry)
@@ -152,9 +281,15 @@ async def upload_file(session_id: str, request: Request, file: UploadFile = File
             )
             if interpreted:
                 manifest["model_manifest"] = interpreted
+        apply_engagement_sanity_to_manifest(manifest)
         write_manifest(session_id, manifest)
     append_audit_event(f"file_uploaded session_id={session_id} file={safe_filename}")
-    return {"uploaded": safe_filename, "size_bytes": len(content)}
+    sanity = read_manifest(session_id).get("engagement_sanity") or {}
+    return {
+        "uploaded": safe_filename,
+        "size_bytes": len(content),
+        "engagement_sanity": sanity,
+    }
 
 
 @router.post("/api/analyze/{session_id}")
@@ -193,38 +328,48 @@ async def analyze_session(session_id: str, payload: AnalyzeRequest) -> Dict[str,
                     )
                     manifest["workbook_manifest_degraded"] = True
                     continue
-    taxonomy = load_taxonomy()
-    spend_lines = []
-    docs_text: List[str] = []
-    ingestion_reports: List[Dict[str, Any]] = []
-    model_manifest = manifest.get("model_manifest") if isinstance(manifest, dict) else None
-    for item in manifest.get("files", []):
-        path = Path(item["path"])
-        if path.suffix.lower() in (".xlsx", ".xls", ".csv"):
-            new_lines, ing_report = await asyncio.to_thread(
-                parse_spend_file_with_report,
-                path,
-                taxonomy,
-                workbook_manifest=model_manifest,
-            )
-            spend_lines.extend(new_lines)
-            ingestion_reports.append(ing_report)
-        else:
-            docs_text.append(await asyncio.to_thread(parse_document, path))
+    spend_lines, docs_text, ingestion_reports, corpus_warnings, manifest = await asyncio.to_thread(
+        load_analysis_corpus, session_id
+    )
+    if corpus_warnings:
+        manifest["corpus_warnings"] = corpus_warnings
     if not spend_lines:
-        raise HTTPException(status_code=400, detail="No spend file (.csv/.xlsx/.xls) uploaded")
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "No spend data found. Upload a CSV, Excel, or JSON spend file on the Documents page "
+                "or attach one in Analysis."
+            ),
+        )
     manifest["ingestion_report"] = ingestion_reports[0] if len(ingestion_reports) == 1 else {
         "source_file": "multiple",
         "files": ingestion_reports,
     }
     write_manifest(session_id, manifest)
+    apply_engagement_sanity_to_manifest(manifest, spend_lines)
+    write_manifest(session_id, manifest)
     if payload.currency is not None:
         manifest["currency"] = payload.currency
     if payload.audience is not None:
         manifest["audience"] = payload.audience
-    if payload.currency is not None or payload.audience is not None:
+    # Anchor reporting currency to the data when the user did not specify one.
+    # Precedence: explicit request > manifest > detected-from-data > INR (the
+    # platform's Indian-enterprise default). This stops INR ledgers from being
+    # reported under a hard-coded USD label.
+    detected_currency = _dominant_currency(spend_lines)
+    reporting_currency = str(
+        payload.currency or manifest.get("currency") or detected_currency or "INR"
+    )
+    currency_changed = manifest.get("currency") != reporting_currency
+    if currency_changed:
+        manifest["currency"] = reporting_currency
+    if payload.currency is not None or payload.audience is not None or currency_changed:
         write_manifest(session_id, manifest)
     ingestion_summary = _format_ingestion_summary(manifest.get("ingestion_report") or {})
+    if corpus_warnings:
+        ingestion_summary = (
+            f"{ingestion_summary} Warnings: {'; '.join(corpus_warnings[:5])}".strip()
+        )
     analysis = await asyncio.to_thread(
         run_core_pipeline,
         session_id=session_id,
@@ -235,7 +380,8 @@ async def analyze_session(session_id: str, payload: AnalyzeRequest) -> Dict[str,
         company_name=payload.company_name or manifest.get("company_name"),
         wacc=float(manifest.get("wacc") or payload.wacc or 0.10),
         effective_tax_rate=float(manifest.get("effective_tax_rate") or payload.effective_tax_rate or 0.0),
-        reporting_currency=str(payload.currency or manifest.get("currency") or "USD"),
+        reporting_currency=reporting_currency,
+        engagement_id=manifest.get("engagement_id"),
         ingestion_summary=ingestion_summary or None,
     )
     manifest_changed = False
@@ -255,10 +401,31 @@ async def analyze_session(session_id: str, payload: AnalyzeRequest) -> Dict[str,
     return analysis
 
 
+@router.get("/api/sessions/{session_id}/status")
+@router.get("/api/v1/sessions/{session_id}/status")
+def get_session_status(session_id: str) -> Dict[str, Any]:
+    """Lightweight session probe — always 200; avoids 404 noise when analysis is not ready."""
+    validate_session_id(session_id)
+    sdir = session_dir(session_id)
+    manifest_path = sdir / "manifest.json"
+    has_manifest = manifest_path.is_file()
+    meta = _memory.get("session_meta", session_id) or _memory.get("session", session_id)
+    session_exists = has_manifest or bool(meta)
+    analysis = _memory.get("session", session_id)
+    has_analysis = bool(analysis)
+    manifest = read_manifest(session_id) if has_manifest else {}
+    return {
+        "session_id": session_id,
+        "session_exists": session_exists,
+        "has_manifest": has_manifest,
+        "has_analysis": has_analysis,
+        "file_count": len(manifest.get("files", [])) if manifest else 0,
+    }
+
+
 @router.get("/api/sessions/{session_id}")
 @router.get("/api/v1/sessions/{session_id}")
 def get_session_analysis(session_id: str) -> Dict[str, Any]:
-    from app.routers._shared import _memory
     validate_session_id(session_id)
     result = _memory.get("session", session_id)
     if not result:
@@ -304,7 +471,7 @@ def get_session_manifest(session_id: str) -> Dict[str, Any]:
             "company_name": meta.get("company_name", ""),
             "industry": meta.get("industry", ""),
             "annual_revenue": meta.get("annual_revenue"),
-            "currency": meta.get("reporting_currency", meta.get("currency", "USD")),
+            "currency": meta.get("reporting_currency", meta.get("currency", "INR")),
             "audience": "consultant",
             "created_at": datetime.now(timezone.utc).isoformat(),
             "files": [],
@@ -313,6 +480,7 @@ def get_session_manifest(session_id: str) -> Dict[str, Any]:
         logger.info('"session_recovered session_id=%s"', session_id)
     manifest = read_manifest(session_id)
     manifest.setdefault("session_id", session_id)
+    apply_engagement_sanity_to_manifest(manifest)
     return manifest
 
 
@@ -350,11 +518,15 @@ def list_sessions() -> List[Dict[str, Any]]:
             top_savings = None
             if analysis and isinstance(analysis, dict):
                 top_savings = analysis.get("total_savings_opportunity")
+            from app.services.engagements_store import backfill_engagement_for_session
+
+            engagement_id = backfill_engagement_for_session(session_path.name, manifest)
             summaries.append({
                 "session_id": session_path.name,
+                "engagement_id": engagement_id,
                 "company_name": manifest.get("company_name") or "Unknown",
                 "industry": manifest.get("industry") or "",
-                "currency": manifest.get("currency") or "USD",
+                "currency": manifest.get("currency") or "INR",
                 "annual_revenue": manifest.get("annual_revenue"),
                 "created_at": manifest.get("created_at"),
                 "file_count": len(manifest.get("files", [])),

@@ -101,3 +101,28 @@ def test_diagnostic_context_patch_round_trip(client) -> None:
 
     on_disk = read_manifest(session_id)
     assert on_disk["diagnostic_result"]["key_findings"] == ["Finding one"]
+
+
+def test_session_status_without_analysis(client) -> None:
+    create = client.post(
+        "/api/v1/sessions",
+        json={"company_name": "Status Co", "industry": "fmcg_consumer", "currency": "INR"},
+    )
+    assert create.status_code == 200
+    session_id = create.json()["session_id"]
+
+    status = client.get(f"/api/v1/sessions/{session_id}/status")
+    assert status.status_code == 200
+    body = status.json()
+    assert body["session_exists"] is True
+    assert body["has_analysis"] is False
+
+    analysis = client.get(f"/api/v1/sessions/{session_id}")
+    assert analysis.status_code == 404
+
+
+def test_session_status_unknown_session(client) -> None:
+    missing = "42a5a063-8e61-42d6-b8ca-ef706ac13e16"
+    status = client.get(f"/api/v1/sessions/{missing}/status")
+    assert status.status_code == 200
+    assert status.json()["session_exists"] is False

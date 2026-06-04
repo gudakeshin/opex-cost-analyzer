@@ -1,0 +1,64 @@
+[
+  {
+    "kpi_id": "employee_cost_pct",
+    "kpi_name": "Employee Cost % of Revenue",
+    "unit": "pct",
+    "formula": "employee_cost / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 15.0,
+    "p50_benchmark_pct": 22.0,
+    "p75_benchmark_pct": 32.0,
+    "source": "DPE CPSE Survey 2022-23: aggregate employee cost 18-25% for manufacturing CPSEs. CIL FY25: 20%, BHEL FY25: 29%, HAL FY25: 23%."
+  },
+  {
+    "kpi_id": "ebitda_margin",
+    "kpi_name": "EBITDA Margin (%)",
+    "unit": "pct",
+    "formula": "ebitda / revenue * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 25.0,
+    "p50_benchmark_pct": 15.0,
+    "p75_benchmark_pct": 5.0,
+    "source": "DPE CPSE Survey 2022-23: 182 profit-making CPSEs, 102 loss-making. CIL FY25 EBITDA: ~28%, HAL: ~22%. BHEL: ~4-5% (turnaround). Loss-making CPSEs: negative EBITDA."
+  },
+  {
+    "kpi_id": "capex_to_revenue",
+    "kpi_name": "Capex % of Revenue",
+    "unit": "pct",
+    "formula": "capex / revenue * 100",
+    "target_direction": "context_dependent",
+    "p50_benchmark_pct": 12.0,
+    "source": "DPE CPSE Survey 2022-23: Infrastructure CPSEs: 20-30% capex intensity. Manufacturing CPSEs: 5-15%. Government capital expenditure programme driving elevated CPSE capex."
+  },
+  {
+    "kpi_id": "inventory_days",
+    "kpi_name": "Inventory Days (Raw Material + WIP + FG)",
+    "unit": "days",
+    "formula": "total_inventory / cogs * 365",
+    "target_direction": "lower",
+    "p25_benchmark_days": 45,
+    "p50_benchmark_days": 90,
+    "p75_benchmark_days": 150,
+    "source": "CAG reports on CPSEs: excess inventory is a recurring finding. BHEL FY25: inventory days ~180 (order-based manufacturing). CIL: ~30 days (coal stockpile management)."
+  },
+  {
+    "kpi_id": "csr_spend_pct",
+    "kpi_name": "CSR Spend % of PAT",
+    "unit": "pct",
+    "formula": "csr_spend / profit_after_tax * 100",
+    "target_direction": "context_dependent",
+    "p50_benchmark_pct": 2.0,
+    "source": "Companies Act Section 135: mandatory 2% of average net profit for last 3 years. CIL FY25: CSR ₹1,800 Cr (~2.5% of PAT). HAL FY25: CSR ₹150 Cr (2.0%)."
+  },
+  {
+    "kpi_id": "revenue_per_employee",
+    "kpi_name": "Revenue per Employee (₹ Lakh/year)",
+    "unit": "INR_lakh",
+    "formula": "annual_revenue / headcount",
+    "target_direction": "higher",
+    "p25_benchmark_lakh": 80.0,
+    "p50_benchmark_lakh": 45.0,
+    "p75_benchmark_lakh": 20.0,
+    "source": "CIL FY25: ~₹85L/emp (high revenue/employee for mining). HAL FY25: ~₹45L/emp. BHEL FY25: ~₹20L/emp (capital goods with high WIP). DPE Survey 2022-23."
+  }
+]

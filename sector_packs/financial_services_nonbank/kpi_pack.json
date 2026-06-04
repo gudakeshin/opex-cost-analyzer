@@ -1,0 +1,62 @@
+[
+  {
+    "kpi_id": "cost_to_income_ratio",
+    "kpi_name": "Cost-to-Income Ratio (%)",
+    "unit": "pct",
+    "formula": "total_opex / net_income * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 28.0,
+    "p50_benchmark_pct": 38.0,
+    "p75_benchmark_pct": 50.0,
+    "source": "RBI NBFC Report 2023-24 + HDFC AMC FY25 (28%), Bajaj Finance FY25 (33%), mid-tier NBFCs 40-55%"
+  },
+  {
+    "kpi_id": "opex_to_aum",
+    "kpi_name": "OpEx / AUM (bps) — AMC",
+    "unit": "bps",
+    "formula": "total_opex / average_aum * 10000",
+    "target_direction": "lower",
+    "p50_benchmark_bps": 25.0,
+    "source": "AMFI FY25 industry data: TER (expense ratio) for large AMCs 10-18 bps on equity AUM; operational cost within TER: 20-30 bps. SEBI TER cap framework."
+  },
+  {
+    "kpi_id": "staff_cost_pct",
+    "kpi_name": "Staff Cost % of Total Income",
+    "unit": "pct",
+    "formula": "staff_cost / total_income * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 10.0,
+    "p50_benchmark_pct": 16.0,
+    "p75_benchmark_pct": 24.0,
+    "source": "HDFC AMC FY25: 13.9%, Bajaj Finance FY25: ~15%, Nippon AMC FY25: ~12%. RBI NBFC aggregate 2023-24."
+  },
+  {
+    "kpi_id": "tech_cost_pct",
+    "kpi_name": "Technology Cost % of Total Income",
+    "unit": "pct",
+    "formula": "tech_cost / total_income * 100",
+    "target_direction": "context_dependent",
+    "p50_benchmark_pct": 3.5,
+    "source": "Gartner Financial Services IT Benchmark 2024: NBFCs 2-5% of revenue on technology. Fintechs 6-10%."
+  },
+  {
+    "kpi_id": "customer_acquisition_cost",
+    "kpi_name": "Customer Acquisition Cost (₹/new customer)",
+    "unit": "INR",
+    "formula": "total_sales_marketing_spend / new_customers_acquired",
+    "target_direction": "lower",
+    "p50_benchmark_inr": 2800,
+    "source": "Bajaj Finance investor presentations FY25: CAC disclosed in borrower addition economics. Digital-first NBFCs targeting sub-₹2,000 CAC."
+  },
+  {
+    "kpi_id": "revenue_per_employee",
+    "kpi_name": "Revenue per Employee (₹ Lakh/year)",
+    "unit": "INR_lakh",
+    "formula": "total_income / headcount",
+    "target_direction": "higher",
+    "p25_benchmark_lakh": 85.0,
+    "p50_benchmark_lakh": 45.0,
+    "p75_benchmark_lakh": 25.0,
+    "source": "HDFC AMC FY25: ~₹180L/emp (high; asset-light AMC). Bajaj Finance FY25: ~₹50L/emp. Mid-tier NBFC: ₹25-40L/emp."
+  }
+]

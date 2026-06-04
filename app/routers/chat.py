@@ -114,9 +114,12 @@ async def chat_v1_with_files(
         }
         schema: Dict[str, Any] = {}
         doc_stats: Dict[str, Any] = {}
-        if out_path.suffix.lower() in (".csv", ".xlsx", ".xls"):
-            schema = await asyncio.to_thread(infer_tabular_schema, out_path)
-            entry["schema"] = schema
+        if out_path.suffix.lower() in (".csv", ".xlsx", ".xls", ".json"):
+            if out_path.suffix.lower() == ".json":
+                entry["schema"] = {"format": "json", "rows": 0}
+            else:
+                schema = await asyncio.to_thread(infer_tabular_schema, out_path)
+                entry["schema"] = schema
         else:
             extracted = await asyncio.to_thread(parse_document, out_path)
             if extracted:
@@ -133,7 +136,7 @@ async def chat_v1_with_files(
         sem = schema.get("semantic_map", {}) if schema else {}
         detected = {role: col for role, col in sem.items() if col}
         suffix = out_path.suffix.lower()
-        if suffix in (".csv", ".xlsx", ".xls"):
+        if suffix in (".csv", ".xlsx", ".xls", ".json"):
             uploaded_summaries.append({
                 "name": safe_filename,
                 "file_kind": "tabular",

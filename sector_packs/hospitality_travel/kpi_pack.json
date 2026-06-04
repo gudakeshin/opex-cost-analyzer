@@ -1,0 +1,66 @@
+[
+  {
+    "kpi_id": "revpar",
+    "kpi_name": "RevPAR (Revenue per Available Room, ₹/night)",
+    "unit": "INR",
+    "formula": "total_room_revenue / (total_rooms * 365)",
+    "target_direction": "higher",
+    "p25_benchmark_inr": 8500,
+    "p50_benchmark_inr": 5000,
+    "p75_benchmark_inr": 2800,
+    "source": "STR India Hotel Performance 2024: luxury/upper-upscale RevPAR ₹8,000-₹15,000, upscale ₹4,000-₹7,000, midscale ₹2,000-₹4,000. IHCL FY25: ~₹10,500."
+  },
+  {
+    "kpi_id": "occupancy_rate",
+    "kpi_name": "Occupancy Rate (%)",
+    "unit": "pct",
+    "formula": "rooms_sold / rooms_available * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 75.0,
+    "p50_benchmark_pct": 65.0,
+    "p75_benchmark_pct": 55.0,
+    "source": "STR India 2024: luxury hotels 70-78%, upscale 60-70%, economy 50-60%. IHCL FY25: ~73%, Lemon Tree FY25: ~72%."
+  },
+  {
+    "kpi_id": "employee_cost_pct",
+    "kpi_name": "Employee Cost % of Revenue",
+    "unit": "pct",
+    "formula": "employee_cost / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 24.0,
+    "p50_benchmark_pct": 28.0,
+    "p75_benchmark_pct": 33.0,
+    "source": "IHCL FY25: 26.4%, Lemon Tree FY25: ~28%, EIH FY25: ~28%. FHRAI Survey 2024: luxury 24-28%, economy 28-36%."
+  },
+  {
+    "kpi_id": "energy_cost_pct",
+    "kpi_name": "Energy Cost % of Revenue",
+    "unit": "pct",
+    "formula": "energy_cost / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 8.0,
+    "p50_benchmark_pct": 11.5,
+    "p75_benchmark_pct": 15.0,
+    "source": "IHCL FY25: ~12%, Lemon Tree: ~12%, EIH: ~10%. FHRAI: energy is 10-14% for Indian hotels. Star-rated hotels with solar and BMS at 8-10%."
+  },
+  {
+    "kpi_id": "gop_margin",
+    "kpi_name": "Gross Operating Profit (GOP) Margin (%)",
+    "unit": "pct",
+    "formula": "gop / total_revenue * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 35.0,
+    "p50_benchmark_pct": 28.0,
+    "p75_benchmark_pct": 20.0,
+    "source": "IHCL FY25 GOP margin: ~35%, EIH: ~32%, Lemon Tree: ~30%. FHRAI: luxury 30-40%, economy 15-25%."
+  },
+  {
+    "kpi_id": "fb_cost_pct",
+    "kpi_name": "F&B Cost % of F&B Revenue",
+    "unit": "pct",
+    "formula": "fb_material_cost / fb_revenue * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 28.0,
+    "source": "FHRAI Survey 2024: F&B cost ratio 25-32% of F&B revenue for Indian hotels. Luxury: 28-32%, midscale: 25-28%."
+  }
+]

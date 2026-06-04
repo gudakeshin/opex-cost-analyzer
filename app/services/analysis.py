@@ -190,6 +190,16 @@ def run_core_pipeline(
     )
     validate_cost_to_serve_output(cost_to_serve)
 
+    # --- SME Critique — evidence qualification for savings initiatives ---
+    # Runs after savings_modeler and contract_lifecycle_manager are both available.
+    sme_critique = engine.sme_critique_analyzer(
+        savings_model,
+        profile,
+        benchmarks,
+        root_causes,
+        contract_lifecycle,
+    )
+
     skill_outputs = {
         "spend-profiler": profile,
         "document-contextualizer": context,
@@ -214,6 +224,8 @@ def run_core_pipeline(
         "consolidation-analyzer": consolidation,
         # Phase 5
         "cost-to-serve-analyzer": cost_to_serve,
+        # SME critique — evidence maturity and probe questions
+        "sme-critique": sme_critique,
         # Strategic skills feeding board-deck / CFO-brief / business-case
         "assumption-register": assumptions,
         "scenario-modeler": scenarios,

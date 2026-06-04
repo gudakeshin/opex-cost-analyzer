@@ -37,8 +37,8 @@ export function benchmarkGapSummary(gap: BenchmarkGapRow): string | null {
   if (!Number.isFinite(p50) || p50 <= 0) return null;
 
   const headroomPart =
-    headroom > 0 ? ` · ${fmtPoolCr(headroom)} savings to P25 best-in-class` : '';
-  return `${categoryName} at ${p50}% of revenue (median)${headroomPart}`;
+    headroom > 0 ? ` · ${fmtPoolCr(headroom)} benchmark band to P25` : '';
+  return `Proxy: ${categoryName} at ${p50}% of revenue (sector median)${headroomPart}`;
 }
 
 export function benchmarkGapCommentary(gap: BenchmarkGapRow): string | null {
@@ -59,9 +59,10 @@ export function benchmarkGapCommentary(gap: BenchmarkGapRow): string | null {
   const p25Text = Number.isFinite(p25) ? `${p25}%` : 'P25 best-in-class';
   const bandText = Number.isFinite(band) && band > 0 ? ` ₹${band.toLocaleString('en-IN')} Cr` : '';
   return (
-    `${categoryName} is modelled at ${p50}% of revenue (industry median P50);` +
-    `${bandText ? `${bandText} savings potential if spend moves to P25 best-in-class (${p25Text}).` : ` gap to P25 best-in-class (${p25Text}).`} ` +
-    'Based on sector benchmark proxy — upload actual spend for company-specific gaps.'
+    `[Benchmark proxy, not your spend] ${categoryName} is modelled at ${p50}% of revenue ` +
+    `(sector median P50 applied to the revenue you entered);` +
+    `${bandText ? `${bandText} illustrative band if spend moved to P25 best-in-class (${p25Text}).` : ` illustrative gap to P25 (${p25Text}).`} ` +
+    'Upload actual spend for company-specific gaps.'
   );
 }
 

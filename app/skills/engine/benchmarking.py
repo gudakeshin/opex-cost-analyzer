@@ -2,11 +2,17 @@
 from __future__ import annotations
 
 import math
+import re
 from collections import defaultdict
 from statistics import median
 from typing import Any, Dict, List, Optional, Tuple
 
 from app.models import NormalizedSpendLine
+
+# Word-boundary PO detection. A naive ``"po" in desc`` substring test misreads
+# "transport", "deposit", "export" as PO-backed spend, so the maverick-buying
+# diagnosis becomes noise. Match PO / P.O. / "purchase order" as whole tokens.
+_PO_TOKEN_RE = re.compile(r"\b(?:po|p\.?\s?o\.?|purchase order)\b")
 
 from ._loaders import (
     _get_heuristic_ranges,
@@ -192,6 +198,9 @@ def root_cause_analyzer(
     include_bands = set(_threshold_val(th.get("peer_percentile_include"), ["P50-P75", "P75-P90", "P90+"]))
     hhi_max = float(_threshold_val(th.get("supplier_fragmentation_hhi_max"), 0.15))
     min_suppliers = int(_threshold_val(th.get("supplier_fragmentation_min_suppliers"), 5))
+    # HHI > 0.25 ≈ "highly concentrated" on the standard DOJ/FTC scale (mirrors
+    # the 0.15 fragmentation floor, which is the "unconcentrated" boundary).
+    conc_min = float(_threshold_val(th.get("supplier_concentration_hhi_min"), 0.25))
     maverick_min = float(_threshold_val(th.get("maverick_spend_ratio_min"), 0.2))
     cpt_cfg = th.get("cost_per_transaction_max", {})
     if reporting_currency.upper() != "INR" and isinstance(cpt_cfg, dict) and "value_usd" in cpt_cfg:
@@ -207,10 +216,15 @@ def root_cause_analyzer(
     for line in lines:
         suppliers_by_cat[line.category_id][line.supplier] += line.amount
         desc = (line.description or "").lower()
-        if "po" in desc:
+        if _PO_TOKEN_RE.search(desc):
             po_spend_by_cat[line.category_id] += line.amount
         else:
             off_po_spend_by_cat[line.category_id] += line.amount
+
+    # Only diagnose maverick (off-PO) buying when the dataset actually tracks
+    # POs. With no PO signal at all, "100% off-PO" is missing metadata, not a
+    # finding — flagging it would put a spurious maverick call on every category.
+    has_po_signal = sum(po_spend_by_cat.values()) > 0
 
     eligible_levers = resolve_eligible_levers(
         industry=industry,
@@ -227,21 +241,14 @@ def root_cause_analyzer(
                 cid_sig = sig.split(":")[1].replace("_present", "")
                 levers_for_category.setdefault(cid_sig, []).append(lv)
 
-    outputs: List[Dict[str, Any]] = []
-    for cmp_row in peer.get("comparisons", []):
-        cid = cmp_row["category_id"]
-        percentile_band = cmp_row.get("percentile_band", "")
-        if percentile_band not in include_bands:
-            continue
-        cat = spend_by_cat.get(cid, {})
-        total = float(cat.get("spend", 0.0))
+    def _diagnose_category(cid: str, category_name: str, total: float) -> Optional[Dict[str, Any]]:
+        """Structural diagnosis for one category. Needs no revenue baseline —
+        supplier fragmentation, maverick buying and cost-per-transaction are all
+        derived from the spend lines themselves."""
         if total <= 0:
-            continue
-
+            return None
         supplier_map = suppliers_by_cat.get(cid, {})
-        hhi = 0.0
-        if total > 0:
-            hhi = sum((amt / total) ** 2 for amt in supplier_map.values())
+        hhi = sum((amt / total) ** 2 for amt in supplier_map.values()) if total > 0 else 0.0
         maverick = off_po_spend_by_cat.get(cid, 0.0) / total if total else 0.0
 
         root_causes: List[Dict[str, Any]] = []
@@ -257,8 +264,24 @@ def root_cause_analyzer(
                     "estimated_timeline_months": 12,
                 }
             )
+        elif hhi >= conc_min and supplier_map:
+            top_share = (max(supplier_map.values()) / total) if total else 0.0
+            root_causes.append(
+                {
+                    "diagnosis": (
+                        f"Spend concentrated across {len(supplier_map)} supplier(s) "
+                        f"(HHI {hhi:.2f}; top supplier {top_share:.0%} of category) — limited competitive tension"
+                    ),
+                    "confidence": "medium",
+                    "addressable_spend": total * float(_threshold_val(rates.get("contract_renegotiation"), 0.08)),
+                    "recommended_lever": "contract_renegotiation",
+                    "implementation_approach": "Run a competitive rebid or dual-source the dominant supplier to restore price tension.",
+                    "implementation_complexity": "medium",
+                    "estimated_timeline_months": 9,
+                }
+            )
 
-        if maverick > maverick_min:
+        if has_po_signal and maverick > maverick_min:
             root_causes.append(
                 {
                     "diagnosis": f"High maverick buying ({maverick:.0%} off-PO spend)",
@@ -302,25 +325,65 @@ def root_cause_analyzer(
             cat_levers = [lv for lv in eligible_levers if "universal_lever" in lv["trigger_signals"]][:5]
         top_levers = sorted(cat_levers, key=lambda x: x["eligibility_score"], reverse=True)[:5]
 
-        outputs.append(
-            {
-                "category_id": cid,
-                "category_name": cmp_row.get("category_name", cid),
-                "root_causes": root_causes,
-                "eligible_levers": [
-                    {
-                        "lever_id": lv["lever_id"],
-                        "lever_name": lv["lever_name"],
-                        "lever_family": lv["lever_family"],
-                        "eligibility_score": lv["eligibility_score"],
-                        "sustainability_score": lv["sustainability_score"],
-                        "bounce_back_risk": lv["bounce_back_risk"],
-                        "complexity_tier": lv["complexity_tier"],
-                        "condition_precedents": lv["condition_precedents"],
-                    }
-                    for lv in top_levers
-                ],
-                "non_addressable_rationale": "Portion may be constrained by contractual or regulatory obligations.",
-            }
+        return {
+            "category_id": cid,
+            "category_name": category_name,
+            "root_causes": root_causes,
+            "eligible_levers": [
+                {
+                    "lever_id": lv["lever_id"],
+                    "lever_name": lv["lever_name"],
+                    "lever_family": lv["lever_family"],
+                    "eligibility_score": lv["eligibility_score"],
+                    "sustainability_score": lv["sustainability_score"],
+                    "bounce_back_risk": lv["bounce_back_risk"],
+                    "complexity_tier": lv["complexity_tier"],
+                    "condition_precedents": lv["condition_precedents"],
+                }
+                for lv in top_levers
+            ],
+            "non_addressable_rationale": "Portion may be constrained by contractual or regulatory obligations.",
+        }
+
+    outputs: List[Dict[str, Any]] = []
+    covered: set = set()
+    # Pass 1 — peer-driven: diagnose categories flagged above the peer median.
+    for cmp_row in peer.get("comparisons", []):
+        cid = cmp_row["category_id"]
+        if cmp_row.get("percentile_band", "") not in include_bands:
+            continue
+        cat = spend_by_cat.get(cid, {})
+        finding = _diagnose_category(cid, cmp_row.get("category_name", cid), float(cat.get("spend", 0.0)))
+        if finding:
+            outputs.append(finding)
+            covered.add(cid)
+
+    # Pass 2 — spend-structural fallback: when peer benchmarking yields nothing
+    # (no revenue supplied, or every category sits below P25) the diagnosis would
+    # otherwise be empty and the user sees "just a chart". Diagnose the material
+    # categories directly so the spend base is actually analysed. Gated on an
+    # empty pass 1 so revenue-anchored runs are unchanged.
+    if not outputs:
+        skip_cats = {"RELATED_PARTY", "OTHER", "STATUTORY"}
+        materials = sorted(
+            profile.get("category_profile", []),
+            key=lambda c: float(c.get("spend", 0.0) or 0.0),
+            reverse=True,
         )
+        for cat in materials:
+            if len(outputs) >= 8:
+                break
+            cid = str(cat.get("category_id") or "")
+            if not cid or cid in covered or cid in skip_cats:
+                continue
+            share = float(cat.get("share_of_total", 0.0) or 0.0)
+            total = float(cat.get("spend", 0.0) or 0.0)
+            # Material categories only: ≥3% of spend, or always the top 3.
+            if share < 0.03 and len(outputs) >= 3:
+                continue
+            finding = _diagnose_category(cid, str(cat.get("category_name") or cid), total)
+            if finding:
+                outputs.append(finding)
+                covered.add(cid)
+
     return {"root_cause_findings": outputs, "eligible_levers_summary": eligible_levers}

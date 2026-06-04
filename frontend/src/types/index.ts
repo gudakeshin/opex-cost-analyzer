@@ -40,6 +40,34 @@ export interface SpendChartData {
   period_totals: Array<{ period: string; spend: number }>;
 }
 
+export interface SmeQualificationSummary {
+  ready_count: number;
+  probe_count: number;
+  insufficient_count: number;
+  savings_ready: number;
+  savings_probe: number;
+  savings_insufficient: number;
+}
+
+export interface SmeInitiativeCritique {
+  initiative_id: string;
+  category_id: string;
+  category_name: string;
+  lever: string;
+  lever_name: string;
+  modelled_saving_3yr: number;
+  evidence_maturity: 'hypothesis' | 'indicative' | 'supported' | 'validated';
+  sme_verdict: 'proceed' | 'probe_first' | 'insufficient_data';
+  critical_risk: string;
+  probe_questions: Array<{
+    question: string;
+    why_critical: string;
+    saving_at_stake: number;
+    data_to_request: string;
+  }>;
+  double_count_risk?: string | null;
+}
+
 export interface AnalysisInsightSnapshot {
   total_spend: number;
   reporting_currency: string;
@@ -51,8 +79,13 @@ export interface AnalysisInsightSnapshot {
   peer_comparison_count?: number;
   savings_headline?: string;
   savings_headline_raw?: number;
+  modelled_savings?: string;
+  modelled_savings_raw?: number;
+  savings_opportunity_count?: number;
   ingestion_note?: string;
   chart_data?: SpendChartData;
+  sme_qualification?: SmeQualificationSummary;
+  sme_initiative_critiques?: SmeInitiativeCritique[];
 }
 
 export interface ChatMessage {
@@ -95,10 +128,21 @@ export interface ManifestFileEntry {
   schema?: unknown;
 }
 
+export interface IngestionQuality {
+  rows_parsed?: number;
+  rows_with_amount?: number;
+  total_amount?: number;
+  zero_spend_warning?: boolean;
+  column_mapping_note?: string;
+}
+
 export interface IngestionReport {
   source_file?: string;
   sheets_ingested?: Array<{ sheet?: string; rows?: number; strategy?: string }>;
   sheets_skipped?: Array<{ sheet?: string; role?: string; reason?: string }>;
+  layout?: string;
+  warnings?: string[];
+  quality?: IngestionQuality;
   files?: IngestionReport[];
 }
 
@@ -111,8 +155,38 @@ export interface ModelManifest {
   [key: string]: unknown;
 }
 
+export interface EngagementSummary {
+  engagement_id: string;
+  company_name: string;
+  industry: string;
+  currency: string;
+  annual_revenue?: number;
+  created_at?: string;
+  updated_at?: string;
+  session_count: number;
+  document_count: number;
+  documents_ready: number;
+}
+
+export interface EngagementDocument {
+  document_id: string;
+  filename: string;
+  content_type?: string;
+  size_bytes?: number;
+  role?: 'spend_tabular' | 'context_doc' | 'mixed';
+  status?: 'pending' | 'processing' | 'ready' | 'failed';
+  parse_backend?: string | null;
+  error?: string | null;
+  uploaded_at?: string;
+  processed_at?: string | null;
+  text_preview?: string | null;
+  line_count?: number;
+  warnings?: string[];
+}
+
 export interface SessionManifest {
   session_id: string;
+  engagement_id?: string;
   company_name?: string;
   industry?: string;
   annual_revenue?: number;
@@ -133,6 +207,26 @@ export interface SessionManifest {
   deep_research_summary?: string;
   deep_research_full_report?: string;
   deep_research_completed_at?: string;
+  engagement_sanity?: EngagementSanity;
+}
+
+export interface EngagementSanityConflict {
+  kind: string;
+  severity?: string;
+  engagement_company?: string;
+  detected_company?: string;
+  detected_companies?: string[];
+  source?: string;
+  signal_source?: string;
+  message?: string;
+}
+
+export interface EngagementSanity {
+  engagement_company?: string | null;
+  has_diagnostic_context?: boolean;
+  upload_signals?: Array<{ source?: string; file?: string; company_guess?: string }>;
+  conflicts?: EngagementSanityConflict[];
+  has_conflicts?: boolean;
 }
 
 export interface ChatProgressResponse {
@@ -151,6 +245,7 @@ export interface SessionManifestPatch {
 
 export interface SessionSummary {
   session_id: string;
+  engagement_id?: string;
   company_name: string;
   industry: string;
   currency: string;

@@ -1,0 +1,66 @@
+[
+  {
+    "kpi_id": "gross_margin_pct",
+    "kpi_name": "Gross Margin (%)",
+    "unit": "pct",
+    "formula": "(revenue - cogs) / revenue * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 15.0,
+    "p50_benchmark_pct": 25.0,
+    "p75_benchmark_pct": 38.0,
+    "source": "DMart FY25: gross margin ~14.8% (EDLC discount model), Trent FY25: ~38% (fashion), Shoppers Stop FY25: ~38%. RAI India Retail 2024."
+  },
+  {
+    "kpi_id": "sssg",
+    "kpi_name": "Same-Store Sales Growth (SSSG %)",
+    "unit": "pct",
+    "formula": "(current_year_same_store_sales - prior_year) / prior_year * 100",
+    "target_direction": "higher",
+    "p50_benchmark_pct": 8.0,
+    "source": "RAI India Retail 2024: organised retail SSSG 6-12%. DMart FY25 SSSG: ~7%. Trent: ~20%+ (rapid store additions). Shoppers Stop: ~5-8%."
+  },
+  {
+    "kpi_id": "employee_cost_pct",
+    "kpi_name": "Employee Cost % of Revenue",
+    "unit": "pct",
+    "formula": "employee_cost / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 4.0,
+    "p50_benchmark_pct": 6.0,
+    "p75_benchmark_pct": 9.0,
+    "source": "DMart FY25: 4.1% (store staff efficiencies), Trent FY25: ~6%, Shoppers Stop FY25: ~8%."
+  },
+  {
+    "kpi_id": "occupancy_cost_pct",
+    "kpi_name": "Occupancy Cost % of Revenue",
+    "unit": "pct",
+    "formula": "rent_and_occupancy / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 1.5,
+    "p50_benchmark_pct": 4.0,
+    "p75_benchmark_pct": 8.0,
+    "source": "DMart FY25: ~1.0% (owned stores). Trent FY25: ~10% (leased stores in malls). Shoppers Stop FY25: ~10%."
+  },
+  {
+    "kpi_id": "revenue_per_sqft",
+    "kpi_name": "Revenue per Sq Ft of Retail Area (₹/year)",
+    "unit": "INR",
+    "formula": "annual_revenue / total_retail_area_sqft",
+    "target_direction": "higher",
+    "p25_benchmark_inr": 28000,
+    "p50_benchmark_inr": 18000,
+    "p75_benchmark_inr": 10000,
+    "source": "DMart FY25: ~₹35,000/sqft (hypermarket efficiency), Trent FY25: ~₹20,000, Shoppers Stop FY25: ~₹12,000. RAI India Retail Benchmarks 2024."
+  },
+  {
+    "kpi_id": "inventory_days",
+    "kpi_name": "Inventory Days",
+    "unit": "days",
+    "formula": "average_inventory / cogs * 365",
+    "target_direction": "lower",
+    "p25_benchmark_days": 25,
+    "p50_benchmark_days": 45,
+    "p75_benchmark_days": 70,
+    "source": "DMart FY25: ~24 days (high turnover). Fashion/specialty: 45-90 days. RAI India Retail 2024."
+  }
+]

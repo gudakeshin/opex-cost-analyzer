@@ -22,7 +22,7 @@ _memory = MemoryStore()
 
 def _session_currency(session_id: str) -> str:
     """Resolve the reporting currency for a session (session state → meta →
-    upload manifest), defaulting to USD when unknown. Used to format chat money
+    upload manifest), defaulting to INR when unknown. Used to format chat money
     answers in the right currency (₹ Cr for INR engagements)."""
     analysis = _memory.get("session", session_id)
     if isinstance(analysis, dict) and analysis.get("reporting_currency"):
@@ -36,7 +36,7 @@ def _session_currency(session_id: str) -> str:
             return str(manifest["currency"])
     except Exception:
         pass
-    return "USD"
+    return "INR"
 
 
 # ---------------------------------------------------------------------------

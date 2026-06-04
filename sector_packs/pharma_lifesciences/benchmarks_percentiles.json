@@ -1,0 +1,108 @@
+{
+  "sector": "pharma_lifesciences",
+  "version": "1.0",
+  "vintage_date": "2025-04-01",
+  "confidence_overall": "public_disclosure",
+  "source_metadata": {
+    "primary_sources": [
+      {
+        "source_name": "Sun Pharmaceutical FY25 Annual Report (BSE: 524715)",
+        "url": "https://www.sunpharma.com/investor-relations/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹50,000 Cr. Employee costs ~₹7,000 Cr (14%), R&D ~₹3,500 Cr (7%), Selling & marketing ~₹8,500 Cr (17%)."
+      },
+      {
+        "source_name": "Cipla FY25 Annual Report (BSE: 500087)",
+        "url": "https://www.cipla.com/investor-relations/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹27,000 Cr. Employee ~16%, R&D ~5.5%, Marketing/distribution ~14%."
+      },
+      {
+        "source_name": "Dr. Reddy's Laboratories FY25 Annual Report (BSE: 500124)",
+        "url": "https://www.drreddys.com/cms/cms/investor-relations/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹32,000 Cr. Employee ~18%, R&D ~6%, Selling & marketing ~12%."
+      },
+      {
+        "source_name": "OPPI (Organisation of Pharmaceutical Producers of India) India Pharma Industry Review 2024",
+        "url": "https://oppi.in/publications/",
+        "publication_year": 2024,
+        "source_type": "published_research",
+        "notes": "Industry cost structure: R&D 5-10% of revenue, selling & distribution 14-20%, employee 12-20%."
+      },
+      {
+        "source_name": "IQVIA India Pharma Market Outlook 2024 (public summary)",
+        "url": "https://www.iqvia.com/insights/the-iqvia-institute/reports/india-pharma-market",
+        "publication_year": 2024,
+        "source_type": "published_research",
+        "notes": "India pharma market structure: domestic branded generics, export-oriented manufacturers. Cost benchmarks by segment."
+      }
+    ],
+    "methodology": "P25/P50/P75 derived from FY24-25 annual reports of 3 listed Indian pharma companies (Sun Pharma, Cipla, Dr. Reddy's). OPPI India Pharma Review 2024 and IQVIA public data used for cross-validation. Categories as % of net revenue. P25 is operationally efficient global pharma player; P90 is domestic-only, small-scale player.",
+    "sample_size": 3
+  },
+  "benchmarks": {
+    "pharma_lifesciences": {
+      "label": "Pharma & Life Sciences (India)",
+      "categories": {
+        "HR": {
+          "P25": 13.0, "P50": 16.0, "P75": 20.0, "P90": 26.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Employee cost % of revenue. Sun Pharma FY25: ~14%, Cipla FY25: ~16%, Dr. Reddy's FY25: ~18%. OPPI: 12-20% range. Best-in-class: scale manufacturers with high automation."
+        },
+        "MARKETING": {
+          "P25": 12.0, "P50": 16.0, "P75": 21.0, "P90": 28.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Selling, medical representative, and distribution costs. Sun Pharma FY25: ~17%, Cipla FY25: ~14%, Dr. Reddy's FY25: ~12%. OPPI: domestic-focused companies 18-24%."
+        },
+        "RND": {
+          "P25": 5.0, "P50": 6.5, "P75": 9.0, "P90": 13.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "R&D expenditure % of revenue. Sun Pharma FY25: 7%, Cipla FY25: 5.5%, Dr. Reddy's FY25: 6%. OPPI: India pharma R&D 5-10% for innovator-oriented companies; generics-only: 2-4%."
+        },
+        "OUTSOURCED": {
+          "P25": 8.0, "P50": 14.0, "P75": 20.0, "P90": 28.0,
+          "unit": "% of revenue",
+          "confidence": "published_research",
+          "source_note": "Contract manufacturing and CMO costs. IQVIA India 2024: contract manufacturing growing; generics-only domestic players use CMOs 20-30% of production."
+        },
+        "IT": {
+          "P25": 1.0, "P50": 2.0, "P75": 3.2, "P90": 5.0,
+          "unit": "% of revenue",
+          "confidence": "published_research",
+          "source_note": "IT including regulatory systems (eTMF, PV systems), ERP, track-and-trace. Gartner Pharma IT 2024: pharma 2-4% of revenue on technology. FDA 21 CFR Part 11 compliance drives IT spend."
+        },
+        "FACILITIES": {
+          "P25": 1.5, "P50": 2.5, "P75": 4.0, "P90": 6.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Office, lab, and non-manufacturing facilities. Manufacturing plant costs excluded. INTERNAL_CALIBRATION — estimated from Indian pharma overhead structure."
+        },
+        "PROF_SVCS": {
+          "P25": 1.0, "P50": 2.0, "P75": 3.5, "P90": 5.5,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Regulatory filing fees, legal (USFDA responses, patent litigation), audit. Sun Pharma FY25: significant regulatory compliance spend disclosed. USFDA-approved companies higher."
+        },
+        "LOGISTICS_INDIA": {
+          "P25": 2.5, "P50": 4.0, "P75": 6.0, "P90": 9.0,
+          "unit": "% of revenue",
+          "confidence": "published_research",
+          "source_note": "Cold-chain and distribution logistics. CII Pharma Logistics 2024: India pharma logistics 3-6% of revenue; cold chain adds 30-50% premium."
+        },
+        "INSURANCE": {
+          "P25": 0.3, "P50": 0.6, "P75": 1.0, "P90": 1.6,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Product liability, D&O, clinical trial insurance. INTERNAL_CALIBRATION — higher for US-market pharma companies due to product liability."
+        }
+      }
+    }
+  }
+}

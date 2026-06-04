@@ -1,6 +1,7 @@
 import React from 'react';
 import { ConfidenceBadge } from '../../Trust/ConfidenceBadge';
 import { ChatInsightBlock } from './ChatInsightBlock';
+import { ProbeQuestionsBlock } from './ProbeQuestionsBlock';
 import { ThinkingBlock } from './ThinkingBlock';
 import { artefactLinks, renderChatMarkdown } from '../../../utils/chatMarkdown';
 import type { ChatMessage } from '../../../types';
@@ -179,6 +180,18 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
             showPeerSavings={message.show_peer_savings}
           />
         )}
+
+        {!isUser &&
+          message.insight_snapshot &&
+          (message.insight_snapshot.sme_qualification?.probe_count ?? 0) +
+            (message.insight_snapshot.sme_qualification?.insufficient_count ?? 0) >
+            0 && (
+            <ProbeQuestionsBlock
+              snapshot={message.insight_snapshot}
+              currency={message.insight_snapshot.reporting_currency}
+              onAnswer={onOptionClick}
+            />
+          )}
 
         {!isUser && sections && typeof sections === 'object' && (
           <AdvisorySections sections={sections} />

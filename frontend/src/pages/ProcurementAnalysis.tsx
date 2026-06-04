@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { Loader } from '../components/Common/Loader';
 import { Alert } from '../components/Common/Alert';
@@ -21,10 +22,22 @@ import {
   buildDeepDivePrompts,
   buildRestoredInsightMessage,
   buildWelcomePrompts,
+  buildProbePrompts,
   chatHasInsightSnapshot,
   extractInsightSnapshot,
+  isComplianceOrConflictQuery,
+  mergeNextOptions,
   wantsPeerSavingsInsight,
 } from '../utils/analysisInsights';
+import { VerticalResizeHandle } from '../components/Common/VerticalResizeHandle';
+import { EngagementConflictBanner } from '../components/PageComponents/Procurement/EngagementConflictBanner';
+import { useResizableWidth } from '../hooks/useResizableWidth';
+import {
+  conflictDismissKey,
+  conflictSummaryMessage,
+  engagementSanityFromManifest,
+} from '../utils/engagementConflict';
+import type { EngagementSanityConflict } from '../types';
 import type { ManifestFileEntry } from '../utils/sessionFiles';
 import type {
   ChatMessage,
@@ -37,6 +50,28 @@ import type {
   SessionResponse,
   V1ChatResponse,
 } from '../types';
+
+const CONFLICT_DISMISS_PREFIX = 'opex_conflict_dismiss_';
+const INSIGHTS_PANEL_WIDTH_KEY = 'opex_analysis_insights_width';
+const INSIGHTS_PANEL_DEFAULT_WIDTH = 320;
+const INSIGHTS_PANEL_MIN_WIDTH = 260;
+const INSIGHTS_PANEL_MAX_WIDTH = 560;
+
+function loadDismissedConflictKeys(sessionId: string | null): Set<string> {
+  if (!sessionId) return new Set();
+  try {
+    const raw = localStorage.getItem(`${CONFLICT_DISMISS_PREFIX}${sessionId}`);
+    if (!raw) return new Set();
+    return new Set(JSON.parse(raw) as string[]);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveDismissedConflictKeys(sessionId: string | null, keys: Set<string>): void {
+  if (!sessionId) return;
+  localStorage.setItem(`${CONFLICT_DISMISS_PREFIX}${sessionId}`, JSON.stringify([...keys]));
+}
 
 const DeepResearchBanner: React.FC<{ companyName: string; onDismiss: () => void }> = ({
   companyName,
@@ -114,6 +149,7 @@ async function pollChatProgress(
 export const ProcurementAnalysis: React.FC = () => {
   const {
     sessionId,
+    engagementId,
     setSessionId,
     ensureSession,
     engagement,
@@ -129,6 +165,17 @@ export const ProcurementAnalysis: React.FC = () => {
   const [analysis, setAnalysis] = useState<SessionResponse | null>(null);
   const [manifest, setManifest] = useState<SessionManifest | null>(null);
   const [insightsOpen, setInsightsOpen] = useState(true);
+  const {
+    width: insightsPanelWidth,
+    isDragging: insightsResizing,
+    onHandlePointerDown: onInsightsResizePointerDown,
+    onHandleKeyDown: onInsightsResizeKeyDown,
+  } = useResizableWidth({
+    storageKey: INSIGHTS_PANEL_WIDTH_KEY,
+    defaultWidth: INSIGHTS_PANEL_DEFAULT_WIDTH,
+    minWidth: INSIGHTS_PANEL_MIN_WIDTH,
+    maxWidth: INSIGHTS_PANEL_MAX_WIDTH,
+  });
   const [trustOpen, setTrustOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
   const [planPreview, setPlanPreview] = useState<ChatPlanPreview | null>(null);
@@ -141,6 +188,10 @@ export const ProcurementAnalysis: React.FC = () => {
   const [pipelineLabel, setPipelineLabel] = useState<string | undefined>();
   const [sectorUpdating, setSectorUpdating] = useState(false);
   const [thinkingMode, setThinkingMode] = useState(false);
+  const [conflictResolving, setConflictResolving] = useState(false);
+  const [dismissedConflictKeys, setDismissedConflictKeys] = useState<Set<string>>(
+    () => loadDismissedConflictKeys(sessionId),
+  );
   const fileRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const pollAbortRef = useRef<AbortController | null>(null);
@@ -150,6 +201,10 @@ export const ProcurementAnalysis: React.FC = () => {
     setManifest(m);
     return m;
   }, []);
+
+  useEffect(() => {
+    setDismissedConflictKeys(loadDismissedConflictKeys(sessionId));
+  }, [sessionId]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -167,6 +222,19 @@ export const ProcurementAnalysis: React.FC = () => {
 
     (async () => {
       try {
+        const status = await apiGet<{
+          session_exists?: boolean;
+          has_analysis?: boolean;
+        }>(`/api/v1/sessions/${sessionId}/status`);
+        if (!status.session_exists) {
+          if (!cancelled) {
+            setManifest(null);
+            setAnalysis(null);
+            setMessages([]);
+          }
+          return;
+        }
+
         const m = await apiGet<SessionManifest>(`/api/v1/sessions/${sessionId}/manifest`);
         if (cancelled) return;
         setManifest(m);
@@ -181,6 +249,10 @@ export const ProcurementAnalysis: React.FC = () => {
         }
 
         try {
+          if (!status.has_analysis) {
+            if (!cancelled) setAnalysis(null);
+            return;
+          }
           const sess = await apiGet<SessionResponse>(`/api/v1/sessions/${sessionId}`);
           if (!cancelled) {
             setAnalysis(sess);
@@ -263,8 +335,11 @@ export const ProcurementAnalysis: React.FC = () => {
       let session: SessionResponse | null = null;
       let latestManifest = manifest;
       try {
-        session = await apiGet<SessionResponse>(`/api/v1/sessions/${sid}`);
-        setAnalysis(session);
+        const status = await apiGet<{ has_analysis?: boolean }>(`/api/v1/sessions/${sid}/status`);
+        if (status.has_analysis) {
+          session = await apiGet<SessionResponse>(`/api/v1/sessions/${sid}`);
+          setAnalysis(session);
+        }
         await refreshAnalysisStatus();
       } catch {
         /* analysis not run yet */
@@ -276,13 +351,20 @@ export const ProcurementAnalysis: React.FC = () => {
       }
       const snapshot = extractInsightSnapshot(session, latestManifest);
       const showPeer = wantsPeerSavingsInsight(text);
-      const baseOptions = res.next_options?.length
-        ? res.next_options
-        : buildDataRootedPrompts(snapshot, latestManifest);
+      const baseOptions = mergeNextOptions(
+        res.next_options,
+        buildProbePrompts(snapshot),
+        buildDataRootedPrompts(snapshot, latestManifest),
+      );
       const nextOptions = showPeer
-        ? [...baseOptions, ...buildDeepDivePrompts(snapshot)]
+        ? mergeNextOptions(baseOptions, buildDeepDivePrompts(snapshot))
         : baseOptions;
-      const thinResponse = (res.response_text || '').length < 80;
+      const responseText = res.response_text || '';
+      const conflictAnswer = /cross-source|tds mismatch|gst mismatch|vendor duplicate|conflict/i.test(
+        responseText,
+      );
+      const thinResponse =
+        responseText.length < 80 && !isComplianceOrConflictQuery(text) && !conflictAnswer;
       setMessages((m) => [
         ...m,
         {
@@ -319,31 +401,131 @@ export const ProcurementAnalysis: React.FC = () => {
     }
   };
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setLoading(true);
+  const handleDismissConflict = (conflict: EngagementSanityConflict) => {
+    const key = conflictDismissKey(sessionId, conflict);
+    setDismissedConflictKeys((prev) => {
+      const next = new Set(prev);
+      next.add(key);
+      saveDismissedConflictKeys(sessionId, next);
+      return next;
+    });
+  };
+
+  const handleUseDetectedCompany = async (company: string) => {
+    setConflictResolving(true);
     setError(null);
-    setInsightsOpen(true);
     try {
       const sid = await ensureSession();
-      const fd = new FormData();
-      fd.append('file', file);
-      await apiUpload(`/api/v1/upload/${sid}`, fd);
-      await refreshManifest(sid);
-      setMessages((m) => [
-        ...m,
-        {
-          role: 'assistant',
-          content: `Uploaded **${file.name}**. Ask a question or run full analysis when ready.`,
-        },
-      ]);
+      const patch: SessionManifestPatch = { company_name: company };
+      const updated = await apiPatch<SessionManifest>(
+        `/api/v1/sessions/${sid}/manifest`,
+        patch,
+      );
+      setManifest(updated);
+      await refreshEngagement();
+      setDismissedConflictKeys(new Set());
+      saveDismissedConflictKeys(sid, new Set());
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {
-      setLoading(false);
-      if (fileRef.current) fileRef.current.value = '';
+      setConflictResolving(false);
     }
+  };
+
+  const handleKeepEngagementCompany = () => {
+    const sanity = engagementSanityFromManifest(manifest);
+    sanity?.conflicts?.forEach((c) => handleDismissConflict(c));
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    setLoading(true);
+    setError(null);
+    setInsightsOpen(true);
+
+    let sid: string;
+    try {
+      sid = await ensureSession();
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+      setLoading(false);
+      return;
+    }
+
+    const succeeded: string[] = [];
+    const failed: string[] = [];
+    const SENTINEL = '__upload_progress__';
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: 'assistant' as const,
+        content: `Uploading ${files.length} file${files.length > 1 ? 's' : ''}…`,
+        run_id: SENTINEL,
+      },
+    ]);
+
+    let latestSanity: SessionManifest['engagement_sanity'] | undefined;
+    for (let i = 0; i < files.length; i++) {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.run_id === SENTINEL
+            ? {
+                ...m,
+                content: `Uploading ${files.length} file${files.length > 1 ? 's' : ''}… ${i} of ${files.length} done`,
+              }
+            : m,
+        ),
+      );
+      try {
+        const fd = new FormData();
+        fd.append('file', files[i]);
+        const res = await apiUpload<{
+          uploaded?: string;
+          engagement_sanity?: SessionManifest['engagement_sanity'];
+        }>(`/api/v1/upload/${sid}`, fd);
+        succeeded.push(files[i].name);
+        if (res.engagement_sanity) latestSanity = res.engagement_sanity;
+      } catch {
+        failed.push(files[i].name);
+      }
+    }
+
+    try {
+      const m = await refreshManifest(sid);
+      latestSanity = latestSanity ?? m.engagement_sanity;
+    } catch {
+      /* non-fatal */
+    }
+
+    const conflictNote =
+      latestSanity?.has_conflicts && latestSanity.conflicts?.length
+        ? `\n\n⚠️ ${conflictSummaryMessage(latestSanity.conflicts).replace(/\*\*/g, '')}`
+        : '';
+    if (latestSanity?.has_conflicts) {
+      setDismissedConflictKeys(new Set());
+      saveDismissedConflictKeys(sid, new Set());
+    }
+
+    let summary: string;
+    if (succeeded.length > 0 && failed.length === 0) {
+      summary = `Uploaded ${succeeded.length} file${succeeded.length > 1 ? 's' : ''}: ${succeeded.map((n) => `**${n}**`).join(', ')}. Ask a question or run full analysis when ready.${conflictNote}`;
+    } else if (succeeded.length > 0) {
+      summary = `Uploaded ${succeeded.map((n) => `**${n}**`).join(', ')}. Failed: ${failed.map((n) => `**${n}**`).join(', ')}.${conflictNote}`;
+      setError(`${failed.length} file(s) failed to upload: ${failed.join(', ')}`);
+    } else {
+      summary = `All uploads failed: ${failed.map((n) => `**${n}**`).join(', ')}`;
+      setError(`All ${failed.length} file(s) failed to upload.`);
+    }
+
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.run_id === SENTINEL ? { ...m, run_id: undefined, content: summary } : m,
+      ),
+    );
+    setLoading(false);
+    if (fileRef.current) fileRef.current.value = '';
   };
 
   const requestPlanThenChat = async (text: string) => {
@@ -429,7 +611,8 @@ export const ProcurementAnalysis: React.FC = () => {
             role: 'assistant',
             content: buildAnalyzeCompleteContent(snapshot),
             insight_snapshot: snapshot,
-            next_options: buildDataRootedPrompts(snapshot, m),
+            show_peer_savings: true,
+            next_options: mergeNextOptions(buildProbePrompts(snapshot), buildDataRootedPrompts(snapshot, m)),
           },
         ]);
       } else {
@@ -439,7 +622,7 @@ export const ProcurementAnalysis: React.FC = () => {
             role: 'assistant',
             content:
               'Analysis finished but spend totals are empty. Re-upload your file or check column mapping, then run analysis again.',
-            next_options: buildDataRootedPrompts(null, m),
+            next_options: mergeNextOptions(buildProbePrompts(null), buildDataRootedPrompts(null, m)),
           },
         ]);
       }
@@ -468,7 +651,7 @@ export const ProcurementAnalysis: React.FC = () => {
               role: 'assistant',
               content: 'Incremental analysis complete. Updated spend signals below.',
               insight_snapshot: snapshot,
-              next_options: buildDataRootedPrompts(snapshot, m),
+              next_options: mergeNextOptions(buildProbePrompts(snapshot), buildDataRootedPrompts(snapshot, m)),
             }
           : {
               role: 'assistant',
@@ -538,6 +721,16 @@ export const ProcurementAnalysis: React.FC = () => {
             sessionId={sessionId}
             compact
           />
+          {engagementId && (
+            <p className="text-xs text-brand-muted w-full basis-full -mt-1">
+              Engagement{' '}
+              <span className="font-mono text-brand-ink">{engagementId.slice(0, 8)}…</span>
+              {' · '}
+              <Link to="/documents" className="text-deloitte-green hover:underline">
+                Manage documents
+              </Link>
+            </p>
+          )}
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             <div className="w-44 min-w-[10rem]">
               <Select
@@ -601,6 +794,16 @@ export const ProcurementAnalysis: React.FC = () => {
           </div>
         )}
 
+        <EngagementConflictBanner
+          manifest={manifest}
+          sessionId={sessionId}
+          dismissedKeys={dismissedConflictKeys}
+          onDismiss={handleDismissConflict}
+          onUseDetectedCompany={handleUseDetectedCompany}
+          onKeepEngagementCompany={handleKeepEngagementCompany}
+          resolving={conflictResolving}
+        />
+
         <div className="flex flex-1 min-h-0 overflow-hidden">
           <section className="flex flex-col flex-1 min-w-0 bg-brand-surface">
             {deepResearchSummary && (
@@ -640,6 +843,22 @@ export const ProcurementAnalysis: React.FC = () => {
                     >
                       Download spend template ↓
                     </a>
+                    <span className="text-xs text-brand-muted mx-2">·</span>
+                    <a
+                      href="/api/v1/samples/spend-ledger.csv"
+                      download="spend_ledger_sample.csv"
+                      className="text-xs text-brand-muted hover:text-deloitte-green underline underline-offset-2 transition-colors"
+                    >
+                      Sample ledger CSV ↓
+                    </a>
+                    <span className="text-xs text-brand-muted mx-2">·</span>
+                    <a
+                      href="/api/v1/samples/pnl-expense.xlsx"
+                      download="pnl_expense_summary_sample.xlsx"
+                      className="text-xs text-brand-muted hover:text-deloitte-green underline underline-offset-2 transition-colors"
+                    >
+                      Sample P&L workbook ↓
+                    </a>
                   </div>
                 ) : (
                   <>
@@ -663,7 +882,7 @@ export const ProcurementAnalysis: React.FC = () => {
               </div>
             </div>
 
-            <input ref={fileRef} type="file" className="hidden" onChange={handleUpload} />
+            <input ref={fileRef} type="file" multiple accept=".csv,.xlsx,.xls" className="hidden" onChange={handleUpload} />
             <ChatComposer
               value={input}
               onChange={setInput}
@@ -676,24 +895,37 @@ export const ProcurementAnalysis: React.FC = () => {
           </section>
 
           {insightsOpen && (
-            <aside className="hidden lg:flex w-80 xl:w-96 flex-col border-l border-brand-border bg-white shrink-0">
-              <div className="px-4 py-3 border-b border-brand-border">
-                <h2 className="text-sm font-semibold font-sans text-brand-ink">Insights</h2>
-                <p className="text-xs text-brand-muted">Session data, metrics & agent activity</p>
-              </div>
-              <div className="flex-1 overflow-y-auto p-4">
-                <InsightCards
-                  analysis={analysis}
-                  manifest={manifest}
-                  agentSteps={agentSteps ?? lastSteps}
-                  agentRunId={lastRunId}
-                  agentLoading={loading}
-                  agentDegraded={agentDegraded}
-                  pipelineLabel={pipelineLabel}
-                  onOpenCostRoom={syncEngagementFromAnalysis}
-                />
-              </div>
-            </aside>
+            <>
+              <VerticalResizeHandle
+                onPointerDown={onInsightsResizePointerDown}
+                onKeyDown={onInsightsResizeKeyDown}
+                isDragging={insightsResizing}
+                ariaValueNow={insightsPanelWidth}
+                ariaValueMin={INSIGHTS_PANEL_MIN_WIDTH}
+                ariaValueMax={INSIGHTS_PANEL_MAX_WIDTH}
+              />
+              <aside
+                style={{ width: insightsPanelWidth }}
+                className="hidden lg:flex flex-col bg-white shrink-0 min-w-0"
+              >
+                <div className="px-4 py-3 border-b border-brand-border">
+                  <h2 className="text-sm font-semibold font-sans text-brand-ink">Insights</h2>
+                  <p className="text-xs text-brand-muted">Session data, metrics & agent activity</p>
+                </div>
+                <div className="flex-1 overflow-y-auto p-4">
+                  <InsightCards
+                    analysis={analysis}
+                    manifest={manifest}
+                    agentSteps={agentSteps ?? lastSteps}
+                    agentRunId={lastRunId}
+                    agentLoading={loading}
+                    agentDegraded={agentDegraded}
+                    pipelineLabel={pipelineLabel}
+                    onOpenCostRoom={syncEngagementFromAnalysis}
+                  />
+                </div>
+              </aside>
+            </>
           )}
         </div>
 

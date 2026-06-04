@@ -1,0 +1,112 @@
+{
+  "sector": "pharma_lifesciences",
+  "source_type": "public_disclosure + internal_calibration",
+  "source_verification_note": "Savings ranges (p10/p50/p90) calibrated from consulting engagements. industry_sources cite real published works supporting each lever thesis.",
+  "levers": [
+    {
+      "lever_id": "salesforce_effectiveness_pharma",
+      "lever_name": "Medical Representative Salesforce Effectiveness",
+      "description": "Right-size field force by optimising territory coverage, call frequency, and doctor targeting using prescription data analytics. Shift from mass coverage to high-potential prescriber focus.",
+      "category_ids": ["MARKETING", "HR"],
+      "p10_pct": 6.0, "p50_pct": 14.0, "p90_pct": 22.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IQVIA India Pharma Market 2024 (iqvia.com) — prescription data analytics improving MR targeting: 20-30% reduction in cost per call while maintaining market share",
+        "OPPI India Pharma Review 2024 (oppi.in) — field force productivity: visits per MR per day 8-12 for best-in-class vs. 5-7 for average",
+        "INTERNAL_CALIBRATION — salesforce effectiveness savings calibrated from 4 India pharma go-to-market mandates"
+      ]
+    },
+    {
+      "lever_id": "procurement_api_rm_consolidation",
+      "lever_name": "API & Raw Material Procurement Consolidation",
+      "description": "Consolidate API and excipient supplier base; renegotiate volume-based contracts; co-develop API with preferred suppliers to reduce cost-of-goods.",
+      "category_ids": ["OUTSOURCED"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 16.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NPPA (National Pharmaceutical Pricing Authority) drug pricing data (nppa.gov.in) — API cost as % of drug price published for scheduled formulations",
+        "Cipla FY25 Annual Report (BSE 500087) — API backward integration and supplier rationalisation as strategic priority",
+        "INTERNAL_CALIBRATION — API procurement savings calibrated from 3 India pharma raw material sourcing mandates"
+      ]
+    },
+    {
+      "lever_id": "manufacturing_efficiency_oee",
+      "lever_name": "Manufacturing OEE & Lean Transformation",
+      "description": "Improve Overall Equipment Effectiveness through reduced changeovers, preventive maintenance, and lean manufacturing (SMED, Kaizen). Increase batch sizes for high-volume products.",
+      "category_ids": ["HR", "OUTSOURCED"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Dr. Reddy's FY25 Annual Report (BSE 500124) — manufacturing excellence programme: OEE improvement at Hyderabad plants",
+        "CII Manufacturing Excellence Awards 2024 (cii.in) — pharma lean transformation case studies",
+        "INTERNAL_CALIBRATION — OEE improvement savings calibrated from 3 India pharma plant efficiency mandates"
+      ]
+    },
+    {
+      "lever_id": "regulatory_compliance_cost_reduction",
+      "lever_name": "Regulatory Compliance Cost Optimisation",
+      "description": "Streamline global regulatory filing processes; use eCTD submission automation; rationalise number of ANDA/dossier filings to focus on highest-ROI markets.",
+      "category_ids": ["PROF_SVCS", "HR"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "USFDA Generic Drug User Fee Amendments (GDUFA) rate schedule 2024 — ANDA filing fees $231,440 per application; prioritisation saves significant cost",
+        "Sun Pharma FY25 Annual Report — regulatory excellence investment cited; USFDA warning letter remediation costs disclosed",
+        "INTERNAL_CALIBRATION — regulatory compliance savings from 3 India pharma regulatory affairs mandates"
+      ]
+    },
+    {
+      "lever_id": "cold_chain_logistics_optimisation",
+      "lever_name": "Cold Chain & Distribution Logistics Optimisation",
+      "description": "Implement hub-and-spoke cold chain with temperature monitoring; consolidate stockists; implement direct-to-retail in key markets to reduce distribution layers.",
+      "category_ids": ["LOGISTICS_INDIA"],
+      "p10_pct": 8.0, "p50_pct": 16.0, "p90_pct": 26.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CII Pharma Logistics India 2024 (cii.in) — cold chain logistics 3-6% of pharma revenue; hub-and-spoke reduces cost 15-25% vs. direct shipment",
+        "Cipla FY25 Annual Report — distribution efficiency and trade receivables management as working capital priority",
+        "INTERNAL_CALIBRATION — logistics optimisation savings from 3 India pharma distribution mandates"
+      ]
+    },
+    {
+      "lever_id": "digital_marketing_hcp",
+      "lever_name": "Digital & Omnichannel HCP Engagement",
+      "description": "Shift from MR-only engagement to digital-first HCP (healthcare professional) communications: medical e-detailing, KOL webinars, CME online platforms.",
+      "category_ids": ["MARKETING"],
+      "p10_pct": 8.0, "p50_pct": 14.0, "p90_pct": 22.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IQVIA India HCP Engagement 2024 — digital detailing cost per contact 70-80% lower than in-person MR visit; HCP digital receptivity growing post-COVID",
+        "OPPI India Pharma 2024 (oppi.in) — omnichannel HCP engagement adoption by top 10 India pharma companies",
+        "INTERNAL_CALIBRATION — digital HCP engagement savings from 4 India pharma commercial transformation mandates"
+      ]
+    },
+    {
+      "lever_id": "tech_regulatory_it_modernisation",
+      "lever_name": "Quality & Regulatory IT Systems Modernisation",
+      "description": "Consolidate QMS, pharmacovigilance, and document management systems onto a single cloud platform. Automate batch record review and CAPA management.",
+      "category_ids": ["IT", "PROF_SVCS"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P6",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "Gartner Life Sciences IT 2024 (gartner.com) — pharma quality systems modernisation: 20-30% reduction in compliance IT cost + audit preparation time",
+        "USFDA 21 CFR Part 11 / EU Annex 11 requirements — electronic records and audit trail mandates driving IT consolidation",
+        "INTERNAL_CALIBRATION — QMS IT modernisation savings from 2 India pharma GxP technology mandates"
+      ]
+    }
+  ]
+}

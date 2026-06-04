@@ -9,8 +9,17 @@ import { MiniCategoryBar } from './SpendCharts';
 import { sectorLabel } from '../../../constants/sectors';
 import {
   extractInsightSnapshot,
+  extractTopSavingsInitiatives,
+  extractRootCauseFindings,
+  extractAnomalyFlags,
+  extractPeerGapDetails,
   formatSpendAmount,
 } from '../../../utils/analysisInsights';
+import { CollapsibleDetail } from '../../Common/CollapsibleDetail';
+import { Badge } from '../../Common/Badge';
+import {
+  showZeroSpendIngestionWarning,
+} from '../../../utils/ingestionWarnings';
 import type { ManifestFileEntry } from '../../../utils/sessionFiles';
 import type { ProgressStep, SessionManifest, SessionResponse } from '../../../types';
 
@@ -48,6 +57,7 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
 
   const industry = analysis?.industry || manifest?.industry || '';
   const company = analysis?.company_name || manifest?.company_name || '—';
+  const engagementConflict = manifest?.engagement_sanity?.has_conflicts ?? false;
 
   const snapshot = useMemo(
     () => extractInsightSnapshot(analysis, manifest),
@@ -64,6 +74,26 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
   const comparisonCount = snapshot?.peer_comparison_count ?? 0;
   const topCategories = snapshot?.top_categories ?? [];
 
+  const skillOutputs = analysis?.skill_outputs as Record<string, unknown> | undefined;
+  const currency = snapshot?.reporting_currency ?? 'INR';
+  const topSavings = useMemo(() => extractTopSavingsInitiatives(skillOutputs), [skillOutputs]);
+  const rootCauseFindings = useMemo(() => extractRootCauseFindings(skillOutputs), [skillOutputs]);
+  const anomalyFlags = useMemo(() => extractAnomalyFlags(skillOutputs), [skillOutputs]);
+  const peerGapDetails = useMemo(() => extractPeerGapDetails(skillOutputs), [skillOutputs]);
+
+  // SME critique data — keyed by "category_id|lever" for O(1) lookup
+  const smeInitiativeCritiqueMap = useMemo(() => {
+    const map = new Map<string, { maturity: string; verdict: string; criticalRisk: string }>();
+    (snapshot?.sme_initiative_critiques ?? []).forEach((c) => {
+      map.set(`${c.category_id}|${c.lever}`, {
+        maturity: c.evidence_maturity,
+        verdict: c.sme_verdict,
+        criticalRisk: c.critical_risk,
+      });
+    });
+    return map;
+  }, [snapshot?.sme_initiative_critiques]);
+
   const dataValidator = analysis?.skill_outputs
     ? asRecord((analysis.skill_outputs as Record<string, unknown>)['data-validator'])
     : null;
@@ -74,6 +104,8 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
   const lineCount = Array.isArray(analysis?.normalized_spend)
     ? analysis!.normalized_spend!.length
     : undefined;
+
+  const zeroSpendWarning = showZeroSpendIngestionWarning(manifest, analysis);
 
   const hasContent = analysis || files.length > 0 || agentSteps?.length || agentLoading;
 
@@ -96,6 +128,14 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
         lineCount={lineCount}
       />
 
+      {zeroSpendWarning && (
+        <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">
+          Uploaded data did not produce spend totals. Use <span className="font-medium">Run analysis</span>{' '}
+          after upload, and check the sample files in <span className="font-mono">data/samples/</span> for
+          supported layouts.
+        </p>
+      )}
+
       {(analysis || industry) && (
         <div>
           <div className="flex items-center gap-2 mb-2">
@@ -106,8 +146,18 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
             <MetricTile
               label="Company"
               value={String(company)}
-              change={sectorLabel(industry)}
+              change={
+                engagementConflict
+                  ? `${sectorLabel(industry)} · context mismatch`
+                  : sectorLabel(industry)
+              }
             />
+            {engagementConflict && (
+              <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">
+                Spend files may belong to a different company than this diagnostic session. See the
+                banner above to align context.
+              </p>
+            )}
             {totalSpend && (
               <MetricTile label="Total spend (signal)" value={totalSpend} highlight />
             )}
@@ -161,28 +211,136 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
         </div>
       )}
 
-      {comparisonCount > 0 && analysis?.skill_outputs && (
+      {peerGapDetails.length > 0 && (
         <div>
-          <p className="text-xs font-semibold uppercase text-brand-muted mb-2">Above peer (P75+)</p>
-          <ul className="text-xs space-y-1 max-h-32 overflow-y-auto">
-            {(
-              (asRecord((analysis.skill_outputs as Record<string, unknown>)['peer-benchmarker'])
-                ?.comparisons as unknown[]) ?? []
-            )
-              .filter((c) => {
-                const row = asRecord(c);
-                const band = String(row?.percentile_band ?? '');
-                return band.includes('P75') || band.includes('P90');
-              })
-              .slice(0, 5)
-              .map((c) => {
-                const row = asRecord(c)!;
-                return (
-                  <li key={String(row.category_id)} className="text-brand-ink">
-                    {String(row.category_name ?? row.category_id)} — {String(row.percentile_band)}
-                  </li>
-                );
-              })}
+          <div className="flex items-center gap-2 mb-2">
+            <FactVsInferenceLabel kind="benchmark_proxy" />
+            <p className="text-xs font-semibold uppercase text-brand-muted">Above peer (P75+)</p>
+          </div>
+          <div className="grid grid-cols-1 gap-2">
+            {peerGapDetails.map((gap) => (
+              <MetricTile
+                key={gap.category_id}
+                label={gap.category_name}
+                value={formatSpendAmount(gap.estimated_saving_amount, currency)}
+                change={`${gap.percentile_band} · target ${gap.benchmark_target_pct.toFixed(1)}% of rev`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {topSavings.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <FactVsInferenceLabel kind="inference" />
+            <p className="text-xs font-semibold uppercase text-brand-muted">Savings opportunities</p>
+          </div>
+          <ul className="space-y-2">
+            {topSavings.map((initiative, idx) => {
+              const smeCritique = smeInitiativeCritiqueMap.get(
+                `${initiative.category_id ?? initiative.category_name?.toLowerCase().replace(/\s+/g, '_')}|${initiative.lever}`,
+              );
+              const maturityTone = smeCritique
+                ? smeCritique.maturity === 'validated'
+                  ? 'success'
+                  : smeCritique.maturity === 'supported'
+                  ? 'success'
+                  : smeCritique.maturity === 'indicative'
+                  ? 'warning'
+                  : 'error'
+                : null;
+              const maturityLabel = smeCritique
+                ? smeCritique.maturity === 'validated'
+                  ? 'Validated'
+                  : smeCritique.maturity === 'supported'
+                  ? 'Supported'
+                  : smeCritique.maturity === 'indicative'
+                  ? 'Indicative'
+                  : 'Needs probing'
+                : null;
+              return (
+                <li key={idx} className="space-y-0.5 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-medium text-brand-ink break-words">{initiative.category_name}</p>
+                      <p className="text-[11px] text-brand-muted break-words">{initiative.lever_name}</p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="text-xs font-semibold text-brand-navy tabular-nums">
+                        {formatSpendAmount(initiative.net_savings_3yr, currency)}
+                      </p>
+                      <div className="flex gap-1 justify-end mt-0.5">
+                        <Badge
+                          tone={
+                            initiative.confidence === 'high'
+                              ? 'success'
+                              : initiative.confidence === 'low'
+                              ? 'warning'
+                              : 'default'
+                          }
+                        >
+                          {initiative.confidence}
+                        </Badge>
+                        {maturityLabel && maturityTone && (
+                          <Badge tone={maturityTone as 'success' | 'warning' | 'error' | 'default'}>
+                            {maturityLabel}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {smeCritique?.criticalRisk && smeCritique.verdict !== 'proceed' && (
+                    <p className="text-[10px] text-amber-700 leading-snug break-words">
+                      {smeCritique.criticalRisk}
+                    </p>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      {rootCauseFindings.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <FactVsInferenceLabel kind="inference" />
+            <p className="text-xs font-semibold uppercase text-brand-muted">Root cause insights</p>
+          </div>
+          <CollapsibleDetail
+            summary={`${rootCauseFindings[0].category_name}: ${rootCauseFindings[0].diagnosis}`}
+            summaryClassName="text-xs"
+          >
+            <ul className="space-y-2">
+              {rootCauseFindings.slice(1).map((f, idx) => (
+                <li key={idx} className="text-xs">
+                  <span className="font-medium text-brand-ink">{f.category_name}:</span>{' '}
+                  <span className="text-brand-muted">{f.diagnosis}</span>
+                </li>
+              ))}
+            </ul>
+          </CollapsibleDetail>
+        </div>
+      )}
+
+      {anomalyFlags.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <FactVsInferenceLabel kind="inference" />
+            <p className="text-xs font-semibold uppercase text-brand-muted">
+              Anomaly flags ({anomalyFlags.length})
+            </p>
+          </div>
+          <ul className="text-xs space-y-1.5">
+            {anomalyFlags.map((flag) => (
+              <li key={flag.category_id} className="flex items-start justify-between gap-2">
+                <span className="text-brand-ink truncate">{flag.category_name}</span>
+                <span className="text-amber-700 shrink-0 tabular-nums font-medium">
+                  {formatSpendAmount(flag.estimated_saving_amount, currency)}
+                </span>
+              </li>
+            ))}
           </ul>
         </div>
       )}

@@ -6,6 +6,8 @@ import type {
   ChatNextOption,
   SessionManifest,
   SessionResponse,
+  SmeInitiativeCritique,
+  SmeQualificationSummary,
   SpendChartData,
 } from '../types';
 
@@ -73,6 +75,59 @@ function peerStatsFromOutputs(skillOutputs: Record<string, unknown> | undefined)
   return { abovePeerCount, comparisonCount: comparisons.length };
 }
 
+function smeQualificationFromOutputs(skillOutputs: Record<string, unknown> | undefined): {
+  summary: SmeQualificationSummary | null;
+  critiques: SmeInitiativeCritique[];
+} {
+  const sme = asRecord(skillOutputs?.['sme-critique']);
+  if (!sme) return { summary: null, critiques: [] };
+
+  const summary = asRecord(sme.critique_summary);
+  const parsed: SmeQualificationSummary | null = summary
+    ? {
+        ready_count: Number(summary.ready_count ?? 0),
+        probe_count: Number(summary.probe_count ?? 0),
+        insufficient_count: Number(summary.insufficient_count ?? 0),
+        savings_ready: Number(summary.savings_ready ?? 0),
+        savings_probe: Number(summary.savings_probe ?? 0),
+        savings_insufficient: Number(summary.savings_insufficient ?? 0),
+      }
+    : null;
+
+  const raw = Array.isArray(sme.initiative_critiques) ? (sme.initiative_critiques as unknown[]) : [];
+  const critiques: SmeInitiativeCritique[] = raw
+    .map((c) => {
+      const r = asRecord(c);
+      if (!r) return null;
+      return {
+        initiative_id: String(r.initiative_id ?? ''),
+        category_id: String(r.category_id ?? ''),
+        category_name: String(r.category_name ?? ''),
+        lever: String(r.lever ?? ''),
+        lever_name: String(r.lever_name ?? ''),
+        modelled_saving_3yr: Number(r.modelled_saving_3yr ?? 0),
+        evidence_maturity: (r.evidence_maturity ?? 'hypothesis') as SmeInitiativeCritique['evidence_maturity'],
+        sme_verdict: (r.sme_verdict ?? 'insufficient_data') as SmeInitiativeCritique['sme_verdict'],
+        critical_risk: String(r.critical_risk ?? ''),
+        probe_questions: Array.isArray(r.probe_questions)
+          ? (r.probe_questions as unknown[]).map((q) => {
+              const pq = asRecord(q) ?? {};
+              return {
+                question: String(pq.question ?? ''),
+                why_critical: String(pq.why_critical ?? ''),
+                saving_at_stake: Number(pq.saving_at_stake ?? 0),
+                data_to_request: String(pq.data_to_request ?? ''),
+              };
+            })
+          : [],
+        double_count_risk: r.double_count_risk != null ? String(r.double_count_risk) : null,
+      } satisfies SmeInitiativeCritique;
+    })
+    .filter(Boolean) as SmeInitiativeCritique[];
+
+  return { summary: parsed, critiques };
+}
+
 function ingestionNoteFromManifest(manifest: SessionManifest | null | undefined): string | undefined {
   const report = manifest?.ingestion_report;
   if (!report) return undefined;
@@ -86,7 +141,9 @@ function ingestionNoteFromManifest(manifest: SessionManifest | null | undefined)
   const conf = manifest?.model_manifest?.confidence;
   const confPct =
     typeof conf === 'number' && conf > 0 ? ` · structure confidence ${Math.round(conf * 100)}%` : '';
-  return `Ingested ${parts.join(', ')}${confPct}.`;
+  const mapping = report.quality?.column_mapping_note;
+  const mappingNote = mapping ? ` ${mapping}` : '';
+  return `Ingested ${parts.join(', ')}${confPct}.${mappingNote}`;
 }
 
 export function extractInsightSnapshot(
@@ -124,7 +181,21 @@ export function extractInsightSnapshot(
   const peer = peerStatsFromOutputs(skillOutputs);
   const savings = savingsHeadlineFromOutputs(skillOutputs, reportingCurrency);
 
+  // Modelled savings total (value bridge mid-case) + number of distinct
+  // initiatives, so the post-analysis brief can quantify the opportunity even
+  // when peer benchmarks are unavailable (e.g. no revenue supplied).
+  const bridge = asRecord(skillOutputs['value-bridge-calculator']);
+  const midRaw = Number(asRecord(bridge?.confidence_bands)?.mid ?? 0);
+  const savingsModel = asRecord(skillOutputs['savings-modeler']);
+  const initiativesArr = Array.isArray(savingsModel?.initiatives)
+    ? (savingsModel!.initiatives as Array<Record<string, unknown>>)
+    : [];
+  const oppCount = initiativesArr.filter(
+    (i) => Number(asRecord(i.net_savings)?.total_3yr ?? 0) > 0,
+  ).length;
+
   const chartData = extractChartData(spendProfiler);
+  const smeData = smeQualificationFromOutputs(skillOutputs);
 
   return {
     total_spend: totalSpend,
@@ -137,8 +208,13 @@ export function extractInsightSnapshot(
     peer_comparison_count: peer.comparisonCount,
     savings_headline: savings?.label,
     savings_headline_raw: savings?.raw,
+    modelled_savings: midRaw > 0 ? formatSpendAmount(midRaw, reportingCurrency) : undefined,
+    modelled_savings_raw: midRaw > 0 ? midRaw : undefined,
+    savings_opportunity_count: oppCount > 0 ? oppCount : undefined,
     ingestion_note: ingestionNoteFromManifest(manifest ?? null),
     chart_data: chartData ?? undefined,
+    sme_qualification: smeData.summary ?? undefined,
+    sme_initiative_critiques: smeData.critiques.length > 0 ? smeData.critiques : undefined,
   };
 }
 
@@ -185,6 +261,73 @@ function extractChartData(spendProfiler: Record<string, unknown>): SpendChartDat
 
 export function wantsPeerSavingsInsight(userMessage: string): boolean {
   return PEER_SAVINGS_KEYWORDS.test(userMessage);
+}
+
+const CONFLICT_QUERY_PATTERN =
+  /\b(tds|gst|gstr|vendor conflict|vendor duplicate|cross-?source|conflict|mismatch)\b/i;
+
+export function isComplianceOrConflictQuery(userMessage: string): boolean {
+  return CONFLICT_QUERY_PATTERN.test(userMessage);
+}
+
+export interface TopProbeQuestion {
+  question: string;
+  category_name: string;
+  why_critical: string;
+  saving_at_stake: number;
+}
+
+export function collectTopProbeQuestions(
+  snapshot: AnalysisInsightSnapshot | null,
+  limit = 5,
+): TopProbeQuestion[] {
+  const critiques = snapshot?.sme_initiative_critiques ?? [];
+  const flat: TopProbeQuestion[] = [];
+  for (const c of critiques) {
+    for (const pq of c.probe_questions ?? []) {
+      if (!pq.question?.trim()) continue;
+      flat.push({
+        question: pq.question.trim(),
+        category_name: c.category_name,
+        why_critical: pq.why_critical,
+        saving_at_stake: pq.saving_at_stake > 0 ? pq.saving_at_stake : c.modelled_saving_3yr,
+      });
+    }
+  }
+  flat.sort((a, b) => b.saving_at_stake - a.saving_at_stake);
+  const seen = new Set<string>();
+  const out: TopProbeQuestion[] = [];
+  for (const p of flat) {
+    const stem = p.question.slice(0, 80);
+    if (seen.has(stem)) continue;
+    seen.add(stem);
+    out.push(p);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+export function buildProbePrompts(snapshot: AnalysisInsightSnapshot | null): ChatNextOption[] {
+  return collectTopProbeQuestions(snapshot, 3).map((p) => {
+    const shortQ = p.question.length > 52 ? `${p.question.slice(0, 49)}…` : p.question;
+    return {
+      label: `${p.category_name}: ${shortQ}`,
+      message: p.question,
+    };
+  });
+}
+
+export function mergeNextOptions(...groups: Array<ChatNextOption[] | undefined>): ChatNextOption[] {
+  const seen = new Set<string>();
+  const out: ChatNextOption[] = [];
+  for (const group of groups) {
+    for (const opt of group ?? []) {
+      if (!opt.message || seen.has(opt.message)) continue;
+      seen.add(opt.message);
+      out.push(opt);
+    }
+  }
+  return out.slice(0, 8);
 }
 
 export function buildDataRootedPrompts(
@@ -277,9 +420,95 @@ export function buildAnalyzeCompleteContent(snapshot: AnalysisInsightSnapshot): 
     ? snapshot.company_name
     : 'your engagement';
   const sector = sectorLabel(snapshot.industry);
-  const spend = formatSpendAmount(snapshot.total_spend, snapshot.reporting_currency);
-  const lines = snapshot.line_count ? ` · ${snapshot.line_count.toLocaleString()} lines` : '';
-  return `Analysis complete for **${company}** (${sector}). Total spend signal: **${spend}**${lines}.`;
+  const ccy = snapshot.reporting_currency;
+  const spend = formatSpendAmount(snapshot.total_spend, ccy);
+  const cats = snapshot.top_categories ?? [];
+  const lines: string[] = [];
+
+  lines.push(`**Analysis complete — ${company}** (${sector})`);
+  const lineNote = snapshot.line_count ? ` across ${snapshot.line_count.toLocaleString()} lines` : '';
+  lines.push(`Total spend signal: **${spend}**${lineNote}.`);
+
+  if (cats.length > 0) {
+    lines.push('');
+    lines.push('**Where the money goes**');
+    cats.slice(0, 3).forEach((c) => {
+      const share = c.share_of_total > 0 ? `${(c.share_of_total * 100).toFixed(1)}%` : '—';
+      lines.push(`• ${c.category_name} — ${formatSpendAmount(c.spend, ccy)} (${share})`);
+    });
+    const top = cats[0];
+    if (top.share_of_total >= 0.4) {
+      lines.push(
+        `Spend is concentrated — **${top.category_name}** alone is ${(top.share_of_total * 100).toFixed(0)}% of the base, the highest-leverage place to start.`,
+      );
+    }
+  }
+
+  if (snapshot.modelled_savings && snapshot.savings_opportunity_count) {
+    const n = snapshot.savings_opportunity_count;
+    lines.push('');
+    lines.push(
+      `**Modelled savings: ${snapshot.modelled_savings}** (mid-case, 3-yr net) across ${n} initiative${n > 1 ? 's' : ''}.`,
+    );
+  } else if (snapshot.savings_headline) {
+    lines.push('');
+    lines.push(`**Top savings signal:** ${snapshot.savings_headline}`);
+  }
+
+  if ((snapshot.peer_comparison_count ?? 0) > 0) {
+    const gaps = snapshot.peer_gap_count ?? 0;
+    lines.push(
+      gaps > 0
+        ? `Benchmarked ${snapshot.peer_comparison_count} categories — **${gaps} above peer P75**.`
+        : `Benchmarked ${snapshot.peer_comparison_count} categories against peers.`,
+    );
+  } else if (snapshot.total_spend > 0) {
+    lines.push('');
+    lines.push('Tip: add annual revenue on the Diagnostic tab to unlock peer-benchmark gaps.');
+  }
+
+  // SME qualification block — only shown when there are initiatives to probe
+  const sme = snapshot.sme_qualification;
+  if (sme && (sme.probe_count > 0 || sme.insufficient_count > 0)) {
+    lines.push('');
+    lines.push('**Before we call this a value case — SME read:**');
+    if (sme.ready_count > 0 && sme.savings_ready > 0) {
+      lines.push(
+        `✓ Ready for business case: **${formatSpendAmount(sme.savings_ready, ccy)}** (${sme.ready_count} initiative${sme.ready_count !== 1 ? 's' : ''})`,
+      );
+    }
+    if (sme.probe_count > 0 && sme.savings_probe > 0) {
+      lines.push(
+        `⚑ Needs probing first: **${formatSpendAmount(sme.savings_probe, ccy)}** (${sme.probe_count} initiative${sme.probe_count !== 1 ? 's' : ''})`,
+      );
+    }
+    if (sme.insufficient_count > 0 && sme.savings_insufficient > 0) {
+      lines.push(
+        `✗ Insufficient data to model: **${formatSpendAmount(sme.savings_insufficient, ccy)}** (${sme.insufficient_count} initiative${sme.insufficient_count !== 1 ? 's' : ''})`,
+      );
+    }
+    const probeTotal = sme.savings_probe + sme.savings_insufficient;
+    const topProbes = collectTopProbeQuestions(snapshot, 5);
+    if (probeTotal > 0) {
+      lines.push(
+        `Answer the probe questions below to move **${formatSpendAmount(probeTotal, ccy)}** from hypothesis to evidenced case.`,
+      );
+    }
+    if (topProbes.length > 0) {
+      lines.push('');
+      lines.push('**Probe questions**');
+      topProbes.forEach((p, idx) => {
+        lines.push(`${idx + 1}. **${p.category_name}** — ${p.question}`);
+      });
+    } else if (probeTotal > 0) {
+      lines.push('');
+      lines.push(
+        '_Probe questions are not available in this session export — re-run analysis or open Insights for initiative-level detail._',
+      );
+    }
+  }
+
+  return lines.join('\n');
 }
 
 export function chatHasInsightSnapshot(messages: { insight_snapshot?: AnalysisInsightSnapshot }[]): boolean {
@@ -293,12 +522,125 @@ export function buildRestoredInsightMessage(
   role: 'assistant';
   content: string;
   insight_snapshot: AnalysisInsightSnapshot;
+  show_peer_savings: boolean;
   next_options: ChatNextOption[];
 } {
   return {
     role: 'assistant',
     content: buildAnalyzeCompleteContent(snapshot),
     insight_snapshot: snapshot,
-    next_options: buildDataRootedPrompts(snapshot, manifest),
+    show_peer_savings: true,
+    next_options: mergeNextOptions(buildProbePrompts(snapshot), buildDataRootedPrompts(snapshot, manifest)),
   };
+}
+
+export interface SavingsInitiativeSummary {
+  category_id: string;
+  category_name: string;
+  lever: string;
+  lever_name: string;
+  net_savings_3yr: number;
+  confidence: string;
+}
+
+export interface RootCauseFinding {
+  category_name: string;
+  diagnosis: string;
+  recommended_lever: string;
+  confidence: string;
+}
+
+export interface AnomalyFlag {
+  category_id: string;
+  category_name: string;
+  actual_pct_of_revenue: number;
+  heuristic_target_pct: number;
+  estimated_saving_amount: number;
+}
+
+export interface PeerGapDetail {
+  category_id: string;
+  category_name: string;
+  percentile_band: string;
+  actual_pct_of_revenue: number;
+  benchmark_target_pct: number;
+  estimated_saving_amount: number;
+}
+
+export function extractTopSavingsInitiatives(
+  skillOutputs: Record<string, unknown> | undefined,
+  topN = 3,
+): SavingsInitiativeSummary[] {
+  if (!skillOutputs) return [];
+  const sm = asRecord(skillOutputs['savings-modeler']);
+  return (Array.isArray(sm?.initiatives) ? (sm!.initiatives as Array<Record<string, unknown>>) : [])
+    .map((i) => ({
+      category_id: String(i.category_id ?? '').toLowerCase(),
+      category_name: String(i.category_name ?? i.category_id ?? 'Unknown'),
+      lever: String(i.lever ?? ''),
+      lever_name: String(i.lever_name ?? i.lever ?? 'Unknown lever'),
+      net_savings_3yr: Number(asRecord(i.net_savings)?.total_3yr ?? 0),
+      confidence: String(i.confidence ?? 'medium'),
+    }))
+    .filter((i) => i.net_savings_3yr > 0)
+    .sort((a, b) => b.net_savings_3yr - a.net_savings_3yr)
+    .slice(0, topN);
+}
+
+export function extractRootCauseFindings(
+  skillOutputs: Record<string, unknown> | undefined,
+  topN = 4,
+): RootCauseFinding[] {
+  if (!skillOutputs) return [];
+  const rc = asRecord(skillOutputs['root-cause-analyzer']);
+  return (Array.isArray(rc?.root_cause_findings) ? (rc!.root_cause_findings as Array<Record<string, unknown>>) : [])
+    .slice(0, topN)
+    .map((f) => {
+      const causes = Array.isArray(f.root_causes) ? (f.root_causes as Array<Record<string, unknown>>) : [];
+      const top = causes[0] ?? {};
+      return {
+        category_name: String(f.category_name ?? f.category_id ?? 'Unknown'),
+        diagnosis: String(top.diagnosis ?? 'No diagnosis available'),
+        recommended_lever: String(top.recommended_lever ?? ''),
+        confidence: String(top.confidence ?? 'low'),
+      };
+    });
+}
+
+export function extractAnomalyFlags(
+  skillOutputs: Record<string, unknown> | undefined,
+  topN = 5,
+): AnomalyFlag[] {
+  if (!skillOutputs) return [];
+  const ha = asRecord(skillOutputs['heuristic-analyzer']);
+  return (Array.isArray(ha?.heuristic_findings) ? (ha!.heuristic_findings as Array<Record<string, unknown>>) : [])
+    .filter((f) => Number(f.estimated_saving_amount ?? 0) > 0)
+    .slice(0, topN)
+    .map((f) => ({
+      category_id: String(f.category_id ?? ''),
+      category_name: String(f.category_name ?? f.category_id ?? 'Unknown'),
+      actual_pct_of_revenue: Number(f.actual_pct_of_revenue ?? 0),
+      heuristic_target_pct: Number(f.heuristic_target_pct ?? 0),
+      estimated_saving_amount: Number(f.estimated_saving_amount ?? 0),
+    }));
+}
+
+export function extractPeerGapDetails(
+  skillOutputs: Record<string, unknown> | undefined,
+  topN = 3,
+): PeerGapDetail[] {
+  if (!skillOutputs) return [];
+  const pb = asRecord(skillOutputs['peer-benchmarker']);
+  return (Array.isArray(pb?.comparisons) ? (pb!.comparisons as Array<Record<string, unknown>>) : [])
+    .filter((c) => { const b = String(c.percentile_band ?? ''); return b.includes('P75') || b.includes('P90'); })
+    .sort((a, b) => Number(b.estimated_saving_amount ?? 0) - Number(a.estimated_saving_amount ?? 0))
+    .slice(0, topN)
+    .map((c) => ({
+      category_id: String(c.category_id ?? ''),
+      category_name: String(c.category_name ?? c.category_id ?? 'Unknown'),
+      percentile_band: String(c.percentile_band ?? ''),
+      actual_pct_of_revenue: Number(c.actual_pct_of_revenue ?? 0),
+      benchmark_target_pct: Number(c.benchmark_target_pct ?? 0),
+      estimated_saving_amount: Number(c.estimated_saving_amount ?? 0),
+    }));
 }

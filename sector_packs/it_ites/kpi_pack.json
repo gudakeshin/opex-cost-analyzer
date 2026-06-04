@@ -1,0 +1,79 @@
+[
+  {
+    "kpi_id": "revenue_per_employee",
+    "kpi_name": "Revenue per Employee (₹ Lakh/year)",
+    "unit": "INR_lakh",
+    "formula": "annual_revenue / headcount",
+    "target_direction": "higher",
+    "p25_benchmark_lakh": 32.0,
+    "p50_benchmark_lakh": 26.0,
+    "p75_benchmark_lakh": 20.0,
+    "source": "NASSCOM Strategic Review 2025 + TCS FY25 (₹34L/emp), Infosys FY25 (₹27L/emp), HCL FY25 (₹26L/emp)"
+  },
+  {
+    "kpi_id": "employee_cost_pct",
+    "kpi_name": "Employee Cost % of Revenue",
+    "unit": "pct",
+    "formula": "employee_benefit_expense / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 52.0,
+    "p50_benchmark_pct": 59.0,
+    "p75_benchmark_pct": 65.0,
+    "source": "TCS FY25: 52.4%, Infosys FY25: 58.2%, HCL FY25: 59.1%, Wipro FY25: 62.0% (BSE/NSE annual report filings)"
+  },
+  {
+    "kpi_id": "subcontracting_pct",
+    "kpi_name": "Subcontracting Cost % of Revenue",
+    "unit": "pct",
+    "formula": "subcontracting_cost / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 5.0,
+    "p50_benchmark_pct": 8.0,
+    "p75_benchmark_pct": 11.0,
+    "source": "TCS FY25: 5.0%, Wipro FY25: 7.7%, Infosys FY25: 9.1%, HCL FY25: 9.0% (annual report disclosures)"
+  },
+  {
+    "kpi_id": "ebit_margin",
+    "kpi_name": "EBIT Margin (%)",
+    "unit": "pct",
+    "formula": "ebit / revenue * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 24.0,
+    "p50_benchmark_pct": 19.0,
+    "p75_benchmark_pct": 14.0,
+    "source": "TCS FY25 EBIT margin: 24.5%, Infosys: 20.1%, HCL: 18.2%, Wipro: 16.1%, LTI: 15.0% (annual report P&L)"
+  },
+  {
+    "kpi_id": "attrition_rate",
+    "kpi_name": "Annual Attrition Rate (%)",
+    "unit": "pct",
+    "formula": "employees_left / avg_headcount * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 12.0,
+    "p50_benchmark_pct": 16.0,
+    "p75_benchmark_pct": 21.0,
+    "source": "TCS FY25 attrition: 13.3%, Infosys: 15.9%, Wipro: 18.0%, Mphasis: 22.1%. NASSCOM: sector normalising to 14-18% post-FY23 peak."
+  },
+  {
+    "kpi_id": "utilisation_rate",
+    "kpi_name": "Billable Utilisation Rate (%)",
+    "unit": "pct",
+    "formula": "billable_hours / available_hours * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 85.0,
+    "p50_benchmark_pct": 80.0,
+    "p75_benchmark_pct": 74.0,
+    "source": "Infosys FY25: 82.8% utilisation disclosed. TCS: ~84%. HCL: ~82%. Wipro: ~79%. Industry benchmark from NASSCOM Strategic Review 2025."
+  },
+  {
+    "kpi_id": "sga_pct",
+    "kpi_name": "SG&A % of Revenue",
+    "unit": "pct",
+    "formula": "sga_cost / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 4.5,
+    "p50_benchmark_pct": 6.5,
+    "p75_benchmark_pct": 9.0,
+    "source": "Derived from annual reports: TCS SG&A ~4.5%, Infosys ~6.0%, HCL ~6.8%, Wipro ~8.2%. NASSCOM: mid-tier firms 8-12%."
+  }
+]

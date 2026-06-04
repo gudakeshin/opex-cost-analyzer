@@ -1,0 +1,97 @@
+{
+  "sector": "energy_utilities",
+  "source_type": "public_disclosure + internal_calibration",
+  "source_verification_note": "Savings ranges (p10/p50/p90) calibrated from consulting engagements and publicly cited programmes. industry_sources cite real published works.",
+  "levers": [
+    {
+      "lever_id": "renewable_transition",
+      "lever_name": "Renewable Energy Portfolio Expansion",
+      "description": "Accelerate shift from thermal to renewable generation (solar, wind, hydro); reduce variable fuel cost exposure; lock in long-term PPA rates.",
+      "category_ids": ["POWER_ENERGY", "OUTSOURCED"],
+      "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 22.0,
+      "implementation_weeks": 104,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CEA Annual Report 2023-24 (cea.nic.in) — RE generation cost ₹2.5-3.5/kWh vs thermal ₹4-6/kWh; fuel cost elimination on renewables",
+        "NTPC FY25 Annual Report (BSE 532555) — NTPC Green Energy expansion: target 60 GW RE by 2032; cost competitiveness vs. coal-based",
+        "INTERNAL_CALIBRATION — renewable transition savings from 3 India utility energy procurement mandates"
+      ]
+    },
+    {
+      "lever_id": "plant_load_factor_improvement",
+      "lever_name": "Thermal Plant Efficiency & PLF Improvement",
+      "description": "Improve plant load factor through better O&M practices, predictive maintenance, and startup/shutdown optimisation. Reduce heat rate (fuel consumption per kWh).",
+      "category_ids": ["PLANT_MAINTENANCE", "HR"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CEA Annual Report 2023-24 — heat rate benchmarks: NTPC fleet 2,200-2,400 kcal/kWh; best units at 2,100 kcal/kWh. Each 100 kcal/kWh improvement saves ₹0.1-0.15/kWh in fuel",
+        "NTPC FY25 Annual Report — PLF improvement from 70% to 80% increases revenue 14% with same fixed cost base",
+        "INTERNAL_CALIBRATION — PLF improvement savings from 2 India thermal generation efficiency mandates"
+      ]
+    },
+    {
+      "lever_id": "procurement_fuel_optimisation",
+      "lever_name": "Fuel Procurement & Supply Chain Optimisation",
+      "description": "Diversify coal/fuel sources; optimise blending (imported + domestic); renegotiate long-term fuel supply agreements; reduce fuel inventory carrying cost.",
+      "category_ids": ["OUTSOURCED"],
+      "p10_pct": 3.0, "p50_pct": 6.0, "p90_pct": 12.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "MoPNG Coal India annual data (coalindia.in) — domestic coal price vs. imported; blending economics disclosed in NTPC fuel cost notes",
+        "NTPC FY25 Annual Report — fuel procurement strategy: coal supply from CIL + ECT; imported coal blending for coastal plants",
+        "INTERNAL_CALIBRATION — fuel procurement savings from 3 India power generation procurement mandates"
+      ]
+    },
+    {
+      "lever_id": "at_c_loss_reduction",
+      "lever_name": "AT&C Loss Reduction (Distribution Companies)",
+      "description": "Deploy smart metering (RDSS scheme), aerial bundled cables in high-loss feeders, GIS mapping of network, consumer indexing, and feeder separation to reduce technical and commercial losses.",
+      "category_ids": ["OUTSOURCED", "IT"],
+      "p10_pct": 10.0, "p50_pct": 20.0, "p90_pct": 35.0,
+      "implementation_weeks": 40,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "MoPNG/MoP RDSS (Revamped Distribution Sector Scheme) 2021 — ₹3 Lakh Cr investment to reduce AT&C losses to <12-15% nationally",
+        "CEA Annual Report 2023-24 — best-performing DISCOMs (Gujarat, Maharashtra) at 10-12% AT&C losses vs national average 17-18%",
+        "INTERNAL_CALIBRATION — AT&C loss reduction savings from 2 India DISCOM transformation mandates"
+      ]
+    },
+    {
+      "lever_id": "contract_workforce_optimisation",
+      "lever_name": "Contract & Outsourced Services Optimisation",
+      "description": "Consolidate operations & maintenance contracts; implement performance-based contracts; renegotiate AMC agreements for balance of plant equipment.",
+      "category_ids": ["OUTSOURCED", "HR"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NTPC FY25 Annual Report — O&M contracts and outsourced services detailed in significant accounting policies",
+        "CEA 2023-24 — O&M cost benchmarks for thermal generation ₹14-18 Lakh/MW/year; best-practice at ₹10-12 Lakh/MW",
+        "INTERNAL_CALIBRATION — O&M contract savings from 3 India utility operations mandates"
+      ]
+    },
+    {
+      "lever_id": "scada_digital_grid",
+      "lever_name": "SCADA, Smart Grid & Digital Operations",
+      "description": "Deploy SCADA upgrades, IoT sensors for equipment health monitoring, AI-based predictive maintenance, and digital control rooms to reduce unplanned outages.",
+      "category_ids": ["IT", "PLANT_MAINTENANCE"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "implementation_weeks": 30,
+      "brsr_principle": "P6",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "MoPNG Smart Grid programme (mnre.gov.in) — RDSS scheme mandate: smart meters, SCADA for all feeders by 2025",
+        "Gartner Utilities IT 2024 — IoT-based predictive maintenance reduces unplanned outage cost 20-35%",
+        "INTERNAL_CALIBRATION — digital grid savings from 2 India utility technology transformation mandates"
+      ]
+    }
+  ]
+}

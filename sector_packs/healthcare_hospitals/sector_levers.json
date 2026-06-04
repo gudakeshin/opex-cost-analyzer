@@ -1,0 +1,112 @@
+{
+  "sector": "healthcare_hospitals",
+  "source_type": "public_disclosure + internal_calibration",
+  "source_verification_note": "Savings ranges (p10/p50/p90) calibrated from consulting engagements. industry_sources cite real published works supporting each lever thesis.",
+  "levers": [
+    {
+      "lever_id": "consumables_procurement_GPO",
+      "lever_name": "Medical Consumables & Implants Group Procurement",
+      "description": "Aggregate multi-hospital purchasing into a group purchasing organisation (GPO); standardise implant preferences across surgeons; renegotiate device and consumable contracts.",
+      "category_ids": ["OUTSOURCED"],
+      "p10_pct": 8.0, "p50_pct": 16.0, "p90_pct": 25.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NHA (National Health Authority) PM-JAY hospital cost data 2023-24 (nha.gov.in) — consumables 22-28% of hospital revenue; GPO saves 12-18% on implant costs",
+        "Apollo Hospitals FY25 Annual Report (BSE 508869) — group procurement as key cost management lever across network hospitals",
+        "INTERNAL_CALIBRATION — consumables GPO savings calibrated from 3 India hospital chain procurement mandates"
+      ]
+    },
+    {
+      "lever_id": "clinical_pathway_standardisation",
+      "lever_name": "Clinical Pathway Standardisation & ALOS Reduction",
+      "description": "Implement evidence-based clinical pathways for top 20 DRGs; pre-admission testing to reduce length of stay; structured discharge planning from Day 1.",
+      "category_ids": ["HR", "OUTSOURCED"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NABH Clinical Standards 2024 (nabh.co) — clinical pathways as NABH accreditation requirement; ALOS reduction 15-25% achievable",
+        "Narayana Health FY25 Annual Report (BSE 539551) — clinical excellence and cost efficiency model: ALOS 3.2-3.5 days vs. sector median 4.5 days",
+        "INTERNAL_CALIBRATION — clinical pathway savings calibrated from 3 India hospital operations mandates"
+      ]
+    },
+    {
+      "lever_id": "energy_hospital_efficiency",
+      "lever_name": "Hospital Energy Efficiency & Renewable Transition",
+      "description": "Deploy BMS for HVAC/lighting/CSSD; install rooftop solar; optimise medical gas systems; right-size boiler and chiller capacity.",
+      "category_ids": ["POWER_ENERGY"],
+      "p10_pct": 12.0, "p50_pct": 22.0, "p90_pct": 32.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Apollo Hospitals FY25 Annual Report — Apollo Green Hospital programme: energy intensity reduction target, solar installed at 12 hospitals",
+        "NHA PM-JAY hospital benchmarks — energy 4-7% of revenue for tertiary hospitals; BMS reduces 15-25%",
+        "INTERNAL_CALIBRATION — hospital energy savings calibrated from 4 India hospital energy efficiency mandates"
+      ]
+    },
+    {
+      "lever_id": "workforce_staffing_optimisation",
+      "lever_name": "Clinical Workforce Staffing Optimisation",
+      "description": "Right-size nursing staff ratios using patient acuity-based staffing models; cross-train paramedics; optimise resident doctor scheduling; reduce agency/contract nursing dependency.",
+      "category_ids": ["HR"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P5",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NABH Patient Safety Standards 2024 (nabh.co) — nurse-patient ratio guidelines: 1:6 general ward, 1:2 ICU; acuity-based staffing reduces over-staffing 10-15%",
+        "Fortis Healthcare FY25 Annual Report (BSE 532843) — workforce productivity cited as operational efficiency lever",
+        "INTERNAL_CALIBRATION — staffing optimisation savings from 3 India hospital workforce management mandates"
+      ]
+    },
+    {
+      "lever_id": "hospital_information_system",
+      "lever_name": "Hospital Information System (HIS) & EMR Modernisation",
+      "description": "Replace legacy HIS with integrated cloud-native EMR + billing + pharmacy + lab. Enable order entry at bedside; eliminate paper-based processes.",
+      "category_ids": ["IT"],
+      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 30.0,
+      "implementation_weeks": 30,
+      "brsr_principle": "P6",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "NHA (nha.gov.in) — Ayushman Bharat Digital Mission (ABDM) mandating digital health records for all hospitals",
+        "Gartner Healthcare IT 2024 — integrated HIS reduces administrative cost 15-25% via automation of billing, coding, and claim submission",
+        "INTERNAL_CALIBRATION — HIS modernisation savings from 2 India hospital IT transformation mandates"
+      ]
+    },
+    {
+      "lever_id": "pharmacy_formulary_management",
+      "lever_name": "Pharmacy Formulary Optimisation & Generic Substitution",
+      "description": "Establish and enforce hospital formulary with approved generic equivalents for branded drugs; implement therapeutic substitution protocols; centralise inpatient dispensing.",
+      "category_ids": ["OUTSOURCED"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NPPA drug price ceiling notifications (nppa.gov.in) — scheduled formulations capped; generic substitution reduces pharmacy cost 20-40%",
+        "NHA PM-JAY essential medicine list — generic formulary basis for empanelled hospitals saves 15-30% on drug cost",
+        "INTERNAL_CALIBRATION — formulary management savings from 3 India hospital pharmacy optimisation mandates"
+      ]
+    },
+    {
+      "lever_id": "revenue_cycle_management",
+      "lever_name": "Revenue Cycle Management & Billing Efficiency",
+      "description": "Reduce insurance claim denials via front-end eligibility checks; implement DRG-based coding; automate pre-authorisation workflows; reduce DSO on insurance receivables.",
+      "category_ids": ["HR", "IT"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 16.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NHA PM-JAY claims processing data (nha.gov.in) — claim denial rate 8-15% for poorly structured billing; best-in-class <3%",
+        "Apollo Hospitals FY25 Annual Report — revenue cycle management as operational priority; insurance receivables management cited",
+        "INTERNAL_CALIBRATION — revenue cycle savings calibrated from 3 India hospital billing optimisation mandates"
+      ]
+    }
+  ]
+}

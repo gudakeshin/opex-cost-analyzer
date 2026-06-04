@@ -1,0 +1,108 @@
+{
+  "sector": "fmcg_consumer",
+  "version": "1.0",
+  "vintage_date": "2025-04-01",
+  "confidence_overall": "public_disclosure",
+  "source_metadata": {
+    "primary_sources": [
+      {
+        "source_name": "HUL FY25 Annual Report (BSE: 500696)",
+        "url": "https://www.hul.co.in/investor-relations/annual-reports/",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹60,000 Cr. Employee costs ~₹3,200 Cr (5.3%), Advertising & promotion ~₹8,400 Cr (14.0%), Distribution/logistics ~₹6,000 Cr (10.0%)."
+      },
+      {
+        "source_name": "ITC Limited FY25 Annual Report (BSE: 500875)",
+        "url": "https://www.itcportal.com/investor/annual-reports.aspx",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "FMCG segment revenue ~₹25,000 Cr. Advertising ~14-16% of FMCG revenue. Employee segment cost ~8%."
+      },
+      {
+        "source_name": "Dabur India FY25 Annual Report (BSE: 500096)",
+        "url": "https://www.dabur.com/investors/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹13,000 Cr. Employee costs ~₹1,000 Cr (7.7%), Advertising & promotion ~₹1,820 Cr (14%), Distribution ~₹1,170 Cr (9%)."
+      },
+      {
+        "source_name": "Marico FY25 Annual Report (BSE: 531642)",
+        "url": "https://marico.com/india/investors/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹10,000 Cr. Employee ~8%, Advertising ~15%, Distribution ~8%."
+      },
+      {
+        "source_name": "FICCI FMCG Survey 2024",
+        "url": "https://ficci.in/sector/25",
+        "publication_year": 2024,
+        "source_type": "published_research",
+        "notes": "FMCG industry cost structure benchmarks: advertising 12-16% of revenue, distribution 8-12%, employee 5-10%."
+      }
+    ],
+    "methodology": "P25/P50/P75 derived from FY24-25 annual reports of 4 listed Indian FMCG companies (HUL, ITC-FMCG, Dabur, Marico). FICCI FMCG survey used for cross-validation. P25 is best-in-class; P90 is structurally high-cost player (premium/niche, lower scale). All categories as % of net revenue.",
+    "sample_size": 4
+  },
+  "benchmarks": {
+    "fmcg_consumer": {
+      "label": "FMCG & Consumer Goods (India)",
+      "categories": {
+        "HR": {
+          "P25": 5.0, "P50": 7.5, "P75": 10.0, "P90": 14.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Employee cost % of revenue. HUL FY25: 5.3%, Marico FY25: ~8%, Dabur FY25: 7.7%, ITC-FMCG: ~8%. Best-in-class reflects scale leverage and fixed cost absorption."
+        },
+        "MARKETING": {
+          "P25": 11.0, "P50": 14.5, "P75": 18.0, "P90": 24.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Advertising, promotion, trade marketing as % of revenue. HUL FY25: 14.0%, Dabur FY25: 14.0%, Marico FY25: 15.0%, ITC-FMCG: 14-16%. FICCI FMCG Survey 2024: 12-16% industry range."
+        },
+        "LOGISTICS_INDIA": {
+          "P25": 6.0, "P50": 9.0, "P75": 12.0, "P90": 16.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Distribution, freight, C&FA costs. HUL FY25: ~10%, Dabur FY25: ~9%, Marico FY25: ~8%. CII Logistics Report 2024: India FMCG logistics 8-12% of revenue."
+        },
+        "IT": {
+          "P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.0,
+          "unit": "% of revenue",
+          "confidence": "published_research",
+          "source_note": "Internal IT including ERP, DMS, trade analytics. Gartner Retail/CPG IT Benchmark 2024: CPG companies 1-2% of revenue on IT."
+        },
+        "FACILITIES": {
+          "P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Corporate offices and sales offices (manufacturing facilities excluded). FMCG companies are primarily asset-light in offices. INTERNAL_CALIBRATION."
+        },
+        "PROF_SVCS": {
+          "P25": 0.3, "P50": 0.7, "P75": 1.2, "P90": 2.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Legal, audit, regulatory consulting. SEBI LODR compliance costs for listed FMCG. INTERNAL_CALIBRATION."
+        },
+        "PACKAGING": {
+          "P25": 8.0, "P50": 11.0, "P75": 14.0, "P90": 18.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Primary and secondary packaging material. HUL: packaging included in material costs; typically 9-12% of revenue. Dabur FY25 disclosures."
+        },
+        "OUTSOURCED": {
+          "P25": 2.0, "P50": 4.5, "P75": 7.0, "P90": 11.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Contract manufacturing and third-party processing. Dabur FY25: contract manufacturing disclosed. HUL: ~30% of production outsourced. Smaller FMCG companies: higher outsourcing."
+        },
+        "INSURANCE": {
+          "P25": 0.1, "P50": 0.3, "P75": 0.5, "P90": 0.8,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Group health, D&O, property insurance (operations). INTERNAL_CALIBRATION."
+        }
+      }
+    }
+  }
+}

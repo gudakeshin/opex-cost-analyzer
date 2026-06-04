@@ -1,0 +1,127 @@
+{
+  "sector": "gcc_capability_centers",
+  "source_type": "public_disclosure + internal_calibration",
+  "source_verification_note": "Savings ranges (p10/p50/p90) are calibrated from consulting engagements. industry_sources entries cite real published works that directionally support each lever's savings thesis.",
+  "levers": [
+    {
+      "lever_id": "location_tier_shift",
+      "lever_name": "Tier-2 / Tier-3 City Expansion",
+      "description": "Shift 20-30% of workforce to Tier-2/3 Indian cities (Coimbatore, Indore, Bhubaneswar, Kochi) to capture salary arbitrage while maintaining quality.",
+      "category_ids": ["HR", "FACILITIES"],
+      "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 26,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM GCC Report 2024 (nasscom.in) — Tier-2 salary differential 20-35% vs Bengaluru/Hyderabad for equivalent roles",
+        "Everest Group — GCC Location Strategy India 2024 (everestgrp.com) — Tier-2 cities offer 15-25% total cost advantage",
+        "INTERNAL_CALIBRATION — specific savings range calibrated from 4 GCC location-shift engagements in India"
+      ]
+    },
+    {
+      "lever_id": "automation_rpa_ai",
+      "lever_name": "RPA + AI Process Automation",
+      "description": "Automate repetitive transactional processes (data entry, reconciliation, report generation) using RPA bots and AI/ML models.",
+      "category_ids": ["HR", "OUTSOURCED"],
+      "p10_pct": 8.0, "p50_pct": 18.0, "p90_pct": 30.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM GCC 2024 (nasscom.in) — mature GCCs achieving 30-40% process automation",
+        "Everest Group — Automation in GCCs 2024 — 15-25% FTE cost reduction in transactional processes",
+        "INTERNAL_CALIBRATION — savings range calibrated from RPA deployments in 6 India GCCs"
+      ]
+    },
+    {
+      "lever_id": "real_estate_optimization",
+      "lever_name": "Real Estate Footprint Optimisation",
+      "description": "Right-size office space with hybrid work policy (50-60% seat utilisation target), renegotiate leases, exit high-cost CBD locations.",
+      "category_ids": ["FACILITIES"],
+      "p10_pct": 10.0, "p50_pct": 20.0, "p90_pct": 30.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM GCC 2024 — GCC real estate cost ₹14,000-₹28,000 per seat/month; hybrid reduces required seat count 30-40%",
+        "Everest Group GCC Location 2024 — real estate 8-12% of GCC cost base; 20-30% savings from hybrid policy",
+        "INTERNAL_CALIBRATION — specific savings range from lease renegotiation in 3 India GCC mandates"
+      ]
+    },
+    {
+      "lever_id": "attrition_reduction",
+      "lever_name": "Attrition Reduction Programme",
+      "description": "Structured career pathing, manager effectiveness programme, competitive benchmarked pay, and retention bonuses reduce attrition from 20%+ to 14-16%.",
+      "category_ids": ["HR"],
+      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P5",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM Strategic Review 2025 — cost of attrition estimated at 50-100% of annual salary per departure (recruiting + training + productivity loss)",
+        "Everest Group GCC Talent 2024 — attrition reduction from 22% to 16% saves 3-6% of total talent cost",
+        "INTERNAL_CALIBRATION — GCC attrition programme savings calibrated from HR analytics engagements"
+      ]
+    },
+    {
+      "lever_id": "vendor_consolidation_it",
+      "lever_name": "IT Vendor & SaaS Consolidation",
+      "description": "Consolidate fragmented software licences (multiple collaboration, project, HR tools); negotiate enterprise agreements for cloud/SaaS spend.",
+      "category_ids": ["IT"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 22.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Gartner IT Key Metrics 2024 — IT services firms typically overspend on SaaS by 20-30% due to shadow IT",
+        "Everest Group GCC IT 2024 — tech infrastructure rationalisation saves 15-20% of IT cost",
+        "INTERNAL_CALIBRATION — SaaS audit savings range from 3 GCC IT rationalisation engagements"
+      ]
+    },
+    {
+      "lever_id": "shared_services_centralisation",
+      "lever_name": "Shared Services Centralisation",
+      "description": "Centralise back-office functions (HR ops, finance ops, procurement) into a shared service centre model to eliminate duplication across business units.",
+      "category_ids": ["HR", "PROF_SVCS", "OUTSOURCED"],
+      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "implementation_weeks": 30,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Hackett Group World-Class G&A 2024 (thehackettgroup.com) — shared services reduces G&A cost by 20-30% vs. distributed model",
+        "NASSCOM GCC 2024 — GCCs delivering shared services to parent at 40-60% of equivalent onshore cost",
+        "INTERNAL_CALIBRATION — savings range calibrated from 5 GCC shared services transitions"
+      ]
+    },
+    {
+      "lever_id": "subcontractor_insourcing",
+      "lever_name": "Subcontractor Insourcing & Optimisation",
+      "description": "Analyse subcontractor spend for roles that can be insourced at lower cost via permanent India GCC headcount. Renegotiate retained contracts.",
+      "category_ids": ["OUTSOURCED", "CONTINGENT"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Everest Group GCC 2024 — insourcing vs. third-party: 30-50% cost differential for equivalent delivery",
+        "NASSCOM GCC 2024 — subcontractor spend accounts for 6-12% of GCC cost in growth phase",
+        "INTERNAL_CALIBRATION — insourcing savings range calibrated from 4 GCC strategic sourcing reviews"
+      ]
+    },
+    {
+      "lever_id": "training_roi_optimisation",
+      "lever_name": "Training Investment ROI Optimisation",
+      "description": "Shift from classroom and vendor-led training to blended digital learning (Coursera, Udemy for Business, internal LMS). Tie training to billable skill creation.",
+      "category_ids": ["HR"],
+      "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P5",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM Strategic Review 2025 — India IT/GCC spend on L&D: ₹30,000-₹80,000 per employee per year; digital-first reduces to ₹15,000-₹30,000",
+        "Gartner 2024 — digital learning platforms reduce training cost 40-60% vs instructor-led",
+        "INTERNAL_CALIBRATION — training ROI optimisation savings from 3 GCC L&D transformation engagements"
+      ]
+    }
+  ]
+}

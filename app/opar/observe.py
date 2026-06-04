@@ -109,8 +109,8 @@ def _detect_conflict_signals(msg: str, manifest: Dict[str, Any]) -> Dict[str, An
 
     # Classify intent override for conflict-specific queries
     conflict_query_kw = [
-        "conflict", "mismatch", "discrepan", "reconcil", "tds mismatch", "gst mismatch",
-        "duplicate vendor", "intercompany", "consolidat",
+        "conflict", "mismatch", "discrepan", "reconcil", "tds", "gst", "gstr",
+        "vendor conflict", "vendor duplicate", "cross-source", "intercompany", "consolidat",
     ]
     has_conflict_query = any(k in msg.lower() for k in conflict_query_kw)
 
@@ -136,6 +136,11 @@ def _classify_intent_rule_based(msg: str) -> Tuple[str, str | None]:
 
     # 0. Conflict-specific intents (must check before broader analysis keywords)
     if any(w in lowered for w in ["conflict", "mismatch", "discrepan", "reconcile conflicts", "show conflicts", "resolve conflict"]):
+        return "conflict_review", None
+    if (
+        any(w in lowered for w in ["tds", "gst", "gstr", "vendor conflict", "vendor duplicate"])
+        and any(w in lowered for w in ["check", "scan", "detect", "conflict", "mismatch", "reconcil", "across", "source", "upload"])
+    ):
         return "conflict_review", None
     if any(w in lowered for w in ["consolidat", "group view", "entity rollup", "multi-entity", "intercompany elimination"]):
         return "consolidate", None

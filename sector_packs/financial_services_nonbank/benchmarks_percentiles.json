@@ -1,0 +1,102 @@
+{
+  "sector": "financial_services_nonbank",
+  "version": "1.0",
+  "vintage_date": "2025-04-01",
+  "confidence_overall": "public_disclosure",
+  "source_metadata": {
+    "primary_sources": [
+      {
+        "source_name": "RBI Report on Non-Banking Financial Companies 2023-24",
+        "url": "https://www.rbi.org.in/Scripts/AnnualReportPublications.aspx",
+        "publication_year": 2024,
+        "source_type": "public_disclosure",
+        "notes": "RBI NBFC Supervision Report: aggregate OpEx/NII ratios, staff cost benchmarks for deposit-taking and non-deposit NBFCs."
+      },
+      {
+        "source_name": "HDFC AMC FY25 Annual Report (BSE: 541729)",
+        "url": "https://www.hdfcfund.com/content/dam/hdfcfund/investor-relations/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹4,300 Cr, employee expenses ~₹600 Cr (13.9%), total opex ~₹1,200 Cr (27.9% of revenue). India's largest AMC."
+      },
+      {
+        "source_name": "Nippon Life India AMC FY25 Annual Report (BSE: 540767)",
+        "url": "https://www.nipponindiaim.com/investor-relations/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Profitability metrics and cost structure for mid-sized AMC."
+      },
+      {
+        "source_name": "Bajaj Finance FY25 Annual Report (BSE: 500034)",
+        "url": "https://www.bajajfinserv.in/investor-relations",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "India's largest NBFC. Opex/NII ratio, employee costs, credit costs disclosed. Total expenses ~₹22,000 Cr on NII ~₹28,000 Cr."
+      },
+      {
+        "source_name": "AMFI Monthly Data — Mutual Fund Industry Statistics FY25",
+        "url": "https://www.amfiindia.com/research-information/industry-data",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "AUM-weighted expense ratios and operational cost benchmarks for Indian mutual fund industry."
+      }
+    ],
+    "methodology": "P25/P50/P75 derived from FY24-25 financial disclosures of 5 India-listed NBFCs and AMCs. Categories expressed as % of total income (net interest income + fee income). P90 represents operationally lagging institutions. RBI NBFC supervision aggregate data used for sector-wide validation.",
+    "sample_size": 5
+  },
+  "benchmarks": {
+    "financial_services_nonbank": {
+      "label": "Non-Bank Financial Services (NBFC, AMC, Fintech — India)",
+      "categories": {
+        "HR": {
+          "P25": 10.0, "P50": 16.0, "P75": 22.0, "P90": 30.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Staff cost % of total income. HDFC AMC FY25: 13.9%, Bajaj Finance FY25: ~15% of total income, mid-tier NBFCs: 18-25%. AMCs lower (asset-light); retail NBFCs higher due to field staff."
+        },
+        "IT": {
+          "P25": 2.0, "P50": 3.5, "P75": 5.5, "P90": 8.0,
+          "unit": "% of revenue",
+          "confidence": "published_research",
+          "source_note": "Technology spend. Gartner FS Benchmark 2024: fintech-adjacent NBFCs spend 5-8% of revenue on tech. Traditional NBFCs 2-4%. AMCs at low end (outsource to RTAs)."
+        },
+        "MARKETING": {
+          "P25": 2.0, "P50": 4.0, "P75": 7.0, "P90": 11.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Sales & distribution, brand, customer acquisition. AMCs: ~1-2% (distributor commissions separate). Retail NBFCs: 5-9% for DSA, lead generation. Fintechs: 8-14%."
+        },
+        "PROF_SVCS": {
+          "P25": 0.8, "P50": 1.8, "P75": 3.0, "P90": 4.5,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Legal, audit, compliance advisory, actuarial. SEBI-mandated compliance costs + audit + legal for listed NBFCs and AMCs."
+        },
+        "FACILITIES": {
+          "P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.2,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Rent + property. Asset-light NBFCs (AMCs, fintechs) low; retail NBFCs with branch networks higher. Bajaj Finance: ~1.5% of total income."
+        },
+        "OUTSOURCED": {
+          "P25": 2.0, "P50": 4.5, "P75": 7.0, "P90": 10.0,
+          "unit": "% of revenue",
+          "confidence": "published_research",
+          "source_note": "Business process outsourcing: collections agencies, KYC, credit bureau API costs. RBI NBFC: outsourced collections common for retail lending NBFCs."
+        },
+        "FIN_SVCS": {
+          "P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Bank charges, custodian fees, clearing costs. HDFC AMC: custodian and RTA fees included in administrative expenses."
+        },
+        "INSURANCE": {
+          "P25": 0.2, "P50": 0.5, "P75": 0.9, "P90": 1.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "D&O, professional indemnity, group health. INTERNAL_CALIBRATION — calibrated from NBFC compliance and insurance cost surveys."
+        }
+      }
+    }
+  }
+}

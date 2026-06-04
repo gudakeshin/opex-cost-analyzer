@@ -1,0 +1,66 @@
+[
+  {
+    "kpi_id": "gross_margin_pct",
+    "kpi_name": "Gross Margin (%)",
+    "unit": "pct",
+    "formula": "(revenue - cogs) / revenue * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 52.0,
+    "p50_benchmark_pct": 44.0,
+    "p75_benchmark_pct": 38.0,
+    "source": "HUL FY25: gross margin ~50%, Dabur FY25: ~47%, Marico FY25: ~44%. ITC-FMCG: ~35%. FICCI FMCG 2024."
+  },
+  {
+    "kpi_id": "advertising_pct",
+    "kpi_name": "Advertising & Promotion % of Revenue",
+    "unit": "pct",
+    "formula": "advertising_spend / revenue * 100",
+    "target_direction": "context_dependent",
+    "p25_benchmark_pct": 11.0,
+    "p50_benchmark_pct": 14.5,
+    "p75_benchmark_pct": 18.0,
+    "source": "HUL FY25: 14.0%, Dabur FY25: 14.0%, Marico FY25: 15.0%, ITC-FMCG: 14-16%. FICCI FMCG Survey 2024."
+  },
+  {
+    "kpi_id": "distribution_cost_pct",
+    "kpi_name": "Distribution & Logistics % of Revenue",
+    "unit": "pct",
+    "formula": "distribution_cost / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 6.0,
+    "p50_benchmark_pct": 9.0,
+    "p75_benchmark_pct": 12.0,
+    "source": "HUL FY25: ~10%, Dabur FY25: ~9%, Marico FY25: ~8%. CII Logistics India 2024: FMCG logistics 8-12% of revenue."
+  },
+  {
+    "kpi_id": "ebitda_margin",
+    "kpi_name": "EBITDA Margin (%)",
+    "unit": "pct",
+    "formula": "ebitda / revenue * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 22.0,
+    "p50_benchmark_pct": 17.0,
+    "p75_benchmark_pct": 12.0,
+    "source": "HUL FY25 EBITDA margin: 23.5%, Dabur FY25: 18.9%, Marico FY25: 19.5%, ITC-FMCG: ~10-12% (higher distribution cost)."
+  },
+  {
+    "kpi_id": "revenue_per_employee",
+    "kpi_name": "Revenue per Employee (₹ Cr)",
+    "unit": "INR_cr",
+    "formula": "annual_revenue / headcount",
+    "target_direction": "higher",
+    "p25_benchmark_cr": 1.8,
+    "p50_benchmark_cr": 1.2,
+    "p75_benchmark_cr": 0.8,
+    "source": "HUL FY25: ~₹1.8Cr/emp, Dabur: ~₹1.1Cr/emp, Marico: ~₹1.0Cr/emp. FICCI FMCG 2024."
+  },
+  {
+    "kpi_id": "working_capital_days",
+    "kpi_name": "Working Capital Days (Cash Conversion Cycle)",
+    "unit": "days",
+    "formula": "debtor_days + inventory_days - creditor_days",
+    "target_direction": "lower",
+    "p50_benchmark_days": 18,
+    "source": "HUL FY25: working capital negative (strong trade credit). Dabur FY25: ~25 days. FMCG best-in-class: negative working capital due to retailer credit management."
+  }
+]

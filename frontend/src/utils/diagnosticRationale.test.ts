@@ -18,7 +18,7 @@ describe('diagnosticRationale', () => {
       p50_pct: 10,
       benchmark_p50_to_p25_band_cr: 100,
     });
-    expect(text).toContain('R&D & Engineering at 10%');
+    expect(text).toContain('Proxy: R&D & Engineering at 10%');
     expect(text).toContain('₹100 Cr');
     expect(text!.length).toBeLessThan(120);
   });
@@ -55,6 +55,7 @@ describe('diagnosticRationale', () => {
       benchmark_p50_to_p25_band_cr: 100,
     });
     expect(text).toContain('R&D & Engineering');
+    expect(text).toContain('Benchmark proxy');
     expect(text).toContain('10% of revenue');
     expect(text).toContain('₹100 Cr');
   });

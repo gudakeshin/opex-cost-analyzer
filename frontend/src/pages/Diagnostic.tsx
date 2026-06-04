@@ -15,7 +15,9 @@ import {
   ValueAtTableTable,
   diagnosticTablesFromResult,
 } from '../components/PageComponents/Diagnostic/DiagnosticTables';
+import { BenchmarkProxyDisclaimer } from '../components/PageComponents/Diagnostic/BenchmarkProxyDisclaimer';
 import { DeepResearchSection } from '../components/PageComponents/Diagnostic/DeepResearchSection';
+import { isBenchmarkProxyProfile } from '../utils/diagnosticProxyDisclaimer';
 import { apiGet, apiPatch, apiPost, getApiErrorMessage } from '../hooks/useApi';
 import { friendlyErrorMessage } from '../utils/errorMessages';
 import { useSession } from '../context/SessionContext';
@@ -314,18 +316,23 @@ export const Diagnostic: React.FC = () => {
               Run Diagnostic
             </Button>
           </form>
-          {loading && <Loader label="Analyzing company data…" />}
+          {loading && <Loader label="Building sector benchmark estimate…" />}
         </Card>
 
         {result && (
           <>
             <DiagnosticScorecard result={result} />
 
+            {isBenchmarkProxyProfile(result.profile_basis) && (
+              <BenchmarkProxyDisclaimer dataNote={result.data_note} />
+            )}
+
             <Card title="Key findings" className="border-brand-border bg-white">
               <FindingCards findings={result.key_findings ?? []} />
-              {result.data_note && (
-                <p className="mt-4 text-sm text-brand-muted border-l-4 border-brand-navy pl-3">
-                  {result.data_note}
+              {isBenchmarkProxyProfile(result.profile_basis) && (
+                <p className="mt-4 text-sm text-brand-muted border-l-4 border-amber-400 pl-3">
+                  Findings below are illustrative from sector benchmarks and the revenue you entered—not
+                  from company-specific spend uploads.
                 </p>
               )}
             </Card>
@@ -349,6 +356,7 @@ export const Diagnostic: React.FC = () => {
             <BenchmarkGapsTable
               gaps={tableData?.benchmarkGaps ?? []}
               dataNote={result.data_note}
+              profileBasis={result.profile_basis}
               percentileLegend={result.percentile_legend}
             />
 
@@ -356,6 +364,8 @@ export const Diagnostic: React.FC = () => {
               rows={tableData?.valueAtTable ?? []}
               totalP50Cr={tableData?.totalP50}
               annualRevenueCr={result.annual_revenue_cr}
+              dataNote={result.data_note}
+              profileBasis={result.profile_basis}
               percentileLegend={result.percentile_legend}
               methodology={result.value_at_table_methodology}
             />

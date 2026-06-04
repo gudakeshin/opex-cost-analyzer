@@ -107,7 +107,8 @@ Return ONLY valid JSON with this schema:
     }
   ],
   "assumptions": ["string"],
-  "citations": ["string"]
+  "citations": ["string"],
+  "sme_qualification_narrative": "string"
 }
 
 Constraints:
@@ -137,6 +138,7 @@ Constraints:
 - When NOT category-focused, leave `category_focus_section` as an empty string.
 - Avoid section headers like "Top recommendations" for category-focused asks; frame as focused category actions.
 - If `deep_research_context` is present in the input, treat it as verified background research on this company/industry. Use it to strengthen evidence citations and benchmark references — do not contradict it.
+- When `sme_critique_data` is present in the input: populate `sme_qualification_narrative` with 2–4 sentences written as a Deloitte senior manager who just reviewed the output. For each initiative flagged as probe_first or insufficient_data, name the category, state the specific evidence gap, and explain what risk that creates for the saving. Be direct and specific — do NOT hedge with "it may be possible". Example tone: "The IT Cloud consolidation saving assumes contracts are up for renewal, but no contract register was provided — if locked beyond 18 months, this saving is FY27+ at best." Leave sme_qualification_narrative as empty string if no sme_critique_data is present or all initiatives are verdict=proceed.
 """
 
 EXECUTIVE_COMMUNICATION_SYSTEM_PROMPT = """You are a Finance Business Partner communicating to CFO/leadership.

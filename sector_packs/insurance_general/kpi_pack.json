@@ -1,0 +1,66 @@
+[
+  {
+    "kpi_id": "combined_ratio",
+    "kpi_name": "Combined Ratio (%)",
+    "unit": "pct",
+    "formula": "(incurred_claims + operating_expenses) / earned_premium * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 100.0,
+    "p50_benchmark_pct": 107.0,
+    "p75_benchmark_pct": 115.0,
+    "source": "IRDAI Annual Report 2023-24: aggregate combined ratio Indian general insurance ~108%. ICICI Lombard FY25: 104.3%, Star Health FY25: 97.8% (profitable), PSU players 112-120%."
+  },
+  {
+    "kpi_id": "expense_ratio",
+    "kpi_name": "Expense of Management Ratio (%)",
+    "unit": "pct",
+    "formula": "operating_expenses / gross_written_premium * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 20.0,
+    "p50_benchmark_pct": 28.0,
+    "p75_benchmark_pct": 35.0,
+    "source": "IRDAI mandated disclosure. ICICI Lombard FY25: 27.5%. Bajaj Allianz FY25: ~26%. New India FY25: ~29%. PSU players: 30-38%. IRDAI regulatory cap: 30% for private, 35% for PSU."
+  },
+  {
+    "kpi_id": "loss_ratio",
+    "kpi_name": "Loss Ratio (%)",
+    "unit": "pct",
+    "formula": "incurred_claims / earned_premium * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 65.0,
+    "p50_benchmark_pct": 76.0,
+    "p75_benchmark_pct": 85.0,
+    "source": "IRDAI FY24: Industry net loss ratio ~75%. ICICI Lombard FY25: 76.8%. Commercial lines: 60-70%. Health: 85-95%."
+  },
+  {
+    "kpi_id": "commission_ratio",
+    "kpi_name": "Commission Ratio (%)",
+    "unit": "pct",
+    "formula": "commissions_paid / gross_written_premium * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 8.0,
+    "p50_benchmark_pct": 13.0,
+    "p75_benchmark_pct": 18.0,
+    "source": "IRDAI Annual Report 2023-24: aggregate industry commission ratio 11-15%. Retail health: 18-22%. Commercial: 7-10%. Direct channel reduces commissions significantly."
+  },
+  {
+    "kpi_id": "digital_channel_pct",
+    "kpi_name": "Digital Channel Premium % of GWP",
+    "unit": "pct",
+    "formula": "direct_digital_premium / gwp * 100",
+    "target_direction": "higher",
+    "p50_benchmark_pct": 18.0,
+    "source": "IRDAI Digital Insurance Repository: direct digital channel share growing. ICICI Lombard FY25: 22% direct digital. Industry average ~15-20%. Fintechs (Digit, Acko): 100% digital."
+  },
+  {
+    "kpi_id": "staff_cost_per_gwp",
+    "kpi_name": "Staff Cost % of GWP",
+    "unit": "pct",
+    "formula": "staff_cost / gross_written_premium * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 8.0,
+    "p50_benchmark_pct": 12.0,
+    "p75_benchmark_pct": 17.0,
+    "source": "IRDAI expense-of-management disclosures. ICICI Lombard FY25: ~9%. New India Assurance FY25: ~15% (higher due to large PSU workforce). Private insurers: 8-13%."
+  }
+]

@@ -1,0 +1,97 @@
+{
+  "sector": "psu_cpse",
+  "source_type": "public_disclosure + internal_calibration",
+  "source_verification_note": "Savings ranges (p10/p50/p90) calibrated from consulting engagements and DPE/CAG-cited improvement programmes. industry_sources cite real published works.",
+  "levers": [
+    {
+      "lever_id": "manpower_rationalisation_vrs",
+      "lever_name": "Manpower Rationalisation & VRS",
+      "description": "Implement Voluntary Retirement Scheme (VRS) to reduce headcount in overstaffed functions; redeploy staff to growth areas; contract-out non-core services.",
+      "category_ids": ["HR"],
+      "p10_pct": 6.0, "p50_pct": 14.0, "p90_pct": 24.0,
+      "implementation_weeks": 26,
+      "brsr_principle": "P5",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "DPE Annual Survey 2022-23 (dpe.gov.in) — VRS cited as key manpower cost reduction tool for loss-making CPSEs; BHEL VRS 2019-20 reduced headcount 10,000",
+        "Ministry of Heavy Industries — BHEL revival plan 2022: workforce rationalisation as strategic pillar",
+        "INTERNAL_CALIBRATION — manpower rationalisation savings from 2 India PSU turnaround mandates"
+      ]
+    },
+    {
+      "lever_id": "procurement_gem_portal",
+      "lever_name": "GeM Portal & Centralised Procurement",
+      "description": "Mandate Government e-Marketplace (GeM) for all eligible purchases; implement centralised procurement for common items across CPSE group; standardise technical specifications.",
+      "category_ids": ["OUTSOURCED", "PLANT_MAINTENANCE"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "GeM Annual Report 2023-24 (gem.gov.in) — ₹2.5 Lakh Cr in transactions; CPSEs mandated to procure via GeM; competitive pricing 8-15% below traditional procurement",
+        "CVC (Central Vigilance Commission) Procurement Guidelines — GeM adoption saves procurement time and reduces corruption risk",
+        "INTERNAL_CALIBRATION — GeM-based procurement savings from 3 India CPSE procurement transformation mandates"
+      ]
+    },
+    {
+      "lever_id": "inventory_rationalisation",
+      "lever_name": "Inventory Rationalisation & Stores Management",
+      "description": "Implement inventory analytics to identify slow-moving stores & spares; reduce dead stock; implement VMI with key suppliers; standardise spare parts catalogue.",
+      "category_ids": ["OUTSOURCED"],
+      "p10_pct": 8.0, "p50_pct": 16.0, "p90_pct": 26.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CAG Reports on CPSEs 2023-24 (cag.gov.in) — excess inventory is recurring finding; BHEL stores blocking ₹3,000+ Cr in excess inventory cited",
+        "DPE Survey 2022-23 — inventory days 90-180 for manufacturing CPSEs vs. private sector median 45-60 days",
+        "INTERNAL_CALIBRATION — inventory rationalisation savings from 3 India PSU supply chain mandates"
+      ]
+    },
+    {
+      "lever_id": "technology_erp_modernisation",
+      "lever_name": "ERP & Digital Transformation",
+      "description": "Migrate from legacy systems to modern ERP (SAP S/4HANA); implement e-tendering and digital payments; deploy analytics for production planning and cost monitoring.",
+      "category_ids": ["IT"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 52,
+      "brsr_principle": "P6",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "MeitY Digital India programme — ERP adoption in CPSEs mandated for transparency; CIL SAP implementation cited as modernisation benchmark",
+        "Gartner ERP 2024 — S/4HANA migration reduces IT maintenance 20-30% vs. legacy ERP + process efficiency gains 10-15%",
+        "INTERNAL_CALIBRATION — ERP modernisation savings from 2 India PSU digital transformation mandates"
+      ]
+    },
+    {
+      "lever_id": "energy_efficiency_plants",
+      "lever_name": "Energy Efficiency in Manufacturing Plants",
+      "description": "PAT (Perform Achieve and Trade) scheme compliance; implement waste heat recovery, motor efficiency upgrades, compressed air leak reduction, lighting LED retrofit.",
+      "category_ids": ["POWER_ENERGY", "PLANT_MAINTENANCE"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "BEE (Bureau of Energy Efficiency) PAT Scheme Cycle VI 2023-24 (beeindia.gov.in) — designated consumers (DCs) including CPSEs must achieve specific energy reduction targets",
+        "BHEL FY25 Annual Report — energy efficiency investments under PAT scheme at manufacturing plants",
+        "INTERNAL_CALIBRATION — energy efficiency savings from 3 India manufacturing PSU energy mandates"
+      ]
+    },
+    {
+      "lever_id": "commercial_recovery_ndues",
+      "lever_name": "Commercial Recovery & Dues Realisation",
+      "description": "Improve debtor days through active collection of government dues, advance payment clauses in new contracts, and legal proceedings for aged receivables.",
+      "category_ids": ["HR", "PROF_SVCS"],
+      "p10_pct": 3.0, "p50_pct": 8.0, "p90_pct": 15.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P1",
+      "savings_type": "one_time",
+      "industry_sources": [
+        "CAG Reports on CPSEs 2023-24 — excess receivables: BHEL outstanding dues from government utilities cited; debtors >180 days flagged",
+        "DPE CPSE Survey 2022-23 — working capital management improvement as key recommendation for Miniratna CPSEs",
+        "INTERNAL_CALIBRATION — receivables recovery savings from 2 India PSU commercial excellence mandates"
+      ]
+    }
+  ]
+}

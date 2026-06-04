@@ -2,7 +2,9 @@ import React, { useMemo } from 'react';
 import { Card } from '../../Common/Card';
 import { CollapsibleDetail, CollapsiblePanel } from '../../Common/CollapsibleDetail';
 import { FactVsInferenceLabel } from '../../Common/FactVsInferenceLabel';
+import { BenchmarkProxyDisclaimer } from './BenchmarkProxyDisclaimer';
 import { DiagnosticValueBridge } from './DiagnosticValueBridge';
+import { isBenchmarkProxyProfile } from '../../../utils/diagnosticProxyDisclaimer';
 import { formatCr } from '../../../utils/formatInr';
 import { gapHeadroomCr, resolveCategoryLabel } from '../../../utils/categoryLabels';
 import {
@@ -53,12 +55,14 @@ function sortBenchmarkGaps(gaps: BenchmarkGapRow[]): BenchmarkGapRow[] {
 interface BenchmarkGapsTableProps {
   gaps: BenchmarkGapRow[];
   dataNote?: string;
+  profileBasis?: string;
   percentileLegend?: Record<string, string>;
 }
 
 export const BenchmarkGapsTable: React.FC<BenchmarkGapsTableProps> = ({
   gaps,
   dataNote,
+  profileBasis,
   percentileLegend,
 }) => {
   const sorted = useMemo(() => sortBenchmarkGaps(gaps).slice(0, 10), [gaps]);
@@ -67,14 +71,16 @@ export const BenchmarkGapsTable: React.FC<BenchmarkGapsTableProps> = ({
     ? `P25 = ${percentileLegend.p25} · P50 = ${percentileLegend.p50 ?? 'industry median'}`
     : 'P25 = best-in-class quartile · P50 = industry median';
 
+  const showProxyDisclaimer = isBenchmarkProxyProfile(profileBasis);
+
   return (
     <Card title="Benchmark gaps" className="border-brand-border bg-white">
+      {showProxyDisclaimer && (
+        <BenchmarkProxyDisclaimer dataNote={dataNote} compact className="mb-4" />
+      )}
       <CollapsiblePanel title="Ranked category gaps" summary={panelSummary}>
-        {(dataNote || legend) && (
-          <div className="mb-4 space-y-1">
-            {dataNote && <p className="text-sm text-brand-muted leading-relaxed">{dataNote}</p>}
-            <p className="text-xs text-brand-muted">{legend}</p>
-          </div>
+        {legend && (
+          <p className="mb-4 text-xs text-brand-muted">{legend}</p>
         )}
         <div className="overflow-x-auto executive-shell">
           <table className="w-full">
@@ -93,7 +99,7 @@ export const BenchmarkGapsTable: React.FC<BenchmarkGapsTableProps> = ({
                   Savings to best-in-class (₹ Cr)
                 </th>
                 <th scope="col" className={TH_CLASS}>
-                  Summary
+                  Benchmark narrative (proxy)
                 </th>
               </tr>
             </thead>
@@ -147,6 +153,8 @@ interface ValueAtTableTableProps {
   rows: ValueAtTableRow[];
   totalP50Cr?: number;
   annualRevenueCr?: number;
+  dataNote?: string;
+  profileBasis?: string;
   percentileLegend?: Record<string, string>;
   methodology?: ValueAtTableMethodology;
 }
@@ -165,6 +173,8 @@ export const ValueAtTableTable: React.FC<ValueAtTableTableProps> = ({
   rows,
   totalP50Cr,
   annualRevenueCr,
+  dataNote,
+  profileBasis,
   percentileLegend,
   methodology,
 }) => {
@@ -172,17 +182,25 @@ export const ValueAtTableTable: React.FC<ValueAtTableTableProps> = ({
   const { summary, steps, scopeNote } = valueAtTableMethodologyCopy(methodology);
   const methodologyPanelSummary = valueAtTableMethodologySummary(methodology);
 
+  const showProxyDisclaimer = isBenchmarkProxyProfile(profileBasis);
+
   return (
     <Card title="Value at table" className="border-brand-border bg-white">
+      {showProxyDisclaimer && (
+        <BenchmarkProxyDisclaimer dataNote={dataNote} compact className="mb-4" />
+      )}
       <div className="flex flex-wrap items-center gap-2 mb-4">
-        <FactVsInferenceLabel kind="inference" />
-        <span className="text-sm text-brand-muted">{legendLine}</span>
+        <FactVsInferenceLabel kind="benchmark_proxy" />
+        <span className="text-sm text-brand-muted">
+          Sector lever model on synthetic spend pools · {legendLine}
+        </span>
       </div>
 
       <DiagnosticValueBridge
         rows={rows}
         totalP50Cr={totalP50Cr}
         annualRevenueCr={annualRevenueCr}
+        showProxyDisclaimer={showProxyDisclaimer}
       />
 
       <CollapsiblePanel title="How value at table is calculated" summary={methodologyPanelSummary}>

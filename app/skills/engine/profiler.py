@@ -2,6 +2,7 @@
 industry inference, addressability helpers, and lever resolution."""
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from datetime import date
 from typing import Any, Dict, List, Optional, Tuple
@@ -196,6 +197,27 @@ def classify_discretionary(line: NormalizedSpendLine) -> bool:
 # Industry inference
 # ---------------------------------------------------------------------------
 
+# Spend-line keyword signals for industry inference. Matched with word
+# boundaries so short acronyms (RAN, OSS, BSS, CRO, NPA, CBS) do not false-match
+# inside ordinary words — e.g. "ran" must not fire on "brand", "oss" not on
+# "loss". A naive substring match here once mislabelled an FMCG ledger as
+# telecom because every "brand campaign" line contained "ran".
+_SPEND_INDUSTRY_KEYWORDS: Dict[str, Tuple[str, ...]] = {
+    "bfsi_banks": ("npa", "core banking", "cbs", "casa", "nbfc", "rbi circular"),
+    "pharma_lifesciences": ("clinical trial", "api batch", "cro", "pharmacovigilance", "dossier"),
+    "insurance_general": ("claims", "underwriting", "reinsurance", "loss ratio", "irdai"),
+    "telecom_infra": ("tower", "bts", "ran", "bss", "oss", "spectrum", "roaming"),
+    "gcc_capability_centers": (
+        "gcc", "captive center", "shared service", "ssc", "center of excellence",
+        "coe", "offshore delivery", "global in-house", "captive unit",
+    ),
+}
+_SPEND_INDUSTRY_PATTERNS: Dict[str, "re.Pattern[str]"] = {
+    industry: re.compile(r"\b(?:" + "|".join(re.escape(k) for k in keywords) + r")\b")
+    for industry, keywords in _SPEND_INDUSTRY_KEYWORDS.items()
+}
+
+
 def infer_industry_from_spend(lines: List[NormalizedSpendLine], total_spend: float) -> str:
     """Infer sector pack ID from spend patterns when industry is not user-supplied."""
     if not lines or total_spend <= 0:
@@ -205,22 +227,9 @@ def infer_industry_from_spend(lines: List[NormalizedSpendLine], total_spend: flo
     for line in lines:
         by_cat[line.category_id] += line.reporting_amount
         desc = (line.description or "").lower()
-        if any(k in desc for k in ("npa", "core banking", "cbs", "casa", "nbfc", "rbi circular")):
-            keyword_hits["bfsi_banks"] += 1
-        if any(k in desc for k in ("clinical trial", "api batch", "cro", "pharmacovigilance", "dossier")):
-            keyword_hits["pharma_lifesciences"] += 1
-        if any(k in desc for k in ("claims", "underwriting", "reinsurance", "loss ratio", "irdai")):
-            keyword_hits["insurance_general"] += 1
-        if any(k in desc for k in ("tower", "bts", "ran", "bss", "oss", "spectrum", "roaming")):
-            keyword_hits["telecom_infra"] += 1
-        if any(
-            k in desc
-            for k in (
-                "gcc", "captive center", "shared service", "ssc", "center of excellence",
-                "coe", "offshore delivery", "global in-house", "captive unit",
-            )
-        ):
-            keyword_hits["gcc_capability_centers"] += 1
+        for industry, pattern in _SPEND_INDUSTRY_PATTERNS.items():
+            if pattern.search(desc):
+                keyword_hits[industry] += 1
 
     if keyword_hits:
         return max(keyword_hits, key=keyword_hits.__getitem__)

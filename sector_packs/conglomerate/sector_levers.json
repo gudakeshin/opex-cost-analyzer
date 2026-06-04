@@ -1,0 +1,112 @@
+{
+  "sector": "conglomerate",
+  "source_type": "public_disclosure + internal_calibration",
+  "source_verification_note": "Savings ranges (p10/p50/p90) calibrated from consulting engagements. industry_sources cite real published works. Note: business-unit-level savings should use the relevant sector-specific lever pack, not this group-level pack.",
+  "levers": [
+    {
+      "lever_id": "shared_services_group",
+      "lever_name": "Group-Level Shared Services Centre",
+      "description": "Centralise back-office functions (HR ops, finance ops, IT, procurement, legal) across group companies into a single shared service centre. Eliminate entity-level duplication.",
+      "category_ids": ["HR", "IT", "PROF_SVCS"],
+      "p10_pct": 12.0, "p50_pct": 22.0, "p90_pct": 35.0,
+      "implementation_weeks": 30,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Hackett Group G&A Benchmarks 2024 (thehackettgroup.com) — world-class shared services: 25-35% G&A reduction vs. decentralised model",
+        "SEBI LODR — group entity governance and related-party frameworks enabling shared service arrangements",
+        "INTERNAL_CALIBRATION — group shared services savings calibrated from 3 India conglomerate G&A transformation mandates"
+      ]
+    },
+    {
+      "lever_id": "group_procurement_consolidation",
+      "lever_name": "Group Procurement Consolidation & Category Management",
+      "description": "Aggregate common spend categories (IT, travel, professional services, utilities, packaging, marketing) across group companies. Negotiate enterprise-level agreements.",
+      "category_ids": ["OUTSOURCED", "IT", "MARKETING", "PROF_SVCS"],
+      "p10_pct": 8.0, "p50_pct": 16.0, "p90_pct": 25.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "M&M FY25 Annual Report (BSE 500520) — group procurement synergies cited for auto and farm equipment sourcing",
+        "Aditya Birla Group — group-level procurement arm consolidating spend across Hindalco, UltraTech, Grasim, Fashion & Lifestyle",
+        "INTERNAL_CALIBRATION — group procurement savings calibrated from 4 India conglomerate sourcing mandates"
+      ]
+    },
+    {
+      "lever_id": "portfolio_rationalisation",
+      "lever_name": "Portfolio Rationalisation & Sub-Optimal Business Exit",
+      "description": "Identify and divest underperforming or non-core businesses; redeploy capital to high-ROCE businesses. Eliminate holding company overhead for exited entities.",
+      "category_ids": ["PROF_SVCS", "HR"],
+      "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 22.0,
+      "implementation_weeks": 40,
+      "brsr_principle": "P1",
+      "savings_type": "one_time",
+      "industry_sources": [
+        "SEBI LODR — board-level portfolio review governance requirements for listed conglomerates",
+        "Tata Sons portfolio rationalization: Tata Steel Europe restructuring, Tata AIG stake management — published investor communications",
+        "INTERNAL_CALIBRATION — portfolio rationalisation savings from 2 India conglomerate strategic review mandates"
+      ]
+    },
+    {
+      "lever_id": "treasury_working_capital",
+      "lever_name": "Group Treasury & Working Capital Optimisation",
+      "description": "Implement cash pooling across group entities; optimise inter-company loans at arm's length; reduce gross debt through better working capital management.",
+      "category_ids": ["FIN_SVCS", "HR"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "SEBI RPT Regulations 2021 — inter-company loan frameworks and arm's-length pricing requirements",
+        "M&M FY25 Annual Report — treasury operations and inter-company financing structure detailed in RPT disclosures",
+        "INTERNAL_CALIBRATION — group treasury savings from 3 India conglomerate treasury transformation mandates"
+      ]
+    },
+    {
+      "lever_id": "real_estate_group_portfolio",
+      "lever_name": "Group Real Estate Portfolio Optimisation",
+      "description": "Audit group real estate holdings; exit non-strategic properties; monetise surplus land (listed or unlisted assets); consolidate offices of co-located group companies.",
+      "category_ids": ["FACILITIES"],
+      "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 22.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P4",
+      "savings_type": "one_time",
+      "industry_sources": [
+        "SEBI LODR — disclosure of significant real estate transactions and related-party property arrangements",
+        "Aditya Birla Group — surplus land monetisation from legacy manufacturing sites disclosed in annual reports",
+        "INTERNAL_CALIBRATION — group real estate monetisation from 2 India conglomerate property review mandates"
+      ]
+    },
+    {
+      "lever_id": "digital_group_platform",
+      "lever_name": "Group-Wide Digital Platform & IT Rationalisation",
+      "description": "Consolidate ERP, HR, finance, and supply chain IT systems on group-wide platforms. Eliminate redundant SaaS subscriptions across entities. Migrate to group cloud agreement.",
+      "category_ids": ["IT"],
+      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "implementation_weeks": 36,
+      "brsr_principle": "P6",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "Gartner G2000 IT Benchmark 2024 — group-level IT consolidation: 20-30% reduction in per-entity IT spend",
+        "Tata Consultancy Services (group IT arm) — Tata group companies' shared IT services model cited in TCS investor materials",
+        "INTERNAL_CALIBRATION — group IT rationalisation from 2 India conglomerate technology transformation mandates"
+      ]
+    },
+    {
+      "lever_id": "brsr_esg_programme",
+      "lever_name": "Integrated ESG Programme & BRSR Compliance Efficiency",
+      "description": "Build group-level ESG data management system to reduce BRSR compliance cost; identify carbon credit monetisation opportunities; align CSR spend to business-linked programmes.",
+      "category_ids": ["BRSR_ESG", "PROF_SVCS"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "SEBI BRSR Core Circular 2023 (sebi.gov.in) — mandatory assured BRSR for top-1000 listed entities; integrated platform reduces per-entity assurance cost",
+        "M&M FY25 Annual Report — integrated sustainability reporting and CSR spend of ₹1,800 Cr disclosed with outcome metrics",
+        "INTERNAL_CALIBRATION — ESG programme efficiency savings from 2 India conglomerate sustainability mandates"
+      ]
+    }
+  ]
+}

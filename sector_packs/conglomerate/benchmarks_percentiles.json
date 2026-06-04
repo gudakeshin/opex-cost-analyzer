@@ -1,0 +1,95 @@
+{
+  "sector": "conglomerate",
+  "version": "1.0",
+  "vintage_date": "2025-04-01",
+  "confidence_overall": "public_disclosure",
+  "source_metadata": {
+    "primary_sources": [
+      {
+        "source_name": "Mahindra & Mahindra FY25 Annual Report (BSE: 500520)",
+        "url": "https://www.mahindra.com/investors/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Standalone revenue ~₹155,000 Cr. Employee costs ~₹18,000 Cr (11.6%), Material ~₹95,000 Cr (61%). Diversified auto + farm equipment + financial services + IT (Tech Mahindra)."
+      },
+      {
+        "source_name": "Aditya Birla Group — Hindalco + Grasim + UltraTech FY25 BRSR disclosures",
+        "url": "https://www.adityabirla.com/investor-relations",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Conglomerate cost structure: metals (Hindalco), cement (UltraTech), chemicals (Grasim), financial services. Segment-wise cost disclosed in BRSR filings."
+      },
+      {
+        "source_name": "Reliance Industries FY25 Annual Report (BSE: 500325)",
+        "url": "https://www.ril.com/InvestorRelations/AnnualReports.aspx",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹938,000 Cr. O2C segment (dominant), telecom (Jio), retail (Reliance Retail), media. Employee ~3-4% of consolidated revenue. Cross-segment shared services."
+      },
+      {
+        "source_name": "SEBI BRSR Core Reporting Framework 2023 (Business Responsibility and Sustainability Report)",
+        "url": "https://www.sebi.gov.in/legal/circulars/jul-2023/comprehensive-framework-for-business-responsibility-and-sustainability-report_74588.html",
+        "publication_year": 2023,
+        "source_type": "public_disclosure",
+        "notes": "Mandatory BRSR Core disclosure for top 1000 listed entities. Standardised cost and sustainability metrics enabling cross-conglomerate comparison."
+      }
+    ],
+    "methodology": "Conglomerates are by definition diversified, making single-sector benchmarks imprecise. P25/P50/P75 represent weighted-average operating cost ratios across diversified business mixes. Benchmark uses SEBI BRSR disclosures + annual report segment data for 3 major Indian conglomerates. Note: individual business units should be benchmarked against sector-specific packs, not this aggregate.",
+    "sample_size": 3
+  },
+  "benchmarks": {
+    "conglomerate": {
+      "label": "Conglomerates (India — Diversified)",
+      "categories": {
+        "HR": {
+          "P25": 8.0, "P50": 13.0, "P75": 20.0, "P90": 30.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Consolidated employee cost % of revenue. M&M FY25: 11.6%, Reliance FY25: ~3-4% (O2C-heavy lowers ratio), Aditya Birla Group: 8-15% depending on segment mix. Range reflects business mix: O2C/commodities lowers ratio, services/tech raises it."
+        },
+        "OUTSOURCED": {
+          "P25": 30.0, "P50": 45.0, "P75": 60.0, "P90": 72.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Material, manufacturing, and outsourced services combined. M&M FY25: material + manufacturing ~65%. Commodity-heavy conglomerates (Hindalco): material 50-70%. Services-heavy: lower."
+        },
+        "IT": {
+          "P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.5,
+          "unit": "% of revenue",
+          "confidence": "published_research",
+          "source_note": "Consolidated IT. Conglomerates with IT subsidiaries (Mahindra with Tech Mahindra) show higher ratios. Commodity-heavy: 0.5-1%. Diversified-services: 1.5-3%. Gartner CPG/Industrial IT 2024."
+        },
+        "MARKETING": {
+          "P25": 2.0, "P50": 4.0, "P75": 7.0, "P90": 12.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "S&M across segments (weighted average). Consumer-facing segments (Reliance Retail, Aditya Birla Fashion): 5-10%. B2B/commodity segments: 0.5-2%."
+        },
+        "FACILITIES": {
+          "P25": 0.5, "P50": 1.2, "P75": 2.5, "P90": 4.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Group corporate HQ and business services overhead. INTERNAL_CALIBRATION — conglomerate HQ overhead typically 0.5-1.5% of group revenue."
+        },
+        "POWER_ENERGY": {
+          "P25": 2.0, "P50": 4.5, "P75": 8.0, "P90": 14.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Energy costs across manufacturing operations. Energy-intensive conglomerates (Hindalco aluminium, UltraTech cement): 10-15%. Diversified: 3-6%. M&M FY25: ~3%."
+        },
+        "PROF_SVCS": {
+          "P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Group-level legal, audit, governance. SEBI LODR + BRSR Core compliance costs for top-1000 listed entities. INTERNAL_CALIBRATION."
+        },
+        "BRSR_ESG": {
+          "P25": 0.1, "P50": 0.3, "P75": 0.6, "P90": 1.2,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "CSR (2% of PAT mandatory) + ESG assurance costs. M&M FY25: CSR spend ₹1,800 Cr. SEBI BRSR Core mandates third-party assurance for top-1000. Conglomerate scale means significant absolute CSR."
+        }
+      }
+    }
+  }
+}

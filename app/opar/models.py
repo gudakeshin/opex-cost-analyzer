@@ -177,6 +177,7 @@ class AdvisorySections(BaseModel):
     business_levers: List[AdvisoryBusinessLever] = Field(default_factory=list)
     executive_callouts: List[str] = Field(default_factory=list)
     priority_actions_30_60_90: List[AdvisoryActionItem] = Field(default_factory=list)
+    sme_qualification_narrative: str = ""
 
 
 class ReflectOutput(BaseModel):

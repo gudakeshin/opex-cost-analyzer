@@ -1,0 +1,102 @@
+{
+  "sector": "insurance_general",
+  "version": "1.0",
+  "vintage_date": "2025-04-01",
+  "confidence_overall": "public_disclosure",
+  "source_metadata": {
+    "primary_sources": [
+      {
+        "source_name": "IRDAI Annual Report 2023-24",
+        "url": "https://irdai.gov.in/document/5553295",
+        "publication_year": 2024,
+        "source_type": "public_disclosure",
+        "notes": "IRDAI aggregate industry data: expense of management ratio, combined ratio, loss ratio, commission ratios for general insurers in India."
+      },
+      {
+        "source_name": "ICICI Lombard General Insurance FY25 Annual Report (BSE: 540716)",
+        "url": "https://www.icicilombard.com/investor-relations/annual-report",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Net earned premium ~₹17,000 Cr, combined ratio 104.3%, expense ratio 27.5%, loss ratio 76.8%."
+      },
+      {
+        "source_name": "Bajaj Allianz General Insurance FY25 (unlisted — BRSR disclosure)",
+        "url": "https://www.bajajallianz.com/about-us/annual-reports.html",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Combined ratio and expense structure from BRSR filing."
+      },
+      {
+        "source_name": "New India Assurance FY25 Annual Report (BSE: 540769)",
+        "url": "https://www.newindia.co.in/portal/NIA/annual_report.htm",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Public sector insurer. Expense of management ratio per IRDAI Form. Operating expense ratio ~28-30%."
+      },
+      {
+        "source_name": "Star Health & Allied Insurance FY25 Annual Report (BSE: 543412)",
+        "url": "https://www.starhealth.in/investor-relations/annual-report",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Standalone health insurer. Expense ratio ~37% including high sales commissions for retail health."
+      }
+    ],
+    "methodology": "Categories expressed as % of gross written premium (GWP) — standard insurance sector convention. IRDAI mandates expense-of-management reporting, making industry data highly standardised. P25/P50/P75 derived from 5 general insurers (FY25 disclosures) plus IRDAI aggregate. P90 reflects PSU insurers and underperforming private players.",
+    "sample_size": 5
+  },
+  "benchmarks": {
+    "insurance_general": {
+      "label": "General Insurance (India)",
+      "categories": {
+        "HR": {
+          "P25": 8.0, "P50": 12.0, "P75": 17.0, "P90": 22.0,
+          "unit": "% of GWP",
+          "confidence": "public_disclosure",
+          "source_note": "Staff costs as % of gross written premium. IRDAI mandates expense-of-management disclosure. ICICI Lombard FY25: employee cost ~9% of GWP, New India ~15%, PSU players 18-22%."
+        },
+        "MARKETING": {
+          "P25": 10.0, "P50": 14.0, "P75": 19.0, "P90": 25.0,
+          "unit": "% of GWP",
+          "confidence": "public_disclosure",
+          "source_note": "Commission + marketing as % of GWP. IRDAI FY24 aggregate: average commission ratio 11-15%. Retail health (Star Health): ~20% commission. Commercial lines: 8-12%."
+        },
+        "IT": {
+          "P25": 2.5, "P50": 4.0, "P75": 6.0, "P90": 9.0,
+          "unit": "% of GWP",
+          "confidence": "published_research",
+          "source_note": "Technology spend. Gartner FS Benchmark 2024: insurance IT spend 3-5% of premium. Insurtech-adjacent players 5-8%. Legacy PSU players 7-9% (inefficient, on-premise)."
+        },
+        "OUTSOURCED": {
+          "P25": 2.0, "P50": 4.0, "P75": 6.5, "P90": 10.0,
+          "unit": "% of GWP",
+          "confidence": "public_disclosure",
+          "source_note": "Outsourced claims processing, surveyor fees, KYC. ICICI Lombard: third-party administrator and surveyor costs ~3% of GWP."
+        },
+        "FACILITIES": {
+          "P25": 1.0, "P50": 1.8, "P75": 2.8, "P90": 4.0,
+          "unit": "% of GWP",
+          "confidence": "public_disclosure",
+          "source_note": "Branch network and office costs. IRDAI: general insurers shifting to direct digital channel; branch cost share declining. PSU players with legacy branch networks higher."
+        },
+        "PROF_SVCS": {
+          "P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.0,
+          "unit": "% of GWP",
+          "confidence": "public_disclosure",
+          "source_note": "Actuarial, legal, reinsurance advisory, audit. IRDAI: mandatory appointed actuary fees + external audit included in expense-of-management ratio."
+        },
+        "INSURANCE": {
+          "P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5,
+          "unit": "% of GWP",
+          "confidence": "internal_calibration",
+          "source_note": "Reinsurance admin costs net of premium (operational cost of reinsurance contracts, not claims). INTERNAL_CALIBRATION."
+        },
+        "TRAVEL": {
+          "P25": 0.3, "P50": 0.6, "P75": 1.0, "P90": 1.5,
+          "unit": "% of GWP",
+          "confidence": "internal_calibration",
+          "source_note": "Sales staff travel and agent support. INTERNAL_CALIBRATION — estimated from IRDAI expense-of-management sub-heads."
+        }
+      }
+    }
+  }
+}

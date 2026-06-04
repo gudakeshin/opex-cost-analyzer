@@ -95,6 +95,9 @@ from .context import (
     consolidation_analyzer,
 )
 
+# sme_critique — evidence qualification and probe question engine
+from .sme_critique import sme_critique_analyzer
+
 # strategic — scenario modeler, shareholder bridge, peer disclosure miner,
 #              contract lifecycle, conflict detector, cost-to-serve, ZBB
 from .strategic import (
@@ -180,6 +183,8 @@ __all__ = [
     "assumption_register",
     "vendor_master_builder",
     "consolidation_analyzer",
+    # sme critique
+    "sme_critique_analyzer",
     # strategic
     "scenario_modeler",
     "value_to_shareholder_bridge",

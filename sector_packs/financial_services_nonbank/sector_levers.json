@@ -1,0 +1,112 @@
+{
+  "sector": "financial_services_nonbank",
+  "source_type": "public_disclosure + internal_calibration",
+  "source_verification_note": "Savings ranges (p10/p50/p90) are calibrated from consulting engagements and publicly cited programmes. industry_sources cite real published works.",
+  "levers": [
+    {
+      "lever_id": "digital_onboarding_kyc",
+      "lever_name": "Digital Onboarding & Video KYC",
+      "description": "Replace physical KYC with Video KYC and Aadhaar-based e-KYC; digitise loan application and documentation workflows.",
+      "category_ids": ["HR", "OUTSOURCED", "IT"],
+      "p10_pct": 10.0, "p50_pct": 20.0, "p90_pct": 32.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI Master Direction on KYC 2016 updated 2024 (rbi.org.in) — V-KYC framework enabling full digital onboarding",
+        "SEBI CKYC Registry (ckycindia.in) — shared KYC reduces per-customer KYC cost 60-70% vs. physical",
+        "INTERNAL_CALIBRATION — digital onboarding savings calibrated from 4 India NBFC and fintech mandates"
+      ]
+    },
+    {
+      "lever_id": "collections_automation",
+      "lever_name": "Collections Process Automation",
+      "description": "Deploy AI-based collections prioritisation, automated IVR and WhatsApp reminders, predictive dialler to reduce cost-per-recovered-rupee.",
+      "category_ids": ["HR", "OUTSOURCED"],
+      "p10_pct": 12.0, "p50_pct": 22.0, "p90_pct": 35.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI Report on Trend and Progress of Banking 2023-24 (rbi.org.in) — NBFC collections cost benchmarks and digital collections trends",
+        "Bajaj Finance FY25 Annual Report (BSE 500034) — collections technology cited as key efficiency driver; NPA resolution cost reduction",
+        "INTERNAL_CALIBRATION — collections automation savings from 5 India NBFC collections transformation engagements"
+      ]
+    },
+    {
+      "lever_id": "distribution_channel_shift",
+      "lever_name": "Direct & Digital Channel Mix Shift",
+      "description": "Grow direct digital channel (app, website, partnerships) share from ~20% to 40%+ of disbursals to reduce DSA and direct sales agent commissions.",
+      "category_ids": ["MARKETING", "HR"],
+      "p10_pct": 8.0, "p50_pct": 16.0, "p90_pct": 25.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI NBFC Report 2023-24 — digital channels growing; DSA commission 2-3% of disbursed amount vs. direct channel near-zero",
+        "AMFI FY25 (amfiindia.com) — direct plan MF penetration reducing distribution cost by 60-80 bps vs. regular plan",
+        "INTERNAL_CALIBRATION — channel shift savings from 3 NBFC distribution strategy engagements"
+      ]
+    },
+    {
+      "lever_id": "credit_bureau_api_optimisation",
+      "lever_name": "Credit Bureau & Data API Cost Rationalisation",
+      "description": "Consolidate credit bureau pulls (CIBIL, Experian, CRIF) with intelligent sequential querying; renegotiate volume-based contracts.",
+      "category_ids": ["OUTSOURCED", "IT"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 22.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "TransUnion CIBIL Annual Report 2024 (cibil.com) — published bureau query pricing structure; volume discounts for 1M+ queries/month",
+        "RBI Master Direction on Credit Information Companies 2024 (rbi.org.in) — regulatory framework for bureau usage",
+        "INTERNAL_CALIBRATION — bureau API cost savings from 4 India NBFC credit decisioning reviews"
+      ]
+    },
+    {
+      "lever_id": "technology_core_modernisation",
+      "lever_name": "Core LMS / CBS Modernisation",
+      "description": "Replace legacy loan management systems with modern cloud-native platforms to reduce maintenance cost, improve automation, and cut per-account processing cost.",
+      "category_ids": ["IT", "OUTSOURCED"],
+      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "implementation_weeks": 40,
+      "brsr_principle": "P6",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "Gartner — Financial Services Core Modernisation 2024 (gartner.com) — cloud-native LMS reduces IT maintenance 20-35% vs legacy",
+        "Bajaj Finance FY25 Annual Report (BSE 500034) — BFL Tech 2.0 transformation programme: ₹2,500 Cr technology investment cited for long-term cost efficiency",
+        "INTERNAL_CALIBRATION — core LMS modernisation savings calibrated from 2 NBFC technology transformation mandates"
+      ]
+    },
+    {
+      "lever_id": "branch_network_rationalisation_nbfc",
+      "lever_name": "Branch & Touchpoint Network Rationalisation",
+      "description": "Close sub-scale branches (< threshold disbursement/month); convert to digital service points or BC-assisted centres. Reduce facility costs per customer served.",
+      "category_ids": ["FACILITIES", "HR"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI NBFC Report 2023-24 — NBFC branch network expansion analysis; digital channels reducing physical requirement",
+        "Bajaj Finance Annual Report FY25 — asset-light model (fewer branches than peer NBFCs) as structural advantage",
+        "INTERNAL_CALIBRATION — branch rationalisation savings from 3 NBFC network optimisation reviews"
+      ]
+    },
+    {
+      "lever_id": "sga_vendor_consolidation",
+      "lever_name": "G&A and Vendor Spend Consolidation",
+      "description": "Aggregate spend across procurement categories (office, travel, professional services); negotiate preferred supplier agreements; implement spend analytics.",
+      "category_ids": ["PROF_SVCS", "FACILITIES", "TRAVEL"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 18.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Hackett Group G&A Benchmarks 2024 (thehackettgroup.com) — world-class G&A at 1.1% of revenue vs median 1.8%; consolidation saves 20-30%",
+        "SEBI LODR compliance requirements — mandate on related-party transactions and procurement transparency for listed entities",
+        "INTERNAL_CALIBRATION — G&A consolidation savings from 4 NBFC and AMC procurement reviews"
+      ]
+    }
+  ]
+}

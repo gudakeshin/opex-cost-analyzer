@@ -1,0 +1,102 @@
+{
+  "sector": "psu_cpse",
+  "version": "1.0",
+  "vintage_date": "2025-04-01",
+  "confidence_overall": "public_disclosure",
+  "source_metadata": {
+    "primary_sources": [
+      {
+        "source_name": "DPE Annual Survey of Central Public Sector Enterprises 2022-23",
+        "url": "https://dpe.gov.in/en/reports/annual-surveys",
+        "publication_year": 2024,
+        "source_type": "public_disclosure",
+        "notes": "Department of Public Enterprises survey covers 384 CPSEs. Aggregate financials: employee costs, establishment charges, profitability by sector. FY2022-23 data (most recent DPE publication)."
+      },
+      {
+        "source_name": "Coal India Limited FY25 Annual Report (BSE: 533278)",
+        "url": "https://www.coalindia.in/en-us/performance/annualreport.aspx",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹150,000 Cr. Employee costs ~₹30,000 Cr (20%), Stores & spares ~₹12,000 Cr (8%)."
+      },
+      {
+        "source_name": "BHEL FY25 Annual Report (BSE: 500103)",
+        "url": "https://www.bhel.com/investor-relations/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹24,000 Cr. Employee costs ~₹7,000 Cr (29.2%), Material ~₹12,000 Cr (50%)."
+      },
+      {
+        "source_name": "HAL (Hindustan Aeronautics) FY25 Annual Report (BSE: 541154)",
+        "url": "https://hal-india.co.in/investors/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹30,000 Cr. Employee costs ~₹7,000 Cr (23.3%), Manufacturing expenses ~40%."
+      },
+      {
+        "source_name": "CAG (Comptroller and Auditor General of India) Reports on PSUs 2023-24",
+        "url": "https://cag.gov.in/reports",
+        "publication_year": 2024,
+        "source_type": "public_disclosure",
+        "notes": "CAG performance audit reports cite specific cost benchmarks and wastage/inefficiency metrics for CPSEs."
+      }
+    ],
+    "methodology": "P25/P50/P75 derived from DPE CPSE survey aggregate data + FY24-25 annual reports of 3 representative CPSEs (CIL, BHEL, HAL). DPE notes 'Miniratna' and 'Navratna' CPSEs as best-in-class; 'loss-making' CPSEs at P90. Categories as % of revenue.",
+    "sample_size": 4
+  },
+  "benchmarks": {
+    "psu_cpse": {
+      "label": "Public Sector Undertakings / CPSEs (India)",
+      "categories": {
+        "HR": {
+          "P25": 15.0, "P50": 22.0, "P75": 32.0, "P90": 45.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Employee costs % of revenue. HAL FY25: 23.3%, CIL FY25: 20%, BHEL FY25: 29.2%. DPE CPSE Survey: manufacturing CPSEs 20-35%, financial CPSEs 10-15%, service CPSEs 30-45%. P90 represents loss-making or infrastructure CPSEs."
+        },
+        "OUTSOURCED": {
+          "P25": 10.0, "P50": 20.0, "P75": 35.0, "P90": 50.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Stores, spares, contract services, raw material. CIL FY25: stores & spares ~8%, contract expenses ~12%. BHEL: materials ~50%. DPE: aggregate cost-of-goods including outsourced services."
+        },
+        "PLANT_MAINTENANCE": {
+          "P25": 2.0, "P50": 4.5, "P75": 8.0, "P90": 13.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "R&M and maintenance costs. CIL FY25: R&M ~3.5% of revenue. DPE survey: maintenance costs elevated in ageing PSU infrastructure. CAG performance audits frequently cite deferred maintenance as issue."
+        },
+        "IT": {
+          "P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "IT spend. CPSEs typically underinvest in IT relative to private sector. MCA21 and e-procurement mandates driving IT investments. INTERNAL_CALIBRATION."
+        },
+        "FACILITIES": {
+          "P25": 0.5, "P50": 1.5, "P75": 3.0, "P90": 5.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Establishment charges including township, canteen, schools. DPE CPSE Survey: township and establishment charges significant for manufacturing CPSEs with captive residential colonies."
+        },
+        "PROF_SVCS": {
+          "P25": 0.2, "P50": 0.6, "P75": 1.2, "P90": 2.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Legal, CAG audit, Ministry consultations. CAG statutory audit is mandated; CPSEs also subject to supplementary audit. INTERNAL_CALIBRATION."
+        },
+        "BRSR_ESG": {
+          "P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "CSR mandatory spend (2% of PAT) + ESG reporting costs. CIL FY25: CSR ₹1,800 Cr (1.2% of revenue). Navratna CPSEs: higher CSR absolute spend. BRSR mandated by SEBI for listed PSUs."
+        },
+        "INSURANCE": {
+          "P25": 0.1, "P50": 0.3, "P75": 0.6, "P90": 1.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "INTERNAL_CALIBRATION — CPSEs often self-insure large assets via New India Assurance (public sector insurer) at subsidised rates."
+        }
+      }
+    }
+  }
+}

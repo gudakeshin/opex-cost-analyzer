@@ -19,7 +19,7 @@ from app.schemas import (
     SectorPackOverrideRequest,
 )
 from app.services.analysis import load_taxonomy
-from app.services.benchmarks import resolve_benchmark_payload
+from app.services.benchmarks import benchmark_industry_for, resolve_benchmark_payload
 from app.services.compliance import append_audit_event
 from app.services.sector_packs import (
     get_pack_override,
@@ -306,12 +306,14 @@ def _benchmark_gap_commentary(
     source: str,
 ) -> str:
     parts = [
-        f"{category_name} is modelled at {p50_pct:g}% of revenue (industry median P50); "
-        f"{_fmt_cr(band_cr)} savings potential if spend moves to P25 best-in-class ({p25_pct:g}%).",
+        "[Benchmark proxy, not your spend] "
+        f"{category_name} is modelled at {p50_pct:g}% of revenue "
+        f"(sector median P50 applied to the revenue you entered); "
+        f"{_fmt_cr(band_cr)} illustrative band if spend moved to P25 best-in-class ({p25_pct:g}%).",
     ]
     if source:
         parts.append(f"Benchmark: {source}.")
-    parts.append("Based on sector benchmark proxy — upload actual spend for company-specific gaps.")
+    parts.append("Upload actual spend for company-specific gaps.")
     return " ".join(parts)
 
 
@@ -325,7 +327,10 @@ def _lever_rationale(lv: Dict[str, Any], matched_category_id: str) -> str:
     if phrases:
         parts.append("Selected because " + "; ".join(phrases) + ".")
     if lv.get("root_cause_match"):
-        parts.append("Supported by root-cause analysis on the spend profile.")
+        parts.append(
+            "Supported by root-cause signals on the benchmark proxy spend profile "
+            "(not uploaded company spend)."
+        )
 
     complexity = _COMPLEXITY_LABELS.get(str(lv.get("complexity_tier", "medium")), "medium complexity")
     savings_key = str(lv.get("savings_type", "run_rate"))
@@ -563,24 +568,7 @@ async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
     inferred = company_signals.get("inferred_industry", "")
     effective_industry = inferred if inferred else req.industry
 
-    _PACK_TO_BENCH: Dict[str, str] = {
-        "it_ites": "technology",
-        "bfsi_banks": "financial_services",
-        "insurance_general": "financial_services",
-        "fmcg_consumer": "retail_consumer",
-        "pharma_lifesciences": "healthcare",
-        "energy_utilities": "manufacturing",
-        "retail_organized": "retail_consumer",
-        "telecom_infra": "technology",
-        "manufacturing_diversified": "manufacturing",
-        "psu_cpse": "manufacturing",
-        "conglomerate": "manufacturing",
-        "financial_services_nonbank": "financial_services",
-        "gcc_capability_centers": "technology",
-        "healthcare_hospitals": "healthcare",
-        "hospitality_travel": "retail_consumer",
-    }
-    bench_industry = _PACK_TO_BENCH.get(effective_industry, effective_industry)
+    bench_industry = benchmark_industry_for(effective_industry)
     revenue_inr = req.annual_revenue_cr * 1_00_00_000
     # Single benchmark fetch — categories param used for dataset selection; payload always covers all categories
     bench_resolved = resolve_benchmark_payload(industry=bench_industry, categories=[], annual_revenue=revenue_inr)

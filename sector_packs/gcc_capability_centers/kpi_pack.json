@@ -1,0 +1,73 @@
+[
+  {
+    "kpi_id": "talent_cost_pct",
+    "kpi_name": "Talent Cost % of Total OpEx",
+    "unit": "pct",
+    "formula": "total_staff_cost / total_opex * 100",
+    "target_direction": "context_dependent",
+    "p25_benchmark_pct": 58.0,
+    "p50_benchmark_pct": 64.0,
+    "p75_benchmark_pct": 70.0,
+    "source": "Everest Group GCC State of the Market 2024 + NASSCOM GCC Report 2024 + WNS/Genpact FY25 annual reports"
+  },
+  {
+    "kpi_id": "revenue_per_fte",
+    "kpi_name": "Revenue per FTE (₹ Lakh/year)",
+    "unit": "INR_lakh",
+    "formula": "annual_revenue / headcount",
+    "target_direction": "higher",
+    "p25_benchmark_lakh": 28.0,
+    "p50_benchmark_lakh": 22.0,
+    "p75_benchmark_lakh": 17.0,
+    "source": "NASSCOM GCC Report 2024: India GCC average revenue/FTE $26,000-$35,000. Everest Group 2024: top-quartile GCCs at $40,000+"
+  },
+  {
+    "kpi_id": "attrition_rate",
+    "kpi_name": "Annual Attrition Rate (%)",
+    "unit": "pct",
+    "formula": "employees_left / avg_headcount * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 14.0,
+    "p50_benchmark_pct": 18.0,
+    "p75_benchmark_pct": 22.0,
+    "source": "NASSCOM Strategic Review 2025: IT/GCC sector attrition normalised to 16-19% after FY23 peak. Everest Group 2024 GCC survey."
+  },
+  {
+    "kpi_id": "real_estate_cost_per_seat",
+    "kpi_name": "Real Estate Cost per Seat (₹/month)",
+    "unit": "INR",
+    "formula": "total_facility_cost / total_seats",
+    "target_direction": "lower",
+    "p50_benchmark_inr": 18000,
+    "source": "NASSCOM GCC 2024: Tier-1 India city cost per seat ₹14,000-₹25,000/month. Bengaluru/Hyderabad CBD ₹20,000-₹28,000, Tier-2 cities ₹10,000-₹15,000."
+  },
+  {
+    "kpi_id": "utilisation_rate",
+    "kpi_name": "Billable Utilisation Rate (%)",
+    "unit": "pct",
+    "formula": "billable_hours / total_available_hours * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 85.0,
+    "p50_benchmark_pct": 78.0,
+    "p75_benchmark_pct": 72.0,
+    "source": "WNS FY25 annual report: utilisation 83%. Genpact FY25: ~80%. Everest Group: top-quartile GCCs at 85%+."
+  },
+  {
+    "kpi_id": "automation_pct_of_work",
+    "kpi_name": "Automation Coverage (% of processes automated)",
+    "unit": "pct",
+    "formula": "automated_process_count / total_process_count * 100",
+    "target_direction": "higher",
+    "p50_benchmark_pct": 35.0,
+    "source": "NASSCOM GCC 2024: 30-40% of transactional processes automated in mature GCCs. Everest Group: leading GCCs at 50%+ automation coverage."
+  },
+  {
+    "kpi_id": "it_infra_cost_per_fte",
+    "kpi_name": "IT Infrastructure Cost per FTE (₹ Lakh/year)",
+    "unit": "INR_lakh",
+    "formula": "it_infra_cost / headcount",
+    "target_direction": "lower",
+    "p50_benchmark_lakh": 1.8,
+    "source": "Everest Group GCC 2024: Technology infrastructure 10-15% of GCC cost base divided by FTE count. Best-in-class: ₹1.2-1.5L/FTE with shared cloud platform."
+  }
+]

@@ -22,6 +22,8 @@ describe('DiagnosticTables collapsible rows', () => {
 
     expect(screen.queryByText(/R&D & Engineering at 10% of revenue/)).toBeNull();
 
+    expect(screen.getByText(/Not based on your company/)).toBeTruthy();
+
     fireEvent.click(screen.getByRole('button', { name: /Ranked category gaps/i }));
 
     expect(screen.getByText(/R&D & Engineering at 10% of revenue/)).toBeTruthy();
@@ -58,7 +60,9 @@ describe('DiagnosticTables collapsible rows', () => {
       />,
     );
 
+    expect(screen.getByText(/Not based on your company/)).toBeTruthy();
     expect(screen.getByLabelText('Value at table bridge')).toBeTruthy();
+    expect(screen.getByText('Benchmark proxy')).toBeTruthy();
     expect(screen.getAllByText('Cloud rightsizing').length).toBeGreaterThan(0);
     expect(screen.getByText('Portfolio value')).toBeTruthy();
     expect(screen.queryByText('Lever detail table')).toBeNull();

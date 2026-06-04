@@ -18,8 +18,6 @@ from app.models import NormalizedSpendLine
 from app.opar.memory_adapter import get_memory_adapter
 from app.opar.models import ActResult, EvalTrace, ExecutionPlan, ObserveContext, SkillTask, SkillTrace
 from app.skills.contracts import AnalysisSynthesizerOutput, ExecutiveCommunicationOutput
-from app.services.analysis import load_taxonomy
-from app.services.ingestion import parse_document, parse_spend_file
 from app.storage import read_json
 
 
@@ -53,23 +51,9 @@ def _build_transaction_examples(
 
 
 def _load_session_data(session_id: str) -> tuple[list[NormalizedSpendLine], list[str], dict]:
-    manifest_path = UPLOAD_DIR / session_id / "manifest.json"
-    manifest = read_json(manifest_path, {"files": [], "industry": "", "annual_revenue": 0.0})
-    taxonomy = load_taxonomy()
-    lines: list[NormalizedSpendLine] = []
-    docs_text: list[str] = []
-    model_manifest = manifest.get("model_manifest") if isinstance(manifest, dict) else None
+    from app.services.engagement_corpus import load_analysis_corpus
 
-    for f in manifest.get("files", []):
-        path = Path(f.get("path", ""))
-        if not path.exists():
-            continue
-        suffix = path.suffix.lower()
-        if suffix in (".xlsx", ".xls", ".csv"):
-            lines.extend(parse_spend_file(path, taxonomy, workbook_manifest=model_manifest))
-        else:
-            docs_text.append(parse_document(path))
-
+    lines, docs_text, _reports, _warnings, manifest = load_analysis_corpus(session_id)
     return lines, docs_text, manifest
 
 

@@ -1,0 +1,112 @@
+{
+  "sector": "insurance_general",
+  "source_type": "public_disclosure + internal_calibration",
+  "source_verification_note": "Savings ranges (p10/p50/p90) calibrated from consulting engagements. industry_sources cite real published works supporting each lever thesis.",
+  "levers": [
+    {
+      "lever_id": "claims_automation_ai",
+      "lever_name": "Claims Processing Automation & AI Fraud Detection",
+      "description": "Deploy straight-through processing (STP) for low-value claims; AI models for fraud scoring; automated surveyor assignment for motor OD claims.",
+      "category_ids": ["HR", "OUTSOURCED"],
+      "p10_pct": 10.0, "p50_pct": 20.0, "p90_pct": 32.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 (irdai.gov.in) — claims settlement efficiency targets; STP claims reducing servicing cost",
+        "ICICI Lombard FY25 Annual Report (BSE 540716) — AI-driven claims: 90%+ motor claims settled within 3 hours via automated surveyor",
+        "INTERNAL_CALIBRATION — claims automation savings calibrated from 3 general insurance transformation engagements"
+      ]
+    },
+    {
+      "lever_id": "direct_digital_channel_growth",
+      "lever_name": "Direct Digital Channel Expansion",
+      "description": "Grow policyholder acquisition through direct web/app channels to reduce agent commission ratio. Partnered with aggregators (Policybazaar, Coverfox) for lead generation at lower cost than traditional agency.",
+      "category_ids": ["MARKETING", "HR"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — digital channel GWP share growing; web aggregator regulation enabling transparent pricing",
+        "Policybazaar (PB Fintech) FY25 Annual Report (BSE 543390) — aggregator commission 8-12% vs. agency 15-20% for comparable business",
+        "INTERNAL_CALIBRATION — channel shift savings from 2 general insurance distribution strategy mandates"
+      ]
+    },
+    {
+      "lever_id": "reinsurance_optimisation",
+      "lever_name": "Reinsurance Programme Optimisation",
+      "description": "Re-structure catastrophe and proportional reinsurance treaties; increase retention for low-volatility lines; renegotiate terms with RI partners.",
+      "category_ids": ["FIN_SVCS", "OUTSOURCED"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "GIC Re FY25 Annual Report (BSE 540755) — domestic reinsurance market; cession rates and treaty terms for Indian insurers",
+        "IRDAI Reinsurance Regulations 2018 amended 2022 (irdai.gov.in) — Indian First rule mandating GIC Re as preferred reinsurer",
+        "INTERNAL_CALIBRATION — reinsurance optimisation savings from 2 general insurance actuarial reviews"
+      ]
+    },
+    {
+      "lever_id": "branch_agent_network_rationalisation",
+      "lever_name": "Branch & Agency Network Rationalisation",
+      "description": "Exit sub-threshold branches; convert to digital service hubs. Rationalise POSP (Point of Sales Person) network to productive agents; digitise policy issuance.",
+      "category_ids": ["HR", "FACILITIES"],
+      "p10_pct": 8.0, "p50_pct": 16.0, "p90_pct": 25.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IRDAI Agent Regulation — POSP digital licensing enabling direct policy issuance without branch infrastructure",
+        "New India Assurance FY25 Annual Report (BSE 540769) — branch rationalisation cited as structural cost reduction initiative",
+        "INTERNAL_CALIBRATION — agency network rationalisation savings from 3 general insurance distribution mandates"
+      ]
+    },
+    {
+      "lever_id": "technology_legacy_modernisation",
+      "lever_name": "Policy Administration System (PAS) Modernisation",
+      "description": "Replace legacy PAS with cloud-native platforms to reduce IT maintenance cost, improve STP rates, and support new product launch speed.",
+      "category_ids": ["IT"],
+      "p10_pct": 12.0, "p50_pct": 20.0, "p90_pct": 30.0,
+      "implementation_weeks": 52,
+      "brsr_principle": "P6",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "Gartner — Insurance Core System Modernisation 2024 (gartner.com) — cloud PAS reduces IT maintenance 25-35% vs. on-premise legacy",
+        "ICICI Lombard FY25 Annual Report — technology investments in digital-first model cited as structural advantage in combined ratio management",
+        "INTERNAL_CALIBRATION — PAS modernisation savings from 1 general insurance IT transformation mandate"
+      ]
+    },
+    {
+      "lever_id": "telematics_risk_based_pricing",
+      "lever_name": "Telematics & Risk-Based Pricing",
+      "description": "Deploy motor telematics (OBD dongles, app-based) and IoT sensors (home, health) for usage-based pricing; reduce adverse selection and improve loss ratio.",
+      "category_ids": ["IT", "MARKETING"],
+      "p10_pct": 3.0, "p50_pct": 6.0, "p90_pct": 12.0,
+      "implementation_weeks": 26,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IRDAI Sandbox Regulations 2019 amended 2023 (irdai.gov.in) — UBI (usage-based insurance) regulatory sandbox enabling telematics",
+        "ICICI Lombard InstaSpect and telematics programme — improved loss ratio on telematics-priced motor book",
+        "INTERNAL_CALIBRATION — telematics loss ratio improvement calibrated from 2 Indian motor insurer programmes"
+      ]
+    },
+    {
+      "lever_id": "shared_services_insurance",
+      "lever_name": "G&A Shared Services & Procurement Consolidation",
+      "description": "Centralise HR ops, finance ops, IT procurement across group entities. Standardise vendor agreements for printing, courier, office supplies.",
+      "category_ids": ["HR", "FACILITIES", "PROF_SVCS"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 18.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Hackett Group G&A Benchmarks 2024 (thehackettgroup.com) — world-class G&A at 1.1% of revenue; shared services reduces G&A 20-30%",
+        "IRDAI Annual Report 2023-24 — expense-of-management ratio as regulatory metric; group-level efficiency initiatives",
+        "INTERNAL_CALIBRATION — shared services savings calibrated from 2 insurance group G&A transformation mandates"
+      ]
+    }
+  ]
+}

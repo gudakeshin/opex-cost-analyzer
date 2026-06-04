@@ -5,7 +5,7 @@ export interface ManifestFileEntry {
   schema?: unknown;
 }
 
-const SPEND_EXTENSIONS = new Set(['.csv', '.xlsx', '.xls']);
+const SPEND_EXTENSIONS = new Set(['.csv', '.xlsx', '.xls', '.json']);
 
 export function fileExtension(name: string): string {
   const i = name.lastIndexOf('.');
@@ -19,7 +19,9 @@ export function isSpendReadyFile(name: string): boolean {
 export function fileUploadStatus(name: string): 'spend' | 'document' | 'unsupported' {
   const ext = fileExtension(name);
   if (SPEND_EXTENSIONS.has(ext)) return 'spend';
-  if (['.pdf', '.docx', '.txt', '.png', '.jpg', '.jpeg', '.webp'].includes(ext)) return 'document';
+  if (['.pdf', '.docx', '.txt', '.png', '.jpg', '.jpeg', '.webp'].includes(ext)) {
+    return 'document';
+  }
   return 'unsupported';
 }
 

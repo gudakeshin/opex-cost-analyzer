@@ -1,0 +1,64 @@
+[
+  {
+    "kpi_id": "arpu",
+    "kpi_name": "ARPU (Average Revenue per User, ₹/month)",
+    "unit": "INR",
+    "formula": "total_revenue / avg_subscribers / 12",
+    "target_direction": "higher",
+    "p25_benchmark_inr": 220,
+    "p50_benchmark_inr": 175,
+    "p75_benchmark_inr": 130,
+    "source": "TRAI Annual Report 2023-24: Jio ARPU ₹182, Airtel ARPU ₹209, Vodafone Idea ₹146. Airtel targets ₹300 ARPU by FY27. Industry median ~₹170-180."
+  },
+  {
+    "kpi_id": "ebitda_margin",
+    "kpi_name": "EBITDA Margin (%)",
+    "unit": "pct",
+    "formula": "ebitda / revenue * 100",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 48.0,
+    "p50_benchmark_pct": 40.0,
+    "p75_benchmark_pct": 30.0,
+    "source": "Airtel FY25 EBITDA margin: ~50%, Jio FY25: ~48%. Vodafone Idea FY25: ~26% (stressed). Indus Towers: ~44% EBITDA. GSMA India 2024."
+  },
+  {
+    "kpi_id": "network_cost_pct",
+    "kpi_name": "Network Operating Cost % of Revenue",
+    "unit": "pct",
+    "formula": "network_opex / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 30.0,
+    "p50_benchmark_pct": 38.0,
+    "p75_benchmark_pct": 46.0,
+    "source": "Jio FY25: ~35%, Airtel FY25: ~38%. TRAI: network O&M 35-45% of telecom revenue. Best-in-class: cloud-native network with active sharing."
+  },
+  {
+    "kpi_id": "employee_cost_pct",
+    "kpi_name": "Employee Cost % of Revenue",
+    "unit": "pct",
+    "formula": "employee_cost / revenue * 100",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 4.5,
+    "p50_benchmark_pct": 7.0,
+    "p75_benchmark_pct": 10.0,
+    "source": "Jio FY25: ~5%, Airtel FY25: 6.9%, Indus Towers: 3.6%. TRAI: 5-8% of revenue."
+  },
+  {
+    "kpi_id": "spectrum_revenue_ratio",
+    "kpi_name": "Spectrum/Licence Fees % of Revenue (AGR-linked)",
+    "unit": "pct",
+    "formula": "spectrum_licence_fees / agr * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 13.5,
+    "source": "DoT/TRAI: Licence fee 8% of AGR + Spectrum Usage Charge 3-5% of AGR = 11-13% of AGR. Airtel FY25: licence fees 13.8% of revenue."
+  },
+  {
+    "kpi_id": "data_traffic_per_user",
+    "kpi_name": "Data Traffic per User (GB/month)",
+    "unit": "GB",
+    "formula": "total_data_traffic_pb / avg_data_subscribers * 1000 / 12",
+    "target_direction": "higher",
+    "p50_benchmark": 20.0,
+    "source": "TRAI Annual Report 2023-24: India average data usage 19.5 GB/user/month. Jio: ~27 GB/user. Industry median: ~18-22 GB. GSMA Mobile Economy India 2024."
+  }
+]

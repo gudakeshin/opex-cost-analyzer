@@ -38,6 +38,22 @@ class _FinancialParamsMixin(BaseModel):
         return v
 
 
+class EngagementCreateRequest(_FinancialParamsMixin):
+    company_name: str | None = None
+    industry: str | None = None
+    annual_revenue: float = 0.0
+    currency: str | None = None
+    headcount: float | None = None
+
+
+class EngagementPatchRequest(BaseModel):
+    company_name: str | None = None
+    industry: str | None = None
+    annual_revenue: float | None = None
+    currency: str | None = None
+    headcount: float | None = None
+
+
 class SessionCreateRequest(_FinancialParamsMixin):
     company_name: str | None = None
     industry: str | None = None
@@ -45,6 +61,7 @@ class SessionCreateRequest(_FinancialParamsMixin):
     currency: str | None = None
     audience: str | None = None
     headcount: float | None = None
+    engagement_id: str | None = None
     wacc: float = 0.10
     effective_tax_rate: float = 0.0
 

@@ -1,0 +1,102 @@
+{
+  "sector": "retail_organized",
+  "version": "1.0",
+  "vintage_date": "2025-04-01",
+  "confidence_overall": "public_disclosure",
+  "source_metadata": {
+    "primary_sources": [
+      {
+        "source_name": "Avenue Supermarts (DMart) FY25 Annual Report (BSE: 540376)",
+        "url": "https://www.dmart.in/investor-relations/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹54,000 Cr. Employee costs ~₹2,200 Cr (4.1%), Occupancy costs ~₹540 Cr (1.0%), Other expenses ~₹1,300 Cr (2.4%). India's most profitable organised retailer."
+      },
+      {
+        "source_name": "Trent Limited FY25 Annual Report (BSE: 500251)",
+        "url": "https://www.trent.in/investors/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹14,000 Cr. Employee costs ~6%, Rent/occupancy ~10%, Marketing ~5%."
+      },
+      {
+        "source_name": "Shoppers Stop FY25 Annual Report (BSE: 532638)",
+        "url": "https://www.shoppersstop.com/investors/annual-reports",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Revenue ~₹5,000 Cr. Employee costs ~8%, Rent ~10%, Advertising ~4%."
+      },
+      {
+        "source_name": "Retailers Association of India (RAI) India Retail 2024",
+        "url": "https://www.rai.net.in/research-insights",
+        "publication_year": 2024,
+        "source_type": "published_research",
+        "notes": "India organised retail cost benchmarks: employee 4-8%, occupancy 6-12% of revenue. Industry structural data."
+      },
+      {
+        "source_name": "Gartner Retail IT Benchmark 2024",
+        "url": "https://www.gartner.com/en/retail/insights/retail-technology",
+        "publication_year": 2024,
+        "source_type": "published_research",
+        "notes": "Retail sector IT spend 1-2.5% of revenue globally; India discount retail lower."
+      }
+    ],
+    "methodology": "P25/P50/P75 derived from FY24-25 annual reports of 3 listed Indian organised retailers (DMart, Trent, Shoppers Stop). RAI industry benchmarks used for validation. DMart represents P25 (world-class low-cost retailer), Shoppers Stop/specialty at P75-P90.",
+    "sample_size": 4
+  },
+  "benchmarks": {
+    "retail_organized": {
+      "label": "Organised Retail (India)",
+      "categories": {
+        "HR": {
+          "P25": 4.0, "P50": 6.0, "P75": 9.0, "P90": 13.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Employee cost % of revenue. DMart FY25: 4.1% (best-in-class EDLC model), Trent FY25: ~6%, Shoppers Stop FY25: ~8%. RAI: Indian organised retail employee cost 4-10%."
+        },
+        "FACILITIES": {
+          "P25": 1.5, "P50": 3.5, "P75": 7.0, "P90": 12.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Occupancy / rent costs. DMart FY25: ~1.0% (own stores strategy). Trent: ~10% (leased stores). Shoppers Stop: ~10% (high-street leased locations). RAI: leased retailers 8-12%."
+        },
+        "MARKETING": {
+          "P25": 2.0, "P50": 4.0, "P75": 6.5, "P90": 10.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Advertising, promotions, customer loyalty programme costs. DMart: ~0.5% (minimal advertising, EDLC model). Trent (Zudio/Westside): ~5%. Shoppers Stop: ~4%. E-commerce: 8-12%."
+        },
+        "IT": {
+          "P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.5,
+          "unit": "% of revenue",
+          "confidence": "published_research",
+          "source_note": "IT systems: POS, ERP, loyalty, e-commerce. Gartner Retail IT 2024: 1-2.5% of revenue for omni-channel retailers. Pure-play discount: 0.5-1%. Omni-channel: 2-3%."
+        },
+        "LOGISTICS_INDIA": {
+          "P25": 1.5, "P50": 3.0, "P75": 5.0, "P90": 8.0,
+          "unit": "% of revenue",
+          "confidence": "published_research",
+          "source_note": "Supply chain, warehousing, last-mile. RAI: grocery/value retail 1-3%, fashion 4-7%, e-commerce 6-10%."
+        },
+        "OUTSOURCED": {
+          "P25": 1.0, "P50": 2.5, "P75": 4.5, "P90": 7.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Housekeeping, security, outsourced e-commerce fulfilment. INTERNAL_CALIBRATION."
+        },
+        "INSURANCE": {
+          "P25": 0.1, "P50": 0.3, "P75": 0.6, "P90": 1.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Group health, property, inventory insurance. INTERNAL_CALIBRATION."
+        },
+        "PROF_SVCS": {
+          "P25": 0.2, "P50": 0.5, "P75": 0.9, "P90": 1.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Audit, legal, compliance. INTERNAL_CALIBRATION."
+        }
+      }
+    }
+  }
+}

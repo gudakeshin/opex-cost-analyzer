@@ -1,0 +1,112 @@
+{
+  "sector": "hospitality_travel",
+  "source_type": "public_disclosure + internal_calibration",
+  "source_verification_note": "Savings ranges (p10/p50/p90) calibrated from consulting engagements. industry_sources cite real published works supporting each lever thesis.",
+  "levers": [
+    {
+      "lever_id": "energy_management_system",
+      "lever_name": "Energy Management & Renewable Transition",
+      "description": "Deploy Building Management System (BMS) for HVAC, lighting, chilling optimisation. Install rooftop solar; switch to LED throughout property.",
+      "category_ids": ["POWER_ENERGY"],
+      "p10_pct": 12.0, "p50_pct": 20.0, "p90_pct": 30.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "FHRAI India Hotel Industry Survey 2024 (fhrai.com) — energy 10-14% of hotel revenue; BMS reduces consumption 15-25%",
+        "IHCL FY25 Annual Report (BSE 500850) — Paathya sustainability programme: solar at 8 properties, energy intensity reduction target",
+        "INTERNAL_CALIBRATION — energy management savings calibrated from 4 India hotel energy transformation mandates"
+      ]
+    },
+    {
+      "lever_id": "revenue_management_occ",
+      "lever_name": "Revenue Management & OTA Channel Optimisation",
+      "description": "Implement AI-based revenue management system for dynamic pricing. Shift mix from OTA (12-18% commission) to direct bookings (0-3% cost). Optimise length-of-stay restrictions.",
+      "category_ids": ["MARKETING", "IT"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "STR India Hotel Performance 2024 (str.com) — OTA commission 12-18% of OTA-sourced revenue; direct booking shift saves 10-15% of distribution cost",
+        "IHCL FY25 Annual Report — Taj.com and Tata Neu loyalty platform driving direct booking growth to reduce OTA dependency",
+        "INTERNAL_CALIBRATION — revenue management and OTA optimisation savings from 3 India hotel mandates"
+      ]
+    },
+    {
+      "lever_id": "food_beverage_cost_control",
+      "lever_name": "F&B Cost Control & Menu Engineering",
+      "description": "Rationalise menu to highest-margin items; implement recipe control and wastage tracking; renegotiate F&B supplier contracts; reduce food wastage via predictive ordering.",
+      "category_ids": ["OUTSOURCED"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "FHRAI 2024 (fhrai.com) — F&B cost 25-32% of F&B revenue; menu engineering and supplier consolidation saves 8-15%",
+        "Lemon Tree FY25 Annual Report (BSE 541233) — F&B cost management cited as key margin initiative",
+        "INTERNAL_CALIBRATION — F&B cost optimisation savings from 4 India hotel F&B mandates"
+      ]
+    },
+    {
+      "lever_id": "workforce_cross_training",
+      "lever_name": "Workforce Optimisation & Cross-Training",
+      "description": "Multi-skill housekeeping and F&B staff to enable flexible deployment across functions. Reduce casual labour dependency; implement productivity-linked incentives.",
+      "category_ids": ["HR"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P5",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "FHRAI India Hotel Survey 2024 — employee cost 25-32% of revenue; cross-training reduces overtime and casual labour by 10-20%",
+        "IHCL FY25 Annual Report — Taj hospitality training programme and workforce flexibility cited as operational excellence pillar",
+        "INTERNAL_CALIBRATION — workforce optimisation savings from 4 India hotel operations mandates"
+      ]
+    },
+    {
+      "lever_id": "property_maintenance_preventive",
+      "lever_name": "Preventive Maintenance Programme",
+      "description": "Shift from reactive to preventive/predictive maintenance using IoT sensors. Reduce emergency repair costs and asset downtime. Extend asset life to defer capital expenditure.",
+      "category_ids": ["PLANT_MAINTENANCE"],
+      "p10_pct": 10.0, "p50_pct": 20.0, "p90_pct": 30.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "FHRAI 2024 — maintenance 2-4% of hotel revenue; predictive maintenance reduces emergency repair cost 30-40%",
+        "EIH FY25 Annual Report (BSE 500840) — capital and maintenance efficiency cited as long-term profitability driver",
+        "INTERNAL_CALIBRATION — preventive maintenance savings from 2 India hotel facility management mandates"
+      ]
+    },
+    {
+      "lever_id": "technology_pms_modernisation",
+      "lever_name": "Property Management System (PMS) & Tech Stack Modernisation",
+      "description": "Replace legacy PMS with cloud-native system integrating front desk, POS, channel manager, revenue management, and loyalty in a single platform.",
+      "category_ids": ["IT"],
+      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P6",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "Gartner Hospitality Technology 2024 (gartner.com) — cloud PMS reduces IT maintenance 25-35% vs. on-premise; integration reduces manual processes 30-40%",
+        "STR India 2024 — technology adoption as key differentiator for hotel groups in India",
+        "INTERNAL_CALIBRATION — PMS modernisation savings from 2 India hotel technology transformation mandates"
+      ]
+    },
+    {
+      "lever_id": "procurement_consolidation_hotel",
+      "lever_name": "Procurement Consolidation & Supplier Renegotiation",
+      "description": "Centralise hotel procurement across properties for F&B, housekeeping, linen, amenities. Standardise specifications to achieve volume discounts.",
+      "category_ids": ["OUTSOURCED", "PLANT_MAINTENANCE"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "FHRAI 2024 — group procurement for hotel chains saves 10-18% vs. property-level purchasing",
+        "IHCL FY25 Annual Report — group procurement synergies from Taj hotel network across 200+ properties",
+        "INTERNAL_CALIBRATION — group procurement savings from 3 India hotel chain mandates"
+      ]
+    }
+  ]
+}

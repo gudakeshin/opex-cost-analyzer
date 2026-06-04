@@ -1,0 +1,97 @@
+{
+  "sector": "retail_organized",
+  "source_type": "public_disclosure + internal_calibration",
+  "source_verification_note": "Savings ranges (p10/p50/p90) calibrated from consulting engagements. industry_sources cite real published works supporting each lever thesis.",
+  "levers": [
+    {
+      "lever_id": "real_estate_portfolio_optimisation",
+      "lever_name": "Store Network & Real Estate Portfolio Optimisation",
+      "description": "Exit sub-performing stores (below threshold revenue/sqft); renegotiate leases at renewal; shift from revenue-share to fixed-rent structures where profitable.",
+      "category_ids": ["FACILITIES"],
+      "p10_pct": 8.0, "p50_pct": 16.0, "p90_pct": 28.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RAI India Retail 2024 (rai.net.in) — occupancy 6-12% of revenue; lease renegotiation at renewal saves 15-25%",
+        "Shoppers Stop FY25 Annual Report (BSE 532638) — store portfolio rationalisation cited as margin lever; closed underperforming stores",
+        "INTERNAL_CALIBRATION — real estate optimisation savings from 3 India organised retail mandates"
+      ]
+    },
+    {
+      "lever_id": "shrinkage_reduction",
+      "lever_name": "Shrinkage & Pilferage Reduction",
+      "description": "Deploy RFID, AI-vision cameras, electronic article surveillance; improve inventory reconciliation frequency; staff awareness training.",
+      "category_ids": ["OUTSOURCED", "IT"],
+      "p10_pct": 15.0, "p50_pct": 25.0, "p90_pct": 40.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RAI Retail Shrinkage Survey 2024 (rai.net.in) — India retail shrinkage 1.2-2.5% of revenue; top quartile achieves 0.5-0.8% via technology",
+        "Gartner Retail IT 2024 — RFID reduces shrinkage 30-50%; AI vision cameras improve loss prevention ROI",
+        "INTERNAL_CALIBRATION — shrinkage reduction savings from 2 India organised retail loss prevention mandates"
+      ]
+    },
+    {
+      "lever_id": "private_label_expansion",
+      "lever_name": "Private Label Programme Expansion",
+      "description": "Grow private label share of assortment in high-volume categories to capture 15-25pp margin premium vs. branded products.",
+      "category_ids": ["MARKETING", "OUTSOURCED"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RAI India Retail 2024 — private label penetration 8-20% of modern trade revenue; 15-20pp higher margin than branded",
+        "Trent FY25 Annual Report (BSE 500251) — Zudio private label strategy as key gross margin driver (>38% gross margin)",
+        "INTERNAL_CALIBRATION — private label margin uplift savings from 3 India organised retail mandates"
+      ]
+    },
+    {
+      "lever_id": "supply_chain_direct_sourcing",
+      "lever_name": "Direct Farm/Factory Sourcing & Supply Chain Compression",
+      "description": "Eliminate distributors and C&F agents; source directly from manufacturers and farms; deploy cross-docking to reduce handling touches.",
+      "category_ids": ["LOGISTICS_INDIA"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "DMart FY25 Annual Report (BSE 540376) — direct sourcing from manufacturers as key EDLC structural advantage; logistics cost 1-2% of revenue",
+        "CII Logistics India 2024 — direct sourcing reduces landed cost 8-15% by eliminating distributor margin",
+        "INTERNAL_CALIBRATION — supply chain compression savings from 3 India grocery retail mandates"
+      ]
+    },
+    {
+      "lever_id": "workforce_scheduling_optimisation",
+      "lever_name": "Workforce Scheduling & Productivity Optimisation",
+      "description": "Implement AI-based workforce scheduling aligned to footfall patterns; reduce overtime; use part-time/contractual staffing for peak hours.",
+      "category_ids": ["HR"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P5",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RAI India Retail 2024 — workforce productivity: revenue per employee ₹35,000-₹55,000/month; scheduling tools improve by 15-20%",
+        "Gartner Retail Workforce 2024 — AI scheduling reduces excess staffing 12-18% without service level impact",
+        "INTERNAL_CALIBRATION — workforce scheduling savings from 2 India retail operations mandates"
+      ]
+    },
+    {
+      "lever_id": "omnichannel_digital_integration",
+      "lever_name": "Omnichannel & Digital Integration",
+      "description": "Consolidate online and offline technology stacks (OMS, WMS, loyalty). Reduce duplicate IT maintenance costs; enable ship-from-store to reduce fulfilment cost.",
+      "category_ids": ["IT"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P6",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "Gartner Retail IT 2024 — omnichannel IT stack consolidation reduces technology spend 15-20% vs. siloed systems",
+        "Shoppers Stop FY25 Annual Report — omnichannel investments as growth and efficiency enabler",
+        "INTERNAL_CALIBRATION — omnichannel IT savings from 2 India organised retail technology mandates"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "sector": "fmcg_consumer",
+  "source_type": "public_disclosure + internal_calibration",
+  "source_verification_note": "Savings ranges (p10/p50/p90) calibrated from consulting engagements. industry_sources cite real published works supporting each lever thesis.",
+  "levers": [
+    {
+      "lever_id": "trade_marketing_roi",
+      "lever_name": "Trade Marketing & Promotions ROI Optimisation",
+      "description": "Deploy promotion effectiveness analytics to redirect spend from low-ROI trade schemes to high-ROI channels and formats. Shift from blanket discounts to targeted incentives.",
+      "category_ids": ["MARKETING"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Nielsen India FMCG Intelligence 2024 — trade promotion ROI in Indian FMCG: 30-40% of trade spend generates <1x ROI; reallocation saves 10-20% of total trade budget",
+        "HUL FY25 Annual Report (BSE 500696) — advertising & promotion efficiency cited as strategic priority; A&P at 14% of revenue",
+        "INTERNAL_CALIBRATION — trade marketing optimisation savings from 4 India FMCG consumer goods mandates"
+      ]
+    },
+    {
+      "lever_id": "distribution_network_optimisation",
+      "lever_name": "Distribution Network & Logistics Optimisation",
+      "description": "Consolidate C&F agents, optimise hub-and-spoke delivery routes, implement demand-driven replenishment with distributors to reduce freight and handling cost.",
+      "category_ids": ["LOGISTICS_INDIA"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CII Logistics India Report 2024 (cii.in) — FMCG logistics 8-12% of revenue; consolidation and direct shipment reduce cost 15-25%",
+        "HUL FY25 Annual Report — Project Ridhi initiative: distribution network optimisation reducing cost per case",
+        "INTERNAL_CALIBRATION — logistics optimisation savings from 5 India FMCG distribution transformation engagements"
+      ]
+    },
+    {
+      "lever_id": "packaging_material_renegotiation",
+      "lever_name": "Packaging Material Cost Reduction",
+      "description": "Right-weight primary packaging; renegotiate volume-based contracts with packaging suppliers; switch to mono-material for sustainability + cost saving.",
+      "category_ids": ["PACKAGING"],
+      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 15.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "FICCI FMCG Survey 2024 (ficci.in) — packaging material 8-14% of FMCG revenue; supplier consolidation saves 8-12%",
+        "HUL FY25 Annual Report — plastic packaging reduction and material efficiency as BRSR-linked cost initiative",
+        "INTERNAL_CALIBRATION — packaging cost reduction savings from 3 India FMCG procurement mandates"
+      ]
+    },
+    {
+      "lever_id": "contract_manufacturing_optimisation",
+      "lever_name": "Contract Manufacturing Strategy Optimisation",
+      "description": "Rationalise CM network: fewer, larger CMs with better quality controls and cost transparency. Renegotiate conversion rates; introduce performance-linked pricing.",
+      "category_ids": ["OUTSOURCED"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Dabur FY25 Annual Report (BSE 500096) — contract manufacturing disclosure; quality-linked CM contracts as strategic tool",
+        "HUL FY25 Annual Report — ~30% production outsourced to CMs; CM network efficiency as cost lever",
+        "INTERNAL_CALIBRATION — CM optimisation savings from 4 India FMCG sourcing mandates"
+      ]
+    },
+    {
+      "lever_id": "revenue_management_pricing",
+      "lever_name": "Revenue Management & Pricing Analytics",
+      "description": "Implement dynamic pricing, SKU rationalisation, and mix management to grow gross margin without volume loss. Exit low-margin SKUs, grow high-margin portfolio.",
+      "category_ids": ["MARKETING", "HR"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Nielsen India 2024 — India FMCG SKU rationalisation: 20% of SKUs generate 80% of profit; tail SKU rationalisation improves margin 2-4pp",
+        "Marico FY25 Annual Report (BSE 531642) — focused portfolio strategy and pricing power cited as key margin lever",
+        "INTERNAL_CALIBRATION — pricing analytics savings calibrated from 3 India FMCG commercial excellence mandates"
+      ]
+    },
+    {
+      "lever_id": "sales_force_effectiveness",
+      "lever_name": "Salesforce Effectiveness & Route-to-Market Optimisation",
+      "description": "Restructure field sales force coverage model; use data analytics for territory design; deploy digital van sales (DMS) to improve calls per day and revenue per salesperson.",
+      "category_ids": ["HR"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "FICCI FMCG Survey 2024 (ficci.in) — salesforce productivity: outlet calls per day 15-25 (best-in-class) vs 8-12 (lagging)",
+        "HUL FY25 Annual Report — Winning in Many Indias programme: geographic coverage optimisation",
+        "INTERNAL_CALIBRATION — salesforce effectiveness savings from 5 India FMCG go-to-market mandates"
+      ]
+    },
+    {
+      "lever_id": "supply_chain_inventory",
+      "lever_name": "Supply Chain Inventory & Working Capital Optimisation",
+      "description": "Implement demand sensing, S&OP maturity, and vendor-managed inventory to reduce distributor and trade inventory days without service level deterioration.",
+      "category_ids": ["LOGISTICS_INDIA", "OUTSOURCED"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 16.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CII India Supply Chain Report 2024 — demand sensing reduces safety stock 15-20%; working capital improvement 10-15%",
+        "Dabur FY25 Annual Report — working capital management and supply chain efficiency cited as strategic priorities",
+        "INTERNAL_CALIBRATION — inventory optimisation savings from 4 India FMCG supply chain mandates"
+      ]
+    }
+  ]
+}
