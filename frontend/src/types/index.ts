@@ -88,6 +88,15 @@ export interface AnalysisInsightSnapshot {
   sme_initiative_critiques?: SmeInitiativeCritique[];
 }
 
+export interface AnalysisTraceStep {
+  step: number;
+  phase: string;
+  title: string;
+  detail: string;
+  source_documents: string[];
+  metrics?: Record<string, unknown>;
+}
+
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
@@ -100,6 +109,7 @@ export interface ChatMessage {
   degraded_mode?: boolean;
   artefacts?: Record<string, unknown> | string[];
   insight_snapshot?: AnalysisInsightSnapshot;
+  analysis_trace?: AnalysisTraceStep[];
   show_peer_savings?: boolean;
 }
 
@@ -265,6 +275,10 @@ export interface EngagementMeta {
   engagement_weeks_total: number;
   gate_label: string;
   annual_revenue_cr?: number;
+  // Auto-detected recommendations from uploaded documents (override-able).
+  detected_company_name?: string;
+  detected_industry?: string;
+  detected_industry_label?: string;
 }
 
 export interface V1ChatPayload {
@@ -325,6 +339,7 @@ export interface DiagnosticRequest {
   industry: string;
   annual_revenue_cr: number;
   urls: string[];
+  engagement_id?: string;
 }
 
 export interface BenchmarkGapRow {

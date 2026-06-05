@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Tuple
 
 import pandas as pd
 
 from app.config import ANTHROPIC_ENABLED, UPLOAD_DIR
 from app.memory import MemoryStore
+from app.opar.category_resolver import match_category_from_query, tokenize
 from app.opar.memory_adapter import get_memory_adapter
 from app.utils.inr_format import format_money
 from app.opar.quality import assumptions_from_initiative, check_gate2
@@ -44,8 +46,7 @@ _CONFLICT_TYPE_LABELS: Dict[str, str] = {
 
 
 def _tokenize(text: str) -> list[str]:
-    import re
-    return re.findall(r"[a-z0-9]+", (text or "").lower())
+    return tokenize(text)
 
 
 def _match_focus_category(ctx: ObserveContext, validated: Dict[str, Dict[str, Any]]) -> Dict[str, Any] | None:
@@ -54,22 +55,9 @@ def _match_focus_category(ctx: ObserveContext, validated: Dict[str, Dict[str, An
     if not isinstance(matrix, list) or not matrix:
         return None
     query_tokens = set(_tokenize(ctx.user_message))
-    stop = {
-        "how", "do", "we", "optimize", "optimization", "addressable", "spend", "in", "the",
-        "for", "and", "to", "of", "my", "our", "what", "is", "can", "you", "please",
-        "show", "me", "opportunity", "opportunities", "savings",
-    }
-    query_tokens = {t for t in query_tokens if t not in stop}
     if not query_tokens:
         return None
-    best: tuple[int, Dict[str, Any] | None] = (0, None)
-    for row in matrix:
-        cat_name = str(row.get("category_name") or "")
-        cat_id = str(row.get("category_id") or "").replace("_", " ")
-        overlap = len(query_tokens.intersection(set(_tokenize(f"{cat_name} {cat_id}"))))
-        if overlap > best[0]:
-            best = (overlap, row)
-    return best[1] if best[0] > 0 else None
+    return match_category_from_query(ctx.user_message, matrix)
 
 
 def _build_focus_category_section(ctx: ObserveContext, validated: Dict[str, Dict[str, Any]]) -> str:
@@ -479,11 +467,25 @@ def _generate_llm_advisory_sections(
         docs = [doc_summary]
     tx_examples = _build_transaction_examples_for_llm(validated)
 
+    # Parent-child RAG: pull question-specific context (auto-merged to parents)
+    # from the engagement's indexed documents. Empty when nothing is indexed,
+    # in which case synthesis falls back to the front-truncated doc summary.
+    retrieved_context: List[str] | None = None
+    try:
+        from app.services.document_index import retrieve_context
+
+        engagement_id = ctx.engagement_id or manifest.get("engagement_id") or ""
+        blocks = retrieve_context(engagement_id, ctx.user_message)
+        if blocks:
+            retrieved_context = blocks
+    except Exception:
+        retrieved_context = None
+
     estimated_tokens = _estimate_tokens({
         "user_message": ctx.user_message,
         "manifest": manifest,
         "skill_outputs": validated,
-        "docs_text": docs,
+        "docs_text": retrieved_context or docs,
         "transaction_examples": tx_examples,
     })
     from app.config import logger as _logger
@@ -514,6 +516,7 @@ def _generate_llm_advisory_sections(
                 thinking_enabled=thinking_enabled,
                 thinking_budget_tokens=thinking_budget_tokens,
                 deep_research_summary=ctx.deep_research_summary,
+                retrieved_context=retrieved_context,
             )
         except Exception:
             raw, thinking_text = None, None
@@ -858,6 +861,18 @@ def reflect(
         adapter.add_session(ctx.session_id, {"value_bridge": bridge}, {"phase": "reflect"})
 
     loop_complete, next_trigger = _determine_loop_control(validated, failed, ctx, plan)
+    replanner_log: List[Dict[str, Any]] = []
+    replannable_skills = {"peer-benchmarker", "root-cause-analyzer", "savings-modeler", "value-bridge-calculator"}
+    replannable_intents = {"benchmark", "value_bridge", "business_case", "drill_down", "savings_plan", "sensitivity"}
+    if ctx.intent_class in replannable_intents and any(t.skill_name in replannable_skills for t in plan.tasks):
+        try:
+            from app.opar.plan import replan
+
+            _new_plan, replanner_log = replan(ctx, validated, plan)
+            if replanner_log and not next_trigger:
+                next_trigger = "Additional analysis steps are available based on reflect-gate quality checks."
+        except Exception:
+            replanner_log = []
     manifest_path = UPLOAD_DIR / ctx.session_id / "manifest.json"
     manifest = read_json(manifest_path, {}) if manifest_path.exists() else {}
 
@@ -906,22 +921,31 @@ def reflect(
     # can reuse previously generated artefacts without rerunning full flows.
     if validated:
         existing_analysis = _memory.get("session", ctx.session_id)
+        analysis_snapshot: Dict[str, Any] = dict(existing_analysis) if isinstance(existing_analysis, dict) else {}
         merged_outputs: Dict[str, Any] = {}
-        if isinstance(existing_analysis, dict):
-            prior_outputs = existing_analysis.get("skill_outputs", {})
-            if isinstance(prior_outputs, dict):
-                merged_outputs.update(prior_outputs)
+        prior_outputs = analysis_snapshot.get("skill_outputs", {})
+        if isinstance(prior_outputs, dict):
+            merged_outputs.update(prior_outputs)
         merged_outputs.update(validated)
-        analysis_snapshot = {
+        analysis_snapshot.update({
             "session_id": ctx.session_id,
-            "company_name": manifest.get("company_name"),
-            "industry": manifest.get("industry") or "",
-            "annual_revenue": float(manifest.get("annual_revenue") or 0),
+            "engagement_id": manifest.get("engagement_id") or analysis_snapshot.get("engagement_id") or getattr(ctx, "engagement_id", None),
+            "company_name": manifest.get("company_name") or analysis_snapshot.get("company_name"),
+            "industry": manifest.get("industry") or analysis_snapshot.get("industry") or "",
+            "annual_revenue": float(manifest.get("annual_revenue") or analysis_snapshot.get("annual_revenue") or 0),
             "reporting_currency": _REFLECT_CURRENCY,
+            "normalized_spend": analysis_snapshot.get("normalized_spend", []),
+            "context_summary": analysis_snapshot.get("context_summary", ""),
+            "analysis_trace": analysis_snapshot.get("analysis_trace", []),
+            "wacc": manifest.get("wacc", analysis_snapshot.get("wacc")),
+            "effective_tax_rate": manifest.get("effective_tax_rate", analysis_snapshot.get("effective_tax_rate")),
             "skill_outputs": merged_outputs,
-            "advisory_sections": advisory_sections.model_dump() if advisory_sections else {},
-            "response_artefacts": act_result.response_artefacts if hasattr(act_result, "response_artefacts") else [],
-        }
+            "advisory_sections": advisory_sections.model_dump() if advisory_sections else analysis_snapshot.get("advisory_sections", {}),
+            "response_artefacts": act_result.response_artefacts if hasattr(act_result, "response_artefacts") else analysis_snapshot.get("response_artefacts", []),
+            "last_run_intent": ctx.intent_class,
+            "skills_run_this_turn": list(validated.keys()),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        })
         _memory.put("session", ctx.session_id, analysis_snapshot)
 
     if "conflict-detector" in validated and manifest_path.parent.exists():
@@ -1049,6 +1073,7 @@ def reflect(
         degraded_mode=bool(degradation_reasons),
         fallback_reasons=degradation_reasons,
         next_options=next_options,
+        replanner_log=replanner_log,
         gate2_blocked=gate2_blocked,
         gate2_narrative=gate2_narrative,
         regulatory_events=reg_events,

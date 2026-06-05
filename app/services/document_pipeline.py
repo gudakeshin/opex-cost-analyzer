@@ -12,7 +12,10 @@ from app.services.engagements_store import (
     SUPPORTED_EXTENSIONS,
     document_dir,
     document_parsed_dir,
+    get_document_record,
+    read_engagement_manifest,
     update_document_record,
+    write_parent_nodes,
 )
 from app.services.ingestion import (
     parse_document,
@@ -32,6 +35,44 @@ def _serialize_lines(lines: List[NormalizedSpendLine]) -> List[Dict[str, Any]]:
 
 def _deserialize_lines(payload: List[Dict[str, Any]]) -> List[NormalizedSpendLine]:
     return [NormalizedSpendLine.model_validate(item) for item in payload]
+
+
+def index_document_nodes(
+    engagement_id: str,
+    document_id: str,
+    markdown: str,
+    filename: str,
+) -> Dict[str, int]:
+    """Hierarchically chunk markdown, store parents, embed children. Returns counts."""
+    from app.services.chunking import split_markdown_hierarchical
+    from app.services.document_index import get_document_index
+
+    parents, children = split_markdown_hierarchical(
+        markdown, doc_id=document_id, engagement_id=engagement_id, filename=filename
+    )
+    write_parent_nodes(engagement_id, document_id, parents)
+    get_document_index().index_document(engagement_id, document_id, children)
+    return {"parent_count": len(parents), "chunk_count": len(children)}
+
+
+def reindex_engagement(engagement_id: str) -> Dict[str, Any]:
+    """Backfill: re-chunk + re-index every ready context document from cached markdown."""
+    manifest = read_engagement_manifest(engagement_id)
+    summary = {"engagement_id": engagement_id, "documents": 0, "chunks": 0, "parents": 0}
+    for doc in manifest.get("documents") or []:
+        doc_id = doc.get("document_id")
+        if not doc_id or doc.get("status") != "ready":
+            continue
+        markdown = load_cached_markdown(engagement_id, doc_id)
+        if not markdown.strip():
+            continue
+        stats = index_document_nodes(
+            engagement_id, doc_id, markdown, doc.get("filename") or doc_id
+        )
+        summary["documents"] += 1
+        summary["chunks"] += stats["chunk_count"]
+        summary["parents"] += stats["parent_count"]
+    return summary
 
 
 def process_engagement_document(
@@ -66,6 +107,7 @@ def process_engagement_document(
     parse_backend = "native"
     text_preview = ""
     line_count = 0
+    parsed_markdown = ""
 
     try:
         if suffix in (".csv", ".xlsx", ".xls"):
@@ -108,6 +150,7 @@ def process_engagement_document(
             role = "context_doc"
             parse_backend = "native"
             text_preview = text[:500]
+            parsed_markdown = text
 
         elif suffix == ".docx":
             markdown = ""
@@ -126,6 +169,7 @@ def process_engagement_document(
             role = "context_doc"
             parse_backend = backend
             text_preview = markdown[:500]
+            parsed_markdown = markdown
 
         elif suffix == ".pdf":
             markdown = ""
@@ -144,10 +188,33 @@ def process_engagement_document(
             role = "mixed"
             parse_backend = backend
             text_preview = markdown[:500]
+            parsed_markdown = markdown
             # Attempt tabular extraction from markdown tables (simple heuristic: skip for now)
 
         else:
             raise ValueError(f"Unsupported file type: {suffix}")
+
+        index_stats: Dict[str, Any] = {
+            "chunk_count": 0,
+            "parent_count": 0,
+            "indexed": False,
+            "index_backend": None,
+        }
+        if parsed_markdown.strip():
+            try:
+                from app.services.document_index import get_document_index_status
+
+                friendly_name = get_document_record(engagement_id, document_id).get("filename") or raw_path.name
+                counts = index_document_nodes(
+                    engagement_id, document_id, parsed_markdown, friendly_name
+                )
+                index_stats = {
+                    **counts,
+                    "indexed": True,
+                    "index_backend": get_document_index_status().get("backend"),
+                }
+            except Exception as exc:
+                warnings.append(f"Document indexing failed: {exc}")
 
         meta_patch = {
             "status": "ready",
@@ -158,6 +225,7 @@ def process_engagement_document(
             "text_preview": text_preview,
             "line_count": line_count,
             "warnings": warnings,
+            **index_stats,
         }
         update_document_record(engagement_id, document_id, meta_patch)
         append_meta = {**meta_patch, "document_id": document_id}

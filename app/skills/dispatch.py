@@ -21,10 +21,11 @@ No changes to act.py are required.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Callable, Dict, List
 
 from app.models import NormalizedSpendLine
+from app.opar.transaction_examples import build_transaction_examples_from_lines
 
 
 # ---------------------------------------------------------------------------
@@ -41,6 +42,12 @@ class SkillContext:
     prior_results: Dict[str, Dict[str, Any]]
     user_message: str = ""
     headcount: float | None = None
+    wacc: float | None = None
+    effective_tax_rate: float | None = None
+    reporting_currency: str = "USD"
+    entity_tree: Dict[str, Any] | None = None
+    segment_revenue: Dict[str, float] | None = None
+    sector_weights: Dict[str, float] | None = None
 
     # ── Convenience accessors ───────────────────────────────────────────────
 
@@ -53,6 +60,24 @@ class SkillContext:
         return float(self.manifest.get("annual_revenue") or 0.0)
 
     @property
+    def discount_rate(self) -> float:
+        return float(
+            self.wacc
+            if self.wacc is not None
+            else self.manifest.get("wacc")
+            or 0.10
+        )
+
+    @property
+    def tax_rate(self) -> float:
+        return float(
+            self.effective_tax_rate
+            if self.effective_tax_rate is not None
+            else self.manifest.get("effective_tax_rate")
+            or 0.0
+        )
+
+    @property
     def company_name(self) -> str | None:
         return self.manifest.get("company_name")
 
@@ -63,6 +88,15 @@ class SkillContext:
     @property
     def model_manifest(self) -> Dict[str, Any]:
         return self.manifest.get("model_manifest", {}) if isinstance(self.manifest, dict) else {}
+
+    @property
+    def document_context(self) -> Dict[str, Any]:
+        context = self.prior("document-contextualizer")
+        if context:
+            return context
+        if self.docs_text:
+            return _engine.document_contextualizer(self.docs_text)
+        return {}
 
 
 SkillHandler = Callable[[SkillContext], tuple[Dict[str, Any], str | None]]
@@ -132,32 +166,11 @@ def _build_transaction_examples(
     max_categories: int = 8,
     max_examples_per_category: int = 3,
 ) -> Dict[str, list]:
-    """Compact per-category spend examples for LLM narrative grounding."""
-    grouped: Dict[str, List[NormalizedSpendLine]] = {}
-    for line in lines:
-        grouped.setdefault(line.category_id, []).append(line)
-    out: Dict[str, list] = {}
-    for category_id, cat_lines in grouped.items():
-        top = sorted(cat_lines, key=lambda x: float(x.amount or 0.0), reverse=True)[
-            :max_examples_per_category
-        ]
-        out[category_id] = [
-            {
-                "supplier": x.supplier,
-                "description": x.description,
-                "amount": float(x.amount or 0.0),
-                "business_unit": x.business_unit,
-                "geo": x.geo,
-                "spend_date": x.spend_date,
-            }
-            for x in top
-        ]
-    limited = sorted(
-        out.items(),
-        key=lambda kv: sum(e["amount"] for e in kv[1]),
-        reverse=True,
-    )[:max_categories]
-    return dict(limited)
+    return build_transaction_examples_from_lines(
+        lines,
+        max_categories=max_categories,
+        max_examples_per_category=max_examples_per_category,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -195,6 +208,7 @@ def _temporal_analyzer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
 def _payment_terms_optimizer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     return _engine.payment_terms_optimizer(
         ctx.lines,
+        wacc=ctx.discount_rate,
         industry=ctx.industry or "default",
     ), None
 
@@ -206,6 +220,7 @@ def _heuristic_analyzer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
         profile,
         ctx.annual_revenue,
         headcount=ctx.headcount,
+        reporting_currency=ctx.reporting_currency,
     ), None
 
 
@@ -237,6 +252,9 @@ def _root_cause_analyzer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]
         peer,
         ctx.lines,
         headcount=ctx.headcount,
+        industry=ctx.industry,
+        annual_revenue=ctx.annual_revenue,
+        reporting_currency=ctx.reporting_currency,
     ), None
 
 
@@ -249,7 +267,19 @@ def _savings_modeler(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     heuristic = ctx.prior("heuristic-analyzer")
     raw_rows = _engine.build_raw_rows(peer, internal, heuristic)
     root = ctx.prior("root-cause-analyzer")
-    return _engine.savings_modeler({"raw_rows": raw_rows}, root), None
+    profile = _get_profile(ctx)
+    return _engine.savings_modeler(
+        {"raw_rows": raw_rows},
+        root,
+        discount_rate=ctx.discount_rate,
+        effective_tax_rate=ctx.tax_rate,
+        industry=ctx.industry,
+        spend_profile=profile,
+        headcount=float(ctx.headcount or 0.0),
+        annual_revenue=ctx.annual_revenue,
+        document_context=ctx.document_context,
+        spend_lines=ctx.lines,
+    ), None
 
 
 @register("value-bridge-calculator")
@@ -273,6 +303,24 @@ def _value_bridge_calculator(ctx: SkillContext) -> tuple[Dict[str, Any], str | N
 def _data_validator(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     bridge = ctx.prior("value-bridge-calculator")
     return _engine.data_validator(bridge), None
+
+
+@register("sme-critique")
+def _sme_critique(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    savings_model = ctx.prior("savings-modeler")
+    profile = _get_profile(ctx)
+    benchmarks = ctx.prior("peer-benchmarker")
+    root_causes = ctx.prior("root-cause-analyzer")
+    contract_lifecycle = ctx.prior("contract-lifecycle-manager")
+    if not contract_lifecycle and ctx.lines:
+        contract_lifecycle = _engine.contract_lifecycle_manager(ctx.lines)
+    return _engine.sme_critique_analyzer(
+        savings_model,
+        profile,
+        benchmarks,
+        root_causes,
+        contract_lifecycle,
+    ), None
 
 
 # ── Tier 3: charts & reporting ───────────────────────────────────────────────
@@ -317,7 +365,11 @@ def _business_case_builder(ctx: SkillContext) -> tuple[Dict[str, Any], str | Non
 def _analysis_synthesizer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     try:
         from app.opar.claude_client import synthesize_analysis_claude_with_meta  # lazy
+        from app.services.document_index import retrieve_context  # lazy
 
+        retrieved = retrieve_context(
+            ctx.manifest.get("engagement_id") or "", ctx.user_message
+        ) or None
         synthesized, degraded_reason = synthesize_analysis_claude_with_meta(
             user_message=ctx.user_message,
             manifest=ctx.manifest,
@@ -326,6 +378,7 @@ def _analysis_synthesizer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None
             docs_text=ctx.docs_text,
             transaction_examples=_build_transaction_examples(ctx.lines),
             deep_research_summary=ctx.manifest.get("deep_research_summary") or None,
+            retrieved_context=retrieved,
         )
         return (synthesized or {}), degraded_reason
     except Exception:

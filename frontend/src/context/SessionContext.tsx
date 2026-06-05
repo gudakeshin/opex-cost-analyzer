@@ -33,7 +33,7 @@ interface SessionContextValue {
 const defaultEngagement: EngagementMeta = {
   company_name: 'New engagement',
   industry: 'manufacturing_diversified',
-  currency: 'USD',
+  currency: 'INR',
   engagement_week: 1,
   engagement_weeks_total: 12,
   gate_label: 'Gate 1: Data & diagnostic',
@@ -52,7 +52,7 @@ function engagementFromManifest(manifest: SessionManifest): EngagementMeta {
   return {
     company_name: manifest.company_name || defaultEngagement.company_name,
     industry: manifest.industry || defaultEngagement.industry,
-    currency: manifest.currency || 'USD',
+    currency: manifest.currency || 'INR',
     audience: manifest.audience,
     engagement_week: manifest.engagement_week ?? weeksSince,
     engagement_weeks_total: manifest.engagement_weeks_total ?? 12,
@@ -91,6 +91,9 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       industry?: string;
       currency?: string;
       annual_revenue?: number;
+      detected_company_name?: string;
+      detected_industry?: string;
+      detected_industry_label?: string;
     }>(`/api/v1/engagements/${eid}`);
     const revenue = detail.annual_revenue;
     setEngagement({
@@ -102,6 +105,9 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       gate_label: defaultEngagement.gate_label,
       annual_revenue_cr:
         revenue != null && revenue > 1_000_000 ? revenue / 10_000_000 : revenue,
+      detected_company_name: detail.detected_company_name || undefined,
+      detected_industry: detail.detected_industry || undefined,
+      detected_industry_label: detail.detected_industry_label || undefined,
     });
   }, []);
 
@@ -127,6 +133,26 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setEngagementIdState(manifest.engagement_id);
       }
       setEngagement(engagementFromManifest(manifest));
+      // Merge auto-detected company/industry recommendations from the engagement
+      // manifest (the session manifest doesn't carry them) so the Diagnostic and
+      // Analysis pages can surface the "Recommended" badge.
+      if (manifest.engagement_id) {
+        try {
+          const detail = await apiGet<{
+            detected_company_name?: string;
+            detected_industry?: string;
+            detected_industry_label?: string;
+          }>(`/api/v1/engagements/${manifest.engagement_id}`);
+          setEngagement((prev) => ({
+            ...prev,
+            detected_company_name: detail.detected_company_name || undefined,
+            detected_industry: detail.detected_industry || undefined,
+            detected_industry_label: detail.detected_industry_label || undefined,
+          }));
+        } catch {
+          /* detection is best-effort; ignore */
+        }
+      }
       const mode = manifestAudienceToMode(manifest.audience);
       if (mode) setAudience(mode);
       setDeepResearchSummary(manifest.deep_research_summary ?? null);

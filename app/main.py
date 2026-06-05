@@ -35,6 +35,7 @@ from app.config import (
     request_id_var,
 )
 from app.opar.memory_adapter import get_memory_adapter_status
+from app.services.document_index import get_document_index_status
 from app.routers import benchmarks, chat, compliance, engagements, enterprise, outputs, pipeline, sessions, skills
 from app.storage import ensure_dirs
 
@@ -159,6 +160,7 @@ async def _global_exception_handler(request: Request, exc: Exception) -> JSONRes
 @app.get("/health")
 def health():  # type: ignore[return]
     mem_status = get_memory_adapter_status()
+    doc_status = get_document_index_status()
     usage = _memory_store.usage_stats()
     return {
         "status": "ok",
@@ -168,6 +170,8 @@ def health():  # type: ignore[return]
             "qdrant_configured": QDRANT_ENABLED,
             "qdrant_active": mem_status.get("qdrant_active"),
             "memory_status_reason": mem_status.get("reason"),
+            "document_index_backend": doc_status.get("backend"),
+            "document_index_reason": doc_status.get("reason"),
             "anthropic_configured": ANTHROPIC_ENABLED,
         },
         "storage": usage,

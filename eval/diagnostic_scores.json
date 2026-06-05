@@ -1,8 +1,8 @@
 {
   "eval_name": "Diagnostic Feature Eval",
-  "eval_date": "2026-06-03",
+  "eval_date": "2026-06-05",
   "platform_version": "v2.1",
-  "overall_score": 9.5,
+  "overall_score": 9.35,
   "passed": true,
   "scenario_run_count": 5,
   "scenario_pass_count": 5,
@@ -560,7 +560,7 @@
       "name": "input_signal_quality",
       "display": "Input Signal Quality",
       "weight": 0.2,
-      "score": 7.65,
+      "score": 6.9,
       "passed": true,
       "dimensions": [
         {
@@ -624,22 +624,23 @@
           "name": "Circular Benchmark Derivation Disclosure",
           "weight": 0.3,
           "threshold": 5.0,
-          "score": 7.5,
+          "score": 5.0,
           "passed": true,
           "gap": 0.0,
           "scenarios_run": 5,
           "scenarios_below_threshold": 0,
-          "finding_summary": "1/4 disclosure issues confirmed. Circularity present in: ['S01', 'S02', 'S03']. data_note present: True.",
+          "finding_summary": "2/4 disclosure issues confirmed. Circularity present in: ['S01', 'S02', 'S03']. data_note present: True.",
           "remediation": "1) Rename headroom_to_p25_cr \u2192 benchmark_p50_to_p25_band_cr to clarify it is a benchmark range width. 2) Change percentile_band from hardcoded 'Reference' to 'synthetic_P50' to make derivation explicit. 3) Add top-level field 'profile_basis': 'benchmark_proxy' in addition to data_note. Structural fix: when session has uploaded spend data, use actual spend profile instead of synthetic.",
           "evidence": {
             "issue_checks": {
               "circular_derivation_confirmed": true,
               "percentile_band_hardcoded_reference": false,
               "data_note_missing_or_inaccurate": false,
-              "headroom_field_name_misleading": false
+              "headroom_field_name_misleading": true
             },
             "confirmed_issues": [
-              "circular_derivation_confirmed"
+              "circular_derivation_confirmed",
+              "headroom_field_name_misleading"
             ],
             "per_scenario_circularity": {
               "S01": {

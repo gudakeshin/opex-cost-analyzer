@@ -54,11 +54,39 @@ def _add_task(tasks: list[SkillTask], task: SkillTask) -> None:
     tasks.append(task)
 
 
+def _add_sme_critique_if_value_modeled(tasks: list[SkillTask]) -> None:
+    """Attach evidence-qualification after savings modeling when available."""
+    names = {t.skill_name for t in tasks}
+    if "savings-modeler" not in names or "sme-critique" in names:
+        return
+    deps = [
+        skill
+        for skill in (
+            "savings-modeler",
+            "spend-profiler",
+            "peer-benchmarker",
+            "root-cause-analyzer",
+            "contract-lifecycle-manager",
+        )
+        if skill in names
+    ]
+    tasks.append(
+        SkillTask(
+            skill_name="sme-critique",
+            inputs={},
+            depends_on=deps,
+            parallel_group=max((t.parallel_group for t in tasks), default=0) + 1,
+            estimated_tokens=300,
+        )
+    )
+
+
 def _has_capability(ctx: ObserveContext, capability: str) -> bool:
     return capability in set(ctx.query_capabilities or [])
 
 
 def _finalize_plan(tasks: list[SkillTask], user_summary: str, estimated_duration: str, requires_approval: bool) -> ExecutionPlan:
+    _add_sme_critique_if_value_modeled(tasks)
     parallel_groups = max((t.parallel_group for t in tasks), default=-1) + 1 if tasks else 0
     return ExecutionPlan(
         tasks=tasks,
@@ -119,6 +147,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
                         estimated_tokens=300,
                     )
                 )
+            _add_sme_critique_if_value_modeled(tasks)
             return ExecutionPlan(
                 tasks=tasks,
                 total_skills=len(tasks),

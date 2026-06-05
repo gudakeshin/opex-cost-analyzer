@@ -268,6 +268,13 @@ _PERCENTILE_LEGEND: Dict[str, str] = {
     "p90": "lagging quartile",
 }
 
+# Sector-pack → benchmark-registry resolution lives in a single source of truth:
+# benchmarks.SECTOR_PACK_TO_BENCHMARK (resolved via benchmark_industry_for). A
+# divergent local copy previously mapped gcc_capability_centers → technology even
+# though the registry ships a dedicated gcc_capability_centers dataset, silently
+# mis-benchmarking GCC engagements. Always call benchmark_industry_for() instead
+# of re-declaring the map here.
+
 _TAXONOMY_NAMES: Dict[str, str] | None = None
 
 
@@ -404,6 +411,39 @@ _VALUE_AT_TABLE_METHODOLOGY: Dict[str, Any] = {
     ],
 }
 
+def _build_real_spend_profile(lines: List[Any]) -> Dict[str, Any]:
+    """Aggregate NormalizedSpendLine objects into a spend profile for diagnostic use."""
+    from collections import defaultdict
+
+    cat_spend: Dict[str, float] = defaultdict(float)
+    cat_tx: Dict[str, int] = defaultdict(int)
+    cat_vendors: Dict[str, set] = defaultdict(set)
+    for line in lines:
+        if hasattr(line, "is_actual") and not line.is_actual():
+            continue
+        cat = (getattr(line, "category", None) or "uncategorized").lower().replace(" ", "_")
+        amount = float(getattr(line, "reporting_amount", None) or getattr(line, "amount", 0) or 0)
+        cat_spend[cat] += amount
+        cat_tx[cat] += 1
+        vendor = getattr(line, "vendor", None) or ""
+        if vendor:
+            cat_vendors[cat].add(vendor)
+
+    category_profile = [
+        {
+            "category_id": cat_id,
+            "category_name": _category_display_name(cat_id),
+            "spend": spend,
+            "supplier_count": len(cat_vendors.get(cat_id, set())),
+            "transaction_count": cat_tx.get(cat_id, 0),
+        }
+        for cat_id, spend in sorted(cat_spend.items(), key=lambda x: -x[1])
+        if spend > 0
+    ]
+    total = sum(c["spend"] for c in category_profile) or 1.0
+    return {"total_spend": total, "category_profile": category_profile, "data_source": "actual_spend"}
+
+
 _FINDINGS_SYSTEM_PROMPT = """You are a senior FP&A analyst writing a diagnostic findings summary for a CFO audience.
 You will receive structured diagnostic data about a company's OpEx benchmark profile.
 
@@ -442,6 +482,7 @@ def _generate_findings_llm(
     value_at_table: List[Dict],
     assumptions: Dict,
     template_fallback: List[str],
+    context_docs: Optional[List[str]] = None,
 ) -> List[str]:
     """Generate FP&A-grade key findings via Gemini Flash-Lite. Falls back to template_fallback on any error."""
     try:
@@ -472,7 +513,7 @@ def _generate_findings_llm(
         total_p90 = sum(lv.get("p90_cr", 0) for lv in value_at_table)
         total_pct = round(total_p50 / annual_revenue_cr * 100, 1) if annual_revenue_cr > 0 else 0
 
-        user_content = _json.dumps({
+        structured = _json.dumps({
             "company_name": company_name,
             "industry": industry,
             "annual_revenue_cr": annual_revenue_cr,
@@ -484,6 +525,12 @@ def _generate_findings_llm(
             "total_pct_of_revenue": total_pct,
             "assumptions": assumptions,
         }, ensure_ascii=False)
+
+        if context_docs:
+            doc_excerpt = "\n\n".join(context_docs)[:3000]
+            user_content = f"Company document excerpts:\n{doc_excerpt}\n\n---\nDiagnostic data:\n{structured}"
+        else:
+            user_content = structured
 
         raw = call_gemini(
             system=_FINDINGS_SYSTEM_PROMPT,
@@ -514,6 +561,7 @@ def _generate_executive_summary_llm(
     top_lever_npv: float,
     top_lever_complexity: str,
     assumptions: Dict,
+    context_docs: Optional[List[str]] = None,
 ) -> str:
     """Generate 3-sentence CFO executive summary via Gemini Flash-Lite. Falls back to first key_finding."""
     try:
@@ -521,7 +569,7 @@ def _generate_executive_summary_llm(
         from app.opar.gemini_client import call_gemini
 
         total_pct = round(total_p50 / annual_revenue_cr * 100, 1) if annual_revenue_cr > 0 else 0
-        user_content = _json.dumps({
+        structured = _json.dumps({
             "company_name": company_name,
             "industry": industry,
             "annual_revenue_cr": annual_revenue_cr,
@@ -533,6 +581,12 @@ def _generate_executive_summary_llm(
             "wacc_pct": assumptions.get("wacc_pct", 12.0),
             "key_findings_preview": key_findings[:3],
         }, ensure_ascii=False)
+
+        if context_docs:
+            doc_excerpt = "\n\n".join(context_docs)[:2000]
+            user_content = f"Company document excerpts:\n{doc_excerpt}\n\n---\nDiagnostic data:\n{structured}"
+        else:
+            user_content = structured
 
         summary = call_gemini(
             system=_EXECUTIVE_SUMMARY_SYSTEM_PROMPT,
@@ -548,6 +602,18 @@ def _generate_executive_summary_llm(
 
 @router.post("/api/v1/diagnostic/company-research")
 async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
+    # ── Engagement hydration ────────────────────────────────────────────────
+    engagement_docs_text: List[str] = []
+    real_profile: Optional[Dict[str, Any]] = None
+    if req.engagement_id:
+        try:
+            from app.services.engagement_corpus import load_engagement_corpus
+            eng_lines, engagement_docs_text, _, _ = load_engagement_corpus(req.engagement_id)
+            if eng_lines:
+                real_profile = _build_real_spend_profile(eng_lines)
+        except Exception as _exc:
+            logger.warning("diagnostic_engagement_hydration_failed eng=%s err=%s", req.engagement_id, _exc)
+
     texts: List[str] = []
     url_errors: List[Dict[str, str]] = []
     for url in (req.urls or [])[:5]:
@@ -592,8 +658,13 @@ async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
             })
     total_implied = sum(c["spend"] for c in category_profile) or 1.0
     synthetic_profile = {"total_spend": total_implied, "category_profile": category_profile, "data_source": "benchmark_proxy"}
+
+    # Use real spend profile when engagement data is available; fall back to synthetic.
+    active_profile = real_profile if real_profile else synthetic_profile
+    profile_basis = "actual_spend" if real_profile else "benchmark_proxy"
+
     benchmarks = _engine.peer_benchmarker(
-        synthetic_profile,
+        active_profile,
         bench_resolved["benchmark_data"],
         bench_industry,
         revenue_inr,
@@ -633,10 +704,10 @@ async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
         })
     benchmark_gaps.sort(key=lambda x: x["implied_p50_cr"], reverse=True)
 
-    # Derive root causes from synthetic profile before lever resolution
+    # Derive root causes from active profile before lever resolution
     from app.skills.engine.lever_rules import build_signal_corpus as _build_signal_corpus
     root_cause_output = _engine.root_cause_analyzer(
-        profile=synthetic_profile,
+        profile=active_profile,
         peer=benchmarks,
         lines=[],
         headcount=float(req.headcount),
@@ -644,20 +715,21 @@ async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
         industry=effective_industry,
     )
     derived_root_causes = root_cause_output.get("root_causes", [])
-    signal_corpus = _build_signal_corpus(synthetic_profile)
-    engagement_id = f"diag-{req.company_name[:20].strip()}-{int(revenue_inr)}"
+    signal_corpus = _build_signal_corpus(active_profile)
+    diag_engagement_id = req.engagement_id or f"diag-{req.company_name[:20].strip()}-{int(revenue_inr)}"
 
     eligible_levers = _engine.resolve_eligible_levers(
         industry=effective_industry,
-        spend_profile=synthetic_profile,
+        spend_profile=active_profile,
         headcount=float(req.headcount),
         annual_revenue=revenue_inr,
         root_causes=derived_root_causes,
         signal_corpus=signal_corpus,
         line_flags={"constraints": company_signals.get("constraints", [])},
-        engagement_id=engagement_id,
+        engagement_id=diag_engagement_id,
     )
-    cat_spend_cr = {c["category_id"]: c["spend"] / 1_00_00_000 for c in category_profile}
+    active_cat_profile = active_profile.get("category_profile", category_profile)
+    cat_spend_cr = {c["category_id"]: c["spend"] / 1_00_00_000 for c in active_cat_profile}
     total_spend_cr = sum(cat_spend_cr.values()) or 1.0
     value_at_table = []
     for lv in eligible_levers:
@@ -751,7 +823,12 @@ async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
     key_findings.append(
         f"Total value at table (P50 annual): {_fmt_cr(total_p50)} ({total_pct}% of revenue) across {len(value_at_table)} levers"
     )
-    if bench_resolved.get("selected_dataset"):
+    if real_profile:
+        data_note = (
+            f"Spend profile derived from {len(active_cat_profile)} categories of actual uploaded data. "
+            f"Benchmarks compare your real spend against {bench_industry} sector peers."
+        )
+    elif bench_resolved.get("selected_dataset"):
         data_note = (
             f"Spend profile derived from {bench_industry} benchmark P50 values — "
             f"upload actual spend data for company-specific analysis."
@@ -766,8 +843,9 @@ async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
         "wacc_pct": round(req.wacc * 100, 1),
         "headcount": req.headcount,
         "npv_horizon_years": 3,
-        "profile_basis": "benchmark_proxy",
+        "profile_basis": profile_basis,
     }
+    context_docs = engagement_docs_text if engagement_docs_text else None
     # LLM-1: replace template findings with Gemini Flash-Lite narrative (falls back to templates)
     key_findings = _generate_findings_llm(
         company_name=req.company_name,
@@ -777,6 +855,7 @@ async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
         value_at_table=value_at_table,
         assumptions=assumptions,
         template_fallback=key_findings,
+        context_docs=context_docs,
     )
     # LLM-3: 3-sentence executive summary (falls back to first finding)
     executive_summary = _generate_executive_summary_llm(
@@ -789,6 +868,7 @@ async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
         top_lever_npv=top_lever.get("npv", 0.0) if top_lever else 0.0,
         top_lever_complexity=top_lever.get("complexity_tier", "medium") if top_lever else "medium",
         assumptions=assumptions,
+        context_docs=context_docs,
     )
     append_audit_event("diagnostic_company_research", data={"company": req.company_name, "industry": effective_industry})
     return {
@@ -809,7 +889,8 @@ async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
         "total_p50_value_cr": total_p50,
         "key_findings": key_findings,
         "percentile_legend": _PERCENTILE_LEGEND,
-        "profile_basis": "benchmark_proxy",
+        "profile_basis": profile_basis,
+        "engagement_id": req.engagement_id or None,
         "data_note": data_note,
         "_meta": {"url_count": len(texts), "url_errors": url_errors, "bench_industry": bench_industry},
     }

@@ -57,6 +57,11 @@ def create_engagement_manifest(
     headcount: float | None = None,
     engagement_id: str | None = None,
 ) -> Dict[str, Any]:
+    if engagement_id:
+        try:
+            uuid.UUID(engagement_id, version=4)
+        except ValueError as exc:
+            raise ValueError(f"Invalid engagement_id (must be UUID v4): {engagement_id!r}") from exc
     eid = engagement_id or str(uuid.uuid4())
     root = engagement_dir(eid)
     root.mkdir(parents=True, exist_ok=True)
@@ -68,12 +73,61 @@ def create_engagement_manifest(
         "annual_revenue": annual_revenue,
         "currency": currency or "INR",
         "headcount": headcount if headcount and headcount > 0 else None,
+        # Auto-detected recommendations from uploaded documents (see
+        # engagement_detection.detect_engagement_profile). Kept separate from the
+        # user-facing company_name/industry so the UI can show a "Recommended"
+        # badge even after the user overrides.
+        "detected_company_name": "",
+        "detected_industry": "",
+        "detected_industry_label": "",
+        "detection_signals": {},
+        "context_text_hash": "",
         "created_at": _utc_now(),
         "updated_at": _utc_now(),
         "session_ids": [],
         "documents": [],
     }
     write_engagement_manifest(eid, manifest)
+    return manifest
+
+
+def update_engagement_detection(engagement_id: str, detection: Dict[str, Any]) -> Dict[str, Any]:
+    """Persist auto-detected company/industry on the engagement manifest.
+
+    The detected values are always stored (so the UI can surface a recommendation
+    and flag overrides), but the user-facing ``company_name``/``industry`` fields
+    are only auto-filled when the user has *not* already set them — a placeholder
+    ``"New engagement"`` company or an empty industry. An explicit user choice is
+    never overwritten.
+    """
+    manifest = read_engagement_manifest(engagement_id)
+    if not manifest.get("engagement_id"):
+        return {}
+
+    detected_company = str(detection.get("detected_company_name") or "").strip()
+    detected_industry = str(detection.get("detected_industry") or "").strip()
+
+    manifest["detected_company_name"] = detected_company
+    manifest["detected_industry"] = detected_industry
+    manifest["detected_industry_label"] = str(detection.get("detected_industry_label") or "")
+    manifest["detection_signals"] = {
+        "industry_source": str(detection.get("industry_source") or ""),
+        "industry_llm": str(detection.get("industry_llm") or ""),
+        "industry_spend": str(detection.get("industry_spend") or ""),
+        "source_documents": detection.get("source_documents") or {},
+    }
+    manifest["context_text_hash"] = str(detection.get("context_text_hash") or "")
+
+    # Auto-apply only when the user hasn't made an explicit choice.
+    current_company = str(manifest.get("company_name") or "").strip()
+    if detected_company and current_company in ("", "New engagement"):
+        manifest["company_name"] = detected_company
+    current_industry = str(manifest.get("industry") or "").strip()
+    if detected_industry and not current_industry:
+        manifest["industry"] = detected_industry
+
+    manifest["updated_at"] = _utc_now()
+    write_engagement_manifest(engagement_id, manifest)
     return manifest
 
 
@@ -113,6 +167,9 @@ def list_engagements() -> List[Dict[str, Any]]:
             "session_count": len(manifest.get("session_ids") or []),
             "document_count": len(docs),
             "documents_ready": sum(1 for d in docs if d.get("status") == "ready"),
+            "detected_company_name": manifest.get("detected_company_name") or "",
+            "detected_industry": manifest.get("detected_industry") or "",
+            "detected_industry_label": manifest.get("detected_industry_label") or "",
         })
     summaries.sort(key=lambda x: x.get("updated_at") or "", reverse=True)
     return summaries
@@ -208,6 +265,44 @@ def document_parsed_dir(engagement_id: str, document_id: str) -> Path:
     path = document_dir(engagement_id, document_id) / "parsed"
     path.mkdir(parents=True, exist_ok=True)
     return path
+
+
+def parent_nodes_path(engagement_id: str, document_id: str) -> Path:
+    """Filesystem doc store for hierarchical parent nodes (keyed by parent_id)."""
+    return document_parsed_dir(engagement_id, document_id) / "parent_nodes.json"
+
+
+def write_parent_nodes(engagement_id: str, document_id: str, parents: List[Any]) -> None:
+    """Persist parent nodes as a JSON KV map {parent_id: parent_dict}."""
+    store: Dict[str, Any] = {}
+    for p in parents:
+        d = p.to_dict() if hasattr(p, "to_dict") else dict(p)
+        store[d["parent_id"]] = d
+    write_json(parent_nodes_path(engagement_id, document_id), store)
+
+
+def load_parent_nodes(engagement_id: str, document_id: str) -> Dict[str, Any]:
+    data = read_json(parent_nodes_path(engagement_id, document_id), {})
+    return data if isinstance(data, dict) else {}
+
+
+def load_parent_node(engagement_id: str, document_id: str, parent_id: str) -> Optional[Dict[str, Any]]:
+    return load_parent_nodes(engagement_id, document_id).get(parent_id)
+
+
+def child_nodes_path(engagement_id: str, document_id: str) -> Path:
+    """Local store of child (leaf) nodes — used by the keyword fallback + reindex."""
+    return document_parsed_dir(engagement_id, document_id) / "child_nodes.json"
+
+
+def write_child_nodes(engagement_id: str, document_id: str, children: List[Any]) -> None:
+    payload = [c.to_dict() if hasattr(c, "to_dict") else dict(c) for c in children]
+    write_json(child_nodes_path(engagement_id, document_id), payload)
+
+
+def load_child_nodes(engagement_id: str, document_id: str) -> List[Dict[str, Any]]:
+    data = read_json(child_nodes_path(engagement_id, document_id), [])
+    return data if isinstance(data, list) else []
 
 
 def backfill_engagement_for_session(session_id: str, manifest: Dict[str, Any]) -> str:

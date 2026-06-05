@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 from app.config import ROOT_DIR
 from app.memory import MemoryStore
@@ -53,18 +53,105 @@ def run_core_pipeline(
     segment_revenue: Dict[str, float] | None = None,
     sector_weights: Dict[str, float] | None = None,
     ingestion_summary: str | None = None,
+    progress_cb: Callable[[str, str], None] | None = None,
+    source_files: Dict[str, List[str]] | None = None,
 ) -> Dict[str, Any]:
+    # --- Traceability scaffolding --------------------------------------------
+    # Build a human-readable, ordered trace of how the analysis is derived, with
+    # the source documents each step drew on. The same narrative is streamed live
+    # via progress_cb so the chat UI can show steps as they happen, then the
+    # persisted trace backs the "How this analysis was derived" collapsible.
+    spend_files = [f for f in (source_files or {}).get("spend", []) if f]
+    context_files = [f for f in (source_files or {}).get("context", []) if f]
+    analysis_trace: List[Dict[str, Any]] = []
+
+    def _emit(phase: str, title: str, detail: str,
+              sources: List[str] | None = None,
+              metrics: Dict[str, Any] | None = None) -> None:
+        analysis_trace.append({
+            "step": len(analysis_trace) + 1,
+            "phase": phase,
+            "title": title,
+            "detail": detail,
+            "source_documents": [s for s in (sources or []) if s],
+            "metrics": metrics or {},
+        })
+        if progress_cb:
+            try:
+                progress_cb("act", f"{title} — {detail}")
+            except Exception:  # pragma: no cover - never let tracing break analysis
+                pass
+
+    def _money(value: float) -> str:
+        return f"{reporting_currency} {value:,.0f}"
+
     profile = engine.spend_profiler(lines)
+    total_spend = float(profile.get("total_spend", 0.0) or 0.0)
+    cat_profile = [c for c in profile.get("category_profile", []) if isinstance(c, dict)]
+    _emit(
+        "ingest",
+        "Read spend data",
+        (
+            f"Parsed {len(lines):,} spend lines totalling {_money(total_spend)}"
+            + (f" across {len(spend_files)} file(s)." if spend_files else ".")
+        ),
+        sources=spend_files,
+        metrics={"line_count": len(lines), "total_spend": total_spend,
+                 "reporting_currency": reporting_currency},
+    )
+    if cat_profile:
+        top = cat_profile[:3]
+        top_desc = ", ".join(
+            f"{c.get('category_name') or c.get('category_id')} "
+            f"{(float(c.get('spend', 0.0)) / total_spend * 100):.0f}%"
+            for c in top if total_spend > 0
+        )
+        _emit(
+            "profile",
+            "Profiled spend by category",
+            f"Classified into {len(cat_profile)} categories"
+            + (f"; top: {top_desc}." if top_desc else "."),
+            sources=spend_files,
+            metrics={"category_count": len(cat_profile)},
+        )
+
     context = engine.document_contextualizer(docs_text)
     if ingestion_summary:
         base = str(context.get("context_summary") or "").strip()
         context["context_summary"] = f"{base}\n{ingestion_summary}".strip() if base else ingestion_summary
 
+    if any(t.strip() for t in docs_text):
+        constraints = [c for c in (context.get("constraints") or []) if c]
+        maturity = str(context.get("procurement_maturity") or "").strip()
+        ctx_inferred = str(context.get("inferred_industry") or "").strip()
+        extraction_method = str(context.get("extraction_method") or "").strip()
+        bits: List[str] = []
+        if extraction_method:
+            bits.append(f"via **{extraction_method}**")
+        if ctx_inferred:
+            bits.append(f"inferred sector **{ctx_inferred}** (used for benchmarking when industry unset)")
+        if maturity:
+            bits.append(f"procurement maturity **{maturity}**")
+        if constraints:
+            preview = "; ".join(str(c) for c in constraints[:3])
+            suffix = f" (+{len(constraints) - 3} more)" if len(constraints) > 3 else ""
+            bits.append(f"constraints ({len(constraints)}): {preview}{suffix}")
+        _emit(
+            "context",
+            "Read context documents",
+            "Extracted " + ("; ".join(bits) if bits else "qualitative context") + ".",
+            sources=context_files,
+            metrics={
+                "constraint_count": len(constraints),
+                "inferred_industry": ctx_inferred,
+                "extraction_method": extraction_method,
+            },
+        )
+
     # Auto-detect industry if not supplied — prefer document signals, fall back to spend patterns
     if not industry:
         industry = context.get("inferred_industry", "")
     if not industry and lines:
-        total_spend = sum(x.reporting_amount for x in lines)
         industry = engine.infer_industry_from_spend(lines, total_spend)
 
     categories = [c.get("category_id") for c in profile.get("category_profile", []) if c.get("category_id")]
@@ -77,6 +164,43 @@ def run_core_pipeline(
         selected_dataset=bench_resolved.get("selected_dataset"),
         selection_rationale=bench_resolved.get("selection_rationale"),
     )
+    comparisons = [c for c in benchmarks.get("comparisons", []) if isinstance(c, dict)]
+    above_median = [
+        c for c in comparisons
+        if str(c.get("percentile_band") or "") in ("P50-P75", "P75-P90", "P90+")
+    ]
+    dataset_name = ""
+    bench_meta = benchmarks.get("benchmark_metadata") or {}
+    if isinstance(bench_meta, dict):
+        dataset_name = str(bench_meta.get("source_name") or "")
+    sel_rationale = bench_resolved.get("selection_rationale") or {}
+    rationale_bits: List[str] = []
+    if isinstance(sel_rationale, dict):
+        if sel_rationale.get("source"):
+            rationale_bits.append(f"source **{sel_rationale['source']}**")
+        if sel_rationale.get("pack_id"):
+            rationale_bits.append(f"sector pack **{sel_rationale['pack_id']}**")
+        if sel_rationale.get("score") is not None:
+            rationale_bits.append(f"dataset score {sel_rationale['score']}")
+        if sel_rationale.get("match_ratio") is not None:
+            rationale_bits.append(f"category match {float(sel_rationale['match_ratio']):.0%}")
+    rationale_text = f" Rationale: {', '.join(rationale_bits)}." if rationale_bits else ""
+    _emit(
+        "benchmark",
+        "Benchmarked against peers",
+        (
+            f"Compared {len(comparisons)} categories to **{industry or 'industry'}** peers"
+            + (f" using dataset **{dataset_name}**" if dataset_name else "")
+            + f"; {len(above_median)} above the peer median (optimization headroom)."
+            + rationale_text
+        ),
+        sources=spend_files,
+        metrics={
+            "comparison_count": len(comparisons),
+            "above_median_count": len(above_median),
+            "selection_rationale": sel_rationale if isinstance(sel_rationale, dict) else {},
+        },
+    )
     internal = engine.internal_benchmarker(lines)
     heuristics = engine.heuristic_analyzer(profile, annual_revenue, headcount=headcount, reporting_currency=reporting_currency)
     root_causes = engine.root_cause_analyzer(
@@ -86,6 +210,35 @@ def run_core_pipeline(
         annual_revenue=annual_revenue,
         reporting_currency=reporting_currency,
     )
+    rc_findings = [r for r in root_causes.get("root_cause_findings", []) if isinstance(r, dict)]
+    if rc_findings:
+        finding_lines: List[str] = []
+        for finding in rc_findings[:3]:
+            cat = str(finding.get("category_name") or finding.get("category_id") or "category")
+            rc_list = finding.get("root_causes") or []
+            primary = rc_list[0] if isinstance(rc_list, list) and rc_list else finding
+            if isinstance(primary, dict):
+                diagnosis = str(primary.get("diagnosis") or "").strip()
+                lever = str(primary.get("recommended_lever") or "").strip()
+                if diagnosis and lever:
+                    finding_lines.append(f"**{cat}**: {diagnosis} → lever **{lever}**")
+                elif diagnosis:
+                    finding_lines.append(f"**{cat}**: {diagnosis}")
+                else:
+                    finding_lines.append(f"**{cat}**")
+            else:
+                finding_lines.append(f"**{cat}**")
+        suffix = f" (+{len(rc_findings) - 3} more)" if len(rc_findings) > 3 else ""
+        _emit(
+            "root_cause",
+            "Diagnosed root causes",
+            (
+                f"Identified {len(rc_findings)} root-cause finding(s)"
+                + (f"; top drivers: {'; '.join(finding_lines)}{suffix}." if finding_lines else ".")
+            ),
+            sources=spend_files,
+            metrics={"finding_count": len(rc_findings)},
+        )
 
     # Build raw rows once and feed them to savings_modeler — avoids a full
     # value_bridge_calculator call just to produce the intermediate raw_rows.
@@ -104,6 +257,53 @@ def run_core_pipeline(
     bridge = engine.value_bridge_calculator(benchmarks, internal, heuristics, profile["total_spend"], savings_model=savings_model)
     validation = engine.data_validator(bridge)
     validate_core_skill_outputs(profile, context, benchmarks, internal, heuristics, bridge, validation)
+
+    initiative_list = [i for i in savings_model.get("initiatives", []) if isinstance(i, dict)]
+    mid_savings = float((bridge.get("confidence_bands", {}) or {}).get("mid", 0.0) or 0.0)
+
+    def _initiative_savings(item: Dict[str, Any]) -> float:
+        net = item.get("net_savings") or {}
+        if isinstance(net, dict):
+            for key in ("total_3yr", "y3", "y1"):
+                val = net.get(key)
+                if val is not None:
+                    try:
+                        return float(val)
+                    except (TypeError, ValueError):
+                        continue
+        try:
+            return float(item.get("annualized_run_rate_savings") or 0.0)
+        except (TypeError, ValueError):
+            return 0.0
+
+    ranked_initiatives = sorted(
+        initiative_list,
+        key=_initiative_savings,
+        reverse=True,
+    )
+    initiative_bits: List[str] = []
+    for item in ranked_initiatives[:3]:
+        name = str(item.get("lever_name") or item.get("lever") or "initiative")
+        amt = _initiative_savings(item)
+        if amt > 0:
+            initiative_bits.append(f"**{name}** {_money(amt)}")
+        else:
+            initiative_bits.append(f"**{name}**")
+    initiative_suffix = (
+        f" (+{len(initiative_list) - 3} more)" if len(initiative_list) > 3 else ""
+    )
+    _emit(
+        "savings",
+        "Modelled savings opportunities",
+        (
+            f"Built {len(initiative_list)} initiative(s); mid-case portfolio savings "
+            f"{_money(mid_savings)}"
+            + (f" (~{(mid_savings / total_spend * 100):.1f}% of spend)" if total_spend > 0 else "")
+            + (f"; leading initiatives: {', '.join(initiative_bits)}{initiative_suffix}." if initiative_bits else ".")
+        ),
+        sources=spend_files,
+        metrics={"initiative_count": len(initiative_list), "mid_case_savings": mid_savings},
+    )
 
     # --- Strategic skills (board-deck / CFO-brief / business-case consumers) ---
     # scenario surface, shareholder-value bridge, BRSR co-benefits, assumption
@@ -244,6 +444,7 @@ def run_core_pipeline(
         normalized_spend=lines,
         context_summary=context["context_summary"],
         skill_outputs=skill_outputs,
+        analysis_trace=analysis_trace,
     )
     state_dict = state.model_dump(mode="json")
     _memory.put("session", session_id, state_dict)

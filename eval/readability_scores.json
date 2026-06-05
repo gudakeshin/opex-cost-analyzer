@@ -1,6 +1,6 @@
 {
   "eval_name": "Diagnostic Readability Eval",
-  "eval_date": "2026-06-03",
+  "eval_date": "2026-06-05",
   "platform_version": "v2.1",
   "overall_score": 10.0,
   "passed": true,
@@ -418,8 +418,8 @@
               "has_actionability_signal": true,
               "matched_keyword": "medium complexity",
               "complexity_tiers_in_vat": [
-                "high",
-                "medium"
+                "medium",
+                "high"
               ],
               "findings_preview": [
                 "Largest category: Rnd \u2014 \u20b9200 Cr (10.0% of revenue) at P50 benchmark; \u20b9100 Cr headroom to P25 best-in-class",
@@ -430,8 +430,8 @@
               "has_actionability_signal": true,
               "matched_keyword": "high complexity",
               "complexity_tiers_in_vat": [
-                "high",
-                "medium"
+                "medium",
+                "high"
               ],
               "findings_preview": [
                 "Largest category: Outsourced \u2014 \u20b95,000 Cr (10.0% of revenue) at P50 benchmark; \u20b92,000 Cr headroom to P25 best-in-class",
@@ -442,8 +442,8 @@
               "has_actionability_signal": true,
               "matched_keyword": "high complexity",
               "complexity_tiers_in_vat": [
-                "high",
-                "medium"
+                "medium",
+                "high"
               ],
               "findings_preview": [
                 "Largest category: Rnd \u2014 \u20b960 Cr (12.0% of revenue) at P50 benchmark; \u20b935 Cr headroom to P25 best-in-class",
@@ -457,8 +457,8 @@
               "has_actionability_signal": true,
               "matched_keyword": "medium complexity",
               "complexity_tiers_in_vat": [
-                "high",
-                "medium"
+                "medium",
+                "high"
               ],
               "findings_preview": [
                 "Largest category: Facilities \u2014 \u20b9240 Cr (8.0% of revenue) at P50 benchmark; \u20b990 Cr headroom to P25 best-in-class",

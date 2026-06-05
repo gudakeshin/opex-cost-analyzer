@@ -1,6 +1,7 @@
 import { sectorLabel } from '../constants/sectors';
 import type {
   AnalysisInsightSnapshot,
+  AnalysisTraceStep,
   CategoryInsightRow,
   ChartCategoryRow,
   ChatNextOption,
@@ -515,13 +516,30 @@ export function chatHasInsightSnapshot(messages: { insight_snapshot?: AnalysisIn
   return messages.some((m) => m.insight_snapshot != null && m.insight_snapshot.total_spend > 0);
 }
 
+/** Safe, high-level pipeline summary for the Thinking block (not raw chain-of-thought). */
+export function buildTraceThinkingSummary(trace: AnalysisTraceStep[]): string {
+  if (!trace.length) return '';
+  return trace
+    .map((step) => {
+      const detail = step.detail.replace(/\*\*/g, '');
+      const sources =
+        step.source_documents.length > 0
+          ? ` [from: ${step.source_documents.join(', ')}]`
+          : '';
+      return `${step.step}. ${step.title}: ${detail}${sources}`;
+    })
+    .join('\n\n');
+}
+
 export function buildRestoredInsightMessage(
   snapshot: AnalysisInsightSnapshot,
   manifest?: SessionManifest | null,
+  analysisTrace?: AnalysisTraceStep[],
 ): {
   role: 'assistant';
   content: string;
   insight_snapshot: AnalysisInsightSnapshot;
+  analysis_trace?: AnalysisTraceStep[];
   show_peer_savings: boolean;
   next_options: ChatNextOption[];
 } {
@@ -529,6 +547,7 @@ export function buildRestoredInsightMessage(
     role: 'assistant',
     content: buildAnalyzeCompleteContent(snapshot),
     insight_snapshot: snapshot,
+    analysis_trace: analysisTrace?.length ? analysisTrace : undefined,
     show_peer_savings: true,
     next_options: mergeNextOptions(buildProbePrompts(snapshot), buildDataRootedPrompts(snapshot, manifest)),
   };

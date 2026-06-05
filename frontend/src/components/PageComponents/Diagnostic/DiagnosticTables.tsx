@@ -65,7 +65,8 @@ export const BenchmarkGapsTable: React.FC<BenchmarkGapsTableProps> = ({
   profileBasis,
   percentileLegend,
 }) => {
-  const sorted = useMemo(() => sortBenchmarkGaps(gaps).slice(0, 10), [gaps]);
+  const allSorted = useMemo(() => sortBenchmarkGaps(gaps), [gaps]);
+  const sorted = useMemo(() => allSorted.slice(0, 10), [allSorted]);
   const panelSummary = benchmarkGapsPanelSummary(sorted);
   const legend = percentileLegend?.p25
     ? `P25 = ${percentileLegend.p25} · P50 = ${percentileLegend.p50 ?? 'industry median'}`
@@ -144,6 +145,11 @@ export const BenchmarkGapsTable: React.FC<BenchmarkGapsTableProps> = ({
             </tbody>
           </table>
         </div>
+        {allSorted.length > 10 && (
+          <p className="mt-2 text-xs text-brand-muted">
+            Showing top 10 of {allSorted.length} categories by savings gap.
+          </p>
+        )}
       </CollapsiblePanel>
     </Card>
   );

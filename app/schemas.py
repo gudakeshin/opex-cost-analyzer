@@ -74,6 +74,9 @@ class AnalyzeRequest(_FinancialParamsMixin):
     audience: str | None = None
     wacc: float = 0.10
     effective_tax_rate: float = 0.0
+    # Optional client-generated run id; when present, the analysis streams live
+    # progress steps to GET /api/v1/chat/progress/{run_id} as it executes.
+    run_id: str | None = None
 
 
 class SessionManifestPatch(BaseModel):
@@ -224,6 +227,7 @@ class CompanyResearchRequest(BaseModel):
     urls: List[str] = []
     headcount: int = 500
     wacc: float = 0.12
+    engagement_id: Optional[str] = None
 
 
 class DeepResearchStartRequest(BaseModel):

@@ -13,6 +13,9 @@ from app.config import DATA_DIR, MAX_UPLOAD_MB, UPLOAD_DIR, logger
 from app.routers._shared import (
     _memory,
     merge_context_into_manifest,
+    progress_append,
+    progress_complete,
+    progress_init,
     read_manifest,
     session_dir,
     session_lock,
@@ -27,6 +30,7 @@ from app.services.engagement_sanity import apply_engagement_sanity_to_manifest
 from app.services.engagement_corpus import load_analysis_corpus
 from app.services.engagements_store import (
     create_engagement_manifest,
+    read_engagement_manifest,
     register_session_on_engagement,
 )
 from app.services.ingestion import infer_tabular_schema, parse_document, parse_spend_file_with_report
@@ -127,6 +131,51 @@ def _dominant_currency(lines: List[Any]) -> str | None:
     if not totals:
         return None
     return max(totals, key=totals.__getitem__)
+
+
+_TABULAR_SUFFIXES = {".csv", ".xlsx", ".xls", ".json"}
+
+
+def _collect_source_files(manifest: Dict[str, Any]) -> Dict[str, List[str]]:
+    """Gather source-document names for trace attribution, split spend vs context.
+
+    Pulls engagement-level documents (which carry an explicit role) and
+    session-local uploads (classified by file extension). Best-effort: missing or
+    malformed entries are skipped so tracing never blocks analysis.
+    """
+    spend: List[str] = []
+    context: List[str] = []
+
+    engagement_id = manifest.get("engagement_id")
+    if engagement_id:
+        try:
+            em = read_engagement_manifest(str(engagement_id))
+        except Exception:
+            em = {}
+        for doc in em.get("documents") or []:
+            if not isinstance(doc, dict) or doc.get("status") != "ready":
+                continue
+            name = str(doc.get("filename") or "").strip()
+            if not name:
+                continue
+            role = doc.get("role")
+            if role in ("spend_tabular", "mixed"):
+                spend.append(name)
+            if role in ("context_doc", "mixed"):
+                context.append(name)
+
+    for entry in manifest.get("files") or []:
+        if not isinstance(entry, dict):
+            continue
+        name = str(entry.get("name") or "").strip()
+        if not name:
+            continue
+        if Path(name).suffix.lower() in _TABULAR_SUFFIXES:
+            spend.append(name)
+        else:
+            context.append(name)
+
+    return {"spend": sorted(set(spend)), "context": sorted(set(context))}
 
 
 def _format_ingestion_summary(report: Dict[str, Any]) -> str:
@@ -370,20 +419,45 @@ async def analyze_session(session_id: str, payload: AnalyzeRequest) -> Dict[str,
         ingestion_summary = (
             f"{ingestion_summary} Warnings: {'; '.join(corpus_warnings[:5])}".strip()
         )
-    analysis = await asyncio.to_thread(
-        run_core_pipeline,
-        session_id=session_id,
-        lines=spend_lines,
-        docs_text=docs_text,
-        industry=payload.industry or manifest.get("industry") or "",
-        annual_revenue=payload.annual_revenue or float(manifest.get("annual_revenue") or 0.0),
-        company_name=payload.company_name or manifest.get("company_name"),
-        wacc=float(manifest.get("wacc") or payload.wacc or 0.10),
-        effective_tax_rate=float(manifest.get("effective_tax_rate") or payload.effective_tax_rate or 0.0),
-        reporting_currency=reporting_currency,
-        engagement_id=manifest.get("engagement_id"),
-        ingestion_summary=ingestion_summary or None,
-    )
+
+    # Source-document attribution for the analysis trace: engagement-level docs
+    # (which carry an explicit role) plus session-local uploads (classified by
+    # extension). Names let each trace step cite where its insight came from.
+    source_files = _collect_source_files(manifest)
+
+    # Live progress: when the client supplies a run_id it polls
+    # GET /api/v1/chat/progress/{run_id} while the pipeline runs.
+    run_id = payload.run_id
+    progress_cb = None
+    if run_id:
+        progress_init(run_id, session_id)
+        progress_append(run_id, "observe", "Loading spend and context documents…")
+        progress_cb = lambda phase, msg: progress_append(run_id, phase, msg)  # noqa: E731
+
+    try:
+        analysis = await asyncio.to_thread(
+            run_core_pipeline,
+            session_id=session_id,
+            lines=spend_lines,
+            docs_text=docs_text,
+            industry=payload.industry or manifest.get("industry") or "",
+            annual_revenue=payload.annual_revenue or float(manifest.get("annual_revenue") or 0.0),
+            company_name=payload.company_name or manifest.get("company_name"),
+            wacc=float(manifest.get("wacc") or payload.wacc or 0.10),
+            effective_tax_rate=float(manifest.get("effective_tax_rate") or payload.effective_tax_rate or 0.0),
+            reporting_currency=reporting_currency,
+            engagement_id=manifest.get("engagement_id"),
+            ingestion_summary=ingestion_summary or None,
+            progress_cb=progress_cb,
+            source_files=source_files,
+        )
+    except Exception as exc:
+        if run_id:
+            progress_complete(run_id, failed=True, error=str(exc)[:300])
+        raise
+    if run_id:
+        progress_append(run_id, "reflect", "Analysis complete.")
+        progress_complete(run_id)
     manifest_changed = False
     if analysis.get("company_name") and manifest.get("company_name") != analysis["company_name"]:
         manifest["company_name"] = analysis["company_name"]

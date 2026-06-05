@@ -31,6 +31,50 @@ describe('diagnosticPersistence', () => {
     expect(form.urlsText).toBe('https://acme.com');
   });
 
+  it('falls back to detected values when user fields are unset', () => {
+    const manifest: SessionManifest = {
+      session_id: 's1',
+      company_name: 'New engagement',
+      industry: '',
+    };
+    const form = formStateFromManifest(manifest, {
+      company_name: 'New engagement',
+      industry: '',
+      detected_company_name: 'Belrise',
+      detected_industry: 'fmcg_consumer',
+    });
+    expect(form.companyName).toBe('Belrise');
+    expect(form.industry).toBe('fmcg_consumer');
+  });
+
+  it('prefers detected industry over placeholder engagement default', () => {
+    const manifest: SessionManifest = {
+      session_id: 's1',
+      company_name: 'New engagement',
+      industry: '',
+    };
+    const form = formStateFromManifest(manifest, {
+      company_name: 'New engagement',
+      industry: 'manufacturing_diversified',
+      detected_industry: 'it_ites',
+    });
+    expect(form.industry).toBe('it_ites');
+  });
+
+  it('does not override explicit user industry with detected value', () => {
+    const manifest: SessionManifest = {
+      session_id: 's1',
+      company_name: 'Acme',
+      industry: 'it_ites',
+    };
+    const form = formStateFromManifest(manifest, {
+      company_name: 'Acme',
+      industry: 'it_ites',
+      detected_industry: 'fmcg_consumer',
+    });
+    expect(form.industry).toBe('it_ites');
+  });
+
   it('builds diagnostic context patch with result', () => {
     const result: DiagnosticResponse = {
       company_name: 'Acme',

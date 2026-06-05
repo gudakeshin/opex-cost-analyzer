@@ -1412,8 +1412,9 @@ def parse_spend_json_with_report(
         "format": "json",
         "rows_parsed": len(lines),
         "column_mapping_note": note,
+        "_empty_parse_rows": len(frame) - len(lines),
     }
-    return lines, report
+    return lines, _enrich_ingestion_report(report, lines, note)
 
 
 def parse_spend_json(

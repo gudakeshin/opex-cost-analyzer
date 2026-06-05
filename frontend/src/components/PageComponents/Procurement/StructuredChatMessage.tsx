@@ -1,5 +1,6 @@
 import React from 'react';
 import { ConfidenceBadge } from '../../Trust/ConfidenceBadge';
+import { AnalysisTraceBlock } from './AnalysisTraceBlock';
 import { ChatInsightBlock } from './ChatInsightBlock';
 import { ProbeQuestionsBlock } from './ProbeQuestionsBlock';
 import { ThinkingBlock } from './ThinkingBlock';
@@ -172,6 +173,10 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
 
         {!isUser && message.thinking && (
           <ThinkingBlock thinking={message.thinking} />
+        )}
+
+        {!isUser && message.analysis_trace && message.analysis_trace.length > 0 && (
+          <AnalysisTraceBlock steps={message.analysis_trace} />
         )}
 
         {!isUser && message.insight_snapshot && (

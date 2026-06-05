@@ -1,6 +1,6 @@
 # Diagnostic Feature Eval — ✅ PASS
 
-**Date:** 2026-06-03  |  **Version:** v2.1  |  **Overall Score:** 9.5/10
+**Date:** 2026-06-05  |  **Version:** v2.1  |  **Overall Score:** 9.35/10
 
 ## Summary
 
@@ -9,7 +9,7 @@
 | Data Integrity | 10.0/10 | 30% | ✅ |
 | Analysis Completeness | 9.9/10 | 35% | ✅ |
 | Schema & Signal Integrity | 10.0/10 | 15% | ✅ |
-| Input Signal Quality | 7.7/10 | 20% | ✅ |
+| Input Signal Quality | 6.9/10 | 20% | ✅ |
 
 ## Dimension Detail
 
@@ -24,7 +24,7 @@
 | DG-07 | Diagnostic Signal Schema | 10.0 | 9.0 | ✅ | 0.0 |
 | DG-08 | Sector Pack Mapping Coverage | 10.0 | 8.0 | ✅ | 0.0 |
 | DG-09 | Document Contextualizer Signal Quality | 6.0 | 4.0 | ✅ | 0.0 |
-| DG-10 | Circular Benchmark Derivation Disclosure | 7.5 | 5.0 | ✅ | 0.0 |
+| DG-10 | Circular Benchmark Derivation Disclosure | 5.0 | 5.0 | ✅ | 0.0 |
 | DG-11 | Silent Parameter Defaulting | 10.0 | 4.0 | ✅ | 0.0 |
 
 ## Known Stubs & Inconsistencies

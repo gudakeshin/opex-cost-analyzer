@@ -533,6 +533,7 @@ def synthesize_analysis_claude(
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
     deep_research_summary: str | None = None,
+    retrieved_context: List[str] | None = None,
 ) -> Tuple[Dict[str, Any] | None, str | None]:
     """Synthesize executive recommendations from deterministic skill outputs.
 
@@ -550,7 +551,7 @@ def synthesize_analysis_claude(
         },
         "model_manifest": model_manifest or {},
         "skill_outputs": _slim_skill_outputs(skill_outputs),
-        "document_chunks": _truncate_doc_chunks(docs_text, max_chunks=2),
+        "document_chunks": retrieved_context if retrieved_context else _truncate_doc_chunks(docs_text, max_chunks=2),
         "transaction_examples_by_category": _slim_transaction_examples(transaction_examples),
     }
     if deep_research_summary:
@@ -633,6 +634,7 @@ def synthesize_analysis_claude_with_meta(
     transaction_examples: Dict[str, List[Dict[str, Any]]] | None = None,
     strict_mode: bool = False,
     deep_research_summary: str | None = None,
+    retrieved_context: List[str] | None = None,
 ) -> Tuple[Dict[str, Any] | None, str | None]:
     if not ANTHROPIC_ENABLED:
         return None, "provider_disabled"
@@ -646,7 +648,7 @@ def synthesize_analysis_claude_with_meta(
         },
         "model_manifest": model_manifest or {},
         "skill_outputs": _slim_skill_outputs(skill_outputs),
-        "document_chunks": _truncate_doc_chunks(docs_text, max_chunks=2),
+        "document_chunks": retrieved_context if retrieved_context else _truncate_doc_chunks(docs_text, max_chunks=2),
         "transaction_examples_by_category": _slim_transaction_examples(transaction_examples),
     }
     if deep_research_summary:

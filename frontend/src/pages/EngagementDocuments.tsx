@@ -1,18 +1,28 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { PageHeader } from '../components/Common/PageHeader';
 import { Card } from '../components/Common/Card';
 import { Alert } from '../components/Common/Alert';
 import { Loader } from '../components/Common/Loader';
 import { Button } from '../components/Common/Button';
+import { Input } from '../components/Common/Input';
+import { Select } from '../components/Common/Select';
 import { useSession } from '../context/SessionContext';
 import { apiDelete, apiGet, apiPost, apiUpload, getApiErrorMessage } from '../hooks/useApi';
 import { formatFileSize } from '../utils/sessionFiles';
+import { SECTOR_OPTIONS } from '../constants/sectors';
 import type { EngagementDocument, EngagementSummary } from '../types';
 
 const ACCEPT =
   '.csv,.xlsx,.xls,.json,.pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json';
+
+const CURRENCY_OPTIONS = [
+  { value: 'INR', label: 'INR (₹)' },
+  { value: 'USD', label: 'USD ($)' },
+  { value: 'EUR', label: 'EUR (€)' },
+  { value: 'GBP', label: 'GBP (£)' },
+];
 
 const STATUS_STYLES: Record<string, string> = {
   pending: 'bg-amber-50 text-amber-900 border-amber-200',
@@ -26,6 +36,7 @@ function truncateId(id: string): string {
 }
 
 export const EngagementDocuments: React.FC = () => {
+  const navigate = useNavigate();
   const {
     engagementId,
     setEngagementId,
@@ -41,7 +52,17 @@ export const EngagementDocuments: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const uploadSectionRef = useRef<HTMLDivElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // New engagement modal state
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newIndustry, setNewIndustry] = useState('manufacturing_diversified');
+  const [newRevenueCr, setNewRevenueCr] = useState('5000');
+  const [newCurrency, setNewCurrency] = useState('INR');
+  const [creating, setCreating] = useState(false);
+  const [justCreatedId, setJustCreatedId] = useState<string | null>(null);
 
   const loadEngagements = useCallback(async () => {
     const list = await listEngagements();
@@ -82,22 +103,24 @@ export const EngagementDocuments: React.FC = () => {
     refresh();
   }, [refresh]);
 
+  const hasPending = documents.some(
+    (d) => d.status === 'pending' || d.status === 'processing',
+  );
+
   useEffect(() => {
     if (pollRef.current) clearInterval(pollRef.current);
-    const pending = documents.some(
-      (d) => d.status === 'pending' || d.status === 'processing',
-    );
-    if (!engagementId || !pending) return;
+    if (!engagementId || !hasPending) return;
     pollRef.current = setInterval(() => {
       loadDocuments(engagementId).catch(() => undefined);
     }, 2500);
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
-  }, [documents, engagementId, loadDocuments]);
+  }, [hasPending, engagementId, loadDocuments]);
 
   const handleSelectEngagement = async (eid: string) => {
     setEngagementId(eid);
+    setJustCreatedId(null);
     setLoading(true);
     try {
       await loadDocuments(eid);
@@ -108,20 +131,33 @@ export const EngagementDocuments: React.FC = () => {
     }
   };
 
-  const handleNewEngagement = async () => {
-    setLoading(true);
+  const openCreateModal = () => {
+    setNewName('');
+    setNewIndustry(engagement.industry || 'manufacturing_diversified');
+    setNewRevenueCr(engagement.annual_revenue_cr ? String(engagement.annual_revenue_cr) : '5000');
+    setNewCurrency(engagement.currency || 'INR');
+    setShowCreateModal(true);
+  };
+
+  const handleCreateEngagement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newName.trim()) return;
+    setCreating(true);
     try {
       const eid = await createEngagement({
-        company_name: 'New engagement',
-        industry: engagement.industry,
-        currency: engagement.currency || 'INR',
+        company_name: newName.trim(),
+        industry: newIndustry,
+        annual_revenue: parseFloat(newRevenueCr) * 1e7,
+        currency: newCurrency,
       });
       await loadEngagements();
       await loadDocuments(eid);
+      setJustCreatedId(eid);
+      setShowCreateModal(false);
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {
-      setLoading(false);
+      setCreating(false);
     }
   };
 
@@ -165,6 +201,9 @@ export const EngagementDocuments: React.FC = () => {
     }
   };
 
+  const activeEngagement = engagements.find((e) => e.engagement_id === engagementId);
+  const readyDocCount = documents.filter((d) => d.status === 'ready').length;
+
   return (
     <MainLayout>
       <PageHeader
@@ -193,16 +232,59 @@ export const EngagementDocuments: React.FC = () => {
         </Alert>
       )}
 
+      {/* Post-creation success banner */}
+      {justCreatedId && justCreatedId === engagementId && (
+        <div className="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-emerald-800">
+              Engagement created — {activeEngagement?.company_name}
+            </p>
+            <p className="text-xs text-emerald-700 mt-0.5">
+              Upload your spend files below, then run Analysis or Diagnostic.
+            </p>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <button
+              type="button"
+              className="px-3 py-1.5 rounded-lg bg-white border border-emerald-300 text-xs font-medium text-emerald-800 hover:bg-emerald-50 transition-colors"
+              onClick={() => uploadSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              Upload files ↓
+            </button>
+            <button
+              type="button"
+              className="px-3 py-1.5 rounded-lg bg-white border border-brand-border text-xs font-medium text-brand-ink hover:bg-brand-surface-muted transition-colors"
+              onClick={() => navigate('/')}
+            >
+              Analysis →
+            </button>
+            <button
+              type="button"
+              className="px-3 py-1.5 rounded-lg bg-deloitte-green text-white text-xs font-medium hover:bg-[#6fa31e] transition-colors"
+              onClick={() => navigate('/diagnostic')}
+            >
+              Diagnostic →
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         <Card title="Engagement" className="bg-white border-brand-border lg:col-span-1">
           <p className="text-xs text-brand-muted mb-3">
             One engagement can have multiple analysis sessions. Documents apply to all sessions
             under this engagement.
           </p>
-          {engagementId && (
-            <p className="text-xs font-mono text-brand-ink mb-3">
-              ID: {engagementId}
-            </p>
+          {activeEngagement && (
+            <div className="mb-3 p-2.5 bg-brand-surface-muted rounded-lg border border-brand-border">
+              <p className="text-xs font-semibold text-brand-ink">{activeEngagement.company_name}</p>
+              <p className="text-[10px] font-mono text-brand-muted mt-0.5">{engagementId}</p>
+              {readyDocCount > 0 && (
+                <p className="text-[10px] text-emerald-700 mt-1 font-medium">
+                  {readyDocCount} document{readyDocCount !== 1 ? 's' : ''} ready
+                </p>
+              )}
+            </div>
           )}
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {engagements.map((e) => (
@@ -223,42 +305,62 @@ export const EngagementDocuments: React.FC = () => {
               </button>
             ))}
           </div>
-          <Button type="button" variant="secondary" className="mt-4 w-full" onClick={handleNewEngagement}>
-            New engagement
+          <Button type="button" variant="secondary" className="mt-4 w-full" onClick={openCreateModal}>
+            + New engagement
           </Button>
+
+          {/* Navigation shortcuts */}
+          {engagementId && (
+            <div className="mt-3 flex gap-2">
+              <Link
+                to="/"
+                className="flex-1 text-center px-2 py-1.5 rounded-lg border border-brand-border text-xs font-medium text-brand-ink hover:bg-brand-surface-muted transition-colors"
+              >
+                Analysis →
+              </Link>
+              <Link
+                to="/diagnostic"
+                className="flex-1 text-center px-2 py-1.5 rounded-lg border border-brand-border text-xs font-medium text-brand-ink hover:bg-brand-surface-muted transition-colors"
+              >
+                Diagnostic →
+              </Link>
+            </div>
+          )}
         </Card>
 
-        <Card title="Upload files" className="bg-white border-brand-border lg:col-span-2">
-          <p className="text-sm text-brand-muted mb-4">
-            Supported: CSV, Excel (.xlsx, .xls), JSON, PDF, DOCX, TXT. Tabular files feed spend
-            analysis; documents enrich context via LlamaParse when configured.
-          </p>
-          <div
-            className="border-2 border-dashed border-brand-border rounded-xl p-8 text-center hover:border-deloitte-green/50 transition-colors"
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              e.preventDefault();
-              void handleUpload(e.dataTransfer.files);
-            }}
-          >
-            <input
-              ref={fileRef}
-              type="file"
-              multiple
-              accept={ACCEPT}
-              className="hidden"
-              onChange={(e) => void handleUpload(e.target.files)}
-            />
-            <p className="text-sm text-brand-ink mb-3">Drag and drop files here, or</p>
-            <Button
-              type="button"
-              disabled={uploading || !engagementId}
-              onClick={() => fileRef.current?.click()}
+        <div ref={uploadSectionRef} className="lg:col-span-2">
+          <Card title="Upload files" className="bg-white border-brand-border h-full">
+            <p className="text-sm text-brand-muted mb-4">
+              Supported: CSV, Excel (.xlsx, .xls), JSON, PDF, DOCX, TXT. Tabular files feed spend
+              analysis; documents enrich context via LlamaParse when configured.
+            </p>
+            <div
+              className="border-2 border-dashed border-brand-border rounded-xl p-8 text-center hover:border-deloitte-green/50 transition-colors"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                void handleUpload(e.dataTransfer.files);
+              }}
             >
-              {uploading ? 'Uploading…' : 'Choose files'}
-            </Button>
-          </div>
-        </Card>
+              <input
+                ref={fileRef}
+                type="file"
+                multiple
+                accept={ACCEPT}
+                className="hidden"
+                onChange={(e) => void handleUpload(e.target.files)}
+              />
+              <p className="text-sm text-brand-ink mb-3">Drag and drop files here, or</p>
+              <Button
+                type="button"
+                disabled={uploading || !engagementId}
+                onClick={() => fileRef.current?.click()}
+              >
+                {uploading ? 'Uploading…' : 'Choose files'}
+              </Button>
+            </div>
+          </Card>
+        </div>
       </div>
 
       <Card title="Document library" className="bg-white border-brand-border mt-6">
@@ -348,8 +450,69 @@ export const EngagementDocuments: React.FC = () => {
         <Link to="/" className="text-deloitte-green hover:underline">
           Analysis
         </Link>{' '}
-        to run the pipeline — it uses documents from this engagement plus any session attachments.
+        or{' '}
+        <Link to="/diagnostic" className="text-deloitte-green hover:underline">
+          Diagnostic
+        </Link>{' '}
+        — both use documents from this engagement.
       </p>
+
+      {/* New engagement modal */}
+      {showCreateModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+          onClick={(e) => { if (e.target === e.currentTarget) setShowCreateModal(false); }}
+        >
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
+            <h2 className="text-lg font-semibold text-brand-ink mb-1">New engagement</h2>
+            <p className="text-xs text-brand-muted mb-5">
+              Enter company details. You can upload documents once the engagement is created.
+            </p>
+            <form onSubmit={handleCreateEngagement} className="space-y-4">
+              <Input
+                label="Company name"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="e.g. Acme Corp"
+                required
+              />
+              <Select
+                label="Industry"
+                value={newIndustry}
+                onChange={(e) => setNewIndustry(e.target.value)}
+                options={SECTOR_OPTIONS as unknown as { value: string; label: string }[]}
+              />
+              <Input
+                label="Annual Revenue (₹ Cr)"
+                type="number"
+                value={newRevenueCr}
+                onChange={(e) => setNewRevenueCr(e.target.value)}
+                placeholder="5000"
+              />
+              <Select
+                label="Reporting Currency"
+                value={newCurrency}
+                onChange={(e) => setNewCurrency(e.target.value)}
+                options={CURRENCY_OPTIONS}
+              />
+              <div className="flex gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="flex-1"
+                  onClick={() => setShowCreateModal(false)}
+                  disabled={creating}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" className="flex-1" disabled={creating || !newName.trim()} loading={creating}>
+                  Create engagement
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 };

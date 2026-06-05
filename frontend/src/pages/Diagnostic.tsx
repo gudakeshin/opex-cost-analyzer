@@ -5,6 +5,7 @@ import { Button } from '../components/Common/Button';
 import { Card } from '../components/Common/Card';
 import { Input } from '../components/Common/Input';
 import { Select } from '../components/Common/Select';
+import { RecommendedBadge } from '../components/Common/RecommendedBadge';
 import { Loader } from '../components/Common/Loader';
 import { Alert } from '../components/Common/Alert';
 import { PageHeader } from '../components/Common/PageHeader';
@@ -52,11 +53,15 @@ const SECTOR_OPTIONS = [
   { value: 'telecom_infra', label: 'Telecom & Infrastructure' },
 ];
 
+function sectorLabel(value: string): string {
+  return SECTOR_OPTIONS.find((o) => o.value === value)?.label || value;
+}
+
 const FORM_SAVE_DEBOUNCE_MS = 500;
 
 export const Diagnostic: React.FC = () => {
   const navigate = useNavigate();
-  const { sessionId, ensureSession, refreshEngagement, engagement } = useSession();
+  const { sessionId, engagementId, ensureSession, refreshEngagement, engagement } = useSession();
   const [activeSid, setActiveSid] = useState<string | null>(sessionId);
   const [hydrating, setHydrating] = useState(true);
   const [manifest, setManifest] = useState<SessionManifest | null>(null);
@@ -69,8 +74,10 @@ export const Diagnostic: React.FC = () => {
   const [result, setResult] = useState<DiagnosticResponse | null>(null);
   const [deepResearchSummary, setDeepResearchSummary] = useState<string | null>(null);
   const [handoffLoading, setHandoffLoading] = useState(false);
+  const [engagementDocCount, setEngagementDocCount] = useState(0);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipFormSaveRef = useRef(true);
+  const engagementHydratedRef = useRef(false);
 
   const formState = useCallback(
     () => ({ companyName, industry, revenueCr, urlsText }),
@@ -112,7 +119,13 @@ export const Diagnostic: React.FC = () => {
         if (cancelled) return;
         setManifest(m);
 
-        const form = formStateFromManifest(m, engagement);
+        const form = formStateFromManifest(m, {
+          company_name: engagement.company_name,
+          industry: engagement.industry,
+          annual_revenue_cr: engagement.annual_revenue_cr,
+          detected_company_name: engagement.detected_company_name,
+          detected_industry: engagement.detected_industry,
+        });
         setCompanyName(form.companyName);
         setIndustry(form.industry);
         setRevenueCr(form.revenueCr);
@@ -141,6 +154,47 @@ export const Diagnostic: React.FC = () => {
       cancelled = true;
     };
   }, [sessionId, ensureSession]);
+
+  // Pre-fill form from engagement metadata (once, after hydration, only if form is empty)
+  useEffect(() => {
+    if (hydrating || engagementHydratedRef.current) return;
+    const effectiveCompany =
+      engagement.company_name && engagement.company_name !== 'New engagement'
+        ? engagement.company_name
+        : engagement.detected_company_name || '';
+    const effectiveIndustry =
+      engagement.detected_industry &&
+      (!engagement.industry || engagement.industry === 'manufacturing_diversified')
+        ? engagement.detected_industry
+        : engagement.industry || engagement.detected_industry || '';
+    if (!effectiveCompany && !effectiveIndustry) return;
+    engagementHydratedRef.current = true;
+    if (!companyName && effectiveCompany) setCompanyName(effectiveCompany);
+    if (!industry && effectiveIndustry) setIndustry(effectiveIndustry);
+    if (engagement.annual_revenue_cr && engagement.annual_revenue_cr > 0) {
+      setRevenueCr(String(engagement.annual_revenue_cr));
+    }
+  }, [
+    hydrating,
+    engagement.company_name,
+    engagement.detected_company_name,
+    engagement.industry,
+    engagement.detected_industry,
+    engagement.annual_revenue_cr,
+    companyName,
+    industry,
+  ]);
+
+  // Fetch engagement document count for the context banner
+  useEffect(() => {
+    if (!engagementId) return;
+    apiGet<{ documents: { status: string }[] }>(`/api/v1/engagements/${engagementId}/documents`)
+      .then((res) => {
+        const ready = (res.documents ?? []).filter((d) => d.status === 'ready').length;
+        setEngagementDocCount(ready);
+      })
+      .catch(() => setEngagementDocCount(0));
+  }, [engagementId]);
 
   useEffect(() => {
     if (!activeSid || hydrating || skipFormSaveRef.current) return;
@@ -214,6 +268,7 @@ export const Diagnostic: React.FC = () => {
         industry,
         annual_revenue_cr: parseFloat(revenueCr) || 5000,
         urls: parseUrlsText(urlsText),
+        ...(engagementId ? { engagement_id: engagementId } : {}),
       };
       const res = await apiPost<DiagnosticResponse>(
         '/api/v1/diagnostic/company-research',
@@ -276,24 +331,78 @@ export const Diagnostic: React.FC = () => {
           </Alert>
         )}
 
+        {/* Engagement context banner */}
+        {engagementId && engagementDocCount > 0 && (
+          <div className="flex items-start gap-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-800">
+            <svg className="w-4 h-4 mt-0.5 shrink-0 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <div>
+              <span className="font-semibold">{engagementDocCount} document{engagementDocCount !== 1 ? 's' : ''} loaded</span>
+              {' from '}
+              <span className="font-semibold">{engagement.company_name}</span>
+              {' — diagnostic will use actual spend data where available.'}
+              {' '}
+              <a href="/ui/documents" className="underline hover:text-blue-900">Manage documents</a>
+            </div>
+          </div>
+        )}
+        {engagementId && engagementDocCount === 0 && (
+          <div className="flex items-start gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800">
+            <svg className="w-4 h-4 mt-0.5 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              No documents uploaded for <span className="font-semibold">{engagement.company_name}</span> — diagnostic will use benchmark proxies.{' '}
+              <a href="/ui/documents" className="underline hover:text-amber-900">Upload documents</a> for actual-spend analysis.
+            </div>
+          </div>
+        )}
+
         <Card className="border-brand-border bg-white">
           <p className="text-brand-muted mb-6">
             Enter company details for benchmark-backed diagnostic research.
           </p>
           <form onSubmit={handleAnalyze} className="space-y-4">
-            <Input
-              label="Company Name"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              placeholder="Enter company name…"
-              required
-            />
-            <Select
-              label="Industry (sector pack)"
-              value={industry}
-              onChange={(e) => setIndustry(e.target.value)}
-              options={SECTOR_OPTIONS}
-            />
+            <div>
+              <Input
+                label="Company Name"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="Enter company name…"
+                required
+              />
+              {engagement.detected_company_name && (
+                <RecommendedBadge
+                  className="mt-1"
+                  label={engagement.detected_company_name}
+                  matches={
+                    companyName.trim().toLowerCase() ===
+                    engagement.detected_company_name.toLowerCase()
+                  }
+                  onApply={() => setCompanyName(engagement.detected_company_name as string)}
+                />
+              )}
+            </div>
+            <div>
+              <Select
+                label="Industry (sector pack)"
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value)}
+                options={SECTOR_OPTIONS}
+              />
+              {engagement.detected_industry && (
+                <RecommendedBadge
+                  className="mt-1"
+                  label={
+                    engagement.detected_industry_label ||
+                    sectorLabel(engagement.detected_industry)
+                  }
+                  matches={industry === engagement.detected_industry}
+                  onApply={() => setIndustry(engagement.detected_industry as string)}
+                />
+              )}
+            </div>
             <Input
               label="Annual Revenue (₹ Cr)"
               type="number"

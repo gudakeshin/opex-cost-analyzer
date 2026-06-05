@@ -91,6 +91,18 @@ QDRANT_ENABLED = os.getenv("QDRANT_ENABLED", "true").lower() not in ("false", "0
 # Sentence-transformers embedding model used for Qdrant semantic search (runs locally, no API cost)
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 
+# Parent-child (hierarchical) document RAG over engagement documents.
+# Children (leaf chunks) are embedded into the DOC_CHUNKS_COLLECTION Qdrant collection;
+# parents (full sections) live in a filesystem doc store and are merged back in at retrieval.
+DOC_RAG_ENABLED = os.getenv("DOC_RAG_ENABLED", "true").lower() not in ("false", "0", "no")
+DOC_CHUNKS_COLLECTION = os.getenv("DOC_CHUNKS_COLLECTION", "document_chunks")
+DOC_PARENT_CHARS = int(os.getenv("DOC_PARENT_CHARS", "4000"))   # ~1024 tokens
+DOC_CHILD_CHARS = int(os.getenv("DOC_CHILD_CHARS", "1000"))     # ~256 tokens
+DOC_CHILD_OVERLAP = int(os.getenv("DOC_CHILD_OVERLAP", "150"))
+DOC_RETRIEVE_TOP_K = int(os.getenv("DOC_RETRIEVE_TOP_K", "12"))
+DOC_MERGE_MIN_CHILDREN = int(os.getenv("DOC_MERGE_MIN_CHILDREN", "2"))
+DOC_CONTEXT_CHAR_BUDGET = int(os.getenv("DOC_CONTEXT_CHAR_BUDGET", "8000"))
+
 # Deep Research — uses Google Interactions API (same GEMINI_API_KEY, requires google-genai package)
 DEEP_RESEARCH_ENABLED = bool(GEMINI_API_KEY)
 

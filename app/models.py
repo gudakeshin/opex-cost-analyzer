@@ -123,6 +123,10 @@ class SessionAnalysisState(BaseModel):
     normalized_spend: List[NormalizedSpendLine] = Field(default_factory=list)
     context_summary: str = ""
     skill_outputs: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
+    # Human-readable, ordered trace of how the analysis was derived — one entry
+    # per pipeline step, each carrying the source documents it drew on. Surfaced
+    # as the "How this analysis was derived" collapsible in the chat.
+    analysis_trace: List[Dict[str, Any]] = Field(default_factory=list)
     updated_at: datetime = Field(default_factory=_utcnow)
 
 

@@ -48,6 +48,17 @@ def _run_document_pipeline(engagement_id: str, document_id: str, currency: str) 
             reporting_currency=currency,
         )
         append_audit_event(f"document_parsed engagement_id={engagement_id} document_id={document_id}")
+        # Refresh the engagement's auto-detected company/industry recommendation
+        # from everything parsed so far. Off the request path (background task);
+        # the LLM contextualizer is cached by content hash inside detection.
+        try:
+            from app.services.engagement_detection import detect_engagement_profile
+            from app.services.engagements_store import update_engagement_detection
+
+            detection = detect_engagement_profile(engagement_id)
+            update_engagement_detection(engagement_id, detection)
+        except Exception as exc:
+            logger.warning("engagement detection failed engagement_id=%s: %s", engagement_id, exc)
     except Exception as exc:
         logger.warning("background document pipeline failed: %s", exc)
         append_audit_event(
@@ -172,9 +183,11 @@ async def upload_document(
     ddir = document_dir(engagement_id, document_id)
     ddir.mkdir(parents=True, exist_ok=True)
     raw_path = ddir / f"raw{suffix}"
-    raw_path.write_bytes(content)
 
+    # Write file and update manifest inside the same lock so they're atomic.
+    # Also re-read the manifest inside the lock to get the current currency (P0-2, P0-3).
     async with engagement_lock(engagement_id):
+        raw_path.write_bytes(content)
         record = add_document_record(
             engagement_id,
             document_id=document_id,
@@ -183,11 +196,12 @@ async def upload_document(
             size_bytes=len(content),
             raw_path=str(raw_path),
         )
+        fresh_manifest = read_engagement_manifest(engagement_id)
+        currency = str(fresh_manifest.get("currency") or "INR")
 
     append_audit_event(
         f"document_uploaded engagement_id={engagement_id} document_id={document_id} file={safe_filename}"
     )
-    currency = str(manifest.get("currency") or "INR")
     background_tasks.add_task(_run_document_pipeline, engagement_id, document_id, currency)
     return {"document": record, "status": "pending"}
 

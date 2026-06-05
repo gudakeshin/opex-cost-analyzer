@@ -214,7 +214,8 @@ def _check_double_count(
     lever = str(initiative.get("lever") or "")
     overlapping = [
         i for i in all_initiatives
-        if str(i.get("category_id") or "") == cat
+        if isinstance(i, dict)
+        and str(i.get("category_id") or "") == cat
         and str(i.get("lever") or "") != lever
     ]
     if not overlapping:

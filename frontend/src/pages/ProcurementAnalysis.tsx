@@ -5,6 +5,7 @@ import { Loader } from '../components/Common/Loader';
 import { Alert } from '../components/Common/Alert';
 import { PageHeader } from '../components/Common/PageHeader';
 import { Select } from '../components/Common/Select';
+import { RecommendedBadge } from '../components/Common/RecommendedBadge';
 import { StructuredChatMessage } from '../components/PageComponents/Procurement/StructuredChatMessage';
 import { InsightCards } from '../components/PageComponents/Procurement/InsightCards';
 import { PlanApprovalModal } from '../components/PageComponents/Procurement/PlanApprovalModal';
@@ -16,8 +17,10 @@ import { useSession } from '../context/SessionContext';
 import { apiGet, apiPatch, apiPost, apiUpload, getApiErrorMessage } from '../hooks/useApi';
 import { friendlyErrorMessage } from '../utils/errorMessages';
 import { clearChatMessages, loadChatMessages, saveChatMessages } from '../utils/chatStorage';
+import { effectiveAnalysisIndustry } from '../utils/engagementContext';
 import {
   buildAnalyzeCompleteContent,
+  buildTraceThinkingSummary,
   buildDataRootedPrompts,
   buildDeepDivePrompts,
   buildRestoredInsightMessage,
@@ -40,6 +43,7 @@ import {
 import type { EngagementSanityConflict } from '../types';
 import type { ManifestFileEntry } from '../utils/sessionFiles';
 import type {
+  AnalysisTraceStep,
   ChatMessage,
   ChatPlanPreview,
   ChatProgressResponse,
@@ -86,18 +90,14 @@ const DeepResearchBanner: React.FC<{ companyName: string; onDismiss: () => void 
   </div>
 );
 
-const ANALYZE_PIPELINE_STEPS: ProgressStep[] = [
-  { phase: 'act', message: 'Running spend-profiler…' },
-  { phase: 'act', message: 'Running document-contextualizer & peer-benchmarker…' },
-  { phase: 'act', message: 'Running heuristic-analyzer & root-cause-analyzer…' },
-  { phase: 'act', message: 'Running savings-modeler & value-bridge-calculator…' },
-  { phase: 'reflect', message: 'Validating outputs and persisting session…' },
-];
-
-function contextPayload(engagement: EngagementMeta): Record<string, unknown> {
+function contextPayload(
+  engagement: EngagementMeta,
+  manifest?: SessionManifest | null,
+): Record<string, unknown> {
+  const industry = effectiveAnalysisIndustry(manifest, engagement);
   const body: Record<string, unknown> = {
-    industry: engagement.industry || undefined,
-    currency: engagement.currency,
+    industry: industry || undefined,
+    currency: engagement.currency || 'INR',
   };
   if (engagement.company_name && engagement.company_name !== 'New engagement') {
     body.company_name = engagement.company_name;
@@ -152,6 +152,7 @@ export const ProcurementAnalysis: React.FC = () => {
     engagementId,
     setSessionId,
     ensureSession,
+    ensureEngagement,
     engagement,
     refreshEngagement,
     syncEngagementFromAnalysis,
@@ -164,6 +165,7 @@ export const ProcurementAnalysis: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<SessionResponse | null>(null);
   const [manifest, setManifest] = useState<SessionManifest | null>(null);
+  const [engagementDocCount, setEngagementDocCount] = useState<number | null>(null);
   const [insightsOpen, setInsightsOpen] = useState(true);
   const {
     width: insightsPanelWidth,
@@ -205,6 +207,16 @@ export const ProcurementAnalysis: React.FC = () => {
   useEffect(() => {
     setDismissedConflictKeys(loadDismissedConflictKeys(sessionId));
   }, [sessionId]);
+
+  useEffect(() => {
+    if (!engagementId) { setEngagementDocCount(null); return; }
+    apiGet<{ documents: { status: string }[] }>(`/api/v1/engagements/${engagementId}/documents`)
+      .then((res) => {
+        const ready = (res.documents ?? []).filter((d) => d.status === 'ready').length;
+        setEngagementDocCount(ready);
+      })
+      .catch(() => setEngagementDocCount(null));
+  }, [engagementId]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -260,7 +272,9 @@ export const ProcurementAnalysis: React.FC = () => {
             if (snapshot && snapshot.total_spend > 0) {
               setMessages((prev) => {
                 if (chatHasInsightSnapshot(prev)) return prev;
-                const restored = buildRestoredInsightMessage(snapshot, m);
+                const rawTrace = (sess as { analysis_trace?: unknown }).analysis_trace;
+                const trace = Array.isArray(rawTrace) ? (rawTrace as AnalysisTraceStep[]) : undefined;
+                const restored = buildRestoredInsightMessage(snapshot, m, trace);
                 return prev.length > 0 ? [restored, ...prev] : [restored];
               });
             }
@@ -326,7 +340,7 @@ export const ProcurementAnalysis: React.FC = () => {
         session_id: sid,
         run_id: runId,
         thinking_mode: thinkingMode ? 'extended' : 'standard',
-        ...contextPayload(engagement),
+        ...contextPayload(engagement, manifest),
       });
       setLastSignals(res.quality_signals);
       setLastSteps(res.progress_steps);
@@ -535,7 +549,7 @@ export const ProcurementAnalysis: React.FC = () => {
       const plan = await apiPost<ChatPlanPreview>('/api/v1/chat/plan', {
         message: text,
         session_id: sid,
-        ...contextPayload(engagement),
+        ...contextPayload(engagement, manifest),
       });
       if (plan.requires_confirmation !== false && plan.user_summary) {
         setPlanPreview(plan);
@@ -590,17 +604,33 @@ export const ProcurementAnalysis: React.FC = () => {
     setError(null);
     setInsightsOpen(true);
     setPipelineLabel('Core analysis pipeline');
-    setAgentSteps(ANALYZE_PIPELINE_STEPS);
+    // Real steps stream in via progress polling; seed with a single "starting"
+    // line so the panel isn't empty for the first poll interval.
+    setAgentSteps([{ phase: 'observe', message: 'Starting analysis…' }]);
+    const runId =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `run-${Date.now()}`;
+    setLastRunId(runId);
+    const controller = new AbortController();
+    const pollPromise = pollChatProgress(runId, setAgentSteps, controller.signal);
     try {
       const sid = await ensureSession();
-      await apiPost(`/api/v1/analyze/${sid}`, contextPayload(engagement));
+      const analysisResult = await apiPost<SessionResponse>(`/api/v1/analyze/${sid}`, {
+        ...contextPayload(engagement, manifest),
+        run_id: runId,
+      });
+      controller.abort();
+      await pollPromise.catch(() => undefined);
+      const rawTrace = (analysisResult as { analysis_trace?: unknown }).analysis_trace;
+      const trace = Array.isArray(rawTrace) ? (rawTrace as AnalysisTraceStep[]) : undefined;
       await syncEngagementFromAnalysis();
       const session = await apiGet<SessionResponse>(`/api/v1/sessions/${sid}`);
       setAnalysis(session);
       const m = await refreshManifest(sid);
       const snapshot = extractInsightSnapshot(session, m);
-      setAgentSteps([
-        ...ANALYZE_PIPELINE_STEPS,
+      setAgentSteps((prev) => [
+        ...(prev ?? []),
         { phase: 'reflect', message: 'Analysis complete.' },
       ]);
       setPipelineLabel(undefined);
@@ -611,6 +641,9 @@ export const ProcurementAnalysis: React.FC = () => {
             role: 'assistant',
             content: buildAnalyzeCompleteContent(snapshot),
             insight_snapshot: snapshot,
+            analysis_trace: trace,
+            thinking: thinkingMode && trace?.length ? buildTraceThinkingSummary(trace) : undefined,
+            run_id: runId,
             show_peer_savings: true,
             next_options: mergeNextOptions(buildProbePrompts(snapshot), buildDataRootedPrompts(snapshot, m)),
           },
@@ -622,11 +655,15 @@ export const ProcurementAnalysis: React.FC = () => {
             role: 'assistant',
             content:
               'Analysis finished but spend totals are empty. Re-upload your file or check column mapping, then run analysis again.',
+            analysis_trace: trace,
+            thinking: thinkingMode && trace?.length ? buildTraceThinkingSummary(trace) : undefined,
+            run_id: runId,
             next_options: mergeNextOptions(buildProbePrompts(null), buildDataRootedPrompts(null, m)),
           },
         ]);
       }
     } catch (err) {
+      controller.abort();
       setError(getApiErrorMessage(err));
       setAgentSteps([{ phase: 'reflect', message: 'Analysis failed. See error above.' }]);
     } finally {
@@ -689,11 +726,13 @@ export const ProcurementAnalysis: React.FC = () => {
     setError(null);
     stopPolling();
     try {
+      const eid = await ensureEngagement();
       const res = await apiPost<SessionManifest>('/api/v1/sessions', {
-        company_name: 'New engagement',
+        company_name: engagement.company_name || 'New engagement',
         industry: engagement.industry || '',
-        currency: engagement.currency || 'USD',
+        currency: engagement.currency || 'INR',
         audience: 'consultant',
+        engagement_id: eid,
       });
       if (sessionId) clearChatMessages(sessionId);
       setSessionId(res.session_id);
@@ -709,7 +748,7 @@ export const ProcurementAnalysis: React.FC = () => {
     }
   };
 
-  const currentIndustry = manifest?.industry || engagement.industry || '';
+  const currentIndustry = effectiveAnalysisIndustry(manifest, engagement);
 
   return (
     <MainLayout hideHeader>
@@ -722,14 +761,34 @@ export const ProcurementAnalysis: React.FC = () => {
             compact
           />
           {engagementId && (
-            <p className="text-xs text-brand-muted w-full basis-full -mt-1">
-              Engagement{' '}
-              <span className="font-mono text-brand-ink">{engagementId.slice(0, 8)}…</span>
-              {' · '}
-              <Link to="/documents" className="text-deloitte-green hover:underline">
-                Manage documents
-              </Link>
-            </p>
+            <div className="w-full basis-full -mt-1 space-y-1">
+              <p className="text-xs text-brand-muted">
+                {engagement.company_name && engagement.company_name !== 'New engagement' ? (
+                  <span className="font-medium text-brand-ink">{engagement.company_name}</span>
+                ) : (
+                  <span className="font-mono text-brand-ink">{engagementId.slice(0, 8)}…</span>
+                )}
+                {engagementDocCount !== null && (
+                  <span className={`ml-1.5 ${engagementDocCount > 0 ? 'text-emerald-700' : 'text-amber-700'}`}>
+                    · {engagementDocCount > 0 ? `${engagementDocCount} doc${engagementDocCount !== 1 ? 's' : ''} loaded` : 'no docs'}
+                  </span>
+                )}
+                {' · '}
+                <Link to="/documents" className="text-deloitte-green hover:underline">
+                  Manage documents
+                </Link>
+              </p>
+              {engagement.detected_company_name && (
+                <RecommendedBadge
+                  label={engagement.detected_company_name}
+                  matches={
+                    (engagement.company_name || '').trim().toLowerCase() ===
+                    engagement.detected_company_name.toLowerCase()
+                  }
+                  changeLink="/diagnostic"
+                />
+              )}
+            </div>
           )}
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             <div className="w-44 min-w-[10rem]">
@@ -743,6 +802,19 @@ export const ProcurementAnalysis: React.FC = () => {
                   ...SECTOR_OPTIONS.map((o) => ({ value: o.value, label: o.label })),
                 ]}
               />
+              {engagement.detected_industry && (
+                <RecommendedBadge
+                  className="mt-1"
+                  label={
+                    engagement.detected_industry_label ||
+                    SECTOR_OPTIONS.find((o) => o.value === engagement.detected_industry)?.label ||
+                    engagement.detected_industry
+                  }
+                  matches={currentIndustry === engagement.detected_industry}
+                  onApply={() => void handleSectorChange(engagement.detected_industry as string)}
+                  changeLink="/diagnostic"
+                />
+              )}
             </div>
             <button
               type="button"

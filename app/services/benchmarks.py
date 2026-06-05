@@ -42,7 +42,12 @@ SECTOR_PACK_TO_BENCHMARK: Dict[str, str] = {
 
 def benchmark_industry_for(industry: str) -> str:
     """Resolve a sector-pack id (or raw industry) to a benchmark-registry key."""
-    return SECTOR_PACK_TO_BENCHMARK.get((industry or "").strip(), industry)
+    key = (industry or "").strip()
+    result = SECTOR_PACK_TO_BENCHMARK.get(key, key)
+    if result == key and key and key not in SECTOR_PACK_TO_BENCHMARK.values():
+        from app.config import logger
+        logger.warning("benchmark_industry_for: no mapping for %r — passing through as-is", key)
+    return result
 
 # Lock protecting all read-modify-write operations on the benchmark store.
 _LOCK = threading.Lock()

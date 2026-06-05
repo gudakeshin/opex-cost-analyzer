@@ -28,19 +28,29 @@ export interface DiagnosticFormState {
 
 export function formStateFromManifest(
   manifest: SessionManifest,
-  engagement?: { company_name?: string; industry?: string; annual_revenue_cr?: number },
+  engagement?: {
+    company_name?: string;
+    industry?: string;
+    annual_revenue_cr?: number;
+    detected_company_name?: string;
+    detected_industry?: string;
+  },
 ): DiagnosticFormState {
   const companyFromManifest = manifest.company_name;
   const companyFromEngagement = engagement?.company_name;
+  const companyFromDetected = engagement?.detected_company_name;
   const companyName =
     companyFromManifest && !isPlaceholderCompanyName(companyFromManifest)
       ? companyFromManifest
       : companyFromEngagement && !isPlaceholderCompanyName(companyFromEngagement)
         ? companyFromEngagement
-        : '';
+        : companyFromDetected && !isPlaceholderCompanyName(companyFromDetected)
+          ? companyFromDetected
+          : '';
 
   const industry =
     manifest.industry ||
+    engagement?.detected_industry ||
     engagement?.industry ||
     'manufacturing_diversified';
 

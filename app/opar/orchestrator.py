@@ -8,6 +8,7 @@ from typing import Any, Callable, Dict, List
 from app.config import UPLOAD_DIR, logger
 from app.metrics import opar_cycle_duration_seconds
 from app.memory import MemoryStore
+from app.opar.category_resolver import match_category_from_query, tokenize
 from app.storage import read_json
 from app.utils.inr_format import format_money
 from app.opar.act import act
@@ -85,7 +86,7 @@ _CAPABILITIES_MSG = (
 
 
 def _tokenize(text: str) -> list[str]:
-    return re.findall(r"[a-z0-9]+", (text or "").lower())
+    return tokenize(text)
 
 
 def _is_spend_chart_request(msg: str) -> bool:
@@ -155,35 +156,7 @@ def _extract_chart_url_from_analysis(analysis: Dict[str, Any]) -> str | None:
 
 def _match_category_from_query(msg: str, categories: list[dict[str, Any]]) -> dict[str, Any] | None:
     """Best-effort category matcher using exact + token overlap (generic, non-hardcoded)."""
-    lowered = (msg or "").lower()
-    query_tokens = set(_tokenize(lowered))
-    if not categories or not query_tokens:
-        return None
-
-    stopwords = {
-        "what", "is", "the", "my", "for", "of", "and", "in", "on", "to", "me", "show",
-        "give", "please", "spend", "spends", "category", "categories", "total", "how",
-        "much", "do", "we", "our", "tell", "about",
-    }
-    query_tokens = {t for t in query_tokens if t not in stopwords}
-    if not query_tokens:
-        return None
-
-    best: tuple[int, int, dict[str, Any] | None] = (0, 0, None)
-    for cat in categories:
-        cat_name = str(cat.get("category_name") or "").lower()
-        cat_id = str(cat.get("category_id") or "").lower().replace("_", " ")
-        blob = f"{cat_name} {cat_id}".strip()
-        if not blob:
-            continue
-        # Exact phrase boost
-        exact = int(bool(cat_name and cat_name in lowered) or bool(cat_id and cat_id in lowered))
-        cat_tokens = set(_tokenize(blob))
-        overlap = len(query_tokens.intersection(cat_tokens))
-        score = exact * 10 + overlap
-        if score > best[0] or (score == best[0] and overlap > best[1]):
-            best = (score, overlap, cat)
-    return best[2] if best[0] > 0 else None
+    return match_category_from_query(msg, categories)
 
 
 def _add_progress_step(progress: list[Dict[str, str]], phase: str, message: str) -> None:

@@ -17,6 +17,7 @@ from app.metrics import skill_execution_duration_seconds
 from app.models import NormalizedSpendLine
 from app.opar.memory_adapter import get_memory_adapter
 from app.opar.models import ActResult, EvalTrace, ExecutionPlan, ObserveContext, SkillTask, SkillTrace
+from app.opar.transaction_examples import build_transaction_examples_from_lines
 from app.skills.contracts import AnalysisSynthesizerOutput, ExecutiveCommunicationOutput
 from app.storage import read_json
 
@@ -27,27 +28,11 @@ def _build_transaction_examples(
     max_examples_per_category: int = 3,
 ) -> Dict[str, list[Dict[str, Any]]]:
     """Build concrete spend examples per category for narrative grounding."""
-    grouped: Dict[str, list[NormalizedSpendLine]] = {}
-    for line in lines:
-        grouped.setdefault(line.category_id, []).append(line)
-
-    out: Dict[str, list[Dict[str, Any]]] = {}
-    for category_id, cat_lines in grouped.items():
-        top = sorted(cat_lines, key=lambda x: float(x.amount or 0.0), reverse=True)[:max_examples_per_category]
-        out[category_id] = [
-            {
-                "supplier": x.supplier,
-                "description": x.description,
-                "amount": float(x.amount or 0.0),
-                "business_unit": x.business_unit,
-                "geo": x.geo,
-                "spend_date": x.spend_date,
-            }
-            for x in top
-        ]
-    # Keep payload compact for LLM prompts.
-    limited = sorted(out.items(), key=lambda kv: sum(e["amount"] for e in kv[1]), reverse=True)[:max_categories]
-    return dict(limited)
+    return build_transaction_examples_from_lines(
+        lines,
+        max_categories=max_categories,
+        max_examples_per_category=max_examples_per_category,
+    )
 
 
 def _load_session_data(session_id: str) -> tuple[list[NormalizedSpendLine], list[str], dict]:
@@ -81,6 +66,12 @@ def _invoke_skill(
         prior_results=prior_results,
         user_message=user_message,
         headcount=headcount,
+        wacc=float(manifest.get("wacc") or 0.10),
+        effective_tax_rate=float(manifest.get("effective_tax_rate") or 0.0),
+        reporting_currency=str(manifest.get("currency") or manifest.get("reporting_currency") or "USD"),
+        entity_tree=manifest.get("entity_tree"),
+        segment_revenue=manifest.get("segment_revenue"),
+        sector_weights=manifest.get("sector_weights"),
     )
     _t0 = time.time()
     try:
