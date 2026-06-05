@@ -10,6 +10,7 @@ from app.config import ANTHROPIC_ENABLED, UPLOAD_DIR
 from app.memory import MemoryStore
 from app.opar.category_resolver import match_category_from_query, tokenize
 from app.opar.memory_adapter import get_memory_adapter
+from app.opar.qa_lookup import answer_general_qa
 from app.utils.inr_format import format_money
 from app.opar.quality import assumptions_from_initiative, check_gate2
 from app.opar.provenance import record_llm_narrative
@@ -268,6 +269,36 @@ def _is_category_focused_request(ctx: ObserveContext | None, validated: Dict[str
     if bool((ctx.explicit_category or "").strip()):
         return True
     return _match_focus_category(ctx, validated) is not None
+
+
+# Deep-analysis skills whose presence means a general_qa turn warranted the full
+# advisory narrative rather than a deterministic QA lookup.
+_QA_LOOKUP_DEEP_SKILLS = frozenset({
+    "peer-benchmarker",
+    "internal-benchmarker",
+    "root-cause-analyzer",
+    "savings-modeler",
+    "value-bridge-calculator",
+    "analysis-synthesizer",
+    "executive-communication",
+})
+
+
+def _is_qa_lookup(ctx: ObserveContext | None, validated: Dict[str, Dict[str, Any]]) -> bool:
+    """True when a general_qa turn ran only the profiler/doc-contextualizer and
+    should be answered with the deterministic QA lookup instead of the value-bridge
+    template. Mirrors the condition the orchestrator used to apply post-hoc, now
+    owned by reflect so there is a single response-composition path."""
+    if not ctx or getattr(ctx, "intent_class", "") != "general_qa":
+        return False
+    if not ("spend-profiler" in validated or "document-contextualizer" in validated):
+        return False
+    if any(skill in validated for skill in _QA_LOOKUP_DEEP_SKILLS):
+        return False
+    # Preserve chart-builder formatting when the user explicitly asked to visualize spend.
+    if getattr(ctx, "wants_spend_visualization", False) and "chart-builder" in validated:
+        return False
+    return True
 
 
 def _build_transaction_examples_for_llm(validated: Dict[str, Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
@@ -802,6 +833,49 @@ def _run_reg_watcher(
     )
 
 
+def _build_chat_analysis_trace(validated: Dict[str, Dict[str, Any]], currency: str) -> List[Dict[str, Any]]:
+    """Lightweight, ordered derivation trace for chat-only sessions (no /api/analyze).
+
+    Gives the "How this analysis was derived" panel something to show when the full
+    batch trace is absent. Deliberately concise — the batch path emits the rich
+    version via run_core_pipeline's on_complete hook."""
+    trace: List[Dict[str, Any]] = []
+
+    def add(phase: str, title: str, detail: str, metrics: Dict[str, Any] | None = None) -> None:
+        trace.append({
+            "step": len(trace) + 1, "phase": phase, "title": title,
+            "detail": detail, "source_documents": [], "metrics": metrics or {},
+        })
+
+    profile = validated.get("spend-profiler")
+    if isinstance(profile, dict):
+        total = float(profile.get("total_spend", 0.0) or 0.0)
+        cats = [c for c in profile.get("category_profile", []) if isinstance(c, dict)]
+        add("ingest", "Read spend data",
+            f"Profiled {len(cats)} categories totalling {currency} {total:,.0f}.",
+            {"category_count": len(cats), "total_spend": total})
+    peer = validated.get("peer-benchmarker")
+    if isinstance(peer, dict):
+        comps = peer.get("comparisons", []) or []
+        add("benchmark", "Benchmarked against peers",
+            f"Compared {len(comps)} categories to industry peers.",
+            {"comparison_count": len(comps)})
+    rc = validated.get("root-cause-analyzer")
+    if isinstance(rc, dict):
+        findings = rc.get("root_cause_findings", []) or []
+        add("root_cause", "Diagnosed root causes",
+            f"Identified {len(findings)} root-cause finding(s).",
+            {"finding_count": len(findings)})
+    bridge = validated.get("value-bridge-calculator")
+    if isinstance(bridge, dict):
+        mid = float((bridge.get("confidence_bands", {}) or {}).get("mid", 0.0) or 0.0)
+        inits = (validated.get("savings-modeler", {}) or {}).get("initiatives", []) or []
+        add("savings", "Modelled savings opportunities",
+            f"Built {len(inits)} initiative(s); mid-case savings {currency} {mid:,.0f}.",
+            {"initiative_count": len(inits), "mid_case_savings": mid})
+    return trace
+
+
 def reflect(
     act_result: ActResult,
     plan: ExecutionPlan,
@@ -892,7 +966,11 @@ def reflect(
         thinking_budget_tokens=thinking_budget_tokens,
     )
     category_focused = _is_category_focused_request(ctx, validated)
-    if advisory_sections is not None:
+    if _is_qa_lookup(ctx, validated):
+        # Conversational lookup (e.g. "what's my IT spend?") — answer deterministically
+        # from cached skill outputs without the full advisory/value-bridge framing.
+        response = answer_general_qa(ctx.user_message, validated, currency=_REFLECT_CURRENCY)
+    elif advisory_sections is not None:
         response = _compose_response_from_advisory(
             advisory_sections,
             validated,
@@ -927,6 +1005,15 @@ def reflect(
         if isinstance(prior_outputs, dict):
             merged_outputs.update(prior_outputs)
         merged_outputs.update(validated)
+        # Completeness parity for chat-only sessions (no prior /api/analyze): when the
+        # snapshot has no spend lines / trace, populate them from this turn so follow-up
+        # asks read the same SessionAnalysisState shape the batch path produces.
+        prior_spend = analysis_snapshot.get("normalized_spend", [])
+        if not prior_spend and getattr(act_result, "normalized_spend", None):
+            prior_spend = [l.model_dump(mode="json") for l in act_result.normalized_spend]
+        prior_trace = analysis_snapshot.get("analysis_trace", [])
+        if not prior_trace:
+            prior_trace = _build_chat_analysis_trace(merged_outputs, _REFLECT_CURRENCY)
         analysis_snapshot.update({
             "session_id": ctx.session_id,
             "engagement_id": manifest.get("engagement_id") or analysis_snapshot.get("engagement_id") or getattr(ctx, "engagement_id", None),
@@ -934,9 +1021,9 @@ def reflect(
             "industry": manifest.get("industry") or analysis_snapshot.get("industry") or "",
             "annual_revenue": float(manifest.get("annual_revenue") or analysis_snapshot.get("annual_revenue") or 0),
             "reporting_currency": _REFLECT_CURRENCY,
-            "normalized_spend": analysis_snapshot.get("normalized_spend", []),
+            "normalized_spend": prior_spend,
             "context_summary": analysis_snapshot.get("context_summary", ""),
-            "analysis_trace": analysis_snapshot.get("analysis_trace", []),
+            "analysis_trace": prior_trace,
             "wacc": manifest.get("wacc", analysis_snapshot.get("wacc")),
             "effective_tax_rate": manifest.get("effective_tax_rate", analysis_snapshot.get("effective_tax_rate")),
             "skill_outputs": merged_outputs,

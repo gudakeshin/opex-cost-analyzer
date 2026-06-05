@@ -1,7 +1,7 @@
 """Currency-aware money formatting for chat answers (INR Lakh/Crore vs others)."""
 from __future__ import annotations
 
-from app.opar.orchestrator import _answer_general_qa
+from app.opar.qa_lookup import answer_general_qa as _answer_general_qa
 from app.utils.inr_format import format_money
 
 _PROFILE = {

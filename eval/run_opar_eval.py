@@ -674,7 +674,7 @@ def eval_or01_no_data_routing() -> DimensionResult:
 # ---------------------------------------------------------------------------
 
 def eval_or02_qa_answer_quality() -> DimensionResult:
-    from app.opar.orchestrator import _answer_general_qa
+    from app.opar.qa_lookup import answer_general_qa as _answer_general_qa
 
     validated = {
         "spend-profiler": {

@@ -30,36 +30,6 @@ Rules:
 When in doubt between general_qa and an analysis intent, choose general_qa.
 """
 
-PLANNING_SYSTEM_PROMPT = """You are the planning agent for OpEx Intelligence Platform.
-Given the ObserveContext below, output a JSON object with:
-1. "tasks": array of skill invocations, each: {"skill_name": str, "depends_on": [str], "parallel_group": int}
-2. "user_summary": 1-3 sentence plain English for the user
-3. "estimated_duration": e.g. "~60 seconds"
-4. "requires_approval": boolean (true for business_case)
-
-Skills available: spend-profiler, document-contextualizer, chart-builder, peer-benchmarker, internal-benchmarker, payment-terms-optimizer, bva-analyzer, temporal-analyzer, heuristic-analyzer, root-cause-analyzer, savings-modeler, value-bridge-calculator, data-validator, business-case-builder, analysis-synthesizer, executive-communication
-
-Rules:
-- spend-profiler must run first (parallel_group 0)
-- document-contextualizer is optional; include only when document files are present or user explicitly asks for document-context summary
-- chart-builder depends on spend-profiler and should be included when user asks for spend profile visualization (parallel_group 1)
-- peer-benchmarker, internal-benchmarker, payment-terms-optimizer, bva-analyzer, temporal-analyzer, heuristic-analyzer can run in parallel (parallel_group 1) after spend-profiler
-- root-cause-analyzer requires spend-profiler + peer-benchmarker (parallel_group 2)
-- savings-modeler requires peer-benchmarker + internal-benchmarker + root-cause-analyzer (+ heuristic-analyzer only when included) (parallel_group 3)
-- value-bridge-calculator requires peer-benchmarker + internal-benchmarker + savings-modeler (+ heuristic-analyzer only when included) (parallel_group 4)
-- data-validator requires value-bridge-calculator (parallel_group 5)
-- business-case-builder requires value-bridge-calculator (parallel_group 5, business_case intent only)
-- analysis-synthesizer requires value-bridge-calculator + data-validator (+ document-contextualizer only when included) (parallel_group 6)
-- executive-communication requires analysis-synthesizer (parallel_group 7)
-- If headcount/revenue data is missing (check missing_fields), exclude heuristic-analyzer
-- For upload_data intent: only spend-profiler
-- For benchmark intent: use minimal benchmark plan (profiling + benchmarkers + FP&A diagnostics bva/temporal, optional heuristic)
-- For value_bridge intent: include modeling chain (root-cause, savings-modeler, value-bridge, data-validator)
-- Include analysis-synthesizer/executive-communication only when user asks for executive narrative/recommendations, or for business_case
-- Prefer minimum viable plan that satisfies intent, data availability, and dependencies. Do not include unnecessary skills.
-
-Output ONLY valid JSON. No markdown code blocks, no prose."""
-
 ANALYSIS_SYNTHESIS_SYSTEM_PROMPT = """You are an executive FP&A synthesis copilot.
 You must produce recommendations ONLY from provided skill outputs and document excerpts.
 Never invent categories, values, assumptions, benchmarks, suppliers, or sources.
@@ -317,30 +287,6 @@ def classify_intent_claude_with_meta(msg: str) -> Dict[str, Any]:
         "intent_confidence": max(0.0, min(1.0, confidence)),
         "category_confidence": max(0.0, min(1.0, category_confidence)),
     }
-
-
-def plan_with_claude(ctx: ObserveContext) -> Dict[str, Any] | None:
-    """Generate ExecutionPlan via Claude. Returns parsed plan dict or None on failure."""
-    context_str = (
-        f"user_message: {ctx.user_message}\n"
-        f"intent_class: {ctx.intent_class}\n"
-        f"explicit_category: {ctx.explicit_category}\n"
-        f"spend_profile_ready: {ctx.spend_profile_ready}\n"
-        f"benchmark_results_ready: {ctx.benchmark_results_ready}\n"
-        f"uploaded_file_ids: {ctx.uploaded_file_ids}\n"
-        f"missing_fields: {ctx.missing_fields}\n"
-        f"data_quality_score: {ctx.data_quality_score}\n"
-        f"file_parse_status: {ctx.file_parse_status}\n"
-    )
-    raw = _call_claude(
-        system=PLANNING_SYSTEM_PROMPT,
-        user_content=f"ObserveContext:\n{context_str}\n\nOutput the plan as JSON:",
-        max_tokens=1024,
-    )
-    data = _extract_json(raw)
-    if isinstance(data, dict) and "tasks" in data:
-        return data
-    return None
 
 
 _CHART_SELECTION_SYSTEM_PROMPT = (

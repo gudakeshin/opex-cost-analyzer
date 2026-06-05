@@ -17,7 +17,7 @@ from app.opar.reflect import (
     _layer2_coherence_checks,
 )
 from app.opar.models import AdvisorySections, ObserveContext, ExecutionPlan, SkillTask
-from app.opar.orchestrator import _answer_general_qa
+from app.opar.qa_lookup import answer_general_qa as _answer_general_qa
 from app.opar.reflect import _advisory_quality_ok
 
 
@@ -281,7 +281,9 @@ def test_plan_rule_based_value_bridge_has_modeling_chain_without_exec_narrative(
     assert "executive-communication" not in skill_names
 
 
-def test_plan_rule_based_value_bridge_adds_exec_narrative_when_requested() -> None:
+def test_plan_rule_based_value_bridge_narrative_delegated_to_reflect_advisory() -> None:
+    """Executive narrative is produced by reflect's single LLM advisory pass, not by
+    separate act-phase synthesis skills (which duplicated the same LLM call)."""
     ctx = ObserveContext(
         user_message="calculate value bridge and make it executive-ready",
         intent_class="value_bridge",
@@ -293,8 +295,10 @@ def test_plan_rule_based_value_bridge_adds_exec_narrative_when_requested() -> No
     )
     exec_plan = _plan_rule_based(ctx)
     skill_names = [t.skill_name for t in exec_plan.tasks]
-    assert "analysis-synthesizer" in skill_names
-    assert "executive-communication" in skill_names
+    # Modeling chain still runs; narrative composition is reflect's job.
+    assert "value-bridge-calculator" in skill_names
+    assert "analysis-synthesizer" not in skill_names
+    assert "executive-communication" not in skill_names
 
 
 def test_plan_rule_based_business_case() -> None:

@@ -119,6 +119,33 @@ def test_reflect_preserves_full_session_state_when_merging_chat_outputs() -> Non
     assert saved["skill_outputs"]["peer-benchmarker"] == {"comparisons": []}
     assert saved["skill_outputs"]["spend-profiler"] == {"total_spend": 1_000_000}
     assert saved["last_run_intent"] == "general_qa"
+
+
+def test_reflect_populates_spend_and_trace_for_chat_only_session() -> None:
+    """Chat-only session (no prior /api/analyze) gains normalized_spend + a trace
+    from the turn's ActResult, matching the batch SessionAnalysisState shape."""
+    session_id = str(uuid.uuid4())  # no prior snapshot in memory
+    reflect(
+        ActResult(
+            skill_outputs={
+                "spend-profiler": {"total_spend": 1_000_000, "category_profile": [{"category_id": "IT", "spend": 1_000_000}]},
+            },
+            errors={},
+            normalized_spend=[_line()],
+        ),
+        ExecutionPlan(tasks=[SkillTask(skill_name="spend-profiler")]),
+        ObserveContext(
+            user_message="what is my spend?",
+            intent_class="general_qa",
+            session_id=session_id,
+            user_id="user-1",
+        ),
+    )
+
+    saved = MemoryStore().get("session", session_id)
+    assert saved["normalized_spend"] == [_line().model_dump(mode="json")]
+    assert saved["analysis_trace"], "expected a non-empty lightweight trace for chat-only session"
+    assert saved["analysis_trace"][0]["phase"] == "ingest"
     assert saved["skills_run_this_turn"] == ["spend-profiler"]
     assert saved["updated_at"]
 

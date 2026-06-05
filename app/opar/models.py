@@ -5,6 +5,8 @@ from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
+from app.models import NormalizedSpendLine
+
 
 class IntentClass(str, Enum):
     """T2-3: Typed intent classifications used throughout the OPAR loop.
@@ -142,6 +144,9 @@ class ActResult(BaseModel):
     degradation_reasons: Dict[str, str] = Field(default_factory=dict)
     duration_ms: float = 0.0
     eval_trace: Optional[EvalTrace] = None  # populated when enable_tracing=True
+    # Normalized spend lines resolved for this turn — lets reflect persist a
+    # complete SessionAnalysisState for chat-only sessions (no prior /api/analyze).
+    normalized_spend: List[NormalizedSpendLine] = Field(default_factory=list)
 
 
 class ConfidenceScore(BaseModel):

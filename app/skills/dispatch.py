@@ -189,7 +189,14 @@ def _spend_profiler(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
 
 @register("document-contextualizer")
 def _document_contextualizer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
-    return _engine.document_contextualizer(ctx.docs_text), None
+    out = _engine.document_contextualizer(ctx.docs_text)
+    # Fold an ingestion summary (parser notes) into the context summary when one
+    # was threaded through the manifest, so downstream skills and the trace see it.
+    ingestion_summary = ctx.manifest.get("ingestion_summary")
+    if ingestion_summary:
+        base = str(out.get("context_summary") or "").strip()
+        out["context_summary"] = f"{base}\n{ingestion_summary}".strip() if base else ingestion_summary
+    return out, None
 
 
 # ── Tier 1: FP&A analytics ──────────────────────────────────────────────────
@@ -431,8 +438,7 @@ def _assumption_register(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]
 
 @register("indian-tax-optimizer")
 def _indian_tax_optimizer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
-    effective_tax_rate = float(ctx.manifest.get("effective_tax_rate") or 0.25)
-    return _engine.indian_tax_optimizer(ctx.lines, effective_tax_rate=effective_tax_rate), None
+    return _engine.indian_tax_optimizer(ctx.lines, effective_tax_rate=ctx.tax_rate), None
 
 
 @register("brsr-cobenefit-calculator")
@@ -447,8 +453,8 @@ def _portfolio_inputs(ctx: SkillContext) -> tuple[list, float, float, float]:
     """Shared inputs for strategic skills: (initiatives, wacc, tax_rate, base_savings_mid)."""
     savings = ctx.prior("savings-modeler")
     initiatives = savings.get("initiatives", []) if isinstance(savings, dict) else []
-    wacc = float(ctx.manifest.get("wacc") or 0.12)
-    tax_rate = float(ctx.manifest.get("effective_tax_rate") or 0.2517)
+    wacc = ctx.discount_rate
+    tax_rate = ctx.tax_rate
     bridge = ctx.prior("value-bridge-calculator")
     base_savings_mid = float(bridge.get("confidence_bands", {}).get("mid", 0.0) or 0.0) if isinstance(bridge, dict) else 0.0
     return initiatives, wacc, tax_rate, base_savings_mid
@@ -533,6 +539,7 @@ def _zbb_modeler(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
 def _cost_to_serve_analyzer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     return _engine.cost_to_serve_analyzer(
         ctx.lines,
+        segment_revenue=ctx.segment_revenue,
         annual_revenue=ctx.annual_revenue,
         headcount=ctx.headcount or 0.0,
     ), None

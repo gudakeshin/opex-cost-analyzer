@@ -312,6 +312,7 @@ async def _act_async(
         degradation_reasons=degradation_reasons,
         duration_ms=duration_ms,
         eval_trace=eval_trace,
+        normalized_spend=lines,
     )
 
 
