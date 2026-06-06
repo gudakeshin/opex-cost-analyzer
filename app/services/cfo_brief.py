@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from docx import Document
-from docx.shared import Pt, RGBColor
+from docx.shared import Pt
 
 from app.config import OUTPUT_DIR
 from app.utils.inr_format import fmt_inr_cr
@@ -23,7 +23,7 @@ def _fmt_cr(value: float) -> str:
 
 
 def _safe_float(outputs: Dict, *keys: str, default: float = 0.0) -> float:
-    d = outputs
+    d: Any = outputs
     for k in keys:
         if not isinstance(d, dict):
             return default

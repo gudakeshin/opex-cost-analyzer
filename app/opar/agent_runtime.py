@@ -13,7 +13,7 @@ import os
 import time
 import uuid
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Protocol
+from typing import Any, Callable, Dict, List, Protocol
 
 from app.config import AGENT_MAX_TOOL_ITERATIONS, AGENT_TOOL_TIMEOUT_SECONDS, logger
 

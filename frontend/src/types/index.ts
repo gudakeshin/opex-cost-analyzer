@@ -192,6 +192,7 @@ export interface SessionResponse {
   session_id: string;
   company_name?: string;
   industry?: string;
+  annual_revenue?: number;
   files?: unknown[];
   skill_outputs?: Record<string, unknown>;
   [key: string]: unknown;

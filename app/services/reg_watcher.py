@@ -11,7 +11,6 @@ from __future__ import annotations
 import json
 import threading
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from app.config import ROOT_DIR
@@ -212,7 +211,6 @@ def surface_at_reflect_gate(
     matching = get_active_events(categories=active_category_ids, severity_filter=SEVERITY_HIGH)
     forced = len(matching) > 0
     if forced:
-        titles = "; ".join(ev.get("title", "") for ev in matching[:3])
         prompt = (
             f"Week {engagement_week} gate — regulatory events require a decision before proceeding:\n"
             + "\n".join(

@@ -19,7 +19,6 @@ from app.routers._shared import (
     read_manifest,
     session_dir,
     session_lock,
-    utc_now_iso,
     validate_session_id,
     write_manifest,
 )
@@ -33,7 +32,7 @@ from app.services.engagements_store import (
     read_engagement_manifest,
     register_session_on_engagement,
 )
-from app.services.ingestion import infer_tabular_schema, parse_document, parse_spend_file_with_report
+from app.services.ingestion import infer_tabular_schema
 from app.skills.model_contextualizer import (
     build_workbook_manifest,
     compute_file_fingerprint,
@@ -253,7 +252,7 @@ def create_session(payload: SessionCreateRequest) -> Dict[str, Any]:
         currency = payload.currency
         headcount = payload.headcount
 
-    manifest = {
+    manifest: Dict[str, Any] = {
         "session_id": session_id,
         "engagement_id": engagement_id,
         "company_name": company_name,
@@ -619,7 +618,6 @@ async def incremental_analyze(session_id: str, files: List[UploadFile] = File(de
     validate_session_id(session_id)
     if not session_dir(session_id).exists():
         raise HTTPException(status_code=404, detail="Session not found")
-    manifest = read_manifest(session_id)
     taxonomy = load_taxonomy()
     new_lines = []
     for file in files:

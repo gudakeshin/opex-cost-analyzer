@@ -38,6 +38,7 @@ from app.opar.memory_adapter import get_memory_adapter_status
 from app.services.document_index import get_document_index_status
 from app.routers import benchmarks, chat, compliance, connectors, engagements, enterprise, outputs, pipeline, sessions, skills
 from app.storage import ensure_dirs
+from app.memory import MemoryStore as _MemoryStore
 
 # ---------------------------------------------------------------------------
 # Module-level setup
@@ -48,7 +49,6 @@ _SESSION_TTL_DAYS = int(os.getenv("SESSION_TTL_DAYS", "30"))
 _CLEANUP_INTERVAL_H = int(os.getenv("CLEANUP_INTERVAL_HOURS", "24"))
 
 # Shared memory store for health/usage stats (MemoryStore is stateless wrapper).
-from app.memory import MemoryStore as _MemoryStore
 _memory_store = _MemoryStore()
 
 

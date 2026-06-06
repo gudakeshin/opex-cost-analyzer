@@ -8,12 +8,6 @@ from statistics import median
 from typing import Any, Dict, List, Optional, Tuple
 
 from app.models import NormalizedSpendLine
-
-# Word-boundary PO detection. A naive ``"po" in desc`` substring test misreads
-# "transport", "deposit", "export" as PO-backed spend, so the maverick-buying
-# diagnosis becomes noise. Match PO / P.O. / "purchase order" as whole tokens.
-_PO_TOKEN_RE = re.compile(r"\b(?:po|p\.?\s?o\.?|purchase order)\b")
-
 from ._loaders import (
     _get_heuristic_ranges,
     _get_per_employee_targets,
@@ -21,6 +15,11 @@ from ._loaders import (
     _HEADCOUNT_APPLICABLE_CATEGORIES,
 )
 from .profiler import resolve_eligible_levers
+
+# Word-boundary PO detection. A naive ``"po" in desc`` substring test misreads
+# "transport", "deposit", "export" as PO-backed spend, so the maverick-buying
+# diagnosis becomes noise. Match PO / P.O. / "purchase order" as whole tokens.
+_PO_TOKEN_RE = re.compile(r"\b(?:po|p\.?\s?o\.?|purchase order)\b")
 
 
 def _category_pct_of_revenue(category_spend: float, revenue: float) -> float:
@@ -233,7 +232,6 @@ def root_cause_analyzer(
         annual_revenue=annual_revenue,
         root_causes=[],
     )
-    eligible_lever_by_id: Dict[str, Dict[str, Any]] = {lv["lever_id"]: lv for lv in eligible_levers}
     levers_for_category: Dict[str, List[Dict[str, Any]]] = {}
     for lv in eligible_levers:
         for sig in lv["trigger_signals"]:

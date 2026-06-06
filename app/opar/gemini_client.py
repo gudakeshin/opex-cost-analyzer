@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import os
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
+from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from typing import Any, Dict, List, Tuple
 
 from app.config import (
@@ -245,7 +245,7 @@ def synthesize_chat_response_gemini(
     max_tokens = 2048 if thinking_enabled else 1024
     executor = ThreadPoolExecutor(max_workers=1)
     if thinking_enabled:
-        future = executor.submit(
+        future: Future[Any] = executor.submit(
             call_gemini_with_thinking,
             CHAT_RESPONSE_SYSTEM_PROMPT,
             user_prompt,
@@ -344,7 +344,7 @@ def synthesize_analysis_gemini(
     max_tokens = 1800
     executor = ThreadPoolExecutor(max_workers=1)
     if thinking_enabled:
-        future = executor.submit(
+        future: Future[Any] = executor.submit(
             call_gemini_with_thinking,
             ANALYSIS_SYNTHESIS_SYSTEM_PROMPT,
             user_prompt,

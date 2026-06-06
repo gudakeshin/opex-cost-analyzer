@@ -3,3 +3,29 @@ markers = [
     "llm_judge: marks tests that make live LLM API calls (deselect with -m 'not llm_judge')",
     "smoke: marks end-to-end smoke tests (optional; run with -m smoke)",
 ]
+
+[tool.mypy]
+# Pragmatic configuration for a dynamically-typed (dict[str, Any]-heavy) codebase.
+# Keeps mypy meaningful for our own code while not fighting third-party libraries
+# whose published types are inaccurate at the boundary (docx/pptx/qdrant/etc.).
+python_version = "3.11"
+ignore_missing_imports = true
+
+# Third-party libraries whose shipped type info is incomplete or wrong at the call
+# sites we use (e.g. Document.save/Presentation.save reject Path in stubs but accept
+# it at runtime; QdrantClient.search is dynamically dispatched). Treat as untyped.
+[[tool.mypy.overrides]]
+module = [
+    "docx.*",
+    "pptx.*",
+    "qdrant_client.*",
+    "sentence_transformers.*",
+    "yaml",
+    "google.*",
+    "llama_parse.*",
+    "requests",
+    "requests.*",
+]
+follow_imports = "skip"
+follow_imports_for_stubs = true
+ignore_missing_imports = true

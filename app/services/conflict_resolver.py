@@ -8,7 +8,7 @@ from __future__ import annotations
 import hashlib
 import logging
 import re
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 from app.models import ConflictRecord, NormalizedSpendLine
 
@@ -43,7 +43,7 @@ def _delta_pct(a: float, b: float) -> float:
     return abs(a - b) / denom
 
 
-def _severity_from_delta(delta: float) -> str:
+def _severity_from_delta(delta: float) -> Literal["critical", "high", "medium", "low"]:
     if delta >= 0.20:
         return "critical"
     if delta >= 0.10:
@@ -96,10 +96,10 @@ def detect_tds_mismatch(lines: List[NormalizedSpendLine]) -> List[ConflictRecord
             by_record.setdefault(line.source_record_id, []).append(line)
 
     for rec_id, group in by_record.items():
-        sources = {l.source_system_id for l in group if l.source_system_id}
+        sources = {ln.source_system_id for ln in group if ln.source_system_id}
         if len(sources) < 2:
             continue
-        amounts = [(l.source_system_id or "unknown", l.amount) for l in group]
+        amounts = [(ln.source_system_id or "unknown", ln.amount) for ln in group]
         for i in range(len(amounts)):
             for j in range(i + 1, len(amounts)):
                 src_a, amt_a = amounts[i]
@@ -119,7 +119,7 @@ def detect_tds_mismatch(lines: List[NormalizedSpendLine]) -> List[ConflictRecord
                         amount_b=amt_b,
                         delta_pct=round(delta * 100, 2),
                         resolution_strategy="tds_gross_up",
-                        row_ids=[l.row_id for l in group],
+                        row_ids=[ln.row_id for ln in group],
                     ))
     logger.info('"conflict_tds_mismatch detected=%d"', len(conflicts))
     return conflicts
@@ -132,19 +132,19 @@ def detect_gst_mismatch(lines: List[NormalizedSpendLine]) -> List[ConflictRecord
     with the same GSTIN but different amounts (same period).
     """
     conflicts: List[ConflictRecord] = []
-    eligible = [l for l in lines if l.gst_treatment in ("itc_eligible", "rcm")]
+    eligible = [ln for ln in lines if ln.gst_treatment in ("itc_eligible", "rcm")]
     by_gstin = _group_by_gstin(eligible)
 
     for gstin, group in by_gstin.items():
-        sources = {l.source_system_id for l in group if l.source_system_id}
+        sources = {ln.source_system_id for ln in group if ln.source_system_id}
         if len(sources) < 2:
             continue
         by_src: Dict[str, float] = {}
         src_rows: Dict[str, List[int]] = {}
-        for l in group:
-            sid = l.source_system_id or "unknown"
-            by_src[sid] = by_src.get(sid, 0.0) + l.amount
-            src_rows.setdefault(sid, []).append(l.row_id)
+        for ln in group:
+            sid = ln.source_system_id or "unknown"
+            by_src[sid] = by_src.get(sid, 0.0) + ln.amount
+            src_rows.setdefault(sid, []).append(ln.row_id)
 
         srcs = list(by_src.keys())
         for i in range(len(srcs)):
@@ -216,13 +216,13 @@ def detect_vendor_duplicates(lines: List[NormalizedSpendLine]) -> List[ConflictR
 
     # Primary path: GSTIN-keyed dedup
     for gstin, group in by_gstin.items():
-        names = {(l.supplier or "").strip().lower() for l in group if l.supplier}
-        sources = {l.source_system_id for l in group if l.source_system_id}
+        names = {(ln.supplier or "").strip().lower() for ln in group if ln.supplier}
+        sources = {ln.source_system_id for ln in group if ln.source_system_id}
         if len(names) < 2:
             continue
         canonical = max(names, key=len)
         aliases = list(names - {canonical})
-        total_amount = sum(l.amount for l in group)
+        total_amount = sum(ln.amount for ln in group)
         conflicts.append(ConflictRecord(
             conflict_type="vendor_duplicate",
             severity="medium",
@@ -233,24 +233,24 @@ def detect_vendor_duplicates(lines: List[NormalizedSpendLine]) -> List[ConflictR
             delta_pct=0.0,
             resolution_strategy="gstin_dedup",
             resolution_notes=f"canonical={canonical!r} aliases={aliases}",
-            row_ids=[l.row_id for l in group],
+            row_ids=[ln.row_id for ln in group],
         ))
 
     # Secondary path: name-based dedup for lines without GSTIN
-    no_gstin = [l for l in lines if not (l.vendor_gstin or l.gstin)]
+    no_gstin = [ln for ln in lines if not (ln.vendor_gstin or ln.gstin)]
     if no_gstin:
         norm_groups: Dict[str, List[NormalizedSpendLine]] = {}
-        for l in no_gstin:
-            key = _normalise_vendor_name(l.supplier or "")
+        for ln in no_gstin:
+            key = _normalise_vendor_name(ln.supplier or "")
             if key and len(key) >= 3:
-                norm_groups.setdefault(key, []).append(l)
+                norm_groups.setdefault(key, []).append(ln)
 
         for norm_name, group in norm_groups.items():
-            raw_names = {(l.supplier or "").strip().lower() for l in group}
+            raw_names = {(ln.supplier or "").strip().lower() for ln in group}
             if len(raw_names) < 2:
                 continue
-            sources = {l.source_system_id for l in group if l.source_system_id}
-            total_amount = sum(l.amount for l in group)
+            sources = {ln.source_system_id for ln in group if ln.source_system_id}
+            total_amount = sum(ln.amount for ln in group)
             canonical = max(raw_names, key=len)
             aliases = list(raw_names - {canonical})
             conflicts.append(ConflictRecord(
@@ -266,7 +266,7 @@ def detect_vendor_duplicates(lines: List[NormalizedSpendLine]) -> List[ConflictR
                     f"Script-agnostic name match (no GSTIN): "
                     f"canonical={canonical!r} aliases={aliases} norm_key={norm_name!r}"
                 ),
-                row_ids=[l.row_id for l in group],
+                row_ids=[ln.row_id for ln in group],
             ))
 
     logger.info('"conflict_vendor_duplicates detected=%d"', len(conflicts))
@@ -284,15 +284,15 @@ def detect_intercompany_inflation(
     """
     conflicts: List[ConflictRecord] = []
     ic_lines = [
-        l for l in lines
-        if (l.related_party_flag or l.is_intercompany) and not l.consolidation_eliminated
+        ln for ln in lines
+        if (ln.related_party_flag or ln.is_intercompany) and not ln.consolidation_eliminated
     ]
     if not ic_lines:
         return conflicts
 
-    total_ic = sum(l.amount for l in ic_lines)
-    row_ids = [l.row_id for l in ic_lines]
-    sources = list({l.source_system_id for l in ic_lines if l.source_system_id})
+    total_ic = sum(ln.amount for ln in ic_lines)
+    row_ids = [ln.row_id for ln in ic_lines]
+    sources = list({ln.source_system_id for ln in ic_lines if ln.source_system_id})
     conflicts.append(ConflictRecord(
         conflict_type="intercompany_inflation",
         severity="high",
@@ -321,14 +321,14 @@ def detect_fx_mismatch(lines: List[NormalizedSpendLine]) -> List[ConflictRecord]
             by_record.setdefault(line.source_record_id, []).append(line)
 
     for rec_id, group in by_record.items():
-        rates = [l.fx_rate_to_reporting for l in group]
+        rates = [ln.fx_rate_to_reporting for ln in group]
         if not rates:
             continue
         min_r, max_r = min(rates), max(rates)
         delta = _delta_pct(min_r, max_r)
         if delta < _MATERIALITY_THRESHOLD:
             continue
-        sources = list({l.source_system_id for l in group if l.source_system_id})
+        sources = list({ln.source_system_id for ln in group if ln.source_system_id})
         conflicts.append(ConflictRecord(
             conflict_type="fx_mismatch",
             severity=_severity_from_delta(delta),
@@ -339,7 +339,7 @@ def detect_fx_mismatch(lines: List[NormalizedSpendLine]) -> List[ConflictRecord]
             delta_pct=round(delta * 100, 2),
             resolution_strategy="escalate",
             resolution_notes=f"record_id={rec_id} currency={group[0].currency}",
-            row_ids=[l.row_id for l in group],
+            row_ids=[ln.row_id for ln in group],
         ))
     logger.info('"conflict_fx_mismatch detected=%d"', len(conflicts))
     return conflicts
@@ -400,11 +400,11 @@ def detect_cost_center_lag(lines: List[NormalizedSpendLine]) -> List[ConflictRec
             by_record.setdefault(line.source_record_id, []).append(line)
 
     for rec_id, group in by_record.items():
-        cost_centers = {l.cost_center_id for l in group}
+        cost_centers = {ln.cost_center_id for ln in group}
         if len(cost_centers) < 2:
             continue
-        sources = list({l.source_system_id for l in group if l.source_system_id})
-        amounts = [l.amount for l in group]
+        sources = list({ln.source_system_id for ln in group if ln.source_system_id})
+        amounts = [ln.amount for ln in group]
         conflicts.append(ConflictRecord(
             conflict_type="cost_center_lag",
             severity="medium",
@@ -415,7 +415,7 @@ def detect_cost_center_lag(lines: List[NormalizedSpendLine]) -> List[ConflictRec
             delta_pct=0.0,
             resolution_strategy="escalate",
             resolution_notes=f"record_id={rec_id} cost_centers={list(cost_centers)}",
-            row_ids=[l.row_id for l in group],
+            row_ids=[ln.row_id for ln in group],
         ))
     logger.info('"conflict_cost_center_lag detected=%d"', len(conflicts))
     return conflicts

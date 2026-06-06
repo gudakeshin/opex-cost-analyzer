@@ -17,9 +17,9 @@ Optional kwargs for fetch():
 from __future__ import annotations
 
 import logging
-from typing import Any, List
+from typing import Any
 
-from app.connectors.base import ConnectorConfig, ConnectorInterface, FetchResult
+from app.connectors.base import ConnectorInterface, FetchResult
 from app.models import NormalizedSpendLine
 
 logger = logging.getLogger("opex.connector.sap_odata")

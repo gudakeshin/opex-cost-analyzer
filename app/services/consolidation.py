@@ -159,7 +159,7 @@ class ConsolidationEngine:
     ) -> CompletenessReport:
         """Compare observed entity IDs to expected IDs from entity tree."""
         expected = self._tree.get_entity_ids() if self._tree else []
-        observed = list({l.legal_entity_id for l in lines if l.legal_entity_id})
+        observed = list({ln.legal_entity_id for ln in lines if ln.legal_entity_id})
         return CompletenessReport(expected, observed)
 
     def consolidate(self, lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
@@ -179,10 +179,10 @@ class ConsolidationEngine:
         entity_rollups = self.aggregate_by_entity(lines_clean)
 
         # Step 3: group-level rollup (non-eliminated only)
-        active_lines = [l for l in lines_clean if not l.consolidation_eliminated]
-        group_total = sum(l.amount for l in active_lines)
-        group_addressable = sum(l.amount for l in active_lines if l.is_addressable)
-        ic_total = sum(l.amount for l in lines if l.related_party_flag or l.is_intercompany)
+        active_lines = [ln for ln in lines_clean if not ln.consolidation_eliminated]
+        group_total = sum(ln.amount for ln in active_lines)
+        group_addressable = sum(ln.amount for ln in active_lines if ln.is_addressable)
+        ic_total = sum(ln.amount for ln in lines if ln.related_party_flag or ln.is_intercompany)
 
         # Step 4: completeness
         completeness = self.validate_completeness(lines)

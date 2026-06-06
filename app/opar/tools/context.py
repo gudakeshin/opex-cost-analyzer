@@ -45,7 +45,7 @@ class ToolSessionContext:
     def invoke_skill(self, skill_name: str) -> Dict[str, Any]:
         """Run one skill with deps auto-resolved; returns compact output summary."""
         from app.opar.plan import resolve_skill_dependencies
-        from app.skills.dispatch import SkillContext, invoke_skill, registered_skills
+        from app.skills.dispatch import registered_skills
 
         if skill_name not in registered_skills():
             raise ValueError(f"Unknown skill: {skill_name}")

@@ -21,7 +21,7 @@ from app.skills.contracts import (
 from app.skills import engine
 from app.skills.dispatch import SkillContext
 from app.opar.pipeline_profile import PipelineProfile, run_profile
-from app.services.spend_base import bump_spend_base_revision, load_authoritative_spend_lines, refresh_spend_base
+from app.services.spend_base import bump_spend_base_revision, refresh_spend_base
 from app.services.spend_line_merge import merge_persisted_line_adjustments, prior_lines_from_session
 
 
@@ -366,9 +366,9 @@ def run_core_pipeline(
     # --- Data-shape flags for agent memory ---
     has_budget = any(x.amount_type == "budget" for x in lines)
     has_periods = any(x.fiscal_period for x in lines)
-    has_multi_source = len({l.source_system_id for l in lines if l.source_system_id}) >= 2
-    has_contracts = any(l.contract_expiry_date or l.contract_status for l in lines)
-    has_multi_entity = len({l.legal_entity_id for l in lines if l.legal_entity_id}) >= 2 or entity_tree is not None
+    has_multi_source = len({ln.source_system_id for ln in lines if ln.source_system_id}) >= 2
+    has_contracts = any(ln.contract_expiry_date or ln.contract_status for ln in lines)
+    has_multi_entity = len({ln.legal_entity_id for ln in lines if ln.legal_entity_id}) >= 2 or entity_tree is not None
 
     state = SessionAnalysisState(
         session_id=session_id,
@@ -455,10 +455,10 @@ def run_incremental_pipeline(
             existing_lines.append(raw)
 
     # Dedup: skip lines already present by (source_record_id, source_file_hash).
-    existing_keys = {
-        (l.source_record_id, l.source_file_hash)
-        for l in existing_lines
-        if l.source_record_id and l.source_file_hash
+    existing_keys: set[tuple[str | None, str | None]] = {
+        (ln.source_record_id, ln.source_file_hash)
+        for ln in existing_lines
+        if ln.source_record_id and ln.source_file_hash
     }
     merged = list(existing_lines)
     added = 0

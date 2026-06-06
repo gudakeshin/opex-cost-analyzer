@@ -16,7 +16,7 @@ Each ``ChartSpec`` is render-agnostic (see ``frontend .../DynamicChart.tsx``):
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, cast
 
 # Palette mirrors frontend SpendCharts.tsx so backend-chosen colors match the theme.
 _GREEN = "#86BC25"
@@ -243,7 +243,7 @@ def _peer_datasets(peer: Dict[str, Any]) -> List[Dict[str, Any]]:
         "actual": round(_num(c.get("actual_pct_of_revenue")), 2),
         "benchmark": round(_num(c.get("benchmark_target_pct")), 2),
     } for c in comps if _num(c.get("actual_pct_of_revenue")) > 0]
-    rows.sort(key=lambda r: r["actual"] - r["benchmark"], reverse=True)
+    rows.sort(key=lambda r: cast(float, r["actual"]) - cast(float, r["benchmark"]), reverse=True)
     rows = rows[:_MAX_ROWS]
     if not rows:
         return []

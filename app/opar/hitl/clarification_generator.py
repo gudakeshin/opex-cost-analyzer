@@ -5,12 +5,18 @@ from __future__ import annotations
 import json
 import os
 import re
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from app.config import GEMINI_ENABLED
 from app.opar.gemini_client import call_gemini
 from app.opar.hitl.clarification_tool import BusinessClarificationPayload
-from app.opar.models import ObserveContext
+
+if TYPE_CHECKING:
+    # Imported lazily to avoid a circular import: app.opar.models imports the
+    # hitl package at module load, which would otherwise re-enter models before
+    # ObserveContext is defined. Only needed for type hints (annotations are
+    # strings under `from __future__ import annotations`).
+    from app.opar.models import ObserveContext
 
 _CLARIFICATION_SYSTEM = """You are an FP&A advisor preparing a human-in-the-loop clarification probe.
 Return ONLY valid JSON with this schema (no markdown, no prose outside JSON):

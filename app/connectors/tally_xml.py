@@ -23,7 +23,7 @@ try:
 except ImportError:
     from xml.etree import ElementTree as ET  # type: ignore[assignment]
 
-from app.connectors.base import ConnectorConfig, ConnectorInterface, FetchResult
+from app.connectors.base import ConnectorInterface, FetchResult
 from app.models import NormalizedSpendLine
 
 logger = logging.getLogger("opex.connector.tally_xml")

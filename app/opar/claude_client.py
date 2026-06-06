@@ -5,11 +5,10 @@ from __future__ import annotations
 import json
 import os
 import re
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
+from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from typing import Any, Dict, List, Tuple
 
 from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED, LLM_PROVIDER
-from app.opar.models import ObserveContext
 
 INTENT_CLASSIFY_PROMPT = """Classify the user's intent for an OpEx cost analysis platform.
 
@@ -172,7 +171,7 @@ def _call_claude(
         system=system,
         messages=[{"role": "user", "content": user_content}],
     )
-    text = response.content[0].text if response.content else ""
+    text = getattr(response.content[0], "text", "") if response.content else ""
     return text.strip()
 
 
@@ -556,7 +555,7 @@ def synthesize_analysis_claude(
     timeout_s = 35 if thinking_enabled else 8
     executor = ThreadPoolExecutor(max_workers=1)
     if thinking_enabled:
-        future = executor.submit(
+        future: Future[Any] = executor.submit(
             _call_claude_with_thinking,
             ANALYSIS_SYNTHESIS_SYSTEM_PROMPT,
             user_prompt,

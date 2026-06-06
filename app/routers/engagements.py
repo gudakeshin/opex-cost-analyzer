@@ -161,7 +161,7 @@ async def upload_document(
     file: UploadFile = File(...),
 ) -> Dict[str, Any]:
     validate_engagement_id(engagement_id)
-    manifest = ensure_engagement_exists(engagement_id)
+    ensure_engagement_exists(engagement_id)
     _max_bytes = MAX_UPLOAD_MB * 1024 * 1024
     cl = request.headers.get("content-length")
     if cl and int(cl) > _max_bytes:

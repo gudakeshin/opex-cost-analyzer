@@ -1,7 +1,7 @@
 """Merge persisted spend-line adjustments when analysis is re-run from source files."""
 from __future__ import annotations
 
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from app.models import NormalizedSpendLine
 
@@ -70,12 +70,12 @@ def merge_persisted_line_adjustments(
 
     merged: List[NormalizedSpendLine] = []
     for line in new_lines:
-        prior = prior_by_key.get(spend_line_key(line))
-        merged.append(_apply_persisted_fields(line, prior) if prior else line)
+        prior_match = prior_by_key.get(spend_line_key(line))
+        merged.append(_apply_persisted_fields(line, prior_match) if prior_match else line)
     return merged
 
 
-def prior_lines_from_session(existing: Dict[str, object]) -> List[NormalizedSpendLine]:
+def prior_lines_from_session(existing: Dict[str, Any]) -> List[NormalizedSpendLine]:
     rows: List[NormalizedSpendLine] = []
     for raw in existing.get("normalized_spend") or []:
         if isinstance(raw, dict):

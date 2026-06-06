@@ -202,7 +202,7 @@ def build_response_text(
         executive_takeaway = synthesis.get("executive_takeaway", "")
         recs = synthesis.get("recommendations", [])
         assumptions = synthesis.get("assumptions", [])
-        lines: list[str] = build_analysis_context_lines(validated)
+        lines = build_analysis_context_lines(validated)
         if lines:
             lines.append("")
         if executive_takeaway and ctx and ctx.wants_executive_narrative:

@@ -6,8 +6,8 @@ Provides:
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from typing import Any, Dict, List
 
 from app.security.classification import DataBand, classify_aggregate, classify_output_block
 

@@ -12,9 +12,7 @@ An optional LLM prominence score is gated behind pytest.mark.llm_judge.
 """
 from __future__ import annotations
 
-import copy
-from dataclasses import dataclass, field
-from datetime import date
+from dataclasses import dataclass
 from typing import List, Optional
 
 from app.models import NormalizedSpendLine

@@ -19,8 +19,7 @@ from __future__ import annotations
 
 import json
 import os
-from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional
 
 from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED, LLM_PROVIDER, ROOT_DIR, logger
 
@@ -171,7 +170,7 @@ def _call_m2(
             system=system,
             messages=[{"role": "user", "content": user_content}],
         )
-        return response.content[0].text.strip() if response.content else None
+        return getattr(response.content[0], "text", "").strip() if response.content else None
     except Exception as exc:
         logger.warning('"llm_provider M2 call failed: %s"', exc)
         return None

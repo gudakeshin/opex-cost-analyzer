@@ -53,7 +53,9 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Install dev tools
-        run: pip install ruff mypy pytest-cov
+        # Pinned for deterministic lint/type-check runs — unpinned linters can
+        # introduce new rules/inference that fail CI on unrelated changes.
+        run: pip install ruff==0.15.9 mypy==1.17.1 pytest-cov
 
       - name: Lint (ruff)
         run: ruff check app/

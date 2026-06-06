@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from app.config import OUTPUT_DIR
 
@@ -95,10 +95,10 @@ def build_pmo_data(
         })
 
     # FTC variance report
-    total_p50 = sum(r["p50_savings_cr"] for r in tracker_rows)
-    total_ftc = sum(r["ftc_cr"] for r in tracker_rows)
+    total_p50 = sum(cast(float, r["p50_savings_cr"]) for r in tracker_rows)
+    total_ftc = sum(cast(float, r["ftc_cr"]) for r in tracker_rows)
     total_variance = round(total_p50 - total_ftc, 1)
-    at_risk = [r for r in tracker_rows if r["variance_cr"] < -0.5]
+    at_risk = [r for r in tracker_rows if cast(float, r["variance_cr"]) < -0.5]
 
     return {
         "type": "pmo_toolkit",

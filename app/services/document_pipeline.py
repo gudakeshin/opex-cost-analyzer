@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List
 
 from app.config import logger
 from app.models import NormalizedSpendLine
@@ -58,7 +58,7 @@ def index_document_nodes(
 def reindex_engagement(engagement_id: str) -> Dict[str, Any]:
     """Backfill: re-chunk + re-index every ready context document from cached markdown."""
     manifest = read_engagement_manifest(engagement_id)
-    summary = {"engagement_id": engagement_id, "documents": 0, "chunks": 0, "parents": 0}
+    summary: Dict[str, Any] = {"engagement_id": engagement_id, "documents": 0, "chunks": 0, "parents": 0}
     for doc in manifest.get("documents") or []:
         doc_id = doc.get("document_id")
         if not doc_id or doc.get("status") != "ready":

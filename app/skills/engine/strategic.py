@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from collections import defaultdict
 from datetime import date
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from app.models import NormalizedSpendLine
 
@@ -38,7 +38,7 @@ def scenario_modeler(
 ) -> Dict[str, Any]:
     """Build a 6-scenario macro surface for initiative portfolio sensitivity."""
     initiatives = initiatives or []
-    total_spend = sum(float(getattr(l, "amount", 0) or 0) for l in lines)
+    total_spend = sum(float(getattr(ln, "amount", 0) or 0) for ln in lines)
 
     if base_savings <= 0:
         base_savings = sum(
@@ -107,7 +107,7 @@ def scenario_modeler(
     ]
 
     base_npv = _npv(base_savings)
-    downside_floor = min(s["savings_impact"] for s in scenarios)
+    downside_floor = min(cast(float, s["savings_impact"]) for s in scenarios)
     return {
         "scenarios": scenarios,
         "base_savings": round(base_savings, 2),
@@ -148,7 +148,7 @@ def value_to_shareholder_bridge(
         float(i.get("mid_case_savings") or i.get("deduped_mid_savings") or 0.0)
         for i in initiatives
     )
-    total_spend = sum(float(getattr(l, "amount", 0) or 0) for l in lines)
+    total_spend = sum(float(getattr(ln, "amount", 0) or 0) for ln in lines)
     effective_tax = 0.2517
 
     delta_ebitda = total_mid_savings
@@ -413,13 +413,13 @@ def cost_to_serve_analyzer(
             "total_opex_unallocated": 0.0,
         }
 
-    total_opex = sum(l.reporting_amount for l in lines)
+    total_opex = sum(ln.reporting_amount for ln in lines)
 
-    cost_per_employee: Optional[Dict[str, float]] = None
+    cost_per_employee: Optional[Dict[str, Any]] = None
     if headcount and headcount > 0:
         by_cat: Dict[str, float] = defaultdict(float)
-        for l in lines:
-            by_cat[l.category_id] += l.reporting_amount
+        for ln in lines:
+            by_cat[ln.category_id] += ln.reporting_amount
         cost_per_employee = {
             "total": round(total_opex / headcount, 2),
             "by_category": {cat: round(spend / headcount, 2) for cat, spend in sorted(by_cat.items(), key=lambda x: -x[1])[:10]},
@@ -427,15 +427,15 @@ def cost_to_serve_analyzer(
 
     cat_spend: Dict[str, float] = defaultdict(float)
     cat_names: Dict[str, str] = {}
-    for l in lines:
-        cat_spend[l.category_id] += l.reporting_amount
-        cat_names[l.category_id] = l.category_name or l.category_id
+    for ln in lines:
+        cat_spend[ln.category_id] += ln.reporting_amount
+        cat_names[ln.category_id] = ln.category_name or ln.category_id
 
     top_drivers = sorted(
         [{"category_id": cid, "category_name": cat_names.get(cid, cid), "spend": round(amt, 2),
           "pct_of_opex": round(amt / max(total_opex, 1) * 100, 2)}
          for cid, amt in cat_spend.items()],
-        key=lambda x: -x["spend"],
+        key=lambda x: -cast(float, x["spend"]),
     )[:10]
 
     if not segment_revenue:
@@ -455,29 +455,29 @@ def cost_to_serve_analyzer(
 
     fixed_pool: List[NormalizedSpendLine] = []
     allocable: List[NormalizedSpendLine] = []
-    for l in lines:
-        if (l.spend_type or "").lower() in ("lease", "statutory"):
-            fixed_pool.append(l)
+    for ln in lines:
+        if (ln.spend_type or "").lower() in ("lease", "statutory"):
+            fixed_pool.append(ln)
         else:
-            allocable.append(l)
+            allocable.append(ln)
 
-    total_allocable = sum(l.reporting_amount for l in allocable)
-    total_fixed = sum(l.reporting_amount for l in fixed_pool)
+    total_allocable = sum(ln.reporting_amount for ln in allocable)
+    total_fixed = sum(ln.reporting_amount for ln in fixed_pool)
 
     seg_direct: Dict[str, float] = {seg: 0.0 for seg in segment_revenue}
     unattributed: List[NormalizedSpendLine] = []
-    for l in allocable:
-        text = ((l.description or "") + " " + (l.supplier or "")).lower()
+    for ln in allocable:
+        text = ((ln.description or "") + " " + (ln.supplier or "")).lower()
         matched = False
         for seg in segment_revenue:
             if seg.lower() in text:
-                seg_direct[seg] += l.reporting_amount
+                seg_direct[seg] += ln.reporting_amount
                 matched = True
                 break
         if not matched:
-            unattributed.append(l)
+            unattributed.append(ln)
 
-    total_indirect = sum(l.reporting_amount for l in unattributed)
+    total_indirect = sum(ln.reporting_amount for ln in unattributed)
 
     seg_indirect: Dict[str, float] = {}
     for seg, rev in segment_revenue.items():
@@ -500,7 +500,7 @@ def cost_to_serve_analyzer(
             "is_unprofitable": cost_pct is not None and cost_pct > 100,
         })
 
-    segments.sort(key=lambda x: -(x.get("cost_pct_of_revenue") or 0))
+    segments.sort(key=lambda x: -(cast(float, x.get("cost_pct_of_revenue") or 0)))
     unprofitable = [s["segment"] for s in segments if s.get("is_unprofitable")]
 
     return {

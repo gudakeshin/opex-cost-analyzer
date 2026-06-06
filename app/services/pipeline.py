@@ -160,7 +160,7 @@ def add_actual(initiative_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         store = _load_store()
         committed = payload.get("committed_savings")
         if committed is None:
-            match = next((i for i in store.get("initiatives", []) if i.get("initiative_id") == initiative_id), {})
+            match: Dict[str, Any] = next((i for i in store.get("initiatives", []) if i.get("initiative_id") == initiative_id), {})
             committed = float(match.get("committed_savings") or 0.0)
         row = {
             "actuals_id": str(uuid.uuid4()),

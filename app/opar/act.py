@@ -1,16 +1,12 @@
 from __future__ import annotations
 
 import asyncio
-import json
 import os
 import time
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any, Callable, Dict, List
 
-PER_SKILL_TIMEOUT_SECONDS: float = float(os.environ.get("PER_SKILL_TIMEOUT_SECONDS", "30"))
-
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 from app.config import UPLOAD_DIR, logger
 from app.metrics import skill_execution_duration_seconds
@@ -19,7 +15,8 @@ from app.opar.memory_adapter import get_memory_adapter
 from app.opar.models import ActResult, EvalTrace, ExecutionPlan, ObserveContext, SkillTask, SkillTrace
 from app.opar.transaction_examples import build_transaction_examples_from_lines
 from app.skills.contracts import AnalysisSynthesizerOutput, ExecutiveCommunicationOutput
-from app.storage import read_json
+
+PER_SKILL_TIMEOUT_SECONDS: float = float(os.environ.get("PER_SKILL_TIMEOUT_SECONDS", "30"))
 
 
 def _build_transaction_examples(
@@ -87,7 +84,7 @@ def _invoke_skill(
 # T2-4: Pydantic contracts for LLM synthesis skill outputs.
 # On ValidationError the output is replaced with a safe fallback so that
 # downstream reflect/respond steps never crash on a missing key.
-_LLM_OUTPUT_CONTRACTS: Dict[str, type] = {
+_LLM_OUTPUT_CONTRACTS: Dict[str, type[BaseModel]] = {
     "analysis-synthesizer": AnalysisSynthesizerOutput,
     "executive-communication": ExecutiveCommunicationOutput,
 }
@@ -247,6 +244,10 @@ async def _act_async(
                         duration_ms=skill_duration_ms,
                     ))
                 continue
+
+            if isinstance(outcome, BaseException):
+                # Non-Exception BaseException (e.g. CancelledError) — don't swallow.
+                raise outcome
 
             skill_name, output, err, degraded_reason = outcome
             if degraded_reason:

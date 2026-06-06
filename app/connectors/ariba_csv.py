@@ -17,7 +17,7 @@ import logging
 from pathlib import Path
 from typing import Any, List
 
-from app.connectors.base import ConnectorConfig, ConnectorInterface, FetchResult
+from app.connectors.base import ConnectorInterface, FetchResult
 from app.models import NormalizedSpendLine
 
 logger = logging.getLogger("opex.connector.ariba_csv")

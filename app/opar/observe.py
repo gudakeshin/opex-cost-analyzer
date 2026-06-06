@@ -5,7 +5,9 @@ from pathlib import Path
 import re
 from typing import Any, Dict, List, Tuple
 
-from app.config import ANTHROPIC_ENABLED, MEMORY_DIR, UPLOAD_DIR
+# ANTHROPIC_ENABLED is re-exported here as a module attribute so tests can patch
+# `app.opar.observe.ANTHROPIC_ENABLED` to gate LLM-based intent classification.
+from app.config import ANTHROPIC_ENABLED, MEMORY_DIR, UPLOAD_DIR  # noqa: F401
 from app.opar.memory_adapter import get_memory_adapter
 from app.opar.hitl.clarification_tool import ClarificationAnswer
 from app.opar.models import ObserveContext

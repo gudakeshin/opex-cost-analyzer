@@ -88,7 +88,7 @@ def _apply_incremental_outputs(
     validate_vendor_master_output(inc_outputs["vendor-master-builder"])
     validate_msme_output(inc_outputs["msme-compliance-checker"])
 
-    updated_state["normalized_spend"] = [l.model_dump(mode="json") for l in lines]
+    updated_state["normalized_spend"] = [ln.model_dump(mode="json") for ln in lines]
     updated_state.setdefault("skill_outputs", {})
     updated_state["skill_outputs"]["spend-profiler"] = profile
     updated_state["skill_outputs"]["internal-benchmarker"] = inc_outputs["internal-benchmarker"]

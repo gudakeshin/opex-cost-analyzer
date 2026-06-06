@@ -10,14 +10,12 @@ from app.opar.models import AdvisorySections, ObserveContext
 _LLM_TOKEN_LIMIT = 80_000
 _CHARS_PER_TOKEN = 4
 
+# The concrete synthesizers (claude/gemini) accept several optional keyword
+# arguments (strict_mode, thinking_enabled, transaction_examples, …) on top of
+# the positional payload. Use an open (...) parameter list so callers may pass
+# them without fighting the alias; the return shape is what we rely on.
 AnalysisSynthesizer = Callable[
-    [
-        str,
-        Dict[str, Any],
-        Dict[str, Any] | None,
-        Dict[str, Any],
-        List[str],
-    ],
+    ...,
     Tuple[Dict[str, Any] | None, str | None],
 ]
 

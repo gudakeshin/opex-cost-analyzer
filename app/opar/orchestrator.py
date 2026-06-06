@@ -19,7 +19,7 @@ from app.opar.models import ExecutionPlan, ObserveContext, ReflectOutput, SkillT
 from app.opar.observe import observe
 from app.opar.plan import plan
 from app.opar.chat_synthesis import synthesize_chat_response
-from app.opar.qa_lookup import answer_general_qa, _FILE_FORMAT_MSG, _CAPABILITIES_MSG
+from app.opar.qa_lookup import _FILE_FORMAT_MSG, _CAPABILITIES_MSG
 from app.opar.reflect import reflect
 from app.services.business_case import build_business_case, export_docx
 

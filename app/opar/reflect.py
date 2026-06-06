@@ -12,7 +12,6 @@ from app.opar.models import (
     AdvisorySections,
     ConfidenceScore,
     ExecutionPlan,
-    MemoryUpdate,
     ObserveContext,
     ReflectOutput,
 )

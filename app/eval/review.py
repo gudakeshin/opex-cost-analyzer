@@ -20,14 +20,13 @@ from __future__ import annotations
 
 import os
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
 from app.config import UPLOAD_DIR
 from app.eval.counterfactual import SignalSpec, score_prioritization
 from app.eval.trace import load_trace, summarize_trace
-from app.opar.models import EvalTrace
 
 
 # ---------------------------------------------------------------------------
@@ -129,17 +128,17 @@ def generate_review_bundle(
                  if st.output and "bva" in st.skill_name.lower()),
                 None,
             )
-            result = score_prioritization(
+            prio_result = score_prioritization(
                 response_text=response_text,
                 signal=counterfactual_signal,
                 bva_output=bva_output,
             )
-            icon = "✅" if result.signal_surfaced else "⚠️"
+            icon = "✅" if prio_result.signal_surfaced else "⚠️"
             cf_lines.append(
-                f"- {icon} **signal_surfaced={result.signal_surfaced}** "
-                f"| mentions={result.mention_count} "
-                f"| prominence={result.prominence_score:.2f}\n"
-                f"  - {result.details}\n"
+                f"- {icon} **signal_surfaced={prio_result.signal_surfaced}** "
+                f"| mentions={prio_result.mention_count} "
+                f"| prominence={prio_result.prominence_score:.2f}\n"
+                f"  - {prio_result.details}\n"
             )
         except Exception as exc:
             cf_lines.append(f"> Counterfactual scoring failed: {exc}\n")
