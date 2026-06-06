@@ -1,0 +1,14 @@
+{
+  "engagement_id": "6f584c0f-6bd3-4aa2-96ce-151b61b78ff0",
+  "company_name": "Doc Context Co",
+  "industry": "technology",
+  "annual_revenue": 1000000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "created_at": "2026-06-05T05:15:53.960865+00:00",
+  "updated_at": "2026-06-05T05:15:53.961243+00:00",
+  "session_ids": [
+    "d63edf71-0ab9-4ab6-b15d-42e0154bf6ec"
+  ],
+  "documents": []
+}

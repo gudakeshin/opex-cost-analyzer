@@ -1,0 +1,19 @@
+{
+  "engagement_id": "c57ebb16-7603-48f7-82f4-7ea1cf2ef083",
+  "company_name": "Plan Co",
+  "industry": "technology",
+  "annual_revenue": 1000000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-05T07:15:51.278809+00:00",
+  "updated_at": "2026-06-05T07:15:51.279029+00:00",
+  "session_ids": [
+    "e9254bb9-8120-433e-9a77-ea028b228554"
+  ],
+  "documents": []
+}

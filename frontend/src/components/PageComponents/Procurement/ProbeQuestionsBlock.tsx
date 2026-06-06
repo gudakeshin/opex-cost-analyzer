@@ -1,53 +1,52 @@
 import React from 'react';
-import { collectTopProbeQuestions, formatSpendAmount } from '../../../utils/analysisInsights';
+import {
+  collectUnansweredProbeQuestions,
+  formatSpendAmount,
+} from '../../../utils/analysisInsights';
 import type { AnalysisInsightSnapshot } from '../../../types';
 
 interface ProbeQuestionsBlockProps {
   snapshot: AnalysisInsightSnapshot;
   currency: string;
-  onAnswer?: (message: string) => void;
+  answeredProbeFamilies?: Set<string>;
+  onOpenProbes?: () => void;
 }
 
 export const ProbeQuestionsBlock: React.FC<ProbeQuestionsBlockProps> = ({
   snapshot,
   currency,
-  onAnswer,
+  answeredProbeFamilies,
+  onOpenProbes,
 }) => {
-  const probes = collectTopProbeQuestions(snapshot, 5);
+  const probes = collectUnansweredProbeQuestions(snapshot, answeredProbeFamilies ?? new Set(), 5);
   if (probes.length === 0) return null;
 
+  const stakeTotal = probes.reduce((sum, p) => sum + (p.saving_at_stake > 0 ? p.saving_at_stake : 0), 0);
+
   return (
-    <div className="mt-3 pt-3 border-t border-brand-border space-y-2">
-      <p className="text-[10px] font-semibold uppercase text-brand-muted">Probe questions</p>
-      <ol className="list-decimal list-inside space-y-2 text-xs text-brand-ink leading-snug">
-        {probes.map((p) => (
-          <li key={p.question} className="break-words">
-            <span className="font-medium">{p.category_name}</span>
-            {' — '}
-            {p.question}
-            {p.saving_at_stake > 0 && (
-              <span className="text-brand-muted">
-                {' '}
-                ({formatSpendAmount(p.saving_at_stake, currency)} at stake)
-              </span>
-            )}
-          </li>
-        ))}
-      </ol>
-      {onAnswer && (
-        <div className="flex flex-wrap gap-2">
-          {probes.slice(0, 3).map((p) => (
-            <button
-              key={p.question}
-              type="button"
-              onClick={() => onAnswer(p.question)}
-              className="text-xs px-3 py-1.5 rounded-full border border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100 text-left max-w-full break-words"
-            >
-              Answer: {p.category_name}
-            </button>
-          ))}
-        </div>
-      )}
+    <div className="mt-3 pt-3 border-t border-brand-border">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50/80 px-3 py-2">
+        <p className="text-xs text-amber-950 leading-snug">
+          <span className="font-semibold">{probes.length} assumption probe{probes.length !== 1 ? 's' : ''}</span>
+          {' need your business judgment'}
+          {stakeTotal > 0 && (
+            <span className="text-amber-800">
+              {' '}
+              ({formatSpendAmount(stakeTotal, currency)} at stake)
+            </span>
+          )}
+          .
+        </p>
+        {onOpenProbes && (
+          <button
+            type="button"
+            onClick={onOpenProbes}
+            className="shrink-0 text-xs font-medium px-3 py-1.5 rounded-full border border-amber-400 bg-white text-amber-900 hover:bg-amber-100 transition-colors"
+          >
+            Open probe dialog
+          </button>
+        )}
+      </div>
     </div>
   );
 };

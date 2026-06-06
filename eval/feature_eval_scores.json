@@ -1,7 +1,7 @@
 {
-  "overall_score": 9.545,
+  "overall_score": 9.182,
   "passed": true,
-  "eval_date": "2026-05-30",
+  "eval_date": "2026-06-06",
   "dimensions": [
     {
       "dimension_id": "sp_01",
@@ -11,10 +11,10 @@
       "threshold_pass": 9.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "35/35 skills registered in dispatch.py",
+      "finding_summary": "37/37 skills registered in dispatch.py",
       "evidence": {
-        "total_skill_dirs_with_SKILL_md": 35,
-        "registered_count": 35,
+        "total_skill_dirs_with_SKILL_md": 37,
+        "registered_count": 37,
         "registered": [
           "analysis-synthesizer",
           "assumption-register",
@@ -30,6 +30,7 @@
           "data-classifier",
           "data-validator",
           "document-contextualizer",
+          "evidence-gatherer",
           "executive-communication",
           "export-formatter",
           "gstr-reconciler",
@@ -45,6 +46,7 @@
           "root-cause-analyzer",
           "savings-modeler",
           "scenario-modeler",
+          "sme-critique",
           "spend-profiler",
           "temporal-analyzer",
           "value-bridge-calculator",
@@ -59,17 +61,16 @@
       "dimension_id": "sp_02",
       "name": "Dispatch Handler Implementation Depth",
       "domain": "skill_pipeline",
-      "raw_score": 5.0,
+      "raw_score": 5.526,
       "threshold_pass": 8.0,
       "passed": false,
-      "gap": 3.0,
-      "finding_summary": "18/36 handlers have \u22655 non-blank lines (implemented)",
+      "gap": 2.474,
+      "finding_summary": "21/38 handlers have \u22655 non-blank lines (implemented)",
       "evidence": {
-        "total_registered": 36,
-        "implemented_count": 18,
+        "total_registered": 38,
+        "implemented_count": 21,
         "stubs": [
           "spend-profiler",
-          "document-contextualizer",
           "bva-analyzer",
           "temporal-analyzer",
           "internal-benchmarker",
@@ -97,16 +98,18 @@
       "threshold_pass": 7.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "36/36 registered skills have output contracts (or intentionally use inline dict)",
+      "finding_summary": "38/38 registered skills have output contracts (or intentionally use inline dict)",
       "evidence": {
-        "total_registered": 36,
-        "with_contract_or_intentionally_none": 36,
+        "total_registered": 38,
+        "with_contract_or_intentionally_none": 38,
         "missing_contract_class": [],
         "intentionally_no_dedicated_class": [
           "my-new-skill",
           "root-cause-analyzer",
           "savings-modeler",
           "data-validator",
+          "evidence-gatherer",
+          "sme-critique",
           "chart-builder",
           "business-case-builder",
           "pii-stripper",
@@ -188,23 +191,33 @@
       "threshold_pass": 9.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "31/31 unique frontend API calls resolve to a backend route",
+      "finding_summary": "42/42 unique frontend API calls resolve to a backend route",
       "evidence": {
-        "total_unique_frontend_calls": 31,
-        "resolved_count": 31,
+        "total_unique_frontend_calls": 42,
+        "resolved_count": 42,
         "unresolved": [],
         "resolved": [
+          "/api/v1/engagements/{param}",
+          "/api/v1/sessions/{param}/status",
           "/api/v1/sessions/{param}/manifest",
           "/api/v1/sessions/{param}",
+          "/api/v1/engagements",
           "/api/v1/sessions",
           "/api/v1/template/spend-csv",
+          "/api/v1/diagnostic/deep-research/{param}{param}",
+          "/api/v1/diagnostic/deep-research",
           "/api/v1/compliance/audit-log",
           "/api/v1/chat/progress/{param}",
+          "/api/v1/engagements/{param}/documents",
           "/api/v1/chat",
           "/api/v1/upload/{param}",
           "/api/v1/chat/plan",
+          "/api/v1/chat/probe-answer",
+          "/api/v1/chat/resume",
           "/api/v1/analyze/{param}",
           "/api/v1/analyze/{param}/incremental",
+          "/api/v1/samples/spend-ledger.csv",
+          "/api/v1/samples/pnl-expense.xlsx",
           "/api/v1/diagnostic/company-research",
           "/api/v1/initiatives",
           "/api/v1/pipeline/summary",
@@ -221,6 +234,7 @@
           "/api/v1/consolidate/{param}",
           "/api/v1/initiatives/{param}/milestones",
           "/api/v1/initiatives/{param}/actuals",
+          "/api/v1/engagements/{param}/documents/{param}/reprocess",
           "/api/v1/benchmarks",
           "/api/v1/sector-packs",
           "/api/v1/skills",
@@ -261,10 +275,10 @@
       "threshold_pass": 6.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "31/31 unique frontend API calls use /api/v1/ prefix",
+      "finding_summary": "42/42 unique frontend API calls use /api/v1/ prefix",
       "evidence": {
-        "total_unique_calls": 31,
-        "v1_prefixed_count": 31,
+        "total_unique_calls": 42,
+        "v1_prefixed_count": 42,
         "unversioned_count": 0,
         "v1_calls": [
           "/api/v1/analyze/{param}",
@@ -274,13 +288,21 @@
           "/api/v1/bva/{param}",
           "/api/v1/chat",
           "/api/v1/chat/plan",
+          "/api/v1/chat/probe-answer",
           "/api/v1/chat/progress/{param}",
+          "/api/v1/chat/resume",
           "/api/v1/compliance/audit-log",
           "/api/v1/conflicts/resolve",
           "/api/v1/conflicts/{param}",
           "/api/v1/consolidate/{param}",
           "/api/v1/cost-to-serve",
           "/api/v1/diagnostic/company-research",
+          "/api/v1/diagnostic/deep-research",
+          "/api/v1/diagnostic/deep-research/{param}{param}",
+          "/api/v1/engagements",
+          "/api/v1/engagements/{param}",
+          "/api/v1/engagements/{param}/documents",
+          "/api/v1/engagements/{param}/documents/{param}/reprocess",
           "/api/v1/initiatives",
           "/api/v1/initiatives/{param}/actuals",
           "/api/v1/initiatives/{param}/milestones",
@@ -288,11 +310,14 @@
           "/api/v1/initiatives/{param}/stage",
           "/api/v1/payment-terms/{param}",
           "/api/v1/pipeline/summary",
+          "/api/v1/samples/pnl-expense.xlsx",
+          "/api/v1/samples/spend-ledger.csv",
           "/api/v1/sector-packs",
           "/api/v1/sensitivity/{param}{param}",
           "/api/v1/sessions",
           "/api/v1/sessions/{param}",
           "/api/v1/sessions/{param}/manifest",
+          "/api/v1/sessions/{param}/status",
           "/api/v1/skills",
           "/api/v1/skills/{param}",
           "/api/v1/template/spend-csv",
@@ -348,19 +373,19 @@
         "phases": {
           "observe": {
             "exists": true,
-            "line_count": 604
+            "line_count": 682
           },
           "plan": {
             "exists": true,
-            "line_count": 669
+            "line_count": 760
           },
           "act": {
             "exists": true,
-            "line_count": 356
+            "line_count": 332
           },
           "reflect": {
             "exists": true,
-            "line_count": 1501
+            "line_count": 245
           }
         },
         "thin_or_missing": []
@@ -385,11 +410,11 @@
       "dimension_id": "opar_03",
       "name": "Quality Gate Coverage in Reflect",
       "domain": "opar_loop",
-      "raw_score": 10.0,
+      "raw_score": 3.333,
       "threshold_pass": 8.0,
-      "passed": true,
-      "gap": 0.0,
-      "finding_summary": "3/3 required quality gate symbols present in reflect.py",
+      "passed": false,
+      "gap": 4.667,
+      "finding_summary": "1/3 required quality gate symbols present in reflect.py",
       "evidence": {
         "required_checks": [
           "validate_core_skill_outputs",
@@ -397,11 +422,12 @@
           "peer_benchmarker"
         ],
         "present": [
-          "validate_core_skill_outputs",
-          "savings",
-          "peer_benchmarker"
+          "savings"
         ],
-        "missing": []
+        "missing": [
+          "validate_core_skill_outputs",
+          "peer_benchmarker"
+        ]
       }
     },
     {

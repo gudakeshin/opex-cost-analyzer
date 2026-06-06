@@ -1,0 +1,19 @@
+{
+  "engagement_id": "9c5f3eb5-6b65-4534-bc9d-029dbf9d3ecd",
+  "company_name": "With Files Co",
+  "industry": "technology",
+  "annual_revenue": 1000000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-05T08:09:08.991647+00:00",
+  "updated_at": "2026-06-05T08:09:08.992156+00:00",
+  "session_ids": [
+    "c7617aa9-460b-4f58-8fa6-27667be51d83"
+  ],
+  "documents": []
+}

@@ -1,0 +1,85 @@
+{
+  "eval_date": "2026-06-06",
+  "overall_score": 9.96,
+  "passed": true,
+  "domains": {
+    "controller_routing": {
+      "score": 10.0,
+      "passed": true,
+      "dimensions": {
+        "ag_01": {
+          "name": "Agent Controller Wiring in Orchestrator",
+          "raw_score": 10.0,
+          "passed": true,
+          "finding": "8/8 controller-wiring checks pass"
+        },
+        "ag_02": {
+          "name": "Tool Catalog Completeness",
+          "raw_score": 10.0,
+          "passed": true,
+          "finding": "8/8 required tools present in catalog"
+        },
+        "ag_03": {
+          "name": "Deterministic Fallback Gate",
+          "raw_score": 10.0,
+          "passed": true,
+          "finding": "5/5 fallback gate checks pass"
+        }
+      }
+    },
+    "intelligence_discovery": {
+      "score": 9.9,
+      "passed": true,
+      "dimensions": {
+        "ag_04": {
+          "name": "Semantic Skill Discovery Wired",
+          "raw_score": 10.0,
+          "passed": true,
+          "finding": "9/9 skill discovery checks pass"
+        },
+        "ag_05": {
+          "name": "_DEP_MAP Covers All Registered Skills",
+          "raw_score": 9.7143,
+          "passed": true,
+          "finding": "34/35 analysis skills in _DEP_MAP"
+        },
+        "ag_06": {
+          "name": "SME Critique LLM Enrichment Wired",
+          "raw_score": 10.0,
+          "passed": true,
+          "finding": "6/6 SME enrichment checks pass"
+        },
+        "ag_07": {
+          "name": "Root-Cause LLM Enrichment Wired",
+          "raw_score": 10.0,
+          "passed": true,
+          "finding": "5/5 root-cause enrichment checks pass"
+        }
+      }
+    },
+    "safety_provenance": {
+      "score": 10.0,
+      "passed": true,
+      "dimensions": {
+        "ag_08": {
+          "name": "Offline Guard and Injectable Transport",
+          "raw_score": 10.0,
+          "passed": true,
+          "finding": "7/7 offline guard / transport checks pass"
+        },
+        "ag_09": {
+          "name": "Numeric Provenance on Opportunity Assessment",
+          "raw_score": 10.0,
+          "passed": true,
+          "finding": "8/8 provenance checks pass"
+        },
+        "ag_10": {
+          "name": "Audit Trail for LLM Numeric Adjustments",
+          "raw_score": 10.0,
+          "passed": true,
+          "finding": "7/7 audit trail checks pass"
+        }
+      }
+    }
+  }
+}

@@ -117,3 +117,18 @@ def bps_label(bps: float, decimals: int = 0) -> str:
     """Format a basis-point value, e.g. '+180 bps'."""
     sign = "+" if bps >= 0 else ""
     return f"{sign}{bps:.{decimals}f} bps"
+
+
+def fmt_inr_cr(value: float, *, style: str = "standard") -> str:
+    """Format INR amounts in Crore/Lakh notation for executive decks.
+
+    ``style='cfo'`` uses tiered Cr/L notation (CFO brief).
+    ``style='mor'`` uses simple Cr rounding (MOR pack).
+    """
+    if style == "mor":
+        return f"₹{value / 1e7:.1f} Cr" if value else "₹0 Cr"
+    if value >= 1_00_00_00_000:
+        return f"₹{value / 1e12:.1f}L Cr"
+    if value >= 1_00_00_000:
+        return f"₹{value / 1e7:.0f} Cr"
+    return f"₹{value / 1e5:.1f} L"

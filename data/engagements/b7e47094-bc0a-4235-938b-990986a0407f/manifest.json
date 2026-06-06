@@ -1,0 +1,19 @@
+{
+  "engagement_id": "b7e47094-bc0a-4235-938b-990986a0407f",
+  "company_name": "New engagement",
+  "industry": "fmcg",
+  "annual_revenue": 2000000000.0,
+  "currency": "INR",
+  "headcount": 1500,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-06T03:47:11.666042+00:00",
+  "updated_at": "2026-06-06T03:47:11.666494+00:00",
+  "session_ids": [
+    "b7e47094-bc0a-4235-938b-990986a0407f"
+  ],
+  "documents": []
+}

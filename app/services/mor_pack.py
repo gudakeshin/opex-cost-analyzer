@@ -13,10 +13,11 @@ from typing import Any, Dict, List, Optional
 from docx import Document
 
 from app.config import OUTPUT_DIR
+from app.utils.inr_format import fmt_inr_cr
 
 
 def _fmt_cr(v: float) -> str:
-    return f"₹{v / 1e7:.1f} Cr" if v else "₹0 Cr"
+    return fmt_inr_cr(v, style="mor")
 
 
 def build_mor_pack(

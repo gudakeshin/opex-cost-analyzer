@@ -1,0 +1,19 @@
+{
+  "engagement_id": "381e1aaf-84fa-40e4-a644-3f49e3a4344d",
+  "company_name": "Acme Corp",
+  "industry": "technology",
+  "annual_revenue": 1000000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-05T18:01:46.867158+00:00",
+  "updated_at": "2026-06-05T18:01:46.867341+00:00",
+  "session_ids": [
+    "602443ff-8bd7-439d-a4dd-8f7eb344499f"
+  ],
+  "documents": []
+}

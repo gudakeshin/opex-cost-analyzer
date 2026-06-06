@@ -95,7 +95,14 @@ from .context import (
     consolidation_analyzer,
 )
 
-# sme_critique — evidence qualification and probe question engine
+# evidence — requirements, indexing, gathering, SME qualification
+from .evidence import (
+    build_contracts_by_category,
+    build_supplier_counts,
+    evidence_gatherer,
+    requirements_for_initiative,
+    resolve_structured_indexes,
+)
 from .sme_critique import sme_critique_analyzer
 
 # strategic — scenario modeler, shareholder bridge, peer disclosure miner,
@@ -183,6 +190,11 @@ __all__ = [
     "assumption_register",
     "vendor_master_builder",
     "consolidation_analyzer",
+    # evidence
+    "evidence_gatherer",
+    "requirements_for_initiative",
+    "build_contracts_by_category",
+    "build_supplier_counts",
     # sme critique
     "sme_critique_analyzer",
     # strategic

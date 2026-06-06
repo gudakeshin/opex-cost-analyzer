@@ -1,0 +1,45 @@
+gl_code,cost_center,vendor,description,amount,currency,fiscal_period,amount_type,business_unit,geo,legal_entity,source_system,source_record_id,gst_treatment,gstin,lease_treatment,related_party
+510010,CC-DEL-BFSI,Quess Corp,IT subcontractor staffing — BFSI delivery,420000000,INR,2023-Q2,actual,Delivery-BFSI,India,ADSL-IN,SAP,SAP-AP-100231,itc_eligible,29AABCQ1234A1Z5,,no
+510010,CC-DEL-BFSI,Quess Corp,IT subcontractor staffing — BFSI delivery,435000000,INR,2023-Q3,actual,Delivery-BFSI,India,ADSL-IN,SAP,SAP-AP-100874,itc_eligible,29AABCQ1234A1Z5,,no
+510010,CC-DEL-BFSI,Quess Corp,IT subcontractor staffing — BFSI delivery,448000000,INR,2023-Q4,actual,Delivery-BFSI,India,ADSL-IN,SAP,SAP-AP-101522,itc_eligible,29AABCQ1234A1Z5,,no
+510010,CC-DEL-BFSI,Quess Corp,IT subcontractor staffing — BFSI delivery,452000000,INR,2024-Q1,actual,Delivery-BFSI,India,ADSL-IN,SAP,SAP-AP-102190,itc_eligible,29AABCQ1234A1Z5,,no
+510010,CC-DEL-BFSI,Quess Corp,IT subcontractor staffing — BFSI delivery,455000000,INR,2024-Q2,actual,Delivery-BFSI,India,ADSL-IN,SAP,SAP-AP-102861,itc_eligible,29AABCQ1234A1Z5,,no
+510010,CC-DEL-BFSI,Quess Corp,IT subcontractor staffing — BFSI delivery,460000000,INR,2024-Q3,actual,Delivery-BFSI,India,ADSL-IN,SAP,SAP-AP-103540,itc_eligible,29AABCQ1234A1Z5,,no
+510010,CC-DEL-BFSI,Quess Corp,IT subcontractor staffing — BFSI delivery,468000000,INR,2024-Q4,actual,Delivery-BFSI,India,ADSL-IN,SAP,SAP-AP-104233,itc_eligible,29AABCQ1234A1Z5,,no
+510010,CC-DEL-BFSI,Quess Corp,IT subcontractor staffing — BFSI delivery,457000000,INR,2025-Q1,actual,Delivery-BFSI,India,ADSL-IN,SAP,SAP-AP-104901,itc_eligible,29AABCQ1234A1Z5,,no
+520010,CC-INFRA-CLD,Amazon Web Services,Cloud hosting — client delivery & platforms,300000000,INR,2023-Q2,actual,Infrastructure,India,ADSL-IN,Coupa,CPA-INV-552310,itc_eligible,29AAACA9100B1ZL,,no
+520010,CC-INFRA-CLD,Amazon Web Services,Cloud hosting — client delivery & platforms,312000000,INR,2023-Q3,actual,Infrastructure,India,ADSL-IN,Coupa,CPA-INV-553188,itc_eligible,29AAACA9100B1ZL,,no
+520010,CC-INFRA-CLD,Amazon Web Services,Cloud hosting — client delivery & platforms,318000000,INR,2023-Q4,actual,Infrastructure,India,ADSL-IN,Coupa,CPA-INV-554021,itc_eligible,29AAACA9100B1ZL,,no
+520010,CC-INFRA-CLD,Amazon Web Services,Cloud hosting — client delivery & platforms,326000000,INR,2024-Q1,actual,Infrastructure,India,ADSL-IN,Coupa,CPA-INV-554907,itc_eligible,29AAACA9100B1ZL,,no
+520010,CC-INFRA-CLD,Amazon Web Services,Cloud hosting — client delivery & platforms,331000000,INR,2024-Q2,actual,Infrastructure,India,ADSL-IN,Coupa,CPA-INV-555820,itc_eligible,29AAACA9100B1ZL,,no
+520010,CC-INFRA-CLD,Amazon Web Services,Cloud hosting — client delivery & platforms,338000000,INR,2024-Q3,actual,Infrastructure,India,ADSL-IN,Coupa,CPA-INV-556744,itc_eligible,29AAACA9100B1ZL,,no
+520010,CC-INFRA-CLD,Amazon Web Services,Cloud hosting — client delivery & platforms,344000000,INR,2024-Q4,actual,Infrastructure,India,ADSL-IN,Coupa,CPA-INV-557690,itc_eligible,29AAACA9100B1ZL,,no
+520010,CC-INFRA-CLD,Amazon Web Services,Cloud hosting — client delivery & platforms,335000000,INR,2025-Q1,actual,Infrastructure,India,ADSL-IN,Coupa,CPA-INV-558612,itc_eligible,29AAACA9100B1ZL,,no
+540010,CC-CORP-FAC,Embassy Office Parks,Campus lease — Bangalore SEZ,175000000,INR,2023-Q2,actual,Corporate,India,ADSL-IN,SAP,SAP-AP-200110,ineligible,29AAECE5500F1Z2,operating_ind_as_116,no
+540010,CC-CORP-FAC,Embassy Office Parks,Campus lease — Bangalore SEZ,175000000,INR,2023-Q3,actual,Corporate,India,ADSL-IN,SAP,SAP-AP-200645,ineligible,29AAECE5500F1Z2,operating_ind_as_116,no
+540010,CC-CORP-FAC,Embassy Office Parks,Campus lease — Bangalore SEZ,178000000,INR,2023-Q4,actual,Corporate,India,ADSL-IN,SAP,SAP-AP-201180,ineligible,29AAECE5500F1Z2,operating_ind_as_116,no
+540010,CC-CORP-FAC,Embassy Office Parks,Campus lease — Bangalore SEZ,178000000,INR,2024-Q1,actual,Corporate,India,ADSL-IN,SAP,SAP-AP-201722,ineligible,29AAECE5500F1Z2,operating_ind_as_116,no
+540010,CC-CORP-FAC,Embassy Office Parks,Campus lease — Bangalore SEZ,180000000,INR,2024-Q2,actual,Corporate,India,ADSL-IN,SAP,SAP-AP-202260,ineligible,29AAECE5500F1Z2,operating_ind_as_116,no
+540010,CC-CORP-FAC,Embassy Office Parks,Campus lease — Bangalore SEZ,180000000,INR,2024-Q3,actual,Corporate,India,ADSL-IN,SAP,SAP-AP-202804,ineligible,29AAECE5500F1Z2,operating_ind_as_116,no
+540010,CC-CORP-FAC,Embassy Office Parks,Campus lease — Bangalore SEZ,182000000,INR,2024-Q4,actual,Corporate,India,ADSL-IN,SAP,SAP-AP-203351,ineligible,29AAECE5500F1Z2,operating_ind_as_116,no
+540010,CC-CORP-FAC,Embassy Office Parks,Campus lease — Bangalore SEZ,182000000,INR,2025-Q1,actual,Corporate,India,ADSL-IN,SAP,SAP-AP-203900,ineligible,29AAECE5500F1Z2,operating_ind_as_116,no
+520020,CC-CORP-IT,Microsoft,M365 E5 enterprise licences,160000000,INR,2023-Q2,actual,Corporate,India,ADSL-IN,Coupa,CPA-INV-610044,itc_eligible,29AAACM1234M1ZP,,no
+520020,CC-CORP-IT,Microsoft,M365 E5 enterprise licences,162000000,INR,2023-Q4,actual,Corporate,India,ADSL-IN,Coupa,CPA-INV-611220,itc_eligible,29AAACM1234M1ZP,,no
+520020,CC-CORP-IT,Microsoft,M365 E5 enterprise licences,168000000,INR,2024-Q2,actual,Corporate,India,ADSL-IN,Coupa,CPA-INV-612455,itc_eligible,29AAACM1234M1ZP,,no
+520020,CC-CORP-IT,Microsoft,M365 E5 enterprise licences,172000000,INR,2024-Q4,actual,Corporate,India,ADSL-IN,Coupa,CPA-INV-613702,itc_eligible,29AAACM1234M1ZP,,no
+530010,CC-INFRA-NET,Bharti Airtel,Enterprise MPLS & internet leased lines,80000000,INR,2023-Q3,actual,Infrastructure,India,ADSL-IN,Oracle,ORA-AP-771020,itc_eligible,29AAACB2894G1ZX,,no
+530010,CC-INFRA-NET,Bharti Airtel,Enterprise MPLS & internet leased lines,82000000,INR,2024-Q1,actual,Infrastructure,India,ADSL-IN,Oracle,ORA-AP-772115,itc_eligible,29AAACB2894G1ZX,,no
+530010,CC-INFRA-NET,Bharti Airtel,Enterprise MPLS & internet leased lines,84000000,INR,2024-Q3,actual,Infrastructure,India,ADSL-IN,Oracle,ORA-AP-773240,itc_eligible,29AAACB2894G1ZX,,no
+530010,CC-INFRA-NET,Bharti Airtel,Enterprise MPLS & internet leased lines,84000000,INR,2025-Q1,actual,Infrastructure,India,ADSL-IN,Oracle,ORA-AP-774388,itc_eligible,29AAACB2894G1ZX,,no
+570010,CC-CORP-FIN,Deloitte India,Operating model & transformation advisory,72000000,INR,2024-Q2,actual,Corporate,India,ADSL-IN,SAP,SAP-AP-300451,itc_eligible,29AAAFD4567D1ZH,,no
+570010,CC-CORP-FIN,Deloitte India,Operating model & transformation advisory,84000000,INR,2024-Q3,actual,Corporate,India,ADSL-IN,SAP,SAP-AP-300988,itc_eligible,29AAAFD4567D1ZH,,no
+570010,CC-CORP-FIN,Deloitte India,Operating model & transformation advisory,96000000,INR,2024-Q4,actual,Corporate,India,ADSL-IN,SAP,SAP-AP-301540,itc_eligible,29AAAFD4567D1ZH,,no
+570010,CC-CORP-FIN,Deloitte India,Operating model & transformation advisory,58000000,INR,2025-Q1,actual,Corporate,India,ADSL-IN,SAP,SAP-AP-302093,itc_eligible,29AAAFD4567D1ZH,,no
+510011,CC-DEL-US,Allegis Group,Onsite contractor staffing — US accounts,540000000,INR,2024-Q2,actual,Delivery-BFSI,US,AETS-US,Oracle,ORA-AP-880210,ineligible,,,no
+510011,CC-DEL-US,Allegis Group,Onsite contractor staffing — US accounts,548000000,INR,2024-Q3,actual,Delivery-BFSI,US,AETS-US,Oracle,ORA-AP-881344,ineligible,,,no
+510011,CC-DEL-US,Allegis Group,Onsite contractor staffing — US accounts,552000000,INR,2024-Q4,actual,Delivery-BFSI,US,AETS-US,Oracle,ORA-AP-882490,ineligible,,,no
+510011,CC-DEL-UK,Harvey Nash UK,Onsite contractor staffing — UK accounts,235000000,INR,2024-Q3,actual,Delivery-Healthcare,UK,ADUK-UK,Oracle,ORA-AP-890115,ineligible,,,no
+510011,CC-DEL-UK,Harvey Nash UK,Onsite contractor staffing — UK accounts,242000000,INR,2024-Q4,actual,Delivery-Healthcare,UK,ADUK-UK,Oracle,ORA-AP-891260,ineligible,,,no
+640099,CC-CORP-ICO,Aranya Enterprise Tech Services (US),Intercompany delivery recharge — onsite mgmt,180000000,INR,2024-Q3,actual,Corporate,US,AETS-US,Oracle,ORA-ICO-990012,rcm,,,yes
+640099,CC-CORP-ICO,Aranya Enterprise Tech Services (US),Intercompany delivery recharge — onsite mgmt,186000000,INR,2024-Q4,actual,Corporate,US,AETS-US,Oracle,ORA-ICO-990448,rcm,,,yes
+640099,CC-CORP-ICO,Aranya Digital UK Ltd,Intercompany shared-services recharge,64000000,INR,2024-Q4,actual,Corporate,UK,ADUK-UK,Oracle,ORA-ICO-991207,rcm,,,yes

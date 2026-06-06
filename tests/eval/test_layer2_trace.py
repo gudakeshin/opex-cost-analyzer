@@ -234,8 +234,10 @@ class TestInputSnapshotDependencies:
 def test_trace_grounded_judge_scores_above_threshold():
     """TraceGroundedJudge should return score >= 0.6 for a grounded response."""
     import os
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        pytest.skip("ANTHROPIC_API_KEY not set")
+    if os.environ.get("RUN_LLM_JUDGE") != "1":
+        pytest.skip("Set RUN_LLM_JUDGE=1 to run live LLM judge tests")
+    if not os.environ.get("ANTHROPIC_API_KEY") and not os.environ.get("GEMINI_API_KEY"):
+        pytest.skip("ANTHROPIC_API_KEY or GEMINI_API_KEY required for LLM judge")
 
     from app.eval.judge import TraceGroundedJudge
 

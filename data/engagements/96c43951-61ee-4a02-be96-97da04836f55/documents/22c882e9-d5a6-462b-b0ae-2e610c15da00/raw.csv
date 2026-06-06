@@ -1,0 +1,19 @@
+metric,business_unit,value,unit
+Billable utilization,Delivery-BFSI,82.4,percent
+Billable utilization,Delivery-Retail,79.1,percent
+Billable utilization,Delivery-Healthcare,80.6,percent
+Billable utilization,Digital,76.8,percent
+Bench (non-billable) rate,Delivery-BFSI,12.5,percent
+Bench (non-billable) rate,Delivery-Retail,15.2,percent
+Active seats provisioned,Infrastructure,68000,seats
+Workstations under management,Infrastructure,71500,devices
+Cloud workloads (monthly active),Infrastructure,3400,instances
+Service desk tickets,Infrastructure,142000,per_month
+Office space occupied,Corporate,2850000,sq_ft
+Office seats (capacity),Corporate,76000,seats
+Seat occupancy ratio,Corporate,71.0,percent
+Active client accounts,Delivery-BFSI,38,accounts
+Active client accounts,Delivery-Retail,42,accounts
+Revenue per FTE,Delivery-BFSI,2190000,inr_per_year
+Offshore effort share,Delivery-BFSI,73.0,percent
+Onshore effort share,Delivery-BFSI,27.0,percent

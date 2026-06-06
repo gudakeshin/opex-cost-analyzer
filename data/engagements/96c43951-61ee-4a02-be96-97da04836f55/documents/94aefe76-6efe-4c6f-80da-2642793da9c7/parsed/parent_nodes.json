@@ -1,0 +1,15 @@
+{
+  "94aefe76-6efe-4c6f-80da-2642793da9c7::p0": {
+    "parent_id": "94aefe76-6efe-4c6f-80da-2642793da9c7::p0",
+    "doc_id": "94aefe76-6efe-4c6f-80da-2642793da9c7",
+    "engagement_id": "96c43951-61ee-4a02-be96-97da04836f55",
+    "filename": "T3_19_prior_cost_programmes.txt",
+    "heading_path": "",
+    "order": 0,
+    "text": "Aranya Digital Services Ltd \u2014 Prior Cost Programmes (last 3 years; to avoid double-counting)\n\nFY23 \u2014 \"Project Lean Ops\"\n- Real-estate first wave: exited 2 leased floors (Pune, Noida); ~\u20b922 Cr run-rate saved.\n- Travel policy tightening post-pandemic; ~\u20b914 Cr saved. STATUS: completed, savings in current baseline.\n\nFY24 \u2014 \"Project Margin Guard\" (see T3_20 calibration for realised vs plan)\n- Vendor/subcontractor consolidation (14 \u2192 6 panel): planned \u20b948 Cr, realised \u20b939.5 Cr run-rate.\n- Cloud FinOps wave 1: planned \u20b922 Cr, realised \u20b924.6 Cr.\n- Software licence reclaim: planned \u20b915 Cr, realised \u20b99.2 Cr (M365 E5 downgrade deferred).\n- Real-estate seat consolidation: planned \u20b918 Cr, realised \u20b96 Cr (SEZ lock-in + exit penalties).\n- STATUS: largely completed; realised savings already in FY25 baseline. Do NOT re-claim these.\n\nIn-flight (FY25, partial year \u2014 exclude the booked portion from new opportunity)\n- Network single-carrier consolidation (Airtel + Tata Comms): ~\u20b98 Cr targeted, ~\u20b93 Cr booked YTD.\n- Bench reduction / utilisation push: people-cost lever, tracked separately from third-party cost-out.\n\nImplication\n- New FY26 opportunities should be sized on the residual addressable pool after the above.\n- Cloud and licence levers still have headroom; subcontractor rate harmonisation can be deepened;\n  real-estate remains constrained by SEZ status.",
+    "child_ids": [
+      "94aefe76-6efe-4c6f-80da-2642793da9c7::p0::c0",
+      "94aefe76-6efe-4c6f-80da-2642793da9c7::p0::c1"
+    ]
+  }
+}

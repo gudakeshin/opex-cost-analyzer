@@ -1,0 +1,14 @@
+[
+  {
+    "engagement_id": "36da4258-3798-4048-a051-1b460f5a7dbf",
+    "initiative_id": "6f5c5e95-2b49-43c5-94d0-22f28e8a5159",
+    "lever_id": "supplier_consolidation",
+    "pack_id": "",
+    "planned_p50_cr": 0.05,
+    "realised_cr": 0.01,
+    "realised_date": "2026-01",
+    "data_source": "self_reported",
+    "confidence": "high",
+    "notes": ""
+  }
+]

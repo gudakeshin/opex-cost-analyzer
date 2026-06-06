@@ -1,0 +1,15 @@
+{
+  "80687d06-707f-42b8-b04e-3e5c0917cf83::p0": {
+    "parent_id": "80687d06-707f-42b8-b04e-3e5c0917cf83::p0",
+    "doc_id": "80687d06-707f-42b8-b04e-3e5c0917cf83",
+    "engagement_id": "96c43951-61ee-4a02-be96-97da04836f55",
+    "filename": "T4_23_treasury_fx_summary.txt",
+    "heading_path": "",
+    "order": 0,
+    "text": "Aranya Digital Services Ltd \u2014 Treasury & FX Summary FY25 (excerpt)\n\nCurrency exposure\n- ~70% of revenue is USD/GBP-billed (offshore + onsite); a large share of cost is INR (India delivery).\n  Net long USD/GBP position creates a natural revenue tailwind when the rupee depreciates.\n- Third-party costs that are FX-denominated: onsite contractor staffing (USD/GBP), foreign SaaS\n  (ServiceNow, Salesforce, GitHub, Coursera, Udemy, Cisco), and Google Cloud (USD).\n\nHedge book\n- Policy: hedge 50\u201375% of next-12-month net USD inflows via forwards; layered monthly.\n- FY25 average realised USD/INR ~83.2; forward cover extends ~9 months.\n\nImplications for cost analysis\n- FX moves can make USD-denominated SaaS and onsite staffing look more expensive in INR YoY even when\n  the underlying USD price is flat \u2014 separate FX effect from true price/volume before claiming savings.\n- Foreign-SaaS rationalisation savings should be modelled in the contract currency, then converted at a\n  consistent rate (use ~83.2 USD/INR) for the value bridge.\n- Do not attribute FX-driven cost increases to operational inefficiency in benchmarking.",
+    "child_ids": [
+      "80687d06-707f-42b8-b04e-3e5c0917cf83::p0::c0",
+      "80687d06-707f-42b8-b04e-3e5c0917cf83::p0::c1"
+    ]
+  }
+}

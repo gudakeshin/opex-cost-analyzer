@@ -1,0 +1,19 @@
+{
+  "engagement_id": "046e2c11-c2ec-43f2-9f55-cd3a1108957e",
+  "company_name": "HITL Co",
+  "industry": "technology",
+  "annual_revenue": 1000000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-05T18:19:55.056869+00:00",
+  "updated_at": "2026-06-05T18:19:55.057134+00:00",
+  "session_ids": [
+    "92e8591c-fbae-42c2-a3e3-dd9a97718942"
+  ],
+  "documents": []
+}

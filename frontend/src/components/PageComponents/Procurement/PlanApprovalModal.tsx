@@ -24,18 +24,18 @@ export const PlanApprovalModal: React.FC<PlanApprovalModalProps> = ({
     onConfirm={onConfirm}
     confirmLabel={loading ? 'Running…' : 'Confirm & run'}
   >
-    <p className="text-sm text-brand-muted mb-4">
+    <p className="text-sm text-gray-600 mb-4">
       Human-in-the-loop: confirm the planned skills before the Act phase executes.
     </p>
     {plan?.user_summary ? (
-      <p className="text-sm text-brand-ink whitespace-pre-wrap border-l-4 border-brand-green pl-3">
+      <p className="text-sm text-gray-900 whitespace-pre-wrap border-l-4 border-brand-green bg-gray-50 rounded-r-lg pl-4 py-2">
         {plan.user_summary}
       </p>
     ) : (
-      <p className="text-sm text-brand-muted">No plan summary returned.</p>
+      <p className="text-sm text-gray-500">No plan summary returned.</p>
     )}
     {plan?.planned_skills && plan.planned_skills.length > 0 && (
-      <ul className="mt-4 text-sm list-disc list-inside text-brand-ink">
+      <ul className="mt-4 text-sm list-disc list-inside text-gray-900">
         {plan.planned_skills.map((s) => (
           <li key={s}>{s}</li>
         ))}

@@ -36,7 +36,7 @@ from app.config import (
 )
 from app.opar.memory_adapter import get_memory_adapter_status
 from app.services.document_index import get_document_index_status
-from app.routers import benchmarks, chat, compliance, engagements, enterprise, outputs, pipeline, sessions, skills
+from app.routers import benchmarks, chat, compliance, connectors, engagements, enterprise, outputs, pipeline, sessions, skills
 from app.storage import ensure_dirs
 
 # ---------------------------------------------------------------------------
@@ -193,6 +193,7 @@ def health_ready():  # type: ignore[return]
 # ---------------------------------------------------------------------------
 app.include_router(engagements.router)
 app.include_router(sessions.router)
+app.include_router(connectors.router)
 app.include_router(chat.router)
 app.include_router(pipeline.router)
 app.include_router(benchmarks.router)

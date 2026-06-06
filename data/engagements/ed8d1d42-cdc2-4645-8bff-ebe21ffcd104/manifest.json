@@ -1,0 +1,14 @@
+{
+  "engagement_id": "ed8d1d42-cdc2-4645-8bff-ebe21ffcd104",
+  "company_name": "Perf Co",
+  "industry": "technology",
+  "annual_revenue": 500000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "created_at": "2026-06-04T17:06:48.432156+00:00",
+  "updated_at": "2026-06-04T17:06:48.432586+00:00",
+  "session_ids": [
+    "7b3d8641-5b3e-406d-9333-ba6aacbe733f"
+  ],
+  "documents": []
+}

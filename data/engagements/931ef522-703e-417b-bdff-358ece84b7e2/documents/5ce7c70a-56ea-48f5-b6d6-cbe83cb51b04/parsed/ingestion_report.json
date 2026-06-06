@@ -1,0 +1,17 @@
+{
+  "source_file": "raw.csv",
+  "sheets_ingested": [
+    {
+      "sheet": "raw",
+      "rows": 35,
+      "strategy": "standard"
+    }
+  ],
+  "sheets_skipped": [],
+  "quality": {
+    "rows_parsed": 35,
+    "rows_with_amount": 35,
+    "total_amount": 10134000000.0,
+    "zero_spend_warning": false
+  }
+}

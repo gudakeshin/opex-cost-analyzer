@@ -13,6 +13,7 @@ import {
   extractRootCauseFindings,
   extractAnomalyFlags,
   extractPeerGapDetails,
+  formatEvidenceUsedLine,
   formatSpendAmount,
 } from '../../../utils/analysisInsights';
 import { CollapsibleDetail } from '../../Common/CollapsibleDetail';
@@ -83,12 +84,23 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
 
   // SME critique data — keyed by "category_id|lever" for O(1) lookup
   const smeInitiativeCritiqueMap = useMemo(() => {
-    const map = new Map<string, { maturity: string; verdict: string; criticalRisk: string }>();
+    const map = new Map<
+      string,
+      {
+        maturity: string;
+        verdict: string;
+        criticalRisk: string;
+        evidenceUsed: string | null;
+        gaps: string[];
+      }
+    >();
     (snapshot?.sme_initiative_critiques ?? []).forEach((c) => {
       map.set(`${c.category_id}|${c.lever}`, {
         maturity: c.evidence_maturity,
         verdict: c.sme_verdict,
         criticalRisk: c.critical_risk,
+        evidenceUsed: formatEvidenceUsedLine(c.evidence_signals),
+        gaps: c.gaps ?? [],
       });
     });
     return map;
@@ -250,6 +262,7 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
                   ? 'warning'
                   : 'error'
                 : null;
+              const hasMissingGaps = (smeCritique?.gaps?.length ?? 0) > 0;
               const maturityLabel = smeCritique
                 ? smeCritique.maturity === 'validated'
                   ? 'Validated'
@@ -257,7 +270,11 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
                   ? 'Supported'
                   : smeCritique.maturity === 'indicative'
                   ? 'Indicative'
-                  : 'Needs probing'
+                  : hasMissingGaps && smeCritique.verdict !== 'proceed'
+                  ? 'Needs probing'
+                  : smeCritique.maturity === 'hypothesis'
+                  ? 'Hypothesis'
+                  : null
                 : null;
               return (
                 <li key={idx} className="space-y-0.5 min-w-0">
@@ -290,8 +307,14 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
                       </div>
                     </div>
                   </div>
+                  {smeCritique?.evidenceUsed && (
+                    <p className="text-[10px] text-emerald-700 leading-snug break-words">
+                      Evidence used: {smeCritique.evidenceUsed}
+                    </p>
+                  )}
                   {smeCritique?.criticalRisk && smeCritique.verdict !== 'proceed' && (
                     <p className="text-[10px] text-amber-700 leading-snug break-words">
+                      {smeCritique.gaps?.length ? 'Still needed: ' : ''}
                       {smeCritique.criticalRisk}
                     </p>
                   )}

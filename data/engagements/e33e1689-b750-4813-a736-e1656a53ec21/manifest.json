@@ -1,0 +1,14 @@
+{
+  "engagement_id": "e33e1689-b750-4813-a736-e1656a53ec21",
+  "company_name": "Pipe Co",
+  "industry": "technology",
+  "annual_revenue": 1000000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "created_at": "2026-06-05T05:15:54.027636+00:00",
+  "updated_at": "2026-06-05T05:15:54.028118+00:00",
+  "session_ids": [
+    "2d90d8c6-b3be-4b32-b910-d40fa26c605e"
+  ],
+  "documents": []
+}

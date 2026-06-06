@@ -16,9 +16,10 @@ from app.opar.reflect import (
     _determine_loop_control,
     _layer2_coherence_checks,
 )
-from app.opar.models import AdvisorySections, ObserveContext, ExecutionPlan, SkillTask
-from app.opar.qa_lookup import answer_general_qa as _answer_general_qa
-from app.opar.reflect import _advisory_quality_ok
+from app.opar.models import AdvisorySections, ExecutionPlan, ObserveContext, SkillTask
+from app.opar.orchestrator import _should_use_cached_qa_fastpath
+from app.opar.qa_lookup import answer_general_qa as _answer_general_qa, build_sme_critique_section
+from app.opar.reflect import _advisory_quality_ok, _compose_response_from_advisory
 
 
 def test_classify_intent_rule_based() -> None:
@@ -115,6 +116,134 @@ def test_answer_general_qa_optimization_uses_value_evidence() -> None:
     out = _answer_general_qa("How can I optimize IT & Technology costs?", validated)
     assert "Modeled lever" in out
     assert "$55,000" in out
+
+
+def test_should_use_cached_qa_fastpath_blocks_savings_questions() -> None:
+    ctx = ObserveContext(
+        session_id="s1",
+        user_message="What savings opportunities should we prioritize?",
+        intent_class="general_qa",
+        query_capabilities=["value_modeling"],
+    )
+    assert _should_use_cached_qa_fastpath(ctx, ctx.user_message) is False
+
+
+def test_should_use_cached_qa_fastpath_allows_simple_lookup() -> None:
+    ctx = ObserveContext(
+        session_id="s1",
+        user_message="What is my total spend?",
+        intent_class="general_qa",
+        query_capabilities=[],
+    )
+    assert _should_use_cached_qa_fastpath(ctx, ctx.user_message) is True
+
+
+def test_answer_general_qa_savings_priorities_includes_sme_critique() -> None:
+    validated = {
+        "spend-profiler": {
+            "total_spend": 1_000_000,
+            "category_profile": [{"category_id": "IT", "category_name": "IT", "spend": 300_000}],
+        },
+        "value-bridge-calculator": {
+            "confidence_bands": {"low": 40_000, "mid": 80_000, "high": 120_000},
+            "value_matrix": [
+                {
+                    "category_id": "IT",
+                    "category_name": "IT",
+                    "lever": "contract_renegotiation",
+                    "deduped_mid_savings": 55_000,
+                    "confidence": "medium",
+                }
+            ],
+        },
+        "sme-critique": {
+            "critique_summary": {
+                "ready_count": 0,
+                "probe_count": 1,
+                "insufficient_count": 0,
+                "savings_ready": 0,
+                "savings_probe": 165_000,
+                "savings_insufficient": 0,
+            },
+            "initiative_critiques": [
+                {
+                    "category_name": "IT",
+                    "sme_verdict": "probe_first",
+                    "critical_risk": "No contract register — renewal timing unknown.",
+                    "probe_questions": [
+                        {
+                            "question": "When do IT contracts expire?",
+                            "why_critical": "Locked contracts push savings to future periods.",
+                        }
+                    ],
+                }
+            ],
+        },
+    }
+    out = _answer_general_qa("What savings opportunities should we prioritize?", validated)
+    assert "Top modeled savings priorities" in out
+    assert "SME qualification" in out
+    assert "contract register" in out.lower()
+    assert "Based on your uploaded data: total spend" not in out
+
+
+def test_compose_response_from_advisory_includes_sme_narrative() -> None:
+    advisory = AdvisorySections(
+        executive_takeaway="IT spend is above peer median with consolidation upside.",
+        quick_wins_from_data=["Renegotiate top 2 vendors", "Enforce PO compliance"],
+        business_levers=[
+            {
+                "lever_name": "Supplier consolidation",
+                "what_changes": "Reduce vendor count from 12 to 5",
+                "why_it_works": "Concentration unlocks volume pricing",
+                "evidence": ["Top 3 vendors are 68% of spend", "Peer median is 4 vendors"],
+            },
+            {
+                "lever_name": "Contract renegotiation",
+                "what_changes": "Reset maintenance terms at renewal",
+                "why_it_works": "Benchmark gap is contract-driven",
+                "evidence": ["Gap vs P75 is 2.1 pts of revenue", "Largest vendor is 31% of category"],
+            },
+            {
+                "lever_name": "Maverick compliance",
+                "what_changes": "Route card spend through approved POs",
+                "why_it_works": "Off-contract buying inflates unit cost",
+                "evidence": ["Express-like lines are 14% of category", "Policy exists but is not enforced"],
+            },
+        ],
+        sme_qualification_narrative=(
+            "The IT consolidation saving assumes contracts renew within 18 months, "
+            "but no contract register was uploaded — if locked beyond that horizon, "
+            "this saving is FY27+ at best."
+        ),
+    )
+    validated = {
+        "value-bridge-calculator": {
+            "confidence_bands": {"low": 40_000, "mid": 80_000, "high": 120_000},
+        }
+    }
+    out = _compose_response_from_advisory(advisory, validated)
+    assert "SME qualification" in out
+    assert "contract register" in out.lower()
+
+
+def test_build_sme_critique_section_renders_critical_risk() -> None:
+    validated = {
+        "sme-critique": {
+            "critique_summary": {"probe_count": 1, "savings_probe": 100_000},
+            "initiative_critiques": [
+                {
+                    "category_name": "Logistics",
+                    "sme_verdict": "probe_first",
+                    "critical_risk": "Benchmark gap only — no lane-level freight data.",
+                    "probe_questions": [{"question": "Which lanes drive air freight?", "why_critical": "Lane mix sets achievability."}],
+                }
+            ],
+        }
+    }
+    out = build_sme_critique_section(validated, "USD")
+    assert "SME qualification" in out
+    assert "lane-level freight" in out.lower()
 
 
 def test_assess_data_quality_no_spend_file() -> None:

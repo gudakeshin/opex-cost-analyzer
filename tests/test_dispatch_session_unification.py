@@ -68,6 +68,7 @@ def test_savings_modeler_dispatch_uses_rich_context(monkeypatch) -> None:
 
 def test_sme_critique_is_registered() -> None:
     assert "sme-critique" in registered_skills()
+    assert "evidence-gatherer" in registered_skills()
 
 
 def test_value_modeled_plan_includes_sme_critique() -> None:
@@ -85,7 +86,9 @@ def test_value_modeled_plan_includes_sme_critique() -> None:
 
     skills = [task.skill_name for task in exec_plan.tasks]
     assert "savings-modeler" in skills
+    assert "evidence-gatherer" in skills
     assert "sme-critique" in skills
+    assert skills.index("evidence-gatherer") < skills.index("sme-critique")
 
 
 def test_reflect_preserves_full_session_state_when_merging_chat_outputs() -> None:

@@ -1,19 +1,19 @@
 {
-  "overall_score": 10.0,
+  "overall_score": 9.864,
   "passed": true,
-  "eval_date": "2026-05-30",
+  "eval_date": "2026-06-06",
   "dimensions": [
     {
       "dimension_id": "OB_01",
       "name": "Intent Classification Accuracy",
       "domain": "observe",
-      "raw_score": 10.0,
+      "raw_score": 9.0,
       "threshold_pass": 8.5,
       "passed": true,
       "gap": 0.0,
       "cases_run": 20,
-      "cases_passed": 20,
-      "finding_summary": "20/20 cases correct",
+      "cases_passed": 18,
+      "finding_summary": "18/20 cases correct",
       "evidence": {
         "cases": [
           "benchmark my spend against industry peers \u2192 benchmark",
@@ -38,8 +38,11 @@
           "run zero based budgeting analysis \u2192 zbb"
         ],
         "total_cases": 20,
-        "cases_passed": 20,
-        "failed_cases": []
+        "cases_passed": 18,
+        "failed_cases": [
+          "\u2717 'show me the IT spend breakdown' \u2192 general_qa (got: drill_down)",
+          "\u2717 'reconcile gstr2a with our books' \u2192 gstr_reconcile (got: conflict_review)"
+        ]
       }
     },
     {

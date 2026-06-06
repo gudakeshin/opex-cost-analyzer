@@ -2,6 +2,7 @@
 import pytest
 
 from app.skills.engine.sme_critique import (
+    _build_portfolio_probes,
     _build_probe_questions,
     _check_double_count,
     _score_evidence_maturity,
@@ -110,12 +111,10 @@ class TestScoreEvidenceMaturity:
 
     def test_category_id_is_lowercased_lookup(self):
         init = _make_initiative(category_id="IT_Software")
-        # The function uses category_id as-is; contracts keyed lowercase won't match
         label, score = self._call(
             init, contracts={"it_software": [{}]}
         )
-        # category_id from initiative is "IT_Software", contracts key is "it_software" → no match
-        assert score == 0
+        assert score == 1
 
 
 # ---------------------------------------------------------------------------
@@ -141,6 +140,12 @@ class TestBuildProbeQuestions:
         init = _make_initiative(lever="supplier_consolidation")
         probes = self._call(init)
         assert any("contract" in p["question"].lower() or "contract" in p["data_to_request"].lower()
+                   for p in probes)
+
+    def test_contract_renegotiation_alias_fires_contract_probe(self):
+        init = _make_initiative(lever="contract_renegotiation")
+        probes = self._call(init)
+        assert any("contract" in p["question"].lower() or "renewal" in p["question"].lower()
                    for p in probes)
 
     def test_supplier_consolidation_no_supplier_data_fires(self):
@@ -285,6 +290,9 @@ class TestSmeCritiqueAnalyzer:
         assert critiques[0]["sme_verdict"] in ("insufficient_data", "probe_first")
 
     def test_validated_initiative_with_all_signals_proceeds(self):
+        from datetime import date
+        from app.models import NormalizedSpendLine
+
         init = _make_initiative(confidence="high", lever="supplier_consolidation")
         savings_model = {"initiatives": [init]}
         spend_profile = {
@@ -300,10 +308,24 @@ class TestSmeCritiqueAnalyzer:
                 {"category_id": "it_software", "root_causes": ["price_gap", "fragmented_supply"]}
             ]
         }
-        contracts = {
-            "contracts": [{"category_id": "it_software", "expiry": "2026-06"}]
-        }
-        result = sme_critique_analyzer(savings_model, spend_profile, benchmarks, root_causes, contracts)
+        lines = [
+            NormalizedSpendLine(
+                row_id=i + 1,
+                category_id="it_software",
+                category_name="IT Software",
+                supplier=f"Vendor {i}",
+                description="IT spend",
+                amount=10_000.0,
+                currency="INR",
+                contract_expiry_date=date(2026, 6, 1) if i == 0 else None,
+                contract_status="in_contract" if i == 0 else None,
+            )
+            for i in range(10)
+        ]
+        contract_lifecycle = {"renewal_alerts": []}
+        result = sme_critique_analyzer(
+            savings_model, spend_profile, benchmarks, root_causes, contract_lifecycle, lines=lines,
+        )
         c = result["initiative_critiques"][0]
         assert c["evidence_maturity"] in ("supported", "validated")
         # With contract + supplier data and all signals, should proceed
@@ -373,3 +395,67 @@ class TestSmeCritiqueAnalyzer:
         s = result["critique_summary"]
         total = s["savings_ready"] + s["savings_probe"] + s["savings_insufficient"]
         assert total == 300
+
+    def test_portfolio_probes_dedupe_transaction_volume_across_categories(self):
+        """Three process_automation initiatives missing transaction_volume → one portfolio probe."""
+        initiatives = [
+            _make_initiative(
+                category_id="hr", category_name="HR", lever="process_automation",
+                net_savings={"total_3yr": 300},
+            ),
+            _make_initiative(
+                category_id="travel", category_name="Travel", lever="process_automation",
+                net_savings={"total_3yr": 200},
+            ),
+            _make_initiative(
+                category_id="other", category_name="Other", lever="process_automation",
+                net_savings={"total_3yr": 100},
+            ),
+        ]
+        savings_model = {"initiatives": initiatives}
+        result = sme_critique_analyzer(
+            savings_model, {"category_profile": []}, {"comparisons": []},
+            {"root_cause_findings": []}, {"contracts": []},
+        )
+        portfolio = result.get("portfolio_probes") or []
+        tv = [p for p in portfolio if p.get("probe_family_id") == "transaction_volume"]
+        assert len(tv) == 1
+        cats = set(tv[0].get("affected_categories") or [])
+        assert cats >= {"HR", "Travel", "Other"}
+        assert tv[0].get("scope") == "portfolio"
+        assert "category" not in tv[0].get("question", "").split("across")[0].lower() or "across" in tv[0]["question"].lower()
+
+
+class TestBuildPortfolioProbes:
+    def test_aggregates_saving_at_stake_by_family(self):
+        critiques = [
+            {
+                "category_name": "HR",
+                "probe_questions": [
+                    {
+                        "probe_family_id": "transaction_volume",
+                        "question": "Q1",
+                        "why_critical": "critical",
+                        "saving_at_stake": 100,
+                        "scope": "portfolio",
+                    }
+                ],
+            },
+            {
+                "category_name": "Travel",
+                "probe_questions": [
+                    {
+                        "probe_family_id": "transaction_volume",
+                        "question": "Q2",
+                        "why_critical": "also critical",
+                        "saving_at_stake": 50,
+                        "scope": "portfolio",
+                    }
+                ],
+            },
+        ]
+        out = _build_portfolio_probes(critiques)
+        assert len(out) == 1
+        assert out[0]["probe_family_id"] == "transaction_volume"
+        assert out[0]["saving_at_stake"] == 150
+        assert set(out[0]["affected_categories"]) == {"HR", "Travel"}

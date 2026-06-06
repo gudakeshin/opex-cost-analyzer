@@ -1,0 +1,14 @@
+{
+  "engagement_id": "e11632a2-3e63-4861-8462-0db2ebe7defe",
+  "company_name": "OPAR Co",
+  "industry": "technology",
+  "annual_revenue": 1000000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "created_at": "2026-06-04T18:32:33.634536+00:00",
+  "updated_at": "2026-06-04T18:32:33.634763+00:00",
+  "session_ids": [
+    "19b7a0f9-c33c-40f5-85ad-bf50d39b3f7f"
+  ],
+  "documents": []
+}

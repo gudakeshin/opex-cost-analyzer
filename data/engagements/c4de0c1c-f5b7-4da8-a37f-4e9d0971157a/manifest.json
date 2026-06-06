@@ -1,0 +1,19 @@
+{
+  "engagement_id": "c4de0c1c-f5b7-4da8-a37f-4e9d0971157a",
+  "company_name": "Perf Co",
+  "industry": "technology",
+  "annual_revenue": 500000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-05T06:19:11.887929+00:00",
+  "updated_at": "2026-06-05T06:19:11.888384+00:00",
+  "session_ids": [
+    "6689c258-e9c9-412c-9182-36c757a856ca"
+  ],
+  "documents": []
+}

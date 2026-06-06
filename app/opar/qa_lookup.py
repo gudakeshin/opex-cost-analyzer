@@ -9,10 +9,33 @@ duplicated narrative producer.
 
 from __future__ import annotations
 
-from typing import Any, Dict
+import re
+from typing import Any, Dict, Iterable, List, Optional
 
 from app.opar.category_resolver import match_category_from_query
 from app.utils.inr_format import format_money
+
+_SAVINGS_QUERY_TOKENS = (
+    "savings",
+    "save money",
+    "priorit",
+    "opportunity",
+    "opportunities",
+    "value bridge",
+    "value-at-the-table",
+    "addressable",
+    "npv",
+    "payback",
+    "reduce cost",
+    "cost reduction",
+)
+
+_INTERACTIVE_QA_CAPABILITIES = frozenset({
+    "value_modeling",
+    "benchmarking",
+    "root_cause",
+    "executive_narrative",
+})
 
 _FILE_FORMAT_MSG = (
     "Your spend file (.xlsx or .csv) should have these columns "
@@ -40,6 +63,195 @@ _CAPABILITIES_MSG = (
 )
 
 
+def _is_portfolio_savings_query(msg: str) -> bool:
+    """True for cross-category savings prioritization asks (not category drill-down)."""
+    lowered = (msg or "").lower()
+    return any(
+        token in lowered
+        for token in (
+            "priorit",
+            "which savings",
+            "what savings",
+            "top savings",
+            "savings opportunities",
+            "savings opportunity",
+            "where should we save",
+            "where to save",
+        )
+    )
+
+
+def is_interactive_savings_query(
+    msg: str,
+    capabilities: Optional[Iterable[str]] = None,
+) -> bool:
+    """True when the message needs advisory/SME narrative, not a canned lookup."""
+    caps = set(capabilities or [])
+    if caps & _INTERACTIVE_QA_CAPABILITIES:
+        return True
+    lowered = (msg or "").lower()
+    return any(token in lowered for token in _SAVINGS_QUERY_TOKENS)
+
+
+def build_sme_critique_section(validated: Dict[str, Any], currency: str = "USD") -> str:
+    """Render deterministic SME qualification block from sme-critique skill output."""
+    sme = validated.get("sme-critique", {})
+    if not isinstance(sme, dict):
+        return ""
+    fmt = lambda v: format_money(float(v or 0.0), currency)  # noqa: E731
+    summary = sme.get("critique_summary", {}) if isinstance(sme.get("critique_summary"), dict) else {}
+    critiques = sme.get("initiative_critiques", []) if isinstance(sme.get("initiative_critiques"), list) else []
+
+    ready = int(summary.get("ready_count", 0) or 0)
+    probe = int(summary.get("probe_count", 0) or 0)
+    insufficient = int(summary.get("insufficient_count", 0) or 0)
+    savings_ready = float(summary.get("savings_ready", 0) or 0)
+    savings_probe = float(summary.get("savings_probe", 0) or 0)
+    savings_insufficient = float(summary.get("savings_insufficient", 0) or 0)
+
+    if not critiques and ready == 0 and probe == 0 and insufficient == 0:
+        return ""
+
+    lines: list[str] = ["**SME qualification (before calling this a value case)**"]
+    if ready > 0 and savings_ready > 0:
+        lines.append(
+            f"- Ready for business case: **{fmt(savings_ready)}** ({ready} initiative{'s' if ready != 1 else ''})"
+        )
+    answered_families = int(summary.get("answered_probe_families", 0) or 0)
+    if answered_families > 0:
+        lines.append(
+            f"- User-confirmed assumptions: **{answered_families}** probe famil{'ies' if answered_families != 1 else 'y'} recorded"
+        )
+    if probe > 0 and savings_probe > 0:
+        lines.append(
+            f"- Needs probing first: **{fmt(savings_probe)}** ({probe} initiative{'s' if probe != 1 else ''})"
+        )
+    if insufficient > 0 and savings_insufficient > 0:
+        lines.append(
+            f"- Insufficient data: **{fmt(savings_insufficient)}** ({insufficient} initiative{'s' if insufficient != 1 else ''})"
+        )
+
+    flagged = [
+        c for c in critiques
+        if isinstance(c, dict) and str(c.get("sme_verdict", "")) in ("probe_first", "insufficient_data")
+    ]
+    for critique in flagged[:3]:
+        cat = str(critique.get("category_name") or critique.get("category_id") or "Category")
+        risk = str(critique.get("critical_risk") or "").strip()
+        if risk:
+            lines.append(f"- **{cat}**: {risk}")
+        probes = critique.get("probe_questions", []) if isinstance(critique.get("probe_questions"), list) else []
+        if probes and isinstance(probes[0], dict):
+            q = str(probes[0].get("question") or "").strip()
+            why = str(probes[0].get("why_critical") or "").strip()
+            if q:
+                lines.append(f"  - Probe: {q}")
+            if why:
+                lines.append(f"  - Why it matters: {why}")
+
+    return "\n".join(lines) if len(lines) > 1 else ""
+
+
+def _answer_savings_priorities(msg: str, validated: Dict[str, Any], currency: str) -> Optional[str]:
+    """Top savings initiatives with SME qualification when value model exists in cache."""
+    fmt = lambda v: format_money(float(v or 0.0), currency)  # noqa: E731
+    value_matrix = validated.get("value-bridge-calculator", {}).get("value_matrix", [])
+    if not isinstance(value_matrix, list) or not value_matrix:
+        savings_model = validated.get("savings-modeler", {})
+        initiatives = savings_model.get("initiatives", []) if isinstance(savings_model, dict) else []
+        if not initiatives:
+            return None
+        rows = sorted(
+            [i for i in initiatives if isinstance(i, dict)],
+            key=lambda r: float((r.get("net_savings") or {}).get("total_3yr", 0) or 0),
+            reverse=True,
+        )[:3]
+        lines = ["**Top modeled savings priorities**"]
+        for i, row in enumerate(rows, 1):
+            cat = str(row.get("category_name") or row.get("category_id") or "Category")
+            lever = str(row.get("lever_name") or row.get("lever") or "optimization").replace("_", " ")
+            amt = float((row.get("net_savings") or {}).get("total_3yr", 0) or 0)
+            conf = str(row.get("confidence") or "medium")
+            lines.append(f"{i}. **{cat}** — {fmt(amt)} via {lever} (confidence: {conf})")
+    else:
+        rows = sorted(
+            [r for r in value_matrix if isinstance(r, dict)],
+            key=lambda r: float(r.get("deduped_mid_savings", 0) or 0),
+            reverse=True,
+        )[:3]
+        lines = ["**Top modeled savings priorities**"]
+        for i, row in enumerate(rows, 1):
+            cat = str(row.get("category_name") or row.get("category_id") or "Category")
+            lever = str(row.get("lever") or "optimization").replace("_", " ")
+            mid = float(row.get("deduped_mid_savings", 0) or 0)
+            conf = str(row.get("confidence") or "medium")
+            lines.append(f"{i}. **{cat}** — {fmt(mid)} mid-case via {lever} (confidence: {conf})")
+
+    bands = validated.get("value-bridge-calculator", {}).get("confidence_bands", {})
+    if isinstance(bands, dict) and bands.get("mid"):
+        lines.append(
+            f"\nPortfolio mid-case: **{fmt(bands.get('mid', 0))}** "
+            f"(low {fmt(bands.get('low', 0))}, high {fmt(bands.get('high', 0))})."
+        )
+
+    sme_block = build_sme_critique_section(validated, currency)
+    if sme_block:
+        lines.append("")
+        lines.append(sme_block)
+
+    lowered = msg.lower()
+    if "business case" in lowered:
+        lines.append("\nAsk to **generate a business case** for NPV and payback detail.")
+    return "\n".join(lines)
+
+
+_SUPPLIER_TOKENS = ("supplier", "vendor", "by supplier", "by vendor", "payee")
+_GEO_TOKENS = ("geo", "geograph", "region", "country", "by country", "by region")
+
+
+def _asks_supplier(lowered: str) -> bool:
+    return any(w in lowered for w in _SUPPLIER_TOKENS)
+
+
+def _asks_geo(lowered: str) -> bool:
+    return any(w in lowered for w in _GEO_TOKENS)
+
+
+def _parse_top_limit(msg: str, default: int = 10) -> int:
+    match = re.search(r"\btop\s+(\d+)\b", (msg or "").lower())
+    if match:
+        return max(1, min(int(match.group(1)), 25))
+    return default
+
+
+def aggregate_portfolio_suppliers(
+    categories: Iterable[Dict[str, Any]],
+    *,
+    limit: int = 10,
+    total_spend: float = 0.0,
+) -> List[Dict[str, Any]]:
+    """Roll up per-category top_suppliers into a portfolio-wide ranking."""
+    totals: Dict[str, float] = {}
+    for cat in categories:
+        for sup in cat.get("top_suppliers") or []:
+            if not isinstance(sup, dict):
+                continue
+            name = str(sup.get("supplier") or "").strip()
+            if not name:
+                continue
+            totals[name] = totals.get(name, 0.0) + float(sup.get("spend", 0) or 0.0)
+    ranked = sorted(totals.items(), key=lambda x: x[1], reverse=True)[:limit]
+    denom = float(total_spend or 0) or sum(totals.values())
+    return [
+        {
+            "supplier": name,
+            "spend": spend,
+            "share_of_total": (spend / denom * 100) if denom else 0.0,
+        }
+        for name, spend in ranked
+    ]
+
+
 def answer_general_qa(msg: str, validated: Dict[str, Any], currency: str = "USD") -> str:
     """Construct a contextual answer for general_qa when spend data is available."""
     fmt = lambda v: format_money(float(v or 0.0), currency)  # noqa: E731
@@ -57,7 +269,15 @@ def answer_general_qa(msg: str, validated: Dict[str, Any], currency: str = "USD"
         w in lowered
         for w in ["optimize", "optimise", "reduce cost", "cost optimization", "savings levers", "business lever"]
     )
+    asks_savings = is_interactive_savings_query(msg)
+    asks_supplier = _asks_supplier(lowered)
+    asks_geo = _asks_geo(lowered)
     value_matrix = validated.get("value-bridge-calculator", {}).get("value_matrix", [])
+
+    if _is_portfolio_savings_query(msg):
+        savings_answer = _answer_savings_priorities(msg, validated, currency)
+        if savings_answer:
+            return savings_answer
 
     matched_cat = match_category_from_query(msg, categories)
     if matched_cat:
@@ -86,6 +306,34 @@ def answer_general_qa(msg: str, validated: Dict[str, Any], currency: str = "USD"
             return f"**{nm}** contains **{lines:,}** line item(s), with total spend **{fmt(spend)}**."
         if asks_share:
             return f"**{nm}** represents **{fmt(spend)}** ({pct:.1f}% of total spend)."
+        if asks_supplier:
+            suppliers = matched_cat.get("top_suppliers", []) if isinstance(matched_cat.get("top_suppliers"), list) else []
+            if suppliers:
+                lines_out = [f"**{nm}** spend by supplier (total category spend **{fmt(spend)}**):"]
+                for i, sup in enumerate(suppliers[:10], 1):
+                    sname = sup.get("supplier", "Unknown")
+                    sspend = float(sup.get("spend", 0.0) or 0.0)
+                    share = float(sup.get("share_of_category", 0.0) or 0.0)
+                    lines_out.append(f"  {i}. **{sname}**: {fmt(sspend)} ({share:.1f}% of category)")
+                return "\n".join(lines_out)
+            return (
+                f"**{nm}** has **{fmt(spend)}** total spend, but supplier-level detail is not available "
+                "in the uploaded file. Ensure your spend file includes a Supplier/Vendor column."
+            )
+        if asks_geo:
+            geos = matched_cat.get("top_geos", []) if isinstance(matched_cat.get("top_geos"), list) else []
+            if geos:
+                lines_out = [f"**{nm}** spend by geography (total category spend **{fmt(spend)}**):"]
+                for i, g in enumerate(geos[:8], 1):
+                    gname = g.get("geo", g.get("region", "Unknown"))
+                    gspend = float(g.get("spend", 0.0) or 0.0)
+                    share = float(g.get("share_of_category", 0.0) or 0.0)
+                    lines_out.append(f"  {i}. **{gname}**: {fmt(gspend)} ({share:.1f}% of category)")
+                return "\n".join(lines_out)
+            return (
+                f"**{nm}** has **{fmt(spend)}** total spend, but geography breakdown is not available "
+                "in the uploaded file. Add a Country/Region column to enable geo analysis."
+            )
         if asks_optimization and isinstance(value_matrix, list) and value_matrix:
             row = next(
                 (r for r in value_matrix if str(r.get("category_name", "")).lower() == str(nm).lower() or str(r.get("category_id", "")).lower() == str(matched_cat.get("category_id", "")).lower()),
@@ -94,17 +342,42 @@ def answer_general_qa(msg: str, validated: Dict[str, Any], currency: str = "USD"
             if row:
                 lever = str(row.get("lever", "optimization")).replace("_", " ")
                 mid = float(row.get("deduped_mid_savings", 0.0) or 0.0)
-                return (
+                sme_block = build_sme_critique_section(validated, currency)
+                out = (
                     f"**{nm} optimization focus**\n"
                     f"- Modeled lever: **{lever}**\n"
                     f"- Modeled value-release potential: **{fmt(mid)}**\n"
                     f"- Business rationale: address root-cause bottlenecks and shift spend to controlled commercial terms."
                     f"\n- Ask for a **business case** if you want NPV/payback economics."
                 )
+                if sme_block:
+                    out += f"\n\n{sme_block}"
+                return out
         return (
             f"**{nm}** accounts for **{fmt(spend)}** ({pct:.1f}% of total spend) "
             f"across {lines} line item(s)."
         )
+
+    if asks_supplier:
+        limit = _parse_top_limit(msg)
+        suppliers = aggregate_portfolio_suppliers(categories, limit=limit, total_spend=total)
+        if suppliers:
+            lines_out = [f"Top {len(suppliers)} suppliers by spend (total portfolio **{fmt(total)}**):"]
+            for i, sup in enumerate(suppliers, 1):
+                sname = sup.get("supplier", "Unknown")
+                sspend = float(sup.get("spend", 0.0) or 0.0)
+                share = float(sup.get("share_of_total", 0.0) or 0.0)
+                lines_out.append(f"  {i}. **{sname}**: {fmt(sspend)} ({share:.1f}% of total)")
+            return "\n".join(lines_out)
+        return (
+            "Supplier-level detail is not available in the uploaded file. "
+            "Ensure your spend file includes a Supplier/Vendor column."
+        )
+
+    if asks_savings or asks_optimization:
+        savings_answer = _answer_savings_priorities(msg, validated, currency)
+        if savings_answer:
+            return savings_answer
 
     if any(w in lowered for w in ["addressable", "addressability", "opportunity"]):
         addr_total = sum(float(c.get("addressable_spend", 0.0) or 0.0) for c in categories)
@@ -121,8 +394,11 @@ def answer_general_qa(msg: str, validated: Dict[str, Any], currency: str = "USD"
                 lines_out.append(f"  {i}. **{nm}**: {fmt(amt)}")
         return "\n".join(lines_out)
 
-    # Total / biggest / top categories
-    if any(w in lowered for w in ["total", "biggest", "largest", "top", "highest", "most", "overview"]):
+    # Total / biggest / top categories (skip when user asked for supplier/geo breakdown)
+    if not asks_geo and any(
+        w in lowered
+        for w in ["total", "biggest", "largest", "top", "highest", "most", "overview", "summarize", "summary", "concentration"]
+    ):
         if categories:
             top = sorted(categories, key=lambda c: c.get("spend", 0), reverse=True)[:5]
             lines_out = [f"Your total spend is **{fmt(total)}**. Top categories:"]

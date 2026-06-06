@@ -8,6 +8,10 @@ import { Select } from '../components/Common/Select';
 import { RecommendedBadge } from '../components/Common/RecommendedBadge';
 import { StructuredChatMessage } from '../components/PageComponents/Procurement/StructuredChatMessage';
 import { InsightCards } from '../components/PageComponents/Procurement/InsightCards';
+import {
+  BusinessClarificationModal,
+  type ClarificationModalVariant,
+} from '../components/PageComponents/Procurement/BusinessClarificationModal';
 import { PlanApprovalModal } from '../components/PageComponents/Procurement/PlanApprovalModal';
 import { ChatComposer } from '../components/PageComponents/Analysis/ChatComposer';
 import { TrustRail } from '../components/Trust/TrustRail';
@@ -25,12 +29,20 @@ import {
   buildDeepDivePrompts,
   buildRestoredInsightMessage,
   buildWelcomePrompts,
-  buildProbePrompts,
+  answeredProbeKeysFromMessages,
+  collectUnansweredProbeQuestions,
+  filterProbeNextOptions,
+  hasUnansweredProbeQuestions,
+  mergeAnsweredProbeFamilies,
+  probeAnswerKey,
+  probeToClarification,
+  PROBE_MODAL_TRIGGER,
+  saveAnsweredProbeKeys,
   chatHasInsightSnapshot,
   extractInsightSnapshot,
-  isComplianceOrConflictQuery,
   mergeNextOptions,
   wantsPeerSavingsInsight,
+  type TopProbeQuestion,
 } from '../utils/analysisInsights';
 import { VerticalResizeHandle } from '../components/Common/VerticalResizeHandle';
 import { EngagementConflictBanner } from '../components/PageComponents/Procurement/EngagementConflictBanner';
@@ -53,6 +65,9 @@ import type {
   SessionManifestPatch,
   SessionResponse,
   V1ChatResponse,
+  AnalysisInsightSnapshot,
+  BusinessClarification,
+  ProbeAnswerResponse,
 } from '../types';
 
 const CONFLICT_DISMISS_PREFIX = 'opex_conflict_dismiss_';
@@ -98,6 +113,7 @@ function contextPayload(
   const body: Record<string, unknown> = {
     industry: industry || undefined,
     currency: engagement.currency || 'INR',
+    audience: manifest?.audience || engagement.audience || undefined,
   };
   if (engagement.company_name && engagement.company_name !== 'New engagement') {
     body.company_name = engagement.company_name;
@@ -106,6 +122,13 @@ function contextPayload(
     body.annual_revenue = engagement.annual_revenue_cr * 10_000_000;
   }
   return body;
+}
+
+function chatHistoryPayload(messages: ChatMessage[]): { role: string; content: string }[] {
+  return messages
+    .filter((m) => m.role === 'user' || m.role === 'assistant')
+    .slice(-6)
+    .map((m) => ({ role: m.role, content: m.content }));
 }
 
 function filesToUploadMessages(files: ManifestFileEntry[]): ChatMessage[] {
@@ -182,6 +205,18 @@ export const ProcurementAnalysis: React.FC = () => {
   const [planOpen, setPlanOpen] = useState(false);
   const [planPreview, setPlanPreview] = useState<ChatPlanPreview | null>(null);
   const [pendingMessage, setPendingMessage] = useState('');
+  const [clarificationOpen, setClarificationOpen] = useState(false);
+  const [clarification, setClarification] = useState<BusinessClarification | null>(null);
+  const [clarificationVariant, setClarificationVariant] = useState<ClarificationModalVariant>('observe');
+  const [smeProbeQueue, setSmeProbeQueue] = useState<TopProbeQuestion[]>([]);
+  const [smeProbeSnapshot, setSmeProbeSnapshot] = useState<AnalysisInsightSnapshot | null>(null);
+  const [smeProbeIndex, setSmeProbeIndex] = useState(0);
+  const [smeProbeCurrency, setSmeProbeCurrency] = useState('INR');
+  const [checkpointId, setCheckpointId] = useState<string | null>(null);
+  const [answeredProbeFamilies, setAnsweredProbeFamilies] = useState<Set<string>>(() => new Set());
+  const answeredProbeFamiliesRef = useRef<Set<string>>(new Set());
+  const probeModalShownForRun = useRef<Set<string>>(new Set());
+  const skipNextProbeAutoOpen = useRef(false);
   const [lastRunId, setLastRunId] = useState<string | undefined>();
   const [lastSignals, setLastSignals] = useState<V1ChatResponse['quality_signals']>();
   const [lastSteps, setLastSteps] = useState<V1ChatResponse['progress_steps']>();
@@ -301,6 +336,35 @@ export const ProcurementAnalysis: React.FC = () => {
     }
   }, [sessionId, messages]);
 
+  useEffect(() => {
+    if (!sessionId) {
+      setAnsweredProbeFamilies(new Set());
+      return;
+    }
+    const merged = mergeAnsweredProbeFamilies(
+      manifest,
+      sessionId,
+      answeredProbeKeysFromMessages(messages),
+    );
+    answeredProbeFamiliesRef.current = merged;
+    setAnsweredProbeFamilies(merged);
+  }, [sessionId, messages, manifest]);
+
+  const markProbeFamilyAnswered = useCallback(
+    (familyId: string) => {
+      setAnsweredProbeFamilies((prev) => {
+        const next = new Set(prev);
+        next.add(familyId);
+        answeredProbeFamiliesRef.current = next;
+        if (sessionId) saveAnsweredProbeKeys(sessionId, next);
+        return next;
+      });
+    },
+    [sessionId],
+  );
+
+  const currentAnsweredProbeFamilies = () => answeredProbeFamiliesRef.current;
+
   const friendlyError = error ? friendlyErrorMessage(error) : null;
 
   const insightSnapshot = useMemo(
@@ -325,6 +389,65 @@ export const ProcurementAnalysis: React.FC = () => {
     void pollChatProgress(runId, setAgentSteps, ac.signal);
   };
 
+  const resetSmeProbeState = () => {
+    setSmeProbeQueue([]);
+    setSmeProbeSnapshot(null);
+    setSmeProbeIndex(0);
+    setClarificationVariant('observe');
+  };
+
+  const openSmeProbeModal = useCallback(
+    (snapshot: AnalysisInsightSnapshot, answered: Set<string>) => {
+      const probes = collectUnansweredProbeQuestions(snapshot, answered, 5);
+      if (probes.length === 0) return;
+      const currency = snapshot.reporting_currency || 'INR';
+      setSmeProbeSnapshot(snapshot);
+      setSmeProbeQueue(probes);
+      setSmeProbeIndex(0);
+      setSmeProbeCurrency(currency);
+      setClarification(probeToClarification(probes[0], currency));
+      setClarificationVariant('sme_probe');
+      setCheckpointId(null);
+      setPendingMessage('');
+      setClarificationOpen(true);
+    },
+    [],
+  );
+
+  const maybeAutoOpenProbeModal = useCallback(
+    (
+      snapshot: AnalysisInsightSnapshot | null | undefined,
+      answered: Set<string>,
+      runId?: string,
+    ) => {
+      if (skipNextProbeAutoOpen.current) {
+        skipNextProbeAutoOpen.current = false;
+        return;
+      }
+      if (!snapshot || !hasUnansweredProbeQuestions(snapshot, answered)) return;
+      const unanswered = collectUnansweredProbeQuestions(snapshot, answered, 5);
+      const key =
+        runId ||
+        `probe-${snapshot.total_spend}-${unanswered.map((p) => p.probe_family_id || probeAnswerKey(p.question)).join('|')}`;
+      if (probeModalShownForRun.current.has(key)) return;
+      probeModalShownForRun.current.add(key);
+      openSmeProbeModal(snapshot, answered);
+    },
+    [openSmeProbeModal],
+  );
+
+  const buildAssistantNextOptions = (
+    snapshot: AnalysisInsightSnapshot | null,
+    manifest: SessionManifest | null,
+    resOptions: V1ChatResponse['next_options'],
+    showPeer: boolean,
+    answered: Set<string>,
+  ) => {
+    const base = mergeNextOptions(resOptions, buildDataRootedPrompts(snapshot, manifest));
+    const merged = showPeer ? mergeNextOptions(base, buildDeepDivePrompts(snapshot)) : base;
+    return filterProbeNextOptions(merged, snapshot, answered);
+  };
+
   const runChat = async (text: string) => {
     const sid = await ensureSession();
     const runId = crypto.randomUUID();
@@ -340,8 +463,16 @@ export const ProcurementAnalysis: React.FC = () => {
         session_id: sid,
         run_id: runId,
         thinking_mode: thinkingMode ? 'extended' : 'standard',
+        chat_history: chatHistoryPayload(messages),
         ...contextPayload(engagement, manifest),
       });
+      if (res.hitl_required && res.clarification && res.checkpoint_id) {
+        openClarificationProbe({
+          clarification: res.clarification,
+          checkpoint_id: res.checkpoint_id,
+        });
+        return;
+      }
       setLastSignals(res.quality_signals);
       setLastSteps(res.progress_steps);
       setAgentSteps(res.progress_steps);
@@ -365,20 +496,18 @@ export const ProcurementAnalysis: React.FC = () => {
       }
       const snapshot = extractInsightSnapshot(session, latestManifest);
       const showPeer = wantsPeerSavingsInsight(text);
-      const baseOptions = mergeNextOptions(
+      const suppressCategoryInsight = res.response_metadata?.insight_dimension === 'supplier';
+      const nextOptions = buildAssistantNextOptions(
+        snapshot,
+        latestManifest,
         res.next_options,
-        buildProbePrompts(snapshot),
-        buildDataRootedPrompts(snapshot, latestManifest),
+        showPeer,
+        currentAnsweredProbeFamilies(),
       );
-      const nextOptions = showPeer
-        ? mergeNextOptions(baseOptions, buildDeepDivePrompts(snapshot))
-        : baseOptions;
-      const responseText = res.response_text || '';
-      const conflictAnswer = /cross-source|tds mismatch|gst mismatch|vendor duplicate|conflict/i.test(
-        responseText,
-      );
-      const thinResponse =
-        responseText.length < 80 && !isComplianceOrConflictQuery(text) && !conflictAnswer;
+      const insightSnap =
+        !suppressCategoryInsight && snapshot && (snapshot.total_spend > 0 || showPeer)
+          ? snapshot
+          : undefined;
       setMessages((m) => [
         ...m,
         {
@@ -392,24 +521,11 @@ export const ProcurementAnalysis: React.FC = () => {
           progress_steps: res.progress_steps,
           degraded_mode: res.degraded_mode,
           artefacts: res.artefacts,
-          insight_snapshot: snapshot && (snapshot.total_spend > 0 || showPeer) ? snapshot : undefined,
+          insight_snapshot: insightSnap,
           show_peer_savings: showPeer,
         },
       ]);
-      if (thinResponse && snapshot && snapshot.total_spend > 0 && !showPeer) {
-        setMessages((m) => {
-          const last = m[m.length - 1];
-          if (!last || last.role !== 'assistant') return m;
-          return [
-            ...m.slice(0, -1),
-            {
-              ...last,
-              content: buildAnalyzeCompleteContent(snapshot),
-              insight_snapshot: snapshot,
-            },
-          ];
-        });
-      }
+      maybeAutoOpenProbeModal(insightSnap, currentAnsweredProbeFamilies(), res.run_id);
     } finally {
       stopPolling();
     }
@@ -542,6 +658,17 @@ export const ProcurementAnalysis: React.FC = () => {
     if (fileRef.current) fileRef.current.value = '';
   };
 
+  const openClarificationProbe = (probe: {
+    clarification: BusinessClarification;
+    checkpoint_id: string;
+  }) => {
+    resetSmeProbeState();
+    setClarification(probe.clarification);
+    setCheckpointId(probe.checkpoint_id);
+    setClarificationVariant('observe');
+    setClarificationOpen(true);
+  };
+
   const requestPlanThenChat = async (text: string) => {
     const sid = await ensureSession();
     setPendingMessage(text);
@@ -551,6 +678,13 @@ export const ProcurementAnalysis: React.FC = () => {
         session_id: sid,
         ...contextPayload(engagement, manifest),
       });
+      if (plan.hitl_required && plan.clarification && plan.checkpoint_id) {
+        openClarificationProbe({
+          clarification: plan.clarification,
+          checkpoint_id: plan.checkpoint_id,
+        });
+        return;
+      }
       if (plan.requires_confirmation !== false && plan.user_summary) {
         setPlanPreview(plan);
         setPlanOpen(true);
@@ -563,12 +697,20 @@ export const ProcurementAnalysis: React.FC = () => {
   };
 
   const sendMessage = async (text: string) => {
-    if (!text.trim() || loading) return;
-    setMessages((m) => [...m, { role: 'user', content: text.trim() }]);
+    const trimmed = text.trim();
+    if (!trimmed || loading) return;
+    if (trimmed === PROBE_MODAL_TRIGGER) {
+      const lastWithSnapshot = [...messages].reverse().find((m) => m.insight_snapshot);
+      if (lastWithSnapshot?.insight_snapshot) {
+        openSmeProbeModal(lastWithSnapshot.insight_snapshot, answeredProbeFamilies);
+      }
+      return;
+    }
+    setMessages((m) => [...m, { role: 'user', content: trimmed }]);
     setLoading(true);
     setError(null);
     try {
-      await requestPlanThenChat(text.trim());
+      await requestPlanThenChat(trimmed);
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {
@@ -596,6 +738,181 @@ export const ProcurementAnalysis: React.FC = () => {
     } finally {
       setLoading(false);
       setPendingMessage('');
+    }
+  };
+
+  const confirmSmeProbe = async (selectedOption: string | null, freeText: string) => {
+    const probe = smeProbeQueue[smeProbeIndex];
+    if (!probe) return;
+    const answer = freeText.trim() || selectedOption || '';
+    if (!answer) return;
+    const familyId = probe.probe_family_id || probeAnswerKey(probe.question);
+
+    setLoading(true);
+    setError(null);
+    skipNextProbeAutoOpen.current = true;
+    try {
+      const sid = await ensureSession();
+      const res = await apiPost<ProbeAnswerResponse>('/api/v1/chat/probe-answer', {
+        session_id: sid,
+        probe_family_id: familyId,
+        question: probe.question,
+        answer,
+        selected_option: selectedOption ?? undefined,
+        scope: probe.scope ?? 'portfolio',
+        applies_to_categories:
+          probe.affected_categories?.length
+            ? probe.affected_categories
+            : probe.category_name
+              ? [probe.category_name]
+              : [],
+      });
+
+      markProbeFamilyAnswered(familyId);
+      const updatedManifest = await refreshManifest(sid);
+
+      let freshAnalysis = analysis;
+      try {
+        freshAnalysis = await apiGet<SessionResponse>(`/api/v1/sessions/${sid}`);
+        setAnalysis(freshAnalysis);
+      } catch {
+        /* session refresh optional */
+      }
+
+      const freshSnap = extractInsightSnapshot(freshAnalysis, updatedManifest);
+      const answered = mergeAnsweredProbeFamilies(
+        updatedManifest,
+        sid,
+        currentAnsweredProbeFamilies(),
+      );
+      const remaining = freshSnap
+        ? collectUnansweredProbeQuestions(freshSnap, answered, 5)
+        : [];
+
+      if (remaining.length > 0) {
+        setSmeProbeSnapshot(freshSnap);
+        setSmeProbeQueue(remaining);
+        setSmeProbeIndex(0);
+        setClarification(probeToClarification(remaining[0], smeProbeCurrency));
+      } else {
+        setClarificationOpen(false);
+        resetSmeProbeState();
+      }
+
+      setMessages((m) => [
+        ...m,
+        {
+          role: 'assistant',
+          content: res.response_text,
+          insight_snapshot: freshSnap ?? smeProbeSnapshot ?? undefined,
+        },
+      ]);
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const confirmClarification = async (
+    selectedOption: string | null,
+    freeText: string,
+  ) => {
+    if (clarificationVariant === 'sme_probe') {
+      await confirmSmeProbe(selectedOption, freeText);
+      return;
+    }
+    if (!checkpointId) return;
+    setClarificationOpen(false);
+    setLoading(true);
+    setError(null);
+    setInsightsOpen(true);
+    setPipelineLabel(undefined);
+    const runId = crypto.randomUUID();
+    setLastRunId(runId);
+    setAgentSteps([{ phase: 'observe', message: 'Resuming analysis with your guidance…' }]);
+    startPolling(runId);
+
+    try {
+      const res = await apiPost<V1ChatResponse>('/api/v1/chat/resume', {
+        checkpoint_id: checkpointId,
+        selected_option: selectedOption ?? undefined,
+        free_text: freeText || undefined,
+        run_id: runId,
+        thinking_mode: thinkingMode ? 'extended' : 'standard',
+        chat_history: chatHistoryPayload(messages),
+        ...contextPayload(engagement, manifest),
+      });
+      if (res.hitl_required && res.clarification && res.checkpoint_id) {
+        openClarificationProbe({
+          clarification: res.clarification,
+          checkpoint_id: res.checkpoint_id,
+        });
+        return;
+      }
+      setLastSignals(res.quality_signals);
+      setLastSteps(res.progress_steps);
+      setAgentSteps(res.progress_steps);
+      setAgentDegraded(!!res.degraded_mode);
+      const sid = await ensureSession();
+      let session: SessionResponse | null = null;
+      let latestManifest = manifest;
+      try {
+        const status = await apiGet<{ has_analysis?: boolean }>(`/api/v1/sessions/${sid}/status`);
+        if (status.has_analysis) {
+          session = await apiGet<SessionResponse>(`/api/v1/sessions/${sid}`);
+          setAnalysis(session);
+        }
+        await refreshAnalysisStatus();
+      } catch {
+        /* analysis not run yet */
+      }
+      try {
+        latestManifest = await refreshManifest(sid);
+      } catch {
+        /* manifest optional */
+      }
+      const snapshot = extractInsightSnapshot(session, latestManifest);
+      const showPeer = pendingMessage ? wantsPeerSavingsInsight(pendingMessage) : false;
+      const suppressCategoryInsight = res.response_metadata?.insight_dimension === 'supplier';
+      const nextOptions = buildAssistantNextOptions(
+        snapshot,
+        latestManifest,
+        res.next_options,
+        showPeer,
+        answeredProbeFamilies,
+      );
+      const insightSnap =
+        !suppressCategoryInsight && snapshot && (snapshot.total_spend > 0 || showPeer)
+          ? snapshot
+          : undefined;
+      setMessages((m) => [
+        ...m,
+        {
+          role: 'assistant',
+          content: res.response_text || 'No response',
+          thinking: res.thinking,
+          advisory_sections: res.advisory_sections,
+          quality_signals: res.quality_signals,
+          next_options: nextOptions,
+          run_id: res.run_id,
+          progress_steps: res.progress_steps,
+          degraded_mode: res.degraded_mode,
+          artefacts: res.artefacts,
+          insight_snapshot: insightSnap,
+          show_peer_savings: showPeer,
+        },
+      ]);
+      maybeAutoOpenProbeModal(insightSnap, answeredProbeFamilies, res.run_id);
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      stopPolling();
+      setLoading(false);
+      setPendingMessage('');
+      setCheckpointId(null);
+      setClarification(null);
+      resetSmeProbeState();
     }
   };
 
@@ -645,9 +962,14 @@ export const ProcurementAnalysis: React.FC = () => {
             thinking: thinkingMode && trace?.length ? buildTraceThinkingSummary(trace) : undefined,
             run_id: runId,
             show_peer_savings: true,
-            next_options: mergeNextOptions(buildProbePrompts(snapshot), buildDataRootedPrompts(snapshot, m)),
+            next_options: filterProbeNextOptions(
+              buildDataRootedPrompts(snapshot, m),
+              snapshot,
+              answeredProbeFamilies,
+            ),
           },
         ]);
+        maybeAutoOpenProbeModal(snapshot, answeredProbeFamilies, runId);
       } else {
         setMessages((prev) => [
           ...prev,
@@ -658,7 +980,7 @@ export const ProcurementAnalysis: React.FC = () => {
             analysis_trace: trace,
             thinking: thinkingMode && trace?.length ? buildTraceThinkingSummary(trace) : undefined,
             run_id: runId,
-            next_options: mergeNextOptions(buildProbePrompts(null), buildDataRootedPrompts(null, m)),
+            next_options: buildDataRootedPrompts(null, m),
           },
         ]);
       }
@@ -688,13 +1010,20 @@ export const ProcurementAnalysis: React.FC = () => {
               role: 'assistant',
               content: 'Incremental analysis complete. Updated spend signals below.',
               insight_snapshot: snapshot,
-              next_options: mergeNextOptions(buildProbePrompts(snapshot), buildDataRootedPrompts(snapshot, m)),
+              next_options: filterProbeNextOptions(
+                buildDataRootedPrompts(snapshot, m),
+                snapshot,
+                answeredProbeFamilies,
+              ),
             }
           : {
               role: 'assistant',
               content: 'Incremental analysis complete. New data merged into session.',
             },
       ]);
+      if (snapshot) {
+        maybeAutoOpenProbeModal(snapshot, answeredProbeFamilies);
+      }
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {
@@ -753,7 +1082,7 @@ export const ProcurementAnalysis: React.FC = () => {
   return (
     <MainLayout hideHeader>
       <div className="flex flex-col h-[calc(100vh-2rem)] -m-4 md:-m-6">
-        <header className="flex flex-wrap items-center justify-between gap-3 px-4 md:px-6 py-3 border-b border-brand-border bg-white shrink-0">
+        <header className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 md:px-6 py-2 border-b border-brand-border bg-white shrink-0">
           <PageHeader
             title="Analysis"
             subtitle="Human-in-the-loop spend intelligence"
@@ -761,25 +1090,25 @@ export const ProcurementAnalysis: React.FC = () => {
             compact
           />
           {engagementId && (
-            <div className="w-full basis-full -mt-1 space-y-1">
-              <p className="text-xs text-brand-muted">
-                {engagement.company_name && engagement.company_name !== 'New engagement' ? (
-                  <span className="font-medium text-brand-ink">{engagement.company_name}</span>
-                ) : (
-                  <span className="font-mono text-brand-ink">{engagementId.slice(0, 8)}…</span>
-                )}
-                {engagementDocCount !== null && (
-                  <span className={`ml-1.5 ${engagementDocCount > 0 ? 'text-emerald-700' : 'text-amber-700'}`}>
-                    · {engagementDocCount > 0 ? `${engagementDocCount} doc${engagementDocCount !== 1 ? 's' : ''} loaded` : 'no docs'}
-                  </span>
-                )}
-                {' · '}
-                <Link to="/documents" className="text-deloitte-green hover:underline">
-                  Manage documents
-                </Link>
-              </p>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-brand-muted min-w-0">
+              {engagement.company_name && engagement.company_name !== 'New engagement' ? (
+                <span className="font-medium text-brand-ink truncate max-w-[12rem]">
+                  {engagement.company_name}
+                </span>
+              ) : (
+                <span className="font-mono text-brand-ink">{engagementId.slice(0, 8)}…</span>
+              )}
+              {engagementDocCount !== null && (
+                <span className={engagementDocCount > 0 ? 'text-emerald-700' : 'text-amber-700'}>
+                  · {engagementDocCount > 0 ? `${engagementDocCount} doc${engagementDocCount !== 1 ? 's' : ''}` : 'no docs'}
+                </span>
+              )}
+              <Link to="/documents" className="text-deloitte-green hover:underline shrink-0">
+                Manage docs
+              </Link>
               {engagement.detected_company_name && (
                 <RecommendedBadge
+                  variant="compact"
                   label={engagement.detected_company_name}
                   matches={
                     (engagement.company_name || '').trim().toLowerCase() ===
@@ -790,21 +1119,24 @@ export const ProcurementAnalysis: React.FC = () => {
               )}
             </div>
           )}
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
-            <div className="w-44 min-w-[10rem]">
-              <Select
-                label=""
-                value={currentIndustry}
-                onChange={(e) => void handleSectorChange(e.target.value)}
-                disabled={sectorUpdating || loading}
-                options={[
-                  { value: '', label: 'Select sector…' },
-                  ...SECTOR_OPTIONS.map((o) => ({ value: o.value, label: o.label })),
-                ]}
-              />
+          <div className="flex flex-wrap items-center gap-2 shrink-0 ml-auto">
+            <div className="flex items-center gap-1.5">
+              <div className="w-36 min-w-[8.5rem]">
+                <Select
+                  label=""
+                  value={currentIndustry}
+                  onChange={(e) => void handleSectorChange(e.target.value)}
+                  disabled={sectorUpdating || loading}
+                  className="py-1.5 px-2.5 text-xs"
+                  options={[
+                    { value: '', label: 'Select sector…' },
+                    ...SECTOR_OPTIONS.map((o) => ({ value: o.value, label: o.label })),
+                  ]}
+                />
+              </div>
               {engagement.detected_industry && (
                 <RecommendedBadge
-                  className="mt-1"
+                  variant="compact"
                   label={
                     engagement.detected_industry_label ||
                     SECTOR_OPTIONS.find((o) => o.value === engagement.detected_industry)?.label ||
@@ -819,7 +1151,7 @@ export const ProcurementAnalysis: React.FC = () => {
             <button
               type="button"
               onClick={() => setInsightsOpen((v) => !v)}
-              className="text-xs px-2.5 py-1.5 rounded-lg border border-brand-border hover:bg-brand-surface-muted lg:hidden"
+              className="text-xs px-2 py-1 rounded-md border border-brand-border hover:bg-brand-surface-muted lg:hidden"
             >
               {insightsOpen ? 'Hide insights' : 'Insights'}
             </button>
@@ -827,21 +1159,21 @@ export const ProcurementAnalysis: React.FC = () => {
               type="button"
               onClick={handleIncrementalAnalyze}
               disabled={loading}
-              className="text-xs px-2.5 py-1.5 rounded-lg border border-brand-border hover:bg-brand-surface-muted disabled:opacity-50"
+              className="text-xs px-2 py-1 rounded-md border border-brand-border hover:bg-brand-surface-muted disabled:opacity-50"
             >
               Incremental update
             </button>
             <button
               type="button"
               onClick={() => setTrustOpen(true)}
-              className="text-xs px-2.5 py-1.5 rounded-lg border border-brand-border hover:bg-brand-surface-muted"
+              className="text-xs px-2 py-1 rounded-md border border-brand-border hover:bg-brand-surface-muted"
             >
               Trust rail
             </button>
             <button
               type="button"
               onClick={() => setThinkingMode((v) => !v)}
-              className={`text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${
+              className={`text-xs px-2 py-1 rounded-md border transition-colors ${
                 thinkingMode
                   ? 'border-deloitte-green text-deloitte-green bg-deloitte-green/5'
                   : 'border-brand-border hover:bg-brand-surface-muted'
@@ -939,6 +1271,12 @@ export const ProcurementAnalysis: React.FC = () => {
                         key={idx}
                         message={msg}
                         onOptionClick={(text) => sendMessage(text)}
+                        answeredProbeFamilies={answeredProbeFamilies}
+                        onOpenProbes={
+                          msg.insight_snapshot
+                            ? () => openSmeProbeModal(msg.insight_snapshot!, answeredProbeFamilies)
+                            : undefined
+                        }
                       />
                     ))}
                     {loading && (
@@ -1052,6 +1390,39 @@ export const ProcurementAnalysis: React.FC = () => {
         onCancel={() => {
           setPlanOpen(false);
           setPendingMessage('');
+        }}
+      />
+
+      <BusinessClarificationModal
+        open={clarificationOpen}
+        clarification={clarification}
+        loading={loading}
+        variant={clarificationVariant}
+        probeMeta={
+          clarificationVariant === 'sme_probe' && smeProbeQueue[smeProbeIndex]
+            ? {
+                category_name: smeProbeQueue[smeProbeIndex].category_name,
+                affected_categories: smeProbeQueue[smeProbeIndex].affected_categories,
+                scope: smeProbeQueue[smeProbeIndex].scope,
+                saving_at_stake: smeProbeQueue[smeProbeIndex].saving_at_stake,
+                index: smeProbeIndex,
+                total: smeProbeQueue.length,
+                currency: smeProbeCurrency,
+              }
+            : null
+        }
+        onConfirm={confirmClarification}
+        onCancel={() => {
+          setClarificationOpen(false);
+          if (clarificationVariant === 'observe') {
+            setCheckpointId(null);
+            setClarification(null);
+            setPendingMessage('');
+            setError('Analysis paused — provide the requested data or resend your question when ready.');
+          } else {
+            resetSmeProbeState();
+            setClarification(null);
+          }
         }}
       />
 

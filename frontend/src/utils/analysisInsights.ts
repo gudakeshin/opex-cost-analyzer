@@ -2,9 +2,11 @@ import { sectorLabel } from '../constants/sectors';
 import type {
   AnalysisInsightSnapshot,
   AnalysisTraceStep,
+  BusinessClarification,
   CategoryInsightRow,
   ChartCategoryRow,
   ChatNextOption,
+  PortfolioProbe,
   SessionManifest,
   SessionResponse,
   SmeInitiativeCritique,
@@ -76,6 +78,36 @@ function peerStatsFromOutputs(skillOutputs: Record<string, unknown> | undefined)
   return { abovePeerCount, comparisonCount: comparisons.length };
 }
 
+function parseEvidenceSignals(raw: unknown): Record<string, import('../types').EvidenceSignal> | undefined {
+  const rec = asRecord(raw);
+  if (!rec) return undefined;
+  const out: Record<string, import('../types').EvidenceSignal> = {};
+  for (const [key, val] of Object.entries(rec)) {
+    const sig = asRecord(val);
+    if (!sig) continue;
+    out[key] = {
+      status: (sig.status ?? 'missing') as import('../types').EvidenceSignal['status'],
+      source: String(sig.source ?? ''),
+      provenance: Array.isArray(sig.provenance) ? (sig.provenance as string[]) : [],
+      summary: String(sig.summary ?? ''),
+    };
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+}
+
+export function formatEvidenceUsedLine(
+  signals: Record<string, import('../types').EvidenceSignal> | undefined,
+): string | null {
+  if (!signals) return null;
+  const parts = Object.entries(signals)
+    .filter(([, s]) => s.status === 'found' || s.status === 'partial')
+    .map(([type, s]) => {
+      const prov = s.provenance?.[0] ?? s.source;
+      return `${type.replace(/_/g, ' ')}: ${s.summary}${prov ? ` (${prov})` : ''}`;
+    });
+  return parts.length > 0 ? parts.slice(0, 2).join(' · ') : null;
+}
+
 function smeQualificationFromOutputs(skillOutputs: Record<string, unknown> | undefined): {
   summary: SmeQualificationSummary | null;
   critiques: SmeInitiativeCritique[];
@@ -122,6 +154,9 @@ function smeQualificationFromOutputs(skillOutputs: Record<string, unknown> | und
             })
           : [],
         double_count_risk: r.double_count_risk != null ? String(r.double_count_risk) : null,
+        evidence_sources: asRecord(r.evidence_sources) as Record<string, string> | undefined,
+        gaps: Array.isArray(r.gaps) ? (r.gaps as string[]) : undefined,
+        evidence_signals: parseEvidenceSignals(r.evidence_signals),
       } satisfies SmeInitiativeCritique;
     })
     .filter(Boolean) as SmeInitiativeCritique[];
@@ -197,6 +232,33 @@ export function extractInsightSnapshot(
 
   const chartData = extractChartData(spendProfiler);
   const smeData = smeQualificationFromOutputs(skillOutputs);
+  const smeRaw = asRecord(skillOutputs['sme-critique']);
+  const answeredFamilies = answeredProbeFamiliesFromManifest(manifest ?? null);
+  let portfolioProbes: PortfolioProbe[] = [];
+  const rawPortfolio = smeRaw?.portfolio_probes ?? smeRaw?.top_probes;
+  if (Array.isArray(rawPortfolio)) {
+    portfolioProbes = (rawPortfolio as unknown[])
+      .map((p) => {
+        const r = asRecord(p);
+        if (!r?.question) return null;
+        return {
+          probe_family_id: String(r.probe_family_id ?? r.question).slice(0, 80),
+          question: String(r.question),
+          why_critical: String(r.why_critical ?? ''),
+          saving_at_stake: Number(r.saving_at_stake ?? 0),
+          scope: (r.scope as PortfolioProbe['scope']) ?? 'portfolio',
+          affected_categories: Array.isArray(r.affected_categories)
+            ? (r.affected_categories as string[])
+            : r.category_name
+              ? [String(r.category_name)]
+              : [],
+          options: Array.isArray(r.options) ? (r.options as string[]) : undefined,
+          data_to_request: r.data_to_request != null ? String(r.data_to_request) : undefined,
+        } satisfies PortfolioProbe;
+      })
+      .filter(Boolean) as PortfolioProbe[];
+    portfolioProbes = portfolioProbes.filter((p) => !answeredFamilies.has(p.probe_family_id));
+  }
 
   return {
     total_spend: totalSpend,
@@ -216,6 +278,7 @@ export function extractInsightSnapshot(
     chart_data: chartData ?? undefined,
     sme_qualification: smeData.summary ?? undefined,
     sme_initiative_critiques: smeData.critiques.length > 0 ? smeData.critiques : undefined,
+    portfolio_probes: portfolioProbes.length > 0 ? portfolioProbes : undefined,
   };
 }
 
@@ -276,22 +339,189 @@ export interface TopProbeQuestion {
   category_name: string;
   why_critical: string;
   saving_at_stake: number;
+  probe_family_id?: string;
+  scope?: 'portfolio' | 'category';
+  affected_categories?: string[];
+  options?: string[];
+}
+
+export const PROBE_MODAL_TRIGGER = '__open_probe_modal__';
+const ANSWERED_PROBES_PREFIX = 'opex_answered_probes_';
+
+export function probeAnswerKey(question: string): string {
+  return question.trim().slice(0, 80).toLowerCase();
+}
+
+export function answeredProbeKeysFromMessages(
+  messages: Array<{ role: string; content: string }>,
+): Set<string> {
+  const keys = new Set<string>();
+  for (const m of messages) {
+    if (m.role !== 'user') continue;
+    const probeMatch = m.content.match(/\n\nProbe:\s*([\s\S]+)$/);
+    if (probeMatch?.[1]) {
+      keys.add(probeAnswerKey(probeMatch[1]));
+    }
+  }
+  return keys;
+}
+
+export function loadAnsweredProbeKeys(sessionId: string): Set<string> {
+  try {
+    const raw = localStorage.getItem(`${ANSWERED_PROBES_PREFIX}${sessionId}`);
+    if (!raw) return new Set();
+    const arr = JSON.parse(raw) as string[];
+    return new Set(Array.isArray(arr) ? arr : []);
+  } catch {
+    return new Set();
+  }
+}
+
+export function saveAnsweredProbeKeys(sessionId: string, keys: Set<string>): void {
+  try {
+    localStorage.setItem(`${ANSWERED_PROBES_PREFIX}${sessionId}`, JSON.stringify([...keys]));
+  } catch {
+    /* quota exceeded */
+  }
+}
+
+export function answeredProbeFamiliesFromManifest(
+  manifest?: SessionManifest | null,
+): Set<string> {
+  const out = new Set<string>();
+  for (const a of manifest?.probe_answers ?? []) {
+    if (a?.probe_family_id) out.add(a.probe_family_id);
+  }
+  return out;
+}
+
+export function mergeAnsweredProbeFamilies(
+  manifest?: SessionManifest | null,
+  sessionId?: string | null,
+  legacyKeys?: Set<string>,
+): Set<string> {
+  const merged = new Set<string>(answeredProbeFamiliesFromManifest(manifest));
+  if (sessionId) {
+    for (const k of loadAnsweredProbeKeys(sessionId)) merged.add(k);
+  }
+  if (legacyKeys) {
+    for (const k of legacyKeys) merged.add(k);
+  }
+  return merged;
+}
+
+export function mergeAnsweredProbeKeys(...sources: Array<Set<string> | undefined>): Set<string> {
+  const merged = new Set<string>();
+  for (const src of sources) {
+    if (!src) continue;
+    for (const key of src) merged.add(key);
+  }
+  return merged;
+}
+
+export function hasProbeQuestions(snapshot: AnalysisInsightSnapshot | null): boolean {
+  const sme = snapshot?.sme_qualification;
+  if (!sme) return false;
+  return (sme.probe_count ?? 0) + (sme.insufficient_count ?? 0) > 0 && collectTopProbeQuestions(snapshot, 1).length > 0;
+}
+
+function isProbeAnswered(probe: TopProbeQuestion, answered: Set<string>): boolean {
+  if (probe.probe_family_id && answered.has(probe.probe_family_id)) return true;
+  return answered.has(probeAnswerKey(probe.question));
+}
+
+export function collectUnansweredProbeQuestions(
+  snapshot: AnalysisInsightSnapshot | null,
+  answered: Set<string>,
+  limit = 5,
+): TopProbeQuestion[] {
+  if (!snapshot) return [];
+  const pool = collectTopProbeQuestions(snapshot, Math.max(limit, 5) + answered.size);
+  return pool.filter((p) => !isProbeAnswered(p, answered)).slice(0, limit);
+}
+
+export function hasUnansweredProbeQuestions(
+  snapshot: AnalysisInsightSnapshot | null,
+  answered: Set<string>,
+): boolean {
+  return collectUnansweredProbeQuestions(snapshot, answered, 1).length > 0;
+}
+
+export function probeToClarification(probe: TopProbeQuestion, currency: string): BusinessClarification {
+  const cats = probe.affected_categories?.length
+    ? probe.affected_categories
+    : probe.category_name
+      ? [probe.category_name]
+      : [];
+  const catLabel = cats.length > 1 ? `${cats.length} categories` : cats[0] ?? 'portfolio';
+  const stake =
+    probe.saving_at_stake > 0
+      ? `${formatSpendAmount(probe.saving_at_stake, currency)} at stake across ${catLabel}. `
+      : '';
+  return {
+    question: probe.question,
+    options: probe.options?.length
+      ? probe.options
+      : [
+          'I need to gather this data — defer to the next review cycle',
+          'This assumption does not apply to our business',
+        ],
+    reasoning: `${stake}${probe.why_critical}`.trim(),
+  };
+}
+
+/** Remove duplicate SME probe pills when the HITL probe modal handles answers. */
+export function filterProbeNextOptions(
+  options: ChatNextOption[],
+  snapshot: AnalysisInsightSnapshot | null,
+  answered: Set<string> = new Set(),
+): ChatNextOption[] {
+  if (!hasUnansweredProbeQuestions(snapshot, answered)) return options;
+  const unanswered = collectUnansweredProbeQuestions(snapshot, answered, 5);
+  const probeMessages = new Set(unanswered.map((p) => p.question));
+  const filtered = options.filter((opt) => !probeMessages.has(opt.message));
+  const remaining = unanswered.length;
+  return [
+    {
+      label:
+        remaining > 1
+          ? `Answer assumption probes (${remaining} left)`
+          : 'Answer remaining assumption probe',
+      message: PROBE_MODAL_TRIGGER,
+    },
+    ...filtered,
+  ].slice(0, 8);
 }
 
 export function collectTopProbeQuestions(
   snapshot: AnalysisInsightSnapshot | null,
   limit = 5,
 ): TopProbeQuestion[] {
+  if (snapshot?.portfolio_probes?.length) {
+    return snapshot.portfolio_probes.slice(0, limit).map((p) => ({
+      question: p.question,
+      category_name: p.affected_categories?.[0] ?? 'Portfolio',
+      why_critical: p.why_critical,
+      saving_at_stake: p.saving_at_stake,
+      probe_family_id: p.probe_family_id,
+      scope: p.scope,
+      affected_categories: p.affected_categories,
+      options: p.options,
+    }));
+  }
+
   const critiques = snapshot?.sme_initiative_critiques ?? [];
   const flat: TopProbeQuestion[] = [];
   for (const c of critiques) {
     for (const pq of c.probe_questions ?? []) {
       if (!pq.question?.trim()) continue;
+      const raw = pq as TopProbeQuestion & { probe_family_id?: string };
       flat.push({
         question: pq.question.trim(),
         category_name: c.category_name,
         why_critical: pq.why_critical,
         saving_at_stake: pq.saving_at_stake > 0 ? pq.saving_at_stake : c.modelled_saving_3yr,
+        probe_family_id: raw.probe_family_id,
       });
     }
   }
@@ -299,9 +529,9 @@ export function collectTopProbeQuestions(
   const seen = new Set<string>();
   const out: TopProbeQuestion[] = [];
   for (const p of flat) {
-    const stem = p.question.slice(0, 80);
-    if (seen.has(stem)) continue;
-    seen.add(stem);
+    const key = p.probe_family_id || p.question.slice(0, 80);
+    if (seen.has(key)) continue;
+    seen.add(key);
     out.push(p);
     if (out.length >= limit) break;
   }
@@ -490,21 +720,13 @@ export function buildAnalyzeCompleteContent(snapshot: AnalysisInsightSnapshot): 
     }
     const probeTotal = sme.savings_probe + sme.savings_insufficient;
     const topProbes = collectTopProbeQuestions(snapshot, 5);
-    if (probeTotal > 0) {
+    if (probeTotal > 0 && topProbes.length > 0) {
       lines.push(
-        `Answer the probe questions below to move **${formatSpendAmount(probeTotal, ccy)}** from hypothesis to evidenced case.`,
+        `**${topProbes.length} assumption probe${topProbes.length !== 1 ? 's' : ''}** need your input to move **${formatSpendAmount(probeTotal, ccy)}** from hypothesis to an evidenced case. Use the clarification dialog to answer.`,
       );
-    }
-    if (topProbes.length > 0) {
-      lines.push('');
-      lines.push('**Probe questions**');
-      topProbes.forEach((p, idx) => {
-        lines.push(`${idx + 1}. **${p.category_name}** — ${p.question}`);
-      });
     } else if (probeTotal > 0) {
-      lines.push('');
       lines.push(
-        '_Probe questions are not available in this session export — re-run analysis or open Insights for initiative-level detail._',
+        `Assumption probes need your input to move **${formatSpendAmount(probeTotal, ccy)}** from hypothesis to an evidenced case. Re-run analysis if the dialog does not appear.`,
       );
     }
   }
@@ -549,7 +771,7 @@ export function buildRestoredInsightMessage(
     insight_snapshot: snapshot,
     analysis_trace: analysisTrace?.length ? analysisTrace : undefined,
     show_peer_savings: true,
-    next_options: mergeNextOptions(buildProbePrompts(snapshot), buildDataRootedPrompts(snapshot, manifest)),
+    next_options: filterProbeNextOptions(buildDataRootedPrompts(snapshot, manifest), snapshot),
   };
 }
 

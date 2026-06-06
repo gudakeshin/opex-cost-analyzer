@@ -1,0 +1,9 @@
+legal_entity,parent_entity,business_unit,segment_revenue_inr_cr,geo
+ADSL-IN,,Delivery-BFSI,6200,India
+ADSL-IN,,Delivery-Retail,4100,India
+ADSL-IN,,Delivery-Healthcare,2600,India
+ADSL-IN,,Digital,2300,India
+ADSL-IN,,Infrastructure,900,India
+AETS-US,ADSL-IN,Delivery-BFSI,1500,US
+AETS-US,ADSL-IN,Sales,300,US
+ADUK-UK,ADSL-IN,Delivery-Healthcare,500,UK

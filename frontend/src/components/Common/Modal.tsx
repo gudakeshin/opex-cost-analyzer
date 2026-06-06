@@ -9,7 +9,14 @@ interface ModalProps {
   onConfirm?: () => void;
   confirmLabel?: string;
   confirmVariant?: 'primary' | 'danger';
+  size?: 'md' | 'lg' | 'xl';
 }
+
+const MODAL_SIZE_CLASS: Record<NonNullable<ModalProps['size']>, string> = {
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-xl',
+};
 
 export const Modal: React.FC<ModalProps> = ({
   open,
@@ -19,6 +26,7 @@ export const Modal: React.FC<ModalProps> = ({
   onConfirm,
   confirmLabel = 'Confirm',
   confirmVariant = 'primary',
+  size = 'md',
 }) => {
   useEffect(() => {
     if (!open) return;
@@ -35,13 +43,13 @@ export const Modal: React.FC<ModalProps> = ({
     <>
       <div className="modal-overlay" onClick={onClose} role="presentation">
         <div
-          className="modal-content p-6"
+          className={`modal-content p-6 ${MODAL_SIZE_CLASS[size]}`}
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-title"
         >
-          <h2 id="modal-title" className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <h2 id="modal-title" className="text-lg font-semibold text-gray-900 mb-4">
             {title}
           </h2>
           {children}

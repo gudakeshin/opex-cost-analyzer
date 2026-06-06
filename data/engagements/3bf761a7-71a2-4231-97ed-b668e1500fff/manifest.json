@@ -1,0 +1,19 @@
+{
+  "engagement_id": "3bf761a7-71a2-4231-97ed-b668e1500fff",
+  "company_name": "New engagement",
+  "industry": "",
+  "annual_revenue": 0.0,
+  "currency": "INR",
+  "headcount": null,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-05T17:57:40.523705+00:00",
+  "updated_at": "2026-06-05T17:57:40.523801+00:00",
+  "session_ids": [
+    "3bf761a7-71a2-4231-97ed-b668e1500fff"
+  ],
+  "documents": []
+}

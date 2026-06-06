@@ -15,14 +15,11 @@ from docx import Document
 from docx.shared import Pt, RGBColor
 
 from app.config import OUTPUT_DIR
+from app.utils.inr_format import fmt_inr_cr
 
 
 def _fmt_cr(value: float) -> str:
-    if value >= 1_00_00_00_000:  # 10,000 Cr+
-        return f"₹{value / 1e12:.1f}L Cr"
-    if value >= 1_00_00_000:  # 100 Cr+
-        return f"₹{value / 1e7:.0f} Cr"
-    return f"₹{value / 1e5:.1f} L"
+    return fmt_inr_cr(value, style="cfo")
 
 
 def _safe_float(outputs: Dict, *keys: str, default: float = 0.0) -> float:

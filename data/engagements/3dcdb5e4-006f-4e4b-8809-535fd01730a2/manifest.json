@@ -1,0 +1,19 @@
+{
+  "engagement_id": "3dcdb5e4-006f-4e4b-8809-535fd01730a2",
+  "company_name": "Connector Co",
+  "industry": "technology",
+  "annual_revenue": 500000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-06T03:17:02.950830+00:00",
+  "updated_at": "2026-06-06T03:17:02.950992+00:00",
+  "session_ids": [
+    "98241d6d-6339-4044-8782-84a33eddd945"
+  ],
+  "documents": []
+}

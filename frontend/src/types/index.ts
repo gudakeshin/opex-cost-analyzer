@@ -49,6 +49,13 @@ export interface SmeQualificationSummary {
   savings_insufficient: number;
 }
 
+export interface EvidenceSignal {
+  status: 'found' | 'partial' | 'missing' | 'not_applicable';
+  source: string;
+  provenance: string[];
+  summary: string;
+}
+
 export interface SmeInitiativeCritique {
   initiative_id: string;
   category_id: string;
@@ -66,6 +73,30 @@ export interface SmeInitiativeCritique {
     data_to_request: string;
   }>;
   double_count_risk?: string | null;
+  evidence_sources?: Record<string, string>;
+  gaps?: string[];
+  evidence_signals?: Record<string, EvidenceSignal>;
+}
+
+export interface PortfolioProbe {
+  probe_family_id: string;
+  question: string;
+  why_critical: string;
+  saving_at_stake: number;
+  scope?: 'portfolio' | 'category';
+  affected_categories?: string[];
+  options?: string[];
+  data_to_request?: string;
+}
+
+export interface ProbeAnswerRecord {
+  probe_family_id: string;
+  question?: string;
+  answer: string;
+  selected_option?: string | null;
+  scope?: string;
+  applies_to_categories?: string[];
+  answered_at?: string;
 }
 
 export interface AnalysisInsightSnapshot {
@@ -86,6 +117,7 @@ export interface AnalysisInsightSnapshot {
   chart_data?: SpendChartData;
   sme_qualification?: SmeQualificationSummary;
   sme_initiative_critiques?: SmeInitiativeCritique[];
+  portfolio_probes?: PortfolioProbe[];
 }
 
 export interface AnalysisTraceStep {
@@ -218,6 +250,15 @@ export interface SessionManifest {
   deep_research_full_report?: string;
   deep_research_completed_at?: string;
   engagement_sanity?: EngagementSanity;
+  probe_answers?: ProbeAnswerRecord[];
+}
+
+export interface ProbeAnswerResponse {
+  response_text: string;
+  probe_answer?: ProbeAnswerRecord;
+  answered_probe_families?: string[];
+  remaining_probe_count?: number;
+  loop_complete?: boolean;
 }
 
 export interface EngagementSanityConflict {
@@ -281,6 +322,16 @@ export interface EngagementMeta {
   detected_industry_label?: string;
 }
 
+export interface ChatHistoryTurn {
+  role: string;
+  content: string;
+}
+
+export interface ChatResponseMetadata {
+  insight_dimension?: string;
+  focus_category?: string;
+}
+
 export interface V1ChatPayload {
   message: string;
   session_id: string;
@@ -290,7 +341,15 @@ export interface V1ChatPayload {
   industry?: string;
   annual_revenue?: number;
   currency?: string;
+  audience?: string;
   thinking_mode?: 'standard' | 'extended';
+  chat_history?: ChatHistoryTurn[];
+}
+
+export interface BusinessClarification {
+  question: string;
+  options: string[];
+  reasoning: string;
 }
 
 export interface V1ChatResponse {
@@ -307,12 +366,21 @@ export interface V1ChatResponse {
   next_options?: ChatNextOption[];
   ingestion_summary?: string;
   run_id?: string;
+  hitl_required?: boolean;
+  checkpoint_id?: string;
+  clarification?: BusinessClarification;
+  response_metadata?: ChatResponseMetadata;
 }
 
 export interface ChatPlanPreview {
   user_summary?: string;
   planned_skills?: string[];
   requires_confirmation?: boolean;
+  hitl_required?: boolean;
+  checkpoint_id?: string;
+  clarification?: BusinessClarification;
+  clarification_required?: boolean;
+  clarification_prompt?: string;
   [key: string]: unknown;
 }
 

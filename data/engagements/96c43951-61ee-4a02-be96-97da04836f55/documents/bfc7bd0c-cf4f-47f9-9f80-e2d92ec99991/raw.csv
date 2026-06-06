@@ -1,0 +1,43 @@
+supplier,description,amount,currency,category,gl_code,spend_date,business_unit,country
+Quess Corp,IT subcontractor staffing — BFSI delivery FY25,1840000000,INR,Subcontractor & Staffing,510010,2024-12-15,Delivery-BFSI,India
+TeamLease Digital,Contract engineers — Retail & CPG delivery,1260000000,INR,Subcontractor & Staffing,510010,2024-11-20,Delivery-Retail,India
+Allegis Group,Onsite contractor staffing — US accounts,2180000000,INR,Subcontractor & Staffing,510011,2025-01-10,Delivery-BFSI,US
+Harvey Nash UK,Onsite contractor staffing — UK accounts,940000000,INR,Subcontractor & Staffing,510011,2024-10-05,Delivery-Healthcare,UK
+Randstad India,Temp staffing — testing & support pods,520000000,INR,Subcontractor & Staffing,510012,2025-02-12,Delivery-Retail,India
+Amazon Web Services,Cloud hosting — client delivery & internal platforms,1320000000,INR,Cloud & Hosting,520010,2024-12-28,Infrastructure,India
+Microsoft Azure,Cloud consumption — analytics & AI workloads,860000000,INR,Cloud & Hosting,520010,2025-01-18,Digital,India
+Google Cloud,Data platform & BigQuery workloads,310000000,INR,Cloud & Hosting,520011,2024-09-22,Digital,US
+Equinix,Colocation & data centre hosting Mumbai/Chennai,240000000,INR,Cloud & Hosting,520012,2024-08-30,Infrastructure,India
+Microsoft,M365 E5 enterprise licences FY25,680000000,INR,Software Licences,520020,2024-12-01,Corporate,India
+ServiceNow,ITSM & workflow platform subscription,295000000,INR,Software Licences,520021,2025-01-15,Infrastructure,India
+Salesforce,CRM licences — sales & delivery ops,210000000,INR,Software Licences,520022,2024-11-11,Sales,US
+Atlassian,Jira/Confluence engineering tooling,128000000,INR,Software Licences,520023,2024-10-19,Digital,India
+GitHub Enterprise,Source control & Copilot seats,76000000,INR,Software Licences,520024,2025-02-01,Digital,India
+Oracle,Database & middleware licences AMS,164000000,INR,Software Licences,520025,2024-09-09,Infrastructure,India
+SAP,S/4HANA internal ERP licences & support,142000000,INR,Software Licences,520026,2024-12-20,Corporate,India
+Bharti Airtel,Enterprise MPLS & internet leased lines,330000000,INR,Telecom & Connectivity,530010,2025-01-05,Infrastructure,India
+Tata Communications,Global network & SD-WAN — onsite links,275000000,INR,Telecom & Connectivity,530011,2024-11-25,Infrastructure,India
+Vodafone Idea,Mobile & data plans — workforce,98000000,INR,Telecom & Connectivity,530012,2024-10-14,Corporate,India
+Embassy Office Parks,Campus lease — Bangalore SEZ FY25,720000000,INR,Facilities & Real Estate,540010,2024-12-31,Corporate,India
+DLF Cyber City,Office lease — Gurugram delivery centre,410000000,INR,Facilities & Real Estate,540010,2024-12-31,Corporate,India
+JLL India,Integrated facilities management — pan-India campuses,360000000,INR,Facilities & Real Estate,540011,2025-01-22,Corporate,India
+CBRE,Facilities & workplace services — US/UK offices,185000000,INR,Facilities & Real Estate,540011,2024-11-08,Corporate,US
+Tata Power,Campus electricity & DG fuel,156000000,INR,Facilities & Real Estate,540012,2024-10-30,Corporate,India
+Sodexo,Cafeteria & employee catering services,142000000,INR,Facilities & Real Estate,540013,2025-02-18,Corporate,India
+American Express GBT,Corporate travel — air & hotel FY25,520000000,INR,Travel & Transport,550010,2024-12-10,Delivery-BFSI,India
+MakeMyTrip Corporate,Domestic travel bookings,148000000,INR,Travel & Transport,550011,2024-09-28,Delivery-Retail,India
+Carzonrent,Employee ground transport & cab services,86000000,INR,Travel & Transport,550012,2025-01-30,Corporate,India
+Ogilvy India,Brand & employer branding campaigns,165000000,INR,Marketing & Brand,560010,2024-11-15,Sales,India
+LinkedIn,Talent solutions & recruiter licences,124000000,INR,Marketing & Brand,560011,2025-01-08,Corporate,India
+Gartner,Advisory & market research subscription,98000000,INR,Marketing & Brand,560012,2024-10-02,Corporate,US
+Deloitte India,Operating model & transformation advisory,310000000,INR,Professional Fees,570010,2024-12-05,Corporate,India
+KPMG India,Statutory audit & tax advisory FY25,142000000,INR,Professional Fees,570011,2025-02-25,Finance,India
+EY India,Transfer pricing & TP documentation,96000000,INR,Professional Fees,570012,2024-11-30,Finance,India
+Cyril Amarchand,Legal retainer & contract advisory,72000000,INR,Professional Fees,570013,2024-10-20,Legal,India
+Naukri (Info Edge),Lateral hiring job postings & database,134000000,INR,Recruitment,580010,2024-12-18,Corporate,India
+Hirepro,Campus hiring & assessment services,68000000,INR,Recruitment,580011,2025-01-25,Corporate,India
+Coursera for Business,Workforce upskilling licences,112000000,INR,Training & L&D,590010,2024-11-05,Corporate,India
+Udemy Business,Technical training subscription,54000000,INR,Training & L&D,590011,2025-02-08,Digital,India
+Dell Technologies,Laptops & engineering workstations refresh,420000000,INR,Hardware & Devices,600010,2024-12-22,Infrastructure,India
+Lenovo,Laptop fleet — new hire provisioning,236000000,INR,Hardware & Devices,600011,2024-10-11,Infrastructure,India
+Cisco,Network & collaboration hardware,148000000,INR,Hardware & Devices,600012,2025-01-12,Infrastructure,India

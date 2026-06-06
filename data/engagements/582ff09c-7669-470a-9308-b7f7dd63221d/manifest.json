@@ -1,0 +1,19 @@
+{
+  "engagement_id": "582ff09c-7669-470a-9308-b7f7dd63221d",
+  "company_name": "Diag Co",
+  "industry": "it_ites",
+  "annual_revenue": 50000000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-05T07:47:40.614275+00:00",
+  "updated_at": "2026-06-05T07:47:40.614425+00:00",
+  "session_ids": [
+    "1e5d4bcc-b7b8-4fe8-998d-9d73ae5f1e8a"
+  ],
+  "documents": []
+}

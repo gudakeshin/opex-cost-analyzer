@@ -47,7 +47,9 @@ tr:hover {
 }
 
 .modal-content {
-  @apply bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4;
+  /* Always light — brand-ink tokens are dark and unreadable on dark:bg-gray-800 */
+  @apply bg-white text-gray-900 rounded-lg shadow-xl w-full mx-4;
+  color-scheme: light;
 }
 
 /* Loading skeleton */

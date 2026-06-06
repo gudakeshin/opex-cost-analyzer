@@ -11,7 +11,7 @@ const variants: Record<Variant, string> = {
   primary: 'bg-deloitte-green text-white hover:opacity-90',
   secondary: 'bg-black text-white hover:opacity-90',
   danger: 'bg-error text-white hover:opacity-90',
-  ghost: 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700',
+  ghost: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
 };
 
 export const Button: React.FC<ButtonProps> = ({

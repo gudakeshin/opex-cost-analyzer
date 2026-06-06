@@ -1,6 +1,6 @@
-# Diagnostic Feature Eval — ✅ PASS
+# Diagnostic Feature Eval — ❌ FAIL
 
-**Date:** 2026-06-05  |  **Version:** v2.1  |  **Overall Score:** 9.35/10
+**Date:** 2026-06-05  |  **Version:** v2.1  |  **Overall Score:** 8.45/10
 
 ## Summary
 
@@ -8,7 +8,7 @@
 |--------|-------|--------|--------|
 | Data Integrity | 10.0/10 | 30% | ✅ |
 | Analysis Completeness | 9.9/10 | 35% | ✅ |
-| Schema & Signal Integrity | 10.0/10 | 15% | ✅ |
+| Schema & Signal Integrity | 4.0/10 | 15% | ❌ |
 | Input Signal Quality | 6.9/10 | 20% | ✅ |
 
 ## Dimension Detail
@@ -22,7 +22,7 @@
 | DG-05 | Lever Base Spend Coverage | 9.7 | 6.0 | ✅ | 0.0 |
 | DG-06 | Key Findings Completeness | 10.0 | 7.0 | ✅ | 0.0 |
 | DG-07 | Diagnostic Signal Schema | 10.0 | 9.0 | ✅ | 0.0 |
-| DG-08 | Sector Pack Mapping Coverage | 10.0 | 8.0 | ✅ | 0.0 |
+| DG-08 | Sector Pack Mapping Coverage | 0.0 | 8.0 | ❌ | 8.0 |
 | DG-09 | Document Contextualizer Signal Quality | 6.0 | 4.0 | ✅ | 0.0 |
 | DG-10 | Circular Benchmark Derivation Disclosure | 5.0 | 5.0 | ✅ | 0.0 |
 | DG-11 | Silent Parameter Defaulting | 10.0 | 4.0 | ✅ | 0.0 |
@@ -46,5 +46,10 @@
 | LOW | resolve_benchmark_payload called twice | `enterprise.py:280+303` | Reuse categories list from first call |
 | LOW | engagement_id not passed to lever resolver | `enterprise.py:335-341` | Generate engagement_id from company+timestamp for audit trail |
 
+## Top Gaps to Close
+
+1. **DG-08** (gap 8.0) — Add the following to _PACK_TO_BENCH in app/routers/enterprise.py: "bfsi_banks": "<benchmark_industry
+
 ## Remediation Roadmap
 
+1. **[DG-08] Sector Pack Mapping Coverage** — Add the following to _PACK_TO_BENCH in app/routers/enterprise.py: "bfsi_banks": "<benchmark_industry>", "conglomerate": 

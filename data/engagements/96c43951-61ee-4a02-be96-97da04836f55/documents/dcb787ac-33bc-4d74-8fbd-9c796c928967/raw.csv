@@ -1,0 +1,45 @@
+vendor,vendor_category,gstin,vendor_pan,msme_flag,spend_category,legal_entity,related_party
+Quess Corp,large,29AABCQ1234A1Z5,AABCQ1234A,no,Subcontractor & Staffing,ADSL-IN,no
+TeamLease Digital,large,29AABCT5678L1Z9,AABCT5678L,no,Subcontractor & Staffing,ADSL-IN,no
+Allegis Group,foreign,,,no,Subcontractor & Staffing,AETS-US,no
+Harvey Nash UK,foreign,,,no,Subcontractor & Staffing,ADUK-UK,no
+Randstad India,large,27AAACR8901R1ZK,AAACR8901R,no,Subcontractor & Staffing,ADSL-IN,no
+Amazon Web Services,large,29AAACA9100B1ZL,AAACA9100B,no,Cloud & Hosting,ADSL-IN,no
+Microsoft Azure,large,29AAACM1234M1ZP,AAACM1234M,no,Cloud & Hosting,ADSL-IN,no
+Google Cloud,foreign,,,no,Cloud & Hosting,AETS-US,no
+Equinix,large,27AAECE7700Q1Z3,AAECE7700Q,no,Cloud & Hosting,ADSL-IN,no
+Microsoft,large,29AAACM1234M1ZP,AAACM1234M,no,Software Licences,ADSL-IN,no
+ServiceNow,foreign,,,no,Software Licences,AETS-US,no
+Salesforce,foreign,,,no,Software Licences,AETS-US,no
+Atlassian,foreign,,,no,Software Licences,ADSL-IN,no
+GitHub Enterprise,foreign,,,no,Software Licences,AETS-US,no
+Oracle,large,29AAACO4321O1ZB,AAACO4321O,no,Software Licences,ADSL-IN,no
+SAP,large,29AAACS6543P1ZD,AAACS6543P,no,Software Licences,ADSL-IN,no
+Bharti Airtel,large,29AAACB2894G1ZX,AAACB2894G,no,Telecom & Connectivity,ADSL-IN,no
+Tata Communications,large,27AAACT1234C1Z9,AAACT1234C,no,Telecom & Connectivity,ADSL-IN,no
+Vodafone Idea,large,27AAACV5678V1ZM,AAACV5678V,no,Telecom & Connectivity,ADSL-IN,no
+Embassy Office Parks,large,29AAECE5500F1Z2,AAECE5500F,no,Facilities & Real Estate,ADSL-IN,no
+DLF Cyber City,large,06AAACD3456L1ZF,AAACD3456L,no,Facilities & Real Estate,ADSL-IN,no
+JLL India,large,27AAACJ7890J1ZN,AAACJ7890J,no,Facilities & Real Estate,ADSL-IN,no
+CBRE,foreign,,,no,Facilities & Real Estate,AETS-US,no
+Tata Power,large,27AAACT9012P1ZR,AAACT9012P,no,Facilities & Real Estate,ADSL-IN,no
+Sodexo,large,27AAACS3344S1ZT,AAACS3344S,no,Facilities & Real Estate,ADSL-IN,no
+American Express GBT,large,29AAACA1122E1ZV,AAACA1122E,no,Travel & Transport,ADSL-IN,no
+MakeMyTrip Corporate,large,06AAACM4455T1ZX,AAACM4455T,no,Travel & Transport,ADSL-IN,no
+Carzonrent,msme,07AAFCC6677Z1ZA,AAFCC6677Z,yes,Travel & Transport,ADSL-IN,no
+Ogilvy India,large,27AAACO8899O1ZC,AAACO8899O,no,Marketing & Brand,ADSL-IN,no
+LinkedIn,foreign,,,no,Marketing & Brand,AETS-US,no
+Gartner,foreign,,,no,Marketing & Brand,AETS-US,no
+Deloitte India,large,29AAAFD4567D1ZH,AAAFD4567D,no,Professional Fees,ADSL-IN,no
+KPMG India,large,29AAAFK1234K1ZJ,AAAFK1234K,no,Professional Fees,ADSL-IN,no
+EY India,large,29AAAFE5678E1ZL,AAAFE5678E,no,Professional Fees,ADSL-IN,no
+Cyril Amarchand,large,27AAAFC9012C1ZP,AAAFC9012C,no,Professional Fees,ADSL-IN,no
+Naukri (Info Edge),large,27AAACI3456I1ZR,AAACI3456I,no,Recruitment,ADSL-IN,no
+Hirepro,msme,29AAFCH7788H1ZT,AAFCH7788H,yes,Recruitment,ADSL-IN,no
+Coursera for Business,foreign,,,no,Training & L&D,AETS-US,no
+Udemy Business,foreign,,,no,Training & L&D,AETS-US,no
+Dell Technologies,large,29AAACD5566D1ZV,AAACD5566D,no,Hardware & Devices,ADSL-IN,no
+Lenovo,large,29AAACL7788L1ZX,AAACL7788L,no,Hardware & Devices,ADSL-IN,no
+Cisco,foreign,,,no,Hardware & Devices,AETS-US,no
+Aranya Enterprise Tech Services (US),foreign,,,no,Intercompany,AETS-US,yes
+Aranya Digital UK Ltd,foreign,,,no,Intercompany,ADUK-UK,yes

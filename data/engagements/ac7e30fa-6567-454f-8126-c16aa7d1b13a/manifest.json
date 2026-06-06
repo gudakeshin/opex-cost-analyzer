@@ -1,0 +1,14 @@
+{
+  "engagement_id": "ac7e30fa-6567-454f-8126-c16aa7d1b13a",
+  "company_name": "Test Co",
+  "industry": "technology",
+  "annual_revenue": 500000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "created_at": "2026-06-05T05:15:57.494271+00:00",
+  "updated_at": "2026-06-05T05:15:57.494547+00:00",
+  "session_ids": [
+    "f8a9ae3c-8107-4ef6-8dcc-445b3b5d7414"
+  ],
+  "documents": []
+}

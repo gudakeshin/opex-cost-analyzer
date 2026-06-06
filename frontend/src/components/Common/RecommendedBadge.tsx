@@ -11,6 +11,8 @@ interface RecommendedBadgeProps {
   /** Route to edit the recommendation (e.g. Diagnostic page from Analysis). */
   changeLink?: string;
   className?: string;
+  /** Shorter chip for dense toolbars (e.g. Analysis header). */
+  variant?: 'default' | 'compact';
 }
 
 /**
@@ -25,8 +27,41 @@ export const RecommendedBadge: React.FC<RecommendedBadgeProps> = ({
   onApply,
   changeLink,
   className = '',
+  variant = 'default',
 }) => {
   if (!label) return null;
+
+  if (variant === 'compact') {
+    return (
+      <span className={`inline-flex items-center gap-1 text-[10px] text-brand-muted ${className}`}>
+        <span
+          className="inline-flex items-center gap-0.5 rounded bg-brand-surface-muted px-1 py-0.5 max-w-[10rem]"
+          title={`Recommended from your documents: ${label}`}
+        >
+          <span aria-hidden>✨</span>
+          <span className="font-medium text-brand-ink truncate">{label}</span>
+        </span>
+        {!matches && onApply && (
+          <button
+            type="button"
+            onClick={onApply}
+            className="text-deloitte-green underline underline-offset-2 hover:opacity-80 shrink-0"
+          >
+            Use
+          </button>
+        )}
+        {changeLink && (
+          <Link
+            to={changeLink}
+            className="text-deloitte-green underline underline-offset-2 hover:opacity-80 shrink-0"
+          >
+            Change
+          </Link>
+        )}
+      </span>
+    );
+  }
+
   return (
     <span className={`inline-flex flex-wrap items-center gap-1 text-[11px] text-brand-muted ${className}`}>
       <span className="inline-flex items-center gap-1 rounded bg-brand-surface-muted px-1.5 py-0.5">

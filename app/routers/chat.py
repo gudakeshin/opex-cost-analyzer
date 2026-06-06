@@ -9,7 +9,15 @@ from typing import Any, Dict, List
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 
 from app.config import MAX_UPLOAD_MB, logger
-from app.opar.orchestrator import run_opar_loop, run_opar_plan_preview
+from app.opar.hitl.clarification_tool import ClarificationAnswer
+from app.opar.orchestrator import (
+    CheckpointAlreadyResumedError,
+    CheckpointNotFoundError,
+    ClarificationDeferralError,
+    resume_opar_loop,
+    run_opar_loop,
+    run_opar_plan_preview,
+)
 from app.routers._shared import (
     session_lock,
     merge_context_into_manifest,
@@ -22,7 +30,15 @@ from app.routers._shared import (
     validate_session_id,
     write_manifest,
 )
-from app.schemas import ChatRequest, V1ChatRequest
+from app.opar.hitl.probe_answers import (
+    apply_probe_answer,
+    apply_probe_answers_to_skill_outputs,
+    filter_sme_critique_with_answers,
+    get_answered_family_ids,
+    load_probe_answers,
+)
+from app.opar.probe_intelligence import synthesize_probe_answer_acknowledgment
+from app.schemas import ChatRequest, ClarificationResumeRequest, ProbeAnswerRequest, V1ChatRequest
 from app.services.compliance import append_audit_event
 from app.services.ingestion import infer_tabular_schema, parse_document
 
@@ -56,7 +72,33 @@ def _opar_response(result: Any, run_id: str, session_id: str | None = None) -> D
         "next_options": getattr(result, "next_options", []),
         "ingestion_summary": ingestion_summary,
         "run_id": run_id,
+        "hitl_required": getattr(result, "hitl_required", False),
+        "checkpoint_id": getattr(result, "checkpoint_id", None),
+        "clarification": (
+            result.clarification.model_dump()
+            if getattr(result, "clarification", None) is not None
+            else None
+        ),
+        "response_metadata": getattr(result, "response_metadata", None) or {},
     }
+
+
+def _serialize_chat_history(history: Any) -> list[dict[str, str]] | None:
+    if not history:
+        return None
+    turns: list[dict[str, str]] = []
+    for turn in history:
+        if hasattr(turn, "model_dump"):
+            data = turn.model_dump()
+        elif isinstance(turn, dict):
+            data = turn
+        else:
+            continue
+        role = str(data.get("role") or "").strip()
+        content = str(data.get("content") or "").strip()
+        if role and content:
+            turns.append({"role": role, "content": content[:2000]})
+    return turns or None
 
 
 @router.post("/api/v1/chat/with-files")
@@ -226,6 +268,7 @@ async def chat_v1_opar(payload: V1ChatRequest) -> Dict[str, Any]:
                 None,
                 lambda phase, msg: progress_append(run_id, phase, msg),
                 thinking_enabled=thinking_enabled,
+                chat_history=_serialize_chat_history(payload.chat_history),
             ),
             timeout=float(_OPAR_TIMEOUT_S),
         )
@@ -241,6 +284,165 @@ async def chat_v1_opar(payload: V1ChatRequest) -> Dict[str, Any]:
         raise
     append_audit_event(f"opar_chat session_id={payload.session_id}")
     return _opar_response(result, run_id, session_id=payload.session_id)
+
+
+@router.post("/api/v1/chat/resume")
+async def chat_v1_resume(payload: ClarificationResumeRequest) -> Dict[str, Any]:
+    if not payload.has_answer():
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": "invalid_clarification_answer",
+                "message": "Provide a selected option or custom business logic before continuing.",
+            },
+        )
+    run_id = payload.run_id or str(uuid.uuid4())
+    thinking_enabled = payload.thinking_mode == "extended"
+    session_id: str | None = None
+    try:
+        from app.opar.hitl.checkpoint_store import checkpoint_store as _cp_store
+
+        cp = _cp_store.get(payload.checkpoint_id)
+        if cp:
+            session_id = cp.session_id
+            progress_init(run_id, cp.session_id)
+            manifest = read_manifest(cp.session_id)
+            if merge_context_into_manifest(
+                manifest,
+                company_name=payload.company_name,
+                industry=payload.industry,
+                annual_revenue=payload.annual_revenue,
+                currency=payload.currency,
+                audience=payload.audience,
+                headcount=payload.headcount,
+            ):
+                write_manifest(cp.session_id, manifest)
+    except Exception:
+        pass
+    answer = ClarificationAnswer(
+        selected_option=(payload.selected_option or "").strip() or None,
+        free_text=(payload.free_text or "").strip() or None,
+    )
+    try:
+        result = await asyncio.wait_for(
+            resume_opar_loop(
+                payload.checkpoint_id,
+                answer,
+                thinking_enabled=thinking_enabled,
+                chat_history=_serialize_chat_history(payload.chat_history),
+            ),
+            timeout=float(_OPAR_TIMEOUT_S),
+        )
+        progress_complete(run_id)
+    except CheckpointNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "error": "checkpoint_not_found",
+                "message": "Clarification session expired — please resend your question.",
+            },
+        )
+    except CheckpointAlreadyResumedError:
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "error": "checkpoint_already_resumed",
+                "message": "This clarification was already submitted — please resend your question.",
+            },
+        )
+    except ClarificationDeferralError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": "clarification_deferral",
+                "message": str(exc),
+            },
+        )
+    except asyncio.TimeoutError:
+        progress_complete(run_id, failed=True, error="timeout")
+        raise HTTPException(
+            status_code=408,
+            detail={"error": "analysis_timeout", "message": f"Timed out after {_OPAR_TIMEOUT_S}s"},
+        )
+    except Exception as e:
+        progress_complete(run_id, failed=True, error=str(e))
+        raise
+
+    append_audit_event(f"opar_chat_resume checkpoint_id={payload.checkpoint_id}")
+    return _opar_response(result, run_id, session_id=session_id)
+
+
+@router.post("/api/v1/chat/probe-answer")
+async def chat_v1_probe_answer(payload: ProbeAnswerRequest) -> Dict[str, Any]:
+    validate_session_id(payload.session_id)
+    if not session_dir(payload.session_id).exists():
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    answer_text = (payload.answer or "").strip()
+    if payload.selected_option:
+        answer_text = f"{payload.selected_option}. {answer_text}".strip() if answer_text else payload.selected_option
+
+    entry = apply_probe_answer(
+        payload.session_id,
+        {
+            "probe_family_id": payload.probe_family_id,
+            "question": payload.question,
+            "answer": answer_text,
+            "selected_option": payload.selected_option,
+            "scope": payload.scope or "portfolio",
+            "applies_to_categories": payload.applies_to_categories or [],
+        },
+    )
+
+    answers = load_probe_answers(payload.session_id)
+    answered_ids = get_answered_family_ids(payload.session_id)
+    remaining = 0
+    try:
+        from app.memory import MemoryStore
+
+        mem = MemoryStore()
+        cached = mem.get("session", payload.session_id)
+        if isinstance(cached, dict):
+            outputs = cached.get("skill_outputs", {})
+            if isinstance(outputs, dict):
+                outputs = apply_probe_answers_to_skill_outputs(outputs, payload.session_id)
+                cached["skill_outputs"] = outputs
+                mem.put("session", payload.session_id, cached)
+                sme = outputs.get("sme-critique", {})
+                if isinstance(sme, dict):
+                    remaining = len(sme.get("portfolio_probes") or [])
+    except Exception:
+        remaining = 0
+
+    ack = synthesize_probe_answer_acknowledgment(
+        probe_family_id=payload.probe_family_id,
+        answer=answer_text,
+        applies_to_categories=entry.get("applies_to_categories") or [],
+        remaining_count=remaining,
+    )
+    if not ack:
+        cats = entry.get("applies_to_categories") or []
+        cat_note = f" for **{', '.join(cats)}**" if cats else ""
+        ack = (
+            f"Recorded your answer on **{payload.probe_family_id.replace('_', ' ')}**{cat_note}. "
+            f"{remaining} assumption probe{'s' if remaining != 1 else ''} remaining."
+        )
+
+    append_audit_event(f"probe_answer session_id={payload.session_id} family={payload.probe_family_id}")
+    return {
+        "response_text": ack,
+        "probe_answer": entry,
+        "answered_probe_families": sorted(answered_ids),
+        "remaining_probe_count": remaining,
+        "loop_complete": True,
+    }
+
+
+def _memory_get_session(session_id: str) -> Dict[str, Any]:
+    from app.memory import MemoryStore
+
+    data = MemoryStore().get("session", session_id)
+    return data if isinstance(data, dict) else {}
 
 
 @router.get("/api/v1/chat/progress/{run_id}")

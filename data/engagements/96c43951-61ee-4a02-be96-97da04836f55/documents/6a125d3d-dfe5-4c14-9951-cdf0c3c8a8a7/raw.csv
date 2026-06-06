@@ -1,0 +1,22 @@
+business_unit,function,location,band,headcount
+Delivery-BFSI,Engineering,India,Entry (B1-B2),12400
+Delivery-BFSI,Engineering,India,Mid (B3-B4),6800
+Delivery-BFSI,Engineering,US,Senior (B5-B6),1850
+Delivery-BFSI,Project Management,India,Mid (B3-B4),1450
+Delivery-Retail,Engineering,India,Entry (B1-B2),8900
+Delivery-Retail,Engineering,India,Mid (B3-B4),4600
+Delivery-Retail,Engineering,UK,Senior (B5-B6),720
+Delivery-Healthcare,Engineering,India,Entry (B1-B2),5200
+Delivery-Healthcare,Engineering,India,Mid (B3-B4),2900
+Delivery-Healthcare,Engineering,UK,Senior (B5-B6),540
+Digital,Data & AI,India,Mid (B3-B4),3100
+Digital,Data & AI,India,Senior (B5-B6),980
+Digital,Product & Design,India,Mid (B3-B4),860
+Infrastructure,Cloud & IT Ops,India,Mid (B3-B4),2400
+Infrastructure,Cloud & IT Ops,India,Entry (B1-B2),3300
+Sales,Sales & Pre-sales,US,Senior (B5-B6),420
+Sales,Sales & Pre-sales,India,Mid (B3-B4),610
+Corporate,Finance,India,Mid (B3-B4),540
+Corporate,HR,India,Mid (B3-B4),720
+Corporate,Legal & Compliance,India,Senior (B5-B6),130
+Corporate,Leadership,India,Exec (B7+),95

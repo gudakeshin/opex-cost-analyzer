@@ -437,6 +437,35 @@ def _slim_skill_outputs(skill_outputs: Dict[str, Any]) -> Dict[str, Any]:
     return slimmed
 
 
+def _slim_sme_critique(sme_output: Any) -> Dict[str, Any] | None:
+    """Trim SME critique for synthesis prompt — explicit sme_critique_data field."""
+    if not isinstance(sme_output, dict):
+        return None
+    summary = sme_output.get("critique_summary", {})
+    critiques = sme_output.get("initiative_critiques", []) if isinstance(sme_output.get("initiative_critiques"), list) else []
+    slim_critiques: List[Dict[str, Any]] = []
+    for c in critiques[:5]:
+        if not isinstance(c, dict):
+            continue
+        probes = c.get("probe_questions", []) if isinstance(c.get("probe_questions"), list) else []
+        top_probe = probes[0] if probes and isinstance(probes[0], dict) else {}
+        slim_critiques.append({
+            "category_name": c.get("category_name"),
+            "lever": c.get("lever"),
+            "sme_verdict": c.get("sme_verdict"),
+            "evidence_maturity": c.get("evidence_maturity"),
+            "critical_risk": c.get("critical_risk"),
+            "top_probe_question": top_probe.get("question"),
+            "top_probe_why_critical": top_probe.get("why_critical"),
+        })
+    if not slim_critiques and not summary:
+        return None
+    return {
+        "critique_summary": summary if isinstance(summary, dict) else {},
+        "initiative_critiques": slim_critiques,
+    }
+
+
 def _slim_transaction_examples(
     tx: Dict[str, List[Dict[str, Any]]] | None,
 ) -> Dict[str, List[Dict[str, Any]]]:
@@ -485,7 +514,7 @@ def synthesize_analysis_claude(
 
     Returns (advisory_dict, thinking_text). thinking_text is None unless thinking_enabled=True.
     """
-    if not ANTHROPIC_ENABLED:
+    if not GEMINI_ENABLED and not ANTHROPIC_ENABLED:
         return None, None
     payload = {
         "user_message": user_message,
@@ -502,6 +531,9 @@ def synthesize_analysis_claude(
     }
     if deep_research_summary:
         payload["deep_research_context"] = deep_research_summary
+    sme_data = _slim_sme_critique(skill_outputs.get("sme-critique"))
+    if sme_data:
+        payload["sme_critique_data"] = sme_data
     strict_hint = ""
     if strict_mode:
         strict_hint = (
@@ -599,6 +631,9 @@ def synthesize_analysis_claude_with_meta(
     }
     if deep_research_summary:
         payload["deep_research_context"] = deep_research_summary
+    sme_data = _slim_sme_critique(skill_outputs.get("sme-critique"))
+    if sme_data:
+        payload["sme_critique_data"] = sme_data
     strict_hint = ""
     if strict_mode:
         strict_hint = (
@@ -759,3 +794,120 @@ def interpret_workbook_structure_claude_with_meta(
         return None, "timeout"
     except Exception:
         return None, "provider_unavailable"
+
+
+class ClaudeToolTransport:
+    """Anthropic tool_use transport for ``run_tool_loop``."""
+
+    def __init__(
+        self,
+        *,
+        model: str | None = None,
+        max_tokens: int = 4096,
+        thinking_budget: int = 8000,
+    ) -> None:
+        from app.config import ANTHROPIC_TOOL_MODEL
+
+        self.model = model or ANTHROPIC_TOOL_MODEL
+        self.max_tokens = max_tokens
+        self.thinking_budget = thinking_budget
+
+    def generate(
+        self,
+        *,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list,
+        thinking: bool = True,
+    ) -> tuple[str | None, list, str | None]:
+        from app.opar.agent_runtime import ToolCall, ToolDefinition
+
+        if os.getenv("PYTEST_CURRENT_TEST"):
+            raise RuntimeError("Claude calls disabled during pytest runs")
+        if not ANTHROPIC_ENABLED or not ANTHROPIC_API_KEY:
+            raise RuntimeError("Anthropic not configured")
+        import anthropic
+
+        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        anthropic_tools = [t.to_anthropic() if isinstance(t, ToolDefinition) else t for t in tools]
+        api_messages = _to_anthropic_messages(messages)
+
+        kwargs: dict[str, Any] = {
+            "model": self.model,
+            "max_tokens": self.max_tokens,
+            "system": system,
+            "messages": api_messages,
+            "tools": anthropic_tools,
+        }
+        if thinking:
+            kwargs["thinking"] = {"type": "enabled", "budget_tokens": self.thinking_budget}
+
+        response = client.messages.create(**kwargs)
+
+        text_parts: list[str] = []
+        thinking_parts: list[str] = []
+        tool_calls: list[ToolCall] = []
+
+        for block in response.content:
+            btype = getattr(block, "type", None)
+            if btype == "thinking":
+                thinking_parts.append(getattr(block, "thinking", "") or "")
+            elif btype == "text":
+                text_parts.append(getattr(block, "text", "") or "")
+            elif btype == "tool_use":
+                tool_calls.append(
+                    ToolCall(
+                        id=block.id,
+                        name=block.name,
+                        arguments=dict(block.input or {}),
+                    )
+                )
+
+        return (
+            "\n".join(text_parts).strip() or None,
+            tool_calls,
+            "\n".join(thinking_parts) if thinking_parts else None,
+        )
+
+
+def _to_anthropic_messages(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Convert generic agent messages to Anthropic API format."""
+    from app.opar.agent_runtime import ToolCall
+
+    out: list[dict[str, Any]] = []
+    for msg in messages:
+        role = msg.get("role", "user")
+        if role not in ("user", "assistant"):
+            role = "user"
+        content = msg.get("content")
+        blocks: list[dict[str, Any]] = []
+
+        if isinstance(content, str) and content:
+            blocks.append({"type": "text", "text": content})
+        elif isinstance(content, list):
+            for item in content:
+                if isinstance(item, dict) and item.get("type") == "tool_result":
+                    blocks.append(
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": item.get("tool_use_id") or item.get("tool_call_id"),
+                            "content": item.get("content", ""),
+                        }
+                    )
+                elif isinstance(item, str):
+                    blocks.append({"type": "text", "text": item})
+
+        for call in msg.get("tool_calls") or []:
+            if isinstance(call, ToolCall):
+                blocks.append(
+                    {
+                        "type": "tool_use",
+                        "id": call.id,
+                        "name": call.name,
+                        "input": call.arguments,
+                    }
+                )
+
+        if blocks:
+            out.append({"role": role, "content": blocks})
+    return out

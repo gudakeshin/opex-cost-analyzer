@@ -1,0 +1,19 @@
+{
+  "engagement_id": "b2c5439e-cc73-4b57-b61a-dbab9956c7da",
+  "company_name": "Chart Co",
+  "industry": "technology",
+  "annual_revenue": 1000000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-05T07:48:32.149901+00:00",
+  "updated_at": "2026-06-05T07:48:32.150052+00:00",
+  "session_ids": [
+    "2cc323e7-17c6-4a44-bd46-98c146f937dd"
+  ],
+  "documents": []
+}

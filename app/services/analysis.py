@@ -109,6 +109,7 @@ def run_core_pipeline(
     resolved = {"industry": industry}
     manifest: Dict[str, Any] = {
         "session_id": session_id,
+        "engagement_id": engagement_id,
         "company_name": company_name,
         "industry": industry,
         "annual_revenue": annual_revenue,
@@ -270,6 +271,33 @@ def run_core_pipeline(
                     sources=spend_files,
                     metrics={"finding_count": len(rc_findings)},
                 )
+        elif name == "evidence-gatherer":
+            summary = output.get("corpus_summary") or {}
+            inventory = output.get("evidence_inventory") or []
+            doc_sources: List[str] = []
+            for item in inventory:
+                if not isinstance(item, dict):
+                    continue
+                for sig in (item.get("signals") or {}).values():
+                    if isinstance(sig, dict) and sig.get("source") == "document":
+                        doc_sources.extend(str(p) for p in (sig.get("provenance") or []) if p)
+            doc_sources = list(dict.fromkeys(doc_sources))[:8]
+            _emit(
+                "evidence",
+                "Searched document corpus for evidence",
+                (
+                    f"Searched {int(summary.get('searched_documents') or 0)} document(s), "
+                    f"ran {int(summary.get('retrieval_queries_run') or 0)} retrieval queries, "
+                    f"found {int(summary.get('signals_found') or 0)} evidence signal(s) "
+                    f"across {len(inventory)} initiative(s)."
+                ),
+                sources=doc_sources or context_files,
+                metrics={
+                    "docs_searched": int(summary.get("searched_documents") or 0),
+                    "chunks_retrieved": int(summary.get("chunks_retrieved") or 0),
+                    "signals_found": int(summary.get("signals_found") or 0),
+                },
+            )
         elif name == "value-bridge-calculator":
             # Savings step is emitted here (not after savings-modeler) because the
             # mid-case portfolio figure comes from the value bridge confidence band.

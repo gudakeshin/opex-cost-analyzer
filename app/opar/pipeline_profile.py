@@ -83,7 +83,9 @@ _FULL_SKILLS: List[str] = [
     "consolidation-analyzer",     # gated: ≥2 legal entities or entity_tree
     # phase 5
     "cost-to-serve-analyzer",
-    # evidence qualification (after savings + contract-lifecycle)
+    # document-aware evidence (after savings + contract-lifecycle)
+    "evidence-gatherer",
+    # evidence qualification (after evidence gatherer)
     "sme-critique",
 ]
 
@@ -145,16 +147,7 @@ GATING: Dict[str, Gate] = {
 }
 
 
-# ── Intent → profile map (consumed by the chat planner in P2) ────────────────
-
-INTENT_TO_PROFILE: Dict[str, PipelineProfile] = {
-    "benchmark": PipelineProfile.BENCHMARK,
-    "value_bridge": PipelineProfile.VALUE_BRIDGE,
-    "business_case": PipelineProfile.VALUE_BRIDGE,
-    "savings_plan": PipelineProfile.VALUE_BRIDGE,
-    "drill_down": PipelineProfile.VALUE_BRIDGE,
-    "sensitivity": PipelineProfile.VALUE_BRIDGE,
-}
+# ── Intent → profile map (removed — agent controller + plan._DEP_MAP supersede) ──
 
 
 # ── Executor ─────────────────────────────────────────────────────────────────

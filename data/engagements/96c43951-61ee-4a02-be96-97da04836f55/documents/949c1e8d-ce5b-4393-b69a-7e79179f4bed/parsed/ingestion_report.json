@@ -1,0 +1,14 @@
+{
+  "source_file": "raw.json",
+  "format": "json",
+  "rows_parsed": 4,
+  "column_mapping_note": "Hierarchical expense layout: line items from 'notes'.",
+  "_empty_parse_rows": 0,
+  "quality": {
+    "rows_parsed": 4,
+    "rows_with_amount": 4,
+    "total_amount": 103.0,
+    "zero_spend_warning": false,
+    "column_mapping_note": "Hierarchical expense layout: line items from 'notes'."
+  }
+}

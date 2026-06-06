@@ -78,9 +78,21 @@ ANTHROPIC_ENABLED = bool(ANTHROPIC_API_KEY)
 # Gemini provider — set LLM_PROVIDER=gemini to route all LLM calls through Gemini.
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_ENABLED = bool(GEMINI_API_KEY)
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_THINKING_MODEL = os.getenv("GEMINI_THINKING_MODEL", "gemini-2.5-pro")
+GEMINI_TOOL_MODEL = os.getenv("GEMINI_TOOL_MODEL", "gemini-2.5-flash")
 # "gemini" (default when key present) | "anthropic"
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini" if bool(os.getenv("GEMINI_API_KEY", "")) else "anthropic")
+
+# Agent controller — LLM tool-use loop (M2/M3 only; pytest/M1 use deterministic fallback)
+AGENT_CONTROLLER_ENABLED = os.getenv("AGENT_CONTROLLER_ENABLED", "true").lower() not in ("false", "0", "no")
+AGENT_MAX_TOOL_ITERATIONS = int(os.getenv("AGENT_MAX_TOOL_ITERATIONS", "12"))
+AGENT_TOOL_TIMEOUT_SECONDS = float(os.getenv("AGENT_TOOL_TIMEOUT_SECONDS", "45"))
+AGENT_THINKING_BUDGET = int(os.getenv("AGENT_THINKING_BUDGET", "8192"))
+AGENT_LLM_NUMERIC_ADJUSTMENT_PCT = float(os.getenv("AGENT_LLM_NUMERIC_ADJUSTMENT_PCT", "0.25"))
+ANTHROPIC_AGENT_MODEL = os.getenv("ANTHROPIC_AGENT_MODEL", "claude-sonnet-4-6")
+ANTHROPIC_TOOL_MODEL = os.getenv("ANTHROPIC_TOOL_MODEL", "claude-sonnet-4-6")
+SKILL_CATALOG_COLLECTION = os.getenv("SKILL_CATALOG_COLLECTION", "skill_catalog")
 
 # Qdrant vector memory (replaces Mem0; self-hosted, no external SaaS dependency)
 QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")

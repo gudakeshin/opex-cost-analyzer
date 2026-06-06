@@ -2,8 +2,8 @@
   "eval_name": "Diagnostic Feature Eval",
   "eval_date": "2026-06-05",
   "platform_version": "v2.1",
-  "overall_score": 9.35,
-  "passed": true,
+  "overall_score": 8.45,
+  "passed": false,
   "scenario_run_count": 5,
   "scenario_pass_count": 5,
   "domains": [
@@ -463,8 +463,8 @@
       "name": "schema_signal_integrity",
       "display": "Schema & Signal Integrity",
       "weight": 0.15,
-      "score": 10.0,
-      "passed": true,
+      "score": 4.0,
+      "passed": false,
       "dimensions": [
         {
           "id": "DG-07",
@@ -490,13 +490,13 @@
           "name": "Sector Pack Mapping Coverage",
           "weight": 0.6,
           "threshold": 8.0,
-          "score": 10.0,
-          "passed": true,
-          "gap": 0.0,
+          "score": 0.0,
+          "passed": false,
+          "gap": 8.0,
           "scenarios_run": 0,
           "scenarios_below_threshold": 0,
-          "finding_summary": "15/15 sector packs mapped (100%). Missing: []",
-          "remediation": "Add the following to _PACK_TO_BENCH in app/routers/enterprise.py: . Suggested mappings: financial_services_nonbank\u2192financial_services, gcc_capability_centers\u2192technology, healthcare_hospitals\u2192healthcare, hospitality_travel\u2192retail_consumer.",
+          "finding_summary": "0/15 sector packs mapped (0%). Missing: ['bfsi_banks', 'conglomerate', 'energy_utilities', 'financial_services_nonbank', 'fmcg_consumer', 'gcc_capability_centers', 'healthcare_hospitals', 'hospitality_travel', 'insurance_general', 'it_ites', 'manufacturing_diversified', 'pharma_lifesciences', 'psu_cpse', 'retail_organized', 'telecom_infra']",
+          "remediation": "Add the following to _PACK_TO_BENCH in app/routers/enterprise.py: \"bfsi_banks\": \"<benchmark_industry>\", \"conglomerate\": \"<benchmark_industry>\", \"energy_utilities\": \"<benchmark_industry>\", \"financial_services_nonbank\": \"<benchmark_industry>\", \"fmcg_consumer\": \"<benchmark_industry>\", \"gcc_capability_centers\": \"<benchmark_industry>\", \"healthcare_hospitals\": \"<benchmark_industry>\", \"hospitality_travel\": \"<benchmark_industry>\", \"insurance_general\": \"<benchmark_industry>\", \"it_ites\": \"<benchmark_industry>\", \"manufacturing_diversified\": \"<benchmark_industry>\", \"pharma_lifesciences\": \"<benchmark_industry>\", \"psu_cpse\": \"<benchmark_industry>\", \"retail_organized\": \"<benchmark_industry>\", \"telecom_infra\": \"<benchmark_industry>\". Suggested mappings: financial_services_nonbank\u2192financial_services, gcc_capability_centers\u2192technology, healthcare_hospitals\u2192healthcare, hospitality_travel\u2192retail_consumer.",
           "evidence": {
             "discovered_packs": [
               "bfsi_banks",
@@ -515,7 +515,9 @@
               "retail_organized",
               "telecom_infra"
             ],
-            "mapped_in_pack_to_bench": [
+            "mapped_in_pack_to_bench": [],
+            "covered": [],
+            "missing_from_mapping": [
               "bfsi_banks",
               "conglomerate",
               "energy_utilities",
@@ -532,26 +534,8 @@
               "retail_organized",
               "telecom_infra"
             ],
-            "covered": [
-              "bfsi_banks",
-              "conglomerate",
-              "energy_utilities",
-              "financial_services_nonbank",
-              "fmcg_consumer",
-              "gcc_capability_centers",
-              "healthcare_hospitals",
-              "hospitality_travel",
-              "insurance_general",
-              "it_ites",
-              "manufacturing_diversified",
-              "pharma_lifesciences",
-              "psu_cpse",
-              "retail_organized",
-              "telecom_infra"
-            ],
-            "missing_from_mapping": [],
             "phantom_keys_in_dict": [],
-            "coverage_ratio": 1.0
+            "coverage_ratio": 0.0
           }
         }
       ]
@@ -720,6 +704,19 @@
       ]
     }
   ],
-  "top_gaps": [],
-  "remediation_roadmap": []
+  "top_gaps": [
+    {
+      "dimension": "DG-08",
+      "name": "Sector Pack Mapping Coverage",
+      "gap": 8.0,
+      "remediation": "Add the following to _PACK_TO_BENCH in app/routers/enterprise.py: \"bfsi_banks\": \"<benchmark_industry>\", \"conglomerate\": \"<benchmark_industry>\", \"energy_utilities\": \"<benchmark_industry>\", \"financial_services_nonbank\": \"<benchmark_industry>\", \"fmcg_consumer\": \"<benchmark_industry>\", \"gcc_capability_centers\": \"<benchmark_industry>\", \"healthcare_hospitals\": \"<benchmark_industry>\", \"hospitality_travel\": \"<benchmark_industry>\", \"insurance_general\": \"<benchmark_industry>\", \"it_ites\": \"<benchmark_industry>\", \"manufacturing_diversified\": \"<benchmark_industry>\", \"pharma_lifesciences\": \"<benchmark_industry>\", \"psu_cpse\": \"<benchmark_industry>\", \"retail_organized\": \"<benchmark_industry>\", \"telecom_infra\": \"<benchmark_industry>\". Suggested mappings: financial_services_nonbank\u2192financial_services, gcc_capability_centers\u2192technology, healthcare_hospitals\u2192healthcare, hospitality_travel\u2192retail_consumer."
+    }
+  ],
+  "remediation_roadmap": [
+    {
+      "dimension_id": "DG-08",
+      "name": "Sector Pack Mapping Coverage",
+      "remediation": "Add the following to _PACK_TO_BENCH in app/routers/enterprise.py: \"bfsi_banks\": \"<benchmark_industry>\", \"conglomerate\": \"<benchmark_industry>\", \"energy_utilities\": \"<benchmark_industry>\", \"financial_services_nonbank\": \"<benchmark_industry>\", \"fmcg_consumer\": \"<benchmark_industry>\", \"gcc_capability_centers\": \"<benchmark_industry>\", \"healthcare_hospitals\": \"<benchmark_industry>\", \"hospitality_travel\": \"<benchmark_industry>\", \"insurance_general\": \"<benchmark_industry>\", \"it_ites\": \"<benchmark_industry>\", \"manufacturing_diversified\": \"<benchmark_industry>\", \"pharma_lifesciences\": \"<benchmark_industry>\", \"psu_cpse\": \"<benchmark_industry>\", \"retail_organized\": \"<benchmark_industry>\", \"telecom_infra\": \"<benchmark_industry>\". Suggested mappings: financial_services_nonbank\u2192financial_services, gcc_capability_centers\u2192technology, healthcare_hospitals\u2192healthcare, hospitality_travel\u2192retail_consumer."
+    }
+  ]
 }

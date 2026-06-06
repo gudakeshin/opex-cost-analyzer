@@ -1,0 +1,14 @@
+{
+  "engagement_id": "6fc16833-a285-4fa7-be69-eb088583f6dd",
+  "company_name": "Chart Co",
+  "industry": "technology",
+  "annual_revenue": 1000000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "created_at": "2026-06-05T05:15:53.970761+00:00",
+  "updated_at": "2026-06-05T05:15:53.971018+00:00",
+  "session_ids": [
+    "9b3ff61f-5f23-47b8-8dd1-cabcedda21cd"
+  ],
+  "documents": []
+}

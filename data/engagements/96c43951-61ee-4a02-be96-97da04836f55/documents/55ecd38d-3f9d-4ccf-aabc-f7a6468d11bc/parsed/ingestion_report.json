@@ -1,0 +1,19 @@
+{
+  "source_file": "raw.csv",
+  "sheets_ingested": [
+    {
+      "sheet": "raw",
+      "rows": 8,
+      "strategy": "standard"
+    }
+  ],
+  "sheets_skipped": [],
+  "layout": "hierarchical_expense",
+  "quality": {
+    "rows_parsed": 8,
+    "rows_with_amount": 8,
+    "total_amount": 18400.0,
+    "zero_spend_warning": false,
+    "column_mapping_note": "Hierarchical expense layout: line items from 'business_unit'."
+  }
+}

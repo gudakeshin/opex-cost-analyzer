@@ -1,0 +1,45 @@
+{
+  "engagement_id": "931ef522-703e-417b-bdff-358ece84b7e2",
+  "company_name": "New engagement",
+  "industry": "technology",
+  "annual_revenue": 0.0,
+  "currency": "INR",
+  "headcount": null,
+  "created_at": "2026-06-04T17:12:52.834533+00:00",
+  "updated_at": "2026-06-04T17:13:01.571553+00:00",
+  "session_ids": [],
+  "documents": [
+    {
+      "document_id": "f5599ad9-5b2d-49e9-ab04-8cacecf57afb",
+      "filename": "hul_india_pnl_expense_fy25.csv",
+      "content_type": "text/csv",
+      "size_bytes": 1057,
+      "raw_path": "/Users/pallavchaturvedi/Agentic Projects/Opex Cost analyzer/data/engagements/931ef522-703e-417b-bdff-358ece84b7e2/documents/f5599ad9-5b2d-49e9-ab04-8cacecf57afb/raw.csv",
+      "role": "spend_tabular",
+      "status": "ready",
+      "parse_backend": "native",
+      "error": null,
+      "uploaded_at": "2026-06-04T17:13:01.530341+00:00",
+      "processed_at": "2026-06-04T17:13:01.555555+00:00",
+      "text_preview": "Parsed 17 spend lines from raw.csv",
+      "line_count": 17,
+      "warnings": []
+    },
+    {
+      "document_id": "5ce7c70a-56ea-48f5-b6d6-cbe83cb51b04",
+      "filename": "hul_india_spend_ledger_fy25.csv",
+      "content_type": "text/csv",
+      "size_bytes": 3328,
+      "raw_path": "/Users/pallavchaturvedi/Agentic Projects/Opex Cost analyzer/data/engagements/931ef522-703e-417b-bdff-358ece84b7e2/documents/5ce7c70a-56ea-48f5-b6d6-cbe83cb51b04/raw.csv",
+      "role": "spend_tabular",
+      "status": "ready",
+      "parse_backend": "native",
+      "error": null,
+      "uploaded_at": "2026-06-04T17:13:01.555392+00:00",
+      "processed_at": "2026-06-04T17:13:01.571413+00:00",
+      "text_preview": "Parsed 35 spend lines from raw.csv",
+      "line_count": 35,
+      "warnings": []
+    }
+  ]
+}

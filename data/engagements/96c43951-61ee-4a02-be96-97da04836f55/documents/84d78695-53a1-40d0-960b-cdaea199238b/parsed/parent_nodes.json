@@ -1,0 +1,14 @@
+{
+  "84d78695-53a1-40d0-960b-cdaea199238b::p0": {
+    "parent_id": "84d78695-53a1-40d0-960b-cdaea199238b::p0",
+    "doc_id": "84d78695-53a1-40d0-960b-cdaea199238b",
+    "engagement_id": "96c43951-61ee-4a02-be96-97da04836f55",
+    "filename": "T2_12_diagnostic_urls.txt",
+    "heading_path": "",
+    "order": 0,
+    "text": "Aranya Digital Services Ltd \u2014 Diagnostic source URLs (synthetic / illustrative)\n\nNOTE: Aranya Digital Services Ltd is a fictional entity created for testing. The URLs below are\nPLACEHOLDERS in the shape of real investor-relations / filing / news links. They will not resolve;\nfor a live diagnostic, replace with a real company's public sources.\n\n1. Investor relations:        https://www.aranyadigital.example/investors/financials\n2. Exchange filing (NSE):     https://www.nseindia.example/get-quotes/equity?symbol=ARANYADIG\n3. Annual report (PDF):       https://www.aranyadigital.example/ir/annual-report-fy25.pdf\n4. Quarterly results PR:      https://www.aranyadigital.example/newsroom/q4-fy25-results\n5. Analyst/industry note:     https://research.example/it-services-india-cost-pressure-fy25",
+    "child_ids": [
+      "84d78695-53a1-40d0-960b-cdaea199238b::p0::c0"
+    ]
+  }
+}

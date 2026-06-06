@@ -1,0 +1,19 @@
+{
+  "engagement_id": "d5addfaa-7a0b-4cdf-9a35-c678f5f21f63",
+  "company_name": "Big File Co",
+  "industry": "",
+  "annual_revenue": 0.0,
+  "currency": "INR",
+  "headcount": null,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-05T17:57:43.009334+00:00",
+  "updated_at": "2026-06-05T17:57:43.009618+00:00",
+  "session_ids": [
+    "fe033818-648a-499d-9d3e-c109a3931eaf"
+  ],
+  "documents": []
+}

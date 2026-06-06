@@ -5,11 +5,14 @@ import { ChatInsightBlock } from './ChatInsightBlock';
 import { ProbeQuestionsBlock } from './ProbeQuestionsBlock';
 import { ThinkingBlock } from './ThinkingBlock';
 import { artefactLinks, renderChatMarkdown } from '../../../utils/chatMarkdown';
+import { filterProbeNextOptions } from '../../../utils/analysisInsights';
 import type { ChatMessage } from '../../../types';
 
 interface StructuredChatMessageProps {
   message: ChatMessage;
   onOptionClick?: (text: string) => void;
+  onOpenProbes?: () => void;
+  answeredProbeFamilies?: Set<string>;
 }
 
 function AssistantAvatar() {
@@ -29,6 +32,7 @@ function asRecord(v: unknown): Record<string, unknown> | null {
 
 function AdvisorySections({ sections }: { sections: Record<string, unknown> }) {
   const takeaway = String(sections.executive_takeaway ?? '').trim();
+  const smeQualification = String(sections.sme_qualification_narrative ?? '').trim();
   const categoryFocus = String(sections.category_focus_section ?? '').trim();
   const quickWins = Array.isArray(sections.quick_wins_from_data)
     ? (sections.quick_wins_from_data as unknown[]).map(String).filter(Boolean)
@@ -43,6 +47,7 @@ function AdvisorySections({ sections }: { sections: Record<string, unknown> }) {
 
   const hasTyped =
     takeaway ||
+    smeQualification ||
     categoryFocus ||
     quickWins.length > 0 ||
     callouts.length > 0 ||
@@ -72,6 +77,12 @@ function AdvisorySections({ sections }: { sections: Record<string, unknown> }) {
         <div>
           <p className="text-xs font-bold uppercase text-brand-muted">Executive takeaway</p>
           <p className="text-xs mt-0.5 leading-relaxed">{renderChatMarkdown(takeaway)}</p>
+        </div>
+      )}
+      {smeQualification && (
+        <div>
+          <p className="text-xs font-bold uppercase text-brand-muted">SME qualification</p>
+          <p className="text-xs mt-0.5 leading-relaxed">{renderChatMarkdown(smeQualification)}</p>
         </div>
       )}
       {categoryFocus && (
@@ -144,6 +155,8 @@ function AdvisorySections({ sections }: { sections: Record<string, unknown> }) {
 export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
   message,
   onOptionClick,
+  onOpenProbes,
+  answeredProbeFamilies,
 }) => {
   const isUser = message.role === 'user';
   const sections = message.advisory_sections;
@@ -186,15 +199,12 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
           />
         )}
 
-        {!isUser &&
-          message.insight_snapshot &&
-          (message.insight_snapshot.sme_qualification?.probe_count ?? 0) +
-            (message.insight_snapshot.sme_qualification?.insufficient_count ?? 0) >
-            0 && (
+        {!isUser && message.insight_snapshot && (
             <ProbeQuestionsBlock
               snapshot={message.insight_snapshot}
               currency={message.insight_snapshot.reporting_currency}
-              onAnswer={onOptionClick}
+              answeredProbeFamilies={answeredProbeFamilies}
+              onOpenProbes={onOpenProbes}
             />
           )}
 
@@ -218,9 +228,14 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
           </div>
         )}
 
-        {!isUser && message.next_options && message.next_options.length > 0 && (
+        {!isUser && message.next_options && message.next_options.length > 0 && (() => {
+          const options = message.insight_snapshot
+            ? filterProbeNextOptions(message.next_options, message.insight_snapshot, answeredProbeFamilies)
+            : message.next_options;
+          if (options.length === 0) return null;
+          return (
           <div className="flex flex-wrap gap-2 mt-3">
-            {message.next_options.map((opt) => (
+            {options.map((opt) => (
               <button
                 key={opt.label}
                 type="button"
@@ -231,7 +246,8 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
               </button>
             ))}
           </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );

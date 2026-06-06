@@ -100,6 +100,11 @@ class ChatRequest(BaseModel):
     message: str
 
 
+class ChatHistoryTurn(BaseModel):
+    role: str
+    content: str
+
+
 class V1ChatRequest(BaseModel):
     message: str
     session_id: str
@@ -112,6 +117,51 @@ class V1ChatRequest(BaseModel):
     audience: str | None = None
     headcount: float | None = None
     thinking_mode: str | None = None  # "standard" | "extended"
+    chat_history: List[ChatHistoryTurn] | None = None
+
+
+class ProbeAnswerRequest(BaseModel):
+    session_id: str
+    probe_family_id: str
+    question: str | None = None
+    answer: str
+    selected_option: str | None = None
+    scope: str | None = "portfolio"
+    applies_to_categories: List[str] | None = None
+
+    @field_validator("probe_family_id", "answer")
+    @classmethod
+    def validate_non_empty(cls, v: str) -> str:
+        v = (v or "").strip()
+        if not v:
+            raise ValueError("field is required")
+        return v
+
+
+class ClarificationResumeRequest(BaseModel):
+    checkpoint_id: str
+    selected_option: str | None = None
+    free_text: str | None = None
+    run_id: str | None = None
+    thinking_mode: str | None = None  # "standard" | "extended"
+    company_name: str | None = None
+    industry: str | None = None
+    annual_revenue: float | None = None
+    currency: str | None = None
+    audience: str | None = None
+    headcount: float | None = None
+    chat_history: List[ChatHistoryTurn] | None = None
+
+    @field_validator("checkpoint_id")
+    @classmethod
+    def validate_checkpoint_id(cls, v: str) -> str:
+        v = (v or "").strip()
+        if not v:
+            raise ValueError("checkpoint_id is required")
+        return v
+
+    def has_answer(self) -> bool:
+        return bool((self.selected_option or "").strip() or (self.free_text or "").strip())
 
 
 class InitiativeCreateRequest(BaseModel):
@@ -259,3 +309,12 @@ class DiagnosticContextPatch(BaseModel):
     diagnostic_urls: List[str] | None = None
     diagnostic_result: Dict[str, Any] | None = None
     diagnostic_completed_at: str | None = None
+
+
+class ConnectorIngestRequest(BaseModel):
+    session_id: str
+    source_file: str
+    source_system_id: str | None = None
+    credentials: Dict[str, str] = {}
+    fetch_kwargs: Dict[str, Any] = {}
+    run_analysis: bool = False

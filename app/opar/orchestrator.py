@@ -11,9 +11,14 @@ from app.opar.category_resolver import tokenize
 from app.storage import read_json
 from app.utils.inr_format import format_money
 from app.opar.act import act
-from app.opar.models import ExecutionPlan, ReflectOutput, SkillTask
+from app.opar.hitl.checkpoint_store import checkpoint_store
+from app.opar.hitl.clarification_tool import ClarificationAnswer
+from app.opar.hitl.clarification_generator import generate_business_clarification
+from app.opar.hitl.resume import apply_clarification_answer
+from app.opar.models import ExecutionPlan, ObserveContext, ReflectOutput, SkillTask
 from app.opar.observe import observe
 from app.opar.plan import plan
+from app.opar.chat_synthesis import synthesize_chat_response
 from app.opar.qa_lookup import answer_general_qa, _FILE_FORMAT_MSG, _CAPABILITIES_MSG
 from app.opar.reflect import reflect
 from app.services.business_case import build_business_case, export_docx
@@ -94,6 +99,70 @@ def _is_schema_request(msg: str) -> bool:
     )
 
 
+_INTERACTIVE_QA_CAPABILITIES = frozenset({
+    "value_modeling",
+    "benchmarking",
+    "root_cause",
+    "executive_narrative",
+})
+
+_INTERACTIVE_QA_TOKENS = (
+    "savings",
+    "save money",
+    "optimize",
+    "optimise",
+    "priorit",
+    "opportunity",
+    "opportunities",
+    "value bridge",
+    "value-at-the-table",
+    "addressable",
+    "business case",
+    "npv",
+    "payback",
+    "benchmark",
+    "peer",
+    "compare",
+    "root cause",
+    "why ",
+    "driver",
+    "executive",
+    "cfo",
+    "board",
+    "reduce cost",
+    "cost reduction",
+    "cost optimization",
+    "cost optimisation",
+)
+
+
+def _should_use_agent_path(ctx: Any) -> bool:
+    """True when the agentic tool loop should run instead of rule-based plan()."""
+    from app.opar.agent_runtime import agent_loop_available
+
+    if not agent_loop_available():
+        return False
+    if ctx.intent_class == "export_business_case":
+        return False
+    if not (ctx.has_tabular_spend or ctx.spend_profile_ready or ctx.has_document_files):
+        return False
+    return True
+
+
+def _should_use_cached_qa_fastpath(ctx: Any, msg: str) -> bool:
+    """Return True only for simple spend lookups that can be answered from cache.
+
+    Savings, optimization, benchmark, and executive questions must fall through
+    to plan → act → reflect so the response is query-conditioned."""
+    caps = set(getattr(ctx, "query_capabilities", None) or [])
+    if caps & _INTERACTIVE_QA_CAPABILITIES:
+        return False
+    lowered = (msg or "").lower()
+    if any(token in lowered for token in _INTERACTIVE_QA_TOKENS):
+        return False
+    return True
+
+
 def _schema_summary_for_session(session_id: str) -> str | None:
     analysis = _memory.get("session", session_id)
     if not isinstance(analysis, dict):
@@ -158,6 +227,63 @@ def _skipped_skill_reasons(ctx: Any, selected_skills: set[str]) -> list[str]:
     return reasons[:5]
 
 
+class CheckpointNotFoundError(Exception):
+    """Raised when a HITL checkpoint is missing or expired."""
+
+
+class CheckpointAlreadyResumedError(Exception):
+    """Raised when a checkpoint was already consumed without a cached result."""
+
+
+class ClarificationDeferralError(Exception):
+    """Raised when the user selected a deferral option that requires data upload first."""
+
+
+def _session_manifest(session_id: str) -> Dict[str, Any]:
+    return read_json(UPLOAD_DIR / session_id / "manifest.json", {"files": [], "industry": "", "annual_revenue": 0.0})
+
+
+def _create_hitl_checkpoint(
+    ctx: ObserveContext,
+    msg: str,
+    session_id: str,
+    user_id: str,
+    file_ids: list[str] | None,
+) -> tuple[str, Any]:
+    manifest = _session_manifest(session_id)
+    clarification = generate_business_clarification(
+        ctx,
+        company_name=str(manifest.get("company_name") or ""),
+        industry=str(manifest.get("industry") or ""),
+    )
+    checkpoint_id = checkpoint_store.save(
+        session_id=session_id,
+        user_id=user_id,
+        original_message=msg,
+        observe_context=ctx.model_dump(mode="json"),
+        clarification=clarification,
+        file_ids=file_ids,
+    )
+    return checkpoint_id, clarification
+
+
+def _hitl_reflect_output(
+    clarification: Any,
+    checkpoint_id: str,
+    progress: list[Dict[str, str]],
+) -> ReflectOutput:
+    return ReflectOutput(
+        response_text=clarification.question,
+        loop_complete=False,
+        next_loop_trigger=clarification.question,
+        progress_steps=progress,
+        next_options=[{"label": opt, "message": opt} for opt in clarification.options[:4]],
+        hitl_required=True,
+        checkpoint_id=checkpoint_id,
+        clarification=clarification,
+    )
+
+
 def _handle_no_data_qa(msg: str) -> ReflectOutput:
     """Return a helpful guidance response when no spend data is available."""
     lowered = msg.lower()
@@ -188,23 +314,48 @@ def run_opar_plan_preview(
     session_id: str,
     user_id: str,
     file_ids: list[str] | None = None,
+    *,
+    clarification_answer: ClarificationAnswer | None = None,
+    clarification_resolved: bool = False,
+    waive_spend_requirement: bool = False,
+    business_override_note: str | None = None,
 ) -> Dict[str, Any]:
     """Run Observe + Plan only. Returns plan summary for user confirmation."""
-    ctx = observe(msg, session_id, user_id, file_ids)
-    if ctx.clarification_required and ctx.clarification_prompt:
+    ctx = observe(
+        msg,
+        session_id,
+        user_id,
+        file_ids,
+        clarification_answer=clarification_answer,
+        clarification_resolved=clarification_resolved,
+        waive_spend_requirement=waive_spend_requirement,
+        business_override_note=business_override_note,
+    )
+    if ctx.clarification_required and ctx.clarification_prompt and not ctx.clarification_resolved:
+        checkpoint_id, clarification = _create_hitl_checkpoint(ctx, msg, session_id, user_id, file_ids)
         return {
+            "hitl_required": True,
+            "checkpoint_id": checkpoint_id,
+            "clarification": clarification.model_dump(),
             "clarification_required": True,
-            "clarification_prompt": ctx.clarification_prompt,
+            "clarification_prompt": clarification.question,
             "user_summary": None,
             "plan": None,
+            "requires_confirmation": False,
         }
     exec_plan = plan(ctx)
+    planned_skills = [t.skill_name for t in exec_plan.tasks]
     return {
+        "hitl_required": False,
+        "checkpoint_id": None,
+        "clarification": None,
         "clarification_required": False,
         "clarification_prompt": None,
         "user_summary": exec_plan.user_summary,
         "estimated_duration": exec_plan.estimated_duration,
         "requires_approval": exec_plan.requires_approval,
+        "requires_confirmation": exec_plan.requires_approval,
+        "planned_skills": planned_skills,
         "plan": {
             "total_skills": exec_plan.total_skills,
             "parallel_groups": exec_plan.parallel_groups,
@@ -221,6 +372,7 @@ async def run_opar_loop(
     progress_callback: Callable[[str, str], None] | None = None,
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
+    chat_history: list[dict[str, str]] | None = None,
 ) -> ReflectOutput:
     """Run full Observe -> Plan -> Act -> Reflect cycle (async-native)."""
     _opar_start = time.perf_counter()
@@ -231,9 +383,54 @@ async def run_opar_loop(
             msg, session_id, user_id, file_ids, progress_callback, progress,
             thinking_enabled=thinking_enabled,
             thinking_budget_tokens=thinking_budget_tokens,
+            chat_history=chat_history,
         )
     finally:
         opar_cycle_duration_seconds.observe(time.perf_counter() - _opar_start)
+
+
+async def resume_opar_loop(
+    checkpoint_id: str,
+    answer: ClarificationAnswer,
+    progress_callback: Callable[[str, str], None] | None = None,
+    thinking_enabled: bool = False,
+    thinking_budget_tokens: int = 8000,
+    chat_history: list[dict[str, str]] | None = None,
+) -> ReflectOutput:
+    """Resume a suspended OPAR run after the user answers a clarification probe."""
+    cp = checkpoint_store.get(checkpoint_id)
+    if not cp:
+        raise CheckpointNotFoundError(checkpoint_id)
+    if cp.status == "resumed":
+        if cp.result_snapshot:
+            return ReflectOutput.model_validate(cp.result_snapshot)
+        raise CheckpointAlreadyResumedError(checkpoint_id)
+
+    overrides = apply_clarification_answer(cp.session_id, answer)
+    if overrides.get("defer_only"):
+        raise ClarificationDeferralError(
+            "Selected option requires providing data before analysis can continue."
+        )
+
+    clarification_answer = ClarificationAnswer.model_validate(overrides["clarification_answer"])
+    progress: list[Dict[str, str]] = []
+    result = await _run_opar_loop_inner(
+        cp.original_message,
+        cp.session_id,
+        cp.user_id,
+        cp.file_ids,
+        progress_callback,
+        progress,
+        thinking_enabled=thinking_enabled,
+        thinking_budget_tokens=thinking_budget_tokens,
+        clarification_answer=clarification_answer,
+        clarification_resolved=bool(overrides["clarification_resolved"]),
+        waive_spend_requirement=bool(overrides["waive_spend_requirement"]),
+        business_override_note=overrides.get("business_override_note"),
+        chat_history=chat_history,
+    )
+    checkpoint_store.mark_resumed(checkpoint_id, result_snapshot=result.model_dump(mode="json"))
+    return result
 
 
 async def _run_opar_loop_inner(
@@ -245,12 +442,26 @@ async def _run_opar_loop_inner(
     progress: list[Dict[str, str]],
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
+    clarification_answer: ClarificationAnswer | None = None,
+    clarification_resolved: bool = False,
+    waive_spend_requirement: bool = False,
+    business_override_note: str | None = None,
+    chat_history: list[dict[str, str]] | None = None,
 ) -> ReflectOutput:
 
     _add_progress_step(progress, "observe", "Understanding your request...")
     if progress_callback:
         progress_callback("observe", "Understanding your request...")
-    ctx = observe(msg, session_id, user_id, file_ids)
+    ctx = observe(
+        msg,
+        session_id,
+        user_id,
+        file_ids,
+        clarification_answer=clarification_answer,
+        clarification_resolved=clarification_resolved,
+        waive_spend_requirement=waive_spend_requirement,
+        business_override_note=business_override_note,
+    )
     _add_progress_step(
         progress,
         "observe",
@@ -264,14 +475,9 @@ async def _run_opar_loop_inner(
     # ------------------------------------------------------------------
     # Clarification gate: only fires for analysis intents missing data
     # ------------------------------------------------------------------
-    if ctx.clarification_required and ctx.clarification_prompt:
-        return ReflectOutput(
-            response_text=ctx.clarification_prompt,
-            loop_complete=False,
-            next_loop_trigger=ctx.clarification_prompt,
-            progress_steps=progress,
-            next_options=[{"label": "Upload spend data", "message": "How do I upload my data?"}],
-        )
+    if ctx.clarification_required and ctx.clarification_prompt and not ctx.clarification_resolved:
+        checkpoint_id, clarification = _create_hitl_checkpoint(ctx, msg, session_id, user_id, file_ids)
+        return _hitl_reflect_output(clarification, checkpoint_id, progress)
 
     # ------------------------------------------------------------------
     # general_qa: answer from existing context, no heavy pipeline
@@ -309,12 +515,26 @@ async def _run_opar_loop_inner(
                         progress_steps=progress,
                         next_options=[{"label": "File format guide", "message": "What columns does my spend file need?"}],
                     )
-            if not chart_request:
+            if not chart_request and _should_use_cached_qa_fastpath(ctx, msg):
                 validated = existing_analysis.get("skill_outputs", {})
                 if not validated:
-                    # Wrap entire analysis as if it were skill outputs
                     validated = {"spend-profiler": existing_analysis} if existing_analysis.get("category_profile") else {}
-                answer = answer_general_qa(msg, validated, currency=str(existing_analysis.get("reporting_currency") or _session_currency(session_id)))
+                try:
+                    from app.opar.hitl.probe_answers import apply_probe_answers_to_skill_outputs
+
+                    validated = apply_probe_answers_to_skill_outputs(validated, session_id)
+                except Exception:
+                    pass
+                manifest = _session_manifest(session_id)
+                currency = str(existing_analysis.get("reporting_currency") or _session_currency(session_id))
+                synthesis = synthesize_chat_response(
+                    ctx,
+                    manifest,
+                    validated,
+                    chat_history=chat_history,
+                    currency=currency,
+                    thinking_enabled=thinking_enabled,
+                )
                 next_opts = []
                 if validated.get("spend-profiler"):
                     next_opts = [
@@ -322,15 +542,18 @@ async def _run_opar_loop_inner(
                         {"label": "Value-at-the-table", "message": "Calculate the value-at-the-table matrix"},
                     ]
                 return ReflectOutput(
-                    response_text=answer,
+                    response_text=synthesis.response_text,
                     loop_complete=True,
                     progress_steps=progress,
                     next_options=next_opts,
+                    used_llm_synthesis=synthesis.used_llm,
+                    thinking_text=synthesis.thinking_text,
+                    response_metadata=synthesis.response_metadata,
                 )
 
         # No stored analysis — check if files are uploaded
-        if ctx.uploaded_file_ids:
-            # Files exist but no analysis yet — run profiler to give a first answer
+        if ctx.uploaded_file_ids or ctx.has_tabular_spend:
+            # Session files or engagement corpus spend — run profiler to answer
             pass  # fall through to normal OPAR pipeline (plan will set up profiler-only)
         else:
             # Truly no data — return onboarding guidance
@@ -363,7 +586,45 @@ async def _run_opar_loop_inner(
         )
 
     # ------------------------------------------------------------------
-    # Normal OPAR pipeline: Plan → Act → Reflect
+    # Agent controller (M2/M3): tool-use investigation before reflect
+    # ------------------------------------------------------------------
+    if _should_use_agent_path(ctx):
+        from app.opar.agent_controller import try_agent_run
+
+        _add_progress_step(progress, "plan", "Agent investigating with tools...")
+        if progress_callback:
+            progress_callback("plan", "Agent investigating with tools...")
+        agent_result = try_agent_run(ctx, progress_callback=progress_callback)
+        if agent_result and agent_result.act_result and agent_result.exec_plan:
+            _add_progress_step(
+                progress,
+                "act",
+                f"Agent ran {len(agent_result.exec_plan.tasks)} skill(s) via tools.",
+            )
+            _add_progress_step(progress, "reflect", "Validating and summarizing results...")
+            if progress_callback:
+                progress_callback("reflect", "Validating and summarizing results...")
+            result = reflect(
+                agent_result.act_result,
+                agent_result.exec_plan,
+                ctx,
+                thinking_enabled=thinking_enabled,
+                thinking_budget_tokens=thinking_budget_tokens,
+                chat_history=chat_history,
+            )
+            meta = dict(result.response_metadata or {})
+            meta["agent_trace"] = agent_result.agent_trace or []
+            meta["agent_summary"] = agent_result.agent_summary
+            meta["agent_path"] = True
+            result.response_metadata = meta
+            if agent_result.thinking_text:
+                result.thinking_text = agent_result.thinking_text
+            result.progress_steps = progress
+            logger.info('"opar_agent_complete session_id=%s"', session_id)
+            return result
+
+    # ------------------------------------------------------------------
+    # Deterministic fallback: Plan → Act → Reflect
     # ------------------------------------------------------------------
     _add_progress_step(progress, "plan", "Planning analysis steps...")
     if progress_callback:
@@ -422,6 +683,7 @@ async def _run_opar_loop_inner(
         act_result, exec_plan, ctx,
         thinking_enabled=thinking_enabled,
         thinking_budget_tokens=thinking_budget_tokens,
+        chat_history=chat_history,
     )
 
     result.progress_steps = progress

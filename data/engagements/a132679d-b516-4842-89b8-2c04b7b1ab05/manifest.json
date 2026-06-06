@@ -1,0 +1,23 @@
+{
+  "engagement_id": "a132679d-b516-4842-89b8-2c04b7b1ab05",
+  "company_name": "New engagement",
+  "industry": "",
+  "annual_revenue": 0.0,
+  "currency": "INR",
+  "headcount": null,
+  "created_at": "2026-06-04T18:49:39.142017+00:00",
+  "updated_at": "2026-06-05T08:20:39.089259+00:00",
+  "session_ids": [
+    "9e330419-0a58-4a99-944f-dc141253313a",
+    "d15f9b64-6c44-4460-a920-86e131f4039a",
+    "bae4177f-75b6-4e93-b53f-0f4962174712",
+    "31133d0f-38eb-4188-97b2-3cbada68b8ce",
+    "564fab9e-75c0-423e-818d-7337b5d4cf34",
+    "d1f6d70c-bc38-4817-9298-141314e00d23",
+    "fce568f6-356e-457c-b59c-b1cad6756e54",
+    "e2590a72-f072-4314-b032-2cd2fc611db6",
+    "8abbe75b-d307-4703-a4f8-0123bd7296d6",
+    "a2f180a8-bfa5-4931-b218-a226fac88a67"
+  ],
+  "documents": []
+}

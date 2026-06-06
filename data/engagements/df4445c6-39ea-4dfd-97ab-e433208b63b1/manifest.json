@@ -1,0 +1,19 @@
+{
+  "engagement_id": "df4445c6-39ea-4dfd-97ab-e433208b63b1",
+  "company_name": "Bench Co",
+  "industry": "technology",
+  "annual_revenue": 1000000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-05T08:01:04.019801+00:00",
+  "updated_at": "2026-06-05T08:01:04.019962+00:00",
+  "session_ids": [
+    "5ab4ed4d-b2d8-4fd6-a169-260ccc7a076e"
+  ],
+  "documents": []
+}

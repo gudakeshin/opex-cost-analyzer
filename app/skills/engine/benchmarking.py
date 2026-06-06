@@ -386,4 +386,12 @@ def root_cause_analyzer(
                 outputs.append(finding)
                 covered.add(cid)
 
-    return {"root_cause_findings": outputs, "eligible_levers_summary": eligible_levers}
+    result: Dict[str, Any] = {"root_cause_findings": outputs, "eligible_levers_summary": eligible_levers}
+    try:
+        from app.opar.root_cause_intelligence import enrich_root_cause_with_llm
+        enriched = enrich_root_cause_with_llm(result)
+        if enriched:
+            result = enriched
+    except Exception:
+        pass
+    return result

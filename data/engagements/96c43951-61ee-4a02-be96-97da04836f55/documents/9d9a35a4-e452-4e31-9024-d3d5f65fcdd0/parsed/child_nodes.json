@@ -1,0 +1,32 @@
+[
+  {
+    "child_id": "9d9a35a4-e452-4e31-9024-d3d5f65fcdd0::p0::c0",
+    "parent_id": "9d9a35a4-e452-4e31-9024-d3d5f65fcdd0::p0",
+    "doc_id": "9d9a35a4-e452-4e31-9024-d3d5f65fcdd0",
+    "engagement_id": "96c43951-61ee-4a02-be96-97da04836f55",
+    "filename": "T2_11_deep_research_brief.txt",
+    "heading_path": "",
+    "order": 0,
+    "text": "Deep Research Brief \u2014 Indian IT/ITeS cost structure & peer cost-out (for Aranya Digital Services Ltd)\n\nMarket context (FY24\u2013FY25)\n- Indian IT services growth moderated to mid-single digits as discretionary tech spend tightened in\n  BFSI and Retail; clients pushed for vendor consolidation and price concessions. - Margin pressure across the sector from wage inflation, elevated subcontractor usage during demand\n  spikes, and higher cloud pass-through on GenAI workloads. - Utilisation and pyramid optimisation (fresher mix, bench reduction) are the dominant margin levers;\n  large peers target 84\u201387% billable utilisation. Peer cost-out programmes (illustrative, from public commentary)\n- Tier-1 peers ran multi-quarter subcontractor reduction, cutting subcontractor cost as a % of revenue\n  by 150\u2013250 bps by insourcing and rate harmonisation. - FinOps / cloud cost governance commonly delivers 10\u201318% of cloud spend via reserved capacity,\n  rightsizing, and idle reclaim."
+  },
+  {
+    "child_id": "9d9a35a4-e452-4e31-9024-d3d5f65fcdd0::p0::c1",
+    "parent_id": "9d9a35a4-e452-4e31-9024-d3d5f65fcdd0::p0",
+    "doc_id": "9d9a35a4-e452-4e31-9024-d3d5f65fcdd0",
+    "engagement_id": "96c43951-61ee-4a02-be96-97da04836f55",
+    "filename": "T2_11_deep_research_brief.txt",
+    "heading_path": "",
+    "order": 1,
+    "text": "d rate harmonisation. - FinOps / cloud cost governance commonly delivers 10\u201318% of cloud spend via reserved capacity,\n  rightsizing, and idle reclaim. - Software licence rationalisation (shelfware, edition downgrades) typically yields 8\u201315% of SaaS spend,\n  constrained where security/compliance features are bundled. - Real-estate consolidation under hybrid work delivers 10\u201320% facilities savings but is gated by SEZ\n  lock-ins and lease exit penalties. Constraints specific to India / Aranya\n- SEZ tax benefits tie campus occupancy to continued physical presence \u2014 limits aggressive RE exit. - MSMED Act 45-day payment rule constrains DPO extension on MSME vendors. - Regulated client workloads cap supplier switching speed (security tooling, data residency). Implications for benchmarking\n- Position addressable third-party OpEx (ex committed/locked spend) for 6\u20139% net savings."
+  },
+  {
+    "child_id": "9d9a35a4-e452-4e31-9024-d3d5f65fcdd0::p0::c2",
+    "parent_id": "9d9a35a4-e452-4e31-9024-d3d5f65fcdd0::p0",
+    "doc_id": "9d9a35a4-e452-4e31-9024-d3d5f65fcdd0",
+    "engagement_id": "96c43951-61ee-4a02-be96-97da04836f55",
+    "filename": "T2_11_deep_research_brief.txt",
+    "heading_path": "",
+    "order": 2,
+    "text": "rity tooling, data residency). Implications for benchmarking\n- Position addressable third-party OpEx (ex committed/locked spend) for 6\u20139% net savings. - Treat people-cost levers (utilisation/pyramid) separately from third-party cost-out to avoid\n  double-counting in the value bridge."
+  }
+]

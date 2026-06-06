@@ -1,0 +1,19 @@
+supplier,category,contract_status,contract_expiry_date,auto_renewal_notice_days,early_exit_penalty_pct,min_purchase_commitment,currency
+Amazon Web Services,Cloud & Hosting,in_contract,2026-12-31,90,15,2800000000,INR
+Microsoft Azure,Cloud & Hosting,in_contract,2026-03-31,60,10,1600000000,INR
+Microsoft,Software Licences,in_contract,2027-09-30,90,0,2400000000,INR
+ServiceNow,Software Licences,in_contract,2026-06-30,60,20,900000000,INR
+Salesforce,Software Licences,in_contract,2025-11-30,45,12,640000000,INR
+Oracle,Software Licences,rolling,,60,0,0,INR
+SAP,Software Licences,in_contract,2028-03-31,180,25,1200000000,INR
+Quess Corp,Subcontractor & Staffing,in_contract,2025-09-30,30,0,0,INR
+Allegis Group,Subcontractor & Staffing,rolling,,30,0,0,INR
+Embassy Office Parks,Facilities & Real Estate,in_contract,2030-03-31,365,40,7200000000,INR
+DLF Cyber City,Facilities & Real Estate,in_contract,2028-03-31,180,30,4100000000,INR
+JLL India,Facilities & Real Estate,in_contract,2026-01-31,90,5,0,INR
+Bharti Airtel,Telecom & Connectivity,in_contract,2025-12-31,60,8,720000000,INR
+Tata Communications,Telecom & Connectivity,at_risk,2025-08-31,90,10,540000000,INR
+American Express GBT,Travel & Transport,in_contract,2026-04-30,60,0,0,INR
+Deloitte India,Professional Fees,expired,2025-03-31,30,0,0,INR
+Dell Technologies,Hardware & Devices,rolling,,30,0,0,INR
+Gartner,Marketing & Brand,in_contract,2025-10-31,60,0,0,INR

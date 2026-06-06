@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Tuple
 
 from app.config import ANTHROPIC_ENABLED, MEMORY_DIR, UPLOAD_DIR
 from app.opar.memory_adapter import get_memory_adapter
+from app.opar.hitl.clarification_tool import ClarificationAnswer
 from app.opar.models import ObserveContext
 from app.skills.model_contextualizer import (
     build_workbook_manifest,
@@ -59,6 +60,7 @@ def _detect_query_capabilities(msg: str) -> List[str]:
         "schema_lookup": ["schema", "columns", "headers", "semantic map", "field mapping"],
         "document_context": ["document", "contract", "policy", "constraint", "pdf", "docx", "txt"],
         "executive_narrative": ["executive", "board", "cfo", "leadership", "decision-ready"],
+        "supplier_breakdown": ["supplier", "vendor", "by supplier", "by vendor", "payee"],
     }
     capabilities: List[str] = []
     for capability, tokens in capability_tokens.items():
@@ -168,7 +170,19 @@ def _classify_intent_rule_based(msg: str) -> Tuple[str, str | None]:
         return "bva", None
     if any(w in lowered for w in ["year over year", "year-over-year", "yoy", "qoq", "month over month", "run rate", "run-rate", "spend trend", "trend analysis", "trend over time"]):
         return "temporal", None
-    if any(w in lowered for w in ["drill down", "drill-down", "deep dive", "deep-dive", "drill into"]):
+    if any(
+        w in lowered
+        for w in [
+            "drill down",
+            "drill-down",
+            "deep dive",
+            "deep-dive",
+            "drill into",
+            "break down",
+            "breakdown",
+            "split by",
+        ]
+    ):
         return "drill_down", None
 
     # 1. Export / download intent (must precede business_case to avoid partial match)
@@ -375,6 +389,20 @@ def assess_data_quality(
     if intent in ("benchmark", "value_bridge", "business_case") and not manifest.get("industry"):
         missing.append("industry")
 
+    engagement_id = str(manifest.get("engagement_id") or "")
+    if engagement_id:
+        try:
+            from app.services.engagements_store import read_engagement_manifest
+            eng_manifest = read_engagement_manifest(engagement_id)
+            ready_docs = [
+                d for d in (eng_manifest.get("documents") or [])
+                if isinstance(d, dict) and d.get("status") == "ready"
+            ]
+            if ready_docs:
+                score = min(score + 0.05, 1.0)
+        except Exception:
+            pass
+
     return min(score, 1.0), missing
 
 
@@ -384,17 +412,21 @@ def observe(
     user_id: str,
     file_ids: List[str] | None = None,
     manifest: Dict[str, Any] | None = None,
+    *,
+    clarification_answer: ClarificationAnswer | None = None,
+    clarification_resolved: bool = False,
+    waive_spend_requirement: bool = False,
+    business_override_note: str | None = None,
 ) -> ObserveContext:
     """Assemble ObserveContext from message, session, memory, and files."""
     adapter = get_memory_adapter()
     user_mem = adapter.get_user_memory(user_id)
     session_mem = adapter.get_session_memory(session_id, query=msg, limit=10)
-    engagement_id = str(manifest.get("engagement_id") or session_id) if manifest else session_id
-
     if manifest is None:
         manifest_path = UPLOAD_DIR / session_id / "manifest.json"
         manifest = read_json(manifest_path, {"files": [], "industry": "", "annual_revenue": 0.0})
 
+    engagement_id = str(manifest.get("engagement_id") or session_id)
     files = manifest.get("files", [])
     model_manifest: Dict[str, Any] = dict(manifest.get("model_manifest") or {})
     schema_confirmation_required = False
@@ -414,10 +446,30 @@ def observe(
         Path(f.get("path", "")).suffix.lower() in (".csv", ".xlsx", ".xls")
         for f in files
     )
-    has_document_files = any(
+    corpus_line_count = 0
+    try:
+        from app.services.engagement_corpus import load_analysis_corpus
+        _corpus_lines, _, _, _, _ = load_analysis_corpus(session_id)
+        corpus_line_count = len(_corpus_lines)
+    except Exception:
+        corpus_line_count = 0
+    if corpus_line_count > 0:
+        has_tabular_spend = True
+    has_session_document_files = any(
         Path(f.get("path", "")).suffix.lower() in (".txt", ".docx", ".pdf")
         for f in files
     )
+    engagement_doc_count = 0
+    try:
+        from app.services.engagements_store import read_engagement_manifest
+        eng_manifest = read_engagement_manifest(engagement_id)
+        engagement_doc_count = sum(
+            1 for d in (eng_manifest.get("documents") or [])
+            if isinstance(d, dict) and d.get("status") == "ready"
+        )
+    except Exception:
+        engagement_doc_count = 0
+    has_document_files = has_session_document_files or engagement_doc_count > 0
     has_annual_revenue = bool(float(manifest.get("annual_revenue") or 0.0) > 0)
     has_headcount = headcount is not None
     wants_executive_narrative = any(
@@ -482,6 +534,9 @@ def observe(
 
     parse_results = [f.get("schema") for f in files if f.get("schema")]
     dq_score, missing_fields = assess_data_quality(parse_results, intent_class, manifest)
+    if corpus_line_count > 0:
+        dq_score = max(dq_score, 0.35)
+        missing_fields = [f for f in missing_fields if f != "spend_data"]
     engagement_week = _infer_engagement_week(manifest, session_mem)
     decision_gate = _infer_decision_gate(engagement_week, intent_class)
     conflict_signals = _detect_conflict_signals(msg, manifest)
@@ -543,14 +598,26 @@ def observe(
                 f"Detected sheet roles: {role_hint}"
             )
 
+    # HITL resume: manifest may carry waiver from prior clarification answer.
+    if not waive_spend_requirement:
+        waive_spend_requirement = bool(manifest.get("waive_spend_requirement"))
+    if not business_override_note:
+        business_override_note = manifest.get("business_override_note") or None
+    probe_answers = manifest.get("probe_answers")
+    if not isinstance(probe_answers, list):
+        probe_answers = []
+    if clarification_resolved or clarification_answer is not None:
+        clarification_resolved = True
+
     # Only gate analysis intents on data quality/completeness.
     # general_qa and upload_data should never be blocked by clarification —
     # the former is conversational, the latter is exactly how data gets provided.
     _analysis_intents = {"benchmark", "value_bridge", "business_case"}
-    clarification_required = bool(
+    _gate_blocked = bool(
         intent_class in _analysis_intents
         and ("spend_data" in missing_fields or dq_score < 0.6)
     )
+    clarification_required = _gate_blocked and not (waive_spend_requirement and clarification_resolved)
     clarification_prompt = None
     if clarification_required and missing_fields:
         parts: list[str] = []
@@ -595,6 +662,11 @@ def observe(
         data_quality_score=dq_score,
         clarification_required=clarification_required,
         clarification_prompt=clarification_prompt,
+        clarification_answer=clarification_answer,
+        clarification_resolved=clarification_resolved,
+        waive_spend_requirement=waive_spend_requirement,
+        business_override_note=business_override_note,
+        probe_answers=probe_answers,
         session_id=session_id,
         user_id=user_id,
         turn_id=session_id,

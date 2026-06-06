@@ -24,6 +24,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List
 
+from app.skills.engine.evidence import evidence_gatherer
 from app.models import NormalizedSpendLine
 from app.opar.transaction_examples import build_transaction_examples_from_lines
 
@@ -254,7 +255,7 @@ def _peer_benchmarker(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
 def _root_cause_analyzer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     profile = _get_profile(ctx)
     peer = ctx.prior("peer-benchmarker")
-    return _engine.root_cause_analyzer(
+    output = _engine.root_cause_analyzer(
         profile,
         peer,
         ctx.lines,
@@ -262,7 +263,16 @@ def _root_cause_analyzer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]
         industry=ctx.industry,
         annual_revenue=ctx.annual_revenue,
         reporting_currency=ctx.reporting_currency,
-    ), None
+    )
+    try:
+        from app.opar.root_cause_intelligence import enrich_root_cause_with_llm
+
+        enriched = enrich_root_cause_with_llm(output)
+        if enriched:
+            output = enriched
+    except Exception:
+        pass
+    return output, None
 
 
 # ── Tier 2: savings modelling ────────────────────────────────────────────────
@@ -312,6 +322,28 @@ def _data_validator(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     return _engine.data_validator(bridge), None
 
 
+@register("evidence-gatherer")
+def _evidence_gatherer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    savings_model = ctx.prior("savings-modeler")
+    profile = _get_profile(ctx)
+    root_causes = ctx.prior("root-cause-analyzer")
+    contract_lifecycle = ctx.prior("contract-lifecycle-manager")
+    if not contract_lifecycle and ctx.lines:
+        contract_lifecycle = _engine.contract_lifecycle_manager(ctx.lines)
+    benchmarks = ctx.prior("peer-benchmarker")
+    engagement_id = str(ctx.manifest.get("engagement_id") or "")
+    return evidence_gatherer(
+        savings_model,
+        profile,
+        root_causes,
+        contract_lifecycle,
+        benchmarks,
+        ctx.lines,
+        engagement_id=engagement_id,
+        docs_text=ctx.docs_text,
+    ), None
+
+
 @register("sme-critique")
 def _sme_critique(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     savings_model = ctx.prior("savings-modeler")
@@ -321,12 +353,15 @@ def _sme_critique(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     contract_lifecycle = ctx.prior("contract-lifecycle-manager")
     if not contract_lifecycle and ctx.lines:
         contract_lifecycle = _engine.contract_lifecycle_manager(ctx.lines)
+    evidence_output = ctx.prior("evidence-gatherer")
     return _engine.sme_critique_analyzer(
         savings_model,
         profile,
         benchmarks,
         root_causes,
         contract_lifecycle,
+        evidence_gatherer_output=evidence_output or None,
+        lines=ctx.lines,
     ), None
 
 

@@ -1,0 +1,19 @@
+{
+  "engagement_id": "dde1e5a6-9e12-4420-883a-5c1f9c804222",
+  "company_name": "HeadcountCo",
+  "industry": "technology",
+  "annual_revenue": 500000000.0,
+  "currency": "INR",
+  "headcount": 2500.0,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-05T18:19:54.864581+00:00",
+  "updated_at": "2026-06-05T18:19:54.864810+00:00",
+  "session_ids": [
+    "2294c3cd-f292-4a1b-bf0e-4803de4632b7"
+  ],
+  "documents": []
+}

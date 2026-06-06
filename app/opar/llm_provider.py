@@ -177,6 +177,51 @@ def _call_m2(
         return None
 
 
+def get_tool_loop_transport():
+    """Return the configured tool-loop transport for M2 agent paths."""
+    from app.config import ANTHROPIC_ENABLED, GEMINI_ENABLED, LLM_PROVIDER
+
+    if os.getenv("PYTEST_CURRENT_TEST"):
+        return None
+    if LLM_PROVIDER == "gemini" and GEMINI_ENABLED:
+        from app.opar.gemini_client import GeminiToolTransport
+
+        return GeminiToolTransport()
+    if ANTHROPIC_ENABLED:
+        from app.opar.claude_client import ClaudeToolTransport
+
+        return ClaudeToolTransport()
+    return None
+
+
+def call_llm_with_tools(
+    system: str,
+    messages: list[dict[str, Any]],
+    tools: list[Any],
+    dispatch: Any,
+    *,
+    mode: Optional[str] = None,
+    thinking: bool = True,
+) -> Optional[Any]:
+    """Run an agent tool loop via the active provider. Returns None in M1/pytest."""
+    active_mode = (mode or get_active_mode()).upper()
+    if active_mode == "M1" or os.getenv("PYTEST_CURRENT_TEST"):
+        return None
+    transport = get_tool_loop_transport()
+    if transport is None:
+        return None
+    from app.opar.agent_runtime import run_tool_loop
+
+    return run_tool_loop(
+        system=system,
+        messages=messages,
+        tools=tools,
+        dispatch=dispatch,
+        transport=transport,
+        thinking=thinking,
+    )
+
+
 def _call_m3(
     system: str,
     user_content: str,

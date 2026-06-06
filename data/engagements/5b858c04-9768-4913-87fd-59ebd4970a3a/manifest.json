@@ -1,0 +1,19 @@
+{
+  "engagement_id": "5b858c04-9768-4913-87fd-59ebd4970a3a",
+  "company_name": "Value Co",
+  "industry": "technology",
+  "annual_revenue": 1000000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-05T08:01:03.888252+00:00",
+  "updated_at": "2026-06-05T08:01:03.888461+00:00",
+  "session_ids": [
+    "098fde9d-615d-42be-b4e0-724fae73715f"
+  ],
+  "documents": []
+}

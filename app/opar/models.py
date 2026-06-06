@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Literal, Optional
 from pydantic import BaseModel, Field
 
 from app.models import NormalizedSpendLine
+from app.opar.hitl.clarification_tool import BusinessClarificationPayload, ClarificationAnswer
 
 
 class IntentClass(str, Enum):
@@ -80,6 +81,12 @@ class ObserveContext(BaseModel):
     data_quality_score: float = 0.0
     clarification_required: bool = False
     clarification_prompt: str | None = None
+    clarification_payload: BusinessClarificationPayload | None = None
+    clarification_answer: ClarificationAnswer | None = None
+    clarification_resolved: bool = False
+    waive_spend_requirement: bool = False
+    business_override_note: str | None = None
+    probe_answers: List[Dict[str, Any]] = Field(default_factory=list)
 
     session_id: str = ""
     user_id: str = ""
@@ -210,6 +217,14 @@ class ReflectOutput(BaseModel):
     # UX: thinking process and interactive options
     progress_steps: List[Dict[str, str]] = Field(default_factory=list)  # [{phase, message}]
     next_options: List[Dict[str, str]] = Field(default_factory=list)  # [{label, message}]
+
+    # HITL clarification probe (Observe gate)
+    hitl_required: bool = False
+    checkpoint_id: str | None = None
+    clarification: BusinessClarificationPayload | None = None
+
+    # Chat synthesis metadata (supplier/geo dimension hints for UI)
+    response_metadata: Dict[str, Any] = Field(default_factory=dict)
 
     # Phase 3: replanner + quality gate + regulatory events
     replanner_log: List[Dict[str, Any]] = Field(default_factory=list)  # decisions made by replanner

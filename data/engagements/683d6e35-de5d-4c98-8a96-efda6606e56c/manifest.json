@@ -1,0 +1,14 @@
+{
+  "engagement_id": "683d6e35-de5d-4c98-8a96-efda6606e56c",
+  "company_name": "Audience Co",
+  "industry": "technology",
+  "annual_revenue": 1000000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "created_at": "2026-06-04T18:32:33.542759+00:00",
+  "updated_at": "2026-06-04T18:32:33.543209+00:00",
+  "session_ids": [
+    "a67c71a4-c3c1-4032-84af-c81aa1b371c3"
+  ],
+  "documents": []
+}

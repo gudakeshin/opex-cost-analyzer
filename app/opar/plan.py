@@ -52,8 +52,36 @@ def _add_task(tasks: list[SkillTask], task: SkillTask) -> None:
     tasks.append(task)
 
 
+def _add_evidence_gatherer_if_value_modeled(tasks: list[SkillTask]) -> None:
+    """Attach document-aware evidence gathering before SME critique."""
+    names = {t.skill_name for t in tasks}
+    if "savings-modeler" not in names or "evidence-gatherer" in names:
+        return
+    deps = [
+        skill
+        for skill in (
+            "savings-modeler",
+            "spend-profiler",
+            "root-cause-analyzer",
+            "contract-lifecycle-manager",
+            "peer-benchmarker",
+        )
+        if skill in names
+    ]
+    tasks.append(
+        SkillTask(
+            skill_name="evidence-gatherer",
+            inputs={},
+            depends_on=deps,
+            parallel_group=max((t.parallel_group for t in tasks), default=0) + 1,
+            estimated_tokens=400,
+        )
+    )
+
+
 def _add_sme_critique_if_value_modeled(tasks: list[SkillTask]) -> None:
     """Attach evidence-qualification after savings modeling when available."""
+    _add_evidence_gatherer_if_value_modeled(tasks)
     names = {t.skill_name for t in tasks}
     if "savings-modeler" not in names or "sme-critique" in names:
         return
@@ -65,6 +93,7 @@ def _add_sme_critique_if_value_modeled(tasks: list[SkillTask]) -> None:
             "peer-benchmarker",
             "root-cause-analyzer",
             "contract-lifecycle-manager",
+            "evidence-gatherer",
         )
         if skill in names
     ]
@@ -95,8 +124,10 @@ def _has_capability(ctx: ObserveContext, capability: str) -> bool:
 # ---------------------------------------------------------------------------
 
 _DEP_MAP: Dict[str, tuple[int, List[str], int]] = {
+    # Group 0 — no upstream deps
     "spend-profiler":            (0, [], 500),
     "document-contextualizer":   (0, [], 300),
+    # Group 1 — depend on spend-profiler
     "peer-benchmarker":          (1, ["spend-profiler"], 800),
     "internal-benchmarker":      (1, ["spend-profiler"], 600),
     "heuristic-analyzer":        (1, ["spend-profiler"], 500),
@@ -104,15 +135,37 @@ _DEP_MAP: Dict[str, tuple[int, List[str], int]] = {
     "bva-analyzer":              (1, ["spend-profiler"], 500),
     "temporal-analyzer":         (1, ["spend-profiler"], 500),
     "chart-builder":             (1, ["spend-profiler"], 300),
+    "contract-lifecycle-manager":(1, ["spend-profiler"], 500),
+    "dashboard-builder":         (1, ["spend-profiler"], 300),
+    "consolidation-analyzer":    (1, ["spend-profiler"], 500),
+    "cost-to-serve-analyzer":    (1, ["spend-profiler"], 500),
+    "vendor-master-builder":     (1, ["spend-profiler"], 400),
+    "peer-disclosure-miner":     (1, ["spend-profiler"], 400),
+    "gstr-reconciler":           (1, ["spend-profiler"], 400),
+    "msme-compliance-checker":   (1, ["spend-profiler"], 400),
+    # Group 2 — depend on group 1
     "root-cause-analyzer":       (2, ["spend-profiler", "peer-benchmarker"], 650),
+    "zbb-modeler":               (2, ["spend-profiler", "peer-benchmarker"], 700),
+    "indian-tax-optimizer":      (2, ["spend-profiler", "peer-benchmarker"], 500),
+    "conflict-detector":         (2, ["spend-profiler", "peer-benchmarker"], 400),
+    # Group 3 — depend on group 2
     "savings-modeler":           (3, ["peer-benchmarker", "internal-benchmarker", "root-cause-analyzer", "heuristic-analyzer"], 900),
+    "brsr-cobenefit-calculator": (3, ["spend-profiler", "savings-modeler"], 500),
+    # Group 4 — depend on group 3
     "value-bridge-calculator":   (4, ["peer-benchmarker", "internal-benchmarker", "savings-modeler", "heuristic-analyzer"], 700),
+    "evidence-gatherer":         (4, ["savings-modeler", "spend-profiler", "root-cause-analyzer", "peer-benchmarker"], 400),
+    "scenario-modeler":          (4, ["savings-modeler"], 600),
+    # Group 5 — depend on group 4
     "data-validator":            (5, ["value-bridge-calculator"], 200),
     "business-case-builder":     (5, ["value-bridge-calculator"], 1500),
     "assumption-register":       (5, ["value-bridge-calculator"], 300),
+    "sme-critique":              (5, ["savings-modeler", "spend-profiler", "peer-benchmarker", "root-cause-analyzer", "evidence-gatherer"], 300),
+    "value-to-shareholder-bridge":(5, ["value-bridge-calculator"], 600),
+    # Group 6 — depend on group 5
     "analysis-synthesizer":      (6, ["value-bridge-calculator", "data-validator", "document-contextualizer"], 1200),
-    "executive-communication":   (7, ["analysis-synthesizer"], 900),
     "export-formatter":          (6, ["business-case-builder", "value-bridge-calculator"], 400),
+    # Group 7 — depend on group 6
+    "executive-communication":   (7, ["analysis-synthesizer"], 900),
 }
 
 
@@ -142,6 +195,25 @@ def _expand(selected: List[str]) -> List[SkillTask]:
             estimated_tokens=tokens,
         ))
     return tasks
+
+
+def get_skill_dep_map() -> Dict[str, tuple[int, List[str], int]]:
+    """Canonical skill dependency map — shared by planner and agent run_skill tool."""
+    return dict(_DEP_MAP)
+
+
+def resolve_skill_dependencies(skill_names: List[str]) -> List[str]:
+    """Return skill_names plus transitive deps from _DEP_MAP in dependency order."""
+    needed: set[str] = set()
+    queue = list(skill_names)
+    while queue:
+        name = queue.pop(0)
+        if name in needed or name not in _DEP_MAP:
+            continue
+        needed.add(name)
+        _, deps, _ = _DEP_MAP[name]
+        queue.extend(deps)
+    return sorted(needed, key=lambda n: (_DEP_MAP[n][0], n))
 
 
 def _finalize_plan(tasks: list[SkillTask], user_summary: str, estimated_duration: str, requires_approval: bool) -> ExecutionPlan:
@@ -247,7 +319,9 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
         wants_root_cause = _has_capability(ctx, "root_cause")
         wants_visual = _has_capability(ctx, "visualization")
 
-        include_docs = ctx.has_document_files and (ctx.wants_document_context or intent in {"value_bridge", "business_case"})
+        include_docs = ctx.has_document_files and (
+            ctx.wants_document_context or intent in {"value_bridge", "business_case", "benchmark"}
+        )
         include_heuristic = ctx.has_annual_revenue
         include_value_modeling = intent in {"value_bridge", "business_case"} or wants_value_modeling
         include_business_case = intent == "business_case"

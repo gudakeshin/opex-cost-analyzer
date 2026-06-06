@@ -1,0 +1,19 @@
+{
+  "engagement_id": "ed372c31-d42c-4bbf-86c6-2737eef42302",
+  "company_name": "Preview Co",
+  "industry": "technology",
+  "annual_revenue": 1000000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-05T18:16:40.882379+00:00",
+  "updated_at": "2026-06-05T18:16:40.882596+00:00",
+  "session_ids": [
+    "dcecf2c2-f530-486e-ad47-800317f985f5"
+  ],
+  "documents": []
+}

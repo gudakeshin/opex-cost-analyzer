@@ -1,0 +1,19 @@
+{
+  "engagement_id": "7553a02a-d38a-49ab-a4c0-00d7d357b477",
+  "company_name": "X",
+  "industry": "tech",
+  "annual_revenue": 1000000000.0,
+  "currency": "INR",
+  "headcount": null,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-06T03:47:43.868032+00:00",
+  "updated_at": "2026-06-06T03:47:43.868263+00:00",
+  "session_ids": [
+    "cf1507b0-a045-49fb-bffa-c64613abb8a1"
+  ],
+  "documents": []
+}

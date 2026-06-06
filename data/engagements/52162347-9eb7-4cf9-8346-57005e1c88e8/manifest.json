@@ -1,0 +1,19 @@
+{
+  "engagement_id": "52162347-9eb7-4cf9-8346-57005e1c88e8",
+  "company_name": "Status Co",
+  "industry": "fmcg_consumer",
+  "annual_revenue": 0.0,
+  "currency": "INR",
+  "headcount": null,
+  "detected_company_name": "",
+  "detected_industry": "",
+  "detected_industry_label": "",
+  "detection_signals": {},
+  "context_text_hash": "",
+  "created_at": "2026-06-06T03:23:02.525302+00:00",
+  "updated_at": "2026-06-06T03:23:02.525658+00:00",
+  "session_ids": [
+    "4895e220-9fec-49cb-a6f8-df5999ed397d"
+  ],
+  "documents": []
+}
