@@ -140,6 +140,7 @@ class SessionAnalysisState(BaseModel):
     # per pipeline step, each carrying the source documents it drew on. Surfaced
     # as the "How this analysis was derived" collapsible in the chat.
     analysis_trace: List[Dict[str, Any]] = Field(default_factory=list)
+    spend_base_revision: int = 0
     updated_at: datetime = Field(default_factory=_utcnow)
 
 

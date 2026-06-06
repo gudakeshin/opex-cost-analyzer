@@ -176,11 +176,13 @@ def resolve_conflicts(req: ConflictResolveRequest, session_id: str) -> Dict[str,
         _memory.put("session", session_id, updated_analysis)
 
     append_audit_event(f"conflicts_resolved session={session_id} resolved={resolved_count} escalated={escalated_count}")
+    spend_base_revision = int((updated_analysis or {}).get("spend_base_revision") or 0)
     return {
         "resolved_count": resolved_count,
         "escalated_count": escalated_count,
         "total_conflicts": len(conflicts),
         "spend_impact": spend_impact,
+        "spend_base_revision": spend_base_revision,
         "summary": resolver.summary(conflicts, user_actions=user_actions),
     }
 

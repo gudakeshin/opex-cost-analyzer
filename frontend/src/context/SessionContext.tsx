@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { apiGet, apiPost } from '../hooks/useApi';
 import { manifestAudienceToMode, useAudience } from './AudienceContext';
 import { isPlaceholderCompanyName } from '../utils/engagement';
-import type { EngagementMeta, EngagementSummary, SessionManifest } from '../types';
+import type { EngagementMeta, EngagementSummary, SessionManifest, SessionResponse } from '../types';
 
 const STORAGE_KEY = 'opex_session_id';
 const ENGAGEMENT_STORAGE_KEY = 'opex_engagement_id';
@@ -26,6 +26,9 @@ interface SessionContextValue {
   loadingEngagement: boolean;
   hasAnalysis: boolean;
   refreshAnalysisStatus: () => Promise<void>;
+  sessionAnalysis: SessionResponse | null;
+  spendBaseRevision: number;
+  refreshSessionAnalysis: () => Promise<SessionResponse | null>;
   syncEngagementFromAnalysis: () => Promise<void>;
   deepResearchSummary: string | null;
 }
@@ -73,7 +76,10 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [engagement, setEngagement] = useState<EngagementMeta>(defaultEngagement);
   const [loadingEngagement, setLoadingEngagement] = useState(false);
   const [hasAnalysis, setHasAnalysis] = useState(false);
+  const [sessionAnalysis, setSessionAnalysis] = useState<SessionResponse | null>(null);
   const [deepResearchSummary, setDeepResearchSummary] = useState<string | null>(null);
+
+  const spendBaseRevision = Number(sessionAnalysis?.spend_base_revision ?? 0);
 
   useEffect(() => {
     if (sessionId) localStorage.setItem(STORAGE_KEY, sessionId);
@@ -187,41 +193,51 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [sessionId]);
 
-  const syncEngagementFromAnalysis = useCallback(async () => {
-    if (!sessionId) return;
+  const refreshSessionAnalysis = useCallback(async (): Promise<SessionResponse | null> => {
+    if (!sessionId) {
+      setSessionAnalysis(null);
+      setHasAnalysis(false);
+      return null;
+    }
     try {
       const status = await apiGet<{
         session_exists?: boolean;
         has_analysis?: boolean;
       }>(`/api/v1/sessions/${sessionId}/status`);
       if (!status.session_exists || !status.has_analysis) {
+        setSessionAnalysis(null);
         setHasAnalysis(false);
-        return;
+        return null;
       }
-      const analysis = await apiGet<{
-        company_name?: string;
-        industry?: string;
-        annual_revenue?: number;
-      }>(`/api/v1/sessions/${sessionId}`);
+      const analysis = await apiGet<SessionResponse>(`/api/v1/sessions/${sessionId}`);
+      setSessionAnalysis(analysis);
       setHasAnalysis(true);
-      if (analysis.company_name && !isPlaceholderCompanyName(analysis.company_name)) {
-        setEngagement((prev) => ({
-          ...prev,
-          company_name: analysis.company_name!,
-          industry: analysis.industry || prev.industry,
-          gate_label: 'Gate 2: Portfolio sign-off',
-          engagement_week: Math.max(prev.engagement_week, 2),
-          annual_revenue_cr:
-            analysis.annual_revenue != null && analysis.annual_revenue > 1_000_000
-              ? analysis.annual_revenue / 10_000_000
-              : analysis.annual_revenue ?? prev.annual_revenue_cr,
-        }));
-      }
-      await refreshEngagement();
+      return analysis;
     } catch {
+      setSessionAnalysis(null);
       setHasAnalysis(false);
+      return null;
     }
-  }, [sessionId, refreshEngagement]);
+  }, [sessionId]);
+
+  const syncEngagementFromAnalysis = useCallback(async () => {
+    const analysis = await refreshSessionAnalysis();
+    if (!analysis) return;
+    if (analysis.company_name && !isPlaceholderCompanyName(analysis.company_name)) {
+      setEngagement((prev) => ({
+        ...prev,
+        company_name: analysis.company_name!,
+        industry: analysis.industry || prev.industry,
+        gate_label: 'Gate 2: Portfolio sign-off',
+        engagement_week: Math.max(prev.engagement_week, 2),
+        annual_revenue_cr:
+          analysis.annual_revenue != null && analysis.annual_revenue > 1_000_000
+            ? analysis.annual_revenue / 10_000_000
+            : analysis.annual_revenue ?? prev.annual_revenue_cr,
+      }));
+    }
+    await refreshEngagement();
+  }, [refreshSessionAnalysis, refreshEngagement]);
 
   useEffect(() => {
     refreshEngagement();
@@ -232,6 +248,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setSessionIdState(id);
     if (!id) {
       setHasAnalysis(false);
+      setSessionAnalysis(null);
       setDeepResearchSummary(null);
     }
   }, []);
@@ -308,6 +325,9 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       loadingEngagement,
       hasAnalysis,
       refreshAnalysisStatus,
+      sessionAnalysis,
+      spendBaseRevision,
+      refreshSessionAnalysis,
       syncEngagementFromAnalysis,
       deepResearchSummary,
     }),
@@ -325,6 +345,9 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       loadingEngagement,
       hasAnalysis,
       refreshAnalysisStatus,
+      sessionAnalysis,
+      spendBaseRevision,
+      refreshSessionAnalysis,
       syncEngagementFromAnalysis,
       deepResearchSummary,
     ],

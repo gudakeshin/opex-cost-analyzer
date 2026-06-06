@@ -263,6 +263,7 @@ export function extractInsightSnapshot(
   return {
     total_spend: totalSpend,
     reporting_currency: reportingCurrency,
+    spend_base_revision: Number(session.spend_base_revision ?? 0) || undefined,
     line_count: lineCount,
     company_name: session.company_name ?? manifest?.company_name,
     industry: session.industry ?? manifest?.industry,
@@ -735,7 +736,48 @@ export function buildAnalyzeCompleteContent(snapshot: AnalysisInsightSnapshot): 
 }
 
 export function chatHasInsightSnapshot(messages: { insight_snapshot?: AnalysisInsightSnapshot }[]): boolean {
-  return messages.some((m) => m.insight_snapshot != null && m.insight_snapshot.total_spend > 0);
+  return messages.some(
+    (m) =>
+      m.insight_snapshot != null &&
+      (m.insight_snapshot.sme_qualification != null ||
+        (m.insight_snapshot.portfolio_probes?.length ?? 0) > 0 ||
+        m.insight_snapshot.total_spend > 0),
+  );
+}
+
+/** Overlay live session spend totals onto a message snapshot (probe/SME fields preserved). */
+export function mergeLiveSpendIntoSnapshot(
+  messageSnap: AnalysisInsightSnapshot | undefined,
+  liveSnap: AnalysisInsightSnapshot | null,
+): AnalysisInsightSnapshot | null {
+  if (!liveSnap && !messageSnap) return null;
+  if (!messageSnap) return liveSnap;
+  if (!liveSnap) return messageSnap;
+  return {
+    ...messageSnap,
+    total_spend: liveSnap.total_spend,
+    top_categories: liveSnap.top_categories,
+    chart_data: liveSnap.chart_data,
+    line_count: liveSnap.line_count,
+    reporting_currency: liveSnap.reporting_currency,
+    ingestion_note: liveSnap.ingestion_note,
+    spend_base_revision: liveSnap.spend_base_revision,
+    peer_gap_count: liveSnap.peer_gap_count,
+    peer_comparison_count: liveSnap.peer_comparison_count,
+    savings_headline: liveSnap.savings_headline,
+    savings_headline_raw: liveSnap.savings_headline_raw,
+    modelled_savings: liveSnap.modelled_savings,
+    modelled_savings_raw: liveSnap.modelled_savings_raw,
+    savings_opportunity_count: liveSnap.savings_opportunity_count,
+  };
+}
+
+export function shouldShowSpendInsightBlock(
+  snap: AnalysisInsightSnapshot | null,
+  showPeer?: boolean,
+): boolean {
+  if (!snap) return false;
+  return snap.total_spend > 0 || !!showPeer;
 }
 
 /** Safe, high-level pipeline summary for the Thinking block (not raw chain-of-thought). */

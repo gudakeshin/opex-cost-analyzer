@@ -135,6 +135,7 @@ export interface ProbeAnswerRecord {
 export interface AnalysisInsightSnapshot {
   total_spend: number;
   reporting_currency: string;
+  spend_base_revision?: number;
   line_count?: number;
   company_name?: string;
   industry?: string;
@@ -447,6 +448,7 @@ export interface ConflictSpendImpact {
   spend_delta?: number;
   lines_excluded?: number;
   excluded_spend?: number;
+  spend_base_revision?: number;
   initiatives_refresh_required?: boolean;
 }
 

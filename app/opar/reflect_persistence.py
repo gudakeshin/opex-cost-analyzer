@@ -154,6 +154,10 @@ def persist_session_analysis(
         "skills_run_this_turn": list(validated.keys()),
         "updated_at": datetime.now(timezone.utc).isoformat(),
     })
+    if "spend-profiler" in validated:
+        from app.services.spend_base import repair_spend_base_if_needed
+
+        analysis_snapshot = repair_spend_base_if_needed(ctx.session_id, analysis_snapshot)
     _memory.put("session", ctx.session_id, analysis_snapshot)
 
 

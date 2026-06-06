@@ -7,8 +7,8 @@ import { ProbeQuestionsBlock } from './ProbeQuestionsBlock';
 import { ThinkingBlock } from './ThinkingBlock';
 import { Markdown } from '../../Common/Markdown';
 import { artefactLinks, renderChatMarkdown } from '../../../utils/chatMarkdown';
-import { filterProbeNextOptions } from '../../../utils/analysisInsights';
-import type { ChatMessage } from '../../../types';
+import { filterProbeNextOptions, mergeLiveSpendIntoSnapshot, shouldShowSpendInsightBlock } from '../../../utils/analysisInsights';
+import type { AnalysisInsightSnapshot, ChatMessage } from '../../../types';
 
 interface StructuredChatMessageProps {
   message: ChatMessage;
@@ -16,6 +16,7 @@ interface StructuredChatMessageProps {
   onOpenProbes?: () => void;
   answeredProbeFamilies?: Set<string>;
   currency?: string;
+  liveSnapshot?: AnalysisInsightSnapshot | null;
 }
 
 function AssistantAvatar() {
@@ -161,10 +162,13 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
   onOpenProbes,
   answeredProbeFamilies,
   currency,
+  liveSnapshot,
 }) => {
   const isUser = message.role === 'user';
   const sections = message.advisory_sections;
   const urls = artefactLinks(message.artefacts);
+  const spendSnapshot = mergeLiveSpendIntoSnapshot(message.insight_snapshot, liveSnapshot ?? null);
+  const probeSnapshot = spendSnapshot ?? message.insight_snapshot ?? liveSnapshot;
 
   return (
     <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -198,9 +202,9 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
           <AnalysisTraceBlock steps={message.analysis_trace} />
         )}
 
-        {!isUser && message.insight_snapshot && (
+        {!isUser && spendSnapshot && shouldShowSpendInsightBlock(spendSnapshot, message.show_peer_savings) && (
           <ChatInsightBlock
-            snapshot={message.insight_snapshot}
+            snapshot={spendSnapshot}
             showPeerSavings={message.show_peer_savings}
             suppressCharts={!!(message.charts && message.charts.length > 0)}
           />
@@ -209,14 +213,14 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
         {!isUser && message.charts && message.charts.length > 0 && (
           <DynamicCharts
             charts={message.charts}
-            currency={message.insight_snapshot?.reporting_currency ?? currency ?? 'INR'}
+            currency={spendSnapshot?.reporting_currency ?? message.insight_snapshot?.reporting_currency ?? currency ?? 'INR'}
           />
         )}
 
-        {!isUser && message.insight_snapshot && (
+        {!isUser && probeSnapshot && (
             <ProbeQuestionsBlock
-              snapshot={message.insight_snapshot}
-              currency={message.insight_snapshot.reporting_currency}
+              snapshot={probeSnapshot}
+              currency={probeSnapshot.reporting_currency}
               answeredProbeFamilies={answeredProbeFamilies}
               onOpenProbes={onOpenProbes}
             />
@@ -243,8 +247,8 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
         )}
 
         {!isUser && message.next_options && message.next_options.length > 0 && (() => {
-          const options = message.insight_snapshot
-            ? filterProbeNextOptions(message.next_options, message.insight_snapshot, answeredProbeFamilies)
+          const options = probeSnapshot
+            ? filterProbeNextOptions(message.next_options, probeSnapshot, answeredProbeFamilies)
             : message.next_options;
           if (options.length === 0) return null;
           return (

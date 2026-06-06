@@ -36,10 +36,9 @@ def _build_transaction_examples(
 
 
 def _load_session_data(session_id: str) -> tuple[list[NormalizedSpendLine], list[str], dict]:
-    from app.services.engagement_corpus import load_analysis_corpus
+    from app.services.spend_base import load_authoritative_spend_lines
 
-    lines, docs_text, _reports, _warnings, manifest = load_analysis_corpus(session_id)
-    return lines, docs_text, manifest
+    return load_authoritative_spend_lines(session_id)
 
 
 def _invoke_skill(
