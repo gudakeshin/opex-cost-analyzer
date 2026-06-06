@@ -42,8 +42,74 @@ def test_classify_intent_rule_based() -> None:
 def test_classify_intent_with_meta_returns_confidence() -> None:
     meta = classify_intent_with_meta("How can I optimize my IT & Technology costs?")
     assert meta["intent_class"] == "value_bridge"
-    assert meta["intent_source"] in {"rule_based", "claude_disambiguated"}
+    assert meta["intent_source"] in {"rule_based", "claude_disambiguated", "llm"}
     assert 0.0 <= float(meta["intent_confidence"]) <= 1.0
+
+
+def test_classify_intent_with_meta_llm_first_routes_initiatives() -> None:
+    # "create a list of initiatives" has no routing keyword, so the rule-based
+    # classifier sends it to general_qa (the reported bug). LLM-first routing
+    # reads the message and sends it to savings_plan instead.
+    canned = {
+        "intent_class": "savings_plan",
+        "explicit_category": None,
+        "intent_source": "llm",
+        "intent_confidence": 0.91,
+        "category_confidence": 0.0,
+        "query_capabilities": ["value_modeling"],
+    }
+    with patch("app.opar.observe._llm_intent_enabled", return_value=True), patch(
+        "app.opar.claude_client.classify_intent_claude_with_meta", return_value=canned
+    ):
+        meta = classify_intent_with_meta("create a list of initiatives")
+    assert meta["intent_class"] == "savings_plan"
+    assert meta["intent_source"] == "llm"
+    assert "value_modeling" in meta["query_capabilities"]
+
+
+def test_classify_intent_with_meta_falls_back_when_llm_unavailable() -> None:
+    # When the LLM returns None (disabled / timeout / unparseable), the keyword
+    # classifier is used. It has no 'initiatives' keyword → general_qa, which is
+    # exactly the gap the LLM path closes.
+    with patch("app.opar.observe._llm_intent_enabled", return_value=True), patch(
+        "app.opar.claude_client.classify_intent_claude_with_meta", return_value=None
+    ):
+        meta = classify_intent_with_meta("create a list of initiatives")
+    assert meta["intent_source"] == "rule_based"
+    assert meta["intent_class"] == "general_qa"
+
+
+def test_classify_intent_claude_with_meta_parses_full_taxonomy() -> None:
+    from app.opar import claude_client
+
+    raw = (
+        '{"intent":"savings_plan","explicit_category":null,"confidence":0.9,'
+        '"category_confidence":0.0,"capabilities":["value_modeling","not_a_capability"]}'
+    )
+    with patch.object(claude_client, "_call_claude", return_value=raw):
+        meta = claude_client.classify_intent_claude_with_meta("create a list of initiatives")
+    assert meta is not None
+    assert meta["intent_class"] == "savings_plan"
+    assert meta["intent_source"] == "llm"
+    # Unknown capability tokens are filtered out against the fixed vocabulary.
+    assert meta["query_capabilities"] == ["value_modeling"]
+
+
+def test_classify_intent_claude_with_meta_rejects_unknown_intent() -> None:
+    from app.opar import claude_client
+
+    with patch.object(claude_client, "_call_claude", return_value='{"intent":"make_coffee"}'):
+        meta = claude_client.classify_intent_claude_with_meta("brew something")
+    assert meta is not None
+    assert meta["intent_class"] == "general_qa"
+
+
+def test_classify_intent_claude_with_meta_returns_none_on_error() -> None:
+    from app.opar import claude_client
+
+    with patch.object(claude_client, "_call_claude", side_effect=RuntimeError("provider down")):
+        meta = claude_client.classify_intent_claude_with_meta("anything")
+    assert meta is None
 
 
 def test_answer_general_qa_addressable_for_specific_category() -> None:
