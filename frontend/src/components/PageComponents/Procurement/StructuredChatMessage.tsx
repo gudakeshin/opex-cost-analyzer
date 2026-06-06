@@ -2,8 +2,10 @@ import React from 'react';
 import { ConfidenceBadge } from '../../Trust/ConfidenceBadge';
 import { AnalysisTraceBlock } from './AnalysisTraceBlock';
 import { ChatInsightBlock } from './ChatInsightBlock';
+import { DynamicCharts } from './DynamicCharts';
 import { ProbeQuestionsBlock } from './ProbeQuestionsBlock';
 import { ThinkingBlock } from './ThinkingBlock';
+import { Markdown } from '../../Common/Markdown';
 import { artefactLinks, renderChatMarkdown } from '../../../utils/chatMarkdown';
 import { filterProbeNextOptions } from '../../../utils/analysisInsights';
 import type { ChatMessage } from '../../../types';
@@ -13,6 +15,7 @@ interface StructuredChatMessageProps {
   onOptionClick?: (text: string) => void;
   onOpenProbes?: () => void;
   answeredProbeFamilies?: Set<string>;
+  currency?: string;
 }
 
 function AssistantAvatar() {
@@ -157,6 +160,7 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
   onOptionClick,
   onOpenProbes,
   answeredProbeFamilies,
+  currency,
 }) => {
   const isUser = message.role === 'user';
   const sections = message.advisory_sections;
@@ -180,9 +184,11 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
             )}
           </div>
         )}
-        <p className="text-sm whitespace-pre-wrap leading-relaxed">
-          {isUser ? message.content : renderChatMarkdown(message.content)}
-        </p>
+        {isUser ? (
+          <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+        ) : (
+          <Markdown className="text-sm leading-relaxed">{message.content}</Markdown>
+        )}
 
         {!isUser && message.thinking && (
           <ThinkingBlock thinking={message.thinking} />
@@ -196,6 +202,14 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
           <ChatInsightBlock
             snapshot={message.insight_snapshot}
             showPeerSavings={message.show_peer_savings}
+            suppressCharts={!!(message.charts && message.charts.length > 0)}
+          />
+        )}
+
+        {!isUser && message.charts && message.charts.length > 0 && (
+          <DynamicCharts
+            charts={message.charts}
+            currency={message.insight_snapshot?.reporting_currency ?? currency ?? 'INR'}
           />
         )}
 

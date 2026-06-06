@@ -8,13 +8,13 @@ import {
 describe('engagementContext', () => {
   it('prefers manifest industry over detected', () => {
     expect(
-      effectiveAnalysisIndustry({ industry: 'it_ites' }, { industry: 'manufacturing_diversified', detected_industry: 'fmcg_consumer' }),
+      effectiveAnalysisIndustry({ session_id: '', industry: 'it_ites' }, { industry: 'manufacturing_diversified', detected_industry: 'fmcg_consumer' }),
     ).toBe('it_ites');
   });
 
   it('uses detected industry when manifest is empty and engagement is placeholder', () => {
     expect(
-      effectiveAnalysisIndustry({ industry: '' }, { industry: 'manufacturing_diversified', detected_industry: 'it_ites' }),
+      effectiveAnalysisIndustry({ session_id: '', industry: '' }, { industry: 'manufacturing_diversified', detected_industry: 'it_ites' }),
     ).toBe('it_ites');
   });
 

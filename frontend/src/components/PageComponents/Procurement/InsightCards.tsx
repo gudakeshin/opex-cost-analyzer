@@ -282,7 +282,7 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
               `${initiative.category_id ?? initiative.category_name ?? 'init'}-${initiative.lever}-${idx}`
             }
             listClassName="space-y-2"
-            renderItem={(initiative, idx) => {
+            renderItem={(initiative, _idx) => {
               const smeCritique = smeInitiativeCritiqueMap.get(
                 `${initiative.category_id ?? initiative.category_name?.toLowerCase().replace(/\s+/g, '_')}|${initiative.lever}`,
               );

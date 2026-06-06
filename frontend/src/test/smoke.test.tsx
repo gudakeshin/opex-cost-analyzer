@@ -153,7 +153,6 @@ test('ValueBridgeChart renders a labelled value bridge chart', () => {
 // CostRoom — renders without crashing
 // ---------------------------------------------------------------------------
 
-import { act } from '@testing-library/react';
 import { apiGet } from '../hooks/useApi';
 import CostRoom from '../pages/CostRoom';
 

@@ -523,6 +523,7 @@ export const ProcurementAnalysis: React.FC = () => {
           artefacts: res.artefacts,
           insight_snapshot: insightSnap,
           show_peer_savings: showPeer,
+          charts: res.charts,
         },
       ]);
       maybeAutoOpenProbeModal(insightSnap, currentAnsweredProbeFamilies(), res.run_id);
@@ -901,6 +902,7 @@ export const ProcurementAnalysis: React.FC = () => {
           artefacts: res.artefacts,
           insight_snapshot: insightSnap,
           show_peer_savings: showPeer,
+          charts: res.charts,
         },
       ]);
       maybeAutoOpenProbeModal(insightSnap, answeredProbeFamilies, res.run_id);
@@ -1270,6 +1272,7 @@ export const ProcurementAnalysis: React.FC = () => {
                       <StructuredChatMessage
                         key={idx}
                         message={msg}
+                        currency={engagement.currency || 'INR'}
                         onOptionClick={(text) => sendMessage(text)}
                         answeredProbeFamilies={answeredProbeFamilies}
                         onOpenProbes={

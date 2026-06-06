@@ -8,6 +8,7 @@ interface AlertProps {
   children?: React.ReactNode;
   recovery?: string;
   onDismiss?: () => void;
+  className?: string;
 }
 
 const styles: Record<AlertVariant, string> = {
@@ -23,8 +24,9 @@ export const Alert: React.FC<AlertProps> = ({
   children,
   recovery,
   onDismiss,
+  className,
 }) => (
-  <div role="alert" className={`p-4 rounded-xl border text-sm ${styles[variant]}`}>
+  <div role="alert" className={`p-4 rounded-xl border text-sm ${styles[variant]}${className ? ` ${className}` : ''}`}>
     <div className="flex items-start justify-between gap-3">
       <div>
         <p className="font-semibold">{title}</p>

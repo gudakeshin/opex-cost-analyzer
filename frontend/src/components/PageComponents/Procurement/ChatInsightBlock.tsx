@@ -7,11 +7,14 @@ import type { AnalysisInsightSnapshot } from '../../../types';
 interface ChatInsightBlockProps {
   snapshot: AnalysisInsightSnapshot;
   showPeerSavings?: boolean;
+  /** When the message carries LLM-suggested dynamic charts, hide the legacy spend chart to avoid duplication. */
+  suppressCharts?: boolean;
 }
 
 export const ChatInsightBlock: React.FC<ChatInsightBlockProps> = ({
   snapshot,
   showPeerSavings = false,
+  suppressCharts = false,
 }) => {
   const { reporting_currency: currency, top_categories: topCategories } = snapshot;
 
@@ -44,7 +47,7 @@ export const ChatInsightBlock: React.FC<ChatInsightBlockProps> = ({
         </div>
       )}
 
-      {snapshot.chart_data ? (
+      {suppressCharts ? null : snapshot.chart_data ? (
         <SpendCharts chartData={snapshot.chart_data} currency={currency} />
       ) : topCategories.length > 0 ? (
         <div>

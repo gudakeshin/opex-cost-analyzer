@@ -40,6 +40,39 @@ export interface SpendChartData {
   period_totals: Array<{ period: string; spend: number }>;
 }
 
+/** Render-agnostic chart suggested by the LLM and filled with real numbers by the backend. */
+export type ChartType =
+  | 'bar'
+  | 'hbar'
+  | 'line'
+  | 'stacked_bar'
+  | 'grouped_bar'
+  | 'pie'
+  | 'waterfall'
+  | 'scatter';
+
+export type ChartUnit = 'currency' | 'percent' | 'count' | 'days' | 'ratio';
+
+export interface ChartSeries {
+  key: string;
+  name: string;
+  color?: string | null;
+}
+
+export interface ChartSpec {
+  id: string;
+  type: ChartType;
+  title: string;
+  rationale?: string;
+  x_key: string;
+  x_label?: string;
+  y_label?: string;
+  unit: ChartUnit;
+  series: ChartSeries[];
+  data: Array<Record<string, string | number | boolean | null>>;
+  source_skill?: string;
+}
+
 export interface SmeQualificationSummary {
   ready_count: number;
   probe_count: number;
@@ -143,6 +176,7 @@ export interface ChatMessage {
   insight_snapshot?: AnalysisInsightSnapshot;
   analysis_trace?: AnalysisTraceStep[];
   show_peer_savings?: boolean;
+  charts?: ChartSpec[];
 }
 
 export interface SessionCreatePayload {
@@ -370,6 +404,7 @@ export interface V1ChatResponse {
   checkpoint_id?: string;
   clarification?: BusinessClarification;
   response_metadata?: ChatResponseMetadata;
+  charts?: ChartSpec[];
 }
 
 export interface ChatPlanPreview {

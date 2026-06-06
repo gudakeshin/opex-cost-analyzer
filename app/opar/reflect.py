@@ -6,6 +6,7 @@ from typing import Any, Dict, List
 from app.config import UPLOAD_DIR
 from app.memory import MemoryStore
 from app.opar.chat_synthesis import synthesize_chat_response
+from app.opar.visualization import build_chart_specs
 from app.opar.models import (
     ActResult,
     AdvisorySections,
@@ -207,6 +208,9 @@ def reflect(
     )
     provenance_tag = record_advisory_provenance(ctx, validated, advisory_sections)
 
+    # LLM suggests the most relevant chart(s); numbers come from skill outputs.
+    chart_specs = build_chart_specs(ctx.user_message, composition_validated)
+
     return ReflectOutput(
         validated_outputs=validated,
         failed_validations=failed,
@@ -233,6 +237,7 @@ def reflect(
         ),
         thinking_text=thinking_text,
         response_metadata=response_metadata,
+        chart_specs=chart_specs,
         degraded_mode=bool(degradation_reasons),
         fallback_reasons=degradation_reasons,
         next_options=next_options,

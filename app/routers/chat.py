@@ -80,6 +80,7 @@ def _opar_response(result: Any, run_id: str, session_id: str | None = None) -> D
             else None
         ),
         "response_metadata": getattr(result, "response_metadata", None) or {},
+        "charts": getattr(result, "chart_specs", None) or [],
     }
 
 

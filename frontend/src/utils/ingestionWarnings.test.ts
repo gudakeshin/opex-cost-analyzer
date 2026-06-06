@@ -27,7 +27,7 @@ describe('ingestionWarnings', () => {
     };
     const analysis = {
       skill_outputs: { 'spend-profiler': { total_spend: 0, category_profile: [] } },
-    } as SessionResponse;
+    } as unknown as SessionResponse;
     expect(showZeroSpendIngestionWarning(manifest, analysis)).toBe(true);
   });
 });

@@ -515,7 +515,7 @@ export function collectTopProbeQuestions(
   for (const c of critiques) {
     for (const pq of c.probe_questions ?? []) {
       if (!pq.question?.trim()) continue;
-      const raw = pq as TopProbeQuestion & { probe_family_id?: string };
+      const raw = pq as unknown as { probe_family_id?: string };
       flat.push({
         question: pq.question.trim(),
         category_name: c.category_name,
