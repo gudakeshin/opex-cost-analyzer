@@ -848,6 +848,18 @@ export function extractRootCauseFindings(
     });
 }
 
+export function anomalyRecommendation(flag: {
+  category_name: string;
+  actual_pct_of_revenue: number;
+  heuristic_target_pct: number;
+}): string {
+  return (
+    `Spend in ${flag.category_name} is ${flag.actual_pct_of_revenue.toFixed(1)}% of revenue ` +
+    `vs heuristic norm ${flag.heuristic_target_pct.toFixed(1)}%. ` +
+    'Review classification accuracy, demand drivers, and whether rate or volume reduction applies.'
+  );
+}
+
 export function extractAnomalyFlags(
   skillOutputs: Record<string, unknown> | undefined,
   topN = 5,

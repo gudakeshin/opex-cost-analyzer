@@ -92,6 +92,19 @@ class NormalizedSpendLine(BaseModel):
         # fx_rate_to_reporting is guaranteed > 0 by _fx_rate_positive validator.
         return self.amount * self.fx_rate_to_reporting
 
+    @property
+    def effective_reporting_amount(self) -> float:
+        """Amount included in the consolidated spend baseline after conflict resolution."""
+        if self.consolidation_eliminated:
+            return 0.0
+        if self.reconciled_amount is not None:
+            return float(self.reconciled_amount)
+        return self.reporting_amount
+
+    @property
+    def in_spend_base(self) -> bool:
+        return not self.consolidation_eliminated
+
 
 def is_actual(line: "NormalizedSpendLine") -> bool:
     """Canonical actual-spend predicate.

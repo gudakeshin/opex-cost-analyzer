@@ -529,7 +529,8 @@ def _peer_disclosure_miner(ctx: SkillContext) -> tuple[Dict[str, Any], str | Non
 
 @register("conflict-detector")
 def _conflict_detector(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
-    return _engine.conflict_detector(ctx.lines), None
+    user_actions = (ctx.manifest or {}).get("conflict_user_actions") or {}
+    return _engine.conflict_detector(ctx.lines, user_actions=user_actions), None
 
 
 @register("vendor-master-builder")

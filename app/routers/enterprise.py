@@ -50,7 +50,13 @@ def get_conflicts(session_id: str) -> Dict[str, Any]:
     lines = [NormalizedSpendLine(**l) if isinstance(l, dict) else l for l in raw_lines]
     resolver = ConflictResolver()
     conflicts = resolver.run_all(lines)
-    summary = resolver.summary(conflicts)
+    from app.services.conflict_resolver import normalize_user_actions
+
+    user_actions = normalize_user_actions(
+        dict(analysis.get("conflict_user_actions") or {}),
+        conflicts,
+    )
+    summary = resolver.summary(conflicts, user_actions=user_actions)
     manifest_path = UPLOAD_DIR / session_id / "manifest.json"
     manifest = read_json(manifest_path, {})
     manifest["conflict_state"] = {
@@ -73,10 +79,14 @@ def resolve_conflicts(req: ConflictResolveRequest, session_id: str) -> Dict[str,
     from app.models import NormalizedSpendLine
     from app.services.conflict_resolver import (
         ConflictResolver,
+        conflict_matches_request,
         escalate,
+        normalize_user_actions,
         resolve_eliminate_intercompany,
         resolve_gstin_dedup,
+        resolve_gstr_vendor_data,
         resolve_tds_gross_up,
+        stable_conflict_id,
     )
 
     analysis = _memory.get("session", session_id)
@@ -88,34 +98,90 @@ def resolve_conflicts(req: ConflictResolveRequest, session_id: str) -> Dict[str,
     lines = [NormalizedSpendLine(**l) if isinstance(l, dict) else l for l in raw_lines]
     resolver = ConflictResolver()
     conflicts = resolver.run_all(lines)
+    user_actions = normalize_user_actions(
+        dict(analysis.get("conflict_user_actions") or {}),
+        conflicts,
+    )
     resolved_count = 0
     escalated_count = 0
-    for conflict in conflicts:
-        if req.conflict_ids and conflict.conflict_id not in req.conflict_ids:
-            continue
+    from datetime import datetime, timezone
+
+    targets = [c for c in conflicts if conflict_matches_request(c, req.conflict_ids)]
+    if req.conflict_ids and not targets:
+        raise HTTPException(
+            status_code=404,
+            detail="Conflict not found — refresh the page and try again.",
+        )
+
+    for conflict in targets:
         strategy = req.strategy or conflict.resolution_strategy
+        fingerprint = stable_conflict_id(conflict)
         if strategy == "tds_gross_up":
             lines, conflict = resolve_tds_gross_up(lines, conflict)
+            user_actions[fingerprint] = {
+                "status": "applied",
+                "strategy": strategy,
+                "conflict_fingerprint": fingerprint,
+                "at": datetime.now(timezone.utc).isoformat(),
+            }
             resolved_count += 1
         elif strategy == "gstin_dedup":
             lines, conflict = resolve_gstin_dedup(lines, conflict)
+            user_actions[fingerprint] = {
+                "status": "applied",
+                "strategy": strategy,
+                "conflict_fingerprint": fingerprint,
+                "at": datetime.now(timezone.utc).isoformat(),
+            }
             resolved_count += 1
         elif strategy == "eliminate_intercompany":
             lines, conflict = resolve_eliminate_intercompany(lines, conflict)
+            user_actions[fingerprint] = {
+                "status": "applied",
+                "strategy": strategy,
+                "conflict_fingerprint": fingerprint,
+                "at": datetime.now(timezone.utc).isoformat(),
+            }
+            resolved_count += 1
+        elif strategy == "gstr_vendor_data":
+            lines, conflict = resolve_gstr_vendor_data(lines, conflict)
+            user_actions[fingerprint] = {
+                "status": "applied",
+                "strategy": strategy,
+                "conflict_fingerprint": fingerprint,
+                "at": datetime.now(timezone.utc).isoformat(),
+            }
             resolved_count += 1
         elif strategy == "escalate" or not strategy:
             escalate(conflict)
+            user_actions[fingerprint] = {
+                "status": "flagged_for_review",
+                "strategy": "escalate",
+                "conflict_fingerprint": fingerprint,
+                "at": datetime.now(timezone.utc).isoformat(),
+            }
             escalated_count += 1
     updated_analysis = dict(analysis)
     if "normalized_spend" in updated_analysis:
         updated_analysis["normalized_spend"] = [l.model_dump() for l in lines]
-    _memory.put("session", session_id, updated_analysis)
+    updated_analysis["conflict_user_actions"] = user_actions
+
+    spend_impact: Dict[str, Any] | None = None
+    if resolved_count > 0:
+        from app.services.analysis import reprofile_after_spend_correction
+
+        spend_impact = reprofile_after_spend_correction(session_id, lines, updated_analysis)
+        updated_analysis = _memory.get("session", session_id) or updated_analysis
+    else:
+        _memory.put("session", session_id, updated_analysis)
+
     append_audit_event(f"conflicts_resolved session={session_id} resolved={resolved_count} escalated={escalated_count}")
     return {
         "resolved_count": resolved_count,
         "escalated_count": escalated_count,
         "total_conflicts": len(conflicts),
-        "summary": resolver.summary(conflicts),
+        "spend_impact": spend_impact,
+        "summary": resolver.summary(conflicts, user_actions=user_actions),
     }
 
 

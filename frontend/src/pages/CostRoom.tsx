@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { Card } from '../components/Common/Card';
@@ -35,8 +35,15 @@ import {
   buildInitiativeExceptionItems,
   countInitiativeExceptions,
   mergeExceptionItems,
+  type ExceptionItem,
 } from '../utils/exceptions';
-import type { ComplianceAuditResponse, ConflictSummary } from '../types';
+import type {
+  ComplianceAuditResponse,
+  ConflictSpendImpact,
+  ConflictSummary,
+  DataConflict,
+} from '../types';
+import { formatCr } from '../utils/formatInr';
 import { TrendsTab } from '../components/PageComponents/CostRoom/TrendsTab';
 import { BvaTab } from '../components/PageComponents/CostRoom/BvaTab';
 import { PaymentTermsTab } from '../components/PageComponents/CostRoom/PaymentTermsTab';
@@ -136,7 +143,11 @@ export default function CostRoom() {
   const [conflicts, setConflicts] = useState<ConflictSummary | null>(null);
   const [conflictsLoading, setConflictsLoading] = useState(false);
   const [conflictsError, setConflictsError] = useState<string | null>(null);
-  const [resolvingConflicts, setResolvingConflicts] = useState(false);
+  const [actingConflictId, setActingConflictId] = useState<string | null>(null);
+  const [conflictNotice, setConflictNotice] = useState<string | null>(null);
+  const [highlightConflicts, setHighlightConflicts] = useState(false);
+  const conflictsSectionRef = useRef<HTMLDivElement>(null);
+  const portfolioSectionRef = useRef<HTMLDivElement>(null);
   const { setItems: setExceptionItems } = useExceptions();
 
   const exceptionCount = useMemo(() => countInitiativeExceptions(initiatives), [initiatives]);
@@ -347,21 +358,91 @@ export default function CostRoom() {
     loadMilestones(init.initiative_id);
   };
 
-  const resolveConflicts = async () => {
-    if (!sessionId) return;
-    setResolvingConflicts(true);
+  const scrollToSection = useCallback((ref: React.RefObject<HTMLDivElement | null>) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
+
+  const handleExceptionAction = useCallback(
+    (item: ExceptionItem) => {
+      if (item.action === 'conflicts') {
+        scrollToSection(conflictsSectionRef);
+        setHighlightConflicts(true);
+        window.setTimeout(() => setHighlightConflicts(false), 2400);
+        return;
+      }
+      if (item.action === 'portfolio') {
+        setFilters((prev) => ({ ...prev, needsActionOnly: true }));
+        scrollToSection(portfolioSectionRef);
+      }
+    },
+    [scrollToSection],
+  );
+
+  const actOnConflict = async (
+    conflict: DataConflict,
+    strategy: string,
+    auditLabel: string,
+  ) => {
+    if (!sessionId) {
+      setError('No active session — refresh the page and try again.');
+      return;
+    }
+    if (!conflict.conflict_id) {
+      setError('Conflict identity missing — refresh the page and try again.');
+      return;
+    }
+    setActingConflictId(conflict.conflict_id);
+    setConflictNotice(null);
     try {
-      await apiPost(`/api/v1/conflicts/resolve?session_id=${sessionId}`, {
-        conflict_ids: [],
-        strategy: null,
+      const result = await apiPost<{
+        resolved_count?: number;
+        escalated_count?: number;
+        spend_impact?: ConflictSpendImpact | null;
+      }>(`/api/v1/conflicts/resolve?session_id=${sessionId}`, {
+        conflict_ids: [conflict.conflict_id],
+        strategy,
       });
-      appendAudit('conflicts_auto_resolve');
+      const acted = (result.resolved_count ?? 0) + (result.escalated_count ?? 0);
+      if (acted === 0) {
+        setError('No conflict was updated — refresh the page and try again.');
+        return;
+      }
+      appendAudit(`${auditLabel}: ${conflict.conflict_id}`);
+      const impact = result.spend_impact;
+      if (impact && (impact.spend_delta ?? 0) !== 0) {
+        const prior = formatCr(impact.prior_total_spend ?? 0, { currency: engagement.currency });
+        const next = formatCr(impact.new_total_spend ?? 0, { currency: engagement.currency });
+        const delta = formatCr(Math.abs(impact.spend_delta ?? 0), { currency: engagement.currency });
+        const direction = (impact.spend_delta ?? 0) < 0 ? 'reduced' : 'increased';
+        setConflictNotice(
+          `Spend base ${direction} by ${delta} (${prior} → ${next}).` +
+            (impact.initiatives_refresh_required
+              ? ' Re-run analysis in the Analysis tab if initiative savings should reflect this.'
+              : ''),
+        );
+        await loadPipeline();
+        await syncEngagementFromAnalysis();
+      } else if (result.escalated_count) {
+        setConflictNotice(
+          'Flagged for manual review — spend base unchanged until Finance confirms a source.',
+        );
+      }
       await loadConflicts();
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {
-      setResolvingConflicts(false);
+      setActingConflictId(null);
     }
+  };
+
+  const applyConflictRecommendation = (conflict: DataConflict) => {
+    const strategy = conflict.resolution_strategy;
+    if (!strategy || strategy === 'escalate') return;
+    void actOnConflict(conflict, strategy, 'conflict_apply_recommendation');
+  };
+
+  const flagConflictForReview = (conflict: DataConflict) => {
+    void actOnConflict(conflict, 'escalate', 'conflict_flag_manual_review');
   };
 
   const exportBusinessCase = useCallback(async () => {
@@ -444,12 +525,23 @@ export default function CostRoom() {
           </Alert>
         )}
 
+        {conflictNotice && (
+          <Alert
+            variant="success"
+            title="Conflict action recorded"
+            onDismiss={() => setConflictNotice(null)}
+          >
+            {conflictNotice}
+          </Alert>
+        )}
+
         {!isExecutive && (
           <ExceptionInbox
             items={mergeExceptionItems(
               buildInitiativeExceptionItems(initiatives),
               buildConflictExceptionItems(conflicts),
             )}
+            onItemAction={handleExceptionAction}
           />
         )}
 
@@ -487,7 +579,8 @@ export default function CostRoom() {
             )}
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              <Card className="xl:col-span-2 !p-0 overflow-hidden bg-white border-brand-border">
+              <div ref={portfolioSectionRef} id="initiative-portfolio" className="xl:col-span-2 scroll-mt-24">
+              <Card className="!p-0 overflow-hidden bg-white border-brand-border">
                 <div className="px-6 pt-4 pb-2 border-b border-brand-border flex items-center justify-between">
                   <h2 className="font-semibold text-brand-ink">Initiative portfolio</h2>
                   {!isExecutive && sessionId && (
@@ -513,6 +606,7 @@ export default function CostRoom() {
                   />
                 </div>
               </Card>
+              </div>
 
               <div className="space-y-4">
                 <ValueBridgePanel
@@ -536,13 +630,22 @@ export default function CostRoom() {
         )}
 
         {!isExecutive && sessionId && (
-          <ConflictsPanel
-            summary={conflicts}
-            loading={conflictsLoading}
-            error={conflictsError}
-            onResolve={resolveConflicts}
-            resolving={resolvingConflicts}
-          />
+          <div
+            ref={conflictsSectionRef}
+            id="data-conflicts"
+            className={`scroll-mt-24 rounded-xl transition-shadow duration-500 ${
+              highlightConflicts ? 'ring-2 ring-amber-400 ring-offset-2' : ''
+            }`}
+          >
+            <ConflictsPanel
+              summary={conflicts}
+              loading={conflictsLoading}
+              error={conflictsError}
+              onApplyRecommendation={applyConflictRecommendation}
+              onFlagForReview={flagConflictForReview}
+              actingConflictId={actingConflictId}
+            />
+          </div>
         )}
 
         {!isExecutive && (

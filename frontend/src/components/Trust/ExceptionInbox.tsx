@@ -5,6 +5,7 @@ import type { ExceptionItem } from '../../utils/exceptions';
 interface ExceptionInboxProps {
   items: ExceptionItem[];
   onDismiss?: () => void;
+  onItemAction?: (item: ExceptionItem) => void;
   compact?: boolean;
 }
 
@@ -14,9 +15,13 @@ const severityStyles = {
   medium: 'border-l-brand-navy bg-brand-surface-muted',
 };
 
+const actionLinkClass =
+  'inline-block mt-2 text-xs font-semibold text-brand-navy hover:text-brand-green';
+
 export const ExceptionInbox: React.FC<ExceptionInboxProps> = ({
   items,
   onDismiss,
+  onItemAction,
   compact,
 }) => {
   if (!items.length) return null;
@@ -49,14 +54,19 @@ export const ExceptionInbox: React.FC<ExceptionInboxProps> = ({
           >
             <p className="font-medium text-sm text-brand-ink">{item.title}</p>
             <p className="text-xs text-brand-muted mt-0.5">{item.detail}</p>
-            {item.href && (
-              <Link
-                to={item.href}
-                className="inline-block mt-2 text-xs font-semibold text-brand-navy hover:text-brand-green"
+            {item.action && onItemAction ? (
+              <button
+                type="button"
+                className={actionLinkClass}
+                onClick={() => onItemAction(item)}
               >
                 {item.actionLabel ?? 'Open'} →
+              </button>
+            ) : item.href ? (
+              <Link to={item.href} className={actionLinkClass}>
+                {item.actionLabel ?? 'Open'} →
               </Link>
-            )}
+            ) : null}
           </li>
         ))}
       </ul>

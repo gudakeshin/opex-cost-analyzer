@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { CollapsibleOverflow } from '../../Common/CollapsibleOverflow';
 import { FactVsInferenceLabel } from '../../Common/FactVsInferenceLabel';
 import { sectorLabel } from '../../../constants/sectors';
+import { fileUploadStatus, type ManifestFileEntry } from '../../../utils/sessionFiles';
 
 interface SheetGraphNode {
   sheet_name?: string;
@@ -48,6 +50,7 @@ interface ModelManifest {
 interface WorkbookIngestionPanelProps {
   modelManifest?: ModelManifest | null;
   ingestionReport?: IngestionReport | null;
+  sessionFiles?: ManifestFileEntry[];
   industry?: string;
   lineCount?: number;
 }
@@ -58,9 +61,22 @@ function normalizeReports(report: IngestionReport | null | undefined): Ingestion
   return [report];
 }
 
+function workbookSchemaDetail(file: ManifestFileEntry): string | undefined {
+  const wb = (file.schema as { workbook?: Record<string, unknown> } | undefined)?.workbook;
+  if (!wb) return undefined;
+  const selected = wb.selected_sheet as string | undefined;
+  const count = wb.sheet_count as number | undefined;
+  if (selected && count && count > 1) {
+    return `${count} tabs · selected: ${selected}`;
+  }
+  if (count && count > 1) return `${count} tabs`;
+  return 'Schema inferred';
+}
+
 export const WorkbookIngestionPanel: React.FC<WorkbookIngestionPanelProps> = ({
   modelManifest,
   ingestionReport,
+  sessionFiles = [],
   industry,
   lineCount,
 }) => {
@@ -72,7 +88,27 @@ export const WorkbookIngestionPanel: React.FC<WorkbookIngestionPanelProps> = ({
   const zeroSpend = reports.some((r) => r.quality?.zero_spend_warning);
   const mappingNote = reports.map((r) => r.quality?.column_mapping_note).find(Boolean);
 
-  if (!reports.length && !graph.length) return null;
+  const spendFiles = useMemo(
+    () => sessionFiles.filter((f) => fileUploadStatus(f.name ?? '') === 'spend'),
+    [sessionFiles],
+  );
+
+  const hasIngestionSheets = reports.some(
+    (rep) => (rep.sheets_ingested?.length ?? 0) > 0 || (rep.sheets_skipped?.length ?? 0) > 0,
+  );
+
+  const hasWorkbookBody =
+    graph.length > 0 || hasIngestionSheets || spendFiles.length > 0;
+
+  const showPanel = Boolean(
+    modelManifest?.ingestion_strategy ||
+      modelManifest?.ingestion_notes ||
+      graph.length > 0 ||
+      ingestionReport ||
+      spendFiles.length > 0,
+  );
+
+  if (!showPanel) return null;
 
   return (
     <div className="space-y-3">
@@ -139,52 +175,84 @@ export const WorkbookIngestionPanel: React.FC<WorkbookIngestionPanelProps> = ({
         </p>
       )}
 
-      {graph.length > 0 && (
-        <div>
-          <p className="text-[10px] font-semibold uppercase text-brand-muted mb-1">Sheet roles</p>
-          <ul className="text-xs space-y-1">
-            {graph.map((node) => (
-              <li key={node.sheet_name} className="flex justify-between gap-2">
-                <span className="text-brand-ink truncate">{node.sheet_name}</span>
-                <span className="text-brand-muted shrink-0 font-mono">{node.role}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {reports.map((rep, idx) => (
-        <div key={rep.source_file ?? idx}>
-          {rep.source_file && (
-            <p className="text-[10px] text-brand-muted mb-1">{rep.source_file}</p>
-          )}
-          {(rep.sheets_ingested?.length ?? 0) > 0 && (
-            <div className="mb-2">
-              <p className="text-[10px] font-semibold uppercase text-emerald-800 mb-1">Ingested</p>
-              <ul className="text-xs text-brand-ink space-y-0.5">
-                {rep.sheets_ingested!.map((s) => (
-                  <li key={s.sheet}>
-                    <span className="font-medium">{s.sheet}</span> — {s.rows?.toLocaleString() ?? '?'} rows
-                    {s.strategy ? ` (${s.strategy})` : ''}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {(rep.sheets_skipped?.length ?? 0) > 0 && (
+      {hasWorkbookBody ? (
+        <CollapsibleOverflow maxLines={2} linePx={18} contentClassName="text-xs space-y-2">
+          {graph.length > 0 && (
             <div>
-              <p className="text-[10px] font-semibold uppercase text-brand-muted mb-1">Skipped</p>
-              <ul className="text-xs text-brand-muted space-y-0.5">
-                {rep.sheets_skipped!.slice(0, 6).map((s) => (
-                  <li key={s.sheet}>
-                    {s.sheet} — {s.reason}
+              <p className="text-[10px] font-semibold uppercase text-brand-muted mb-1">Sheet roles</p>
+              <ul className="space-y-1">
+                {graph.map((node) => (
+                  <li key={node.sheet_name} className="flex justify-between gap-2 leading-snug">
+                    <span className="text-brand-ink truncate">{node.sheet_name}</span>
+                    <span className="text-brand-muted shrink-0 font-mono">{node.role}</span>
                   </li>
                 ))}
               </ul>
             </div>
           )}
-        </div>
-      ))}
+
+          {reports.map((rep, idx) => (
+            <div key={rep.source_file ?? `report-${idx}`}>
+              {rep.source_file && (
+                <p className="text-[10px] text-brand-muted mb-1">{rep.source_file}</p>
+              )}
+              {(rep.sheets_ingested?.length ?? 0) > 0 && (
+                <div className="mb-1">
+                  <p className="text-[10px] font-semibold uppercase text-emerald-800 mb-0.5">Ingested</p>
+                  <ul className="text-brand-ink space-y-0.5">
+                    {rep.sheets_ingested!.map((s) => (
+                      <li key={`${rep.source_file}-${s.sheet}`} className="leading-snug">
+                        <span className="font-medium">{s.sheet}</span> — {s.rows?.toLocaleString() ?? '?'} rows
+                        {s.strategy ? ` (${s.strategy})` : ''}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {(rep.sheets_skipped?.length ?? 0) > 0 && (
+                <div>
+                  <p className="text-[10px] font-semibold uppercase text-brand-muted mb-0.5">Skipped</p>
+                  <ul className="text-brand-muted space-y-0.5">
+                    {rep.sheets_skipped!.map((s) => (
+                      <li key={`${rep.source_file}-skip-${s.sheet}`} className="leading-snug">
+                        {s.sheet} — {s.reason}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          ))}
+
+          {!hasIngestionSheets && spendFiles.length > 0 && (
+            <div>
+              <p className="text-[10px] font-semibold uppercase text-brand-muted mb-1">
+                Uploaded workbooks
+              </p>
+              <ul className="space-y-1">
+                {spendFiles.map((file) => {
+                  const name = file.name ?? 'Unknown file';
+                  const detail = workbookSchemaDetail(file);
+                  return (
+                    <li key={name} className="leading-snug">
+                      <span className="font-medium text-brand-ink break-all">{name}</span>
+                      {detail ? (
+                        <span className="text-brand-muted"> · {detail}</span>
+                      ) : (
+                        <span className="text-brand-muted"> · Run analysis to ingest sheets</span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+        </CollapsibleOverflow>
+      ) : (
+        <p className="text-xs text-brand-muted">
+          No workbook structure detected yet. Upload an Excel spend file and run analysis.
+        </p>
+      )}
 
       {modelManifest?.ingestion_notes && (
         <p className="text-xs text-brand-muted italic">{modelManifest.ingestion_notes}</p>

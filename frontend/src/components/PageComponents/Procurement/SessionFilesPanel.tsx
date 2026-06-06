@@ -1,4 +1,5 @@
 import React from 'react';
+import { AutoCollapsibleList } from '../../Common/AutoCollapsibleList';
 import { FactVsInferenceLabel } from '../../Common/FactVsInferenceLabel';
 import {
   fileUploadStatus,
@@ -26,16 +27,16 @@ export const SessionFilesPanel: React.FC<SessionFilesPanelProps> = ({ files }) =
       {files.length === 0 ? (
         <p className="text-sm text-brand-muted">No files uploaded yet. Use Attach data to add spend files.</p>
       ) : (
-        <ul className="space-y-2">
-          {files.map((f) => {
+        <AutoCollapsibleList
+          items={files}
+          getKey={(f) => f.name || 'unknown'}
+          listClassName="space-y-2"
+          renderItem={(f) => {
             const name = f.name || 'Unknown file';
             const status = fileUploadStatus(name);
             const chip = STATUS_STYLES[status];
             return (
-              <li
-                key={name}
-                className="text-sm border border-brand-border rounded-lg px-3 py-2 bg-brand-surface-muted"
-              >
+              <div className="text-sm border border-brand-border rounded-lg px-3 py-2 bg-brand-surface-muted">
                 <div className="flex items-start justify-between gap-2">
                   <span className="font-medium text-brand-ink break-all">{name}</span>
                   <span
@@ -63,10 +64,10 @@ export const SessionFilesPanel: React.FC<SessionFilesPanelProps> = ({ files }) =
                     })()}
                   </p>
                 )}
-              </li>
+              </div>
             );
-          })}
-        </ul>
+          }}
+        />
       )}
     </div>
   );

@@ -378,13 +378,14 @@ def conflict_detector(
     lines: List[NormalizedSpendLine],
     benchmarks: Optional[List[Dict[str, Any]]] = None,
     entity_ids: Optional[List[str]] = None,
+    user_actions: Optional[Dict[str, Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
     """Run all 7 conflict detectors via ConflictResolver and return the summary dict."""
     from app.services.conflict_resolver import ConflictResolver
 
     resolver = ConflictResolver()
     conflicts = resolver.run_all(lines, benchmarks=benchmarks, entity_ids=entity_ids)
-    raw = resolver.summary(conflicts)
+    raw = resolver.summary(conflicts, user_actions=user_actions)
     raw["conflict_count"] = raw.pop("total", 0)
     return raw
 

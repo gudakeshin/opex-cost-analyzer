@@ -384,12 +384,45 @@ export interface ChatPlanPreview {
   [key: string]: unknown;
 }
 
+export interface DataConflict {
+  conflict_id?: string;
+  conflict_type?: string;
+  severity?: string;
+  source_a?: string;
+  source_b?: string;
+  amount_a?: number;
+  amount_b?: number;
+  delta_pct?: number;
+  resolution_strategy?: string;
+  resolved?: boolean;
+  resolution_notes?: string;
+  title?: string;
+  description?: string;
+  recommendation?: string;
+  action_label?: string;
+  requires_manual_review?: boolean;
+  can_auto_apply?: boolean;
+  user_status?: 'applied' | 'flagged_for_review';
+  estimated_spend_impact?: number;
+}
+
+export interface ConflictSpendImpact {
+  prior_total_spend?: number;
+  new_total_spend?: number;
+  spend_delta?: number;
+  lines_excluded?: number;
+  excluded_spend?: number;
+  initiatives_refresh_required?: boolean;
+}
+
 export interface ConflictSummary {
   total?: number;
   unresolved?: number;
+  auto_resolvable?: number;
+  requires_escalation?: number;
   by_type?: Record<string, number>;
   by_severity?: Record<string, number>;
-  conflicts?: Array<Record<string, unknown>>;
+  conflicts?: DataConflict[];
 }
 
 export interface ComplianceAuditResponse {

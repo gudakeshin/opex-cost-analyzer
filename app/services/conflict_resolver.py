@@ -5,6 +5,7 @@ Seven detector types, six resolution strategies, one escalation path.
 """
 from __future__ import annotations
 
+import hashlib
 import logging
 import re
 from typing import Any, Dict, List, Optional, Tuple
@@ -546,6 +547,250 @@ def escalate(conflict: ConflictRecord, reason: str = "") -> ConflictRecord:
 
 
 # ---------------------------------------------------------------------------
+# Display guidance — human-readable conflict context for UI / chat
+# ---------------------------------------------------------------------------
+
+_CONFLICT_TYPE_LABELS: Dict[str, str] = {
+    "tds_mismatch": "TDS withholding mismatch",
+    "gst_mismatch": "GST / ITC amount mismatch",
+    "vendor_duplicate": "Duplicate vendor records",
+    "intercompany_inflation": "Intercompany spend inflation",
+    "fx_mismatch": "FX rate inconsistency",
+    "benchmark_disagreement": "Benchmark source disagreement",
+    "amount_mismatch": "Amount mismatch across sources",
+    "cost_center_lag": "Cost centre mapping lag",
+}
+
+_STRATEGY_GUIDANCE: Dict[str, Dict[str, str]] = {
+    "tds_gross_up": {
+        "recommendation": (
+            "The difference matches tax deducted at source (TDS). Use the AP/GL invoice "
+            "amount as canonical and gross up the net bank payment by the applicable TDS rate."
+        ),
+        "action_label": "Apply TDS gross-up",
+    },
+    "gstin_dedup": {
+        "recommendation": (
+            "The same vendor appears under multiple names across sources. Merge to a single "
+            "canonical supplier name (prefer the GSTIN-linked legal name) before counting spend."
+        ),
+        "action_label": "Merge vendor names",
+    },
+    "eliminate_intercompany": {
+        "recommendation": (
+            "Related-party / intercompany lines inflate consolidated spend. Excluding them "
+            "removes those rows from the spend baseline and re-profiles category totals. "
+            "Savings initiatives are not recalculated automatically — re-run analysis if "
+            "pipeline numbers should move."
+        ),
+        "action_label": "Exclude from spend base",
+    },
+    "gstr_vendor_data": {
+        "recommendation": (
+            "GSTR-2A (tax portal) and AP books disagree on ITC-eligible GST. Use the GSTR-2A "
+            "filed amount as the authoritative vendor GST figure for reconciliation."
+        ),
+        "action_label": "Use GSTR-2A amount",
+    },
+    "confidence_blend": {
+        "recommendation": (
+            "Benchmark datasets disagree for this category. Blend values weighted by sample "
+            "size and recency, or override with your preferred benchmark source."
+        ),
+        "action_label": "Blend benchmark sources",
+    },
+    "escalate": {
+        "recommendation": (
+            "Sources cannot be auto-reconciled. Review with Finance / Treasury and confirm "
+            "which source should drive the savings pipeline before committing numbers."
+        ),
+        "action_label": "Flag for manual review",
+    },
+}
+
+
+def _format_amount(value: Optional[float], conflict: ConflictRecord) -> str:
+    if value is None:
+        return "—"
+    if conflict.conflict_type in ("fx_mismatch", "benchmark_disagreement"):
+        return f"{value:,.4f}"
+    return f"₹{value:,.2f} Cr"
+
+
+def _build_conflict_description(conflict: ConflictRecord) -> str:
+    ctype = conflict.conflict_type
+    src_a = conflict.source_a or "source A"
+    src_b = conflict.source_b or "source B"
+    amt_a = _format_amount(conflict.amount_a, conflict)
+    amt_b = _format_amount(conflict.amount_b, conflict)
+    delta = conflict.delta_pct
+
+    if ctype == "tds_mismatch":
+        base = (
+            f"{src_a} records {amt_a} while {src_b} records {amt_b}"
+            + (f" ({delta:.1f}% gap)" if delta is not None else "")
+            + ". The gap is consistent with TDS withholding on the payment."
+        )
+        return base
+    if ctype == "gst_mismatch":
+        return (
+            f"GSTIN-linked ITC spend totals {amt_a} in {src_a} vs {amt_b} in {src_b}"
+            + (f" ({delta:.1f}% gap)" if delta is not None else "")
+            + " for the same filing period."
+        )
+    if ctype == "vendor_duplicate":
+        notes = conflict.resolution_notes or ""
+        if "canonical=" in notes:
+            return (
+                f"The same vendor is recorded under different names across {src_a} and {src_b}. "
+                f"Combined spend is {amt_a}. {notes.replace('canonical=', 'Suggested canonical name: ').replace(' aliases=', '; aliases: ')}"
+            )
+        return (
+            f"The same vendor appears under different names across {src_a} and {src_b}. "
+            f"Combined spend is {amt_a}."
+        )
+    if ctype == "intercompany_inflation":
+        notes = conflict.resolution_notes or ""
+        return (
+            f"Intercompany / related-party transactions totalling {amt_a} are included in "
+            f"consolidated spend from {src_a}"
+            + (f" and {src_b}" if src_b != "consolidated_view" else "")
+            + f". {notes.replace('ic_transaction_count=', 'Transactions: ').replace(' total_ic_amount=', '; amount: ')}"
+        )
+    if ctype == "fx_mismatch":
+        notes = conflict.resolution_notes or ""
+        return (
+            f"FX rates differ: {amt_a} vs {amt_b} between {src_a} and {src_b}"
+            + (f" ({delta:.1f}% gap)" if delta is not None else "")
+            + f". {notes}"
+        )
+    if ctype == "benchmark_disagreement":
+        notes = conflict.resolution_notes or ""
+        return (
+            f"Benchmark values disagree: {src_a} reports {amt_a} vs {src_b} at {amt_b}"
+            + (f" ({delta:.1f}% gap)" if delta is not None else "")
+            + f". {notes.replace('category=', 'Category: ')}"
+        )
+    if ctype == "cost_center_lag":
+        notes = conflict.resolution_notes or ""
+        return (
+            f"The same transaction is mapped to different cost centres in {src_a} vs {src_b}. "
+            f"{notes.replace('record_id=', 'Record: ').replace(' cost_centers=', '; centres: ')}"
+        )
+    return (
+        f"{src_a} vs {src_b}: {amt_a} vs {amt_b}"
+        + (f" ({delta:.1f}% gap)" if delta is not None else "")
+    )
+
+
+def stable_conflict_id(conflict: ConflictRecord) -> str:
+    """Deterministic id so GET and POST refer to the same conflict across re-detection."""
+    parts = [
+        conflict.conflict_type,
+        conflict.source_a or "",
+        conflict.source_b or "",
+        ",".join(str(r) for r in sorted(conflict.row_ids)),
+        (conflict.resolution_notes or "")[:240],
+    ]
+    if conflict.amount_a is not None:
+        parts.append(f"a:{conflict.amount_a:.6f}")
+    if conflict.amount_b is not None:
+        parts.append(f"b:{conflict.amount_b:.6f}")
+    digest = hashlib.sha256("|".join(parts).encode("utf-8")).hexdigest()[:12]
+    return f"conf-{conflict.conflict_type}-{digest}"
+
+
+def assign_stable_conflict_ids(conflicts: List[ConflictRecord]) -> List[ConflictRecord]:
+    return [c.model_copy(update={"conflict_id": stable_conflict_id(c)}) for c in conflicts]
+
+
+def normalize_user_actions(
+    user_actions: Optional[Dict[str, Dict[str, Any]]],
+    conflicts: List[ConflictRecord],
+) -> Dict[str, Dict[str, Any]]:
+    """Re-key persisted actions onto stable conflict ids."""
+    if not user_actions:
+        return {}
+    out: Dict[str, Dict[str, Any]] = {}
+    for conflict in conflicts:
+        sid = stable_conflict_id(conflict)
+        if sid in user_actions:
+            out[sid] = user_actions[sid]
+            continue
+        for _legacy_key, action in user_actions.items():
+            if action.get("conflict_fingerprint") == sid:
+                out[sid] = action
+                break
+    return out
+
+
+def conflict_matches_request(conflict: ConflictRecord, requested_ids: List[str]) -> bool:
+    if not requested_ids:
+        return True
+    sid = stable_conflict_id(conflict)
+    return conflict.conflict_id in requested_ids or sid in requested_ids
+
+
+def apply_user_action_overlay(
+    enriched: Dict[str, Any],
+    user_actions: Optional[Dict[str, Dict[str, Any]]] = None,
+) -> Dict[str, Any]:
+    """Merge persisted user decisions (apply / flag) into API conflict payloads."""
+    if not user_actions:
+        return enriched
+    conflict_id = enriched.get("conflict_id")
+    if not conflict_id:
+        return enriched
+    action = user_actions.get(conflict_id)
+    if not action:
+        for _key, candidate in user_actions.items():
+            if candidate.get("conflict_fingerprint") == conflict_id:
+                action = candidate
+                break
+    if not action:
+        return enriched
+
+    status = action.get("status")
+    if status == "flagged_for_review":
+        enriched["user_status"] = "flagged_for_review"
+        enriched["resolved"] = True
+        enriched["can_auto_apply"] = False
+        enriched["requires_manual_review"] = False
+        enriched["recommendation"] = (
+            "Flagged for manual review. Confirm the correct source with Finance / "
+            "Treasury before including this spend in committed savings."
+        )
+        enriched["action_label"] = "Flagged for review"
+    elif status == "applied":
+        enriched["user_status"] = "applied"
+        enriched["resolved"] = True
+        enriched["can_auto_apply"] = False
+        enriched["requires_manual_review"] = False
+        enriched["action_label"] = "Recommendation applied"
+    return enriched
+
+
+def enrich_conflict_for_display(conflict: ConflictRecord) -> Dict[str, Any]:
+    """Attach human-readable title, description, and recommended action for UI."""
+    data = conflict.model_dump(mode="json")
+    strategy = conflict.resolution_strategy or "escalate"
+    guidance = _STRATEGY_GUIDANCE.get(strategy, _STRATEGY_GUIDANCE["escalate"])
+
+    data["title"] = _CONFLICT_TYPE_LABELS.get(
+        conflict.conflict_type,
+        conflict.conflict_type.replace("_", " ").title(),
+    )
+    data["description"] = _build_conflict_description(conflict)
+    data["recommendation"] = guidance["recommendation"]
+    data["action_label"] = guidance["action_label"]
+    data["requires_manual_review"] = strategy == "escalate"
+    data["can_auto_apply"] = bool(strategy and strategy != "escalate" and not conflict.resolved)
+    if conflict.conflict_type == "intercompany_inflation" and conflict.amount_a is not None:
+        data["estimated_spend_impact"] = round(float(conflict.amount_a), 2)
+    return data
+
+
+# ---------------------------------------------------------------------------
 # ConflictResolver — orchestrates all detectors
 # ---------------------------------------------------------------------------
 
@@ -574,9 +819,13 @@ class ConflictResolver:
             sum(1 for c in all_conflicts if c.severity == "critical"),
             sum(1 for c in all_conflicts if c.severity == "high"),
         )
-        return all_conflicts
+        return assign_stable_conflict_ids(all_conflicts)
 
-    def summary(self, conflicts: List[ConflictRecord]) -> Dict[str, Any]:
+    def summary(
+        self,
+        conflicts: List[ConflictRecord],
+        user_actions: Optional[Dict[str, Dict[str, Any]]] = None,
+    ) -> Dict[str, Any]:
         """Return a structured summary suitable for API responses."""
         by_type: Dict[str, int] = {}
         by_severity: Dict[str, int] = {}
@@ -584,17 +833,23 @@ class ConflictResolver:
             by_type[c.conflict_type] = by_type.get(c.conflict_type, 0) + 1
             by_severity[c.severity] = by_severity.get(c.severity, 0) + 1
 
+        enriched = [
+            apply_user_action_overlay(enrich_conflict_for_display(c), user_actions)
+            for c in conflicts
+        ]
+
         return {
             "total": len(conflicts),
             "by_type": by_type,
             "by_severity": by_severity,
-            "unresolved": sum(1 for c in conflicts if not c.resolved),
+            "unresolved": sum(1 for c in enriched if not c.get("resolved")),
             "auto_resolvable": sum(
-                1 for c in conflicts
-                if c.resolution_strategy and c.resolution_strategy != "escalate"
+                1 for c in enriched
+                if c.get("can_auto_apply")
             ),
             "requires_escalation": sum(
-                1 for c in conflicts if c.resolution_strategy == "escalate"
+                1 for c in enriched
+                if c.get("requires_manual_review") and not c.get("resolved")
             ),
-            "conflicts": [c.model_dump() for c in conflicts],
+            "conflicts": enriched,
         }

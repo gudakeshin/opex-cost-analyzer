@@ -1,7 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MetricTile } from '../../Common/MetricTile';
+import { AutoCollapsibleList } from '../../Common/AutoCollapsibleList';
+import { CompactStatStrip, type StatStripItem } from '../../Common/CompactStatStrip';
 import { FactVsInferenceLabel } from '../../Common/FactVsInferenceLabel';
+import { AnalysisDataQualityPanel } from './AnalysisDataQualityPanel';
 import { SessionFilesPanel } from './SessionFilesPanel';
 import { AgentActivityPanel } from './AgentActivityPanel';
 import { WorkbookIngestionPanel } from './WorkbookIngestionPanel';
@@ -11,7 +13,6 @@ import {
   extractInsightSnapshot,
   extractTopSavingsInitiatives,
   extractRootCauseFindings,
-  extractAnomalyFlags,
   extractPeerGapDetails,
   formatEvidenceUsedLine,
   formatSpendAmount,
@@ -79,8 +80,18 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
   const currency = snapshot?.reporting_currency ?? 'INR';
   const topSavings = useMemo(() => extractTopSavingsInitiatives(skillOutputs), [skillOutputs]);
   const rootCauseFindings = useMemo(() => extractRootCauseFindings(skillOutputs), [skillOutputs]);
-  const anomalyFlags = useMemo(() => extractAnomalyFlags(skillOutputs), [skillOutputs]);
   const peerGapDetails = useMemo(() => extractPeerGapDetails(skillOutputs), [skillOutputs]);
+
+  const peerGapStats = useMemo(
+    (): StatStripItem[] =>
+      peerGapDetails.map((gap) => ({
+        id: gap.category_id,
+        label: gap.category_name,
+        value: formatSpendAmount(gap.estimated_saving_amount, currency),
+        detail: `${gap.percentile_band} · target ${gap.benchmark_target_pct.toFixed(1)}% of rev`,
+      })),
+    [peerGapDetails, currency],
+  );
 
   // SME critique data — keyed by "category_id|lever" for O(1) lookup
   const smeInitiativeCritiqueMap = useMemo(() => {
@@ -119,6 +130,53 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
 
   const zeroSpendWarning = showZeroSpendIngestionWarning(manifest, analysis);
 
+  const engagementStats = useMemo((): StatStripItem[] => {
+    const stats: StatStripItem[] = [
+      {
+        id: 'company',
+        label: 'Company',
+        value: String(company),
+        detail: engagementConflict
+          ? `${sectorLabel(industry)} · context mismatch`
+          : sectorLabel(industry),
+        warning: engagementConflict,
+      },
+    ];
+    if (totalSpend) {
+      stats.push({
+        id: 'spend',
+        label: 'Total spend',
+        value: totalSpend,
+        highlight: true,
+      });
+    }
+    if (comparisonCount > 0) {
+      stats.push({
+        id: 'peer-gaps',
+        label: 'Peer gaps',
+        value: String(abovePeerCount),
+        detail: `${comparisonCount} categories`,
+      });
+    }
+    if (savingsHeadline) {
+      stats.push({
+        id: 'savings',
+        label: 'Top savings',
+        value: savingsHeadline,
+        detail: 'Savings model',
+      });
+    }
+    return stats;
+  }, [
+    company,
+    engagementConflict,
+    industry,
+    totalSpend,
+    comparisonCount,
+    abovePeerCount,
+    savingsHeadline,
+  ]);
+
   const hasContent = analysis || files.length > 0 || agentSteps?.length || agentLoading;
 
   if (!hasContent) {
@@ -136,9 +194,12 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
       <WorkbookIngestionPanel
         modelManifest={manifest?.model_manifest ?? undefined}
         ingestionReport={manifest?.ingestion_report ?? undefined}
+        sessionFiles={files}
         industry={industry}
         lineCount={lineCount}
       />
+
+      <AnalysisDataQualityPanel analysis={analysis} currency={currency} />
 
       {zeroSpendWarning && (
         <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">
@@ -154,40 +215,13 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
             <FactVsInferenceLabel kind="fact" />
             <p className="text-xs font-semibold uppercase text-brand-muted">Engagement</p>
           </div>
-          <div className="grid grid-cols-1 gap-3">
-            <MetricTile
-              label="Company"
-              value={String(company)}
-              change={
-                engagementConflict
-                  ? `${sectorLabel(industry)} · context mismatch`
-                  : sectorLabel(industry)
-              }
-            />
-            {engagementConflict && (
-              <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">
-                Spend files may belong to a different company than this diagnostic session. See the
-                banner above to align context.
-              </p>
-            )}
-            {totalSpend && (
-              <MetricTile label="Total spend (signal)" value={totalSpend} highlight />
-            )}
-            {comparisonCount > 0 && (
-              <MetricTile
-                label="Peer benchmark gaps"
-                value={String(abovePeerCount)}
-                change={`${comparisonCount} categories compared`}
-              />
-            )}
-            {savingsHeadline && (
-              <MetricTile
-                label="Top savings signal"
-                value={savingsHeadline}
-                change="From savings model / value bridge"
-              />
-            )}
-          </div>
+          <CompactStatStrip items={engagementStats} />
+          {engagementConflict && (
+            <p className="mt-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">
+              Spend files may belong to a different company than this diagnostic session. See the
+              banner above to align context.
+            </p>
+          )}
         </div>
       )}
 
@@ -203,42 +237,36 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
               currency={snapshot.reporting_currency}
             />
           ) : (
-            <ul className="text-xs space-y-1.5">
-              {topCategories.map((cat) => {
+            <AutoCollapsibleList
+              items={topCategories}
+              getKey={(cat) => String(cat.category_id)}
+              listClassName="text-xs space-y-1.5"
+              renderItem={(cat) => {
                 const share =
                   cat.share_of_total != null
                     ? `${(Number(cat.share_of_total) * 100).toFixed(1)}%`
                     : '—';
                 return (
-                  <li key={String(cat.category_id)} className="flex justify-between gap-2">
+                  <div className="flex justify-between gap-2">
                     <span className="text-brand-ink truncate">
                       {String(cat.category_name ?? cat.category_id)}
                     </span>
                     <span className="text-brand-muted shrink-0">{share}</span>
-                  </li>
+                  </div>
                 );
-              })}
-            </ul>
+              }}
+            />
           )}
         </div>
       )}
 
-      {peerGapDetails.length > 0 && (
+      {peerGapStats.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-2">
             <FactVsInferenceLabel kind="benchmark_proxy" />
             <p className="text-xs font-semibold uppercase text-brand-muted">Above peer (P75+)</p>
           </div>
-          <div className="grid grid-cols-1 gap-2">
-            {peerGapDetails.map((gap) => (
-              <MetricTile
-                key={gap.category_id}
-                label={gap.category_name}
-                value={formatSpendAmount(gap.estimated_saving_amount, currency)}
-                change={`${gap.percentile_band} · target ${gap.benchmark_target_pct.toFixed(1)}% of rev`}
-              />
-            ))}
-          </div>
+          <CompactStatStrip items={peerGapStats} />
         </div>
       )}
 
@@ -248,8 +276,13 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
             <FactVsInferenceLabel kind="inference" />
             <p className="text-xs font-semibold uppercase text-brand-muted">Savings opportunities</p>
           </div>
-          <ul className="space-y-2">
-            {topSavings.map((initiative, idx) => {
+          <AutoCollapsibleList
+            items={topSavings}
+            getKey={(initiative, idx) =>
+              `${initiative.category_id ?? initiative.category_name ?? 'init'}-${initiative.lever}-${idx}`
+            }
+            listClassName="space-y-2"
+            renderItem={(initiative, idx) => {
               const smeCritique = smeInitiativeCritiqueMap.get(
                 `${initiative.category_id ?? initiative.category_name?.toLowerCase().replace(/\s+/g, '_')}|${initiative.lever}`,
               );
@@ -277,7 +310,7 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
                   : null
                 : null;
               return (
-                <li key={idx} className="space-y-0.5 min-w-0">
+                <div className="space-y-0.5 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <p className="text-xs font-medium text-brand-ink break-words">{initiative.category_name}</p>
@@ -318,10 +351,10 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
                       {smeCritique.criticalRisk}
                     </p>
                   )}
-                </li>
+                </div>
               );
-            })}
-          </ul>
+            }}
+          />
         </div>
       )}
 
@@ -344,27 +377,6 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
               ))}
             </ul>
           </CollapsibleDetail>
-        </div>
-      )}
-
-      {anomalyFlags.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <FactVsInferenceLabel kind="inference" />
-            <p className="text-xs font-semibold uppercase text-brand-muted">
-              Anomaly flags ({anomalyFlags.length})
-            </p>
-          </div>
-          <ul className="text-xs space-y-1.5">
-            {anomalyFlags.map((flag) => (
-              <li key={flag.category_id} className="flex items-start justify-between gap-2">
-                <span className="text-brand-ink truncate">{flag.category_name}</span>
-                <span className="text-amber-700 shrink-0 tabular-nums font-medium">
-                  {formatSpendAmount(flag.estimated_saving_amount, currency)}
-                </span>
-              </li>
-            ))}
-          </ul>
         </div>
       )}
 

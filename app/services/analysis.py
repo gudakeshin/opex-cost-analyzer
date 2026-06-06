@@ -21,6 +21,7 @@ from app.skills.contracts import (
 from app.skills import engine
 from app.skills.dispatch import SkillContext
 from app.opar.pipeline_profile import PipelineProfile, run_profile
+from app.services.spend_line_merge import merge_persisted_line_adjustments, prior_lines_from_session
 
 
 TAXONOMY_PATH = ROOT_DIR / "skills" / "spend-profiler" / "references" / "spend_taxonomy.json"
@@ -106,6 +107,12 @@ def run_core_pipeline(
     #     invocation so batch and chat share one parameter source. The trace
     #     below is layered on via the on_complete hook so the live progress
     #     stream and "How this analysis was derived" panel are preserved. ---
+    existing_session = _memory.get("session", session_id)
+    prior_lines = prior_lines_from_session(existing_session) if existing_session else []
+    if prior_lines:
+        lines = merge_persisted_line_adjustments(lines, prior_lines)
+    conflict_user_actions = dict(existing_session.get("conflict_user_actions") or {}) if existing_session else {}
+
     resolved = {"industry": industry}
     manifest: Dict[str, Any] = {
         "session_id": session_id,
@@ -117,6 +124,7 @@ def run_core_pipeline(
         "effective_tax_rate": effective_tax_rate,
         "entity_tree": entity_tree,
         "ingestion_summary": ingestion_summary,
+        "conflict_user_actions": conflict_user_actions,
     }
     ctx = SkillContext(
         lines=lines,
@@ -374,6 +382,8 @@ def run_core_pipeline(
         analysis_trace=analysis_trace,
     )
     state_dict = state.model_dump(mode="json")
+    if conflict_user_actions:
+        state_dict["conflict_user_actions"] = conflict_user_actions
     _memory.put("session", session_id, state_dict)
     # Persist a thin manifest snapshot so get_session_manifest can recover the
     # session directory even if data/uploads/{id}/ is wiped after analysis.
@@ -505,4 +515,59 @@ def run_incremental_pipeline(
             "msme-compliance-checker",
         ],
         "total_spend": profile.get("total_spend", 0.0),
+    }
+
+
+def reprofile_after_spend_correction(
+    session_id: str,
+    lines: List[NormalizedSpendLine],
+    existing: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Re-run spend-sensitive skills after conflict resolution adjusts line-level spend."""
+    prior_total = float(
+        existing.get("skill_outputs", {}).get("spend-profiler", {}).get("total_spend", 0.0) or 0.0
+    )
+    excluded_lines = sum(1 for line in lines if line.consolidation_eliminated)
+    excluded_spend = sum(
+        line.reporting_amount for line in lines if line.consolidation_eliminated
+    )
+
+    inc_ctx = SkillContext(
+        lines=lines,
+        docs_text=[],
+        manifest={"session_id": session_id},
+        prior_results=dict(existing.get("skill_outputs") or {}),
+    )
+    inc_outputs, _ = run_profile(PipelineProfile.INCREMENTAL, inc_ctx, gating=False)
+    profile = inc_outputs["spend-profiler"]
+    internal = inc_outputs["internal-benchmarker"]
+    vendor_master = inc_outputs["vendor-master-builder"]
+    msme_compliance = inc_outputs["msme-compliance-checker"]
+    validate_vendor_master_output(vendor_master)
+    validate_msme_output(msme_compliance)
+
+    updated_state = dict(existing)
+    updated_state["normalized_spend"] = [l.model_dump(mode="json") for l in lines]
+    updated_state.setdefault("skill_outputs", {})
+    updated_state["skill_outputs"]["spend-profiler"] = profile
+    updated_state["skill_outputs"]["internal-benchmarker"] = internal
+    updated_state["skill_outputs"]["vendor-master-builder"] = vendor_master
+    updated_state["skill_outputs"]["msme-compliance-checker"] = msme_compliance
+
+    _memory.put("session", session_id, updated_state)
+
+    new_total = float(profile.get("total_spend", 0.0) or 0.0)
+    return {
+        "prior_total_spend": round(prior_total, 2),
+        "new_total_spend": round(new_total, 2),
+        "spend_delta": round(new_total - prior_total, 2),
+        "lines_excluded": excluded_lines,
+        "excluded_spend": round(excluded_spend, 2),
+        "updated_skills": [
+            "spend-profiler",
+            "internal-benchmarker",
+            "vendor-master-builder",
+            "msme-compliance-checker",
+        ],
+        "initiatives_refresh_required": abs(new_total - prior_total) > 0.01,
     }

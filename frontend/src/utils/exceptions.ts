@@ -1,12 +1,15 @@
 import type { ConflictSummary, Initiative } from '../types';
 import { GATE2_AQS_THRESHOLD, getAqs } from './initiativeHelpers';
 
+export type ExceptionAction = 'conflicts' | 'portfolio';
+
 export interface ExceptionItem {
   id: string;
   severity: 'critical' | 'high' | 'medium';
   title: string;
   detail: string;
   href?: string;
+  action?: ExceptionAction;
   actionLabel?: string;
 }
 
@@ -37,7 +40,7 @@ export function buildInitiativeExceptionItems(initiatives: Initiative[]): Except
         detail: lowAqs
           ? `AQS ${aqs!.toFixed(2)} below gate (${GATE2_AQS_THRESHOLD}) — review before accept`
           : `Stage: ${init.stage} — pending decision`,
-        href: '/cost-room',
+        action: 'portfolio',
         actionLabel: 'Review',
       };
     });
@@ -52,8 +55,8 @@ export function buildConflictExceptionItems(summary: ConflictSummary | null): Ex
       id: 'conflicts-unresolved',
       severity: (summary.by_severity?.critical ?? 0) > 0 ? 'critical' : 'high',
       title: `${total} unresolved data conflict${total === 1 ? '' : 's'}`,
-      detail: 'Cross-source mismatches need review before committing savings.',
-      href: '/cost-room',
+      detail: 'Cross-source mismatches detected — review each recommendation before applying.',
+      action: 'conflicts',
       actionLabel: 'Resolve',
     });
   }

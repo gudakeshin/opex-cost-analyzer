@@ -468,9 +468,9 @@ def resolve_eligible_levers(
 # ---------------------------------------------------------------------------
 
 def spend_profiler(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
-    actual_lines = [x for x in lines if is_actual(x)]
+    actual_lines = [x for x in lines if is_actual(x) and x.in_spend_base]
     if not actual_lines:
-        actual_lines = lines
+        actual_lines = [x for x in lines if x.in_spend_base]
 
     distinct_bus: set = set()
     distinct_cc: set = set()
@@ -481,7 +481,7 @@ def spend_profiler(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
             distinct_cc.add(line.cost_center_id)
 
     by_category: Dict[str, Dict[str, Any]] = {}
-    total = sum(x.reporting_amount for x in actual_lines)
+    total = sum(x.effective_reporting_amount for x in actual_lines)
     period_totals: Dict[str, float] = {}
     category_period: Dict[str, Dict[str, float]] = {}
     currency_breakdown: Dict[str, float] = {}
@@ -495,7 +495,7 @@ def spend_profiler(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
     express_like_spend_by_cat: Dict[str, float] = defaultdict(float)
 
     for line in actual_lines:
-        amt = line.reporting_amount
+        amt = line.effective_reporting_amount
         text = f"{line.category_name} {line.description}".lower()
         behaviour, discretionary = _classify_line(text)
         addr_cfg = _get_classification_rules().get("cost_behaviour", {}).get("addressability_pct", {})
