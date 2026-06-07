@@ -356,6 +356,7 @@ export interface EngagementMeta {
   detected_company_name?: string;
   detected_industry?: string;
   detected_industry_label?: string;
+  detected_annual_revenue_cr?: number;
 }
 
 export interface ChatHistoryTurn {

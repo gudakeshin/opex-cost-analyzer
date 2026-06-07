@@ -151,8 +151,10 @@ def session_lock(session_id: str):
 
 
 def engagement_lock(engagement_id: str):
-    """Reuse session lock backend keyed by engagement_id."""
-    return _session_lock_backend.acquire(engagement_id)
+    """Async manifest lock — shared with all engagement manifest mutations."""
+    from app.services.manifest_lock import manifest_lock
+
+    return manifest_lock.acquire_async(engagement_id)
 
 
 def merge_context_into_manifest(

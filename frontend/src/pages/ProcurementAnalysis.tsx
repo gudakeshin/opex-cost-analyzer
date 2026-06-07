@@ -175,6 +175,7 @@ export const ProcurementAnalysis: React.FC = () => {
     engagementId,
     setSessionId,
     ensureSession,
+    ensureSessionForEngagement,
     ensureEngagement,
     engagement,
     refreshEngagement,
@@ -579,8 +580,10 @@ export const ProcurementAnalysis: React.FC = () => {
     setInsightsOpen(true);
 
     let sid: string;
+    let eid: string;
     try {
-      sid = await ensureSession();
+      eid = engagementId ?? (await ensureEngagement());
+      sid = await ensureSessionForEngagement(eid);
     } catch (err) {
       setError(getApiErrorMessage(err));
       setLoading(false);
@@ -615,12 +618,8 @@ export const ProcurementAnalysis: React.FC = () => {
       try {
         const fd = new FormData();
         fd.append('file', files[i]);
-        const res = await apiUpload<{
-          uploaded?: string;
-          engagement_sanity?: SessionManifest['engagement_sanity'];
-        }>(`/api/v1/upload/${sid}`, fd);
+        await apiUpload(`/api/v1/engagements/${eid}/documents`, fd);
         succeeded.push(files[i].name);
-        if (res.engagement_sanity) latestSanity = res.engagement_sanity;
       } catch {
         failed.push(files[i].name);
       }

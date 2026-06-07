@@ -28,10 +28,12 @@ from app.services.engagements_store import (
     create_engagement_manifest,
     delete_document,
     document_dir,
+    engagement_dir,
     ensure_engagement_exists,
     get_document_record,
     list_engagements,
     read_engagement_manifest,
+    repair_engagement_manifest,
     update_document_record,
     write_engagement_manifest,
 )
@@ -110,6 +112,23 @@ def patch_engagement(engagement_id: str, payload: EngagementPatchRequest) -> Dic
     return manifest
 
 
+@router.post("/api/v1/engagements/{engagement_id}/repair-manifest")
+def repair_manifest(engagement_id: str) -> Dict[str, Any]:
+    """Rebuild manifest.json from salvageable JSON and on-disk document folders."""
+    validate_engagement_id(engagement_id)
+    if not engagement_dir(engagement_id).exists():
+        raise HTTPException(status_code=404, detail="Engagement not found")
+    manifest = repair_engagement_manifest(engagement_id)
+    append_audit_event(f"manifest_repaired engagement_id={engagement_id}")
+    docs = manifest.get("documents") or []
+    return {
+        "repaired": True,
+        "engagement_id": engagement_id,
+        "document_count": len(docs),
+        "manifest_status": "ok",
+    }
+
+
 @router.get("/api/v1/engagements/{engagement_id}/documents")
 def list_documents(engagement_id: str) -> Dict[str, Any]:
     validate_engagement_id(engagement_id)
@@ -161,7 +180,8 @@ async def upload_document(
     file: UploadFile = File(...),
 ) -> Dict[str, Any]:
     validate_engagement_id(engagement_id)
-    ensure_engagement_exists(engagement_id)
+    manifest = ensure_engagement_exists(engagement_id)
+    currency = str(manifest.get("currency") or "INR")
     _max_bytes = MAX_UPLOAD_MB * 1024 * 1024
     cl = request.headers.get("content-length")
     if cl and int(cl) > _max_bytes:
@@ -195,9 +215,8 @@ async def upload_document(
             content_type=file.content_type or "application/octet-stream",
             size_bytes=len(content),
             raw_path=str(raw_path),
+            _already_locked=True,
         )
-        fresh_manifest = read_engagement_manifest(engagement_id)
-        currency = str(fresh_manifest.get("currency") or "INR")
 
     append_audit_event(
         f"document_uploaded engagement_id={engagement_id} document_id={document_id} file={safe_filename}"

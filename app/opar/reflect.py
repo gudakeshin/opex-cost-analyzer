@@ -153,7 +153,8 @@ def reflect(
         if synthesis.thinking_text:
             thinking_text = synthesis.thinking_text
     else:
-        if needs_llm_advisory(ctx, composition_validated, category_focused=category_focused):
+        advisory_was_needed = needs_llm_advisory(ctx, composition_validated, category_focused=category_focused)
+        if advisory_was_needed:
             advisory_sections, thinking_text = generate_llm_advisory_sections(
                 ctx,
                 manifest,
@@ -170,6 +171,29 @@ def reflect(
                 include_business_case_metrics=bool(ctx.intent_class == "business_case"),
                 category_focused=category_focused,
             )
+        elif advisory_was_needed and category_focused:
+            # The question targets a specific category (e.g. "what drives spend
+            # in HR & Recruitment?") and warranted an LLM narrative, but synthesis
+            # failed or produced low-quality output. build_response_text composes
+            # from whatever portfolio-wide skill outputs happen to be cached
+            # (conflicts/spend-profile/benchmark/BvA) regardless of the category
+            # asked about — answer the user's actual question via the query-aware
+            # chat synthesis path instead. (Portfolio-wide asks like "calculate
+            # value bridge" still get build_response_text's value-bridge summary,
+            # which is the right composer for that broader request.)
+            synthesis = synthesize_chat_response(
+                ctx,
+                manifest,
+                composition_validated,
+                chat_history=chat_history,
+                currency=reporting_currency,
+                thinking_enabled=thinking_enabled,
+            )
+            response = synthesis.response_text
+            response_metadata = synthesis.response_metadata
+            qa_used_llm = synthesis.used_llm
+            if synthesis.thinking_text:
+                thinking_text = synthesis.thinking_text
         else:
             response = build_response_text(composition_validated, failed, plan, ctx)
 

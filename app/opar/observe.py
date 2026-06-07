@@ -64,7 +64,10 @@ def _detect_query_capabilities(msg: str) -> List[str]:
         "variance_analysis": ["budget vs actual", "variance", "over budget", "under budget", "bva"],
         "temporal_trend": ["trend", "month", "quarter", "season", "time", "over time"],
         "working_capital": ["payment terms", "dpo", "net 30", "net 45", "working capital"],
-        "root_cause": ["why", "driver", "root cause", "cause", "bottleneck"],
+        "root_cause": [
+            "why", "driver", "drivers", "drives", "drive", "root cause", "cause",
+            "bottleneck", "what's behind", "whats behind", "what causes", "underlying",
+        ],
         "visualization": ["chart", "graph", "plot", "dashboard", "visual"],
         "schema_lookup": ["schema", "columns", "headers", "semantic map", "field mapping"],
         "document_context": ["document", "contract", "policy", "constraint", "pdf", "docx", "txt"],

@@ -73,12 +73,17 @@ def teardown_engagement(engagement_id: str) -> Dict[str, Any]:
     if not engagement_id or "/" in engagement_id or ".." in engagement_id:
         raise HTTPException(status_code=400, detail="Invalid engagement_id")
     from app.opar.memory_adapter import get_memory_adapter
+    from app.services.engagements_store import delete_engagement
     from app.services.tear_down import execute_tear_down
     adapter = get_memory_adapter()
     result = adapter.teardown_engagement(engagement_id)
     # Run the full artefact sweep (pack-locks, calibration export+sweep, backups)
     # and capture the DLP/attestation envelope from the richer tear-down service.
     sweep = execute_tear_down(engagement_id, dry_run=False, executor="api")
+    # The artefact sweep above does not remove the engagement's own manifest/
+    # document directory under data/engagements/<id> — that's the record the
+    # Documents page lists from, so purge it here too.
+    delete_engagement(engagement_id)
     receipt: Dict[str, Any] = {
         "engagement_id": engagement_id,
         "status": "purged",

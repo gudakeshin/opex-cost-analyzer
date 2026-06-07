@@ -8,6 +8,7 @@ from datetime import date
 from typing import Any, Dict, List, Optional, Tuple
 
 from app.models import NormalizedSpendLine, is_actual
+from app.utils.inr_format import format_money
 
 from ._loaders import (
     _get_classification_rules,
@@ -695,7 +696,11 @@ def _slim_profile_for_chart_llm(profile: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def chart_builder(profile: Dict[str, Any], user_message: str | None = None) -> Dict[str, Any]:
+def chart_builder(
+    profile: Dict[str, Any],
+    user_message: str | None = None,
+    reporting_currency: str = "INR",
+) -> Dict[str, Any]:
     """Select chart patterns and commentary, driven by LLM when user_message is provided."""
     if user_message:
         try:
@@ -760,7 +765,7 @@ def chart_builder(profile: Dict[str, Any], user_message: str | None = None) -> D
         best_addr_name = best_addr.get("category_name") or best_addr.get("category_id") or "N/A"
         best_addr_amt = float(best_addr.get("addressable_spend", 0.0))
         commentary_points.append(
-            f"Largest modeled addressable pool is {best_addr_name} at ${best_addr_amt:,.0f}."
+            f"Largest modeled addressable pool is {best_addr_name} at {format_money(best_addr_amt, reporting_currency)}."
         )
     if has_trend:
         trend = profile.get("trend_analysis", {})
@@ -791,6 +796,8 @@ _DOC_CONTEXTUALIZER_SYSTEM_PROMPT = """You are an expert procurement and FP&A an
 
 Return ONLY a valid JSON object with these exact keys:
 {
+  "inferred_company_name": "<full legal company name or empty string>",
+  "inferred_annual_revenue_cr": <number or null>,
   "inferred_industry": "<pack_id or empty string>",
   "growth_phase": "<scaling|steady_state|restructuring|decline|unknown>",
   "financial_stress_signals": ["<signal>", ...],
@@ -798,6 +805,12 @@ Return ONLY a valid JSON object with these exact keys:
   "constraints": ["<constraint phrase>", ...],
   "positive_signals": ["<signal>", ...]
 }
+
+inferred_company_name: the primary subject company named in the documents (e.g. "Aranya Digital Services Ltd").
+Use the full legal name when available. Empty string if unclear.
+
+inferred_annual_revenue_cr: consolidated annual revenue in Indian Rupees Crores (₹ Cr) when stated in the documents.
+Use null if not found or unclear. Example: 18400 for "₹18,400 Cr revenue".
 
 inferred_industry must be one of these exact values or empty string:
 bfsi_banks, it_ites, fmcg_consumer, pharma_lifesciences, energy_utilities, insurance_general,
@@ -823,6 +836,12 @@ Return only the JSON object. No explanation. No markdown.
 def _keyword_fallback_contextualizer(texts: List[str]) -> Dict[str, Any]:
     """Keyword-based fallback for when LLM is unavailable."""
     import re as _re
+
+    from app.services.engagement_sanity import (
+        extract_company_from_context_text,
+        extract_revenue_cr_from_context_text,
+    )
+
     joined = "\n".join([t for t in texts if t.strip()])
     lowered = joined.lower()
     constraints = []
@@ -846,10 +865,14 @@ def _keyword_fallback_contextualizer(texts: List[str]) -> Dict[str, Any]:
             sorted(industry_hit_counts.keys()),
             key=lambda k: industry_hit_counts[k],
         )
+    inferred_company_name = extract_company_from_context_text(joined) or ""
+    inferred_revenue_cr = extract_revenue_cr_from_context_text(joined)
     return {
         "context_summary": joined[:2500],
         "constraints": constraints,
         "inferred_industry": inferred_industry,
+        "inferred_company_name": inferred_company_name,
+        "inferred_annual_revenue_cr": inferred_revenue_cr,
         "industry_signals": industry_hit_counts,
         "url_data_available": True,
         "extraction_method": "keyword_fallback",
@@ -864,6 +887,8 @@ def document_contextualizer(texts: List[str]) -> Dict[str, Any]:
             "context_summary": "",
             "constraints": [],
             "inferred_industry": "",
+            "inferred_company_name": "",
+            "inferred_annual_revenue_cr": None,
             "industry_signals": {},
             "url_data_available": False,
             "extraction_method": "no_url_provided",
@@ -893,11 +918,23 @@ def document_contextualizer(texts: List[str]) -> Dict[str, Any]:
         inferred = extracted.get("inferred_industry", "")
         if inferred not in valid_pack_ids:
             inferred = ""
+        inferred_company = str(extracted.get("inferred_company_name") or "").strip()
+        raw_revenue = extracted.get("inferred_annual_revenue_cr")
+        inferred_revenue_cr: Optional[float] = None
+        if raw_revenue is not None and str(raw_revenue).strip() not in ("", "null"):
+            try:
+                inferred_revenue_cr = float(raw_revenue)
+                if inferred_revenue_cr <= 0:
+                    inferred_revenue_cr = None
+            except (TypeError, ValueError):
+                inferred_revenue_cr = None
 
         return {
             "context_summary": excerpt[:2500],
             "constraints": extracted.get("constraints", [])[:3],
             "inferred_industry": inferred,
+            "inferred_company_name": inferred_company,
+            "inferred_annual_revenue_cr": inferred_revenue_cr,
             "growth_phase": extracted.get("growth_phase", "unknown"),
             "financial_stress_signals": extracted.get("financial_stress_signals", [])[:3],
             "procurement_maturity": extracted.get("procurement_maturity", "medium"),

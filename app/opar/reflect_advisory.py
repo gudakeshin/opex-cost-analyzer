@@ -10,6 +10,22 @@ from app.opar.models import AdvisorySections, ObserveContext
 _LLM_TOKEN_LIMIT = 80_000
 _CHARS_PER_TOKEN = 4
 
+# Skills whose presence indicates a deep, category-level analysis ran (peer/
+# internal benchmarking, root-cause, variance/trend, value modeling). When the
+# user's question is category-focused and any of these ran, the answer should
+# be an LLM narrative tailored to the question — not the generic value-bridge-
+# only gate below, which would otherwise miss benchmark/drill_down/root-cause
+# turns that don't happen to run value-bridge-calculator or savings-modeler.
+_DEEP_ANALYSIS_SKILLS = frozenset({
+    "peer-benchmarker",
+    "internal-benchmarker",
+    "root-cause-analyzer",
+    "bva-analyzer",
+    "temporal-analyzer",
+    "savings-modeler",
+    "value-bridge-calculator",
+})
+
 # The concrete synthesizers (claude/gemini) accept several optional keyword
 # arguments (strict_mode, thinking_enabled, transaction_examples, …) on top of
 # the positional payload. Use an open (...) parameter list so callers may pass
@@ -29,7 +45,9 @@ def needs_llm_advisory(
     """True when Claude/Gemini advisory synthesis should run (not QA lookup)."""
     if not GEMINI_ENABLED and not ANTHROPIC_ENABLED:
         return False
-    if "value-bridge-calculator" not in validated and "savings-modeler" not in validated:
+    has_value_modeling = "value-bridge-calculator" in validated or "savings-modeler" in validated
+    has_deep_analysis = any(skill in validated for skill in _DEEP_ANALYSIS_SKILLS)
+    if not has_value_modeling and not (category_focused and has_deep_analysis):
         return False
     if ctx.wants_executive_narrative:
         return True

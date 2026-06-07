@@ -239,13 +239,15 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
     # If spend data is already loaded, run spend-profiler lightly to refresh
     # the profile so the response can quote current numbers.
     if intent == "general_qa":
+        # A diagnostic ask ("what drives/causes spend in <category>?") is a
+        # legitimate request for deep analysis even without "savings"/"optimize"
+        # language — gating it behind value_modeling meant such questions only
+        # ran spend-profiler and fell through to a generic chat response.
         wants_deep_category_analysis = (
             _has_capability(ctx, "value_modeling")
-            and (
-                bool((ctx.explicit_category or "").strip())
-                or _has_capability(ctx, "root_cause")
-                or _has_capability(ctx, "working_capital")
-            )
+            or bool((ctx.explicit_category or "").strip())
+            or _has_capability(ctx, "root_cause")
+            or _has_capability(ctx, "working_capital")
         )
         if (ctx.spend_profile_ready or ctx.has_tabular_spend) and ctx.data_quality_score > 0:
             if wants_deep_category_analysis:

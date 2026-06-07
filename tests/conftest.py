@@ -13,6 +13,10 @@ from app.models import NormalizedSpendLine, SessionAnalysisState
 from app.storage import ensure_dirs
 
 
+@pytest.fixture
+def seed_session_upload():
+    from tests.session_test_utils import seed_session_upload as _seed
+
 @pytest.fixture(autouse=True)
 def clean_data_dirs() -> None:
     root = Path(__file__).resolve().parents[1]

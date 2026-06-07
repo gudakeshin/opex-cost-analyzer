@@ -46,7 +46,80 @@ _FILENAME_SKIP_TOKENS = frozenset(
         "q2",
         "q3",
         "q4",
+        # Finance / doc-type tokens common in enterprise filenames
+        "budget",
+        "actual",
+        "memo",
+        "vs",
+        "bva",
+        "pnl",
+        "lineitem",
+        "headcount",
+        "aggregate",
+        "vendor",
+        "master",
+        "contract",
+        "register",
+        "aging",
+        "roster",
+        "capex",
+        "treasury",
+        "utilization",
+        "offshore",
+        "onshore",
+        "deep",
+        "research",
+        "brief",
+        "policy",
+        "disclosure",
+        "excerpt",
+        "structure",
+        "programmes",
+        "calibration",
+        "pack",
+        "gl",
+        "ap",
+        "extract",
+        "segment",
+        "revenue",
+        "entity",
+        "tree",
+        "operational",
+        "drivers",
+        "payment",
+        "terms",
+        "working",
+        "capital",
+        "material",
+        "procurement",
+        "diagnostic",
+        "urls",
+        "brsr",
+        "fx",
     }
+)
+
+_COMPANY_HEADER_RE = re.compile(
+    r"(?:^|\n)\s*([A-Z][A-Za-z0-9&\.\'\-\s]{2,80}?"
+    r"(?:Ltd\.?|Limited|Pvt\.?\s*Ltd\.?|Inc\.?|Corp\.?|Corporation|LLP|PLC))"
+    r"(?:\s*[—\-–|:])?",
+    re.MULTILINE,
+)
+
+_COMPANY_INLINE_RE = re.compile(
+    r"(?:\bfor|\babout|\bon)\s+([A-Z][A-Za-z0-9&\.\'\-\s]{2,80}?"
+    r"(?:Ltd\.?|Limited|Pvt\.?\s*Ltd\.?|Inc\.?|Corp\.?|Corporation|LLP|PLC))\)?",
+    re.IGNORECASE,
+)
+
+_REVENUE_CR_RE = re.compile(
+    r"(?:consolidated\s+)?revenue\s+was[^\d₹]{0,40}₹?\s*([\d,]+(?:\.\d+)?)\s*Cr\b",
+    re.IGNORECASE,
+)
+
+_LEGAL_SUFFIX_RE = re.compile(
+    r"\b(ltd\.?|limited|pvt\.?\s*ltd\.?|inc\.?|corp\.?|corporation|llp|plc)\b",
+    re.IGNORECASE,
 )
 
 
@@ -104,6 +177,8 @@ def extract_company_from_filename(filename: str) -> Optional[str]:
         low = token.lower()
         if low in _FILENAME_SKIP_TOKENS:
             continue
+        if re.fullmatch(r"t\d+", low):
+            continue
         if re.fullmatch(r"fy\d{2,4}", low):
             continue
         if re.fullmatch(r"v\d+", low):
@@ -116,6 +191,70 @@ def extract_company_from_filename(filename: str) -> Optional[str]:
         return None
     # First token is usually the company prefix in `{Co}_Detailed_Spend_…` patterns.
     return candidates[0]
+
+
+def extract_company_from_context_text(text: str) -> Optional[str]:
+    """Extract a legal-entity style company name from document header or inline text."""
+    excerpt = (text or "")[:500]
+    for pattern in (_COMPANY_HEADER_RE, _COMPANY_INLINE_RE):
+        match = pattern.search(excerpt)
+        if not match:
+            continue
+        name = match.group(1).strip()
+        if name and not is_placeholder_company(name):
+            return name
+    return None
+
+
+def extract_revenue_cr_from_context_text(text: str) -> Optional[float]:
+    """Extract consolidated annual revenue in ₹ Cr from narrative context docs."""
+    excerpt = (text or "")[:2000]
+    match = _REVENUE_CR_RE.search(excerpt)
+    if not match:
+        return None
+    try:
+        value = float(match.group(1).replace(",", ""))
+    except ValueError:
+        return None
+    return value if value > 0 else None
+
+
+def is_low_confidence_company_guess(name: Optional[str]) -> bool:
+    """True for single-token generic filename guesses unlikely to be a company."""
+    cleaned = (name or "").strip()
+    if not cleaned:
+        return True
+    if " " in cleaned:
+        return False
+    if _LEGAL_SUFFIX_RE.search(cleaned):
+        return False
+    low = cleaned.lower()
+    if low in _FILENAME_SKIP_TOKENS:
+        return True
+    return len(cleaned) <= 4
+
+
+def should_auto_apply_company(name: Optional[str]) -> bool:
+    """True when a detected company name is safe to auto-fill on the manifest."""
+    cleaned = (name or "").strip()
+    if not cleaned or is_placeholder_company(cleaned):
+        return False
+    return not is_low_confidence_company_guess(cleaned)
+
+
+def pick_best_company_guess(votes: Dict[str, float], display_names: Dict[str, str]) -> str:
+    """Select highest-weight company among high-confidence candidates only."""
+    if not votes:
+        return ""
+    high_conf = {
+        key: weight
+        for key, weight in votes.items()
+        if not is_low_confidence_company_guess(display_names.get(key, key))
+    }
+    if not high_conf:
+        return ""
+    best_key = max(high_conf, key=high_conf.__getitem__)
+    return display_names.get(best_key, best_key)
 
 
 def _signals_from_spend_lines(lines: List[NormalizedSpendLine]) -> List[Dict[str, str]]:

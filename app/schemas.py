@@ -54,6 +54,49 @@ class EngagementPatchRequest(BaseModel):
     headcount: float | None = None
 
 
+class EngagementDocumentRecord(BaseModel):
+    """On-disk document registry entry stored inside engagement manifest.json."""
+
+    model_config = {"extra": "allow"}
+
+    document_id: str
+    filename: str
+    content_type: str = "application/octet-stream"
+    size_bytes: int = 0
+    raw_path: str = ""
+    role: str = "context_doc"
+    status: str = "pending"
+    parse_backend: str | None = None
+    error: str | None = None
+    uploaded_at: str | None = None
+    processed_at: str | None = None
+    text_preview: str | None = None
+    line_count: int = 0
+
+
+class EngagementManifest(BaseModel):
+    """Validated engagement manifest payload before atomic write."""
+
+    model_config = {"extra": "allow"}
+
+    engagement_id: str
+    company_name: str = "New engagement"
+    industry: str = ""
+    annual_revenue: float = 0.0
+    currency: str = "INR"
+    headcount: float | None = None
+    detected_company_name: str = ""
+    detected_industry: str = ""
+    detected_industry_label: str = ""
+    detected_annual_revenue_cr: float | None = None
+    detection_signals: Dict[str, Any] = {}
+    context_text_hash: str = ""
+    created_at: str = ""
+    updated_at: str = ""
+    session_ids: List[str] = []
+    documents: List[EngagementDocumentRecord] = []
+
+
 class SessionCreateRequest(_FinancialParamsMixin):
     company_name: str | None = None
     industry: str | None = None

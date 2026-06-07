@@ -1,9 +1,13 @@
 """Tests for reflect response composition and recommendation formatters."""
 from __future__ import annotations
 
+import uuid
 from unittest.mock import MagicMock, patch
 
-from app.opar.models import ExecutionPlan, ObserveContext, SkillTask
+from app.memory import MemoryStore
+from app.opar.chat_synthesis import ChatSynthesisResult
+from app.opar.models import ActResult, ExecutionPlan, ObserveContext, SkillTask
+from app.opar.reflect import reflect
 from app.opar.reflect_advisory import generate_llm_advisory_sections
 from app.opar.reflect_compose import build_response_text
 from app.opar.reflect_currency import set_reflect_currency
@@ -194,3 +198,51 @@ def test_build_data_backed_recommendation_lines_focus_category() -> None:
     joined = "\n".join(lines)
     assert "Focused category actions" in joined
     assert "primary focus" in joined.lower() or "IT" in joined
+
+
+def test_reflect_falls_through_to_chat_synthesis_when_advisory_fails_for_category_question() -> None:
+    """"What drives spend in HR & Recruitment?" classifies as value_bridge with an
+    explicit category — needs_llm_advisory() is True so generate_llm_advisory_sections
+    is attempted. If that LLM call fails/returns nothing, reflect() must answer the
+    user's actual question via synthesize_chat_response, NOT silently fall back to
+    build_response_text's generic whole-portfolio brief (conflicts/spend-profile/
+    benchmark/BvA) that ignores ctx.user_message entirely."""
+    session_id = str(uuid.uuid4())
+    MemoryStore().put(
+        "session",
+        session_id,
+        {"session_id": session_id, "skill_outputs": {}, "normalized_spend": []},
+    )
+
+    ctx = ObserveContext(
+        user_message="What drives spend in HR & Recruitment?",
+        intent_class="value_bridge",
+        explicit_category="HR & Recruitment",
+        query_capabilities=["root_cause", "value_modeling"],
+        session_id=session_id,
+        user_id="user-1",
+    )
+    validated = _value_bridge_validated()
+    act_result = ActResult(skill_outputs=validated, errors={})
+    plan = ExecutionPlan(tasks=[SkillTask(skill_name=name) for name in validated])
+
+    focused_answer = ChatSynthesisResult(
+        response_text="**HR & Recruitment** spend is driven mainly by contractor staffing and "
+        "recruitment-agency fees — see the breakdown below.\n\n"
+        "| Driver | Share |\n|---|---|\n| Contractor staffing | 54% |\n| Agency fees | 31% |",
+        used_llm=True,
+    )
+
+    with patch(
+        "app.opar.reflect.needs_llm_advisory", return_value=True
+    ), patch("app.opar.reflect.generate_llm_advisory_sections", return_value=(None, None)), patch(
+        "app.opar.reflect.synthesize_chat_response", return_value=focused_answer
+    ) as mock_chat_synth:
+        result = reflect(act_result, plan, ctx)
+
+    mock_chat_synth.assert_called_once()
+    assert result.response_text.startswith(focused_answer.response_text)
+    assert "HR & Recruitment" in result.response_text
+    assert "Cross-source conflicts" not in result.response_text
+    assert "Benchmarked using" not in result.response_text
+    assert "Budget vs. Actuals" not in result.response_text

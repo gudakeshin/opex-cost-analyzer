@@ -13,6 +13,7 @@ interface SessionContextValue {
   setSessionId: (id: string | null) => void;
   setEngagementId: (id: string | null) => void;
   ensureSession: () => Promise<string>;
+  ensureSessionForEngagement: (targetEngagementId?: string) => Promise<string>;
   ensureEngagement: () => Promise<string>;
   listEngagements: () => Promise<EngagementSummary[]>;
   deleteEngagement: (id: string) => Promise<void>;
@@ -101,6 +102,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       detected_company_name?: string;
       detected_industry?: string;
       detected_industry_label?: string;
+      detected_annual_revenue_cr?: number;
     }>(`/api/v1/engagements/${eid}`);
     const revenue = detail.annual_revenue;
     setEngagement({
@@ -115,13 +117,26 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       detected_company_name: detail.detected_company_name || undefined,
       detected_industry: detail.detected_industry || undefined,
       detected_industry_label: detail.detected_industry_label || undefined,
+      detected_annual_revenue_cr:
+        detail.detected_annual_revenue_cr != null && detail.detected_annual_revenue_cr > 0
+          ? detail.detected_annual_revenue_cr
+          : undefined,
     });
   }, []);
 
   const refreshEngagement = useCallback(async () => {
-    if (!sessionId) return;
     setLoadingEngagement(true);
     try {
+      const activeEngagementId = engagementId;
+
+      if (activeEngagementId) {
+        await refreshEngagementMeta(activeEngagementId);
+      }
+
+      if (!sessionId) {
+        return;
+      }
+
       const status = await apiGet<{
         session_exists?: boolean;
         has_analysis?: boolean;
@@ -136,30 +151,15 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const manifest = await apiGet<SessionManifest & { deep_research_summary?: string }>(
         `/api/v1/sessions/${sessionId}/manifest`,
       );
-      if (manifest.engagement_id) {
+
+      // Never let a stale session override the user's selected engagement.
+      if (!activeEngagementId && manifest.engagement_id) {
         setEngagementIdState(manifest.engagement_id);
+        await refreshEngagementMeta(manifest.engagement_id);
+      } else if (!activeEngagementId) {
+        setEngagement(engagementFromManifest(manifest));
       }
-      setEngagement(engagementFromManifest(manifest));
-      // Merge auto-detected company/industry recommendations from the engagement
-      // manifest (the session manifest doesn't carry them) so the Diagnostic and
-      // Analysis pages can surface the "Recommended" badge.
-      if (manifest.engagement_id) {
-        try {
-          const detail = await apiGet<{
-            detected_company_name?: string;
-            detected_industry?: string;
-            detected_industry_label?: string;
-          }>(`/api/v1/engagements/${manifest.engagement_id}`);
-          setEngagement((prev) => ({
-            ...prev,
-            detected_company_name: detail.detected_company_name || undefined,
-            detected_industry: detail.detected_industry || undefined,
-            detected_industry_label: detail.detected_industry_label || undefined,
-          }));
-        } catch {
-          /* detection is best-effort; ignore */
-        }
-      }
+
       const mode = manifestAudienceToMode(manifest.audience);
       if (mode) setAudience(mode);
       setDeepResearchSummary(manifest.deep_research_summary ?? null);
@@ -171,7 +171,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } finally {
       setLoadingEngagement(false);
     }
-  }, [sessionId, setAudience]);
+  }, [sessionId, engagementId, refreshEngagementMeta, setAudience]);
 
   const refreshAnalysisStatus = useCallback(async () => {
     if (!sessionId) {
@@ -245,6 +245,12 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     refreshAnalysisStatus();
   }, [refreshEngagement, refreshAnalysisStatus]);
 
+  useEffect(() => {
+    if (engagementId) {
+      refreshEngagementMeta(engagementId).catch(() => undefined);
+    }
+  }, [engagementId, refreshEngagementMeta]);
+
   const setSessionId = useCallback((id: string | null) => {
     setSessionIdState(id);
     if (!id) {
@@ -256,6 +262,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const setEngagementId = useCallback(
     (id: string | null) => {
+      setSessionIdState(null);
       setEngagementIdState(id);
       if (id) {
         refreshEngagementMeta(id).catch(() => undefined);
@@ -274,6 +281,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     async (id: string) => {
       await apiDelete(`/api/v1/engagement/${id}`);
       if (id === engagementId) {
+        setSessionIdState(null);
         setEngagementIdState(null);
         setEngagement(defaultEngagement);
       }
@@ -288,6 +296,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       annual_revenue?: number;
       currency?: string;
     }) => {
+      setSessionIdState(null);
       const res = await apiPost<{ engagement_id: string }>('/api/v1/engagements', {
         company_name: payload?.company_name ?? 'New engagement',
         industry: payload?.industry ?? '',
@@ -306,21 +315,51 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return createEngagement();
   }, [engagementId, createEngagement]);
 
+  const ensureSessionForEngagement = useCallback(
+    async (targetEngagementId?: string): Promise<string> => {
+      let target = targetEngagementId ?? engagementId;
+      if (!target) {
+        target = await ensureEngagement();
+      }
+
+      if (sessionId) {
+        try {
+          const existing = await apiGet<SessionManifest>(
+            `/api/v1/sessions/${sessionId}/manifest`,
+          );
+          if (existing.engagement_id === target) {
+            return sessionId;
+          }
+        } catch {
+          /* stale or missing session — create a new one below */
+        }
+        setSessionIdState(null);
+      }
+
+      const detail = await apiGet<{
+        company_name?: string;
+        industry?: string;
+        currency?: string;
+      }>(`/api/v1/engagements/${target}`);
+
+      const res = await apiPost<SessionManifest>('/api/v1/sessions', {
+        company_name: detail.company_name,
+        industry: detail.industry || '',
+        currency: detail.currency || 'INR',
+        audience: 'consultant',
+        engagement_id: target,
+      });
+      setSessionIdState(res.session_id);
+      setEngagementIdState(target);
+      await refreshEngagementMeta(target);
+      return res.session_id;
+    },
+    [sessionId, engagementId, ensureEngagement, refreshEngagementMeta],
+  );
+
   const ensureSession = useCallback(async (): Promise<string> => {
-    if (sessionId) return sessionId;
-    const eid = await ensureEngagement();
-    const res = await apiPost<SessionManifest>('/api/v1/sessions', {
-      company_name: engagement.company_name,
-      industry: engagement.industry,
-      currency: engagement.currency || 'INR',
-      audience: 'consultant',
-      engagement_id: eid,
-    });
-    setSessionIdState(res.session_id);
-    if (res.engagement_id) setEngagementIdState(res.engagement_id);
-    setEngagement(engagementFromManifest(res));
-    return res.session_id;
-  }, [sessionId, ensureEngagement, engagement.company_name, engagement.industry, engagement.currency]);
+    return ensureSessionForEngagement();
+  }, [ensureSessionForEngagement]);
 
   const value = useMemo(
     () => ({
@@ -329,6 +368,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setSessionId,
       setEngagementId,
       ensureSession,
+      ensureSessionForEngagement,
       ensureEngagement,
       listEngagements,
       deleteEngagement,
@@ -350,6 +390,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setSessionId,
       setEngagementId,
       ensureSession,
+      ensureSessionForEngagement,
       ensureEngagement,
       listEngagements,
       deleteEngagement,

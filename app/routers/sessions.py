@@ -278,66 +278,13 @@ def create_session(payload: SessionCreateRequest) -> Dict[str, Any]:
 @router.post("/api/v1/upload/{session_id}")
 async def upload_file(session_id: str, request: Request, file: UploadFile = File(...)) -> Dict[str, Any]:
     validate_session_id(session_id)
-    sdir = session_dir(session_id)
-    if not sdir.exists():
-        # Recreate if analysis data exists (session dir was wiped but memory intact).
-        analysis = _memory.get("session", session_id)
-        if analysis:
-            sdir.mkdir(parents=True, exist_ok=True)
-            recovered: Dict[str, Any] = {
-                "session_id": session_id,
-                "company_name": analysis.get("company_name", ""),
-                "industry": analysis.get("industry", ""),
-                "annual_revenue": analysis.get("annual_revenue"),
-                "currency": analysis.get("reporting_currency", "INR"),
-                "audience": "consultant",
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                "files": [],
-            }
-            write_manifest(session_id, recovered)
-        else:
-            raise HTTPException(status_code=404, detail="Session not found")
-    _max_bytes = MAX_UPLOAD_MB * 1024 * 1024
-    cl = request.headers.get("content-length")
-    if cl and int(cl) > _max_bytes:
-        raise HTTPException(status_code=413, detail=f"File exceeds {MAX_UPLOAD_MB} MB limit")
-    content = await file.read()
-    if len(content) > _max_bytes:
-        raise HTTPException(status_code=413, detail=f"File exceeds {MAX_UPLOAD_MB} MB limit")
-    safe_filename = Path(file.filename or "upload").name
-    out_path = session_dir(session_id) / safe_filename
-    out_path.write_bytes(content)
-    entry: Dict[str, Any] = {
-        "name": safe_filename,
-        "content_type": file.content_type or "application/octet-stream",
-        "size_bytes": len(content),
-        "path": str(out_path),
-    }
-    if out_path.suffix.lower() in (".csv", ".xlsx", ".xls"):
-        entry["schema"] = await asyncio.to_thread(infer_tabular_schema, out_path)
-    elif out_path.suffix.lower() == ".json":
-        entry["schema"] = {"format": "json"}
-    async with session_lock(session_id):
-        manifest = read_manifest(session_id)
-        manifest["files"].append(entry)
-        if out_path.suffix.lower() in (".xlsx", ".xls"):
-            interpreted = await asyncio.to_thread(
-                maybe_interpret_workbook_on_upload,
-                out_path,
-                manifest,
-                "",
-            )
-            if interpreted:
-                manifest["model_manifest"] = interpreted
-        apply_engagement_sanity_to_manifest(manifest)
-        write_manifest(session_id, manifest)
-    append_audit_event(f"file_uploaded session_id={session_id} file={safe_filename}")
-    sanity = read_manifest(session_id).get("engagement_sanity") or {}
-    return {
-        "uploaded": safe_filename,
-        "size_bytes": len(content),
-        "engagement_sanity": sanity,
-    }
+    raise HTTPException(
+        status_code=410,
+        detail=(
+            "Session-level uploads are deprecated. "
+            "Use POST /api/v1/engagements/{engagement_id}/documents instead."
+        ),
+    )
 
 
 @router.post("/api/analyze/{session_id}")

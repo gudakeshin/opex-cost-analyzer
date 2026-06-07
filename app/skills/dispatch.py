@@ -372,14 +372,23 @@ def _chart_builder(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     from app.services.spend_charts import build_spend_profile_chart_html  # lazy
 
     profile = _get_profile(ctx)
-    chart_plan = _engine.chart_builder(profile, user_message=ctx.user_message or None)
+    chart_plan = _engine.chart_builder(
+        profile,
+        user_message=ctx.user_message or None,
+        reporting_currency=ctx.reporting_currency,
+    )
     session_key = (
         ctx.manifest.get("session_id")
         or ctx.manifest.get("turn_id")
         or "session"
     )
     chart_filename = f"{session_key}_spend_profile_chart.html"
-    chart_path = build_spend_profile_chart_html(profile, chart_plan, filename=chart_filename)
+    chart_path = build_spend_profile_chart_html(
+        profile,
+        chart_plan,
+        filename=chart_filename,
+        reporting_currency=ctx.reporting_currency,
+    )
     return {**chart_plan, "chart_url": f"/api/exports/{chart_path.name}"}, None
 
 
