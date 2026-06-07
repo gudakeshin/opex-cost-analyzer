@@ -1,13 +1,20 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import re
 from typing import Any, Dict, List, Tuple
 
 # ANTHROPIC_ENABLED is re-exported here as a module attribute so tests can patch
 # `app.opar.observe.ANTHROPIC_ENABLED` to gate LLM-based intent classification.
-from app.config import ANTHROPIC_ENABLED, MEMORY_DIR, UPLOAD_DIR  # noqa: F401
+from app.config import (
+    ANTHROPIC_ENABLED,  # noqa: F401
+    GEMINI_ENABLED,
+    LLM_INTENT_CLASSIFICATION_ENABLED,
+    MEMORY_DIR,
+    UPLOAD_DIR,
+)
 from app.opar.memory_adapter import get_memory_adapter
 from app.opar.hitl.clarification_tool import ClarificationAnswer
 from app.opar.models import ObserveContext
@@ -329,14 +336,46 @@ def _classify_intent_rule_based_with_meta(msg: str) -> Dict[str, Any]:
     }
 
 
-def classify_intent(msg: str) -> Tuple[str, str | None]:
-    """Classify user intent using rule-based classifier."""
-    return _classify_intent_rule_based(msg)
+def _llm_intent_enabled() -> bool:
+    """LLM intent routing is on when the flag is set and a provider is configured.
+
+    Disabled inside pytest so the suite stays deterministic/offline (the LLM call
+    helper itself also raises under pytest, but short-circuiting here avoids the
+    try/except churn for every classification in tests).
+    """
+    if os.getenv("PYTEST_CURRENT_TEST"):
+        return False
+    if not LLM_INTENT_CLASSIFICATION_ENABLED:
+        return False
+    return bool(ANTHROPIC_ENABLED or GEMINI_ENABLED)
 
 
 def classify_intent_with_meta(msg: str) -> Dict[str, Any]:
-    """Classify user intent with source/confidence/category metadata."""
+    """LLM-first intent classification with deterministic rule-based fallback.
+
+    The LLM reads the message and routes over the full intent taxonomy; the
+    keyword classifier is used only when the LLM is unavailable, errors, or
+    returns an out-of-taxonomy result. This removes the class of failures where a
+    valid ask used phrasing the keyword lists never anticipated.
+    """
+    if _llm_intent_enabled():
+        try:
+            from app.opar.claude_client import classify_intent_claude_with_meta
+
+            meta = classify_intent_claude_with_meta(msg)
+        except Exception:
+            meta = None
+        if isinstance(meta, dict) and meta.get("intent_class"):
+            meta.setdefault("intent_source", "llm")
+            meta.setdefault("query_capabilities", [])
+            return meta
     return _classify_intent_rule_based_with_meta(msg)
+
+
+def classify_intent(msg: str) -> Tuple[str, str | None]:
+    """Classify user intent (LLM-first, rule-based fallback)."""
+    meta = classify_intent_with_meta(msg)
+    return str(meta.get("intent_class") or "general_qa"), meta.get("explicit_category")
 
 
 def assess_data_quality(
@@ -443,7 +482,11 @@ def observe(
     intent_source = str(intent_meta.get("intent_source") or "rule_based")
     intent_confidence = float(intent_meta.get("intent_confidence") or 0.0)
     category_confidence = float(intent_meta.get("category_confidence") or 0.0)
-    query_capabilities = _detect_query_capabilities(msg)
+    # Keyword detector is the deterministic floor; union LLM-emitted capabilities
+    # on top so deep-analysis routing is robust to phrasing, never below keywords.
+    query_capabilities = sorted(
+        set(_detect_query_capabilities(msg)) | set(intent_meta.get("query_capabilities") or [])
+    )
     has_tabular_spend = any(
         Path(f.get("path", "")).suffix.lower() in (".csv", ".xlsx", ".xls")
         for f in files

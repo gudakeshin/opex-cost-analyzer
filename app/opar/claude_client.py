@@ -9,24 +9,64 @@ from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError as Futur
 from typing import Any, Dict, List, Tuple
 
 from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED, LLM_PROVIDER
+from app.opar.models import IntentClass
 
-INTENT_CLASSIFY_PROMPT = """Classify the user's intent for an OpEx cost analysis platform.
+# Canonical intent set — derived from the typed enum so the prompt menu below and
+# the validator stay in sync as intents are added.
+_VALID_INTENTS = {ic.value for ic in IntentClass}
+
+# Analytical capability vocabulary the LLM may emit. Mirrors the keyword tokens in
+# app/opar/observe.py::_detect_query_capabilities; that keyword detector remains the
+# deterministic floor (observe unions the two), so this list only gates LLM output.
+_VALID_CAPABILITIES = {
+    "benchmarking",
+    "value_modeling",
+    "variance_analysis",
+    "temporal_trend",
+    "working_capital",
+    "root_cause",
+    "visualization",
+    "schema_lookup",
+    "document_context",
+    "executive_narrative",
+    "supplier_breakdown",
+}
+
+INTENT_CLASSIFY_PROMPT = """You are the intent router for an enterprise OpEx (operating expense) cost-analysis platform. Read the user's message and decide which analysis the platform should run.
 
 User message: "{message}"
 
 Respond with ONLY a JSON object (no markdown, no prose):
-{{"intent": "<one of: general_qa, upload_data, benchmark, value_bridge, business_case, export_business_case>", "explicit_category": "<category name or null>", "confidence": 0.0, "category_confidence": 0.0}}
+{{"intent": "<one intent id>", "explicit_category": "<spend category name or null>", "confidence": 0.0, "category_confidence": 0.0, "capabilities": ["<capability id>", ...]}}
+
+Intent ids (choose exactly one):
+- general_qa: conversational question, greeting, follow-up, or explanation request — NOT an analysis trigger
+- upload_data: user wants to upload / import / attach spend files or data
+- benchmark: compare spend vs industry peers / internal benchmarks / percentiles
+- value_bridge: savings opportunities, addressable spend, value-at-the-table, savings matrix, or how to optimize/reduce a category's cost with levers
+- savings_plan: build a list of savings initiatives, an initiative/savings roadmap, or a multi-year savings plan
+- business_case: a structured business case / proposal / recommendation with financials
+- export_business_case: export / download / save a document (docx/pdf)
+- drill_down: deep-dive or break down a dimension (supplier, geography, category)
+- sensitivity: what-if, scenario analysis, stress test, discount-rate sensitivity
+- temporal: trend over time, YoY/QoQ/MoM, run-rate, seasonality
+- bva: budget vs actual, variance analysis, over/under budget
+- payment_terms: payment terms, DPO, days payable, working-capital optimization
+- cost_to_serve: cost-to-serve, per-employee cost, segment profitability
+- conflict_review: detect/reconcile multi-source data conflicts, mismatches, duplicates
+- consolidate: group/entity rollup, intercompany elimination, multi-entity consolidation
+- vendor_master: vendor master, vendor dedup, canonical/duplicate vendors
+- contract_review: contract lifecycle, expiry, auto-renewal, exit penalties
+- gstr_reconcile: GST / GSTR reconciliation, input tax credit (India)
+- zbb: zero-based budgeting
+
+capabilities (include every analytical dimension the request needs; use [] if none apply):
+benchmarking, value_modeling, variance_analysis, temporal_trend, working_capital, root_cause, visualization, schema_lookup, document_context, executive_narrative, supplier_breakdown
 
 Rules:
-- general_qa: conversational question, greeting, follow-up, or request for explanation — NOT an analysis trigger
-- upload_data: user explicitly wants to upload/import/add files or data
-- benchmark: user wants to compare, benchmark, or analyze spend vs peers/industry
-- value_bridge: user wants value-at-the-table, savings matrix, savings opportunity, or how to optimize/reduce category costs with levers
-- business_case: user wants a business case, proposal, or structured recommendation
-- export_business_case: user wants to export, download, or save a document (docx/pdf)
-- explicit_category: only if user names a specific spend category (e.g. "IT & Technology"); otherwise null
-
-When in doubt between general_qa and an analysis intent, choose general_qa.
+- explicit_category: set only when the user names a specific spend category (e.g. "IT & Technology", "Travel"); otherwise null.
+- A request to "create / list / build initiatives", "what should we go after", or "where can we save" is savings_plan with capabilities including value_modeling.
+- When genuinely ambiguous between general_qa and an analysis intent, choose general_qa.
 """
 
 ANALYSIS_SYNTHESIS_SYSTEM_PROMPT = """You are an executive FP&A synthesis copilot.
@@ -230,48 +270,42 @@ def _extract_json(text: str) -> Dict[str, Any] | List[Any]:
 
 
 def classify_intent_claude(msg: str) -> Tuple[str, str | None]:
-    """Classify user intent via Claude. Returns (intent_class, explicit_category)."""
-    prompt = INTENT_CLASSIFY_PROMPT.format(message=msg)
-    raw = _call_claude(
-        system="You are an intent classifier. Output only valid JSON.",
-        user_content=prompt,
-        max_tokens=128,
-    )
-    data = _extract_json(raw)
-    if isinstance(data, dict):
-        intent = data.get("intent", "general_qa")
-        _valid = {"general_qa", "upload_data", "benchmark", "value_bridge", "business_case", "export_business_case"}
-        if intent not in _valid:
-            intent = "general_qa"
-        explicit = data.get("explicit_category")
-        if explicit and not isinstance(explicit, str):
-            explicit = None
-        return intent, explicit
-    return "general_qa", None
+    """Classify user intent via the LLM. Returns (intent_class, explicit_category)."""
+    meta = classify_intent_claude_with_meta(msg)
+    if meta is None:
+        return "general_qa", None
+    return str(meta.get("intent_class") or "general_qa"), meta.get("explicit_category")
 
 
-def classify_intent_claude_with_meta(msg: str) -> Dict[str, Any]:
+def classify_intent_claude_with_meta(msg: str) -> Dict[str, Any] | None:
+    """LLM intent classification over the full intent taxonomy.
+
+    Returns a meta dict on success, or ``None`` when the LLM is unavailable —
+    provider disabled, pytest, timeout/error, or unparseable output — so the
+    caller can fall back to the deterministic rule-based classifier. (A returned
+    ``general_qa`` means the LLM *chose* general_qa, which is distinct from None.)
+    """
     prompt = INTENT_CLASSIFY_PROMPT.format(message=msg)
-    raw = _call_claude(
-        system="You are an intent classifier. Output only valid JSON.",
-        user_content=prompt,
-        max_tokens=160,
-    )
-    data = _extract_json(raw)
+    try:
+        raw = _call_claude(
+            system="You are an intent classifier. Output only valid JSON.",
+            user_content=prompt,
+            max_tokens=220,
+        )
+        data = _extract_json(raw)
+    except Exception:
+        return None
     if not isinstance(data, dict):
-        return {
-            "intent_class": "general_qa",
-            "explicit_category": None,
-            "intent_confidence": 0.0,
-            "category_confidence": 0.0,
-        }
+        return None
+
     intent = data.get("intent", "general_qa")
-    _valid = {"general_qa", "upload_data", "benchmark", "value_bridge", "business_case", "export_business_case"}
-    if intent not in _valid:
+    if intent not in _VALID_INTENTS:
         intent = "general_qa"
+
     explicit = data.get("explicit_category")
-    if explicit and not isinstance(explicit, str):
+    if not isinstance(explicit, str) or explicit.strip().lower() in ("", "null", "none"):
         explicit = None
+
     try:
         confidence = float(data.get("confidence", 0.0))
     except Exception:
@@ -280,11 +314,21 @@ def classify_intent_claude_with_meta(msg: str) -> Dict[str, Any]:
         category_confidence = float(data.get("category_confidence", 0.0))
     except Exception:
         category_confidence = 0.0
+
+    raw_caps = data.get("capabilities")
+    capabilities = (
+        [c for c in raw_caps if isinstance(c, str) and c in _VALID_CAPABILITIES]
+        if isinstance(raw_caps, list)
+        else []
+    )
+
     return {
         "intent_class": intent,
         "explicit_category": explicit,
+        "intent_source": "llm",
         "intent_confidence": max(0.0, min(1.0, confidence)),
         "category_confidence": max(0.0, min(1.0, category_confidence)),
+        "query_capabilities": capabilities,
     }
 
 

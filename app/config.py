@@ -84,6 +84,14 @@ GEMINI_TOOL_MODEL = os.getenv("GEMINI_TOOL_MODEL", "gemini-2.5-flash")
 # "gemini" (default when key present) | "anthropic"
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini" if bool(os.getenv("GEMINI_API_KEY", "")) else "anthropic")
 
+# LLM-first intent classification — the LLM reads each chat message and routes
+# over the full intent taxonomy; the keyword classifier is the deterministic
+# fallback (offline / timeout / pytest). On by default when a provider exists.
+LLM_INTENT_CLASSIFICATION_ENABLED = (
+    os.getenv("LLM_INTENT_CLASSIFICATION_ENABLED", "true").lower() not in ("false", "0", "no")
+    and bool(ANTHROPIC_API_KEY or GEMINI_API_KEY)
+)
+
 # Agent controller — LLM tool-use loop (M2/M3 only; pytest/M1 use deterministic fallback)
 AGENT_CONTROLLER_ENABLED = os.getenv("AGENT_CONTROLLER_ENABLED", "true").lower() not in ("false", "0", "no")
 AGENT_MAX_TOOL_ITERATIONS = int(os.getenv("AGENT_MAX_TOOL_ITERATIONS", "12"))
