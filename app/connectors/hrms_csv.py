@@ -20,9 +20,9 @@ from __future__ import annotations
 import csv
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
-from app.connectors.base import ConnectorConfig, ConnectorInterface, FetchResult
+from app.connectors.base import ConnectorInterface, FetchResult
 from app.models import NormalizedSpendLine
 
 logger = logging.getLogger("opex.connector.hrms_csv")

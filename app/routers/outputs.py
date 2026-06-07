@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any, Dict
 
 from fastapi import APIRouter, Form, HTTPException
 from fastapi.responses import FileResponse
 
 from app.config import OUTPUT_DIR
-from app.routers._shared import _memory, read_manifest, session_dir, validate_session_id
+from app.routers._shared import _memory, read_manifest, validate_session_id
 from app.services.board_deck import build_board_deck, export_board_deck_pptx
 from app.services.business_case import build_business_case, export_docx, export_pdf_like_text
 from app.services.cfo_brief import build_cfo_brief, export_cfo_brief_docx

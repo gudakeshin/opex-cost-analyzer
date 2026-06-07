@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import re
 import urllib.request as _urllib_req
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from fastapi import APIRouter, HTTPException, Query
 
-from app.config import DEEP_RESEARCH_ENABLED, GEMINI_API_KEY, UPLOAD_DIR, logger
+from app.config import DEEP_RESEARCH_ENABLED, UPLOAD_DIR, logger
 from app.routers._shared import _memory, read_manifest, write_manifest
 from app.schemas import (
     CompanyResearchRequest,
@@ -22,7 +22,6 @@ from app.services.analysis import load_taxonomy
 from app.services.benchmarks import benchmark_industry_for, resolve_benchmark_payload
 from app.services.compliance import append_audit_event
 from app.services.sector_packs import (
-    get_pack_override,
     list_available_packs,
     list_pack_overrides,
     load_pack,
@@ -47,7 +46,7 @@ def get_conflicts(session_id: str) -> Dict[str, Any]:
     raw_lines = analysis.get("normalized_spend") or analysis.get("skill_outputs", {}).get("spend-profiler", {}).get("lines", [])
     if not raw_lines:
         raise HTTPException(status_code=404, detail="No normalized spend lines found — run analysis first")
-    lines = [NormalizedSpendLine(**l) if isinstance(l, dict) else l for l in raw_lines]
+    lines = [NormalizedSpendLine(**ln) if isinstance(ln, dict) else ln for ln in raw_lines]
     resolver = ConflictResolver()
     conflicts = resolver.run_all(lines)
     from app.services.conflict_resolver import normalize_user_actions
@@ -95,7 +94,7 @@ def resolve_conflicts(req: ConflictResolveRequest, session_id: str) -> Dict[str,
     raw_lines = analysis.get("normalized_spend") or analysis.get("skill_outputs", {}).get("spend-profiler", {}).get("lines", [])
     if not raw_lines:
         raise HTTPException(status_code=404, detail="No normalized spend lines — run analysis first")
-    lines = [NormalizedSpendLine(**l) if isinstance(l, dict) else l for l in raw_lines]
+    lines = [NormalizedSpendLine(**ln) if isinstance(ln, dict) else ln for ln in raw_lines]
     resolver = ConflictResolver()
     conflicts = resolver.run_all(lines)
     user_actions = normalize_user_actions(
@@ -163,7 +162,7 @@ def resolve_conflicts(req: ConflictResolveRequest, session_id: str) -> Dict[str,
             escalated_count += 1
     updated_analysis = dict(analysis)
     if "normalized_spend" in updated_analysis:
-        updated_analysis["normalized_spend"] = [l.model_dump() for l in lines]
+        updated_analysis["normalized_spend"] = [ln.model_dump() for ln in lines]
     updated_analysis["conflict_user_actions"] = user_actions
 
     spend_impact: Dict[str, Any] | None = None
@@ -176,11 +175,13 @@ def resolve_conflicts(req: ConflictResolveRequest, session_id: str) -> Dict[str,
         _memory.put("session", session_id, updated_analysis)
 
     append_audit_event(f"conflicts_resolved session={session_id} resolved={resolved_count} escalated={escalated_count}")
+    spend_base_revision = int((updated_analysis or {}).get("spend_base_revision") or 0)
     return {
         "resolved_count": resolved_count,
         "escalated_count": escalated_count,
         "total_conflicts": len(conflicts),
         "spend_impact": spend_impact,
+        "spend_base_revision": spend_base_revision,
         "summary": resolver.summary(conflicts, user_actions=user_actions),
     }
 
@@ -196,7 +197,7 @@ def consolidate_session(session_id: str, req: ConsolidateRequest) -> Dict[str, A
     raw_lines = analysis.get("normalized_spend") or analysis.get("skill_outputs", {}).get("spend-profiler", {}).get("lines", [])
     if not raw_lines:
         raise HTTPException(status_code=404, detail="No normalized spend lines — run analysis first")
-    lines = [NormalizedSpendLine(**l) if isinstance(l, dict) else l for l in raw_lines]
+    lines = [NormalizedSpendLine(**ln) if isinstance(ln, dict) else ln for ln in raw_lines]
     entity_tree: EntityTree | None = None
     if req.entity_tree:
         try:
@@ -506,7 +507,7 @@ def _build_real_spend_profile(lines: List[Any]) -> Dict[str, Any]:
         for cat_id, spend in sorted(cat_spend.items(), key=lambda x: -x[1])
         if spend > 0
     ]
-    total = sum(c["spend"] for c in category_profile) or 1.0
+    total = sum(cast(float, c["spend"]) for c in category_profile) or 1.0
     return {"total_spend": total, "category_profile": category_profile, "data_source": "actual_spend"}
 
 
@@ -794,7 +795,7 @@ async def company_research(req: CompanyResearchRequest) -> Dict[str, Any]:
         line_flags={"constraints": company_signals.get("constraints", [])},
         engagement_id=diag_engagement_id,
     )
-    active_cat_profile = active_profile.get("category_profile", category_profile)
+    active_cat_profile = cast(List[Dict[str, Any]], active_profile.get("category_profile", category_profile))
     cat_spend_cr = {c["category_id"]: c["spend"] / 1_00_00_000 for c in active_cat_profile}
     total_spend_cr = sum(cat_spend_cr.values()) or 1.0
     value_at_table = []

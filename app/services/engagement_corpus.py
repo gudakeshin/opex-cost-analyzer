@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from app.models import NormalizedSpendLine
-from app.routers._shared import read_manifest, session_dir
+from app.routers._shared import read_manifest
 from app.services.analysis import load_taxonomy
 from app.services.engagements_store import (
     backfill_engagement_for_session,
@@ -59,8 +59,6 @@ def load_engagement_corpus(
     if not manifest.get("engagement_id"):
         return [], [], [], [f"Engagement {engagement_id} not found"]
 
-    currency = reporting_currency or manifest.get("currency") or "INR"
-    taxonomy = load_taxonomy()
     lines: List[NormalizedSpendLine] = []
     docs_text: List[str] = []
     reports: List[Dict[str, Any]] = []

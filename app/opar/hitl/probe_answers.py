@@ -120,7 +120,6 @@ def filter_sme_critique_with_answers(
     ]
 
     summary = dict(out.get("critique_summary") or {})
-    insufficient_count = int(summary.get("insufficient_count") or 0)
     summary.update({
         "probe_count": probe_count,
         "ready_count": ready_count,

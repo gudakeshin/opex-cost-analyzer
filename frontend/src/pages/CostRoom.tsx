@@ -108,7 +108,7 @@ function scenarioExecutionRate(scenario: ScenarioPreset): number | undefined {
 }
 
 export default function CostRoom() {
-  const { sessionId, engagement, ensureSession, syncEngagementFromAnalysis } = useSession();
+  const { sessionId, engagement, ensureSession, syncEngagementFromAnalysis, refreshSessionAnalysis } = useSession();
   const { isExecutive } = useAudience();
   const navigate = useNavigate();
 
@@ -422,6 +422,7 @@ export default function CostRoom() {
         );
         await loadPipeline();
         await syncEngagementFromAnalysis();
+        await refreshSessionAnalysis();
       } else if (result.escalated_count) {
         setConflictNotice(
           'Flagged for manual review — spend base unchanged until Finance confirms a source.',

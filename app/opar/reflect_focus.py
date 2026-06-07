@@ -102,7 +102,7 @@ def build_focus_category_section(ctx: ObserveContext, validated: Dict[str, Dict[
                     )
                 break
 
-    root_causes = []
+    root_causes: list = []
     for rc in validated.get("root-cause-analyzer", {}).get("root_cause_findings", []):
         if str(rc.get("category_id")) == cid:
             root_causes = rc.get("root_causes", []) if isinstance(rc.get("root_causes"), list) else []

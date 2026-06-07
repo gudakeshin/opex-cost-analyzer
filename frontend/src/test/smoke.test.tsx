@@ -47,6 +47,9 @@ vi.mock('../context/SessionContext', () => ({
     loadingEngagement: false,
     hasAnalysis: false,
     refreshAnalysisStatus: vi.fn().mockResolvedValue(undefined),
+    sessionAnalysis: null,
+    spendBaseRevision: 0,
+    refreshSessionAnalysis: vi.fn().mockResolvedValue(null),
     syncEngagementFromAnalysis: vi.fn().mockResolvedValue(undefined),
   }),
   SessionProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -153,7 +156,6 @@ test('ValueBridgeChart renders a labelled value bridge chart', () => {
 // CostRoom — renders without crashing
 // ---------------------------------------------------------------------------
 
-import { act } from '@testing-library/react';
 import { apiGet } from '../hooks/useApi';
 import CostRoom from '../pages/CostRoom';
 

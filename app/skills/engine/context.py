@@ -238,10 +238,10 @@ def assumption_register(
 ) -> Dict[str, Any]:
     """Build a per-initiative assumption register with P10/P50/P90 ranges."""
     initiatives = initiatives or []
-    total_spend = sum(float(getattr(l, "amount", 0) or 0) for l in lines)
+    total_spend = sum(float(getattr(ln, "amount", 0) or 0) for ln in lines)
     spend_std = 0.0
     if lines:
-        amounts = [float(getattr(l, "amount", 0) or 0) for l in lines]
+        amounts = [float(getattr(ln, "amount", 0) or 0) for ln in lines]
         mean = total_spend / len(amounts)
         spend_std = math.sqrt(sum((a - mean) ** 2 for a in amounts) / len(amounts))
 
@@ -345,20 +345,20 @@ def vendor_master_builder(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
         by_name[key].append(line)
 
     def _build_entry(vid: int, gstin_key: Optional[str], group: List[NormalizedSpendLine]) -> Dict[str, Any]:
-        names = [l.supplier for l in group if l.supplier]
+        names = [ln.supplier for ln in group if ln.supplier]
         name_counts: Counter = Counter(names)
         canonical = name_counts.most_common(1)[0][0] if name_counts else "Unknown"
         aliases = sorted(set(names) - {canonical})
 
-        total_spend = sum(l.reporting_amount for l in group)
-        source_systems = sorted(set(l.source_system_id for l in group if l.source_system_id))
+        total_spend = sum(ln.reporting_amount for ln in group)
+        source_systems = sorted(set(ln.source_system_id for ln in group if ln.source_system_id))
 
         cat_spend: Dict[str, float] = defaultdict(float)
-        for l in group:
-            cat_spend[l.category_id or "uncategorized"] += l.reporting_amount
+        for ln in group:
+            cat_spend[ln.category_id or "uncategorized"] += ln.reporting_amount
         top_cat = max(cat_spend, key=lambda k: cat_spend[k]) if cat_spend else None
 
-        msme_flags = [l.vendor_msme_flag for l in group if l.vendor_msme_flag is not None]
+        msme_flags = [ln.vendor_msme_flag for ln in group if ln.vendor_msme_flag is not None]
 
         return {
             "vendor_id": f"V{vid:05d}",
@@ -392,8 +392,8 @@ def vendor_master_builder(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
 
     total_spend_all = sum(v["total_spend"] for v in vendors)
     gstin_covered = sum(
-        1 for l in lines
-        if (l.vendor_gstin or "").strip() and len((l.vendor_gstin or "").strip()) == 15
+        1 for ln in lines
+        if (ln.vendor_gstin or "").strip() and len((ln.vendor_gstin or "").strip()) == 15
     )
     coverage_pct = round(gstin_covered / max(len(lines), 1) * 100, 1)
 

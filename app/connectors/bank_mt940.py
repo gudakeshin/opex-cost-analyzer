@@ -13,9 +13,9 @@ from __future__ import annotations
 import logging
 import re
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any, List
 
-from app.connectors.base import ConnectorConfig, ConnectorInterface, FetchResult
+from app.connectors.base import ConnectorInterface, FetchResult
 from app.models import NormalizedSpendLine
 
 logger = logging.getLogger("opex.connector.bank_mt940")

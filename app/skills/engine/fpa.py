@@ -106,7 +106,7 @@ def _infer_period_grain(periods: List[str]) -> tuple[int, int, str]:
         elif len(s) == 4 and s.isdigit():
             annual += 1
     counts = {"monthly": monthly, "quarterly": quarterly, "annual": annual}
-    label = max(counts, key=counts.get)
+    label = max(counts, key=lambda k: counts[k])
     if counts[label] == 0:
         return 1, 12, "monthly"
     return {"monthly": (1, 12), "quarterly": (3, 4), "annual": (12, 1)}[label] + (label,)
@@ -165,11 +165,11 @@ def temporal_analyzer(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
         spend = period_totals[fp]
         prev_spend = period_totals[sorted_periods[i - 1]] if i > 0 else None
         mom_delta = spend - prev_spend if prev_spend is not None else None
-        mom_pct = (mom_delta / prev_spend * 100) if (prev_spend and prev_spend > 0) else None
+        mom_pct = (mom_delta / prev_spend * 100) if (mom_delta is not None and prev_spend and prev_spend > 0) else None
         yoy_period = _prior_year_period(fp, grain_label)
         yoy_spend = period_totals.get(yoy_period) if yoy_period else None
         yoy_delta = (spend - yoy_spend) if yoy_spend is not None else None
-        yoy_pct = (yoy_delta / yoy_spend * 100) if (yoy_spend and yoy_spend > 0) else None
+        yoy_pct = (yoy_delta / yoy_spend * 100) if (yoy_delta is not None and yoy_spend and yoy_spend > 0) else None
         period_trends.append(
             {
                 "period": fp,

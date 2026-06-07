@@ -323,9 +323,7 @@ class TestIngestionIndiaColumns:
     def test_gst_treatment_column_mapped(self, tmp_path):
         from app.services.ingestion import parse_spend_file
         import json, pathlib
-        taxonomy_path = pathlib.Path(
-            "/Users/pallavchaturvedi/Agentic Projects/Opex Cost analyzer"
-        ) / "skills" / "spend-profiler" / "references" / "spend_taxonomy.json"
+        from app.services.analysis import TAXONOMY_PATH as taxonomy_path
         taxonomy = json.loads(taxonomy_path.read_text())
 
         df = pd.DataFrame({
@@ -344,9 +342,7 @@ class TestIngestionIndiaColumns:
     def test_related_party_column_mapped(self, tmp_path):
         from app.services.ingestion import parse_spend_file
         import json, pathlib
-        taxonomy_path = pathlib.Path(
-            "/Users/pallavchaturvedi/Agentic Projects/Opex Cost analyzer"
-        ) / "skills" / "spend-profiler" / "references" / "spend_taxonomy.json"
+        from app.services.analysis import TAXONOMY_PATH as taxonomy_path
         taxonomy = json.loads(taxonomy_path.read_text())
 
         df = pd.DataFrame({
@@ -363,9 +359,7 @@ class TestIngestionIndiaColumns:
     def test_default_currency_inr(self, tmp_path):
         from app.services.ingestion import parse_spend_file
         import json, pathlib
-        taxonomy_path = pathlib.Path(
-            "/Users/pallavchaturvedi/Agentic Projects/Opex Cost analyzer"
-        ) / "skills" / "spend-profiler" / "references" / "spend_taxonomy.json"
+        from app.services.analysis import TAXONOMY_PATH as taxonomy_path
         taxonomy = json.loads(taxonomy_path.read_text())
 
         df = pd.DataFrame({

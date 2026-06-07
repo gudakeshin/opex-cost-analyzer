@@ -195,6 +195,7 @@ __all__ = [
     "requirements_for_initiative",
     "build_contracts_by_category",
     "build_supplier_counts",
+    "resolve_structured_indexes",
     # sme critique
     "sme_critique_analyzer",
     # strategic

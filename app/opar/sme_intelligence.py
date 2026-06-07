@@ -73,7 +73,7 @@ def enrich_sme_critique_with_llm(critique: Dict[str, Any]) -> Dict[str, Any] | N
 
     try:
         if GEMINI_ENABLED:
-            raw = call_gemini(_SME_SYSTEM, json.dumps(payload, default=str), max_tokens=1400)
+            raw: str | None = call_gemini(_SME_SYSTEM, json.dumps(payload, default=str), max_tokens=1400)
         else:
             raw = call_llm(_SME_SYSTEM, json.dumps(payload, default=str), max_tokens=1400, skill_name="sme-critique")
         if not raw:

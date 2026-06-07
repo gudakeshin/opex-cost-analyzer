@@ -115,11 +115,11 @@ class Gate:
 
 
 def _has_multi_source(ctx: SkillContext) -> bool:
-    return len({l.source_system_id for l in ctx.lines if l.source_system_id}) >= 2
+    return len({ln.source_system_id for ln in ctx.lines if ln.source_system_id}) >= 2
 
 
 def _has_multi_entity(ctx: SkillContext) -> bool:
-    entity_ids = {l.legal_entity_id for l in ctx.lines if l.legal_entity_id}
+    entity_ids = {ln.legal_entity_id for ln in ctx.lines if ln.legal_entity_id}
     return len(entity_ids) >= 2 or ctx.entity_tree is not None
 
 

@@ -12,6 +12,7 @@ build/
 .venv/
 venv/
 .pytest_cache/
+.coverage
 
 # Data — session uploads and outputs contain client data
 data/uploads/
@@ -30,4 +31,5 @@ node_modules/
 .DS_Store
 .idea/
 .vscode/
+.cursor/
 *.swp

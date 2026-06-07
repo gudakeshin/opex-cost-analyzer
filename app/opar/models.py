@@ -226,6 +226,9 @@ class ReflectOutput(BaseModel):
     # Chat synthesis metadata (supplier/geo dimension hints for UI)
     response_metadata: Dict[str, Any] = Field(default_factory=dict)
 
+    # LLM-suggested, data-backed charts rendered inline in the chat (see visualization.py)
+    chart_specs: List[Dict[str, Any]] = Field(default_factory=list)
+
     # Phase 3: replanner + quality gate + regulatory events
     replanner_log: List[Dict[str, Any]] = Field(default_factory=list)  # decisions made by replanner
     gate2_blocked: bool = False

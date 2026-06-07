@@ -16,9 +16,9 @@ from __future__ import annotations
 import csv
 import logging
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any, List
 
-from app.connectors.base import ConnectorConfig, ConnectorInterface, FetchResult
+from app.connectors.base import ConnectorInterface, FetchResult
 from app.models import NormalizedSpendLine
 
 logger = logging.getLogger("opex.connector.gst_portal")
@@ -61,11 +61,6 @@ class GSTPortalConnector(ConnectorInterface):
         gstin = str(norm.get("gstin_of_supplier") or norm.get("supplier_gstin") or "")
         supplier = str(norm.get("trade_name") or norm.get("supplier_name") or gstin)
         taxable = float(norm.get("taxable_value") or 0.0)
-        igst = float(norm.get("igst") or 0.0)
-        cgst = float(norm.get("cgst") or 0.0)
-        sgst = float(norm.get("sgst") or 0.0)
-        total_tax = igst + cgst + sgst
-        invoice_value = float(norm.get("invoice_value") or (taxable + total_tax))
         rc = str(norm.get("reverse_charge") or "N").upper()
         gst_treatment = "rcm" if rc == "Y" else "itc_eligible"
         return NormalizedSpendLine(

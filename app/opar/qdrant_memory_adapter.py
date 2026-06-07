@@ -42,7 +42,6 @@ class QdrantMemoryAdapter:
 
         try:
             from qdrant_client import QdrantClient
-            from qdrant_client.models import Distance, VectorParams
             from sentence_transformers import SentenceTransformer
 
             api_key = QDRANT_API_KEY or None

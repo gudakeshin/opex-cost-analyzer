@@ -3,7 +3,7 @@ msme_compliance_checker, brsr_cobenefit_calculator."""
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from app.models import NormalizedSpendLine
 
@@ -68,12 +68,12 @@ def indian_tax_optimizer(
 
     top_itc_categories = sorted(
         [{"category_id": k, "spend": round(v, 2)} for k, v in itc_by_category.items()],
-        key=lambda x: x["spend"],
+        key=lambda x: cast(float, x["spend"]),
         reverse=True,
     )[:5]
     rcm_categories = sorted(
         [{"category_id": k, "spend": round(v, 2)} for k, v in rcm_by_category.items()],
-        key=lambda x: x["spend"],
+        key=lambda x: cast(float, x["spend"]),
         reverse=True,
     )[:5]
 
@@ -148,7 +148,7 @@ def gstr_reconciler(
     gstr_rows = gstr_2a or []
 
     if not gstr_rows:
-        gst_ingested = [l for l in lines if getattr(l, "gst_treatment", None)]
+        gst_ingested = [ln for ln in lines if getattr(ln, "gst_treatment", None)]
         if not gst_ingested:
             return {
                 "gstr_available": False,
@@ -167,11 +167,11 @@ def gstr_reconciler(
             }
         gstr_rows = [
             {
-                "gstin": l.vendor_gstin or "",
-                "invoice_no": l.source_record_id or str(l.row_id),
-                "amount": l.reporting_amount,
+                "gstin": ln.vendor_gstin or "",
+                "invoice_no": ln.source_record_id or str(ln.row_id),
+                "amount": ln.reporting_amount,
             }
-            for l in gst_ingested
+            for ln in gst_ingested
         ]
 
     ap_by_gstin: Dict[str, List[NormalizedSpendLine]] = defaultdict(list)
@@ -262,9 +262,9 @@ def msme_compliance_checker(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
     MSME_LIMIT_DAYS = 45
     PENALTY_RATE_ANNUAL = 0.12
 
-    msme_lines = [l for l in lines if l.vendor_msme_flag is True]
+    msme_lines = [ln for ln in lines if ln.vendor_msme_flag is True]
     if not msme_lines:
-        has_any_flag = any(l.vendor_msme_flag is not None for l in lines)
+        has_any_flag = any(ln.vendor_msme_flag is not None for ln in lines)
         return {
             "msme_data_available": False,
             "reason": (

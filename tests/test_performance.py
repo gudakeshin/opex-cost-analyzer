@@ -160,7 +160,9 @@ def test_performance_smoke_upload_and_analyze_under_budget(client) -> None:
     )
     upload_secs = time.perf_counter() - start_upload
     assert up.status_code == 200
-    assert upload_secs < 10.0
+    # Generous bound: shared CI runners are 2-3x slower than dev machines; this
+    # smoke test guards against gross regressions, not a tight SLO.
+    assert upload_secs < 20.0
 
     start_analyze = time.perf_counter()
     analyze = client.post(
@@ -169,7 +171,7 @@ def test_performance_smoke_upload_and_analyze_under_budget(client) -> None:
     )
     analyze_secs = time.perf_counter() - start_analyze
     assert analyze.status_code == 200
-    assert analyze_secs < 15.0
+    assert analyze_secs < 30.0
 
 
 def test_rejects_file_larger_than_50mb(client) -> None:

@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import hashlib
-import io
 import json
 import re
 from datetime import datetime
 from pathlib import Path
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple, cast
 
 import pandas as pd
 from docx import Document
@@ -1145,9 +1144,9 @@ def _dataframe_to_spend_lines(
                 # Vendor master
                 vendor_pan=vendor_pan,
                 vendor_msme_flag=vendor_msme_flag,
-                vendor_category=vendor_category,
+                vendor_category=cast(Optional[Literal["large", "msme", "startup", "foreign"]], vendor_category),
                 # Classification
-                spend_type=spend_type,
+                spend_type=cast(Literal["opex", "capex", "lease", "statutory", "intercompany"], spend_type),
                 is_addressable=is_addressable,
             )
         )

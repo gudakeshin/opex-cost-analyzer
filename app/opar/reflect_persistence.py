@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any, Dict, List
 
 from app.config import UPLOAD_DIR
@@ -131,7 +130,7 @@ def persist_session_analysis(
     merged_outputs.update(validated)
     prior_spend = analysis_snapshot.get("normalized_spend", [])
     if not prior_spend and getattr(act_result, "normalized_spend", None):
-        prior_spend = [l.model_dump(mode="json") for l in act_result.normalized_spend]
+        prior_spend = [ln.model_dump(mode="json") for ln in act_result.normalized_spend]
     prior_trace = analysis_snapshot.get("analysis_trace", [])
     if not prior_trace:
         prior_trace = _build_chat_analysis_trace(merged_outputs, reporting_currency)
@@ -154,6 +153,10 @@ def persist_session_analysis(
         "skills_run_this_turn": list(validated.keys()),
         "updated_at": datetime.now(timezone.utc).isoformat(),
     })
+    if "spend-profiler" in validated:
+        from app.services.spend_base import repair_spend_base_if_needed
+
+        analysis_snapshot = repair_spend_base_if_needed(ctx.session_id, analysis_snapshot)
     _memory.put("session", ctx.session_id, analysis_snapshot)
 
 

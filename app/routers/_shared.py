@@ -17,7 +17,6 @@ from fastapi import HTTPException
 from app.config import UPLOAD_DIR, logger
 from app.services.engagements_store import engagement_dir as _engagement_dir
 from app.services.engagements_store import engagement_manifest_path as _engagement_manifest_path
-from app.services.engagements_store import read_engagement_manifest, write_engagement_manifest
 from app.memory import MemoryStore
 from app.storage import read_json, write_json
 

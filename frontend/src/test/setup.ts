@@ -6,4 +6,4 @@ class ResizeObserverPolyfill {
   unobserve() {}
   disconnect() {}
 }
-global.ResizeObserver = ResizeObserverPolyfill;
+globalThis.ResizeObserver = ResizeObserverPolyfill as unknown as typeof ResizeObserver;

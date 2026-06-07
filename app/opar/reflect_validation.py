@@ -1,7 +1,7 @@
 """Reflect validation — 3-layer schema/coherence checks, confidence, quality signals."""
 from __future__ import annotations
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Literal, Tuple
 
 import pandas as pd
 
@@ -166,7 +166,6 @@ def _layer2_coherence_checks(
     peer = validated.get("peer-benchmarker", {})
     internal = validated.get("internal-benchmarker", {})
     heuristic = validated.get("heuristic-analyzer", {})
-    bridge = validated.get("value-bridge-calculator", {})
 
     total_spend = profile.get("total_spend", 0.0)
     if total_spend <= 0:
@@ -224,7 +223,7 @@ def _layer3_domain_confidence(
     for skill_name, out in validated.items():
         if skill_name in confidence_scores:
             continue
-        level = "mid"
+        level: Literal["low", "mid", "high"] = "mid"
         factor = 0.75
         rationale = "Schema validated"
         if dq < 0.6:

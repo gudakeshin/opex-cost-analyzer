@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, FrozenSet, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 _CATEGORY_PREFIX = re.compile(r"^category:\s*", re.IGNORECASE)
 _OR_SPLIT = re.compile(r"\s+or\s+", re.IGNORECASE)
@@ -237,10 +237,10 @@ def evaluate_applicable_rule(
         return RuleResult(RuleOutcome.SOFT, [])
 
     if "annual_revenue >" in rule_lower:
-        threshold = _parse_revenue_threshold(rule_lower)
-        if threshold is not None:
-            if annual_revenue and annual_revenue > threshold:
-                return RuleResult(RuleOutcome.HARD_PASS, [f"revenue>{threshold:.0f}"])
+        rev_threshold = _parse_revenue_threshold(rule_lower)
+        if rev_threshold is not None:
+            if annual_revenue and annual_revenue > rev_threshold:
+                return RuleResult(RuleOutcome.HARD_PASS, [f"revenue>{rev_threshold:.0f}"])
             return RuleResult(RuleOutcome.HARD_FAIL, [])
         return RuleResult(RuleOutcome.SOFT, [])
 
@@ -455,7 +455,7 @@ def build_line_flags(lines: List[Any]) -> Dict[str, Any]:
                 if months < 18:
                     contract_ok = True
     total = sum(
-        float(getattr(l, "reporting_amount", 0.0) or getattr(l, "amount", 0.0)) for l in lines
+        float(getattr(ln, "reporting_amount", 0.0) or getattr(ln, "amount", 0.0)) for ln in lines
     ) or 1.0
     return {
         "gst_treatment_present": gst,

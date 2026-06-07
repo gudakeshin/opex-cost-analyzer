@@ -6,9 +6,9 @@ import uuid
 from pathlib import Path
 from typing import Any, Dict, List
 
-from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
-from app.config import MAX_UPLOAD_MB, logger
+from app.config import MAX_UPLOAD_MB
 from app.opar.hitl.clarification_tool import ClarificationAnswer
 from app.opar.orchestrator import (
     CheckpointAlreadyResumedError,
@@ -33,9 +33,7 @@ from app.routers._shared import (
 from app.opar.hitl.probe_answers import (
     apply_probe_answer,
     apply_probe_answers_to_skill_outputs,
-    filter_sme_critique_with_answers,
     get_answered_family_ids,
-    load_probe_answers,
 )
 from app.opar.probe_intelligence import synthesize_probe_answer_acknowledgment
 from app.schemas import ChatRequest, ClarificationResumeRequest, ProbeAnswerRequest, V1ChatRequest
@@ -55,12 +53,11 @@ def _opar_response(result: Any, run_id: str, session_id: str | None = None) -> D
             ingestion_summary = manifest.get("ingestion_summary")
         except Exception:
             pass
+    advisory = getattr(result, "advisory_sections", None)
     return {
         "response_text": result.response_text,
         "artefacts": result.response_artefacts,
-        "advisory_sections": getattr(result, "advisory_sections", None).model_dump()
-        if getattr(result, "advisory_sections", None)
-        else {},
+        "advisory_sections": advisory.model_dump() if advisory else {},
         "quality_signals": getattr(result, "quality_signals", {}),
         "used_llm_synthesis": getattr(result, "used_llm_synthesis", False),
         "thinking": getattr(result, "thinking_text", None),
@@ -80,6 +77,7 @@ def _opar_response(result: Any, run_id: str, session_id: str | None = None) -> D
             else None
         ),
         "response_metadata": getattr(result, "response_metadata", None) or {},
+        "charts": getattr(result, "chart_specs", None) or [],
     }
 
 
@@ -394,7 +392,6 @@ async def chat_v1_probe_answer(payload: ProbeAnswerRequest) -> Dict[str, Any]:
         },
     )
 
-    answers = load_probe_answers(payload.session_id)
     answered_ids = get_answered_family_ids(payload.session_id)
     remaining = 0
     try:
@@ -495,14 +492,13 @@ async def chat_with_planner(session_id: str, payload: ChatRequest) -> Dict[str, 
             detail={"error": "analysis_timeout", "message": f"Timed out after {_OPAR_TIMEOUT_S}s"},
         )
     append_audit_event(f"chat_opar session_id={session_id}")
+    advisory = getattr(result, "advisory_sections", None)
     return {
         "session_id": session_id,
         "assistant_message": result.response_text,
         "asked_question": bool(result.next_loop_trigger),
         "response_text": result.response_text,
-        "advisory_sections": getattr(result, "advisory_sections", None).model_dump()
-        if getattr(result, "advisory_sections", None)
-        else {},
+        "advisory_sections": advisory.model_dump() if advisory else {},
         "quality_signals": getattr(result, "quality_signals", {}),
         "used_llm_synthesis": getattr(result, "used_llm_synthesis", False),
         "degraded_mode": getattr(result, "degraded_mode", False),

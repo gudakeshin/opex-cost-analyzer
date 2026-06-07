@@ -113,7 +113,7 @@ export function complexityShortLabel(tier: string | null | undefined): string | 
 export function buildValueBridgeSegments(
   rows: ValueAtTableRow[],
   percentilesByLever: Record<string, number>,
-  totalP50Cr?: number,
+  _totalP50Cr?: number,
 ): { segments: ValueBridgeSegment[]; totalScenario: number } {
   const sorted = [...rows].sort((a, b) => Number(b.p50_cr ?? 0) - Number(a.p50_cr ?? 0));
   const totalScenario = sumLeverValuesAtPercentiles(rows, percentilesByLever);

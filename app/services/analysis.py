@@ -21,6 +21,7 @@ from app.skills.contracts import (
 from app.skills import engine
 from app.skills.dispatch import SkillContext
 from app.opar.pipeline_profile import PipelineProfile, run_profile
+from app.services.spend_base import bump_spend_base_revision, refresh_spend_base
 from app.services.spend_line_merge import merge_persisted_line_adjustments, prior_lines_from_session
 
 
@@ -365,9 +366,9 @@ def run_core_pipeline(
     # --- Data-shape flags for agent memory ---
     has_budget = any(x.amount_type == "budget" for x in lines)
     has_periods = any(x.fiscal_period for x in lines)
-    has_multi_source = len({l.source_system_id for l in lines if l.source_system_id}) >= 2
-    has_contracts = any(l.contract_expiry_date or l.contract_status for l in lines)
-    has_multi_entity = len({l.legal_entity_id for l in lines if l.legal_entity_id}) >= 2 or entity_tree is not None
+    has_multi_source = len({ln.source_system_id for ln in lines if ln.source_system_id}) >= 2
+    has_contracts = any(ln.contract_expiry_date or ln.contract_status for ln in lines)
+    has_multi_entity = len({ln.legal_entity_id for ln in lines if ln.legal_entity_id}) >= 2 or entity_tree is not None
 
     state = SessionAnalysisState(
         session_id=session_id,
@@ -384,6 +385,7 @@ def run_core_pipeline(
     state_dict = state.model_dump(mode="json")
     if conflict_user_actions:
         state_dict["conflict_user_actions"] = conflict_user_actions
+    state_dict = bump_spend_base_revision(state_dict)
     _memory.put("session", session_id, state_dict)
     # Persist a thin manifest snapshot so get_session_manifest can recover the
     # session directory even if data/uploads/{id}/ is wiped after analysis.
@@ -453,10 +455,10 @@ def run_incremental_pipeline(
             existing_lines.append(raw)
 
     # Dedup: skip lines already present by (source_record_id, source_file_hash).
-    existing_keys = {
-        (l.source_record_id, l.source_file_hash)
-        for l in existing_lines
-        if l.source_record_id and l.source_file_hash
+    existing_keys: set[tuple[str | None, str | None]] = {
+        (ln.source_record_id, ln.source_file_hash)
+        for ln in existing_lines
+        if ln.source_record_id and ln.source_file_hash
     }
     merged = list(existing_lines)
     added = 0
@@ -477,44 +479,21 @@ def run_incremental_pipeline(
             "updated_skills": [],
         }
 
-    # Re-run affected skills through the INCREMENTAL profile — same dispatch
-    # handlers as the full pipeline, so skill parameters live in one place.
-    inc_ctx = SkillContext(
+    impact = refresh_spend_base(
+        session_id,
+        reason="incremental_upload",
         lines=merged,
-        docs_text=[],
-        manifest={"session_id": session_id},
-        prior_results={},
+        existing=existing,
     )
-    inc_outputs, _ = run_profile(PipelineProfile.INCREMENTAL, inc_ctx, gating=False)
-    profile = inc_outputs["spend-profiler"]
-    internal = inc_outputs["internal-benchmarker"]
-    vendor_master = inc_outputs["vendor-master-builder"]
-    msme_compliance = inc_outputs["msme-compliance-checker"]
-    validate_vendor_master_output(vendor_master)
-    validate_msme_output(msme_compliance)
-
-    updated_state = dict(existing)
-    updated_state["normalized_spend"] = [l.model_dump(mode="json") for l in merged]
-    updated_state.setdefault("skill_outputs", {})
-    updated_state["skill_outputs"]["spend-profiler"] = profile
-    updated_state["skill_outputs"]["internal-benchmarker"] = internal
-    updated_state["skill_outputs"]["vendor-master-builder"] = vendor_master
-    updated_state["skill_outputs"]["msme-compliance-checker"] = msme_compliance
-
-    _memory.put("session", session_id, updated_state)
 
     return {
         "status": "updated",
         "session_id": session_id,
         "lines_added": added,
         "total_lines": len(merged),
-        "updated_skills": [
-            "spend-profiler",
-            "internal-benchmarker",
-            "vendor-master-builder",
-            "msme-compliance-checker",
-        ],
-        "total_spend": profile.get("total_spend", 0.0),
+        "updated_skills": impact["updated_skills"],
+        "total_spend": impact["new_total_spend"],
+        "spend_base_revision": impact["spend_base_revision"],
     }
 
 
@@ -524,50 +503,9 @@ def reprofile_after_spend_correction(
     existing: Dict[str, Any],
 ) -> Dict[str, Any]:
     """Re-run spend-sensitive skills after conflict resolution adjusts line-level spend."""
-    prior_total = float(
-        existing.get("skill_outputs", {}).get("spend-profiler", {}).get("total_spend", 0.0) or 0.0
-    )
-    excluded_lines = sum(1 for line in lines if line.consolidation_eliminated)
-    excluded_spend = sum(
-        line.reporting_amount for line in lines if line.consolidation_eliminated
-    )
-
-    inc_ctx = SkillContext(
+    return refresh_spend_base(
+        session_id,
+        reason="conflict_resolution",
         lines=lines,
-        docs_text=[],
-        manifest={"session_id": session_id},
-        prior_results=dict(existing.get("skill_outputs") or {}),
+        existing=existing,
     )
-    inc_outputs, _ = run_profile(PipelineProfile.INCREMENTAL, inc_ctx, gating=False)
-    profile = inc_outputs["spend-profiler"]
-    internal = inc_outputs["internal-benchmarker"]
-    vendor_master = inc_outputs["vendor-master-builder"]
-    msme_compliance = inc_outputs["msme-compliance-checker"]
-    validate_vendor_master_output(vendor_master)
-    validate_msme_output(msme_compliance)
-
-    updated_state = dict(existing)
-    updated_state["normalized_spend"] = [l.model_dump(mode="json") for l in lines]
-    updated_state.setdefault("skill_outputs", {})
-    updated_state["skill_outputs"]["spend-profiler"] = profile
-    updated_state["skill_outputs"]["internal-benchmarker"] = internal
-    updated_state["skill_outputs"]["vendor-master-builder"] = vendor_master
-    updated_state["skill_outputs"]["msme-compliance-checker"] = msme_compliance
-
-    _memory.put("session", session_id, updated_state)
-
-    new_total = float(profile.get("total_spend", 0.0) or 0.0)
-    return {
-        "prior_total_spend": round(prior_total, 2),
-        "new_total_spend": round(new_total, 2),
-        "spend_delta": round(new_total - prior_total, 2),
-        "lines_excluded": excluded_lines,
-        "excluded_spend": round(excluded_spend, 2),
-        "updated_skills": [
-            "spend-profiler",
-            "internal-benchmarker",
-            "vendor-master-builder",
-            "msme-compliance-checker",
-        ],
-        "initiatives_refresh_required": abs(new_total - prior_total) > 0.01,
-    }

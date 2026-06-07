@@ -45,7 +45,7 @@ class MemoryStore:
 
     def list_engagement_sessions(self, engagement_id: str) -> list:
         """Return all session_ids that declare this engagement_id."""
-        sessions = []
+        sessions: list[str] = []
         session_dir = self.base / "session"
         if not session_dir.exists():
             return sessions

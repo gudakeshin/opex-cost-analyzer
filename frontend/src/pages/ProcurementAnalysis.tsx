@@ -180,13 +180,15 @@ export const ProcurementAnalysis: React.FC = () => {
     refreshEngagement,
     syncEngagementFromAnalysis,
     refreshAnalysisStatus,
+    sessionAnalysis,
+    refreshSessionAnalysis,
     deepResearchSummary,
   } = useSession();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [analysis, setAnalysis] = useState<SessionResponse | null>(null);
+  const analysis = sessionAnalysis;
   const [manifest, setManifest] = useState<SessionManifest | null>(null);
   const [engagementDocCount, setEngagementDocCount] = useState<number | null>(null);
   const [insightsOpen, setInsightsOpen] = useState(true);
@@ -260,7 +262,6 @@ export const ProcurementAnalysis: React.FC = () => {
   useEffect(() => {
     if (!sessionId) {
       setManifest(null);
-      setAnalysis(null);
       setMessages([]);
       return;
     }
@@ -276,7 +277,6 @@ export const ProcurementAnalysis: React.FC = () => {
         if (!status.session_exists) {
           if (!cancelled) {
             setManifest(null);
-            setAnalysis(null);
             setMessages([]);
           }
           return;
@@ -297,12 +297,10 @@ export const ProcurementAnalysis: React.FC = () => {
 
         try {
           if (!status.has_analysis) {
-            if (!cancelled) setAnalysis(null);
             return;
           }
-          const sess = await apiGet<SessionResponse>(`/api/v1/sessions/${sessionId}`);
-          if (!cancelled) {
-            setAnalysis(sess);
+          const sess = await refreshSessionAnalysis();
+          if (!cancelled && sess) {
             const snapshot = extractInsightSnapshot(sess, m);
             if (snapshot && snapshot.total_spend > 0) {
               setMessages((prev) => {
@@ -315,12 +313,11 @@ export const ProcurementAnalysis: React.FC = () => {
             }
           }
         } catch {
-          if (!cancelled) setAnalysis(null);
+          /* analysis optional on load */
         }
       } catch {
         if (!cancelled) {
           setManifest(null);
-          setAnalysis(null);
         }
       }
     })();
@@ -328,7 +325,17 @@ export const ProcurementAnalysis: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [sessionId]);
+  }, [sessionId, refreshSessionAnalysis]);
+
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && sessionId) {
+        refreshSessionAnalysis().catch(() => undefined);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [sessionId, refreshSessionAnalysis]);
 
   useEffect(() => {
     if (sessionId && messages.length > 0) {
@@ -480,11 +487,7 @@ export const ProcurementAnalysis: React.FC = () => {
       let session: SessionResponse | null = null;
       let latestManifest = manifest;
       try {
-        const status = await apiGet<{ has_analysis?: boolean }>(`/api/v1/sessions/${sid}/status`);
-        if (status.has_analysis) {
-          session = await apiGet<SessionResponse>(`/api/v1/sessions/${sid}`);
-          setAnalysis(session);
-        }
+        session = await refreshSessionAnalysis();
         await refreshAnalysisStatus();
       } catch {
         /* analysis not run yet */
@@ -523,6 +526,7 @@ export const ProcurementAnalysis: React.FC = () => {
           artefacts: res.artefacts,
           insight_snapshot: insightSnap,
           show_peer_savings: showPeer,
+          charts: res.charts,
         },
       ]);
       maybeAutoOpenProbeModal(insightSnap, currentAnsweredProbeFamilies(), res.run_id);
@@ -773,8 +777,7 @@ export const ProcurementAnalysis: React.FC = () => {
 
       let freshAnalysis = analysis;
       try {
-        freshAnalysis = await apiGet<SessionResponse>(`/api/v1/sessions/${sid}`);
-        setAnalysis(freshAnalysis);
+        freshAnalysis = (await refreshSessionAnalysis()) ?? analysis;
       } catch {
         /* session refresh optional */
       }
@@ -858,11 +861,7 @@ export const ProcurementAnalysis: React.FC = () => {
       let session: SessionResponse | null = null;
       let latestManifest = manifest;
       try {
-        const status = await apiGet<{ has_analysis?: boolean }>(`/api/v1/sessions/${sid}/status`);
-        if (status.has_analysis) {
-          session = await apiGet<SessionResponse>(`/api/v1/sessions/${sid}`);
-          setAnalysis(session);
-        }
+        session = await refreshSessionAnalysis();
         await refreshAnalysisStatus();
       } catch {
         /* analysis not run yet */
@@ -901,6 +900,7 @@ export const ProcurementAnalysis: React.FC = () => {
           artefacts: res.artefacts,
           insight_snapshot: insightSnap,
           show_peer_savings: showPeer,
+          charts: res.charts,
         },
       ]);
       maybeAutoOpenProbeModal(insightSnap, answeredProbeFamilies, res.run_id);
@@ -942,8 +942,7 @@ export const ProcurementAnalysis: React.FC = () => {
       const rawTrace = (analysisResult as { analysis_trace?: unknown }).analysis_trace;
       const trace = Array.isArray(rawTrace) ? (rawTrace as AnalysisTraceStep[]) : undefined;
       await syncEngagementFromAnalysis();
-      const session = await apiGet<SessionResponse>(`/api/v1/sessions/${sid}`);
-      setAnalysis(session);
+      const session = await refreshSessionAnalysis();
       const m = await refreshManifest(sid);
       const snapshot = extractInsightSnapshot(session, m);
       setAgentSteps((prev) => [
@@ -999,8 +998,7 @@ export const ProcurementAnalysis: React.FC = () => {
     try {
       const sid = await ensureSession();
       await apiPost(`/api/v1/analyze/${sid}/incremental`, {});
-      const session = await apiGet<SessionResponse>(`/api/v1/sessions/${sid}`);
-      setAnalysis(session);
+      const session = await refreshSessionAnalysis();
       const m = await refreshManifest(sid);
       const snapshot = extractInsightSnapshot(session, m);
       setMessages((prev) => [
@@ -1066,7 +1064,6 @@ export const ProcurementAnalysis: React.FC = () => {
       if (sessionId) clearChatMessages(sessionId);
       setSessionId(res.session_id);
       setMessages([]);
-      setAnalysis(null);
       setManifest(res);
       setAgentSteps(undefined);
       setPipelineLabel(undefined);
@@ -1270,6 +1267,8 @@ export const ProcurementAnalysis: React.FC = () => {
                       <StructuredChatMessage
                         key={idx}
                         message={msg}
+                        liveSnapshot={insightSnapshot}
+                        currency={engagement.currency || 'INR'}
                         onOptionClick={(text) => sendMessage(text)}
                         answeredProbeFamilies={answeredProbeFamilies}
                         onOpenProbes={

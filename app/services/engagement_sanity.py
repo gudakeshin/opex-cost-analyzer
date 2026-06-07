@@ -128,7 +128,7 @@ def _signals_from_spend_lines(lines: List[NormalizedSpendLine]) -> List[Dict[str
         counts[key] = counts.get(key, 0) + 1
     if not counts:
         return []
-    top = max(counts, key=counts.get)
+    top = max(counts, key=lambda k: counts[k])
     return [{"source": "legal_entity", "company_guess": top}]
 
 

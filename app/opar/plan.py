@@ -335,7 +335,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
 
         # Minimal core; capabilities / data only ADD optional skills. _expand()
         # wires dependencies from the canonical _DEP_MAP.
-        selected: List[str] = ["spend-profiler"]
+        selected = ["spend-profiler"]
         if include_docs:
             selected.append("document-contextualizer")
         selected += ["peer-benchmarker", "internal-benchmarker"]

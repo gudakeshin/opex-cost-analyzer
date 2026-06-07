@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import logging
+import threading as _threading
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -232,8 +233,6 @@ def run_regression_test(pack_id: str) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Sector pack overrides — per-engagement lever suppression / customisation
 # ---------------------------------------------------------------------------
-
-import threading as _threading
 
 _OVERRIDE_LOCK = _threading.Lock()
 _OVERRIDES_PATH = Path("data") / "sector_pack_overrides.json"
