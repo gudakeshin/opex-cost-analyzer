@@ -5,6 +5,7 @@ import { PageHeader } from '../components/Common/PageHeader';
 import { Card } from '../components/Common/Card';
 import { Alert } from '../components/Common/Alert';
 import { Loader } from '../components/Common/Loader';
+import { Modal } from '../components/Common/Modal';
 import { Button } from '../components/Common/Button';
 import { Input } from '../components/Common/Input';
 import { Select } from '../components/Common/Select';
@@ -42,10 +43,14 @@ export const EngagementDocuments: React.FC = () => {
     setEngagementId,
     ensureEngagement,
     listEngagements,
+    deleteEngagement,
     createEngagement,
     engagement,
   } = useSession();
   const [engagements, setEngagements] = useState<EngagementSummary[]>([]);
+  const [engagementSearch, setEngagementSearch] = useState('');
+  const [engagementToDelete, setEngagementToDelete] = useState<EngagementSummary | null>(null);
+  const [deletingEngagement, setDeletingEngagement] = useState(false);
   const [documents, setDocuments] = useState<EngagementDocument[]>([]);
   const [llamaparseConfigured, setLlamaparseConfigured] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -191,6 +196,27 @@ export const EngagementDocuments: React.FC = () => {
     }
   };
 
+  const handleConfirmDeleteEngagement = async () => {
+    if (!engagementToDelete) return;
+    setDeletingEngagement(true);
+    try {
+      await deleteEngagement(engagementToDelete.engagement_id);
+      const wasActive = engagementToDelete.engagement_id === engagementId;
+      setEngagementToDelete(null);
+      const list = await loadEngagements();
+      if (wasActive) {
+        const next = list[0]?.engagement_id ?? null;
+        setEngagementId(next);
+        if (next) await loadDocuments(next);
+        else setDocuments([]);
+      }
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setDeletingEngagement(false);
+    }
+  };
+
   const handleReprocess = async (docId: string) => {
     if (!engagementId) return;
     try {
@@ -203,6 +229,9 @@ export const EngagementDocuments: React.FC = () => {
 
   const activeEngagement = engagements.find((e) => e.engagement_id === engagementId);
   const readyDocCount = documents.filter((d) => d.status === 'ready').length;
+  const filteredEngagements = engagements.filter((e) =>
+    e.company_name.toLowerCase().includes(engagementSearch.trim().toLowerCase()),
+  );
 
   return (
     <MainLayout>
@@ -286,23 +315,50 @@ export const EngagementDocuments: React.FC = () => {
               )}
             </div>
           )}
+          {engagements.length > 0 && (
+            <Input
+              placeholder="Search engagements…"
+              value={engagementSearch}
+              onChange={(e) => setEngagementSearch(e.target.value)}
+              className="mb-3"
+            />
+          )}
           <div className="space-y-2 max-h-64 overflow-y-auto">
-            {engagements.map((e) => (
-              <button
+            {filteredEngagements.length === 0 && engagements.length > 0 && (
+              <p className="text-xs text-brand-muted text-center py-3">
+                No engagements match your search.
+              </p>
+            )}
+            {filteredEngagements.map((e) => (
+              <div
                 key={e.engagement_id}
-                type="button"
-                onClick={() => handleSelectEngagement(e.engagement_id)}
-                className={`w-full text-left px-3 py-2 rounded-lg border text-sm transition-colors ${
+                className={`w-full flex items-start gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
                   e.engagement_id === engagementId
                     ? 'border-deloitte-green bg-emerald-50/50'
                     : 'border-brand-border hover:bg-brand-surface-muted'
                 }`}
               >
-                <p className="font-medium text-brand-ink">{e.company_name}</p>
-                <p className="text-xs text-brand-muted mt-0.5">
-                  {e.document_count} docs · {e.session_count} sessions
-                </p>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => handleSelectEngagement(e.engagement_id)}
+                  className="flex-1 text-left"
+                >
+                  <p className="font-medium text-brand-ink">{e.company_name}</p>
+                  <p className="text-xs text-brand-muted mt-0.5">
+                    {e.document_count} docs · {e.session_count} sessions
+                  </p>
+                </button>
+                <button
+                  type="button"
+                  className="text-xs text-red-700 hover:underline shrink-0 mt-0.5"
+                  onClick={(ev) => {
+                    ev.stopPropagation();
+                    setEngagementToDelete(e);
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
             ))}
           </div>
           <Button type="button" variant="secondary" className="mt-4 w-full" onClick={openCreateModal}>
@@ -513,6 +569,20 @@ export const EngagementDocuments: React.FC = () => {
           </div>
         </div>
       )}
+
+      <Modal
+        open={!!engagementToDelete}
+        title="Delete engagement"
+        onClose={() => { if (!deletingEngagement) setEngagementToDelete(null); }}
+        onConfirm={handleConfirmDeleteEngagement}
+        confirmLabel={deletingEngagement ? 'Deleting…' : 'Delete engagement'}
+        confirmVariant="danger"
+      >
+        <p className="text-sm text-brand-ink">
+          This permanently deletes <span className="font-semibold">{engagementToDelete?.company_name}</span>,
+          along with all of its documents and analysis sessions. This action cannot be undone.
+        </p>
+      </Modal>
     </MainLayout>
   );
 };

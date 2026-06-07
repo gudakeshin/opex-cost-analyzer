@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { apiGet, apiPost } from '../hooks/useApi';
+import { apiDelete, apiGet, apiPost } from '../hooks/useApi';
 import { manifestAudienceToMode, useAudience } from './AudienceContext';
 import { isPlaceholderCompanyName } from '../utils/engagement';
 import type { EngagementMeta, EngagementSummary, SessionManifest, SessionResponse } from '../types';
@@ -15,6 +15,7 @@ interface SessionContextValue {
   ensureSession: () => Promise<string>;
   ensureEngagement: () => Promise<string>;
   listEngagements: () => Promise<EngagementSummary[]>;
+  deleteEngagement: (id: string) => Promise<void>;
   createEngagement: (payload?: {
     company_name?: string;
     industry?: string;
@@ -269,6 +270,17 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return apiGet<EngagementSummary[]>('/api/v1/engagements');
   }, []);
 
+  const deleteEngagement = useCallback(
+    async (id: string) => {
+      await apiDelete(`/api/v1/engagement/${id}`);
+      if (id === engagementId) {
+        setEngagementIdState(null);
+        setEngagement(defaultEngagement);
+      }
+    },
+    [engagementId],
+  );
+
   const createEngagement = useCallback(
     async (payload?: {
       company_name?: string;
@@ -319,6 +331,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       ensureSession,
       ensureEngagement,
       listEngagements,
+      deleteEngagement,
       createEngagement,
       engagement,
       refreshEngagement,
@@ -339,6 +352,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       ensureSession,
       ensureEngagement,
       listEngagements,
+      deleteEngagement,
       createEngagement,
       engagement,
       refreshEngagement,
