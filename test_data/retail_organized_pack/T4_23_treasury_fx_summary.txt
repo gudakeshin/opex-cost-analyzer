@@ -1,0 +1,3 @@
+Bharat Bazaar Retail Ltd — Treasury FY25
+
+Primarily domestic INR business. Import USD: electronics & direct-import fashion (~1800 Cr). Policy: hedge 55% of confirmed import USD orders. USD/INR ~83.4. Some store leases in USD equivalent (premium malls) — creates embedded FX exposure. Separate lease FX from product import FX in analysis.

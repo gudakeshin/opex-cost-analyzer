@@ -1,0 +1,7 @@
+Deep Research Brief — Indian Banking cost structure (Indus Apex Bank)
+
+Cost-to-income 40-48% mid-size private banks; PSBs 50-58%. Technology and ATM/branch ops are primary levers. Branch rationalisation: 8-14% branch OpEx reduction over 2 years. ATM managed services: 10-18% ATM OpEx reduction. KYC/AML RPA: 15-30% reduction. Core banking cloud: 12-22% infra reduction post-migration.
+
+Constraints: RBI data-localisation limits cloud choices. BC commissions regulated. Cybersecurity non-discretionary per RBI framework 2023.
+
+Addressable third-party OpEx ~55-60% of non-interest expense.

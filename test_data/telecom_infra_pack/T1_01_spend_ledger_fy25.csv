@@ -1,0 +1,11 @@
+supplier,description,amount,currency,category,gl_code,spend_date,business_unit,country
+Ericsson India,RAN equipment maintenance & managed services FY25,5320000000,INR,Network Operations & Energy,510010,2024-12-01,Mobile Services,India
+Tata Power (Tower Energy),Diesel & grid power — 42000 tower sites,4560000000,INR,Network Operations & Energy,510011,2024-11-15,Corporate,India
+Nokia Solutions India,Core network & transport operations,3040000000,INR,Network Operations & Energy,510012,2024-10-05,Mobile Services,India
+Huawei Telecom India,5G NR rollout & radio access equipment,2660000000,INR,Network Operations & Energy,510013,2024-09-12,Mobile Services,India
+BSNL (Interconnect),National & international roaming settlement,1900000000,INR,Roaming & Interconnect,520010,2024-08-20,Mobile Services,India
+MSME Tower Maintenance,Passive infrastructure O&M — civil & electrical,1520000000,INR,Network Operations & Energy,510014,2024-07-01,Tower Infrastructure,India
+Amdocs India,BSS/OSS platform — billing & CRM,1140000000,INR,IT & Digital Infrastructure,530010,2024-06-15,Corporate,India
+AWS India,Cloud infrastructure — digital services & analytics,760000000,INR,IT & Digital Infrastructure,530011,2025-01-10,Digital Services,India
+Accenture India,Network transformation & shared services,760000000,INR,Administrative & Corporate,540010,2025-02-01,Corporate,India
+TRAI Filing Services,Spectrum usage charges & TRAI compliance,580000000,INR,Spectrum & Regulatory,550010,2024-05-01,Corporate,India

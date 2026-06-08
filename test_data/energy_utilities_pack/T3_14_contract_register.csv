@@ -1,0 +1,6 @@
+supplier,category,contract_status,contract_expiry_date,auto_renewal_notice_days,early_exit_penalty_pct,min_purchase_commitment,currency
+GE Power India,O&M Services,in_contract,2027-03-31,120,18,4620000000,INR
+Siemens India,O&M Services,in_contract,2026-09-30,90,12,3360000000,INR
+ABB India,IT & SCADA Systems,in_contract,2028-03-31,180,20,2040000000,INR
+Tata Projects,O&M Services,in_contract,2026-03-31,90,15,2670000000,INR
+Schneider Electric,IT & SCADA Systems,in_contract,2027-09-30,120,15,1740000000,INR

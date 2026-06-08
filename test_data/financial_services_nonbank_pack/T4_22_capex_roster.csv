@@ -1,0 +1,25 @@
+asset_class,fiscal_period,amount,currency,status
+Digital platform build,FY23-Q1,130099285,INR,actual
+Digital platform build,FY23-Q2,144554762,INR,actual
+Digital platform build,FY23-Q3,137327023,INR,actual
+Digital platform build,FY23-Q4,156119142,INR,actual
+Digital platform build,FY24-Q1,153228047,INR,actual
+Digital platform build,FY24-Q2,157564690,INR,actual
+Data centre co-location,FY23-Q1,279284011,INR,actual
+Data centre co-location,FY23-Q2,310315568,INR,actual
+Data centre co-location,FY23-Q3,294799789,INR,actual
+Data centre co-location,FY23-Q4,335140813,INR,actual
+Data centre co-location,FY24-Q1,328934502,INR,actual
+Data centre co-location,FY24-Q2,338243969,INR,actual
+Mobile app development,FY23-Q1,230824169,INR,actual
+Mobile app development,FY23-Q2,256471299,INR,actual
+Mobile app development,FY23-Q3,243647734,INR,actual
+Mobile app development,FY23-Q4,276989002,INR,actual
+Mobile app development,FY24-Q1,271859576,INR,actual
+Mobile app development,FY24-Q2,279553715,INR,actual
+RegTech tooling,FY23-Q1,179570892,INR,actual
+RegTech tooling,FY23-Q2,199523214,INR,actual
+RegTech tooling,FY23-Q3,189547053,INR,actual
+RegTech tooling,FY23-Q4,215485071,INR,actual
+RegTech tooling,FY24-Q1,211494606,INR,actual
+RegTech tooling,FY24-Q2,217480303,INR,actual

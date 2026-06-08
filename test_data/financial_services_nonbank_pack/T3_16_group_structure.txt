@@ -1,0 +1,9 @@
+Vistaar Capital Partners Ltd — Group Structure
+
+VCPL-IN: India parent (SEBI-registered AMC + NBFC; NSE/BSE listed). ERP: SAP S4HANA.
+VCPL-MU: Vistaar Offshore Fund SPC (Mauritius; offshore fund vehicle). ERP: Oracle.
+VCPL-AMC: Vistaar Asset Management Co Ltd (India AMC subsidiary). ERP: FIS.
+
+Entity tree: VCPL-IN > VCPL-MU (100%), VCPL-AMC (100%)
+
+Intercompany: VCPL-IN charges management fees to VCPL-MU at arm's-length; investment advisory fees to VCPL-AMC. IC lines flagged related_party=yes. Mauritius entity subject to FEMA + DTAA; repatriation requires RBI approval.

@@ -1,0 +1,12 @@
+FY23 — Project OneERP
+- Consolidated 7 legacy ERP instances onto SAP S4HANA; ~42 Cr run-rate saved.
+- Travel policy tightening: ~28 Cr saved. STATUS: in baseline.
+
+FY24 — Project SynergyFirst
+- Group insurance consolidation: planned 24 Cr, realised 21 Cr.
+- Salesforce rationalisation: planned 18 Cr, realised 22 Cr (exceeded).
+- Legal panel rationalisation: planned 20 Cr, realised 16 Cr.
+- STATUS: complete; in FY25 baseline.
+
+In-flight FY25
+- Shared services centre Pune: HR F&A IT helpdesk; ~35 Cr targeted, ~8 Cr booked YTD.

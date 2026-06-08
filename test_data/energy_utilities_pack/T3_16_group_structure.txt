@@ -1,0 +1,9 @@
+Sahyadri Power & Utilities Ltd — Group Structure
+
+SPUL-IN: India parent (CERC licensed; NSE/BSE listed). ERP: SAP S4HANA.
+SPTR-IN: Sahyadri Power Transmission Ltd (STU licensed inter-state transmission). ERP: Oracle.
+SPUL-RE: Sahyadri Renewables Ltd (solar+wind IPP). ERP: SAP S4HANA.
+
+Entity tree: SPUL-IN > SPTR-IN (100%), SPUL-RE (100%)
+
+Intercompany: SPUL-IN recharges corporate overheads to subs at cost (GL 640099, related_party=yes). Eliminate before consolidation. CERC requires entity-level tariff petitions; maintain entity-level O&M data.

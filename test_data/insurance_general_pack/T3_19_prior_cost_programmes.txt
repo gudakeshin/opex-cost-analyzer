@@ -1,0 +1,12 @@
+FY23 — Project ClaimsRight
+- Motor claims investigation outsourcing (Xceltrait): ~22 Cr run-rate saved vs in-house.
+- TPA renegotiation (health): ~14 Cr saved. STATUS: in baseline.
+
+FY24 — Project DigitalInsure
+- Policy admin migration (legacy to TCS InsureCraft): planned 28 Cr, realised 20 Cr (migration 6 months late).
+- Aggregator commission renegotiation (PolicyBazaar): planned 18 Cr, realised 24 Cr (exceeded; volume leverage).
+- Reinsurance treaty optimisation: planned 16 Cr, realised 11 Cr (GIC Re treaty terms constrained).
+- STATUS: largely complete; in FY25 baseline.
+
+In-flight FY25
+- AI-powered fraud detection: ~15 Cr targeted in reduced fraud payouts, ~4 Cr booked YTD.

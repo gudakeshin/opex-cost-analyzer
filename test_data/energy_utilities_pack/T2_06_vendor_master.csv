@@ -1,0 +1,11 @@
+vendor,vendor_category,gstin,vendor_pan,msme_flag,spend_category,legal_entity,related_party
+GE Power India,large,27AABCG8821P1Z3,AABCG8821P,no,O&M Services,SPUL-IN,no
+Siemens India,large,27AABCS9921L1Z0,AABCS9921L,no,O&M Services,SPUL-IN,no
+ABB India,large,27AABCA4321B1Z7,AABCA4321B,no,IT & SCADA Systems,SPUL-IN,no
+Quippo Energy,msme,29AABCQ3211E1Z5,AABCQ3211E,yes,Contract Labour,SPUL-IN,no
+Tata Projects,large,27AABCT6521P1Z1,AABCT6521P,no,O&M Services,SPUL-IN,no
+Schneider Electric,large,27AABCS7711S1Z4,AABCS7711S,no,IT & SCADA Systems,SPUL-IN,no
+RITES Ltd,large,27AABCR4421L1Z8,AABCR4421L,no,Safety & Compliance,SPUL-IN,no
+Ultratech Logistics,msme,27AABCU2211L1Z2,AABCU2211L,yes,Logistics & Transport,SPUL-IN,no
+KPMG India,large,29AABCK3201F1Z9,AABCK3201F,no,Corporate & Admin,SPUL-IN,no
+L&T Electrical,large,27AABCL9921E1Z5,AABCL9921E,no,O&M Services,SPTR-IN,no

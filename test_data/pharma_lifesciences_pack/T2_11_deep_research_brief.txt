@@ -1,0 +1,9 @@
+Deep Research Brief — Indian pharma cost structure (Zenith Pharma)
+
+Indian pharma EBITDA margins 18-28%. API costs 35-50% of COGS for formulations. US ANDA market: 12-18 month regulatory delay for supplier changes. CRO market consolidating; top 3 Indian CROs handle 60%+ of domestic outsourcing.
+
+Peer observations: API dual-sourcing (China to India): 8-15% cost reduction + supply security. CRO panel consolidation: 10-18% rate reduction. Field force digital tools (e-detailing): 15-25% productivity gain; 8-14% headcount optimisation. Cold chain carrier renegotiation: 6-12% rate reduction.
+
+Constraints: USFDA/EMA approval required for API supplier changes in regulated market products. Pharmacovigilance statutory. Cold chain GDP standards mandatory. Patent cliff timing drives field force investment — cannot be cut without revenue risk.
+
+Addressable API, CRO, and logistics opex ~45-55% of total non-staff opex.

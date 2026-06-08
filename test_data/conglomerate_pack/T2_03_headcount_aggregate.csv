@@ -1,0 +1,46 @@
+business_unit,function,location,band,headcount
+Chemicals,Operations,India,Entry (B1-B2),360
+Chemicals,Operations,India,Mid (B3-B4),280
+Chemicals,Operations,India,Senior (B5-B6),120
+Chemicals,Finance,India,Entry (B1-B2),360
+Chemicals,Finance,India,Mid (B3-B4),280
+Chemicals,Finance,India,Senior (B5-B6),120
+Chemicals,HR,India,Entry (B1-B2),360
+Chemicals,HR,India,Mid (B3-B4),280
+Chemicals,HR,India,Senior (B5-B6),120
+Infrastructure,Operations,India,Entry (B1-B2),450
+Infrastructure,Operations,India,Mid (B3-B4),350
+Infrastructure,Operations,India,Senior (B5-B6),150
+Infrastructure,Finance,India,Entry (B1-B2),450
+Infrastructure,Finance,India,Mid (B3-B4),350
+Infrastructure,Finance,India,Senior (B5-B6),150
+Infrastructure,HR,India,Entry (B1-B2),450
+Infrastructure,HR,India,Mid (B3-B4),350
+Infrastructure,HR,India,Senior (B5-B6),150
+Consumer Goods,Operations,India,Entry (B1-B2),540
+Consumer Goods,Operations,India,Mid (B3-B4),420
+Consumer Goods,Operations,India,Senior (B5-B6),180
+Consumer Goods,Finance,India,Entry (B1-B2),540
+Consumer Goods,Finance,India,Mid (B3-B4),420
+Consumer Goods,Finance,India,Senior (B5-B6),180
+Consumer Goods,HR,India,Entry (B1-B2),540
+Consumer Goods,HR,India,Mid (B3-B4),420
+Consumer Goods,HR,India,Senior (B5-B6),180
+Financial Services,Operations,India,Entry (B1-B2),630
+Financial Services,Operations,India,Mid (B3-B4),489
+Financial Services,Operations,India,Senior (B5-B6),210
+Financial Services,Finance,India,Entry (B1-B2),630
+Financial Services,Finance,India,Mid (B3-B4),489
+Financial Services,Finance,India,Senior (B5-B6),210
+Financial Services,HR,India,Entry (B1-B2),630
+Financial Services,HR,India,Mid (B3-B4),489
+Financial Services,HR,India,Senior (B5-B6),210
+Media & Retail,Operations,India,Entry (B1-B2),720
+Media & Retail,Operations,India,Mid (B3-B4),560
+Media & Retail,Operations,India,Senior (B5-B6),240
+Media & Retail,Finance,India,Entry (B1-B2),720
+Media & Retail,Finance,India,Mid (B3-B4),560
+Media & Retail,Finance,India,Senior (B5-B6),240
+Media & Retail,HR,India,Entry (B1-B2),720
+Media & Retail,HR,India,Mid (B3-B4),560
+Media & Retail,HR,India,Senior (B5-B6),240

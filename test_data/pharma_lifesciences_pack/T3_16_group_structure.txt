@@ -1,0 +1,9 @@
+Zenith Pharma Ltd — Group Structure
+
+ZPL-IN: India parent (CDSCO licensed; NSE/BSE listed). ERP: SAP S4HANA + Veeva.
+ZPL-US: Zenith Pharma Inc (USA; USFDA-registered; marketing & distribution). ERP: Oracle ERP.
+ZPL-UK: Zenith Pharma UK Ltd (UK; MHRA-registered). ERP: Oracle ERP.
+
+Entity tree: ZPL-IN > ZPL-US (100%), ZPL-UK (100%)
+
+Intercompany: ZPL-IN manufactures and supplies to ZPL-US/ZPL-UK at transfer prices per TP policy. Royalties charged on product formulations. IC flagged related_party=yes. USFDA/EMA require GMP records at entity level.

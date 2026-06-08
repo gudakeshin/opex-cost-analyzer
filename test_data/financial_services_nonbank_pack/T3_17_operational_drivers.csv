@@ -1,0 +1,7 @@
+metric,business_unit,value,unit
+AUM INR Cr,Asset Management,185000,INR_cr
+Cost to AUM bps,Asset Management,82,bps
+Distribution cost as % of AUM,Asset Management,52,bps
+Tech spend as % of revenue,Asset Management,35,percent
+Compliance cost as % of revenue,Asset Management,17,percent
+Client count wealth,Wealth Management,48200,count

@@ -1,0 +1,12 @@
+FY23 — Project Lean Branch
+- Closed 128 sub-scale rural branches; migrated footfall to BC network. ~38 Cr run-rate saved.
+- Renegotiated IBM mainframe contract; ~22 Cr saved. STATUS: completed, in baseline.
+
+FY24 — Project Digital First
+- ATM fleet rationalisation (outsourced 2400 ATMs to managed-service): planned 42 Cr, realised 36 Cr.
+- Core banking cloud migration wave 1: planned 28 Cr, realised 19 Cr (migration timeline slipped).
+- Procurement policy tightening: planned 15 Cr, realised 18 Cr (exceeded).
+- STATUS: largely complete; realised savings in FY25 baseline.
+
+In-flight (FY25)
+- KYC/AML automation (RPA): ~12 Cr targeted, ~4 Cr booked YTD.

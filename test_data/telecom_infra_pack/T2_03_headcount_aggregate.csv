@@ -1,0 +1,46 @@
+business_unit,function,location,band,headcount
+Mobile Services,Operations,India,Entry (B1-B2),360
+Mobile Services,Operations,India,Mid (B3-B4),280
+Mobile Services,Operations,India,Senior (B5-B6),120
+Mobile Services,Finance,India,Entry (B1-B2),360
+Mobile Services,Finance,India,Mid (B3-B4),280
+Mobile Services,Finance,India,Senior (B5-B6),120
+Mobile Services,HR,India,Entry (B1-B2),360
+Mobile Services,HR,India,Mid (B3-B4),280
+Mobile Services,HR,India,Senior (B5-B6),120
+Broadband & Fiber,Operations,India,Entry (B1-B2),450
+Broadband & Fiber,Operations,India,Mid (B3-B4),350
+Broadband & Fiber,Operations,India,Senior (B5-B6),150
+Broadband & Fiber,Finance,India,Entry (B1-B2),450
+Broadband & Fiber,Finance,India,Mid (B3-B4),350
+Broadband & Fiber,Finance,India,Senior (B5-B6),150
+Broadband & Fiber,HR,India,Entry (B1-B2),450
+Broadband & Fiber,HR,India,Mid (B3-B4),350
+Broadband & Fiber,HR,India,Senior (B5-B6),150
+Enterprise & B2B,Operations,India,Entry (B1-B2),540
+Enterprise & B2B,Operations,India,Mid (B3-B4),420
+Enterprise & B2B,Operations,India,Senior (B5-B6),180
+Enterprise & B2B,Finance,India,Entry (B1-B2),540
+Enterprise & B2B,Finance,India,Mid (B3-B4),420
+Enterprise & B2B,Finance,India,Senior (B5-B6),180
+Enterprise & B2B,HR,India,Entry (B1-B2),540
+Enterprise & B2B,HR,India,Mid (B3-B4),420
+Enterprise & B2B,HR,India,Senior (B5-B6),180
+Tower Infrastructure,Operations,India,Entry (B1-B2),630
+Tower Infrastructure,Operations,India,Mid (B3-B4),489
+Tower Infrastructure,Operations,India,Senior (B5-B6),210
+Tower Infrastructure,Finance,India,Entry (B1-B2),630
+Tower Infrastructure,Finance,India,Mid (B3-B4),489
+Tower Infrastructure,Finance,India,Senior (B5-B6),210
+Tower Infrastructure,HR,India,Entry (B1-B2),630
+Tower Infrastructure,HR,India,Mid (B3-B4),489
+Tower Infrastructure,HR,India,Senior (B5-B6),210
+Digital Services,Operations,India,Entry (B1-B2),720
+Digital Services,Operations,India,Mid (B3-B4),560
+Digital Services,Operations,India,Senior (B5-B6),240
+Digital Services,Finance,India,Entry (B1-B2),720
+Digital Services,Finance,India,Mid (B3-B4),560
+Digital Services,Finance,India,Senior (B5-B6),240
+Digital Services,HR,India,Entry (B1-B2),720
+Digital Services,HR,India,Mid (B3-B4),560
+Digital Services,HR,India,Senior (B5-B6),240

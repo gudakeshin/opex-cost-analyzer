@@ -126,7 +126,8 @@
         "FNOL data: channel mix (agent, digital, call centre) and data completeness at intake",
         "Policy admin system and claims management system integration architecture",
         "IRDAI compliance requirements for automated adjudication"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "underwriting_automation",
@@ -212,7 +213,8 @@
         "External data availability for risk enrichment (bureau, geo-risk, IoT sensors)",
         "Policy admin system architecture and API capability",
         "IRDAI compliance requirements for automated underwriting"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "policy_admin_digitization",
@@ -297,7 +299,8 @@
         "PAS landscape and integration architecture",
         "Digital channel adoption rate (app, web portal) by policyholder segment",
         "IRDAI compliance requirements for digital policy issuance and documentation"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "fraud_detection_ai_insurance",
@@ -383,7 +386,8 @@
         "Investigation case outcomes and false-positive rate",
         "Claims management system architecture for scoring integration",
         "IRDAI compliance requirements for AI-based fraud detection"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "channel_mix_optimization",
@@ -469,7 +473,8 @@
         "Persistency data (13th and 25th month) by channel",
         "Claims frequency and loss ratio by channel",
         "Digital channel funnel data (leads, conversion, policy issued)"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "reinsurance_optimization",
@@ -554,7 +559,8 @@
         "Reinsurer credit ratings and panel review history",
         "Gross and net combined ratio by product line (3 years)",
         "IRDAI reinsurance program filing requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "investment_ops_efficiency",
@@ -640,7 +646,8 @@
         "Settlement fail rate and penalty data",
         "OMS and custodian integration architecture",
         "IRDAI investment reporting requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "actuarial_automation",
@@ -726,7 +733,8 @@
         "IRDAI actuarial reporting requirements and schedule",
         "IT infrastructure for actuarial modelling platform",
         "Model validation and governance framework"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     }
   ]
 }

@@ -129,7 +129,8 @@
         "Contract renewal dates and pricing tiers by vendor",
         "Headcount forecast for planning period",
         "Vendor audit exposure and licence true-up obligations"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "cloud_finops",
@@ -215,7 +216,8 @@
         "Tagging hygiene report and resource inventory",
         "Reserved instance and savings plan coverage and utilisation",
         "Non-production environment inventory and usage pattern"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "subcontractor_optimization",
@@ -300,7 +302,8 @@
         "Vendor performance data (SLA compliance, defect rate, on-time delivery)",
         "Statement of Work quality assessment by contract",
         "Internal bench vs subcontractor skills overlap analysis"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "tech_debt_payoff",
@@ -386,7 +389,8 @@
         "Incident log with engineering resolution time and business cost",
         "Engineering velocity trend (story points delivered per sprint over 12 months)",
         "System architecture assessment for highest-debt components"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "platform_consolidation",
@@ -472,7 +476,8 @@
         "Technical debt and supportability rating by application",
         "Migration complexity and estimated effort by application",
         "Contract terms and licence obligations for applications under consideration"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "genai_productivity",
@@ -558,7 +563,8 @@
         "Engineering throughput metrics (velocity, PR cycle time, deployment frequency)",
         "Test coverage and defect density baseline data",
         "Cost per engineer (fully loaded) by band and location"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "remote_first_realestate",
@@ -644,7 +650,8 @@
         "Real estate cost per sq ft and per seat by location",
         "Lease terms, break-clause dates, and sublease market rates",
         "Engineering productivity data by location and work model"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "build_vs_buy_optimization",
@@ -729,7 +736,8 @@
         "Commercial vendor alternatives and indicative pricing for shortlisted capabilities",
         "5-year TCO comparison model for build vs buy by application",
         "Engineering capacity allocation by application and feature type"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "devops_automation",
@@ -815,7 +823,8 @@
         "Infrastructure provisioning time and method (manual vs automated) by environment",
         "Engineering time allocation: feature work vs operational and deployment overhead",
         "Cloud and container platform capabilities and current adoption level"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

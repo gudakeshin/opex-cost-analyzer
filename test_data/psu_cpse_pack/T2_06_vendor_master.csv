@@ -1,0 +1,11 @@
+vendor,vendor_category,gstin,vendor_pan,msme_flag,spend_category,legal_entity,related_party
+L&T Construction,large,27AABCL4321C1Z8,AABCL4321C,no,Contract Labour & Subcontracting,NECL-IN,no
+Voltas Ltd,large,27AABCV5431V1Z1,AABCV5431V,no,Materials & Components,NECL-IN,no
+BHEL Forge,large,27AABCB6541F1Z4,AABCB6541F,no,Materials & Components,NECL-IN,no
+Steel Authority of India,large,27AABCS7651S1Z7,AABCS7651S,no,Materials & Components,NECL-IN,no
+MSME Fabricators Consortium,msme,27AABCM8761F1Z0,AABCM8761F,yes,Contract Labour & Subcontracting,NECL-IN,no
+ABB India,large,27AABCA4321B1Z7,AABCA4321B,no,Maintenance & Repair,NECL-IN,no
+NTPC Power Supply,large,27AABCN9871P1Z3,AABCN9871P,no,Energy & Utilities,NECL-IN,no
+KPMG India,large,29AABCK3201F1Z9,AABCK3201F,no,Administrative & Corporate,NECL-IN,no
+Quess Corp,large,29AABCQ1234A1Z5,AABCQ1234A,no,Contract Labour & Subcontracting,NECL-IN,no
+Siemens India,large,27AABCS9921L1Z0,AABCS9921L,no,Materials & Components,NECL-IN,no

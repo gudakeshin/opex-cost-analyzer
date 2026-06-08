@@ -125,7 +125,8 @@
         "ERP/technology landscape across business units",
         "Chargeback/recharge model and inter-company billing data",
         "Location analysis for SSC hub (cost, talent, infrastructure)"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "group_procurement",
@@ -211,7 +212,8 @@
         "Existing contracts by BU with term and pricing details",
         "Demand forecast by category for next 12 months across group",
         "Specification alignment assessment for common categories"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "corporate_overhead_right_size",
@@ -302,7 +304,8 @@
         "Peer benchmark: corporate overhead % of revenue for listed conglomerates",
         "Group revenue and EBITDA trend (3 years)",
         "Org chart with span-of-control data by function"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "portfolio_rationalization",
@@ -387,7 +390,8 @@
         "WACC by business unit and group level",
         "Holding cost allocation (HQ charges, intercompany services) by business",
         "M&A market conditions and indicative valuation for exit candidates"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "group_insurance_pooling",
@@ -472,7 +476,8 @@
         "Broker arrangement and brokerage fee disclosure",
         "Benchmark premium rates for equivalent risk profiles from market survey",
         "Group risk register for key insured assets and liabilities"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "intercompany_pricing_optimization",
@@ -558,7 +563,8 @@
         "Comparable market benchmarks for each service/IP category",
         "Group structure chart with ownership percentages and jurisdictions",
         "Prior-year Form 3CEB and TP documentation"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     {
       "lever_id": "real_estate_portfolio_mgmt",
@@ -649,7 +655,8 @@
         "Headcount trend by location (3 years)",
         "Lease contracts with break-clause and expiry dates",
         "Sublease market rate benchmarks for key locations"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "group_treasury_netting",
@@ -735,7 +742,8 @@
         "FEMA and RBI compliance checklist for netting/pooling structures",
         "FX conversion costs by currency pair and BU",
         "Netting platform vendor options and integration requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

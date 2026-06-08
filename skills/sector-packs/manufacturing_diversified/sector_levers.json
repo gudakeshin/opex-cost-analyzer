@@ -133,7 +133,8 @@
         "Historian/SCADA data for instrumented assets (vibration, temperature, pressure)",
         "Current PM frequency schedule and inspection outcomes",
         "Unplanned outage log with duration and production impact"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "mro_consolidation",
@@ -219,7 +220,8 @@
         "Price data for common items across sites",
         "Current VMI and consignment arrangements",
         "Critical vs non-critical spares classification"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "energy_audit_compliance",
@@ -305,7 +307,8 @@
         "Energy audit report with top-10 efficiency recommendations and investment estimates",
         "Electricity tariff structure and peak demand charges",
         "Motor inventory with load factor and age data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "gst_itc_recovery",
@@ -391,7 +394,8 @@
         "Vendor GSTIN compliance status and filing history",
         "ERP GST configuration and tax code mapping",
         "Prior-year tax authority ITC mismatch notices if any"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     {
       "lever_id": "logistics_network_redesign",
@@ -476,7 +480,8 @@
         "Current depot locations and lease terms",
         "Truck fill rate and load factor data by lane",
         "Customer geography and delivery frequency requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "packaging_optimisation",
@@ -560,7 +565,8 @@
         "Competitor packaging specification benchmarks by category",
         "Structural integrity requirements by product type (fragility, shelf life)",
         "Retailer and logistics packaging requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "factory_automation",
@@ -646,7 +652,8 @@
         "Defect rate and rework cost by process step",
         "Automation vendor options and capital cost estimates",
         "Production volume forecast for ROI model"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "quality_waste_reduction",
@@ -718,7 +725,8 @@
         "Process volume metrics",
         "FTE effort or cost allocation by process",
         "Baseline cycle times"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     }
   ]
 }

@@ -1,0 +1,6 @@
+vendor,payment_terms_days,invoice_date,payment_date,amount,currency,aging_bucket
+Ogilvy India,45,2025-01-10,2025-02-26,490000000,INR,0-30
+DDB Mudra,60,2025-01-05,2025-03-10,280000000,INR,31-60
+Maersk India,30,2025-01-18,2025-02-15,420000000,INR,61-90
+Delhivery,30,2025-01-20,2025-02-18,80000000,INR,0-30
+Nippon Paint India,7,2025-01-01,2025-01-07,210000000,INR,31-60

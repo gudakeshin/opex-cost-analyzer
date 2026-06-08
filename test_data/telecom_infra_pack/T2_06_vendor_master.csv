@@ -1,0 +1,11 @@
+vendor,vendor_category,gstin,vendor_pan,msme_flag,spend_category,legal_entity,related_party
+Ericsson India,large,07AABCE1234E1Z8,AABCE1234E,no,Network Operations & Energy,PTNL-IN,no
+Nokia Solutions India,large,07AABCN5678N1Z1,AABCN5678N,no,Network Operations & Energy,PTNL-IN,no
+Huawei Telecom India,large,07AABCH9012H1Z4,AABCH9012H,no,Network Operations & Energy,PTNL-IN,no
+Tata Power (Tower Energy),large,27AABCT3456T1Z7,AABCT3456T,no,Network Operations & Energy,PTNL-IN,no
+BSNL (Interconnect),large,07AABCB7890B1Z0,AABCB7890B,no,Roaming & Interconnect,PTNL-IN,no
+MSME Tower Maintenance,msme,07AABCM1111T1Z3,AABCM1111T,yes,Network Operations & Energy,PTNL-IN,no
+Amdocs India,large,27AABCA2222A1Z6,AABCA2222A,no,IT & Digital Infrastructure,PTNL-IN,no
+AWS India,large,07AABCA3333C1Z9,AABCA3333C,no,IT & Digital Infrastructure,PTNL-IN,no
+TRAI Filing Services,large,07AABCT4444S1Z2,AABCT4444S,no,Spectrum & Regulatory,PTNL-IN,no
+Accenture India,large,29AABCA5555C1Z5,AABCA5555C,no,Administrative & Corporate,PTNL-IN,no

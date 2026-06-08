@@ -1,0 +1,25 @@
+asset_class,fiscal_period,amount,currency,status
+Luxury hotel renovation,FY23-Q1,347118043,INR,actual
+Luxury hotel renovation,FY23-Q2,385686715,INR,actual
+Luxury hotel renovation,FY23-Q3,366402379,INR,actual
+Luxury hotel renovation,FY23-Q4,416541652,INR,actual
+Luxury hotel renovation,FY24-Q1,408827917,INR,actual
+Luxury hotel renovation,FY24-Q2,420398519,INR,actual
+Solar rooftop installation,FY23-Q1,282059199,INR,actual
+Solar rooftop installation,FY23-Q2,313399111,INR,actual
+Solar rooftop installation,FY23-Q3,297729155,INR,actual
+Solar rooftop installation,FY23-Q4,338471039,INR,actual
+Solar rooftop installation,FY24-Q1,332203057,INR,actual
+Solar rooftop installation,FY24-Q2,341605030,INR,actual
+PMS upgrade,FY23-Q1,266632155,INR,actual
+PMS upgrade,FY23-Q2,296257951,INR,actual
+PMS upgrade,FY23-Q3,281445053,INR,actual
+PMS upgrade,FY23-Q4,319958587,INR,actual
+PMS upgrade,FY24-Q1,314033428,INR,actual
+PMS upgrade,FY24-Q2,322921166,INR,actual
+EV charging infrastructure,FY23-Q1,105312348,INR,actual
+EV charging infrastructure,FY23-Q2,117013720,INR,actual
+EV charging infrastructure,FY23-Q3,111163034,INR,actual
+EV charging infrastructure,FY23-Q4,126374817,INR,actual
+EV charging infrastructure,FY24-Q1,124034543,INR,actual
+EV charging infrastructure,FY24-Q2,127544954,INR,actual

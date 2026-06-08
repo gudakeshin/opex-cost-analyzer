@@ -126,7 +126,8 @@
         "Historian/SCADA data for instrumented assets (vibration, temperature, pressure)",
         "Current PM frequency schedule and inspection outcomes",
         "Unplanned outage log with duration and production impact"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "energy_loss_reduction",
@@ -217,7 +218,8 @@
         "Conductor specifications and age profile for high-loss feeders",
         "Smart meter installation status and AMI coverage by zone",
         "SERC-mandated AT&C loss reduction targets by year"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "fuel_procurement_optimization",
@@ -302,7 +304,8 @@
         "GCV measurement data by delivery consignment",
         "Generation dispatch schedule and fuel consumption plan",
         "Market price forecasts and hedging policy"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "workforce_scheduling",
@@ -388,7 +391,8 @@
         "Maintenance contractor spend by activity and skill category",
         "Plant outage and maintenance schedule (annual)",
         "Skills matrix for in-house workforce"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "grid_modernization",
@@ -474,7 +478,8 @@
         "Load profile data by feeder and time of day",
         "SCADA/DMS/AMI coverage and technology roadmap",
         "CERC/SERC capex approval requirements and timelines"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "renewable_energy_transition",
@@ -559,7 +564,8 @@
         "Solar/wind resource maps and LCOE estimates by site",
         "Grid connectivity assessments and SLDC/RLDC requirements",
         "Existing PPA terms and renewal schedule"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "outsourced_operations",
@@ -645,7 +651,8 @@
         "Availability and heat rate performance vs design parameters",
         "Competitive landscape of O&M service providers",
         "Existing O&M contracts and SLA performance data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "material_inventory_optimization",
@@ -730,7 +737,8 @@
         "Historical material consumption data (3 years)",
         "Lead times by vendor and item category",
         "Emergency procurement log with premium cost data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     }
   ]
 }

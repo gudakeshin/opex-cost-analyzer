@@ -1,0 +1,7 @@
+segment,gwp_inr_cr,loss_ratio_pct,expense_ratio_pct,combined_ratio_pct,claims_settlement_days,fraud_rate_pct,online_share_pct
+Motor TP,1960,82.4,24.2,106.6,14.2,6.2,48
+Motor OD,1960,62.8,28.4,91.2,10.8,4.8,54
+Health Individual,1470,74.2,30.8,105.0,8.4,2.8,38
+Health Group,1470,80.4,22.4,102.8,6.2,1.8,28
+Property,1960,48.4,32.4,80.8,18.4,3.4,22
+Marine & Cargo,588,54.2,28.8,83.0,12.8,2.2,18

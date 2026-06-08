@@ -1,0 +1,7 @@
+legal_entity,parent_entity,business_unit,segment_revenue_inr_cr,geo
+PTNL-IN,,Mobile Services,19000,India
+PTNL-IN,,Broadband & Fiber,9500,India
+PTNL-IN,,Enterprise & B2B,6080,India
+PTNL-IN,,Tower Infrastructure,2280,India
+PTNL-IN,,Digital Services,1140,India
+PTNL-INFRA,PTNL-IN,Mobile Services,2850,India

@@ -1,0 +1,7 @@
+location,cost_center_type,total_seats,occupied_seats,seat_utilisation_pct,cost_per_seat_per_month_inr,contract_staff_pct,attrition_pct
+Bengaluru SEZ,Technology CoE,12000,9240,77.0,48200,26,16.8
+Bengaluru SEZ,Finance & Accounting,4800,3840,80.0,45800,22,14.2
+Hyderabad,Analytics & Data,6000,4140,69.0,38400,32,19.4
+Hyderabad,Operations CoE,3200,2368,74.0,36200,28,18.8
+Chennai,HR Shared Services,2400,1848,77.0,32400,24,15.6
+Pune,Technology CoE,3600,2520,70.0,34800,34,21.2

@@ -1,0 +1,65 @@
+gl_code,cost_center,vendor,description,amount,currency,fiscal_period,amount_type,business_unit,geo,legal_entity,source_system,source_record_id,gst_treatment,gstin,lease_treatment,related_party
+510010,CC-F&B&-001,Metro Cash & Carry,Metro Cash & Carry services — F&B & Housekeeping Supplies,124325995,INR,2023-Q2,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100001,itc_eligible,27AABCM8821C1Z5,,no
+510010,CC-F&B&-001,Metro Cash & Carry,Metro Cash & Carry services — F&B & Housekeeping Supplies,126812514,INR,2023-Q3,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100002,itc_eligible,27AABCM8821C1Z5,,no
+510010,CC-F&B&-001,Metro Cash & Carry,Metro Cash & Carry services — F&B & Housekeeping Supplies,129299034,INR,2023-Q4,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100003,itc_eligible,27AABCM8821C1Z5,,no
+510010,CC-F&B&-001,Metro Cash & Carry,Metro Cash & Carry services — F&B & Housekeeping Supplies,131785554,INR,2024-Q1,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100004,itc_eligible,27AABCM8821C1Z5,,no
+510010,CC-F&B&-001,Metro Cash & Carry,Metro Cash & Carry services — F&B & Housekeeping Supplies,134272074,INR,2024-Q2,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100005,itc_eligible,27AABCM8821C1Z5,,no
+510010,CC-F&B&-001,Metro Cash & Carry,Metro Cash & Carry services — F&B & Housekeeping Supplies,136758594,INR,2024-Q3,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100006,itc_eligible,27AABCM8821C1Z5,,no
+510010,CC-F&B&-001,Metro Cash & Carry,Metro Cash & Carry services — F&B & Housekeeping Supplies,139245114,INR,2024-Q4,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100007,itc_eligible,27AABCM8821C1Z5,,no
+510010,CC-F&B&-001,Metro Cash & Carry,Metro Cash & Carry services — F&B & Housekeeping Supplies,141731634,INR,2025-Q1,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100008,itc_eligible,27AABCM8821C1Z5,,no
+510010,CC-F&B&-001,ITC Hotels Supply,ITC Hotels Supply services — F&B & Housekeeping Supplies,311418535,INR,2023-Q2,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100009,itc_eligible,27AABCI4421H1Z8,,no
+510010,CC-F&B&-001,ITC Hotels Supply,ITC Hotels Supply services — F&B & Housekeeping Supplies,317646905,INR,2023-Q3,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100010,itc_eligible,27AABCI4421H1Z8,,no
+510010,CC-F&B&-001,ITC Hotels Supply,ITC Hotels Supply services — F&B & Housekeeping Supplies,323875276,INR,2023-Q4,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100011,itc_eligible,27AABCI4421H1Z8,,no
+510010,CC-F&B&-001,ITC Hotels Supply,ITC Hotels Supply services — F&B & Housekeeping Supplies,330103647,INR,2024-Q1,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100012,itc_eligible,27AABCI4421H1Z8,,no
+510010,CC-F&B&-001,ITC Hotels Supply,ITC Hotels Supply services — F&B & Housekeeping Supplies,336332017,INR,2024-Q2,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100013,itc_eligible,27AABCI4421H1Z8,,no
+510010,CC-F&B&-001,ITC Hotels Supply,ITC Hotels Supply services — F&B & Housekeeping Supplies,342560388,INR,2024-Q3,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100014,itc_eligible,27AABCI4421H1Z8,,no
+510010,CC-F&B&-001,ITC Hotels Supply,ITC Hotels Supply services — F&B & Housekeeping Supplies,348788759,INR,2024-Q4,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100015,itc_eligible,27AABCI4421H1Z8,,no
+510010,CC-F&B&-001,ITC Hotels Supply,ITC Hotels Supply services — F&B & Housekeeping Supplies,355017129,INR,2025-Q1,actual,F&B,India,SHRL-IN,Oracle,Oracle-AP-100016,itc_eligible,27AABCI4421H1Z8,,no
+520010,CC-PROPER-001,Siemens Building Tech,Siemens Building Tech services — Property Maintenance & Utilities,106906695,INR,2023-Q2,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100017,itc_eligible,27AABCS7711B1Z1,,no
+520010,CC-PROPER-001,Siemens Building Tech,Siemens Building Tech services — Property Maintenance & Utilities,109044828,INR,2023-Q3,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100018,itc_eligible,27AABCS7711B1Z1,,no
+520010,CC-PROPER-001,Siemens Building Tech,Siemens Building Tech services — Property Maintenance & Utilities,111182962,INR,2023-Q4,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100019,itc_eligible,27AABCS7711B1Z1,,no
+520010,CC-PROPER-001,Siemens Building Tech,Siemens Building Tech services — Property Maintenance & Utilities,113321096,INR,2024-Q1,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100020,itc_eligible,27AABCS7711B1Z1,,no
+520010,CC-PROPER-001,Siemens Building Tech,Siemens Building Tech services — Property Maintenance & Utilities,115459230,INR,2024-Q2,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100021,itc_eligible,27AABCS7711B1Z1,,no
+520010,CC-PROPER-001,Siemens Building Tech,Siemens Building Tech services — Property Maintenance & Utilities,117597364,INR,2024-Q3,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100022,itc_eligible,27AABCS7711B1Z1,,no
+520010,CC-PROPER-001,Siemens Building Tech,Siemens Building Tech services — Property Maintenance & Utilities,119735498,INR,2024-Q4,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100023,itc_eligible,27AABCS7711B1Z1,,no
+520010,CC-PROPER-001,Siemens Building Tech,Siemens Building Tech services — Property Maintenance & Utilities,121873632,INR,2025-Q1,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100024,itc_eligible,27AABCS7711B1Z1,,no
+520010,CC-PROPER-001,Johnson Controls,Johnson Controls services — Property Maintenance & Utilities,211142330,INR,2023-Q2,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100025,itc_eligible,27AABCJ6621C1Z4,,no
+520010,CC-PROPER-001,Johnson Controls,Johnson Controls services — Property Maintenance & Utilities,215365176,INR,2023-Q3,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100026,itc_eligible,27AABCJ6621C1Z4,,no
+520010,CC-PROPER-001,Johnson Controls,Johnson Controls services — Property Maintenance & Utilities,219588023,INR,2023-Q4,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100027,itc_eligible,27AABCJ6621C1Z4,,no
+520010,CC-PROPER-001,Johnson Controls,Johnson Controls services — Property Maintenance & Utilities,223810869,INR,2024-Q1,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100028,itc_eligible,27AABCJ6621C1Z4,,no
+520010,CC-PROPER-001,Johnson Controls,Johnson Controls services — Property Maintenance & Utilities,228033716,INR,2024-Q2,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100029,itc_eligible,27AABCJ6621C1Z4,,no
+520010,CC-PROPER-001,Johnson Controls,Johnson Controls services — Property Maintenance & Utilities,232256563,INR,2024-Q3,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100030,itc_eligible,27AABCJ6621C1Z4,,no
+520010,CC-PROPER-001,Johnson Controls,Johnson Controls services — Property Maintenance & Utilities,236479409,INR,2024-Q4,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100031,itc_eligible,27AABCJ6621C1Z4,,no
+520010,CC-PROPER-001,Johnson Controls,Johnson Controls services — Property Maintenance & Utilities,240702256,INR,2025-Q1,actual,Property,India,SHRL-IN,Oracle,Oracle-AP-100032,itc_eligible,27AABCJ6621C1Z4,,no
+530010,CC-STAFFI-001,ISS Facility Services,ISS Facility Services services — Staffing,323818205,INR,2023-Q2,actual,Staffing,India,SHRL-IN,Oracle,Oracle-AP-100033,itc_eligible,27AABCI3321F1Z4,,no
+530010,CC-STAFFI-001,ISS Facility Services,ISS Facility Services services — Staffing,330294569,INR,2023-Q3,actual,Staffing,India,SHRL-IN,Oracle,Oracle-AP-100034,itc_eligible,27AABCI3321F1Z4,,no
+530010,CC-STAFFI-001,ISS Facility Services,ISS Facility Services services — Staffing,336770933,INR,2023-Q4,actual,Staffing,India,SHRL-IN,Oracle,Oracle-AP-100035,itc_eligible,27AABCI3321F1Z4,,no
+530010,CC-STAFFI-001,ISS Facility Services,ISS Facility Services services — Staffing,343247297,INR,2024-Q1,actual,Staffing,India,SHRL-IN,Oracle,Oracle-AP-100036,itc_eligible,27AABCI3321F1Z4,,no
+530010,CC-STAFFI-001,ISS Facility Services,ISS Facility Services services — Staffing,349723661,INR,2024-Q2,actual,Staffing,India,SHRL-IN,Oracle,Oracle-AP-100037,itc_eligible,27AABCI3321F1Z4,,no
+530010,CC-STAFFI-001,ISS Facility Services,ISS Facility Services services — Staffing,356200025,INR,2024-Q3,actual,Staffing,India,SHRL-IN,Oracle,Oracle-AP-100038,itc_eligible,27AABCI3321F1Z4,,no
+530010,CC-STAFFI-001,ISS Facility Services,ISS Facility Services services — Staffing,362676389,INR,2024-Q4,actual,Staffing,India,SHRL-IN,Oracle,Oracle-AP-100039,itc_eligible,27AABCI3321F1Z4,,no
+530010,CC-STAFFI-001,ISS Facility Services,ISS Facility Services services — Staffing,369152753,INR,2025-Q1,actual,Staffing,India,SHRL-IN,Oracle,Oracle-AP-100040,itc_eligible,27AABCI3321F1Z4,,no
+540010,CC-MARKET-001,Booking.com,Booking.com services — Marketing & Distribution,218904428,INR,2023-Q2,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100041,not_applicable,,,no
+540010,CC-MARKET-001,Booking.com,Booking.com services — Marketing & Distribution,223282516,INR,2023-Q3,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100042,not_applicable,,,no
+540010,CC-MARKET-001,Booking.com,Booking.com services — Marketing & Distribution,227660605,INR,2023-Q4,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100043,not_applicable,,,no
+540010,CC-MARKET-001,Booking.com,Booking.com services — Marketing & Distribution,232038693,INR,2024-Q1,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100044,not_applicable,,,no
+540010,CC-MARKET-001,Booking.com,Booking.com services — Marketing & Distribution,236416782,INR,2024-Q2,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100045,not_applicable,,,no
+540010,CC-MARKET-001,Booking.com,Booking.com services — Marketing & Distribution,240794870,INR,2024-Q3,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100046,not_applicable,,,no
+540010,CC-MARKET-001,Booking.com,Booking.com services — Marketing & Distribution,245172959,INR,2024-Q4,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100047,not_applicable,,,no
+540010,CC-MARKET-001,Booking.com,Booking.com services — Marketing & Distribution,249551047,INR,2025-Q1,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100048,not_applicable,,,no
+540010,CC-MARKET-001,Expedia Group,Expedia Group services — Marketing & Distribution,382664761,INR,2023-Q2,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100049,not_applicable,,,no
+540010,CC-MARKET-001,Expedia Group,Expedia Group services — Marketing & Distribution,390318056,INR,2023-Q3,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100050,not_applicable,,,no
+540010,CC-MARKET-001,Expedia Group,Expedia Group services — Marketing & Distribution,397971351,INR,2023-Q4,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100051,not_applicable,,,no
+540010,CC-MARKET-001,Expedia Group,Expedia Group services — Marketing & Distribution,405624646,INR,2024-Q1,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100052,not_applicable,,,no
+540010,CC-MARKET-001,Expedia Group,Expedia Group services — Marketing & Distribution,413277941,INR,2024-Q2,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100053,not_applicable,,,no
+540010,CC-MARKET-001,Expedia Group,Expedia Group services — Marketing & Distribution,420931237,INR,2024-Q3,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100054,not_applicable,,,no
+540010,CC-MARKET-001,Expedia Group,Expedia Group services — Marketing & Distribution,428584532,INR,2024-Q4,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100055,not_applicable,,,no
+540010,CC-MARKET-001,Expedia Group,Expedia Group services — Marketing & Distribution,436237827,INR,2025-Q1,actual,Marketing,India,SHRL-MV,SAP,SAP-AP-100056,not_applicable,,,no
+550010,CC-TECHNO-001,Oracle Hospitality,Oracle Hospitality services — Technology & PMS,188843793,INR,2023-Q2,actual,Technology,India,SHRL-IN,Oracle,Oracle-AP-100057,not_applicable,,,no
+550010,CC-TECHNO-001,Oracle Hospitality,Oracle Hospitality services — Technology & PMS,192620668,INR,2023-Q3,actual,Technology,India,SHRL-IN,Oracle,Oracle-AP-100058,not_applicable,,,no
+550010,CC-TECHNO-001,Oracle Hospitality,Oracle Hospitality services — Technology & PMS,196397544,INR,2023-Q4,actual,Technology,India,SHRL-IN,Oracle,Oracle-AP-100059,not_applicable,,,no
+550010,CC-TECHNO-001,Oracle Hospitality,Oracle Hospitality services — Technology & PMS,200174420,INR,2024-Q1,actual,Technology,India,SHRL-IN,Oracle,Oracle-AP-100060,not_applicable,,,no
+550010,CC-TECHNO-001,Oracle Hospitality,Oracle Hospitality services — Technology & PMS,203951296,INR,2024-Q2,actual,Technology,India,SHRL-IN,Oracle,Oracle-AP-100061,not_applicable,,,no
+550010,CC-TECHNO-001,Oracle Hospitality,Oracle Hospitality services — Technology & PMS,207728172,INR,2024-Q3,actual,Technology,India,SHRL-IN,Oracle,Oracle-AP-100062,not_applicable,,,no
+550010,CC-TECHNO-001,Oracle Hospitality,Oracle Hospitality services — Technology & PMS,211505048,INR,2024-Q4,actual,Technology,India,SHRL-IN,Oracle,Oracle-AP-100063,not_applicable,,,no
+550010,CC-TECHNO-001,Oracle Hospitality,Oracle Hospitality services — Technology & PMS,215281924,INR,2025-Q1,actual,Technology,India,SHRL-IN,Oracle,Oracle-AP-100064,not_applicable,,,no

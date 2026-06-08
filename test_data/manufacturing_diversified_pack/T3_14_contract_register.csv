@@ -1,0 +1,6 @@
+supplier,category,contract_status,contract_expiry_date,auto_renewal_notice_days,early_exit_penalty_pct,min_purchase_commitment,currency
+Mahindra Logistics,Logistics & Freight,in_contract,2026-09-30,90,8,5460000000,INR
+Tata Power,Energy & Utilities,in_contract,2027-03-31,180,15,3780000000,INR
+Adani Electricity,Energy & Utilities,in_contract,2026-12-31,120,12,2520000000,INR
+DB Schenker India,Logistics & Freight,in_contract,2026-06-30,90,10,2040000000,INR
+SKF India,Maintenance & Spares,rolling,,30,0,0,INR

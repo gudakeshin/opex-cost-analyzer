@@ -1,0 +1,9 @@
+Deep Research Brief — Indian power sector cost (Sahyadri Power)
+
+Peak demand record 250 GW May 2024. O&M cost per MW thermal plants 150-220 Lakhs/yr depending on age. SCADA modernisation primary tech lever: legacy systems 2-3x higher fault rates. AT&C losses 14-22% for state DISCOMs.
+
+Peer observations: O&M outsourcing to OEM managed services 10-18% reduction. Inventory optimisation 8-15%. Smart metering distribution: 15-25% field O&M reduction over 3 years. SCADA consolidation: 12-20% on licence+integration.
+
+Constraints: CERC/SERC tariff caps on recoverable O&M. Statutory inspections cannot be deferred. RPO mandates minimum renewable sourcing.
+
+Addressable O&M and tech opex ~45-55% of total controllable opex.

@@ -1,0 +1,7 @@
+Deep Research Brief — Indian hospital cost structure (Aarogya Health Network)
+
+Indian hospital sector revenue growing 15% p.a.; material costs 35-42% of revenue depending on case mix. Generic substitution: 15-25% pharmacy cost reduction where physician acceptance achieved. Biomedical AMC: OEM managed-service (3-OEM panel) 10-18% cheaper than individual OEM contracts. Consumables central procurement: 8-14% savings vs hospital-by-hospital buying.
+
+Constraints: NABH accreditation mandates quality standards for clinical supplies. CPCB regulates biomedical waste. Physician preference drives implant and device choices — difficult to standardise. ICU nursing shortage limits contract staff rate cuts.
+
+Addressable material and maintenance opex ~50-60% of total non-staff opex.

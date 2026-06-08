@@ -134,7 +134,8 @@
         "Digital adoption by geography (mobile/internet banking penetration)",
         "Lease terms, WALE, and break-clause positions per branch",
         "RBI branch closure approval requirements and timelines"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "ops_process_digitization",
@@ -225,7 +226,8 @@
         "FTE count and loaded labour cost per back-office process",
         "IT application landscape map",
         "RBI IT-framework compliance checklist"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "it_vendor_consolidation",
@@ -316,7 +318,8 @@
         "IT spend by sub-category (infrastructure, applications, services, telecom)",
         "RBI IT framework compliance status per system",
         "Contract terms and renewal dates for top-20 IT vendors"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "kyc_aml_automation",
@@ -407,7 +410,8 @@
         "CBS API readiness and V-KYC regulatory approval status",
         "PMLA/RBI Master Directions compliance checklist",
         "Current KYC/AML vendor contracts and SLA performance data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "collections_efficiency",
@@ -498,7 +502,8 @@
         "IBC/SARFAESI case inventory and resolution timelines",
         "Digital channel adoption rates by customer segment",
         "Collections FTE count and cost breakdown by activity"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "treasury_ops_efficiency",
@@ -589,7 +594,8 @@
         "Treasury ops FTE count and time allocation by activity",
         "Current TMS capability assessment and upgrade roadmap",
         "SLR/CRR and RBI regulatory reporting FTE cost and frequency"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     {
       "lever_id": "fraud_detection_ai_banking",
@@ -680,7 +686,8 @@
         "CBS/payment-switch API capability for real-time ML scoring integration",
         "Fraud loss data by product, channel, and customer segment",
         "RBI cyber-security framework compliance checklist"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "regulatory_reporting_automation",
@@ -771,7 +778,8 @@
         "Data warehouse/lake architecture and data-quality assessment",
         "Compliance team FTE count and time allocation per return",
         "Historical late/restated return log with root-cause analysis"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     }
   ]
 }

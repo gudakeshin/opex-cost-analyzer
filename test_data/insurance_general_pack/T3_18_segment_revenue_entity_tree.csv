@@ -1,0 +1,7 @@
+legal_entity,parent_entity,business_unit,segment_revenue_inr_cr,geo
+PGIL-IN,,Motor Insurance,3920,India
+PGIL-IN,,Health Insurance,2940,India
+PGIL-IN,,Property & Casualty,1960,India
+PGIL-IN,,Marine & Cargo,588,India
+PGIL-IN,,Crop Insurance,392,India
+PGIL-RE,PGIL-IN,Motor Insurance,588,India

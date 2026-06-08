@@ -1,0 +1,7 @@
+plant_name,type,state,installed_capacity_mw,generation_fy25_mu,plant_load_factor_pct,om_cost_inr_cr,om_cost_per_mw_lakh
+Nashik Thermal PP,Thermal,Maharashtra,1800,11232,71.2,332,184
+Ratnagiri TPP,Thermal,Maharashtra,1200,7258,69.0,214,178
+Pune CCGT,Gas,Maharashtra,600,3942,75.0,98,163
+Satara Solar Farm,Solar,Maharashtra,500,1050,24.0,42,84
+Nasik Wind Cluster,Wind,Maharashtra,350,896,29.2,31,89
+Vidarbha Solar,Solar,Maharashtra,800,1680,24.0,64,80

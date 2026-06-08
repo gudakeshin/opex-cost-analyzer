@@ -1,0 +1,65 @@
+gl_code,cost_center,vendor,description,amount,currency,fiscal_period,amount_type,business_unit,geo,legal_entity,source_system,source_record_id,gst_treatment,gstin,lease_treatment,related_party
+510010,CC-API&-001,Divi Laboratories,Divi Laboratories services — API & Raw Materials,416149056,INR,2023-Q2,actual,API,India,ZPL-IN,SAP,SAP-AP-100001,itc_eligible,27AABCD3421D1Z8,,no
+510010,CC-API&-001,Divi Laboratories,Divi Laboratories services — API & Raw Materials,424472037,INR,2023-Q3,actual,API,India,ZPL-IN,SAP,SAP-AP-100002,itc_eligible,27AABCD3421D1Z8,,no
+510010,CC-API&-001,Divi Laboratories,Divi Laboratories services — API & Raw Materials,432795018,INR,2023-Q4,actual,API,India,ZPL-IN,SAP,SAP-AP-100003,itc_eligible,27AABCD3421D1Z8,,no
+510010,CC-API&-001,Divi Laboratories,Divi Laboratories services — API & Raw Materials,441117999,INR,2024-Q1,actual,API,India,ZPL-IN,SAP,SAP-AP-100004,itc_eligible,27AABCD3421D1Z8,,no
+510010,CC-API&-001,Divi Laboratories,Divi Laboratories services — API & Raw Materials,449440980,INR,2024-Q2,actual,API,India,ZPL-IN,SAP,SAP-AP-100005,itc_eligible,27AABCD3421D1Z8,,no
+510010,CC-API&-001,Divi Laboratories,Divi Laboratories services — API & Raw Materials,457763961,INR,2024-Q3,actual,API,India,ZPL-IN,SAP,SAP-AP-100006,itc_eligible,27AABCD3421D1Z8,,no
+510010,CC-API&-001,Divi Laboratories,Divi Laboratories services — API & Raw Materials,466086942,INR,2024-Q4,actual,API,India,ZPL-IN,SAP,SAP-AP-100007,itc_eligible,27AABCD3421D1Z8,,no
+510010,CC-API&-001,Divi Laboratories,Divi Laboratories services — API & Raw Materials,474409923,INR,2025-Q1,actual,API,India,ZPL-IN,SAP,SAP-AP-100008,itc_eligible,27AABCD3421D1Z8,,no
+510010,CC-API&-001,Laurus Labs,Laurus Labs services — API & Raw Materials,289222475,INR,2023-Q2,actual,API,India,ZPL-IN,SAP,SAP-AP-100009,itc_eligible,27AABCL4531L1Z1,,no
+510010,CC-API&-001,Laurus Labs,Laurus Labs services — API & Raw Materials,295006924,INR,2023-Q3,actual,API,India,ZPL-IN,SAP,SAP-AP-100010,itc_eligible,27AABCL4531L1Z1,,no
+510010,CC-API&-001,Laurus Labs,Laurus Labs services — API & Raw Materials,300791374,INR,2023-Q4,actual,API,India,ZPL-IN,SAP,SAP-AP-100011,itc_eligible,27AABCL4531L1Z1,,no
+510010,CC-API&-001,Laurus Labs,Laurus Labs services — API & Raw Materials,306575823,INR,2024-Q1,actual,API,India,ZPL-IN,SAP,SAP-AP-100012,itc_eligible,27AABCL4531L1Z1,,no
+510010,CC-API&-001,Laurus Labs,Laurus Labs services — API & Raw Materials,312360273,INR,2024-Q2,actual,API,India,ZPL-IN,SAP,SAP-AP-100013,itc_eligible,27AABCL4531L1Z1,,no
+510010,CC-API&-001,Laurus Labs,Laurus Labs services — API & Raw Materials,318144722,INR,2024-Q3,actual,API,India,ZPL-IN,SAP,SAP-AP-100014,itc_eligible,27AABCL4531L1Z1,,no
+510010,CC-API&-001,Laurus Labs,Laurus Labs services — API & Raw Materials,323929172,INR,2024-Q4,actual,API,India,ZPL-IN,SAP,SAP-AP-100015,itc_eligible,27AABCL4531L1Z1,,no
+510010,CC-API&-001,Laurus Labs,Laurus Labs services — API & Raw Materials,329713621,INR,2025-Q1,actual,API,India,ZPL-IN,SAP,SAP-AP-100016,itc_eligible,27AABCL4531L1Z1,,no
+520010,CC-CONTRA-001,Jubilant Biosys,Jubilant Biosys services — Contract Research & Manufacturing,157769189,INR,2023-Q2,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100017,itc_eligible,27AABCJ5641J1Z4,,no
+520010,CC-CONTRA-001,Jubilant Biosys,Jubilant Biosys services — Contract Research & Manufacturing,160924572,INR,2023-Q3,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100018,itc_eligible,27AABCJ5641J1Z4,,no
+520010,CC-CONTRA-001,Jubilant Biosys,Jubilant Biosys services — Contract Research & Manufacturing,164079956,INR,2023-Q4,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100019,itc_eligible,27AABCJ5641J1Z4,,no
+520010,CC-CONTRA-001,Jubilant Biosys,Jubilant Biosys services — Contract Research & Manufacturing,167235340,INR,2024-Q1,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100020,itc_eligible,27AABCJ5641J1Z4,,no
+520010,CC-CONTRA-001,Jubilant Biosys,Jubilant Biosys services — Contract Research & Manufacturing,170390724,INR,2024-Q2,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100021,itc_eligible,27AABCJ5641J1Z4,,no
+520010,CC-CONTRA-001,Jubilant Biosys,Jubilant Biosys services — Contract Research & Manufacturing,173546107,INR,2024-Q3,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100022,itc_eligible,27AABCJ5641J1Z4,,no
+520010,CC-CONTRA-001,Jubilant Biosys,Jubilant Biosys services — Contract Research & Manufacturing,176701491,INR,2024-Q4,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100023,itc_eligible,27AABCJ5641J1Z4,,no
+520010,CC-CONTRA-001,Jubilant Biosys,Jubilant Biosys services — Contract Research & Manufacturing,179856875,INR,2025-Q1,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100024,itc_eligible,27AABCJ5641J1Z4,,no
+520010,CC-CONTRA-001,Syngene International,Syngene International services — Contract Research & Manufacturing,158028061,INR,2023-Q2,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100025,itc_eligible,27AABCS6751S1Z7,,no
+520010,CC-CONTRA-001,Syngene International,Syngene International services — Contract Research & Manufacturing,161188622,INR,2023-Q3,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100026,itc_eligible,27AABCS6751S1Z7,,no
+520010,CC-CONTRA-001,Syngene International,Syngene International services — Contract Research & Manufacturing,164349183,INR,2023-Q4,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100027,itc_eligible,27AABCS6751S1Z7,,no
+520010,CC-CONTRA-001,Syngene International,Syngene International services — Contract Research & Manufacturing,167509744,INR,2024-Q1,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100028,itc_eligible,27AABCS6751S1Z7,,no
+520010,CC-CONTRA-001,Syngene International,Syngene International services — Contract Research & Manufacturing,170670305,INR,2024-Q2,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100029,itc_eligible,27AABCS6751S1Z7,,no
+520010,CC-CONTRA-001,Syngene International,Syngene International services — Contract Research & Manufacturing,173830867,INR,2024-Q3,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100030,itc_eligible,27AABCS6751S1Z7,,no
+520010,CC-CONTRA-001,Syngene International,Syngene International services — Contract Research & Manufacturing,176991428,INR,2024-Q4,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100031,itc_eligible,27AABCS6751S1Z7,,no
+520010,CC-CONTRA-001,Syngene International,Syngene International services — Contract Research & Manufacturing,180151989,INR,2025-Q1,actual,Contract,India,ZPL-IN,SAP,SAP-AP-100032,itc_eligible,27AABCS6751S1Z7,,no
+530010,CC-REGULA-001,IQVIA India,IQVIA India services — Regulatory & Quality,415858795,INR,2023-Q2,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100033,itc_eligible,27AABCI7861I1Z0,,no
+530010,CC-REGULA-001,IQVIA India,IQVIA India services — Regulatory & Quality,424175970,INR,2023-Q3,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100034,itc_eligible,27AABCI7861I1Z0,,no
+530010,CC-REGULA-001,IQVIA India,IQVIA India services — Regulatory & Quality,432493146,INR,2023-Q4,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100035,itc_eligible,27AABCI7861I1Z0,,no
+530010,CC-REGULA-001,IQVIA India,IQVIA India services — Regulatory & Quality,440810322,INR,2024-Q1,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100036,itc_eligible,27AABCI7861I1Z0,,no
+530010,CC-REGULA-001,IQVIA India,IQVIA India services — Regulatory & Quality,449127498,INR,2024-Q2,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100037,itc_eligible,27AABCI7861I1Z0,,no
+530010,CC-REGULA-001,IQVIA India,IQVIA India services — Regulatory & Quality,457444674,INR,2024-Q3,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100038,itc_eligible,27AABCI7861I1Z0,,no
+530010,CC-REGULA-001,IQVIA India,IQVIA India services — Regulatory & Quality,465761850,INR,2024-Q4,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100039,itc_eligible,27AABCI7861I1Z0,,no
+530010,CC-REGULA-001,IQVIA India,IQVIA India services — Regulatory & Quality,474079026,INR,2025-Q1,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100040,itc_eligible,27AABCI7861I1Z0,,no
+530010,CC-REGULA-001,SGS India,SGS India services — Regulatory & Quality,124777712,INR,2023-Q2,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100041,itc_eligible,27AABCS8971S1Z3,,no
+530010,CC-REGULA-001,SGS India,SGS India services — Regulatory & Quality,127273266,INR,2023-Q3,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100042,itc_eligible,27AABCS8971S1Z3,,no
+530010,CC-REGULA-001,SGS India,SGS India services — Regulatory & Quality,129768820,INR,2023-Q4,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100043,itc_eligible,27AABCS8971S1Z3,,no
+530010,CC-REGULA-001,SGS India,SGS India services — Regulatory & Quality,132264374,INR,2024-Q1,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100044,itc_eligible,27AABCS8971S1Z3,,no
+530010,CC-REGULA-001,SGS India,SGS India services — Regulatory & Quality,134759928,INR,2024-Q2,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100045,itc_eligible,27AABCS8971S1Z3,,no
+530010,CC-REGULA-001,SGS India,SGS India services — Regulatory & Quality,137255483,INR,2024-Q3,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100046,itc_eligible,27AABCS8971S1Z3,,no
+530010,CC-REGULA-001,SGS India,SGS India services — Regulatory & Quality,139751037,INR,2024-Q4,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100047,itc_eligible,27AABCS8971S1Z3,,no
+530010,CC-REGULA-001,SGS India,SGS India services — Regulatory & Quality,142246591,INR,2025-Q1,actual,Regulatory,India,ZPL-IN,SAP,SAP-AP-100048,itc_eligible,27AABCS8971S1Z3,,no
+540010,CC-MARKET-001,Ogilvy Health,Ogilvy Health services — Marketing & Medical Affairs,408105859,INR,2023-Q2,actual,Marketing,India,ZPL-IN,SAP,SAP-AP-100049,itc_eligible,27AABCO9081O1Z6,,no
+540010,CC-MARKET-001,Ogilvy Health,Ogilvy Health services — Marketing & Medical Affairs,416267976,INR,2023-Q3,actual,Marketing,India,ZPL-IN,SAP,SAP-AP-100050,itc_eligible,27AABCO9081O1Z6,,no
+540010,CC-MARKET-001,Ogilvy Health,Ogilvy Health services — Marketing & Medical Affairs,424430093,INR,2023-Q4,actual,Marketing,India,ZPL-IN,SAP,SAP-AP-100051,itc_eligible,27AABCO9081O1Z6,,no
+540010,CC-MARKET-001,Ogilvy Health,Ogilvy Health services — Marketing & Medical Affairs,432592210,INR,2024-Q1,actual,Marketing,India,ZPL-IN,SAP,SAP-AP-100052,itc_eligible,27AABCO9081O1Z6,,no
+540010,CC-MARKET-001,Ogilvy Health,Ogilvy Health services — Marketing & Medical Affairs,440754327,INR,2024-Q2,actual,Marketing,India,ZPL-IN,SAP,SAP-AP-100053,itc_eligible,27AABCO9081O1Z6,,no
+540010,CC-MARKET-001,Ogilvy Health,Ogilvy Health services — Marketing & Medical Affairs,448916444,INR,2024-Q3,actual,Marketing,India,ZPL-IN,SAP,SAP-AP-100054,itc_eligible,27AABCO9081O1Z6,,no
+540010,CC-MARKET-001,Ogilvy Health,Ogilvy Health services — Marketing & Medical Affairs,457078562,INR,2024-Q4,actual,Marketing,India,ZPL-IN,SAP,SAP-AP-100055,itc_eligible,27AABCO9081O1Z6,,no
+540010,CC-MARKET-001,Ogilvy Health,Ogilvy Health services — Marketing & Medical Affairs,465240679,INR,2025-Q1,actual,Marketing,India,ZPL-IN,SAP,SAP-AP-100056,itc_eligible,27AABCO9081O1Z6,,no
+550010,CC-LOGIST-001,DHL Supply Chain,DHL Supply Chain services — Logistics & Cold Chain,461822864,INR,2023-Q2,actual,Logistics,US,ZPL-US,Oracle,Oracle-AP-100057,not_applicable,,,no
+550010,CC-LOGIST-001,DHL Supply Chain,DHL Supply Chain services — Logistics & Cold Chain,471059321,INR,2023-Q3,actual,Logistics,US,ZPL-US,Oracle,Oracle-AP-100058,not_applicable,,,no
+550010,CC-LOGIST-001,DHL Supply Chain,DHL Supply Chain services — Logistics & Cold Chain,480295778,INR,2023-Q4,actual,Logistics,US,ZPL-US,Oracle,Oracle-AP-100059,not_applicable,,,no
+550010,CC-LOGIST-001,DHL Supply Chain,DHL Supply Chain services — Logistics & Cold Chain,489532235,INR,2024-Q1,actual,Logistics,US,ZPL-US,Oracle,Oracle-AP-100060,not_applicable,,,no
+550010,CC-LOGIST-001,DHL Supply Chain,DHL Supply Chain services — Logistics & Cold Chain,498768693,INR,2024-Q2,actual,Logistics,US,ZPL-US,Oracle,Oracle-AP-100061,not_applicable,,,no
+550010,CC-LOGIST-001,DHL Supply Chain,DHL Supply Chain services — Logistics & Cold Chain,508005150,INR,2024-Q3,actual,Logistics,US,ZPL-US,Oracle,Oracle-AP-100062,not_applicable,,,no
+550010,CC-LOGIST-001,DHL Supply Chain,DHL Supply Chain services — Logistics & Cold Chain,517241607,INR,2024-Q4,actual,Logistics,US,ZPL-US,Oracle,Oracle-AP-100063,not_applicable,,,no
+550010,CC-LOGIST-001,DHL Supply Chain,DHL Supply Chain services — Logistics & Cold Chain,526478064,INR,2025-Q1,actual,Logistics,US,ZPL-US,Oracle,Oracle-AP-100064,not_applicable,,,no

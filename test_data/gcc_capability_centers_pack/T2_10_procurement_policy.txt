@@ -1,0 +1,8 @@
+Meridian Global Services India Pvt Ltd — Procurement Policy
+
+1) Three bids above 50 Lakh. Parent company global procurement approval above USD 500K.
+2) Cloud: AWS and Azure pre-approved; any other CSP needs parent CISO approval.
+3) Real estate: parent CRE team approval for any new or modified lease.
+4) Contract staff: approved staffing vendors only (TeamLease, Quess, ManpowerGroup); new vendor: parent HR approval.
+5) MSME payment 45 days.
+6) FY26 target: cloud unit cost reduction 15% via RI/savings plans; contract staff rate card renegotiation.

@@ -1,0 +1,11 @@
+vendor,vendor_category,gstin,vendor_pan,msme_flag,spend_category,legal_entity,related_party
+3M India,large,27AABCT1234M1Z8,AABCT1234M,no,Medical Consumables & Supplies,AHNL-IN,no
+Johnson & Johnson India,large,27AABCJ5621J1Z1,AABCJ5621J,no,Medical Consumables & Supplies,AHNL-IN,no
+Abbott India,large,27AABCA8821A1Z4,AABCA8821A,no,Pharmacy & Drugs,AHNL-IN,no
+Sun Pharma,large,27AABCS9921P1Z7,AABCS9921P,no,Pharmacy & Drugs,AHNL-IN,no
+Siemens Healthineers,large,27AABCS7711H1Z0,AABCS7711H,no,Biomedical Equipment Maintenance,AHNL-IN,no
+GE Healthcare India,large,27AABCG6621H1Z3,AABCG6621H,no,Biomedical Equipment Maintenance,AHNL-IN,no
+ISS Facility Services,large,27AABCI3321F1Z4,AABCI3321F,no,Facility Management,AHNL-IN,no
+TeamLease Digital,large,29AABCT5678L1Z9,AABCT5678L,no,Clinical Staffing,AHNL-IN,no
+Philips India,large,27AABCP4421P1Z6,AABCP4421P,no,Biomedical Equipment Maintenance,AHNL-IN,no
+Cipla,large,27AABCC3311C1Z9,AABCC3311C,no,Pharmacy & Drugs,AHNL-IN,no

@@ -1,0 +1,9 @@
+Pragati General Insurance Ltd — Group Structure
+
+PGIL-IN: India parent (IRDAI-licensed general insurer; NSE/BSE listed). ERP: Oracle FS + SAP.
+PGIL-RE: Pragati Re India Ltd (domestic reinsurer subsidiary; IRDAI licensed). ERP: SAP ECC.
+PGIL-HI: Pragati Health Insurance Ltd (standalone health insurer; IRDAI licensed). ERP: Oracle FS.
+
+Entity tree: PGIL-IN > PGIL-RE (100%), PGIL-HI (74%)
+
+Intercompany: PGIL-IN cedes reinsurance to PGIL-RE at market rates; services to PGIL-HI at cost-plus. IC flagged related_party=yes. IRDAI requires entity-level solvency and reporting; consolidation for SEBI purposes only.

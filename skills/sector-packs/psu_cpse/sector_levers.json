@@ -127,7 +127,8 @@
         "Vendor GSTIN compliance status and filing history",
         "ERP GST configuration and tax code mapping",
         "Prior-year tax authority ITC mismatch notices if any"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     {
       "lever_id": "ind_as_116_lease",
@@ -213,7 +214,8 @@
         "Incremental borrowing rate by tenure for lease liability discounting",
         "ERP lease accounting module capability",
         "DPE reporting requirements for lease disclosures"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     {
       "lever_id": "csr_efficiency",
@@ -298,7 +300,8 @@
         "Implementing agency contracts and performance data",
         "Impact measurement reports by project",
         "CSR committee composition and decision-making process"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "public_procurement_reform",
@@ -383,7 +386,8 @@
         "DGS&D/GeM rate contract prices for common items",
         "CVC audit observations on procurement compliance",
         "GFR 2017 requirements applicable to the entity"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "mro_consolidation",
@@ -469,7 +473,8 @@
         "Price data for common items across sites",
         "Current VMI and consignment arrangements",
         "Critical vs non-critical spares classification"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "energy_audit_compliance",
@@ -555,7 +560,8 @@
         "Energy audit report with top-10 efficiency recommendations and investment estimates",
         "Electricity tariff structure and peak demand charges",
         "Motor inventory with load factor and age data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "manpower_rationalisation",
@@ -641,7 +647,8 @@
         "DPE benchmark: employee cost ratios for comparable CPSEs",
         "VRS eligibility rules and DPE approval requirements",
         "5-year payroll forecast with and without rationalisation"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "project_cost_overrun_control",
@@ -714,7 +721,8 @@
         "Process volume metrics",
         "FTE effort or cost allocation by process",
         "Baseline cycle times"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

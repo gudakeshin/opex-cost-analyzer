@@ -1,0 +1,46 @@
+business_unit,function,location,band,headcount
+Retail Banking,Operations,India,Entry (B1-B2),360
+Retail Banking,Operations,India,Mid (B3-B4),280
+Retail Banking,Operations,India,Senior (B5-B6),120
+Retail Banking,Finance,India,Entry (B1-B2),360
+Retail Banking,Finance,India,Mid (B3-B4),280
+Retail Banking,Finance,India,Senior (B5-B6),120
+Retail Banking,HR,India,Entry (B1-B2),360
+Retail Banking,HR,India,Mid (B3-B4),280
+Retail Banking,HR,India,Senior (B5-B6),120
+Corporate Banking,Operations,India,Entry (B1-B2),450
+Corporate Banking,Operations,India,Mid (B3-B4),350
+Corporate Banking,Operations,India,Senior (B5-B6),150
+Corporate Banking,Finance,India,Entry (B1-B2),450
+Corporate Banking,Finance,India,Mid (B3-B4),350
+Corporate Banking,Finance,India,Senior (B5-B6),150
+Corporate Banking,HR,India,Entry (B1-B2),450
+Corporate Banking,HR,India,Mid (B3-B4),350
+Corporate Banking,HR,India,Senior (B5-B6),150
+Treasury,Operations,India,Entry (B1-B2),540
+Treasury,Operations,India,Mid (B3-B4),420
+Treasury,Operations,India,Senior (B5-B6),180
+Treasury,Finance,India,Entry (B1-B2),540
+Treasury,Finance,India,Mid (B3-B4),420
+Treasury,Finance,India,Senior (B5-B6),180
+Treasury,HR,India,Entry (B1-B2),540
+Treasury,HR,India,Mid (B3-B4),420
+Treasury,HR,India,Senior (B5-B6),180
+Digital Banking,Operations,India,Entry (B1-B2),630
+Digital Banking,Operations,India,Mid (B3-B4),489
+Digital Banking,Operations,India,Senior (B5-B6),210
+Digital Banking,Finance,India,Entry (B1-B2),630
+Digital Banking,Finance,India,Mid (B3-B4),489
+Digital Banking,Finance,India,Senior (B5-B6),210
+Digital Banking,HR,India,Entry (B1-B2),630
+Digital Banking,HR,India,Mid (B3-B4),489
+Digital Banking,HR,India,Senior (B5-B6),210
+Insurance Broking,Operations,India,Entry (B1-B2),720
+Insurance Broking,Operations,India,Mid (B3-B4),560
+Insurance Broking,Operations,India,Senior (B5-B6),240
+Insurance Broking,Finance,India,Entry (B1-B2),720
+Insurance Broking,Finance,India,Mid (B3-B4),560
+Insurance Broking,Finance,India,Senior (B5-B6),240
+Insurance Broking,HR,India,Entry (B1-B2),720
+Insurance Broking,HR,India,Mid (B3-B4),560
+Insurance Broking,HR,India,Senior (B5-B6),240

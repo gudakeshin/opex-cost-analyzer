@@ -1,0 +1,97 @@
+category,fiscal_period,amount_type,amount,currency
+Logistics & Freight,2024-01,budget,595281669,INR
+Logistics & Freight,2024-01,actual,577423218,INR
+Logistics & Freight,2024-02,budget,598243269,INR
+Logistics & Freight,2024-02,actual,658067595,INR
+Logistics & Freight,2024-03,budget,601204870,INR
+Logistics & Freight,2024-03,actual,601204870,INR
+Logistics & Freight,2024-04,budget,604166470,INR
+Logistics & Freight,2024-04,actual,598124805,INR
+Logistics & Freight,2024-05,budget,607128070,INR
+Logistics & Freight,2024-05,actual,588914227,INR
+Logistics & Freight,2024-06,budget,610089671,INR
+Logistics & Freight,2024-06,actual,591786980,INR
+Logistics & Freight,2024-07,budget,613051271,INR
+Logistics & Freight,2024-07,actual,582398707,INR
+Logistics & Freight,2024-08,budget,616012871,INR
+Logistics & Freight,2024-08,actual,640653385,INR
+Logistics & Freight,2024-09,budget,618974472,INR
+Logistics & Freight,2024-09,actual,631353961,INR
+Logistics & Freight,2024-10,budget,621936072,INR
+Logistics & Freight,2024-10,actual,640594154,INR
+Logistics & Freight,2024-11,budget,624897672,INR
+Logistics & Freight,2024-11,actual,668640509,INR
+Logistics & Freight,2024-12,budget,627859273,INR
+Logistics & Freight,2024-12,actual,602744902,INR
+Energy & Utilities,2024-01,budget,514825224,INR
+Energy & Utilities,2024-01,actual,499380467,INR
+Energy & Utilities,2024-02,budget,517386544,INR
+Energy & Utilities,2024-02,actual,522560409,INR
+Energy & Utilities,2024-03,budget,519947863,INR
+Energy & Utilities,2024-03,actual,540745777,INR
+Energy & Utilities,2024-04,budget,522509183,INR
+Energy & Utilities,2024-04,actual,496383723,INR
+Energy & Utilities,2024-05,budget,525070502,INR
+Energy & Utilities,2024-05,actual,582828257,INR
+Energy & Utilities,2024-06,budget,527631822,INR
+Energy & Utilities,2024-06,actual,554013413,INR
+Energy & Utilities,2024-07,budget,530193141,INR
+Energy & Utilities,2024-07,actual,519589278,INR
+Energy & Utilities,2024-08,budget,532754461,INR
+Energy & Utilities,2024-08,actual,591357451,INR
+Energy & Utilities,2024-09,budget,535315780,INR
+Energy & Utilities,2024-09,actual,524609464,INR
+Energy & Utilities,2024-10,budget,537877100,INR
+Energy & Utilities,2024-10,actual,602422351,INR
+Energy & Utilities,2024-11,budget,540438419,INR
+Energy & Utilities,2024-11,actual,551247187,INR
+Energy & Utilities,2024-12,budget,542999739,INR
+Energy & Utilities,2024-12,actual,581009720,INR
+Maintenance & Spares,2024-01,budget,502502743,INR
+Maintenance & Spares,2024-01,actual,497477715,INR
+Maintenance & Spares,2024-02,budget,505002757,INR
+Maintenance & Spares,2024-02,actual,484802646,INR
+Maintenance & Spares,2024-03,budget,507502770,INR
+Maintenance & Spares,2024-03,actual,492277686,INR
+Maintenance & Spares,2024-04,budget,510002784,INR
+Maintenance & Spares,2024-04,actual,520202839,INR
+Maintenance & Spares,2024-05,budget,512502798,INR
+Maintenance & Spares,2024-05,actual,553503021,INR
+Maintenance & Spares,2024-06,budget,515002811,INR
+Maintenance & Spares,2024-06,actual,535602923,INR
+Maintenance & Spares,2024-07,budget,517502825,INR
+Maintenance & Spares,2024-07,actual,522677853,INR
+Maintenance & Spares,2024-08,budget,520002839,INR
+Maintenance & Spares,2024-08,actual,540802952,INR
+Maintenance & Spares,2024-09,budget,522502852,INR
+Maintenance & Spares,2024-09,actual,569528108,INR
+Maintenance & Spares,2024-10,budget,525002866,INR
+Maintenance & Spares,2024-10,actual,546002980,INR
+Maintenance & Spares,2024-11,budget,527502880,INR
+Maintenance & Spares,2024-11,actual,527502880,INR
+Maintenance & Spares,2024-12,budget,530002893,INR
+Maintenance & Spares,2024-12,actual,551203008,INR
+Contract Manufacturing & Subcontracting,2024-01,budget,626564496,INR
+Contract Manufacturing & Subcontracting,2024-01,actual,601501916,INR
+Contract Manufacturing & Subcontracting,2024-02,budget,629681732,INR
+Contract Manufacturing & Subcontracting,2024-02,actual,617088097,INR
+Contract Manufacturing & Subcontracting,2024-03,budget,632798968,INR
+Contract Manufacturing & Subcontracting,2024-03,actual,613814998,INR
+Contract Manufacturing & Subcontracting,2024-04,budget,635916205,INR
+Contract Manufacturing & Subcontracting,2024-04,actual,718585311,INR
+Contract Manufacturing & Subcontracting,2024-05,budget,639033441,INR
+Contract Manufacturing & Subcontracting,2024-05,actual,607081768,INR
+Contract Manufacturing & Subcontracting,2024-06,budget,642150677,INR
+Contract Manufacturing & Subcontracting,2024-06,actual,654993690,INR
+Contract Manufacturing & Subcontracting,2024-07,budget,645267914,INR
+Contract Manufacturing & Subcontracting,2024-07,actual,716247384,INR
+Contract Manufacturing & Subcontracting,2024-08,budget,648385150,INR
+Contract Manufacturing & Subcontracting,2024-08,actual,732675219,INR
+Contract Manufacturing & Subcontracting,2024-09,budget,651502386,INR
+Contract Manufacturing & Subcontracting,2024-09,actual,651502386,INR
+Contract Manufacturing & Subcontracting,2024-10,budget,654619623,INR
+Contract Manufacturing & Subcontracting,2024-10,actual,700442996,INR
+Contract Manufacturing & Subcontracting,2024-11,budget,657736859,INR
+Contract Manufacturing & Subcontracting,2024-11,actual,664314227,INR
+Contract Manufacturing & Subcontracting,2024-12,budget,660854095,INR
+Contract Manufacturing & Subcontracting,2024-12,actual,740156586,INR

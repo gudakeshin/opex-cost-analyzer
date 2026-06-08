@@ -1,0 +1,46 @@
+business_unit,function,location,band,headcount
+Formulations India,Operations,India,Entry (B1-B2),360
+Formulations India,Operations,India,Mid (B3-B4),280
+Formulations India,Operations,India,Senior (B5-B6),120
+Formulations India,Finance,India,Entry (B1-B2),360
+Formulations India,Finance,India,Mid (B3-B4),280
+Formulations India,Finance,India,Senior (B5-B6),120
+Formulations India,HR,India,Entry (B1-B2),360
+Formulations India,HR,India,Mid (B3-B4),280
+Formulations India,HR,India,Senior (B5-B6),120
+Formulations Exports,Operations,India,Entry (B1-B2),450
+Formulations Exports,Operations,India,Mid (B3-B4),350
+Formulations Exports,Operations,India,Senior (B5-B6),150
+Formulations Exports,Finance,India,Entry (B1-B2),450
+Formulations Exports,Finance,India,Mid (B3-B4),350
+Formulations Exports,Finance,India,Senior (B5-B6),150
+Formulations Exports,HR,India,Entry (B1-B2),450
+Formulations Exports,HR,India,Mid (B3-B4),350
+Formulations Exports,HR,India,Senior (B5-B6),150
+API,Operations,India,Entry (B1-B2),540
+API,Operations,India,Mid (B3-B4),420
+API,Operations,India,Senior (B5-B6),180
+API,Finance,India,Entry (B1-B2),540
+API,Finance,India,Mid (B3-B4),420
+API,Finance,India,Senior (B5-B6),180
+API,HR,India,Entry (B1-B2),540
+API,HR,India,Mid (B3-B4),420
+API,HR,India,Senior (B5-B6),180
+CDMO,Operations,India,Entry (B1-B2),630
+CDMO,Operations,India,Mid (B3-B4),489
+CDMO,Operations,India,Senior (B5-B6),210
+CDMO,Finance,India,Entry (B1-B2),630
+CDMO,Finance,India,Mid (B3-B4),489
+CDMO,Finance,India,Senior (B5-B6),210
+CDMO,HR,India,Entry (B1-B2),630
+CDMO,HR,India,Mid (B3-B4),489
+CDMO,HR,India,Senior (B5-B6),210
+Medical Devices,Operations,India,Entry (B1-B2),720
+Medical Devices,Operations,India,Mid (B3-B4),560
+Medical Devices,Operations,India,Senior (B5-B6),240
+Medical Devices,Finance,India,Entry (B1-B2),720
+Medical Devices,Finance,India,Mid (B3-B4),560
+Medical Devices,Finance,India,Senior (B5-B6),240
+Medical Devices,HR,India,Entry (B1-B2),720
+Medical Devices,HR,India,Mid (B3-B4),560
+Medical Devices,HR,India,Senior (B5-B6),240

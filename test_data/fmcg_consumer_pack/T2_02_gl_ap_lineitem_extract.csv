@@ -1,0 +1,65 @@
+gl_code,cost_center,vendor,description,amount,currency,fiscal_period,amount_type,business_unit,geo,legal_entity,source_system,source_record_id,gst_treatment,gstin,lease_treatment,related_party
+510010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Advertising,421294146,INR,2023-Q2,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100001,itc_eligible,27AABCO4521L1Z3,,no
+510010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Advertising,429720028,INR,2023-Q3,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100002,itc_eligible,27AABCO4521L1Z3,,no
+510010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Advertising,438145911,INR,2023-Q4,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100003,itc_eligible,27AABCO4521L1Z3,,no
+510010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Advertising,446571794,INR,2024-Q1,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100004,itc_eligible,27AABCO4521L1Z3,,no
+510010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Advertising,454997677,INR,2024-Q2,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100005,itc_eligible,27AABCO4521L1Z3,,no
+510010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Advertising,463423560,INR,2024-Q3,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100006,itc_eligible,27AABCO4521L1Z3,,no
+510010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Advertising,471849443,INR,2024-Q4,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100007,itc_eligible,27AABCO4521L1Z3,,no
+510010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Advertising,480275326,INR,2025-Q1,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100008,itc_eligible,27AABCO4521L1Z3,,no
+510010,CC-MARKET-001,DDB Mudra,DDB Mudra services — Marketing & Advertising,451106821,INR,2023-Q2,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100009,itc_eligible,27AABCD9821M1Z6,,no
+510010,CC-MARKET-001,DDB Mudra,DDB Mudra services — Marketing & Advertising,460128957,INR,2023-Q3,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100010,itc_eligible,27AABCD9821M1Z6,,no
+510010,CC-MARKET-001,DDB Mudra,DDB Mudra services — Marketing & Advertising,469151093,INR,2023-Q4,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100011,itc_eligible,27AABCD9821M1Z6,,no
+510010,CC-MARKET-001,DDB Mudra,DDB Mudra services — Marketing & Advertising,478173230,INR,2024-Q1,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100012,itc_eligible,27AABCD9821M1Z6,,no
+510010,CC-MARKET-001,DDB Mudra,DDB Mudra services — Marketing & Advertising,487195366,INR,2024-Q2,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100013,itc_eligible,27AABCD9821M1Z6,,no
+510010,CC-MARKET-001,DDB Mudra,DDB Mudra services — Marketing & Advertising,496217503,INR,2024-Q3,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100014,itc_eligible,27AABCD9821M1Z6,,no
+510010,CC-MARKET-001,DDB Mudra,DDB Mudra services — Marketing & Advertising,505239639,INR,2024-Q4,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100015,itc_eligible,27AABCD9821M1Z6,,no
+510010,CC-MARKET-001,DDB Mudra,DDB Mudra services — Marketing & Advertising,514261775,INR,2025-Q1,actual,Marketing,India,PCBL-IN,SAP,SAP-AP-100016,itc_eligible,27AABCD9821M1Z6,,no
+520010,CC-LOGIST-001,Maersk India,Maersk India services — Logistics & Distribution,359001653,INR,2023-Q2,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100017,itc_eligible,27AABCM3421I1Z9,,no
+520010,CC-LOGIST-001,Maersk India,Maersk India services — Logistics & Distribution,366181686,INR,2023-Q3,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100018,itc_eligible,27AABCM3421I1Z9,,no
+520010,CC-LOGIST-001,Maersk India,Maersk India services — Logistics & Distribution,373361719,INR,2023-Q4,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100019,itc_eligible,27AABCM3421I1Z9,,no
+520010,CC-LOGIST-001,Maersk India,Maersk India services — Logistics & Distribution,380541752,INR,2024-Q1,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100020,itc_eligible,27AABCM3421I1Z9,,no
+520010,CC-LOGIST-001,Maersk India,Maersk India services — Logistics & Distribution,387721785,INR,2024-Q2,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100021,itc_eligible,27AABCM3421I1Z9,,no
+520010,CC-LOGIST-001,Maersk India,Maersk India services — Logistics & Distribution,394901818,INR,2024-Q3,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100022,itc_eligible,27AABCM3421I1Z9,,no
+520010,CC-LOGIST-001,Maersk India,Maersk India services — Logistics & Distribution,402081851,INR,2024-Q4,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100023,itc_eligible,27AABCM3421I1Z9,,no
+520010,CC-LOGIST-001,Maersk India,Maersk India services — Logistics & Distribution,409261884,INR,2025-Q1,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100024,itc_eligible,27AABCM3421I1Z9,,no
+520010,CC-LOGIST-001,Delhivery,Delhivery services — Logistics & Distribution,206797622,INR,2023-Q2,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100025,itc_eligible,29AABCD8831L1Z2,,no
+520010,CC-LOGIST-001,Delhivery,Delhivery services — Logistics & Distribution,210933574,INR,2023-Q3,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100026,itc_eligible,29AABCD8831L1Z2,,no
+520010,CC-LOGIST-001,Delhivery,Delhivery services — Logistics & Distribution,215069526,INR,2023-Q4,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100027,itc_eligible,29AABCD8831L1Z2,,no
+520010,CC-LOGIST-001,Delhivery,Delhivery services — Logistics & Distribution,219205479,INR,2024-Q1,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100028,itc_eligible,29AABCD8831L1Z2,,no
+520010,CC-LOGIST-001,Delhivery,Delhivery services — Logistics & Distribution,223341431,INR,2024-Q2,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100029,itc_eligible,29AABCD8831L1Z2,,no
+520010,CC-LOGIST-001,Delhivery,Delhivery services — Logistics & Distribution,227477384,INR,2024-Q3,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100030,itc_eligible,29AABCD8831L1Z2,,no
+520010,CC-LOGIST-001,Delhivery,Delhivery services — Logistics & Distribution,231613336,INR,2024-Q4,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100031,itc_eligible,29AABCD8831L1Z2,,no
+520010,CC-LOGIST-001,Delhivery,Delhivery services — Logistics & Distribution,235749289,INR,2025-Q1,actual,Logistics,India,PCBL-IN,SAP,SAP-AP-100032,itc_eligible,29AABCD8831L1Z2,,no
+530010,CC-CONTRA-001,Nippon Paint India,Nippon Paint India services — Contract Manufacturing,90032782,INR,2023-Q2,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100033,itc_eligible,27AABCN7721P1Z5,,no
+530010,CC-CONTRA-001,Nippon Paint India,Nippon Paint India services — Contract Manufacturing,91833437,INR,2023-Q3,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100034,itc_eligible,27AABCN7721P1Z5,,no
+530010,CC-CONTRA-001,Nippon Paint India,Nippon Paint India services — Contract Manufacturing,93634093,INR,2023-Q4,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100035,itc_eligible,27AABCN7721P1Z5,,no
+530010,CC-CONTRA-001,Nippon Paint India,Nippon Paint India services — Contract Manufacturing,95434748,INR,2024-Q1,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100036,itc_eligible,27AABCN7721P1Z5,,no
+530010,CC-CONTRA-001,Nippon Paint India,Nippon Paint India services — Contract Manufacturing,97235404,INR,2024-Q2,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100037,itc_eligible,27AABCN7721P1Z5,,no
+530010,CC-CONTRA-001,Nippon Paint India,Nippon Paint India services — Contract Manufacturing,99036060,INR,2024-Q3,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100038,itc_eligible,27AABCN7721P1Z5,,no
+530010,CC-CONTRA-001,Nippon Paint India,Nippon Paint India services — Contract Manufacturing,100836715,INR,2024-Q4,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100039,itc_eligible,27AABCN7721P1Z5,,no
+530010,CC-CONTRA-001,Nippon Paint India,Nippon Paint India services — Contract Manufacturing,102637371,INR,2025-Q1,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100040,itc_eligible,27AABCN7721P1Z5,,no
+530010,CC-CONTRA-001,Haldirams,Haldirams services — Contract Manufacturing,312792344,INR,2023-Q2,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100041,itc_eligible,27AABCH4421R1Z8,,no
+530010,CC-CONTRA-001,Haldirams,Haldirams services — Contract Manufacturing,319048190,INR,2023-Q3,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100042,itc_eligible,27AABCH4421R1Z8,,no
+530010,CC-CONTRA-001,Haldirams,Haldirams services — Contract Manufacturing,325304037,INR,2023-Q4,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100043,itc_eligible,27AABCH4421R1Z8,,no
+530010,CC-CONTRA-001,Haldirams,Haldirams services — Contract Manufacturing,331559884,INR,2024-Q1,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100044,itc_eligible,27AABCH4421R1Z8,,no
+530010,CC-CONTRA-001,Haldirams,Haldirams services — Contract Manufacturing,337815731,INR,2024-Q2,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100045,itc_eligible,27AABCH4421R1Z8,,no
+530010,CC-CONTRA-001,Haldirams,Haldirams services — Contract Manufacturing,344071578,INR,2024-Q3,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100046,itc_eligible,27AABCH4421R1Z8,,no
+530010,CC-CONTRA-001,Haldirams,Haldirams services — Contract Manufacturing,350327425,INR,2024-Q4,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100047,itc_eligible,27AABCH4421R1Z8,,no
+530010,CC-CONTRA-001,Haldirams,Haldirams services — Contract Manufacturing,356583272,INR,2025-Q1,actual,Contract,India,PCBL-IN,SAP,SAP-AP-100048,itc_eligible,27AABCH4421R1Z8,,no
+510010,CC-MODERN-001,Reliance Retail,Reliance Retail services — Modern Trade,299757674,INR,2023-Q2,actual,Modern,India,PCBL-IN,SAP,SAP-AP-100049,itc_eligible,27AABCR8891R1Z1,,no
+510010,CC-MODERN-001,Reliance Retail,Reliance Retail services — Modern Trade,305752827,INR,2023-Q3,actual,Modern,India,PCBL-IN,SAP,SAP-AP-100050,itc_eligible,27AABCR8891R1Z1,,no
+510010,CC-MODERN-001,Reliance Retail,Reliance Retail services — Modern Trade,311747980,INR,2023-Q4,actual,Modern,India,PCBL-IN,SAP,SAP-AP-100051,itc_eligible,27AABCR8891R1Z1,,no
+510010,CC-MODERN-001,Reliance Retail,Reliance Retail services — Modern Trade,317743134,INR,2024-Q1,actual,Modern,India,PCBL-IN,SAP,SAP-AP-100052,itc_eligible,27AABCR8891R1Z1,,no
+510010,CC-MODERN-001,Reliance Retail,Reliance Retail services — Modern Trade,323738287,INR,2024-Q2,actual,Modern,India,PCBL-IN,SAP,SAP-AP-100053,itc_eligible,27AABCR8891R1Z1,,no
+510010,CC-MODERN-001,Reliance Retail,Reliance Retail services — Modern Trade,329733441,INR,2024-Q3,actual,Modern,India,PCBL-IN,SAP,SAP-AP-100054,itc_eligible,27AABCR8891R1Z1,,no
+510010,CC-MODERN-001,Reliance Retail,Reliance Retail services — Modern Trade,335728594,INR,2024-Q4,actual,Modern,India,PCBL-IN,SAP,SAP-AP-100055,itc_eligible,27AABCR8891R1Z1,,no
+510010,CC-MODERN-001,Reliance Retail,Reliance Retail services — Modern Trade,341723748,INR,2025-Q1,actual,Modern,India,PCBL-IN,SAP,SAP-AP-100056,itc_eligible,27AABCR8891R1Z1,,no
+550010,CC-TECHNO-001,Blue Star Infotech,Blue Star Infotech services — Technology & Analytics,443604487,INR,2023-Q2,actual,Technology,India,PCBL-IN,SAP,SAP-AP-100057,itc_eligible,27AABCB5511I1Z4,,no
+550010,CC-TECHNO-001,Blue Star Infotech,Blue Star Infotech services — Technology & Analytics,452476576,INR,2023-Q3,actual,Technology,India,PCBL-IN,SAP,SAP-AP-100058,itc_eligible,27AABCB5511I1Z4,,no
+550010,CC-TECHNO-001,Blue Star Infotech,Blue Star Infotech services — Technology & Analytics,461348666,INR,2023-Q4,actual,Technology,India,PCBL-IN,SAP,SAP-AP-100059,itc_eligible,27AABCB5511I1Z4,,no
+550010,CC-TECHNO-001,Blue Star Infotech,Blue Star Infotech services — Technology & Analytics,470220756,INR,2024-Q1,actual,Technology,India,PCBL-IN,SAP,SAP-AP-100060,itc_eligible,27AABCB5511I1Z4,,no
+550010,CC-TECHNO-001,Blue Star Infotech,Blue Star Infotech services — Technology & Analytics,479092845,INR,2024-Q2,actual,Technology,India,PCBL-IN,SAP,SAP-AP-100061,itc_eligible,27AABCB5511I1Z4,,no
+550010,CC-TECHNO-001,Blue Star Infotech,Blue Star Infotech services — Technology & Analytics,487964935,INR,2024-Q3,actual,Technology,India,PCBL-IN,SAP,SAP-AP-100062,itc_eligible,27AABCB5511I1Z4,,no
+550010,CC-TECHNO-001,Blue Star Infotech,Blue Star Infotech services — Technology & Analytics,496837025,INR,2024-Q4,actual,Technology,India,PCBL-IN,SAP,SAP-AP-100063,itc_eligible,27AABCB5511I1Z4,,no
+550010,CC-TECHNO-001,Blue Star Infotech,Blue Star Infotech services — Technology & Analytics,505709115,INR,2025-Q1,actual,Technology,India,PCBL-IN,SAP,SAP-AP-100064,itc_eligible,27AABCB5511I1Z4,,no

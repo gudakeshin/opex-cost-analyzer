@@ -1,0 +1,38 @@
+[
+  {
+    "engagement_id": "eng-necl-fy24",
+    "initiative_id": "INI-1",
+    "lever_id": "subcontracting_renegotiation",
+    "pack_id": "psu_cpse",
+    "planned_p50_cr": 32.0,
+    "realised_cr": 24.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "DPE value-for-money guidelines applied; rate reductions constrained by labour market in project locations."
+  },
+  {
+    "engagement_id": "eng-necl-fy24",
+    "initiative_id": "INI-2",
+    "lever_id": "gem_procurement",
+    "pack_id": "psu_cpse",
+    "planned_p50_cr": 16.0,
+    "realised_cr": 18.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "GeM price discovery exceeded plan; DGS&D rate contracts provided 12-18% lower prices vs open tender."
+  },
+  {
+    "engagement_id": "eng-necl-fy24",
+    "initiative_id": "INI-3",
+    "lever_id": "admin_overhead_reduction",
+    "pack_id": "psu_cpse",
+    "planned_p50_cr": 14.0,
+    "realised_cr": 11.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "medium",
+    "notes": "DPE MoU overhead target partially met; some costs reclassified not reduced."
+  }
+]

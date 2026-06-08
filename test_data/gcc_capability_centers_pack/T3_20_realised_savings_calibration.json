@@ -1,0 +1,38 @@
+[
+  {
+    "engagement_id": "eng-mgsi-fy24",
+    "initiative_id": "INI-1",
+    "lever_id": "m365_rationalisation",
+    "pack_id": "gcc_capability_centers",
+    "planned_p50_cr": 18.0,
+    "realised_cr": 14.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "medium",
+    "notes": "E5 to E3 downgrade partial; security features required for parent company compliance."
+  },
+  {
+    "engagement_id": "eng-mgsi-fy24",
+    "initiative_id": "INI-2",
+    "lever_id": "cloud_finops",
+    "pack_id": "gcc_capability_centers",
+    "planned_p50_cr": 22.0,
+    "realised_cr": 26.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Reserved instances + savings plans + idle reclaim exceeded plan."
+  },
+  {
+    "engagement_id": "eng-mgsi-fy24",
+    "initiative_id": "INI-3",
+    "lever_id": "cafeteria_vendor",
+    "pack_id": "gcc_capability_centers",
+    "planned_p50_cr": 8.0,
+    "realised_cr": 9.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Consolidated to Sodexo; volume discount achieved."
+  }
+]

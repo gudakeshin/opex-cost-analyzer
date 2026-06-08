@@ -1,0 +1,12 @@
+FY23 — Project DigitalFirst
+- Legacy fund accounting migrated to FIS; ~18 Cr run-rate saved on support costs.
+- IFA commission rationalisation (trail vs upfront): ~12 Cr saved. STATUS: in baseline.
+
+FY24 — Project CostRight
+- Market data vendor consolidation (Bloomberg + FactSet to S&P + in-house): planned 14 Cr, realised 11 Cr.
+- CRM rationalisation (3 platforms to Salesforce): planned 10 Cr, realised 13 Cr (exceeded).
+- Legal panel rationalisation: planned 8 Cr, realised 6 Cr.
+- STATUS: complete; in FY25 baseline.
+
+In-flight FY25
+- RegTech automation (SEBI reporting): ~9 Cr targeted, ~3 Cr booked YTD.

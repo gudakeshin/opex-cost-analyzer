@@ -1,0 +1,46 @@
+business_unit,function,location,band,headcount
+Asset Management,Operations,India,Entry (B1-B2),360
+Asset Management,Operations,India,Mid (B3-B4),280
+Asset Management,Operations,India,Senior (B5-B6),120
+Asset Management,Finance,India,Entry (B1-B2),360
+Asset Management,Finance,India,Mid (B3-B4),280
+Asset Management,Finance,India,Senior (B5-B6),120
+Asset Management,HR,India,Entry (B1-B2),360
+Asset Management,HR,India,Mid (B3-B4),280
+Asset Management,HR,India,Senior (B5-B6),120
+Wealth Management,Operations,India,Entry (B1-B2),450
+Wealth Management,Operations,India,Mid (B3-B4),350
+Wealth Management,Operations,India,Senior (B5-B6),150
+Wealth Management,Finance,India,Entry (B1-B2),450
+Wealth Management,Finance,India,Mid (B3-B4),350
+Wealth Management,Finance,India,Senior (B5-B6),150
+Wealth Management,HR,India,Entry (B1-B2),450
+Wealth Management,HR,India,Mid (B3-B4),350
+Wealth Management,HR,India,Senior (B5-B6),150
+NBFC Lending,Operations,India,Entry (B1-B2),540
+NBFC Lending,Operations,India,Mid (B3-B4),420
+NBFC Lending,Operations,India,Senior (B5-B6),180
+NBFC Lending,Finance,India,Entry (B1-B2),540
+NBFC Lending,Finance,India,Mid (B3-B4),420
+NBFC Lending,Finance,India,Senior (B5-B6),180
+NBFC Lending,HR,India,Entry (B1-B2),540
+NBFC Lending,HR,India,Mid (B3-B4),420
+NBFC Lending,HR,India,Senior (B5-B6),180
+Insurance Broking,Operations,India,Entry (B1-B2),630
+Insurance Broking,Operations,India,Mid (B3-B4),489
+Insurance Broking,Operations,India,Senior (B5-B6),210
+Insurance Broking,Finance,India,Entry (B1-B2),630
+Insurance Broking,Finance,India,Mid (B3-B4),489
+Insurance Broking,Finance,India,Senior (B5-B6),210
+Insurance Broking,HR,India,Entry (B1-B2),630
+Insurance Broking,HR,India,Mid (B3-B4),489
+Insurance Broking,HR,India,Senior (B5-B6),210
+Research,Operations,India,Entry (B1-B2),720
+Research,Operations,India,Mid (B3-B4),560
+Research,Operations,India,Senior (B5-B6),240
+Research,Finance,India,Entry (B1-B2),720
+Research,Finance,India,Mid (B3-B4),560
+Research,Finance,India,Senior (B5-B6),240
+Research,HR,India,Entry (B1-B2),720
+Research,HR,India,Mid (B3-B4),560
+Research,HR,India,Senior (B5-B6),240

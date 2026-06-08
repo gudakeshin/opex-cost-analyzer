@@ -1,0 +1,97 @@
+category,fiscal_period,amount_type,amount,currency
+Cost of Goods Sold,2024-01,budget,935388554,INR
+Cost of Goods Sold,2024-01,actual,1056989066,INR
+Cost of Goods Sold,2024-02,budget,940042228,INR
+Cost of Goods Sold,2024-02,actual,893040116,INR
+Cost of Goods Sold,2024-03,budget,944695903,INR
+Cost of Goods Sold,2024-03,actual,982483739,INR
+Cost of Goods Sold,2024-04,budget,949349577,INR
+Cost of Goods Sold,2024-04,actual,968336568,INR
+Cost of Goods Sold,2024-05,budget,954003251,INR
+Cost of Goods Sold,2024-05,actual,963543283,INR
+Cost of Goods Sold,2024-06,budget,958656926,INR
+Cost of Goods Sold,2024-06,actual,1064109187,INR
+Cost of Goods Sold,2024-07,budget,963310600,INR
+Cost of Goods Sold,2024-07,actual,944044388,INR
+Cost of Goods Sold,2024-08,budget,967964275,INR
+Cost of Goods Sold,2024-08,actual,1016362488,INR
+Cost of Goods Sold,2024-09,budget,972617949,INR
+Cost of Goods Sold,2024-09,actual,1079605923,INR
+Cost of Goods Sold,2024-10,budget,977271624,INR
+Cost of Goods Sold,2024-10,actual,1094544218,INR
+Cost of Goods Sold,2024-11,budget,981925298,INR
+Cost of Goods Sold,2024-11,actual,1050660068,INR
+Cost of Goods Sold,2024-12,budget,986578972,INR
+Cost of Goods Sold,2024-12,actual,1104968448,INR
+Store Operations & Occupancy,2024-01,budget,433622753,INR
+Store Operations & Occupancy,2024-01,actual,433622753,INR
+Store Operations & Occupancy,2024-02,budget,435780080,INR
+Store Operations & Occupancy,2024-02,actual,418348876,INR
+Store Operations & Occupancy,2024-03,budget,437937407,INR
+Store Operations & Occupancy,2024-03,actual,446696155,INR
+Store Operations & Occupancy,2024-04,budget,440094734,INR
+Store Operations & Occupancy,2024-04,actual,426891891,INR
+Store Operations & Occupancy,2024-05,budget,442252061,INR
+Store Operations & Occupancy,2024-05,actual,437829540,INR
+Store Operations & Occupancy,2024-06,budget,444409388,INR
+Store Operations & Occupancy,2024-06,actual,475518045,INR
+Store Operations & Occupancy,2024-07,budget,446566715,INR
+Store Operations & Occupancy,2024-07,actual,455498049,INR
+Store Operations & Occupancy,2024-08,budget,448724043,INR
+Store Operations & Occupancy,2024-08,actual,457698523,INR
+Store Operations & Occupancy,2024-09,budget,450881370,INR
+Store Operations & Occupancy,2024-09,actual,455390183,INR
+Store Operations & Occupancy,2024-10,budget,453038697,INR
+Store Operations & Occupancy,2024-10,actual,466629857,INR
+Store Operations & Occupancy,2024-11,budget,455196024,INR
+Store Operations & Occupancy,2024-11,actual,505267586,INR
+Store Operations & Occupancy,2024-12,budget,457353351,INR
+Store Operations & Occupancy,2024-12,actual,498515152,INR
+Logistics & Supply Chain,2024-01,budget,775188798,INR
+Logistics & Supply Chain,2024-01,actual,821700125,INR
+Logistics & Supply Chain,2024-02,budget,779045459,INR
+Logistics & Supply Chain,2024-02,actual,880321368,INR
+Logistics & Supply Chain,2024-03,budget,782902120,INR
+Logistics & Supply Chain,2024-03,actual,892508416,INR
+Logistics & Supply Chain,2024-04,budget,786758780,INR
+Logistics & Supply Chain,2024-04,actual,763156016,INR
+Logistics & Supply Chain,2024-05,budget,790615441,INR
+Logistics & Supply Chain,2024-05,actual,838052367,INR
+Logistics & Supply Chain,2024-06,budget,794472102,INR
+Logistics & Supply Chain,2024-06,actual,786527380,INR
+Logistics & Supply Chain,2024-07,budget,798328762,INR
+Logistics & Supply Chain,2024-07,actual,806312049,INR
+Logistics & Supply Chain,2024-08,budget,802185423,INR
+Logistics & Supply Chain,2024-08,actual,882403965,INR
+Logistics & Supply Chain,2024-09,budget,806042084,INR
+Logistics & Supply Chain,2024-09,actual,765739979,INR
+Logistics & Supply Chain,2024-10,budget,809898744,INR
+Logistics & Supply Chain,2024-10,actual,915185580,INR
+Logistics & Supply Chain,2024-11,budget,813755405,INR
+Logistics & Supply Chain,2024-11,actual,821892959,INR
+Logistics & Supply Chain,2024-12,budget,817612066,INR
+Logistics & Supply Chain,2024-12,actual,833964307,INR
+Marketing & Promotions,2024-01,budget,901530984,INR
+Marketing & Promotions,2024-01,actual,982668772,INR
+Marketing & Promotions,2024-02,budget,906016213,INR
+Marketing & Promotions,2024-02,actual,942256861,INR
+Marketing & Promotions,2024-03,budget,910501442,INR
+Marketing & Promotions,2024-03,actual,1037971643,INR
+Marketing & Promotions,2024-04,budget,914986671,INR
+Marketing & Promotions,2024-04,actual,1043084804,INR
+Marketing & Promotions,2024-05,budget,919471899,INR
+Marketing & Promotions,2024-05,actual,993029650,INR
+Marketing & Promotions,2024-06,budget,923957128,INR
+Marketing & Promotions,2024-06,actual,988634126,INR
+Marketing & Promotions,2024-07,budget,928442357,INR
+Marketing & Promotions,2024-07,actual,909873509,INR
+Marketing & Promotions,2024-08,budget,932927586,INR
+Marketing & Promotions,2024-08,actual,886281206,INR
+Marketing & Promotions,2024-09,budget,937412815,INR
+Marketing & Promotions,2024-09,actual,928038686,INR
+Marketing & Promotions,2024-10,budget,941898043,INR
+Marketing & Promotions,2024-10,actual,894803140,INR
+Marketing & Promotions,2024-11,budget,946383272,INR
+Marketing & Promotions,2024-11,actual,908527941,INR
+Marketing & Promotions,2024-12,budget,950868501,INR
+Marketing & Promotions,2024-12,actual,1055464036,INR

@@ -1,0 +1,9 @@
+metric_category,metric,fy25_value,fy24_value,dpe_target,unit,status
+Financial Performance,Revenue growth,8.5,6.2,10.0,percent,below_target
+Financial Performance,EBITDA margin,8.2,9.4,10.0,percent,below_target
+Cost Efficiency,Subcontracting as % project cost,38.2,36.4,34.0,percent,below_target
+Procurement,GeM procurement share,42.8,28.4,60.0,percent,below_target
+Procurement,MSME procurement share,24.2,22.8,25.0,percent,on_track
+Customer,On-time delivery rate,72.4,69.8,80.0,percent,below_target
+People,Attrition rate,4.2,3.8,5.0,percent,on_track
+Sustainability,Energy intensity reduction,3.2,2.8,5.0,percent,below_target

@@ -1,0 +1,7 @@
+metric,business_unit,value,unit
+Logistics cost as % revenue,Auto Components,7.2,percent
+Energy cost as % revenue,Specialty Chemicals,9.8,percent
+Subcontracting as % COGS,Capital Goods,22.4,percent
+Maintenance cost per machine INR Lakhs,Auto Components,8.4,INR_lakhs
+OEE Overall Equipment Effectiveness,Auto Components,72.4,percent
+Inventory days,Manufacturing Diversified,58,days

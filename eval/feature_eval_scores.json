@@ -1,7 +1,7 @@
 {
   "overall_score": 9.182,
   "passed": true,
-  "eval_date": "2026-06-06",
+  "eval_date": "2026-06-08",
   "dimensions": [
     {
       "dimension_id": "sp_01",
@@ -191,10 +191,10 @@
       "threshold_pass": 9.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "42/42 unique frontend API calls resolve to a backend route",
+      "finding_summary": "41/41 unique frontend API calls resolve to a backend route",
       "evidence": {
-        "total_unique_frontend_calls": 42,
-        "resolved_count": 42,
+        "total_unique_frontend_calls": 41,
+        "resolved_count": 41,
         "unresolved": [],
         "resolved": [
           "/api/v1/engagements/{param}",
@@ -206,11 +206,11 @@
           "/api/v1/template/spend-csv",
           "/api/v1/diagnostic/deep-research/{param}{param}",
           "/api/v1/diagnostic/deep-research",
+          "/api/v1/conflicts/{param}",
           "/api/v1/compliance/audit-log",
           "/api/v1/chat/progress/{param}",
           "/api/v1/engagements/{param}/documents",
           "/api/v1/chat",
-          "/api/v1/upload/{param}",
           "/api/v1/chat/plan",
           "/api/v1/chat/probe-answer",
           "/api/v1/chat/resume",
@@ -222,7 +222,6 @@
           "/api/v1/initiatives",
           "/api/v1/pipeline/summary",
           "/api/v1/sensitivity/{param}{param}",
-          "/api/v1/conflicts/{param}",
           "/api/v1/trends/{param}",
           "/api/v1/bva/{param}",
           "/api/v1/payment-terms/{param}",
@@ -275,10 +274,10 @@
       "threshold_pass": 6.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "42/42 unique frontend API calls use /api/v1/ prefix",
+      "finding_summary": "41/41 unique frontend API calls use /api/v1/ prefix",
       "evidence": {
-        "total_unique_calls": 42,
-        "v1_prefixed_count": 42,
+        "total_unique_calls": 41,
+        "v1_prefixed_count": 41,
         "unversioned_count": 0,
         "v1_calls": [
           "/api/v1/analyze/{param}",
@@ -321,8 +320,7 @@
           "/api/v1/skills",
           "/api/v1/skills/{param}",
           "/api/v1/template/spend-csv",
-          "/api/v1/trends/{param}",
-          "/api/v1/upload/{param}"
+          "/api/v1/trends/{param}"
         ],
         "unversioned_calls": []
       }
@@ -373,11 +371,11 @@
         "phases": {
           "observe": {
             "exists": true,
-            "line_count": 682
+            "line_count": 730
           },
           "plan": {
             "exists": true,
-            "line_count": 760
+            "line_count": 762
           },
           "act": {
             "exists": true,
@@ -385,7 +383,7 @@
           },
           "reflect": {
             "exists": true,
-            "line_count": 245
+            "line_count": 273
           }
         },
         "thin_or_missing": []

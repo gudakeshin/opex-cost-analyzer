@@ -1,0 +1,24 @@
+Operating Expenses,Management P&L — Operating Expenses,FY25 Amount (INR Lakhs),FY24 Amount (INR Lakhs)
+Operating Expenses,I. Network Operations & Energy,,
+,RAN Managed Services,5320.0,4940.0
+,Tower Energy,4560.0,4220.0
+,Core & Transport,3040.0,2820.0
+,5G Rollout Opex,2660.0,1820.0
+,Passive Infra O&M,1520.0,1400.0
+,Network Operations & Energy Subtotal,,
+Operating Expenses,II. Roaming & Interconnect,,
+,Domestic Interconnect,1140.0,1060.0
+,International Roaming,760.0,700.0
+,Roaming & Interconnect Subtotal,,
+Operating Expenses,III. IT & Digital Infrastructure,,
+,BSS/OSS Platform,1140.0,1060.0
+,Cloud & Analytics,760.0,700.0
+,IT & Digital Infrastructure Subtotal,,
+Operating Expenses,IV. Spectrum & Regulatory,,
+,Spectrum Usage Charges,2280.0,2120.0
+,TRAI & DoT Levies,380.0,352.0
+,Spectrum & Regulatory Subtotal,,
+Operating Expenses,V. Administrative & Corporate,,
+,Shared Services & Consulting,760.0,700.0
+,HR & Finance,480.0,440.0
+,Administrative & Corporate Subtotal,,

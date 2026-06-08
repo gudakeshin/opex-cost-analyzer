@@ -1,0 +1,7 @@
+Sahyadri Power & Utilities Ltd — Diagnostic URLs (synthetic/illustrative)
+
+1. Investor relations: https://www.sahyadripower.example/investors
+2. CERC orders: https://www.cercind.example/orders/spul
+3. Annual report: https://www.sahyadripower.example/ir/annual-report-fy25.pdf
+4. NSE: https://www.nseindia.example/get-quotes/equity?symbol=SAHYADRIP
+5. CEA sector: https://cea.nic.in/report/annual/ann2025
