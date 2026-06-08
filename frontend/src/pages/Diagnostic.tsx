@@ -25,7 +25,6 @@ import { useSession } from '../context/SessionContext';
 import {
   buildDiagnosticContextPatch,
   formStateFromManifest,
-  isDiagnosticResponse,
   parseUrlsText,
   sessionDiagnosticResult,
 } from '../utils/diagnosticPersistence';
