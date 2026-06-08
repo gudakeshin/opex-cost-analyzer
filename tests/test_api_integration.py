@@ -73,9 +73,9 @@ def test_end_to_end_analysis_and_exports(client) -> None:
 
     sens = client.get(f"/api/sensitivity/{session_id}")
     assert sens.status_code == 200
-    assert len(sens.json()["scenarios"]) == 7
+    assert len(sens.json()["scenarios"]) == 8
     names = {s["name"] for s in sens.json()["scenarios"]}
-    assert names == {"conservative", "base", "accelerated", "delayed", "partial_success", "volume_growth", "bounce_back"}
+    assert names == {"conservative", "base", "accelerated", "delayed", "partial_success", "volume_growth", "bounce_back", "regulatory_headwind"}
 
 
 def test_skills_and_compliance_endpoints(client) -> None:

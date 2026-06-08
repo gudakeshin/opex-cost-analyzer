@@ -1,7 +1,7 @@
 """Savings modeler, value bridge, data validator, IRR helper."""
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
 from app.models import NormalizedSpendLine
@@ -48,6 +48,35 @@ def _compute_irr(
 
 _OCR_HAIRCUTS: Dict[str, float] = {"high": 0.80, "medium": 0.90, "low": 1.0}
 _GOVERNANCE_Y3_UPLIFT = 1.06
+
+
+def _classify_horizon(
+    phasing_curve: List[float],
+    payback_months: int,
+    effort_weeks_p50: int | None = None,
+) -> str:
+    """Classify an initiative as tactical / structural / transformational.
+
+    Effort (implementation weeks, P50) is the primary signal when available — it is
+    the most reliable delivery-speed measure and what the effort-vs-impact matrix
+    consumes. Thresholds: ≤12 weeks tactical, ≤30 weeks structural, else
+    transformational. (A phasing/payback-only rule cannot reproduce the expected
+    quick-win→transformation spread on real lever data — e.g. contract renegotiation
+    front-loads only 15% in Y1 yet pays back in ~3 months — so effort_weeks leads and
+    the phasing/payback heuristic is a fallback when effort is unknown.)
+    """
+    if effort_weeks_p50:
+        if effort_weeks_p50 <= 12:
+            return "tactical"
+        if effort_weeks_p50 <= 30:
+            return "structural"
+        return "transformational"
+    y1_pct = phasing_curve[0] if phasing_curve else 0.25
+    if y1_pct >= 0.60 or payback_months < 6:
+        return "tactical"
+    if y1_pct >= 0.20 and payback_months <= 18:
+        return "structural"
+    return "transformational"
 
 
 def savings_modeler(
@@ -257,6 +286,19 @@ def savings_modeler(
             "payback_months": payback_months,
             "irr_pct": irr_pct,
         }
+        # EBITDA basis-point framing — savings as bps of annual revenue (CFO lens).
+        revenue_base = float(annual_revenue or 0.0)
+        ebitda_bps = round((run_rate_savings / revenue_base) * 10000, 1) if revenue_base else None
+        initiative_dict["ebitda_impact"] = {
+            "run_rate_savings_annualized": round(run_rate_savings, 2),
+            "ebitda_bps": ebitda_bps,
+            "ebitda_bps_label": f"{ebitda_bps} bps" if ebitda_bps is not None else "N/A",
+            "revenue_base_used": round(revenue_base, 0),
+        }
+        # Delivery horizon for the quick-win → transformation waterfall.
+        initiative_dict["horizon"] = _classify_horizon(
+            curve, payback_months, (lv_meta.get("effort_weeks") or {}).get("p50")
+        )
         if tco_adjusted:
             initiative_dict["tco_breakdown"] = tco_breakdown
         initiatives.append(initiative_dict)
@@ -296,6 +338,10 @@ def savings_modeler(
             "eligible_lever_count": len(eligible_levers),
             "high_bounce_back_count": sum(1 for lv in eligible_levers if lv["bounce_back_risk"] == "high"),
             "governance_y3_uplift_applied": any(i["lever"] == "cost_governance" for i in initiatives),
+            "portfolio_ebitda_impact_bps": (
+                round((total_run_rate / float(annual_revenue)) * 10000, 1) if annual_revenue else None
+            ),
+            "horizon_summary": dict(Counter(i.get("horizon", "structural") for i in initiatives)),
         },
     }
 
@@ -343,6 +389,22 @@ def build_raw_rows(
     return raw_rows
 
 
+def _band_factors(sustainability_score: float, benchmark_specificity: float = 0.70) -> Tuple[float, float]:
+    """Confidence-band multipliers that widen as sustainability or benchmark
+    specificity fall — a signed contract should not carry the same uncertainty as a
+    behavioural lever, nor seed data the same as a client benchmark.
+
+    Base low=0.80 / high=1.20 at sustainability=0.65, specificity=0.70.
+    Lower sustainability or specificity widens the band (low ↓, high ↑); clamped to
+    [0.60, 1.50].
+    """
+    sust_adj = 0.25 * (0.65 - sustainability_score)   # positive = riskier saving
+    spec_adj = 0.15 * (0.70 - benchmark_specificity)   # positive = less specific data
+    low = max(0.60, 0.80 - sust_adj - spec_adj)
+    high = min(1.50, 1.20 + sust_adj + spec_adj)
+    return round(low, 3), round(high, 3)
+
+
 def value_bridge_calculator(
     peer: Dict[str, Any],
     internal: Dict[str, Any],
@@ -350,11 +412,10 @@ def value_bridge_calculator(
     total_spend: float,
     savings_model: Dict[str, Any] | None = None,
     committed_initiatives: List[Dict[str, Any]] | None = None,
+    benchmark_specificity: float = 0.70,
 ) -> Dict[str, Any]:
     vb_cfg = _get_model_params().get("defaults", {}).get("value_bridge", {})
     dedup_mid_factor = float(vb_cfg.get("dedup_mid_factor", 0.75))
-    low_factor = float(vb_cfg.get("low_factor", 0.8))
-    high_factor = float(vb_cfg.get("high_factor", 1.2))
 
     if savings_model and savings_model.get("initiatives"):
         committed = committed_initiatives or []
@@ -372,6 +433,9 @@ def value_bridge_calculator(
             gross = float(item.get("net_savings", {}).get("total_3yr", 0.0))
             already = committed_lookup.get((cat, lever), 0.0)
             deduped_mid = max(0.0, gross - already)
+            low_factor, high_factor = _band_factors(
+                float(item.get("sustainability_score", 0.65)), benchmark_specificity
+            )
             deduped_low = deduped_mid * low_factor
             deduped_high = deduped_mid * high_factor
             low += deduped_low
@@ -416,6 +480,9 @@ def value_bridge_calculator(
 
     matrix = []
     low = mid = high = 0.0
+    # No per-category sustainability in the raw-rows fallback — apply a single
+    # category-average band using the default sustainability and the run specificity.
+    low_factor, high_factor = _band_factors(0.65, benchmark_specificity)
     for cat, values in merged.items():
         combined = values["peer"] + values["internal"] + values["heuristic"]
         deduped_mid = combined * dedup_mid_factor

@@ -30,6 +30,20 @@ function AssistantAvatar() {
   );
 }
 
+function LlmOfflineBanner() {
+  return (
+    <div
+      className="mb-3 rounded-lg border border-amber-300/80 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-950"
+      role="status"
+    >
+      <span className="font-semibold">LLM unavailable</span>
+      {' — '}
+      Using offline answers from cached spend data. Restore Gemini or Anthropic API credits for
+      richer, question-specific responses.
+    </div>
+  );
+}
+
 function asRecord(v: unknown): Record<string, unknown> | null {
   return v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : null;
 }
@@ -186,8 +200,12 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
             {message.degraded_mode && (
               <span className="text-[10px] uppercase font-bold text-amber-700">Degraded</span>
             )}
+            {message.used_llm_synthesis === false && (
+              <span className="text-[10px] uppercase font-bold text-amber-700">Offline</span>
+            )}
           </div>
         )}
+        {!isUser && message.used_llm_synthesis === false && <LlmOfflineBanner />}
         {isUser ? (
           <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
         ) : (

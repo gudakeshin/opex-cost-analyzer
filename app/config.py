@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextvars
 import logging
 import os
+import re
 from pathlib import Path
 
 
@@ -62,7 +63,14 @@ def _load_env_file() -> None:
                 continue
             key, value = line.split("=", 1)
             key = key.strip()
-            value = value.strip().strip("\"").strip("'")
+            value = value.strip()
+            # Strip a trailing inline comment ("KEY=value   # note"), but only
+            # when the "#" is preceded by whitespace so values that legitimately
+            # contain "#" (e.g. URLs with fragments) are left intact.
+            comment_match = re.search(r"\s+#", value)
+            if comment_match:
+                value = value[: comment_match.start()].strip()
+            value = value.strip("\"").strip("'")
             os.environ.setdefault(key, value)
         break
 
@@ -89,6 +97,16 @@ LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini" if bool(os.getenv("GEMINI_API_
 # fallback (offline / timeout / pytest). On by default when a provider exists.
 LLM_INTENT_CLASSIFICATION_ENABLED = (
     os.getenv("LLM_INTENT_CLASSIFICATION_ENABLED", "true").lower() not in ("false", "0", "no")
+    and bool(ANTHROPIC_API_KEY or GEMINI_API_KEY)
+)
+
+# LLM-first chat answer synthesis — the LLM reads the question + full spend
+# context and writes the answer; the deterministic keyword composer
+# (qa_lookup.answer_general_qa) is the offline / timeout / pytest fallback.
+# Provider-agnostic: routed by LLM_PROVIDER (Claude default) with cross-provider
+# fallback. On by default when a provider exists.
+LLM_CHAT_SYNTHESIS_ENABLED = (
+    os.getenv("LLM_CHAT_SYNTHESIS_ENABLED", "true").lower() not in ("false", "0", "no")
     and bool(ANTHROPIC_API_KEY or GEMINI_API_KEY)
 )
 

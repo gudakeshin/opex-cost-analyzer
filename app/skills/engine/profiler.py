@@ -324,6 +324,11 @@ def _build_lever_entry(
         "complexity_tier": meta.get("complexity_tier", "medium"),
         "base_execution_probability": meta.get("base_execution_probability", 0.70),
         "savings_range_pct": savings_range_pct or {},
+        # effort_weeks is an alias over the long-standing implementation_weeks block
+        # (p10/p50/p90) so the effort-vs-impact matrix and horizon classifier have a
+        # single field to read regardless of which JSON source the lever came from.
+        "effort_weeks": meta.get("effort_weeks") or meta.get("implementation_weeks") or {},
+        "applicability_threshold_pct": meta.get("applicability_threshold_pct"),
     }
 
 

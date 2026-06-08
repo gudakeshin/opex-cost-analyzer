@@ -104,6 +104,7 @@ _INTERACTIVE_QA_CAPABILITIES = frozenset({
     "benchmarking",
     "root_cause",
     "executive_narrative",
+    "document_context",
 })
 
 _INTERACTIVE_QA_TOKENS = (
@@ -133,6 +134,11 @@ _INTERACTIVE_QA_TOKENS = (
     "cost reduction",
     "cost optimization",
     "cost optimisation",
+    "renegotiat",
+    "re-negotiat",
+    "renewal",
+    "initiative",
+    "lever",
 )
 
 
@@ -285,23 +291,52 @@ def _hitl_reflect_output(
 
 
 def _handle_no_data_qa(msg: str) -> ReflectOutput:
-    """Return a helpful guidance response when no spend data is available."""
-    lowered = msg.lower()
+    """Guidance response when no spend data is available.
 
-    if any(w in lowered for w in ["column", "format", "template", "header", "field", "file"]):
+    LLM-phrased when a provider is available (the canned messages below are passed
+    in as factual reference for the model to tailor to the actual question); the
+    canned messages remain the offline / pytest fallback.
+    """
+    lowered = msg.lower()
+    file_format_q = any(w in lowered for w in ["column", "format", "template", "header", "field", "file"])
+    next_opts = (
+        [{"label": "Got it, I'll upload now", "message": "Upload spend data"}]
+        if file_format_q
+        else _NO_DATA_NEXT_OPTS
+    )
+
+    from app.opar.chat_synthesis import synthesize_reference_answer
+
+    llm_text = synthesize_reference_answer(
+        msg,
+        {
+            "assistant_role": "OpEx Intelligence copilot for FP&A spend analysis (no spend data uploaded yet).",
+            "capabilities_overview": _CAPABILITIES_MSG,
+            "file_format_guide": _FILE_FORMAT_MSG,
+            "getting_started": _ONBOARDING_MSG,
+        },
+    )
+    if llm_text:
+        return ReflectOutput(
+            response_text=llm_text,
+            loop_complete=True,
+            used_llm_synthesis=True,
+            next_options=next_opts,
+        )
+
+    # Offline / pytest fallback: canned guidance.
+    if file_format_q:
         return ReflectOutput(
             response_text=_FILE_FORMAT_MSG,
             loop_complete=True,
-            next_options=[{"label": "Got it, I'll upload now", "message": "Upload spend data"}],
+            next_options=next_opts,
         )
-
     if any(w in lowered for w in ["can you", "what can", "capabilities", "what do", "help", "analyze"]):
         return ReflectOutput(
             response_text=_CAPABILITIES_MSG,
             loop_complete=True,
             next_options=_NO_DATA_NEXT_OPTS,
         )
-
     return ReflectOutput(
         response_text=_ONBOARDING_MSG,
         loop_complete=True,
@@ -486,8 +521,12 @@ async def _run_opar_loop_inner(
         if _is_schema_request(msg):
             schema_fast = _schema_summary_for_session(session_id)
             if schema_fast:
+                from app.opar.chat_synthesis import synthesize_reference_answer
+
+                llm_text = synthesize_reference_answer(msg, {"schema_summary": schema_fast})
                 return ReflectOutput(
-                    response_text=schema_fast,
+                    response_text=llm_text or schema_fast,
+                    used_llm_synthesis=bool(llm_text),
                     loop_complete=True,
                     progress_steps=progress,
                 )

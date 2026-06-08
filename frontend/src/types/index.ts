@@ -173,6 +173,7 @@ export interface ChatMessage {
   run_id?: string;
   progress_steps?: ProgressStep[];
   degraded_mode?: boolean;
+  used_llm_synthesis?: boolean;
   artefacts?: Record<string, unknown> | string[];
   insight_snapshot?: AnalysisInsightSnapshot;
   analysis_trace?: AnalysisTraceStep[];
@@ -396,6 +397,7 @@ export interface V1ChatResponse {
   advisory_sections?: Record<string, unknown>;
   quality_signals?: QualitySignals;
   degraded_mode?: boolean;
+  used_llm_synthesis?: boolean;
   fallback_reasons?: Record<string, unknown>;
   loop_complete?: boolean;
   next_loop_trigger?: string;

@@ -9,6 +9,7 @@ from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError as Futur
 from typing import Any, Dict, List, Tuple
 
 from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED, LLM_PROVIDER
+from app.opar.gemini_client import CHAT_RESPONSE_SYSTEM_PROMPT
 from app.opar.models import IntentClass
 
 # Canonical intent set — derived from the typed enum so the prompt menu below and
@@ -183,18 +184,13 @@ _AUDIENCE_HINTS = {
 }
 
 
-def _call_claude(
+def _call_anthropic_native(
     system: str,
     user_content: str,
     max_tokens: int = 512,
     model: str = "claude-sonnet-4-5-20250929",
 ) -> str:
-    """Call LLM. Routes to Gemini when LLM_PROVIDER=gemini, else Anthropic."""
-    if LLM_PROVIDER == "gemini" and GEMINI_ENABLED:
-        from app.opar.gemini_client import call_gemini
-        return call_gemini(system=system, user_content=user_content, max_tokens=max_tokens)
-
-    # Keep local/unit tests deterministic and offline.
+    """Call Anthropic directly — never routed through Gemini."""
     if os.getenv("PYTEST_CURRENT_TEST"):
         raise RuntimeError("Claude calls disabled during pytest runs")
     if not ANTHROPIC_ENABLED or not ANTHROPIC_API_KEY:
@@ -213,6 +209,22 @@ def _call_claude(
     )
     text = getattr(response.content[0], "text", "") if response.content else ""
     return text.strip()
+
+
+def _call_claude(
+    system: str,
+    user_content: str,
+    max_tokens: int = 512,
+    model: str = "claude-sonnet-4-5-20250929",
+) -> str:
+    """Call LLM. Routes to Gemini when LLM_PROVIDER=gemini, else Anthropic."""
+    if LLM_PROVIDER == "gemini" and GEMINI_ENABLED:
+        from app.opar.gemini_client import call_gemini
+        return call_gemini(system=system, user_content=user_content, max_tokens=max_tokens)
+
+    return _call_anthropic_native(
+        system, user_content, max_tokens=max_tokens, model=model
+    )
 
 
 def _call_claude_with_thinking(
@@ -538,6 +550,60 @@ def _truncate_doc_chunks(docs_text: List[str], max_chunks: int = 6, max_chars: i
             if len(chunks) >= max_chunks:
                 return chunks
     return chunks[:max_chunks]
+
+
+def synthesize_chat_response_claude(
+    context: Dict[str, Any],
+    *,
+    thinking_enabled: bool = False,
+) -> Tuple[str | None, str | None]:
+    """Conversational QA answer from structured context via Claude.
+
+    Mirrors ``synthesize_chat_response_gemini`` (same prompt, same ``(text, thinking)``
+    return shape) so the chat path can be provider-agnostic. Returns ``(None, None)``
+    when Anthropic is unavailable, on timeout, or on error — the caller then falls
+    back to the deterministic keyword composer.
+    """
+    if not ANTHROPIC_ENABLED:
+        return None, None
+    user_prompt = (
+        "Answer the user's question from this context. Return markdown only.\n"
+        f"{json.dumps(context, ensure_ascii=False)}"
+    )
+    timeout_s = 35 if thinking_enabled else 8
+    max_tokens = 2048 if thinking_enabled else 1024
+    executor = ThreadPoolExecutor(max_workers=1)
+    if thinking_enabled:
+        future: Future[Any] = executor.submit(
+            _call_claude_with_thinking,
+            CHAT_RESPONSE_SYSTEM_PROMPT,
+            user_prompt,
+            max_tokens,
+        )
+    else:
+        future = executor.submit(
+            _call_anthropic_native,
+            CHAT_RESPONSE_SYSTEM_PROMPT,
+            user_prompt,
+            max_tokens,
+        )
+    try:
+        result = future.result(timeout=timeout_s)
+        if thinking_enabled:
+            text, thinking = result
+            return (text or "").strip() or None, thinking
+        return (result or "").strip() or None, None
+    except FuturesTimeoutError:
+        future.cancel()
+        executor.shutdown(wait=False, cancel_futures=True)
+        return None, None
+    except Exception as exc:  # noqa: BLE001 — degrade to deterministic fallback
+        from app.config import logger
+
+        logger.warning('"synthesize_chat_response_claude failed error=%s"', exc)
+        return None, None
+    finally:
+        executor.shutdown(wait=False, cancel_futures=True)
 
 
 def synthesize_analysis_claude(

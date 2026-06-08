@@ -207,6 +207,181 @@ def _answer_savings_priorities(msg: str, validated: Dict[str, Any], currency: st
 
 _SUPPLIER_TOKENS = ("supplier", "vendor", "by supplier", "by vendor", "payee")
 _GEO_TOKENS = ("geo", "geograph", "region", "country", "by country", "by region")
+_LEVER_DETAIL_TOKENS = (
+    "renegotiat",
+    "re-negotiat",
+    "renewal",
+    "contract",
+    "lever",
+    "initiative",
+    "commercial term",
+    "should-cost",
+)
+
+
+def _asks_lever_or_contract_detail(msg: str) -> bool:
+    lowered = (msg or "").lower()
+    return any(token in lowered for token in _LEVER_DETAIL_TOKENS)
+
+
+def _target_lever_from_query(msg: str) -> str | None:
+    """Map a natural-language lever ask to a canonical lever id when possible."""
+    lowered = (msg or "").lower()
+    if "renegotiat" in lowered or "re-negotiat" in lowered:
+        return "contract_renegotiation"
+    if "supplier consolidat" in lowered:
+        return "supplier_consolidation"
+    if "maverick" in lowered or "guided buying" in lowered:
+        return "maverick_compliance"
+    if "demand management" in lowered or "demand challenge" in lowered:
+        return "demand_management"
+    if "payment term" in lowered or "dpo" in lowered:
+        return "payment_terms"
+    return None
+
+
+def _row_matches_lever_query(
+    row: Dict[str, Any],
+    *,
+    target_lever: str | None,
+    msg: str,
+) -> bool:
+    lever = str(row.get("lever") or "").lower()
+    lever_name = str(row.get("lever_name") or "").lower()
+    if target_lever:
+        return lever == target_lever or target_lever.replace("_", " ") in lever_name
+    lowered = (msg or "").lower()
+    if "contract" in lowered:
+        return "contract" in lever_name or lever == "contract_renegotiation"
+    if "renewal" in lowered:
+        return "renewal" in lever_name or "contract" in lever_name
+    return False
+
+
+def _answer_lever_or_contract_details(
+    msg: str,
+    validated: Dict[str, Any],
+    currency: str,
+) -> Optional[str]:
+    """Answer lever / contract / initiative detail asks from modeled outputs."""
+    fmt = lambda v: format_money(float(v or 0.0), currency)  # noqa: E731
+    target_lever = _target_lever_from_query(msg)
+    matched_cat = match_category_from_query(
+        msg,
+        validated.get("spend-profiler", {}).get("category_profile", []),
+    )
+    cat_id = str(matched_cat.get("category_id") or "") if matched_cat else ""
+    cat_name = str(matched_cat.get("category_name") or matched_cat.get("category_id") or "") if matched_cat else ""
+
+    savings_model = validated.get("savings-modeler", {})
+    initiatives = (
+        savings_model.get("initiatives", [])
+        if isinstance(savings_model, dict) and isinstance(savings_model.get("initiatives"), list)
+        else []
+    )
+    filtered_initiatives = [
+        i
+        for i in initiatives
+        if isinstance(i, dict)
+        and _row_matches_lever_query(i, target_lever=target_lever, msg=msg)
+        and (not cat_id or str(i.get("category_id") or "") == cat_id)
+    ]
+
+    value_matrix = validated.get("value-bridge-calculator", {}).get("value_matrix", [])
+    if not isinstance(value_matrix, list):
+        value_matrix = []
+    filtered_matrix = [
+        r
+        for r in value_matrix
+        if isinstance(r, dict)
+        and _row_matches_lever_query(r, target_lever=target_lever, msg=msg)
+        and (not cat_id or str(r.get("category_id") or "") == cat_id)
+    ]
+
+    contract_skill = validated.get("contract-lifecycle-manager", {})
+    renewals = (
+        contract_skill.get("renewal_alerts", [])
+        if isinstance(contract_skill, dict) and isinstance(contract_skill.get("renewal_alerts"), list)
+        else []
+    )
+
+    doc_ctx = validated.get("document-contextualizer", {})
+    constraints = (
+        doc_ctx.get("constraints", [])
+        if isinstance(doc_ctx, dict) and isinstance(doc_ctx.get("constraints"), list)
+        else []
+    )
+    contract_constraints = [
+        c for c in constraints
+        if isinstance(c, str) and any(w in c.lower() for w in ("contract", "renewal", "renegotiat", "term"))
+    ]
+
+    if not filtered_initiatives and not filtered_matrix and not renewals and not contract_constraints:
+        if initiatives or value_matrix:
+            lever_label = (target_lever or "requested lever").replace("_", " ")
+            return (
+                f"No modeled initiatives matched **{lever_label}** in the current session outputs. "
+                "Run **value-at-the-table** analysis to refresh the savings model, "
+                "or ask about a specific category where renegotiation may apply."
+            )
+        return (
+            "I don't have modeled **contract renegotiation** or savings-lever detail in this session yet. "
+            "Run **value-at-the-table** analysis (or ask me to **calculate savings opportunities**) "
+            "so initiatives and contract levers are modeled from your spend data."
+        )
+
+    title = "**Contract renegotiation details**"
+    if target_lever and target_lever != "contract_renegotiation":
+        title = f"**{target_lever.replace('_', ' ').title()} details**"
+    if cat_name:
+        title += f" — {cat_name}"
+
+    lines = [title]
+
+    if filtered_initiatives:
+        lines.append("\n**Modeled initiatives**")
+        for i, row in enumerate(filtered_initiatives[:6], 1):
+            cat = str(row.get("category_name") or row.get("category_id") or "Category")
+            lever = str(row.get("lever_name") or row.get("lever") or "optimization").replace("_", " ")
+            amt = float((row.get("net_savings") or {}).get("total_3yr", 0) or row.get("annualized_run_rate_savings", 0) or 0)
+            conf = str(row.get("confidence") or "medium")
+            horizon = str(row.get("horizon") or "").strip()
+            suffix = f", horizon: {horizon}" if horizon else ""
+            lines.append(f"{i}. **{cat}** — {fmt(amt)} via {lever} (confidence: {conf}{suffix})")
+
+    if filtered_matrix:
+        lines.append("\n**Value bridge (deduped mid-case)**")
+        for i, row in enumerate(filtered_matrix[:6], 1):
+            cat = str(row.get("category_name") or row.get("category_id") or "Category")
+            lever = str(row.get("lever") or "optimization").replace("_", " ")
+            mid = float(row.get("deduped_mid_savings", 0) or 0)
+            payback = int(row.get("payback_months", 0) or 0)
+            payback_txt = f", payback {payback} mo" if payback else ""
+            lines.append(f"{i}. **{cat}** — {fmt(mid)} via {lever}{payback_txt}")
+
+    if renewals:
+        lines.append("\n**Contract renewal alerts**")
+        for i, alert in enumerate(renewals[:5], 1):
+            if not isinstance(alert, dict):
+                continue
+            supplier = str(alert.get("supplier") or "Supplier")
+            alert_type = str(alert.get("alert_type") or alert.get("status") or "renewal")
+            spend = float(alert.get("annual_spend", 0) or alert.get("spend", 0) or 0)
+            days = alert.get("days_to_expiry")
+            expiry_note = f", {days} days to expiry" if isinstance(days, int) else ""
+            lines.append(f"{i}. **{supplier}** — {alert_type}{expiry_note} ({fmt(spend)} annual spend)")
+
+    if contract_constraints:
+        lines.append("\n**Document constraints**")
+        for bullet in contract_constraints[:5]:
+            lines.append(f"- {bullet}")
+
+    sme_block = build_sme_critique_section(validated, currency)
+    if sme_block:
+        lines.append("")
+        lines.append(sme_block)
+
+    return "\n".join(lines)
 
 
 def _asks_supplier(lowered: str) -> bool:
@@ -278,6 +453,11 @@ def answer_general_qa(msg: str, validated: Dict[str, Any], currency: str = "USD"
         savings_answer = _answer_savings_priorities(msg, validated, currency)
         if savings_answer:
             return savings_answer
+
+    if _asks_lever_or_contract_detail(msg):
+        lever_answer = _answer_lever_or_contract_details(msg, validated, currency)
+        if lever_answer:
+            return lever_answer
 
     matched_cat = match_category_from_query(msg, categories)
     if matched_cat:

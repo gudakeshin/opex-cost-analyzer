@@ -307,12 +307,17 @@ def _value_bridge_calculator(ctx: SkillContext) -> tuple[Dict[str, Any], str | N
     heuristic = ctx.prior("heuristic-analyzer")
     total = profile.get("total_spend", 0.0)
     savings_model = ctx.prior_results.get("savings-modeler")
+    # Feed the resolved benchmark's specificity into the confidence-band width:
+    # seed data (0.55) widens bands, a client/sector-pack benchmark (0.85) tightens them.
+    bench = _get_bench_resolved(ctx)
+    specificity = float((bench.get("selected_dataset") or {}).get("specificity_score", 0.70))
     return _engine.value_bridge_calculator(
         peer,
         internal,
         heuristic,
         total,
         savings_model=savings_model,
+        benchmark_specificity=specificity,
     ), None
 
 

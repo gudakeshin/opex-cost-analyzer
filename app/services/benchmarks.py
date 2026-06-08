@@ -32,11 +32,19 @@ SECTOR_PACK_TO_BENCHMARK: Dict[str, str] = {
     "hospitality_travel": "retail_consumer",
     "pharma_lifesciences": "healthcare",
     "healthcare_hospitals": "healthcare",
-    "energy_utilities": "manufacturing",
-    "telecom_infra": "technology",
+    "energy_utilities": "energy_utilities",
+    "telecom_infra": "telecom_infra",
     "manufacturing_diversified": "manufacturing",
     "psu_cpse": "manufacturing",
     "conglomerate": "manufacturing",
+}
+
+# Packs that still borrow a coarser industry's percentiles (no dedicated benchmark
+# key of their own). Resolution surfaces a benchmark_confidence_note for these so
+# downstream readers know the peer comparison is approximate. telecom_infra,
+# energy_utilities and gcc_capability_centers now map to themselves and are excluded.
+FALLBACK_MAPPINGS: Dict[str, str] = {
+    pack: bench for pack, bench in SECTOR_PACK_TO_BENCHMARK.items() if pack != bench
 }
 
 
@@ -501,9 +509,15 @@ def resolve_benchmark_payload(
         benchmarks = dict(benchmarks)
         benchmarks[industry] = benchmarks[bench_key]
         payload = {**payload, "benchmarks": benchmarks}
+    selection_rationale = dict(selection.get("selection_rationale", {}))
+    if industry in FALLBACK_MAPPINGS:
+        selection_rationale["benchmark_confidence_note"] = (
+            f"'{industry}' has no dedicated benchmark set; comparison uses "
+            f"'{FALLBACK_MAPPINGS[industry]}' percentiles as an approximation."
+        )
     return {
         "benchmark_data": payload,
         "selected_dataset": selected,
-        "selection_rationale": selection.get("selection_rationale", {}),
+        "selection_rationale": selection_rationale,
         "candidates": selection.get("candidates", []),
     }

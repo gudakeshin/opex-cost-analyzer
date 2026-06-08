@@ -1,16 +1,106 @@
-"""Gemini-primary conversational QA composer for general_qa chat turns."""
+"""Provider-agnostic conversational QA composer for general_qa chat turns.
+
+The LLM reads the question against the *full* spend context and writes the answer
+(Claude default, Gemini fallback, routed by ``LLM_PROVIDER`` — mirrors
+``reflect_advisory.resolve_analysis_synthesizer``). The deterministic keyword
+composer (``qa_lookup.answer_general_qa``) is the offline / timeout / pytest fallback.
+"""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Literal
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
 
+from app.config import (
+    ANTHROPIC_ENABLED,
+    GEMINI_ENABLED,
+    LLM_CHAT_SYNTHESIS_ENABLED,
+    LLM_PROVIDER,
+)
 from app.opar.category_resolver import match_category_from_query
 from app.opar.gemini_client import synthesize_chat_response_gemini
 from app.opar.models import ObserveContext
 from app.opar.qa_lookup import aggregate_portfolio_suppliers, answer_general_qa, _parse_top_limit
 
 BreakdownDimension = Literal["supplier", "geo", "category", "payment_terms", "none"]
+
+# A chat synthesizer takes the structured context dict and returns (text, thinking).
+ChatSynthesizer = Callable[..., Tuple[Optional[str], Optional[str]]]
+
+
+def resolve_chat_synthesizer() -> ChatSynthesizer | None:
+    """Pick the chat QA synthesizer from ``LLM_PROVIDER`` with cross-provider fallback.
+
+    Mirrors :func:`app.opar.reflect_advisory.resolve_analysis_synthesizer`: Gemini only
+    when it is the preferred provider, otherwise Claude (the default), falling across to
+    whichever provider is configured. Returns ``None`` when no provider is available.
+    """
+    prefer_gemini = LLM_PROVIDER == "gemini"
+    if prefer_gemini and GEMINI_ENABLED:
+        return synthesize_chat_response_gemini
+    if ANTHROPIC_ENABLED:
+        from app.opar.claude_client import synthesize_chat_response_claude
+
+        return synthesize_chat_response_claude
+    if GEMINI_ENABLED:
+        return synthesize_chat_response_gemini
+    return None
+
+
+def _iter_chat_synthesizers() -> list[ChatSynthesizer]:
+    """Ordered chat synthesizers: preferred provider first, then cross-provider fallback."""
+    from app.opar.claude_client import synthesize_chat_response_claude
+
+    prefer_gemini = LLM_PROVIDER == "gemini"
+    ordered: list[ChatSynthesizer] = []
+    if prefer_gemini:
+        if GEMINI_ENABLED:
+            ordered.append(synthesize_chat_response_gemini)
+        if ANTHROPIC_ENABLED:
+            ordered.append(synthesize_chat_response_claude)
+    else:
+        if ANTHROPIC_ENABLED:
+            ordered.append(synthesize_chat_response_claude)
+        if GEMINI_ENABLED:
+            ordered.append(synthesize_chat_response_gemini)
+    return ordered
+
+
+def _synthesize_via_llm(
+    context: Dict[str, Any], *, thinking_enabled: bool = False
+) -> Tuple[str | None, str | None]:
+    """Run chat synthesis across providers; ``(None, None)`` when all miss."""
+    if not LLM_CHAT_SYNTHESIS_ENABLED:
+        return None, None
+    for synth in _iter_chat_synthesizers():
+        try:
+            text, thinking = synth(context, thinking_enabled=thinking_enabled)
+            if text:
+                return text, thinking
+        except Exception:
+            continue
+    return None, None
+
+
+def synthesize_reference_answer(
+    user_message: str,
+    reference: Dict[str, Any],
+    *,
+    session_context: Dict[str, Any] | None = None,
+) -> str | None:
+    """LLM answer for turns with no spend profile (onboarding, capabilities, schema).
+
+    ``reference`` is factual material (capability overview, file-format guide, schema
+    summary) the model rephrases into a tailored reply. Returns ``None`` when no
+    provider is available / offline / pytest, so the caller uses its canned fallback.
+    """
+    context = {
+        "user_message": user_message,
+        "session_context": session_context or {},
+        "reference": reference,
+    }
+    text, _ = _synthesize_via_llm(context)
+    return text
 
 
 @dataclass
@@ -95,6 +185,32 @@ def _portfolio_summary(profile: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _slim_initiative_row(row: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "category_id": row.get("category_id"),
+        "category_name": row.get("category_name"),
+        "lever": row.get("lever"),
+        "lever_name": row.get("lever_name"),
+        "confidence": row.get("confidence"),
+        "annualized_run_rate_savings": row.get("annualized_run_rate_savings"),
+        "net_savings": row.get("net_savings"),
+        "horizon": row.get("horizon"),
+        "execution_probability": row.get("execution_probability"),
+    }
+
+
+def _slim_value_matrix_row(row: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "category_id": row.get("category_id"),
+        "category_name": row.get("category_name"),
+        "lever": row.get("lever"),
+        "deduped_mid_savings": row.get("deduped_mid_savings"),
+        "net_npv": row.get("net_npv"),
+        "payback_months": row.get("payback_months"),
+        "confidence": row.get("confidence"),
+    }
+
+
 def _fetch_document_excerpts(engagement_id: str, query: str, limit: int = 2) -> List[str]:
     if not engagement_id:
         return []
@@ -115,10 +231,19 @@ def build_chat_context(
     chat_history: List[Dict[str, str]] | None = None,
     currency: str = "INR",
 ) -> Dict[str, Any]:
-    """Assemble structured context for Gemini chat synthesis."""
+    """Assemble structured context for chat synthesis.
+
+    Gives the model the *full* (slimmed) spend picture — every category with its
+    suppliers/geos, the portfolio-wide supplier ranking, and payment-terms
+    opportunities — rather than a single keyword-selected slice. The model reads
+    the question and picks the relevant dimension itself; ``query_analysis`` is a
+    non-binding hint, not a gate on what data is visible. (Pre-filtering by
+    keyword was the main cause of "answer doesn't match the question".)
+    """
     profile = skill_outputs.get("spend-profiler", {})
     categories = profile.get("category_profile", []) if isinstance(profile, dict) else []
     dims = extract_query_dimensions(ctx.user_message, categories)
+    total_spend = float(profile.get("total_spend", 0) or 0) if isinstance(profile, dict) else 0.0
 
     matched_row: Dict[str, Any] | None = None
     if dims.focus_category_id:
@@ -129,21 +254,22 @@ def build_chat_context(
     if not matched_row and dims.focus_category:
         matched_row = match_category_from_query(ctx.user_message, categories)
 
-    relevant_data: Dict[str, Any] = {}
-    if matched_row:
-        relevant_data = _slim_category_row(matched_row)
-    elif dims.breakdown_dimension == "supplier" and categories:
-        total_spend = float(profile.get("total_spend", 0) or 0) if isinstance(profile, dict) else 0.0
-        limit = _parse_top_limit(ctx.user_message)
-        relevant_data = {
-            "top_suppliers_portfolio": aggregate_portfolio_suppliers(
-                categories,
-                limit=limit,
-                total_spend=total_spend,
-            )
-        }
-    elif dims.breakdown_dimension == "category" and categories:
-        relevant_data = {"all_categories": [_slim_category_row(c) for c in categories[:12]]}
+    # Full context — not a single pre-selected slice.
+    all_categories = [_slim_category_row(c) for c in categories[:12]]
+    portfolio_top_suppliers = (
+        aggregate_portfolio_suppliers(
+            categories,
+            limit=_parse_top_limit(ctx.user_message),
+            total_spend=total_spend,
+        )
+        if categories
+        else []
+    )
+    focus_category_detail = _slim_category_row(matched_row) if matched_row else {}
+    pt_skill = skill_outputs.get("payment-terms-optimizer", {}) if isinstance(skill_outputs, dict) else {}
+    payment_terms_opportunities = (
+        pt_skill.get("opportunities", [])[:5] if isinstance(pt_skill, dict) else []
+    )
 
     recent_turns = []
     if chat_history:
@@ -154,7 +280,47 @@ def build_chat_context(
                 recent_turns.append({"role": role, "content": content})
 
     engagement_id = ctx.engagement_id or str(manifest.get("engagement_id") or "")
-    doc_excerpts = _fetch_document_excerpts(engagement_id, ctx.user_message)
+    doc_limit = 4 if "contract" in (ctx.user_message or "").lower() else 2
+    doc_excerpts = _fetch_document_excerpts(engagement_id, ctx.user_message, limit=doc_limit)
+
+    savings_model = skill_outputs.get("savings-modeler", {}) if isinstance(skill_outputs, dict) else {}
+    initiatives = (
+        savings_model.get("initiatives", [])[:12]
+        if isinstance(savings_model, dict) and isinstance(savings_model.get("initiatives"), list)
+        else []
+    )
+    value_bridge = skill_outputs.get("value-bridge-calculator", {}) if isinstance(skill_outputs, dict) else {}
+    value_matrix = (
+        value_bridge.get("value_matrix", [])[:12]
+        if isinstance(value_bridge, dict) and isinstance(value_bridge.get("value_matrix"), list)
+        else []
+    )
+    confidence_bands = (
+        value_bridge.get("confidence_bands", {})
+        if isinstance(value_bridge, dict) and isinstance(value_bridge.get("confidence_bands"), dict)
+        else {}
+    )
+    root_cause = skill_outputs.get("root-cause-analyzer", {}) if isinstance(skill_outputs, dict) else {}
+    root_findings = (
+        root_cause.get("root_cause_findings", [])[:8]
+        if isinstance(root_cause, dict) and isinstance(root_cause.get("root_cause_findings"), list)
+        else []
+    )
+    doc_ctx_skill = skill_outputs.get("document-contextualizer", {}) if isinstance(skill_outputs, dict) else {}
+    document_context = {}
+    if isinstance(doc_ctx_skill, dict):
+        document_context = {
+            "context_summary": str(doc_ctx_skill.get("context_summary") or "")[:1200],
+            "constraints": (doc_ctx_skill.get("constraints") or [])[:8]
+            if isinstance(doc_ctx_skill.get("constraints"), list)
+            else [],
+        }
+    contract_skill = skill_outputs.get("contract-lifecycle-manager", {}) if isinstance(skill_outputs, dict) else {}
+    contract_renewals = (
+        contract_skill.get("renewal_alerts", [])[:8]
+        if isinstance(contract_skill, dict) and isinstance(contract_skill.get("renewal_alerts"), list)
+        else []
+    )
 
     sme = skill_outputs.get("sme-critique", {}) if isinstance(skill_outputs, dict) else {}
     portfolio_probes: List[Dict[str, Any]] = []
@@ -188,8 +354,16 @@ def build_chat_context(
             "focus_category_id": dims.focus_category_id,
             "breakdown_dimension": dims.breakdown_dimension,
             "intent_class": ctx.intent_class,
+            "note": "Hint only — answer the dimension the user actually asked for; all data below is available.",
         },
-        "relevant_data": relevant_data,
+        "spend_data": {
+            "total_spend": total_spend,
+            "category_count": len(categories),
+            "categories": all_categories,
+            "portfolio_top_suppliers": portfolio_top_suppliers,
+            "focus_category_detail": focus_category_detail,
+            "payment_terms_opportunities": payment_terms_opportunities,
+        },
         "portfolio_summary": _portfolio_summary(profile) if isinstance(profile, dict) else {},
         "deep_research_summary": manifest.get("deep_research_summary"),
         "business_override_note": manifest.get("business_override_note") or ctx.business_override_note,
@@ -199,6 +373,12 @@ def build_chat_context(
         },
         "recent_turns": recent_turns,
         "document_excerpts": doc_excerpts,
+        "document_context": document_context,
+        "modeled_initiatives": [_slim_initiative_row(i) for i in initiatives if isinstance(i, dict)],
+        "value_matrix_rows": [_slim_value_matrix_row(r) for r in value_matrix if isinstance(r, dict)],
+        "confidence_bands": confidence_bands,
+        "root_cause_findings": root_findings,
+        "contract_renewals": contract_renewals,
     }
 
 
@@ -220,13 +400,13 @@ def synthesize_chat_response(
     currency: str = "INR",
     thinking_enabled: bool = False,
 ) -> ChatSynthesisResult:
-    """Build context, call Gemini, fall back to deterministic QA on failure."""
+    """Build context, run the resolved LLM, fall back to deterministic QA on failure."""
     context = build_chat_context(
         ctx, manifest, skill_outputs, chat_history=chat_history, currency=currency
     )
     metadata = _response_metadata_from_context(context)
 
-    text, thinking = synthesize_chat_response_gemini(context, thinking_enabled=thinking_enabled)
+    text, thinking = _synthesize_via_llm(context, thinking_enabled=thinking_enabled)
     if text:
         return ChatSynthesisResult(
             response_text=text,

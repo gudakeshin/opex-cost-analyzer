@@ -60,6 +60,12 @@ def _detect_query_capabilities(msg: str) -> List[str]:
             "cost reduction",
             "cost optimization",
             "cost optimisation",
+            "renegotiat",
+            "re-negotiat",
+            "contract renewal",
+            "renewal detail",
+            "initiative detail",
+            "lever detail",
         ],
         "variance_analysis": ["budget vs actual", "variance", "over budget", "under budget", "bva"],
         "temporal_trend": ["trend", "month", "quarter", "season", "time", "over time"],
@@ -204,6 +210,11 @@ def _classify_intent_rule_based(msg: str) -> Tuple[str, str | None]:
     # 2. Business case / proposal
     if any(w in lowered for w in ["business case", "businesscase", "proposal", "generate case"]):
         return "business_case", None
+
+    # 2.5 Lever / contract detail asks on modeled initiatives
+    if any(w in lowered for w in ["renegotiat", "re-negotiat", "contract renewal", "renewal detail"]):
+        if any(w in lowered for w in ["detail", "details", "tell me", "show me", "what", "give me", "list", "explain", "describe"]):
+            return "savings_plan", None
 
     # 3. Value bridge / savings matrix
     if any(w in lowered for w in [

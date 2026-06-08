@@ -30,6 +30,38 @@ def _load_exec_rate_defaults() -> tuple[float, float]:
         return 0.60, 0.85  # safe fallback if file is missing or malformed
 
 
+def _load_bounce_back_rates() -> Dict[str, float]:
+    """Per-risk reversion rates from model_parameters.json (CFO-overridable).
+
+    These replace the single global ``bounce_back_reversion_rate`` scalar so a
+    portfolio's bounce-back exposure reflects each lever's own stickiness.
+    """
+    fallback = {"high": 0.80, "medium": 0.40, "low": 0.15}
+    try:
+        params = json.loads(_MODEL_PARAMS_PATH.read_text(encoding="utf-8"))
+        rates = params.get("defaults", {}).get("bounce_back_rates_by_risk", {})
+        return {k: float(rates.get(k, fallback[k])) for k in fallback}
+    except Exception:
+        return fallback
+
+
+def _portfolio_execution_weighted_savings(
+    initiatives: List[Dict[str, Any]], global_exec_rate: float
+) -> float:
+    """Weight each initiative's 3yr net savings by its own base_execution_probability,
+    then apply the global execution rate as a portfolio-level multiplier.
+
+    A demand-management-heavy book (low per-lever probability) therefore lands well
+    below ``mid × global_exec_rate``; a contract-renegotiation-heavy book stays close.
+    """
+    total = 0.0
+    for init in initiatives:
+        bep = float(init.get("base_execution_probability", 0.70))
+        net = float(init.get("net_savings", {}).get("total_3yr", 0.0))
+        total += net * bep
+    return total * global_exec_rate
+
+
 def _npv_phased(
     savings_by_year: List[float],
     costs_by_year: List[float],
@@ -142,6 +174,20 @@ def compute_sensitivity(
     # If business grows, addressable spend pool grows proportionally in volume-driven categories
     volume_growth_factor = 1.0 + max(headcount_growth, revenue_growth)
 
+    # P2-B: weight conservative/accelerated savings by each initiative's own execution
+    # probability when a savings_model is present; fall back to the flat mid-band path.
+    _inits: List[Dict[str, Any]] = (
+        savings_model["initiatives"] if savings_model and savings_model.get("initiatives") else []
+    )
+    conservative_savings = (
+        _portfolio_execution_weighted_savings(_inits, conservative_exec)
+        if _inits else mid * conservative_exec
+    )
+    accelerated_savings = (
+        _portfolio_execution_weighted_savings(_inits, accelerated_exec)
+        if _inits else mid * accelerated_exec
+    )
+
     scenarios: List[Dict[str, Any]] = [
         {
             "name": "conservative",
@@ -149,10 +195,10 @@ def compute_sensitivity(
                 f"{conservative_exec:.0%} execution rate — change management risk; "
                 + (f"headcount +{headcount_growth:.0%}" if headcount_growth else "baseline business drivers")
             ),
-            "savings_3yr": round(mid * conservative_exec, 2),
+            "savings_3yr": round(conservative_savings, 2),
             "timeline_months": int(36 * timeline_factor),
-            "npv_pretax": round(_simple_npv(mid * conservative_exec, 3.0 * timeline_factor, 0.0), 2),
-            "npv_aftertax": round(_simple_npv(mid * conservative_exec, 3.0 * timeline_factor, effective_tax_rate), 2),
+            "npv_pretax": round(_simple_npv(conservative_savings, 3.0 * timeline_factor, 0.0), 2),
+            "npv_aftertax": round(_simple_npv(conservative_savings, 3.0 * timeline_factor, effective_tax_rate), 2),
             "execution_rate": conservative_exec,
             "driver_adjusted": bool(drivers),
         },
@@ -175,10 +221,10 @@ def compute_sensitivity(
                 f"{accelerated_exec:.0%} savings in 18 months — rapid consolidation; "
                 + (f"timeline compressed ×{timeline_factor:.2f}" if timeline_factor != 1.0 else "compressed delivery")
             ),
-            "savings_3yr": round(mid * accelerated_exec, 2),
+            "savings_3yr": round(accelerated_savings, 2),
             "timeline_months": int(18 * timeline_factor),
-            "npv_pretax": round(_simple_npv(mid * accelerated_exec, 1.5 * timeline_factor, 0.0), 2),
-            "npv_aftertax": round(_simple_npv(mid * accelerated_exec, 1.5 * timeline_factor, effective_tax_rate), 2),
+            "npv_pretax": round(_simple_npv(accelerated_savings, 1.5 * timeline_factor, 0.0), 2),
+            "npv_aftertax": round(_simple_npv(accelerated_savings, 1.5 * timeline_factor, effective_tax_rate), 2),
             "execution_rate": accelerated_exec,
             "driver_adjusted": bool(drivers),
         },
@@ -217,33 +263,33 @@ def compute_sensitivity(
         },
     ]
 
-    # Scenario 7: bounce_back — high bounce-back risk levers (sustainability_score < 0.50) revert
-    # 80% of their savings by month 30. This scenario quantifies the NPV cost of not sustaining savings.
-    bounce_back_reversion_rate = 0.80
-    low_sustainability_threshold = 0.50
+    # Scenario 7: bounce_back — each initiative reverts a share of its Year-3 savings by
+    # month 30 based on its own bounce_back_risk (high/medium/low), not one global rate.
+    # A high-risk behavioural lever erodes far more than a low-risk structural one.
+    BOUNCE_BACK_RATES = _load_bounce_back_rates()
     bounce_back_month = 30  # savings start reverting at month 30
 
     if savings_model and savings_model.get("initiatives"):
-        at_risk_3yr = 0.0
-        sustained_3yr = 0.0
+        bounce_back_3yr = 0.0
+        y3_retained = 0.0
         for init in savings_model["initiatives"]:
-            sust = float(init.get("sustainability_score", 0.65))
+            bbr = BOUNCE_BACK_RATES.get(
+                str(init.get("bounce_back_risk", "medium")), BOUNCE_BACK_RATES["medium"]
+            )
             gs = init.get("gross_savings", {})
-            total_3yr = float(gs.get("total_3yr", 0.0))
-            if sust < low_sustainability_threshold:
-                # Only Y1+Y2 savings are realised; Y3 reverts at bounce_back_reversion_rate
-                y1 = float(gs.get("y1", 0.0))
-                y2 = float(gs.get("y2", 0.0))
-                y3_reversion = float(gs.get("y3", 0.0)) * bounce_back_reversion_rate
-                at_risk_3yr += y1 + y2 - y3_reversion
-            else:
-                sustained_3yr += total_3yr
-        bounce_back_3yr = at_risk_3yr + sustained_3yr
-        bounce_back_npv_pretax = _scenario_npv(base_exec, int(36 * timeline_factor), 0.0,
-                                               savings_override=[phased_savings[0], phased_savings[1],
-                                                                  phased_savings[2] * (1.0 - bounce_back_reversion_rate)])
+            y1 = float(gs.get("y1", 0.0))
+            y2 = float(gs.get("y2", 0.0))
+            y3_kept = float(gs.get("y3", 0.0)) * (1.0 - bbr)
+            # Y1+Y2 realised in full; only the retained slice of Y3 survives reversion.
+            bounce_back_3yr += y1 + y2 + y3_kept
+            y3_retained += y3_kept
+        bounce_back_npv_pretax = _scenario_npv(
+            base_exec, int(36 * timeline_factor), 0.0,
+            savings_override=[phased_savings[0], phased_savings[1], y3_retained],
+        )
     else:
-        bounce_back_3yr = mid * base_exec * (1.0 - bounce_back_reversion_rate * 0.33)
+        # No model available: assume a medium reversion on the back third of the horizon.
+        bounce_back_3yr = mid * base_exec * (1.0 - BOUNCE_BACK_RATES["medium"] * 0.33)
         bounce_back_npv_pretax = _simple_npv(bounce_back_3yr, 3.0 * timeline_factor, 0.0)
 
     bounce_back_npv_aftertax = bounce_back_npv_pretax * (1.0 - effective_tax_rate)
@@ -251,9 +297,10 @@ def compute_sensitivity(
     scenarios.append({
         "name": "bounce_back",
         "key_assumption": (
-            f"Levers with sustainability score < {low_sustainability_threshold} (demand management, maverick compliance, etc.) "
-            f"revert {bounce_back_reversion_rate:.0%} of savings by month {bounce_back_month}. "
-            "Structural/technology levers remain intact."
+            f"Each lever reverts a share of its Year-3 savings by month {bounce_back_month} "
+            f"per its bounce-back risk (high {BOUNCE_BACK_RATES['high']:.0%} / "
+            f"medium {BOUNCE_BACK_RATES['medium']:.0%} / low {BOUNCE_BACK_RATES['low']:.0%}). "
+            "Structural/technology levers hold; behavioural levers erode."
         ),
         "savings_3yr": round(bounce_back_3yr, 2),
         "timeline_months": int(36 * timeline_factor),
@@ -262,6 +309,36 @@ def compute_sensitivity(
         "execution_rate": base_exec,
         "driver_adjusted": False,
         "bounce_back_warning": True,
+    })
+
+    # Scenario 8: regulatory_headwind — India-specific. A GST ITC rule change or MSME
+    # payment-mandate enforcement eliminates compliance-linked levers; the remainder
+    # takes a 10% overhead haircut for compliance cost. (lever ids reconciled against
+    # the model: msme maps to payment_terms; gst_itc_recovery + bank_fee_optimization
+    # exist as-is.)
+    regulatory_impacted_levers = {"gst_itc_recovery", "payment_terms", "bank_fee_optimization"}
+    if savings_model and savings_model.get("initiatives"):
+        reg_savings = sum(
+            float(i.get("net_savings", {}).get("total_3yr", 0.0))
+            for i in savings_model["initiatives"]
+            if i.get("lever") not in regulatory_impacted_levers
+        ) * 0.90  # 10% compliance overhead haircut on the remainder
+    else:
+        reg_savings = mid * 0.82  # fallback: ~18% portfolio at risk from regulatory exposure
+    scenarios.append({
+        "name": "regulatory_headwind",
+        "key_assumption": (
+            "GST ITC rule change or MSME payment-mandate enforcement eliminates "
+            "compliance-linked levers; remaining categories take a 10% overhead haircut "
+            "for regulatory compliance cost."
+        ),
+        "savings_3yr": round(reg_savings, 2),
+        "timeline_months": int(36 * timeline_factor),
+        "npv_pretax": round(_simple_npv(reg_savings, 3.0 * timeline_factor, 0.0), 2),
+        "npv_aftertax": round(_simple_npv(reg_savings, 3.0 * timeline_factor, effective_tax_rate), 2),
+        "execution_rate": base_exec,
+        "driver_adjusted": False,
+        "regulatory_warning": True,
     })
 
     return {
@@ -276,7 +353,11 @@ def compute_sensitivity(
             "Pre-tax NPV also provided for operational planning. "
             "Volume growth scenario scales the addressable spend pool by the larger of "
             "headcount or revenue growth rate. "
-            "Bounce-back scenario models reversion risk for low-sustainability levers "
-            "(sustainability score < 0.50) which revert 80% of savings by month 30."
+            "Conservative/accelerated scenarios weight each initiative by its own "
+            "base execution probability when a savings model is present. "
+            "Bounce-back scenario reverts each lever's Year-3 savings by its own "
+            "bounce-back risk (high/medium/low) rather than a single global rate. "
+            "Regulatory-headwind scenario zeroes India compliance-linked levers (GST ITC, "
+            "MSME payment terms, bank fees) and applies a 10% overhead haircut to the rest."
         ),
     }

@@ -201,6 +201,27 @@ def root_cause_analyzer(
     # the 0.15 fragmentation floor, which is the "unconcentrated" boundary).
     conc_min = float(_threshold_val(th.get("supplier_concentration_hhi_min"), 0.25))
     maverick_min = float(_threshold_val(th.get("maverick_spend_ratio_min"), 0.2))
+    # P1-B: graduated maverick tiers. When present, the trigger drops to the warning
+    # tier (catches the 15–25% "elevated" band the flat 0.20 floor missed) and every
+    # finding carries a severity label + narrative.
+    maverick_tiers = th.get("maverick_spend_tiers", {}) or {}
+    _warning_tier = maverick_tiers.get("warning") or {}
+    maverick_trigger = float(_warning_tier.get("value", maverick_min)) if maverick_tiers else maverick_min
+    # P1-C: minimum addressable spend before a fragmentation flag is worth raising.
+    # Value is in reporting currency (₹5 Cr default); non-INR runs should FX-adjust it.
+    frag_min_spend = float(_threshold_val(th.get("supplier_fragmentation_min_spend"), 0.0))
+
+    def _maverick_severity(ratio: float) -> Optional[Dict[str, str]]:
+        """Map a maverick ratio onto the highest tier it clears (critical→warning)."""
+        if not maverick_tiers:
+            return None
+        for key in ("critical", "elevated", "warning"):
+            tier = maverick_tiers.get(key) or {}
+            val = tier.get("value")
+            if val is not None and ratio >= float(val):
+                return {"tier": key, "label": tier.get("label", ""), "narrative": tier.get("narrative", "")}
+        return None
+
     cpt_cfg = th.get("cost_per_transaction_max", {})
     if reporting_currency.upper() != "INR" and isinstance(cpt_cfg, dict) and "value_usd" in cpt_cfg:
         cpt_max = float(cpt_cfg["value_usd"])
@@ -250,7 +271,7 @@ def root_cause_analyzer(
         maverick = off_po_spend_by_cat.get(cid, 0.0) / total if total else 0.0
 
         root_causes: List[Dict[str, Any]] = []
-        if hhi < hhi_max and len(supplier_map) >= min_suppliers:
+        if hhi < hhi_max and len(supplier_map) >= min_suppliers and total >= frag_min_spend:
             root_causes.append(
                 {
                     "diagnosis": f"Supplier fragmentation with {len(supplier_map)} active suppliers (HHI {hhi:.2f})",
@@ -279,18 +300,20 @@ def root_cause_analyzer(
                 }
             )
 
-        if has_po_signal and maverick > maverick_min:
-            root_causes.append(
-                {
-                    "diagnosis": f"High maverick buying ({maverick:.0%} off-PO spend)",
-                    "confidence": "medium",
-                    "addressable_spend": total * float(_threshold_val(rates.get("maverick_compliance"), 0.1)),
-                    "recommended_lever": "maverick_compliance",
-                    "implementation_approach": "Enforce PO-first buying and renegotiate non-compliant contracts.",
-                    "implementation_complexity": "low",
-                    "estimated_timeline_months": 6,
-                }
-            )
+        if has_po_signal and maverick > maverick_trigger:
+            maverick_rc = {
+                "diagnosis": f"High maverick buying ({maverick:.0%} off-PO spend)",
+                "confidence": "medium",
+                "addressable_spend": total * float(_threshold_val(rates.get("maverick_compliance"), 0.1)),
+                "recommended_lever": "maverick_compliance",
+                "implementation_approach": "Enforce PO-first buying and renegotiate non-compliant contracts.",
+                "implementation_complexity": "low",
+                "estimated_timeline_months": 6,
+            }
+            severity = _maverick_severity(maverick)
+            if severity:
+                maverick_rc["maverick_severity"] = severity
+            root_causes.append(maverick_rc)
 
         if transaction_count and transaction_count > 0 and (total / transaction_count) > cpt_max:
             root_causes.append(
