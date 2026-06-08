@@ -36,7 +36,12 @@ def create_business_case(session_id: str, template: str = Form("detailed_proposa
     existing = list_initiatives(session_id=session_id)
     existing_keys = {(i.get("category"), i.get("lever")) for i in existing}
     created_initiatives = 0
-    for row in bc.get("sections", {}).get("savings_opportunity", []):
+    # Persist from the enriched per-initiative detail (carries business
+    # perspective + financials + LLM sharpening); fall back to the thin
+    # value-matrix when no modeled initiatives exist (raw-rows path).
+    sections = bc.get("sections", {})
+    source_rows = sections.get("initiative_details") or sections.get("savings_opportunity", [])
+    for row in source_rows:
         if not isinstance(row, dict):
             continue
         category = row.get("category_name") or row.get("category_id")
@@ -53,12 +58,30 @@ def create_business_case(session_id: str, template: str = Form("detailed_proposa
             "category": category,
             "lever": lever,
             "root_cause": row.get("root_cause"),
-            "gross_savings_y1": row.get("savings_y1", 0.0),
-            "gross_savings_y2": row.get("savings_y2", 0.0),
-            "gross_savings_y3": row.get("savings_y3", 0.0),
+            "gross_savings_y1": row.get("gross_savings_y1", 0.0),
+            "gross_savings_y2": row.get("gross_savings_y2", 0.0),
+            "gross_savings_y3": row.get("gross_savings_y3", 0.0),
             "cost_to_achieve": row.get("cost_to_achieve_3yr", 0.0),
             "net_npv": row.get("net_npv", 0.0),
+            "savings_type": row.get("savings_type", "run_rate"),
+            "annualized_run_rate_savings": row.get("annualized_run_rate_savings", 0.0),
             "stage": "identified",
+            # Business-perspective detail (Layer A/B).
+            "business_rationale": row.get("business_rationale"),
+            "affected_vendors": row.get("affected_vendors", []),
+            "contract_levers": row.get("contract_levers", []),
+            "owner_role": row.get("owner_role"),
+            "business_sponsor": row.get("business_sponsor"),
+            "risks": row.get("risks", []),
+            "kpis": row.get("kpis", []),
+            "change_management": row.get("change_management", {}),
+            "execution_playbook": row.get("execution_playbook", []),
+            "phasing_narrative": row.get("phasing_narrative"),
+            "evidence": row.get("evidence", []),
+            "p50_savings": row.get("p50_savings"),
+            "ebitda_bps": row.get("ebitda_bps"),
+            "payback_months": row.get("payback_months"),
+            "irr_pct": row.get("irr_pct"),
         })
         existing_keys.add(key)
         created_initiatives += 1

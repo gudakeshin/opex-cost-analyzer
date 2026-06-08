@@ -108,6 +108,9 @@ def build_cfo_brief(
                 "p50_cr": round(float(i.get("p50") or 0) / 1e7, 1),
                 "irr_pct": i.get("irr_pct"),
                 "payback_months": i.get("payback_months"),
+                # Business perspective (Layer A enrichment).
+                "owner": i.get("owner_role") or "TBD",
+                "top_risk": (i.get("risks") or [{}])[0].get("risk") if i.get("risks") else None,
             }
             for i in initiatives
         ],
@@ -164,16 +167,21 @@ def export_cfo_brief_docx(brief: Dict[str, Any], filename: str) -> Path:
     doc.add_heading("Top Initiatives", level=1)
     inits = brief["sections"]["top_initiatives"]
     if inits:
-        tbl = doc.add_table(rows=1 + len(inits), cols=4)
+        tbl = doc.add_table(rows=1 + len(inits), cols=5)
         tbl.style = "Table Grid"
-        for j, h in enumerate(["Initiative", "P50 Savings (₹ Cr)", "IRR %", "Payback (mo)"]):
+        for j, h in enumerate(["Initiative", "Owner", "P50 Savings (₹ Cr)", "IRR %", "Payback (mo)"]):
             tbl.rows[0].cells[j].text = h
         for i, row in enumerate(inits):
             tbl.rows[i + 1].cells[0].text = row["name"]
-            tbl.rows[i + 1].cells[1].text = str(row["p50_cr"])
-            tbl.rows[i + 1].cells[2].text = str(row.get("irr_pct") or "—")
-            tbl.rows[i + 1].cells[3].text = str(row.get("payback_months") or "—")
+            tbl.rows[i + 1].cells[1].text = str(row.get("owner") or "TBD")
+            tbl.rows[i + 1].cells[2].text = str(row["p50_cr"])
+            tbl.rows[i + 1].cells[3].text = str(row.get("irr_pct") or "—")
+            tbl.rows[i + 1].cells[4].text = str(row.get("payback_months") or "—")
         doc.add_paragraph("")
+        # Key execution risk per initiative (business perspective).
+        risk_bits = [f"{r['name']}: {r['top_risk']}" for r in inits if r.get("top_risk")]
+        if risk_bits:
+            doc.add_paragraph("Key risks: " + "  |  ".join(risk_bits[:3]))
 
     doc.add_heading("Risk & Quality Signals", level=1)
     floor = brief["sections"].get("scenario_floor_cr")

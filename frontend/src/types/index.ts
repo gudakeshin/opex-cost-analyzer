@@ -597,6 +597,29 @@ export interface Initiative {
   cost_behaviour?: number;
   condition_precedents?: string[];
   assumptions?: Array<Record<string, unknown>>;
+  // Business-perspective detail (Layer A/B enrichment from the business case builder).
+  business_rationale?: string;
+  owner_role?: string;
+  business_sponsor?: string;
+  affected_vendors?: Array<{
+    supplier: string;
+    spend?: number;
+    share_of_category_pct?: number;
+    avg_payment_terms_days?: number | null;
+  }>;
+  contract_levers?: string[];
+  risks?: Array<{ risk: string; severity?: string; mitigation?: string }>;
+  kpis?: Array<{ metric: string; cadence?: string }>;
+  change_management?: {
+    stakeholders?: string[];
+    comms_cadence?: string;
+    resistance_points?: string[];
+  };
+  execution_playbook?: Array<Record<string, unknown>>;
+  phasing_narrative?: string;
+  evidence?: string[];
+  payback_months?: number;
+  irr_pct?: number;
   [key: string]: unknown;
 }
 

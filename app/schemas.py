@@ -228,6 +228,22 @@ class InitiativeCreateRequest(BaseModel):
     owner_email: str | None = None
     committed_date: str | None = None
     target_realization_date: str | None = None
+    # Business-perspective detail (optional — populated by the business-case builder).
+    business_rationale: str | None = None
+    affected_vendors: list = []
+    contract_levers: list = []
+    owner_role: str | None = None
+    business_sponsor: str | None = None
+    risks: list = []
+    kpis: list = []
+    change_management: dict = {}
+    execution_playbook: list = []
+    phasing_narrative: str | None = None
+    evidence: list = []
+    p50_savings: float | None = None
+    ebitda_bps: float | None = None
+    payback_months: float | None = None
+    irr_pct: float | None = None
 
 
 class InitiativeStageRequest(BaseModel):

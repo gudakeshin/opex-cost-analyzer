@@ -85,10 +85,28 @@ def create_initiative(payload: Dict[str, Any]) -> Dict[str, Any]:
         "forecast_to_complete": payload.get("forecast_to_complete"),  # computed from actuals pace
         "stage": payload.get("stage", "identified"),
         "rejection_reason": payload.get("rejection_reason"),
-        "owner_name": payload.get("owner_name"),
+        "owner_name": payload.get("owner_name") or payload.get("owner_role"),
         "owner_email": payload.get("owner_email"),
         "committed_date": payload.get("committed_date"),
         "target_realization_date": payload.get("target_realization_date"),
+        # Business-perspective detail (Layer A/B enrichment). All optional so
+        # manually-created initiatives and older callers stay valid.
+        "business_rationale": payload.get("business_rationale"),
+        "affected_vendors": payload.get("affected_vendors", []),
+        "contract_levers": payload.get("contract_levers", []),
+        "owner_role": payload.get("owner_role"),
+        "business_sponsor": payload.get("business_sponsor"),
+        "risks": payload.get("risks", []),
+        "kpis": payload.get("kpis", []),
+        "change_management": payload.get("change_management", {}),
+        "execution_playbook": payload.get("execution_playbook", []),
+        "phasing_narrative": payload.get("phasing_narrative"),
+        "evidence": payload.get("evidence", []),
+        # Display financials surfaced from the value bridge for the portfolio.
+        "p50_savings": payload.get("p50_savings"),
+        "ebitda_bps": payload.get("ebitda_bps"),
+        "payback_months": payload.get("payback_months"),
+        "irr_pct": payload.get("irr_pct"),
         "created_at": _now_iso(),
         "updated_at": _now_iso(),
     }

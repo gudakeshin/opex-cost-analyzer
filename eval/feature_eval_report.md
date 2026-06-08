@@ -154,7 +154,7 @@ Domain score: **8.00/10** (PASS ✓)
 
 **Finding**: 4/4 OPAR phase modules exist with >100 lines
 
-**Detail**: Checked app/opar/observe.py, plan.py, act.py, reflect.py for existence and line count >100. Thin/missing: none. observe: 730 lines, plan: 762 lines, act: 332 lines, reflect: 273 lines
+**Detail**: Checked app/opar/observe.py, plan.py, act.py, reflect.py for existence and line count >100. Thin/missing: none. observe: 741 lines, plan: 762 lines, act: 332 lines, reflect: 273 lines
 
 **Remediation**: All 4 OPAR phase modules are substantively implemented.
 

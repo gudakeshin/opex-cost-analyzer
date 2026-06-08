@@ -21,6 +21,7 @@ REGULATORY_EXCLUSIONS_PATH = ROOT_DIR / "skills" / "spend-profiler" / "reference
 SECTOR_PACKS_DIR = ROOT_DIR / "skills" / "sector-packs"
 KEYWORD_FAMILIES_PATH = ROOT_DIR / "skills" / "savings-modeler" / "references" / "keyword_families.json"
 GST_RULES_PATH = ROOT_DIR / "skills" / "indian-tax-optimizer" / "references" / "gst_rules.json"
+BUSINESS_DETAIL_TEMPLATES_PATH = ROOT_DIR / "skills" / "savings-modeler" / "references" / "business_detail_templates.json"
 
 # ---------------------------------------------------------------------------
 # Module-level cache variables
@@ -223,6 +224,13 @@ def _get_gst_rules() -> Dict[str, Any]:
     if _GST_RULES is None:
         _GST_RULES = _read_json(GST_RULES_PATH)
     return _GST_RULES
+
+
+@lru_cache(maxsize=1)
+def _get_business_detail_templates() -> Dict[str, Any]:
+    if BUSINESS_DETAIL_TEMPLATES_PATH.exists():
+        return _read_json(BUSINESS_DETAIL_TEMPLATES_PATH)
+    return {}
 
 
 def _resolve_pack_id(industry: str) -> str:
