@@ -402,15 +402,21 @@ def _business_case_builder(ctx: SkillContext) -> tuple[Dict[str, Any], str | Non
     from app.services.business_case import build_business_case  # lazy
 
     profile = _get_profile(ctx)
+    skill_outputs = dict(ctx.prior_results)
+    if profile:
+        skill_outputs.setdefault("spend-profiler", profile)
     bridge = ctx.prior("value-bridge-calculator")
+    if bridge:
+        skill_outputs.setdefault("value-bridge-calculator", bridge)
     analysis = {
         "company_name": ctx.company_name,
         "industry": ctx.industry,
         "annual_revenue": ctx.annual_revenue,
-        "skill_outputs": {
-            "value-bridge-calculator": bridge,
-            "spend-profiler": profile,
-        },
+        "reporting_currency": ctx.reporting_currency,
+        "engagement_id": ctx.manifest.get("engagement_id"),
+        "model_manifest": ctx.model_manifest,
+        "manifest": ctx.manifest,
+        "skill_outputs": skill_outputs,
     }
     return {"business_case": build_business_case(analysis)}, None
 

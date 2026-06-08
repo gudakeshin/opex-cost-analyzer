@@ -141,13 +141,29 @@ def format_business_case_for_chat(bc: Dict[str, Any]) -> str:
         lines.append(f"**{title}**")
         if isinstance(value, str):
             lines.append(value)
+        elif isinstance(value, dict) and "headers" in value and "rows" in value:
+            headers = [str(h) for h in value.get("headers", [])]
+            if headers:
+                lines.append("| " + " | ".join(headers) + " |")
+                lines.append("| " + " | ".join("---" for _ in headers) + " |")
+                for row in value.get("rows", []):
+                    cells = [str(c) for c in row[: len(headers)]]
+                    while len(cells) < len(headers):
+                        cells.append("")
+                    lines.append("| " + " | ".join(cells) + " |")
         elif isinstance(value, list):
             for item in value:
                 if isinstance(item, dict) and "deduped_mid_savings" in item:
                     cat = item.get("category_id", item.get("category_name", ""))
                     lines.append(f"• {cat}: {format_currency(float(item.get('deduped_mid_savings', 0) or 0))} savings")
+                elif isinstance(item, dict) and item.get("lever_name"):
+                    cat = item.get("category_name") or item.get("category_id") or ""
+                    lever = item.get("lever_name") or item.get("lever") or "Initiative"
+                    npv = item.get("net_npv")
+                    npv_txt = f" · NPV {format_currency(float(npv))}" if npv is not None else ""
+                    lines.append(f"• **{lever}** ({cat}){npv_txt}")
                 elif isinstance(item, dict):
-                    lines.append(f"• {item}")
+                    lines.append(f"• {item.get('action') or item.get('lever_name') or item}")
                 else:
                     lines.append(f"• {item}")
         else:

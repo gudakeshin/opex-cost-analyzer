@@ -7,6 +7,26 @@ from typing import Any, Dict
 from docx import Document
 
 from app.config import OUTPUT_DIR
+from app.utils.inr_format import format_money
+
+
+def _resolve_reporting_currency(analysis: Dict[str, Any]) -> str:
+    """Session reporting currency (manifest / analysis payload), default INR for this product."""
+    for key in ("reporting_currency", "currency"):
+        val = analysis.get(key)
+        if val:
+            return str(val).upper()
+    manifest = analysis.get("manifest") if isinstance(analysis.get("manifest"), dict) else {}
+    for key in ("reporting_currency", "currency"):
+        val = manifest.get(key)
+        if val:
+            return str(val).upper()
+    return "INR"
+
+
+def _fmt_money(amount: float, currency: str, *, parens: bool = False) -> str:
+    text = format_money(float(amount or 0.0), currency)
+    return f"({text})" if parens else text
 
 
 def _top_categories_from_profile(outputs: Dict[str, Any], limit: int = 3) -> list[str]:
@@ -37,7 +57,7 @@ def _dynamic_risks(outputs: Dict[str, Any]) -> list[str]:
     return risks
 
 
-def _build_financial_projections(outputs: Dict[str, Any]) -> Dict[str, Any]:
+def _build_financial_projections(outputs: Dict[str, Any], currency: str) -> Dict[str, Any]:
     """Y1/Y2/Y3 table from savings_modeler initiatives."""
     initiatives = outputs.get("savings-modeler", {}).get("initiatives", [])
     gross = [0.0, 0.0, 0.0]
@@ -52,10 +72,10 @@ def _build_financial_projections(outputs: Dict[str, Any]) -> Dict[str, Any]:
     return {
         "headers": ["", "Year 1", "Year 2", "Year 3", "3-Year Total"],
         "rows": [
-            ["Gross Savings"] + [f"${v:,.0f}" for v in gross] + [f"${sum(gross):,.0f}"],
-            ["Cost to Achieve"] + [f"(${v:,.0f})" for v in cta] + [f"(${sum(cta):,.0f})"],
-            ["Net Savings"] + [f"${v:,.0f}" for v in net] + [f"${sum(net):,.0f}"],
-            ["Cumulative Net"] + [f"${v:,.0f}" for v in cum] + [""],
+            ["Gross Savings"] + [_fmt_money(v, currency) for v in gross] + [_fmt_money(sum(gross), currency)],
+            ["Cost to Achieve"] + [_fmt_money(v, currency, parens=True) for v in cta] + [_fmt_money(sum(cta), currency, parens=True)],
+            ["Net Savings"] + [_fmt_money(v, currency) for v in net] + [_fmt_money(sum(net), currency)],
+            ["Cumulative Net"] + [_fmt_money(v, currency) for v in cum] + [""],
         ],
     }
 
@@ -72,12 +92,12 @@ def _build_irr_summary(outputs: Dict[str, Any]) -> list[str]:
     return lines_out or ["No CTA-based initiatives; IRR not applicable."]
 
 
-def _build_do_nothing(conf: Dict[str, Any]) -> str:
+def _build_do_nothing(conf: Dict[str, Any], currency: str) -> str:
     mid = float(conf.get("mid", 0.0))
     return (
-        f"Cost of inaction over 3 years: ${mid:,.0f} in foregone savings. "
+        f"Cost of inaction over 3 years: {_fmt_money(mid, currency)} in foregone savings. "
         f"Competitors operating at P25 efficiency hold a structural cost advantage "
-        f"of approximately ${mid / 3:,.0f} per annum."
+        f"of approximately {_fmt_money(mid / 3, currency)} per annum."
     )
 
 
@@ -263,7 +283,7 @@ def _advisory_business_levers(advisory: Any | None) -> list[Dict[str, Any]]:
     return levers
 
 
-def _priority_actions(advisory: Any | None, details: list[Dict[str, Any]]) -> list[Dict[str, Any]]:
+def _priority_actions(advisory: Any | None, details: list[Dict[str, Any]], currency: str) -> list[Dict[str, Any]]:
     """30/60/90 actions from the LLM, or a deterministic horizon-led fallback."""
     items = getattr(advisory, "priority_actions_30_60_90", []) or []
     if items:
@@ -288,7 +308,7 @@ def _priority_actions(advisory: Any | None, details: list[Dict[str, Any]]) -> li
         out.append({
             "timeline": "60",
             "action": f"Negotiate / execute {d['lever_name']} in {d['category_name']}.",
-            "expected_impact": f"~{d.get('annualized_run_rate_savings', 0):,.0f} run-rate",
+            "expected_impact": f"~{_fmt_money(float(d.get('annualized_run_rate_savings', 0) or 0), currency)} run-rate",
         })
     out.append({
         "timeline": "90",
@@ -302,6 +322,7 @@ def build_business_case(analysis: Dict[str, Any], template: str = "detailed_prop
     outputs = analysis.get("skill_outputs", {})
     bridge = outputs.get("value-bridge-calculator", {})
     conf = bridge.get("confidence_bands", {})
+    currency = _resolve_reporting_currency(analysis)
     company_name = analysis.get("company_name") or "Client"
     top_categories = _top_categories_from_profile(outputs)
     top_text = ", ".join(top_categories) if top_categories else "top identified categories"
@@ -312,8 +333,9 @@ def build_business_case(analysis: Dict[str, Any], template: str = "detailed_prop
     # Executive summary: LLM takeaway when available, else the deterministic band line.
     deterministic_summary = (
         f"{company_name} has an estimated savings opportunity of "
-        f"${conf.get('mid', 0):,.0f} (mid-case), ranging from ${conf.get('low', 0):,.0f} "
-        f"to ${conf.get('high', 0):,.0f}."
+        f"{_fmt_money(float(conf.get('mid', 0) or 0), currency)} (mid-case), ranging from "
+        f"{_fmt_money(float(conf.get('low', 0) or 0), currency)} "
+        f"to {_fmt_money(float(conf.get('high', 0) or 0), currency)}."
     )
     takeaway = (getattr(advisory, "executive_takeaway", "") or "").strip()
     executive_summary = f"{takeaway}\n\n{deterministic_summary}" if takeaway else deterministic_summary
@@ -329,14 +351,14 @@ def build_business_case(analysis: Dict[str, Any], template: str = "detailed_prop
         "executive_summary": executive_summary,
         "strategic_context": strategic_context,
         "current_state": f"Current-state baseline built from uploaded spend and contextual documents, with focus on {top_text}.",
-        "financial_projections": _build_financial_projections(outputs),
+        "financial_projections": _build_financial_projections(outputs, currency),
         "irr_summary": _build_irr_summary(outputs),
         "business_levers": _advisory_business_levers(advisory),
         "initiative_details": details,
-        "priority_actions_30_60_90": _priority_actions(advisory, details),
+        "priority_actions_30_60_90": _priority_actions(advisory, details, currency),
         "quick_wins": list(getattr(advisory, "quick_wins_from_data", []) or []),
         "executive_callouts": list(getattr(advisory, "executive_callouts", []) or []),
-        "do_nothing_comparison": _build_do_nothing(conf),
+        "do_nothing_comparison": _build_do_nothing(conf, currency),
         "savings_opportunity": bridge.get("value_matrix", []),
         "implementation_approach": [
             f"Wave 1: Execute initiatives in {top_text}.",
@@ -347,7 +369,12 @@ def build_business_case(analysis: Dict[str, Any], template: str = "detailed_prop
         "assumption_register": _build_assumption_register_section(outputs),
         "rag_factors": _build_rag_section(outputs),
     }
-    return {"template": template, "generated_on": str(date.today()), "sections": sections}
+    return {
+        "template": template,
+        "generated_on": str(date.today()),
+        "reporting_currency": currency,
+        "sections": sections,
+    }
 
 
 def _render_table(doc: Document, table_data: Dict[str, Any]) -> None:
@@ -365,14 +392,14 @@ def _render_table(doc: Document, table_data: Dict[str, Any]) -> None:
     doc.add_paragraph("")
 
 
-def _money(v: Any) -> str:
+def _money(v: Any, currency: str = "INR") -> str:
     try:
-        return f"${float(v):,.0f}"
+        return _fmt_money(float(v), currency)
     except (TypeError, ValueError):
         return str(v)
 
 
-def _render_initiative_details_docx(doc: Document, details: list) -> None:
+def _render_initiative_details_docx(doc: Document, details: list, currency: str = "INR") -> None:
     if not details:
         doc.add_paragraph("No modeled initiatives available.")
         return
@@ -387,7 +414,7 @@ def _render_initiative_details_docx(doc: Document, details: list) -> None:
         if owner_bits:
             doc.add_paragraph(f"Owner / accountability: {owner_bits[0]} (sponsor: {owner_bits[-1]})." if len(owner_bits) > 1 else f"Owner / accountability: {owner_bits[0]}.")
         fin = (
-            f"3-yr gross {_money(d.get('gross_3yr'))} · net NPV {_money(d.get('net_npv'))} · "
+            f"3-yr gross {_money(d.get('gross_3yr'), currency)} · net NPV {_money(d.get('net_npv'), currency)} · "
             f"payback {d.get('payback_months', '?')} mo"
             + (f" · IRR {d.get('irr_pct')}%" if d.get("irr_pct") is not None else "")
             + (f" · {d.get('ebitda_bps')} bps EBITDA" if d.get("ebitda_bps") is not None else "")
@@ -397,7 +424,7 @@ def _render_initiative_details_docx(doc: Document, details: list) -> None:
             doc.add_paragraph("Affected vendors:")
             for v in d["affected_vendors"]:
                 doc.add_paragraph(
-                    f"{v.get('supplier')} — {_money(v.get('spend'))} ({v.get('share_of_category_pct')}% of category)",
+                    f"{v.get('supplier')} — {_money(v.get('spend'), currency)} ({v.get('share_of_category_pct')}% of category)",
                     style="List Bullet",
                 )
         if d.get("contract_levers"):
@@ -464,13 +491,16 @@ _STRUCTURED_DOCX = {
 def export_docx(business_case: Dict[str, Any], filename: str) -> Path:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     path = OUTPUT_DIR / filename
+    currency = str(business_case.get("reporting_currency") or "INR")
     doc = Document()
     doc.add_heading("OpEx Business Case", level=0)
     doc.add_paragraph(f"Generated: {business_case.get('generated_on')}")
     for key, value in business_case.get("sections", {}).items():
         doc.add_heading(key.replace("_", " ").title(), level=1)
         renderer = _STRUCTURED_DOCX.get(key)
-        if renderer is not None and isinstance(value, list):
+        if renderer is _render_initiative_details_docx and isinstance(value, list):
+            renderer(doc, value, currency)
+        elif renderer is not None and isinstance(value, list):
             renderer(doc, value)
         elif isinstance(value, str):
             doc.add_paragraph(value)
@@ -482,7 +512,7 @@ def export_docx(business_case: Dict[str, Any], filename: str) -> Path:
         elif isinstance(value, list):
             for item in value:
                 if isinstance(item, dict):
-                    doc.add_paragraph(_compact_row(item), style="List Bullet")
+                    doc.add_paragraph(_compact_row(item, currency), style="List Bullet")
                 else:
                     doc.add_paragraph(str(item), style="List Bullet")
         else:
@@ -491,7 +521,7 @@ def export_docx(business_case: Dict[str, Any], filename: str) -> Path:
     return path
 
 
-def _compact_row(item: Dict[str, Any]) -> str:
+def _compact_row(item: Dict[str, Any], currency: str = "INR") -> str:
     """One-line summary of a value-matrix style row for bullet rendering."""
     name = item.get("lever_name") or item.get("lever") or item.get("category_name") or "item"
     cat = item.get("category_name") or item.get("category_id")
@@ -499,13 +529,15 @@ def _compact_row(item: Dict[str, Any]) -> str:
     if cat and cat != name:
         bits.append(f"({cat})")
     if item.get("net_npv") is not None:
-        bits.append(f"— net NPV {_money(item.get('net_npv'))}")
+        bits.append(f"— net NPV {_money(item.get('net_npv'), currency)}")
+    if item.get("deduped_mid_savings") is not None:
+        bits.append(f"— mid {_money(item.get('deduped_mid_savings'), currency)}")
     if item.get("payback_months"):
         bits.append(f"payback {item.get('payback_months')} mo")
     return " ".join(bits)
 
 
-def _render_initiative_details_text(d: Dict[str, Any]) -> list:
+def _render_initiative_details_text(d: Dict[str, Any], currency: str = "INR") -> list:
     lines = [
         f"  • {d.get('lever_name') or d.get('lever')} — {d.get('category_name') or d.get('category_id')}",
     ]
@@ -514,7 +546,7 @@ def _render_initiative_details_text(d: Dict[str, Any]) -> list:
     if d.get("owner_role"):
         lines.append(f"      Owner: {d['owner_role']} (sponsor: {d.get('business_sponsor', 'CFO')})")
     lines.append(
-        f"      Financials: 3-yr gross {_money(d.get('gross_3yr'))}, net NPV {_money(d.get('net_npv'))}, "
+        f"      Financials: 3-yr gross {_money(d.get('gross_3yr'), currency)}, net NPV {_money(d.get('net_npv'), currency)}, "
         f"payback {d.get('payback_months', '?')} mo"
     )
     for v in d.get("affected_vendors", []) or []:
@@ -540,6 +572,7 @@ def export_pdf_like_text(business_case: Dict[str, Any], filename: str) -> Path:
     """
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     path = OUTPUT_DIR / filename
+    currency = str(business_case.get("reporting_currency") or "INR")
     lines = [f"OpEx Business Case - {business_case.get('generated_on')}"]
     for key, value in business_case.get("sections", {}).items():
         lines.append("")
@@ -548,7 +581,7 @@ def export_pdf_like_text(business_case: Dict[str, Any], filename: str) -> Path:
         if key == "initiative_details" and isinstance(value, list):
             for d in value:
                 if isinstance(d, dict):
-                    lines.extend(_render_initiative_details_text(d))
+                    lines.extend(_render_initiative_details_text(d, currency))
         elif key == "business_levers" and isinstance(value, list):
             for lev in value:
                 if isinstance(lev, dict):
@@ -572,7 +605,7 @@ def export_pdf_like_text(business_case: Dict[str, Any], filename: str) -> Path:
                 lines.append(f"- {str(k).replace('_', ' ').title()}: {v}")
         elif isinstance(value, list):
             for item in value:
-                lines.append(f"- {_compact_row(item) if isinstance(item, dict) else item}")
+                lines.append(f"- {_compact_row(item, currency) if isinstance(item, dict) else item}")
         else:
             lines.append(str(value))
     path.write_text("\n".join(lines), encoding="utf-8")

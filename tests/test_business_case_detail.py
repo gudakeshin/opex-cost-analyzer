@@ -145,6 +145,18 @@ def test_business_case_offline_keeps_depth():
     assert "License Rightsizing addresses" in detail["business_rationale"]
 
 
+def test_business_case_uses_reporting_currency_inr():
+    with patch.object(bc_mod, "_llm_advisory_sections", return_value=None):
+        bc = build_business_case(_analysis())
+    secs = bc["sections"]
+    assert bc["reporting_currency"] == "INR"
+    assert "$" not in secs["executive_summary"]
+    assert "₹" in secs["executive_summary"]
+    proj = secs["financial_projections"]
+    assert "$" not in str(proj)
+    assert "₹" in proj["rows"][0][1]
+
+
 def test_initiative_details_carry_financials():
     details = build_initiative_details(_analysis()["skill_outputs"])
     d = details[0]
