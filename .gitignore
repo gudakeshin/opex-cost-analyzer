@@ -19,6 +19,11 @@ data/uploads/
 data/outputs/
 data/memory/
 
+# Data — app-generated runtime state (not source)
+data/engagements/
+data/calibration/
+data/audit.log
+
 # Claude Code session state
 .claude/
 
