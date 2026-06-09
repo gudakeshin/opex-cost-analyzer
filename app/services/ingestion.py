@@ -1495,7 +1495,7 @@ def parse_document(file_path: Path, ocr_lang: str = "eng") -> str:
     Falls back to text extraction (no OCR) when pytesseract is not installed.
     """
     suffix = file_path.suffix.lower()
-    if suffix == ".txt":
+    if suffix in (".txt", ".md"):
         return file_path.read_text(encoding="utf-8", errors="ignore")
     if suffix == ".docx":
         doc = Document(file_path)

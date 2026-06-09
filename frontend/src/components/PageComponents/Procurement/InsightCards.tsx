@@ -32,6 +32,7 @@ interface InsightCardsProps {
   agentRunId?: string;
   agentLoading?: boolean;
   agentDegraded?: boolean;
+  agentFallbackReasons?: Record<string, unknown>;
   pipelineLabel?: string;
   onOpenCostRoom?: () => void | Promise<void>;
 }
@@ -47,6 +48,7 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
   agentRunId,
   agentLoading,
   agentDegraded,
+  agentFallbackReasons,
   pipelineLabel,
   onOpenCostRoom,
 }) => {
@@ -391,6 +393,7 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
         runId={agentRunId}
         loading={agentLoading}
         degradedMode={agentDegraded}
+        fallbackReasons={agentFallbackReasons}
         pipelineLabel={pipelineLabel}
       />
 

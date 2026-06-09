@@ -10,8 +10,9 @@ making the user re-pick every time.
 Detection combines fast heuristics with the LLM document-contextualizer:
 - company: context-doc text + LLM, then legal_entity_id, then spend filename prefix;
 - revenue: context-doc text + LLM (₹ Cr);
-- industry: spend-pattern heuristic, overridden by the LLM-inferred sector pack
-  when context docs are present. The LLM call is cached on the engagement
+- industry: spend-pattern heuristic + LLM inference, reconciled with company-name
+  signals (e.g. "Bank Ltd" → bfsi_banks even when docs mention IT vendors).
+  The LLM call is cached on the engagement
   manifest keyed by a hash of the concatenated context-doc text, so incremental
   uploads don't re-incur a Gemini call when the narrative corpus is unchanged.
 """
@@ -29,6 +30,7 @@ from app.services.engagement_sanity import (
     extract_company_from_context_text,
     extract_company_from_filename,
     extract_revenue_cr_from_context_text,
+    infer_industry_from_company_name,
     is_low_confidence_company_guess,
     pick_best_company_guess,
 )
@@ -71,6 +73,27 @@ def industry_label(pack_id: str) -> str:
     if not pack_id:
         return ""
     return SECTOR_PACK_LABELS.get(pack_id, pack_id.replace("_", " ").title())
+
+
+def reconcile_detection_view(manifest: Dict[str, Any]) -> Dict[str, Any]:
+    """Correct obvious sector mis-detections for API responses (non-persisting)."""
+    company = str(
+        manifest.get("detected_company_name") or manifest.get("company_name") or ""
+    ).strip()
+    name_industry = infer_industry_from_company_name(company)
+    if not name_industry:
+        return manifest
+    current = str(manifest.get("detected_industry") or "").strip()
+    if current == name_industry:
+        return manifest
+    out = dict(manifest)
+    out["detected_industry"] = name_industry
+    out["detected_industry_label"] = industry_label(name_industry)
+    signals = dict(out.get("detection_signals") or {})
+    signals["industry_reconciled_from"] = current or signals.get("industry_llm") or ""
+    signals["industry_source"] = "company_name"
+    out["detection_signals"] = signals
+    return out
 
 
 def _pick_revenue_cr(
@@ -230,8 +253,18 @@ def detect_engagement_profile(engagement_id: str) -> Dict[str, Any]:
         except Exception as exc:  # pragma: no cover - defensive
             logger.warning("infer_industry_from_spend failed for %s: %s", engagement_id, exc)
 
-    # Combine: prefer the LLM-inferred sector pack, fall back to spend heuristic.
-    if industry_llm:
+    # Combine sector signals — company name and spend patterns beat LLM when they
+    # conflict (banks often mention Finacle/TCS/cloud, which misleads doc LLM).
+    name_industry = infer_industry_from_company_name(detected_company)
+    if name_industry:
+        detected_industry = name_industry
+        industry_source = "company_name"
+        industry_docs = context_doc_names or spend_doc_names
+    elif industry_spend and industry_llm and industry_spend != industry_llm:
+        detected_industry = industry_spend
+        industry_source = "spend"
+        industry_docs = spend_doc_names
+    elif industry_llm:
         detected_industry = industry_llm
         industry_source = "llm"
         industry_docs = context_doc_names

@@ -4,7 +4,8 @@ from __future__ import annotations
 import json
 from typing import Any, Callable, Dict, List, Tuple
 
-from app.config import ANTHROPIC_ENABLED, GEMINI_ENABLED, LLM_PROVIDER, logger
+from app.config import ANTHROPIC_ENABLED, GEMINI_ENABLED, logger
+from app.services.llm_selection import get_resolved_llm_provider
 from app.opar.models import AdvisorySections, ObserveContext
 
 _LLM_TOKEN_LIMIT = 80_000
@@ -63,20 +64,29 @@ def needs_llm_advisory(
 
 def resolve_analysis_synthesizer() -> AnalysisSynthesizer | None:
     """Pick advisory synthesizer from LLM_PROVIDER with cross-provider fallback."""
-    prefer_gemini = LLM_PROVIDER == "gemini"
-    if prefer_gemini and GEMINI_ENABLED:
-        from app.opar.gemini_client import synthesize_analysis_gemini
+    ordered = _iter_analysis_synthesizers()
+    return ordered[0] if ordered else None
 
-        return synthesize_analysis_gemini
-    if ANTHROPIC_ENABLED:
-        from app.opar.claude_client import synthesize_analysis_claude
 
-        return synthesize_analysis_claude
-    if GEMINI_ENABLED:
-        from app.opar.gemini_client import synthesize_analysis_gemini
+def _iter_analysis_synthesizers() -> list[AnalysisSynthesizer]:
+    """Ordered advisory synthesizers: preferred provider first, then fallback."""
+    from app.opar.claude_client import synthesize_analysis_claude
+    from app.opar.gemini_client import is_gemini_quota_exhausted, synthesize_analysis_gemini
 
-        return synthesize_analysis_gemini
-    return None
+    prefer_gemini = get_resolved_llm_provider() == "gemini"
+    gemini_available = GEMINI_ENABLED and not is_gemini_quota_exhausted()
+    ordered: list[AnalysisSynthesizer] = []
+    if prefer_gemini:
+        if gemini_available:
+            ordered.append(synthesize_analysis_gemini)
+        if ANTHROPIC_ENABLED:
+            ordered.append(synthesize_analysis_claude)
+    else:
+        if ANTHROPIC_ENABLED:
+            ordered.append(synthesize_analysis_claude)
+        if gemini_available:
+            ordered.append(synthesize_analysis_gemini)
+    return ordered
 
 
 def build_transaction_examples_for_llm(validated: Dict[str, Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
@@ -156,13 +166,14 @@ def generate_llm_advisory_sections(
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
     category_focused: bool | None = None,
-) -> Tuple[AdvisorySections | None, str | None]:
+    thinking_callback: Callable[[str], None] | None = None,
+) -> Tuple[AdvisorySections | None, str | None, str | None]:
     if not needs_llm_advisory(ctx, validated, category_focused=bool(category_focused)):
-        return None, None
+        return None, None, None
 
-    synthesize = resolve_analysis_synthesizer()
-    if synthesize is None:
-        return None, None
+    synthesizers = _iter_analysis_synthesizers()
+    if not synthesizers:
+        return None, None, "provider_unavailable"
 
     docs = []
     doc_summary = str(validated.get("document-contextualizer", {}).get("context_summary", "")).strip()
@@ -181,11 +192,20 @@ def generate_llm_advisory_sections(
     except Exception:
         retrieved_context = None
 
+    from app.opar.claude_client import _slim_skill_outputs, _truncate_doc_chunks
+
+    slim_skill_outputs = _slim_skill_outputs(validated)
+    doc_chunks = retrieved_context if retrieved_context else _truncate_doc_chunks(docs, max_chunks=2)
     estimated_tokens = _estimate_tokens({
         "user_message": ctx.user_message,
-        "manifest": manifest,
-        "skill_outputs": validated,
-        "docs_text": retrieved_context or docs,
+        "session_context": {
+            "company_name": manifest.get("company_name"),
+            "industry": manifest.get("industry"),
+            "annual_revenue": manifest.get("annual_revenue"),
+            "currency": manifest.get("currency"),
+        },
+        "skill_outputs": slim_skill_outputs,
+        "document_chunks": doc_chunks,
         "transaction_examples": tx_examples,
     })
     logger.info("llm_token_budget estimated_tokens=%d limit=%d", estimated_tokens, _LLM_TOKEN_LIMIT)
@@ -195,7 +215,7 @@ def generate_llm_advisory_sections(
             estimated_tokens,
             _LLM_TOKEN_LIMIT,
         )
-        return None, None
+        return None, None, "token_budget_exceeded"
 
     if category_focused is None:
         category_focused = bool(
@@ -204,34 +224,55 @@ def generate_llm_advisory_sections(
 
     best_effort: AdvisorySections | None = None
     captured_thinking: str | None = None
-    mode_order = (True, False) if category_focused else (False, True)
-    for strict_mode in mode_order:
-        try:
-            raw, thinking_text = synthesize(
-                ctx.user_message,
-                manifest,
-                ctx.model_manifest,
-                validated,
-                docs,
-                transaction_examples=tx_examples,
-                strict_mode=strict_mode,
-                thinking_enabled=thinking_enabled,
-                thinking_budget_tokens=thinking_budget_tokens,
-                deep_research_summary=ctx.deep_research_summary,
-                retrieved_context=retrieved_context,
-            )
-        except Exception:
-            raw, thinking_text = None, None
-        if thinking_text and not captured_thinking:
-            captured_thinking = thinking_text
-        advisory = normalize_advisory_sections(raw or {})
-        if not advisory:
-            continue
-        if advisory_quality_ok(advisory, category_focused=category_focused):
-            return advisory, captured_thinking
-        if (
-            len((advisory.executive_takeaway or "").strip()) >= 60
-            and len(advisory.business_levers) >= (2 if category_focused else 1)
-        ):
-            best_effort = advisory
-    return best_effort, captured_thinking
+    # Extended-thinking calls are slow — one quality pass avoids doubling wall-clock time.
+    if thinking_enabled:
+        mode_order = (True,) if category_focused else (False,)
+    else:
+        mode_order = (True, False) if category_focused else (False, True)
+    synth_kwargs = {
+        "manifest": manifest,
+        "model_manifest": ctx.model_manifest,
+        "skill_outputs": slim_skill_outputs,
+        "docs_text": docs,
+        "transaction_examples": tx_examples,
+        "thinking_enabled": thinking_enabled,
+        "thinking_budget_tokens": thinking_budget_tokens,
+        "deep_research_summary": ctx.deep_research_summary,
+        "retrieved_context": retrieved_context,
+    }
+    had_any_raw = False
+    for synthesize in synthesizers:
+        for strict_mode in mode_order:
+            try:
+                raw, thinking_text = synthesize(
+                    ctx.user_message,
+                    **synth_kwargs,
+                    strict_mode=strict_mode,
+                )
+            except Exception as exc:
+                logger.warning("llm_advisory_synthesizer_error error=%s", exc)
+                raw, thinking_text = None, None
+            if raw is not None:
+                had_any_raw = True
+            if thinking_text:
+                if not captured_thinking:
+                    captured_thinking = thinking_text
+                if thinking_callback:
+                    thinking_callback(thinking_text)
+            advisory = normalize_advisory_sections(raw or {})
+            if not advisory:
+                continue
+            if advisory_quality_ok(advisory, category_focused=category_focused):
+                return advisory, captured_thinking, None
+            if (
+                len((advisory.executive_takeaway or "").strip()) >= 60
+                and len(advisory.business_levers) >= (2 if category_focused else 1)
+            ):
+                best_effort = advisory
+        if best_effort is not None:
+            break
+    if best_effort is not None:
+        return best_effort, captured_thinking, None
+    if not had_any_raw and best_effort is None:
+        return None, captured_thinking, "provider_failed"
+    return None, captured_thinking, "synthesis_quality_low"

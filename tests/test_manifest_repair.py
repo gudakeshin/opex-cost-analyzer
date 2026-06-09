@@ -11,10 +11,13 @@ from app.main import app
 from app.services.engagements_store import (
     ManifestReadError,
     _MANIFEST_BACKUP_NAME,
+    _dedupe_manifest_documents,
+    add_document_record,
     engagement_manifest_path,
     list_engagements,
     read_engagement_manifest,
     repair_engagement_manifest,
+    write_document_meta,
     write_engagement_manifest,
 )
 
@@ -135,6 +138,96 @@ def test_repair_engagement_manifest_rebuilds_from_disk(tmp_path, monkeypatch) ->
     assert manifest["engagement_id"] == eid
     assert len(manifest["documents"]) == 1
     assert manifest["documents"][0]["document_id"] == doc_id
+
+
+def test_add_document_record_does_not_duplicate_when_raw_exists(tmp_path, monkeypatch) -> None:
+    """Regression: raw file on disk before manifest row must not create upload.* duplicate."""
+    monkeypatch.setattr("app.services.engagements_store.ENGAGEMENTS_DIR", tmp_path)
+    eid = str(uuid.uuid4())
+    doc_id = str(uuid.uuid4())
+    eng_dir = tmp_path / eid
+    (eng_dir / "documents").mkdir(parents=True)
+    write_engagement_manifest(
+        eid,
+        {
+            "engagement_id": eid,
+            "company_name": "Dup Test Co",
+            "industry": "",
+            "annual_revenue": 0.0,
+            "currency": "INR",
+            "created_at": "2026-01-01T00:00:00+00:00",
+            "updated_at": "2026-01-01T00:00:00+00:00",
+            "session_ids": [],
+            "documents": [],
+        },
+    )
+
+    doc_dir = eng_dir / "documents" / doc_id
+    doc_dir.mkdir(parents=True)
+    raw_path = doc_dir / "raw.csv"
+    raw_path.write_text("a,b\n1,2\n", encoding="utf-8")
+
+    add_document_record(
+        eid,
+        document_id=doc_id,
+        filename="T1_01_spend_ledger_fy25.csv",
+        content_type="text/csv",
+        size_bytes=raw_path.stat().st_size,
+        raw_path=str(raw_path),
+    )
+
+    manifest = read_engagement_manifest(eid)
+    assert len(manifest["documents"]) == 1
+    assert manifest["documents"][0]["filename"] == "T1_01_spend_ledger_fy25.csv"
+
+
+def test_dedupe_manifest_documents_prefers_real_filename(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr("app.services.engagements_store.ENGAGEMENTS_DIR", tmp_path)
+    eid = str(uuid.uuid4())
+    doc_id = str(uuid.uuid4())
+    manifest = {
+        "engagement_id": eid,
+        "documents": [
+            {
+                "document_id": doc_id,
+                "filename": "upload.csv",
+                "status": "ready",
+                "line_count": 10,
+                "processed_at": "2026-01-01T00:00:00+00:00",
+            },
+            {
+                "document_id": doc_id,
+                "filename": "T1_01_spend_ledger_fy25.csv",
+                "status": "pending",
+            },
+        ],
+    }
+    assert _dedupe_manifest_documents(manifest) is True
+    assert len(manifest["documents"]) == 1
+    row = manifest["documents"][0]
+    assert row["filename"] == "T1_01_spend_ledger_fy25.csv"
+    assert row["status"] == "ready"
+    assert row["line_count"] == 10
+
+
+def test_orphan_recovery_uses_meta_filename(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr("app.services.engagements_store.ENGAGEMENTS_DIR", tmp_path)
+    eid = str(uuid.uuid4())
+    doc_id = str(uuid.uuid4())
+    eng_dir = tmp_path / eid
+    doc_dir = eng_dir / "documents" / doc_id
+    doc_dir.mkdir(parents=True)
+    (doc_dir / "raw.csv").write_text("a,b\n1,2\n", encoding="utf-8")
+    write_document_meta(
+        eid,
+        doc_id,
+        filename="T2_06_vendor_master.csv",
+        content_type="text/csv",
+    )
+    (eng_dir / "manifest.json").write_text("{broken", encoding="utf-8")
+
+    manifest = repair_engagement_manifest(eid)
+    assert manifest["documents"][0]["filename"] == "T2_06_vendor_master.csv"
 
 
 def test_repair_manifest_endpoint(client, tmp_path, monkeypatch) -> None:

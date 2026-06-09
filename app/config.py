@@ -77,7 +77,22 @@ def _load_env_file() -> None:
 
 _load_env_file()
 
-MAX_UPLOAD_MB = int(os.getenv("MAX_UPLOAD_MB", "50"))
+
+def _clean_env(key: str, default: str = "") -> str:
+    """Read env var and strip trailing inline comments (defense in depth after _load_env_file)."""
+    raw = os.getenv(key, default) or default
+    comment_match = re.search(r"\s+#", raw)
+    if comment_match:
+        raw = raw[: comment_match.start()]
+    return raw.strip()
+
+
+MAX_UPLOAD_MB = int(_clean_env("MAX_UPLOAD_MB", "50") or "50")
+# Full OPAR loop (agent tool-use + reflect synthesis). Must exceed agent + LLM synthesis budgets.
+OPAR_TIMEOUT_SECONDS = int(_clean_env("OPAR_TIMEOUT_SECONDS", "240") or "240")
+# Wall-clock budgets for reflect/chat LLM synthesis (thread-pool futures).
+LLM_SYNTHESIS_TIMEOUT_SECONDS = int(_clean_env("LLM_SYNTHESIS_TIMEOUT_SECONDS", "90") or "90")
+LLM_THINKING_TIMEOUT_SECONDS = int(_clean_env("LLM_THINKING_TIMEOUT_SECONDS", "180") or "180")
 
 # Optional external connectors; app works in local mode without these.
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
@@ -86,11 +101,33 @@ ANTHROPIC_ENABLED = bool(ANTHROPIC_API_KEY)
 # Gemini provider — set LLM_PROVIDER=gemini to route all LLM calls through Gemini.
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_ENABLED = bool(GEMINI_API_KEY)
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-GEMINI_THINKING_MODEL = os.getenv("GEMINI_THINKING_MODEL", "gemini-2.5-pro")
-GEMINI_TOOL_MODEL = os.getenv("GEMINI_TOOL_MODEL", "gemini-2.5-flash")
+GEMINI_MODEL = _clean_env("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_THINKING_MODEL = _clean_env("GEMINI_THINKING_MODEL", "gemini-2.5-pro")
+GEMINI_TOOL_MODEL = _clean_env("GEMINI_TOOL_MODEL", "gemini-2.5-flash")
 # "gemini" (default when key present) | "anthropic"
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini" if bool(os.getenv("GEMINI_API_KEY", "")) else "anthropic")
+_default_llm_provider = "gemini" if GEMINI_ENABLED else "anthropic"
+_llm_provider_raw = _clean_env("LLM_PROVIDER", _default_llm_provider).lower()
+LLM_PROVIDER = _llm_provider_raw if _llm_provider_raw in ("anthropic", "gemini") else "anthropic"
+
+
+def llm_synthesis_timeout_seconds(payload_bytes: int | None = None) -> int:
+    """Wall-clock budget for standard (non-extended-thinking) synthesis calls."""
+    base = max(30, LLM_SYNTHESIS_TIMEOUT_SECONDS)
+    if payload_bytes:
+        if payload_bytes > 100_000:
+            base = max(base, 120)
+        elif payload_bytes > 50_000:
+            base = max(base, 105)
+        elif payload_bytes > 35_000:
+            base = max(base, 90)
+    # Leave headroom for observe/plan/act before reflect synthesis runs.
+    return min(base, max(OPAR_TIMEOUT_SECONDS - 45, 60))
+
+
+def llm_thinking_timeout_seconds() -> int:
+    """Wall-clock budget for extended-thinking synthesis calls."""
+    cap = max(90, LLM_THINKING_TIMEOUT_SECONDS)
+    return min(cap, max(OPAR_TIMEOUT_SECONDS - 30, 90))
 
 # LLM-first intent classification — the LLM reads each chat message and routes
 # over the full intent taxonomy; the keyword classifier is the deterministic
@@ -116,6 +153,7 @@ AGENT_MAX_TOOL_ITERATIONS = int(os.getenv("AGENT_MAX_TOOL_ITERATIONS", "12"))
 AGENT_TOOL_TIMEOUT_SECONDS = float(os.getenv("AGENT_TOOL_TIMEOUT_SECONDS", "45"))
 AGENT_THINKING_BUDGET = int(os.getenv("AGENT_THINKING_BUDGET", "8192"))
 AGENT_LLM_NUMERIC_ADJUSTMENT_PCT = float(os.getenv("AGENT_LLM_NUMERIC_ADJUSTMENT_PCT", "0.25"))
+ANTHROPIC_MODEL = _clean_env("ANTHROPIC_MODEL", "claude-sonnet-4-6")
 ANTHROPIC_AGENT_MODEL = os.getenv("ANTHROPIC_AGENT_MODEL", "claude-sonnet-4-6")
 ANTHROPIC_TOOL_MODEL = os.getenv("ANTHROPIC_TOOL_MODEL", "claude-sonnet-4-6")
 SKILL_CATALOG_COLLECTION = os.getenv("SKILL_CATALOG_COLLECTION", "skill_catalog")

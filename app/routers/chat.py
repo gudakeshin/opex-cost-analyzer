@@ -22,6 +22,7 @@ from app.routers._shared import (
     session_lock,
     merge_context_into_manifest,
     progress_append,
+    progress_append_thinking,
     progress_complete,
     progress_get,
     progress_init,
@@ -37,12 +38,20 @@ from app.opar.hitl.probe_answers import (
 )
 from app.opar.probe_intelligence import synthesize_probe_answer_acknowledgment
 from app.schemas import ChatRequest, ClarificationResumeRequest, ProbeAnswerRequest, V1ChatRequest
+from app.services.llm_selection import llm_selection_context
 from app.services.compliance import append_audit_event
 from app.services.ingestion import infer_tabular_schema, parse_document
 
 router = APIRouter()
 
 _OPAR_TIMEOUT_S = int(os.getenv("OPAR_TIMEOUT_SECONDS", "120"))
+
+
+def _progress_callbacks(run_id: str) -> tuple:
+    return (
+        lambda phase, msg: progress_append(run_id, phase, msg),
+        lambda chunk: progress_append_thinking(run_id, chunk),
+    )
 
 
 def _opar_response(result: Any, run_id: str, session_id: str | None = None) -> Dict[str, Any]:
@@ -203,13 +212,15 @@ async def chat_v1_with_files(
             write_manifest(session_id, manifest)
 
     try:
+        progress_cb, thinking_cb = _progress_callbacks(run_id)
         result = await asyncio.wait_for(
             run_opar_loop(
                 message,
                 session_id,
                 user_id,
                 None,
-                lambda phase, msg: progress_append(run_id, phase, msg),
+                progress_cb,
+                thinking_cb,
             ),
             timeout=float(_OPAR_TIMEOUT_S),
         )
@@ -257,19 +268,22 @@ async def chat_v1_opar(payload: V1ChatRequest) -> Dict[str, Any]:
         company = manifest.get("company_name") or "default"
         user_id = company.lower().replace(" ", "_").replace(".", "_")
     thinking_enabled = (payload.thinking_mode == "extended")
+    progress_cb, thinking_cb = _progress_callbacks(run_id)
     try:
-        result = await asyncio.wait_for(
-            run_opar_loop(
-                payload.message,
-                payload.session_id,
-                user_id,
-                None,
-                lambda phase, msg: progress_append(run_id, phase, msg),
-                thinking_enabled=thinking_enabled,
-                chat_history=_serialize_chat_history(payload.chat_history),
-            ),
-            timeout=float(_OPAR_TIMEOUT_S),
-        )
+        with llm_selection_context(payload.llm_model):
+            result = await asyncio.wait_for(
+                run_opar_loop(
+                    payload.message,
+                    payload.session_id,
+                    user_id,
+                    None,
+                    progress_cb,
+                    thinking_cb,
+                    thinking_enabled=thinking_enabled,
+                    chat_history=_serialize_chat_history(payload.chat_history),
+                ),
+                timeout=float(_OPAR_TIMEOUT_S),
+            )
         progress_complete(run_id)
     except asyncio.TimeoutError:
         progress_complete(run_id, failed=True, error="timeout")
@@ -321,16 +335,20 @@ async def chat_v1_resume(payload: ClarificationResumeRequest) -> Dict[str, Any]:
         selected_option=(payload.selected_option or "").strip() or None,
         free_text=(payload.free_text or "").strip() or None,
     )
+    progress_cb, thinking_cb = _progress_callbacks(run_id)
     try:
-        result = await asyncio.wait_for(
-            resume_opar_loop(
-                payload.checkpoint_id,
-                answer,
-                thinking_enabled=thinking_enabled,
-                chat_history=_serialize_chat_history(payload.chat_history),
-            ),
-            timeout=float(_OPAR_TIMEOUT_S),
-        )
+        with llm_selection_context(payload.llm_model):
+            result = await asyncio.wait_for(
+                resume_opar_loop(
+                    payload.checkpoint_id,
+                    answer,
+                    progress_cb,
+                    thinking_cb,
+                    thinking_enabled=thinking_enabled,
+                    chat_history=_serialize_chat_history(payload.chat_history),
+                ),
+                timeout=float(_OPAR_TIMEOUT_S),
+            )
         progress_complete(run_id)
     except CheckpointNotFoundError:
         raise HTTPException(

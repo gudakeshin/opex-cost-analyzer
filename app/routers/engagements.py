@@ -89,7 +89,10 @@ def get_engagements() -> List[Dict[str, Any]]:
 @router.get("/api/v1/engagements/{engagement_id}")
 def get_engagement(engagement_id: str) -> Dict[str, Any]:
     validate_engagement_id(engagement_id)
-    return ensure_engagement_exists(engagement_id)
+    from app.services.engagement_detection import reconcile_detection_view
+
+    manifest = ensure_engagement_exists(engagement_id)
+    return reconcile_detection_view(manifest)
 
 
 @router.patch("/api/v1/engagements/{engagement_id}")
@@ -99,7 +102,9 @@ def patch_engagement(engagement_id: str, payload: EngagementPatchRequest) -> Dic
     if payload.company_name is not None:
         manifest["company_name"] = payload.company_name
     if payload.industry is not None:
-        manifest["industry"] = payload.industry
+        from app.services.sector_packs import normalize_industry_selection
+
+        manifest["industry"] = normalize_industry_selection(payload.industry) or payload.industry
     if payload.annual_revenue is not None:
         manifest["annual_revenue"] = max(float(payload.annual_revenue), 0.0)
     if payload.currency is not None:
@@ -201,13 +206,11 @@ async def upload_document(
 
     document_id = str(uuid.uuid4())
     ddir = document_dir(engagement_id, document_id)
-    ddir.mkdir(parents=True, exist_ok=True)
     raw_path = ddir / f"raw{suffix}"
 
-    # Write file and update manifest inside the same lock so they're atomic.
-    # Also re-read the manifest inside the lock to get the current currency (P0-2, P0-3).
+    # Register manifest + sidecar meta before writing raw bytes so orphan-folder
+    # repair cannot synthesize a duplicate upload.* row for the same document_id.
     async with engagement_lock(engagement_id):
-        raw_path.write_bytes(content)
         record = add_document_record(
             engagement_id,
             document_id=document_id,
@@ -217,6 +220,7 @@ async def upload_document(
             raw_path=str(raw_path),
             _already_locked=True,
         )
+        raw_path.write_bytes(content)
 
     append_audit_event(
         f"document_uploaded engagement_id={engagement_id} document_id={document_id} file={safe_filename}"

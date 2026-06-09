@@ -162,9 +162,9 @@ def test_generate_llm_advisory_uses_configured_synthesizer() -> None:
     }
     mock_synth = MagicMock(return_value=(raw_advisory, "thinking trace"))
     with patch("app.opar.reflect_advisory.GEMINI_ENABLED", True), patch(
-        "app.opar.reflect_advisory.resolve_analysis_synthesizer", return_value=mock_synth
+        "app.opar.reflect_advisory._iter_analysis_synthesizers", return_value=[mock_synth]
     ):
-        advisory, thinking = generate_llm_advisory_sections(ctx, {"currency": "INR"}, validated)
+        advisory, thinking, _skip = generate_llm_advisory_sections(ctx, {"currency": "INR"}, validated)
     assert advisory is not None
     assert thinking == "thinking trace"
     mock_synth.assert_called()
@@ -235,7 +235,7 @@ def test_reflect_falls_through_to_chat_synthesis_when_advisory_fails_for_categor
 
     with patch(
         "app.opar.reflect.needs_llm_advisory", return_value=True
-    ), patch("app.opar.reflect.generate_llm_advisory_sections", return_value=(None, None)), patch(
+    ), patch("app.opar.reflect.generate_llm_advisory_sections", return_value=(None, None, "token_budget_exceeded")), patch(
         "app.opar.reflect.synthesize_chat_response", return_value=focused_answer
     ) as mock_chat_synth:
         result = reflect(act_result, plan, ctx)

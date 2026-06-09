@@ -160,6 +160,7 @@ class V1ChatRequest(BaseModel):
     audience: str | None = None
     headcount: float | None = None
     thinking_mode: str | None = None  # "standard" | "extended"
+    llm_model: str | None = None  # e.g. claude-sonnet-4-6, gemini-2.5-flash
     chat_history: List[ChatHistoryTurn] | None = None
 
 
@@ -187,6 +188,7 @@ class ClarificationResumeRequest(BaseModel):
     free_text: str | None = None
     run_id: str | None = None
     thinking_mode: str | None = None  # "standard" | "extended"
+    llm_model: str | None = None
     company_name: str | None = None
     industry: str | None = None
     annual_revenue: float | None = None

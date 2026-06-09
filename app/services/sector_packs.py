@@ -58,6 +58,23 @@ def list_available_packs() -> List[str]:
     )
 
 
+def resolve_sector_pack_id(industry: str) -> str:
+    """Map a user-selected or detected industry label to a sector pack id."""
+    from app.skills.engine._loaders import _resolve_pack_id
+
+    return _resolve_pack_id((industry or "").strip())
+
+
+def normalize_industry_selection(industry: str | None) -> str | None:
+    """Normalize a user industry choice to a sector pack id for storage and analysis."""
+    if industry is None:
+        return None
+    stripped = industry.strip()
+    if not stripped:
+        return None
+    return resolve_sector_pack_id(stripped) or stripped
+
+
 @lru_cache(maxsize=32)
 def _load_pack_cached(pack_id: str) -> Dict[str, Any]:
     pack_dir = _SECTOR_PACKS_ROOT / pack_id

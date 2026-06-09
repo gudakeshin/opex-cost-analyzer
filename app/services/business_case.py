@@ -175,7 +175,7 @@ def _llm_advisory_sections(analysis: Dict[str, Any]) -> Any | None:
             engagement_id=str(analysis.get("engagement_id", "") or ""),
             deep_research_summary=analysis.get("deep_research_summary"),
         )
-        advisory, _thinking = generate_llm_advisory_sections(
+        advisory, _thinking, _skip = generate_llm_advisory_sections(
             ctx, manifest, outputs, category_focused=True
         )
         return advisory

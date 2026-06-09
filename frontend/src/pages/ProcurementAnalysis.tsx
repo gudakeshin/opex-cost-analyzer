@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MainLayout } from '../components/Layout/MainLayout';
-import { Loader } from '../components/Common/Loader';
 import { Alert } from '../components/Common/Alert';
 import { PageHeader } from '../components/Common/PageHeader';
 import { Select } from '../components/Common/Select';
 import { RecommendedBadge } from '../components/Common/RecommendedBadge';
 import { StructuredChatMessage } from '../components/PageComponents/Procurement/StructuredChatMessage';
+import { ThinkingBlock } from '../components/PageComponents/Procurement/ThinkingBlock';
 import { InsightCards } from '../components/PageComponents/Procurement/InsightCards';
 import {
   BusinessClarificationModal,
@@ -68,7 +68,10 @@ import type {
   AnalysisInsightSnapshot,
   BusinessClarification,
   ProbeAnswerResponse,
+  LlmModelsResponse,
 } from '../types';
+
+const LLM_MODEL_STORAGE_KEY = 'opex_llm_model';
 
 const CONFLICT_DISMISS_PREFIX = 'opex_conflict_dismiss_';
 const INSIGHTS_PANEL_WIDTH_KEY = 'opex_analysis_insights_width';
@@ -149,12 +152,15 @@ function progressStepsFromPoll(entry: ChatProgressResponse): ProgressStep[] {
 async function pollChatProgress(
   runId: string,
   onSteps: (steps: ProgressStep[]) => void,
+  onThinking: (thinking: string) => void,
   signal: AbortSignal,
 ): Promise<void> {
   while (!signal.aborted) {
     try {
       const entry = await apiGet<ChatProgressResponse>(`/api/v1/chat/progress/${runId}`);
       if (entry.steps?.length) onSteps(progressStepsFromPoll(entry));
+      const thinking = String(entry.thinking_text ?? '').trim();
+      if (thinking) onThinking(thinking);
       if (
         entry.status === 'completed' ||
         entry.status === 'failed' ||
@@ -225,9 +231,15 @@ export const ProcurementAnalysis: React.FC = () => {
   const [lastSteps, setLastSteps] = useState<V1ChatResponse['progress_steps']>();
   const [agentSteps, setAgentSteps] = useState<ProgressStep[] | undefined>();
   const [agentDegraded, setAgentDegraded] = useState(false);
+  const [agentFallbackReasons, setAgentFallbackReasons] = useState<
+    Record<string, unknown> | undefined
+  >();
   const [pipelineLabel, setPipelineLabel] = useState<string | undefined>();
   const [sectorUpdating, setSectorUpdating] = useState(false);
   const [thinkingMode, setThinkingMode] = useState(false);
+  const [liveThinking, setLiveThinking] = useState('');
+  const [llmModels, setLlmModels] = useState<LlmModelsResponse['models']>([]);
+  const [selectedLlmModel, setSelectedLlmModel] = useState('');
   const [conflictResolving, setConflictResolving] = useState(false);
   const [dismissedConflictKeys, setDismissedConflictKeys] = useState<Set<string>>(
     () => loadDismissedConflictKeys(sessionId),
@@ -245,6 +257,34 @@ export const ProcurementAnalysis: React.FC = () => {
   useEffect(() => {
     setDismissedConflictKeys(loadDismissedConflictKeys(sessionId));
   }, [sessionId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await apiGet<LlmModelsResponse>('/api/v1/llm/models');
+        if (cancelled) return;
+        setLlmModels(res.models ?? []);
+        const stored = localStorage.getItem(LLM_MODEL_STORAGE_KEY);
+        const validStored = res.models?.some((m) => m.id === stored) ? stored : null;
+        setSelectedLlmModel(validStored || res.default_model_id || res.models?.[0]?.id || '');
+      } catch {
+        if (!cancelled) setLlmModels([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleLlmModelChange = (modelId: string) => {
+    setSelectedLlmModel(modelId);
+    if (modelId) {
+      localStorage.setItem(LLM_MODEL_STORAGE_KEY, modelId);
+    } else {
+      localStorage.removeItem(LLM_MODEL_STORAGE_KEY);
+    }
+  };
 
   useEffect(() => {
     if (!engagementId) { setEngagementDocCount(null); return; }
@@ -392,9 +432,10 @@ export const ProcurementAnalysis: React.FC = () => {
 
   const startPolling = (runId: string) => {
     stopPolling();
+    setLiveThinking('');
     const ac = new AbortController();
     pollAbortRef.current = ac;
-    void pollChatProgress(runId, setAgentSteps, ac.signal);
+    void pollChatProgress(runId, setAgentSteps, setLiveThinking, ac.signal);
   };
 
   const resetSmeProbeState = () => {
@@ -471,6 +512,7 @@ export const ProcurementAnalysis: React.FC = () => {
         session_id: sid,
         run_id: runId,
         thinking_mode: thinkingMode ? 'extended' : 'standard',
+        llm_model: selectedLlmModel || undefined,
         chat_history: chatHistoryPayload(messages),
         ...contextPayload(engagement, manifest),
       });
@@ -485,6 +527,7 @@ export const ProcurementAnalysis: React.FC = () => {
       setLastSteps(res.progress_steps);
       setAgentSteps(res.progress_steps);
       setAgentDegraded(!!res.degraded_mode);
+      setAgentFallbackReasons(res.fallback_reasons);
       let session: SessionResponse | null = null;
       let latestManifest = manifest;
       try {
@@ -525,6 +568,7 @@ export const ProcurementAnalysis: React.FC = () => {
           progress_steps: res.progress_steps,
           degraded_mode: res.degraded_mode,
           used_llm_synthesis: res.used_llm_synthesis,
+          fallback_reasons: res.fallback_reasons,
           artefacts: res.artefacts,
           insight_snapshot: insightSnap,
           show_peer_savings: showPeer,
@@ -558,6 +602,31 @@ export const ProcurementAnalysis: React.FC = () => {
         patch,
       );
       setManifest(updated);
+      await refreshEngagement();
+      setDismissedConflictKeys(new Set());
+      saveDismissedConflictKeys(sid, new Set());
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setConflictResolving(false);
+    }
+  };
+
+  const handleApplySector = async (industry: string) => {
+    setConflictResolving(true);
+    setError(null);
+    try {
+      const sid = await ensureSession();
+      const patch: SessionManifestPatch = { industry };
+      const updated = await apiPatch<SessionManifest>(
+        `/api/v1/sessions/${sid}/manifest`,
+        patch,
+      );
+      setManifest(updated);
+      const eid = engagementId ?? engagement.engagement_id;
+      if (eid && industry) {
+        await apiPatch(`/api/v1/engagements/${eid}`, { industry });
+      }
       await refreshEngagement();
       setDismissedConflictKeys(new Set());
       saveDismissedConflictKeys(sid, new Set());
@@ -843,6 +912,7 @@ export const ProcurementAnalysis: React.FC = () => {
         free_text: freeText || undefined,
         run_id: runId,
         thinking_mode: thinkingMode ? 'extended' : 'standard',
+        llm_model: selectedLlmModel || undefined,
         chat_history: chatHistoryPayload(messages),
         ...contextPayload(engagement, manifest),
       });
@@ -857,6 +927,7 @@ export const ProcurementAnalysis: React.FC = () => {
       setLastSteps(res.progress_steps);
       setAgentSteps(res.progress_steps);
       setAgentDegraded(!!res.degraded_mode);
+      setAgentFallbackReasons(res.fallback_reasons);
       const sid = await ensureSession();
       let session: SessionResponse | null = null;
       let latestManifest = manifest;
@@ -898,6 +969,7 @@ export const ProcurementAnalysis: React.FC = () => {
           progress_steps: res.progress_steps,
           degraded_mode: res.degraded_mode,
           used_llm_synthesis: res.used_llm_synthesis,
+          fallback_reasons: res.fallback_reasons,
           artefacts: res.artefacts,
           insight_snapshot: insightSnap,
           show_peer_savings: showPeer,
@@ -931,7 +1003,7 @@ export const ProcurementAnalysis: React.FC = () => {
         : `run-${Date.now()}`;
     setLastRunId(runId);
     const controller = new AbortController();
-    const pollPromise = pollChatProgress(runId, setAgentSteps, controller.signal);
+    const pollPromise = pollChatProgress(runId, setAgentSteps, setLiveThinking, controller.signal);
     try {
       const sid = await ensureSession();
       const analysisResult = await apiPost<SessionResponse>(`/api/v1/analyze/${sid}`, {
@@ -1031,6 +1103,7 @@ export const ProcurementAnalysis: React.FC = () => {
   };
 
   const handleSectorChange = async (industry: string) => {
+    if (!industry) return;
     setSectorUpdating(true);
     setError(null);
     try {
@@ -1041,6 +1114,10 @@ export const ProcurementAnalysis: React.FC = () => {
         patch,
       );
       setManifest(updated);
+      const eid = engagementId ?? engagement.engagement_id;
+      if (eid) {
+        await apiPatch(`/api/v1/engagements/${eid}`, { industry });
+      }
       await refreshEngagement();
     } catch (err) {
       setError(getApiErrorMessage(err));
@@ -1168,6 +1245,21 @@ export const ProcurementAnalysis: React.FC = () => {
             >
               Trust rail
             </button>
+            {llmModels.length > 0 && (
+              <div className="w-44 min-w-[10rem]">
+                <Select
+                  label=""
+                  value={selectedLlmModel}
+                  onChange={(e) => handleLlmModelChange(e.target.value)}
+                  disabled={loading}
+                  className="py-1.5 px-2.5 text-xs"
+                  options={llmModels.map((m) => ({
+                    value: m.id,
+                    label: m.label,
+                  }))}
+                />
+              </div>
+            )}
             <button
               type="button"
               onClick={() => setThinkingMode((v) => !v)}
@@ -1198,10 +1290,12 @@ export const ProcurementAnalysis: React.FC = () => {
 
         <EngagementConflictBanner
           manifest={manifest}
+          engagement={engagement}
           sessionId={sessionId}
           dismissedKeys={dismissedConflictKeys}
           onDismiss={handleDismissConflict}
           onUseDetectedCompany={handleUseDetectedCompany}
+          onApplySector={handleApplySector}
           onKeepEngagementCompany={handleKeepEngagementCompany}
           resolving={conflictResolving}
         />
@@ -1280,9 +1374,15 @@ export const ProcurementAnalysis: React.FC = () => {
                       />
                     ))}
                     {loading && (
-                      <div className="flex justify-start">
-                        <div className="px-4 py-3 rounded-2xl bg-white border border-brand-border shadow-sm">
-                          <Loader label="Thinking…" />
+                      <div className="flex justify-start gap-3 max-w-[85%]">
+                        <span
+                          className="w-8 h-8 rounded-full bg-black flex items-center justify-center shrink-0 text-[10px] font-bold text-white"
+                          aria-hidden
+                        >
+                          AI
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <ThinkingBlock thinking={liveThinking} live />
                         </div>
                       </div>
                     )}
@@ -1330,6 +1430,7 @@ export const ProcurementAnalysis: React.FC = () => {
                     agentRunId={lastRunId}
                     agentLoading={loading}
                     agentDegraded={agentDegraded}
+                    agentFallbackReasons={agentFallbackReasons}
                     pipelineLabel={pipelineLabel}
                     onOpenCostRoom={syncEngagementFromAnalysis}
                   />
@@ -1373,6 +1474,7 @@ export const ProcurementAnalysis: React.FC = () => {
                   agentRunId={lastRunId}
                   agentLoading={loading}
                   agentDegraded={agentDegraded}
+                  agentFallbackReasons={agentFallbackReasons}
                   pipelineLabel={pipelineLabel}
                   onOpenCostRoom={syncEngagementFromAnalysis}
                 />

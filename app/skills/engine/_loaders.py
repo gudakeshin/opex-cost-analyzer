@@ -123,6 +123,26 @@ _INDUSTRY_TO_PACK: Dict[str, str] = {
     "gcc_capability_centers": "gcc_capability_centers",
 }
 
+# Canonical sector-pack ids (Diagnostic / Analysis dropdown values) map to themselves.
+for _pack_id in (
+    "bfsi_banks",
+    "it_ites",
+    "fmcg_consumer",
+    "pharma_lifesciences",
+    "energy_utilities",
+    "insurance_general",
+    "retail_organized",
+    "telecom_infra",
+    "manufacturing_diversified",
+    "psu_cpse",
+    "conglomerate",
+    "financial_services_nonbank",
+    "gcc_capability_centers",
+    "healthcare_hospitals",
+    "hospitality_travel",
+):
+    _INDUSTRY_TO_PACK.setdefault(_pack_id, _pack_id)
+
 # ---------------------------------------------------------------------------
 # JSON loader
 # ---------------------------------------------------------------------------
@@ -240,7 +260,9 @@ def _resolve_pack_id(industry: str) -> str:
     lower = industry.lower().strip()
     if lower in _INDUSTRY_TO_PACK:
         return _INDUSTRY_TO_PACK[lower]
-    for key, pack in _INDUSTRY_TO_PACK.items():
+    # Prefer the longest matching signal so e.g. healthcare_hospitals is not
+    # captured by the shorter "healthcare" → pharma_lifesciences mapping.
+    for key, pack in sorted(_INDUSTRY_TO_PACK.items(), key=lambda kv: -len(kv[0])):
         if key in lower or lower in key:
             return pack
     return ""

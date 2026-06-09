@@ -114,6 +114,10 @@ def run_core_pipeline(
         lines = merge_persisted_line_adjustments(lines, prior_lines)
     conflict_user_actions = dict(existing_session.get("conflict_user_actions") or {}) if existing_session else {}
 
+    from app.services.engagement_sanity import is_placeholder_industry
+    from app.services.sector_packs import resolve_sector_pack_id
+
+    industry = resolve_sector_pack_id(industry) or industry
     resolved = {"industry": industry}
     manifest: Dict[str, Any] = {
         "session_id": session_id,
@@ -176,11 +180,13 @@ def run_core_pipeline(
             # Auto-detect industry (document signals → spend patterns) before any
             # benchmark-dependent skill runs and reads ctx.industry from manifest.
             ind = resolved["industry"]
-            if not ind:
-                ind = str(output.get("inferred_industry") or "")
-            if not ind and lines:
-                total_spend = float(outputs.get("spend-profiler", {}).get("total_spend", 0.0) or 0.0)
-                ind = engine.infer_industry_from_spend(lines, total_spend)
+            if not ind or is_placeholder_industry(ind):
+                inferred = str(output.get("inferred_industry") or "")
+                if not inferred and lines:
+                    total_spend = float(outputs.get("spend-profiler", {}).get("total_spend", 0.0) or 0.0)
+                    inferred = engine.infer_industry_from_spend(lines, total_spend) or ""
+                if inferred:
+                    ind = resolve_sector_pack_id(inferred) or inferred
             resolved["industry"] = ind
             manifest["industry"] = ind
             if any(t.strip() for t in docs_text):

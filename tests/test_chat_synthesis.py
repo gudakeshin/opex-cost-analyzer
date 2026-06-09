@@ -234,21 +234,21 @@ def test_synthesize_chat_response_fallback_when_llm_off(mock_llm) -> None:
 def test_resolve_chat_synthesizer_claude_default(monkeypatch) -> None:
     from app.opar.claude_client import synthesize_chat_response_claude
 
-    monkeypatch.setattr(cs, "LLM_PROVIDER", "anthropic")
+    monkeypatch.setattr(cs, "get_resolved_llm_provider", lambda: "anthropic")
     monkeypatch.setattr(cs, "ANTHROPIC_ENABLED", True)
     monkeypatch.setattr(cs, "GEMINI_ENABLED", False)
     assert resolve_chat_synthesizer() is synthesize_chat_response_claude
 
 
 def test_resolve_chat_synthesizer_gemini_when_preferred(monkeypatch) -> None:
-    monkeypatch.setattr(cs, "LLM_PROVIDER", "gemini")
+    monkeypatch.setattr(cs, "get_resolved_llm_provider", lambda: "gemini")
     monkeypatch.setattr(cs, "GEMINI_ENABLED", True)
     monkeypatch.setattr(cs, "ANTHROPIC_ENABLED", False)
     assert resolve_chat_synthesizer() is cs.synthesize_chat_response_gemini
 
 
 def test_resolve_chat_synthesizer_cross_fallback_to_gemini(monkeypatch) -> None:
-    monkeypatch.setattr(cs, "LLM_PROVIDER", "anthropic")
+    monkeypatch.setattr(cs, "get_resolved_llm_provider", lambda: "anthropic")
     monkeypatch.setattr(cs, "ANTHROPIC_ENABLED", False)
     monkeypatch.setattr(cs, "GEMINI_ENABLED", True)
     assert resolve_chat_synthesizer() is cs.synthesize_chat_response_gemini

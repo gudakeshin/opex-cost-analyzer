@@ -50,7 +50,9 @@ FALLBACK_MAPPINGS: Dict[str, str] = {
 
 def benchmark_industry_for(industry: str) -> str:
     """Resolve a sector-pack id (or raw industry) to a benchmark-registry key."""
-    key = (industry or "").strip()
+    from app.services.sector_packs import resolve_sector_pack_id
+
+    key = resolve_sector_pack_id(industry) or (industry or "").strip()
     result = SECTOR_PACK_TO_BENCHMARK.get(key, key)
     if result == key and key and key not in SECTOR_PACK_TO_BENCHMARK.values():
         from app.config import logger

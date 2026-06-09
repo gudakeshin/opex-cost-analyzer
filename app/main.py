@@ -36,7 +36,7 @@ from app.config import (
 )
 from app.opar.memory_adapter import get_memory_adapter_status
 from app.services.document_index import get_document_index_status
-from app.routers import benchmarks, chat, compliance, connectors, engagements, enterprise, outputs, pipeline, sessions, skills
+from app.routers import benchmarks, chat, compliance, connectors, engagements, enterprise, llm, outputs, pipeline, sessions, skills
 from app.storage import ensure_dirs
 from app.memory import MemoryStore as _MemoryStore
 
@@ -195,6 +195,7 @@ app.include_router(engagements.router)
 app.include_router(sessions.router)
 app.include_router(connectors.router)
 app.include_router(chat.router)
+app.include_router(llm.router)
 app.include_router(pipeline.router)
 app.include_router(benchmarks.router)
 app.include_router(skills.router)

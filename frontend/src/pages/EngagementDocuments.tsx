@@ -16,7 +16,7 @@ import { SECTOR_OPTIONS } from '../constants/sectors';
 import type { EngagementDocument, EngagementSummary } from '../types';
 
 const ACCEPT =
-  '.csv,.xlsx,.xls,.json,.pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json';
+  '.csv,.xlsx,.xls,.json,.pdf,.docx,.txt,.md,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json';
 
 const CURRENCY_OPTIONS = [
   { value: 'INR', label: 'INR (₹)' },
@@ -471,7 +471,7 @@ export const EngagementDocuments: React.FC = () => {
         <div ref={uploadSectionRef} className="lg:col-span-2">
           <Card title="Upload files" className="bg-white border-brand-border h-full">
             <p className="text-sm text-brand-muted mb-4">
-              Supported: CSV, Excel (.xlsx, .xls), JSON, PDF, DOCX, TXT. Tabular files feed spend
+              Supported: CSV, Excel (.xlsx, .xls), JSON, PDF, DOCX, TXT, MD. Tabular files feed spend
               analysis; documents enrich context via LlamaParse when configured.
             </p>
             <div

@@ -15,8 +15,8 @@ from app.config import (
     ANTHROPIC_ENABLED,
     GEMINI_ENABLED,
     LLM_CHAT_SYNTHESIS_ENABLED,
-    LLM_PROVIDER,
 )
+from app.services.llm_selection import get_resolved_llm_provider
 from app.opar.category_resolver import match_category_from_query
 from app.opar.gemini_client import synthesize_chat_response_gemini
 from app.opar.models import ObserveContext
@@ -35,7 +35,7 @@ def resolve_chat_synthesizer() -> ChatSynthesizer | None:
     when it is the preferred provider, otherwise Claude (the default), falling across to
     whichever provider is configured. Returns ``None`` when no provider is available.
     """
-    prefer_gemini = LLM_PROVIDER == "gemini"
+    prefer_gemini = get_resolved_llm_provider() == "gemini"
     if prefer_gemini and GEMINI_ENABLED:
         return synthesize_chat_response_gemini
     if ANTHROPIC_ENABLED:
@@ -50,24 +50,29 @@ def resolve_chat_synthesizer() -> ChatSynthesizer | None:
 def _iter_chat_synthesizers() -> list[ChatSynthesizer]:
     """Ordered chat synthesizers: preferred provider first, then cross-provider fallback."""
     from app.opar.claude_client import synthesize_chat_response_claude
+    from app.opar.gemini_client import is_gemini_quota_exhausted
 
-    prefer_gemini = LLM_PROVIDER == "gemini"
+    prefer_gemini = get_resolved_llm_provider() == "gemini"
+    gemini_available = GEMINI_ENABLED and not is_gemini_quota_exhausted()
     ordered: list[ChatSynthesizer] = []
     if prefer_gemini:
-        if GEMINI_ENABLED:
+        if gemini_available:
             ordered.append(synthesize_chat_response_gemini)
         if ANTHROPIC_ENABLED:
             ordered.append(synthesize_chat_response_claude)
     else:
         if ANTHROPIC_ENABLED:
             ordered.append(synthesize_chat_response_claude)
-        if GEMINI_ENABLED:
+        if gemini_available:
             ordered.append(synthesize_chat_response_gemini)
     return ordered
 
 
 def _synthesize_via_llm(
-    context: Dict[str, Any], *, thinking_enabled: bool = False
+    context: Dict[str, Any],
+    *,
+    thinking_enabled: bool = False,
+    thinking_callback: Callable[[str], None] | None = None,
 ) -> Tuple[str | None, str | None]:
     """Run chat synthesis across providers; ``(None, None)`` when all miss."""
     if not LLM_CHAT_SYNTHESIS_ENABLED:
@@ -75,6 +80,8 @@ def _synthesize_via_llm(
     for synth in _iter_chat_synthesizers():
         try:
             text, thinking = synth(context, thinking_enabled=thinking_enabled)
+            if thinking and thinking_callback:
+                thinking_callback(thinking)
             if text:
                 return text, thinking
         except Exception:
@@ -399,6 +406,7 @@ def synthesize_chat_response(
     chat_history: List[Dict[str, str]] | None = None,
     currency: str = "INR",
     thinking_enabled: bool = False,
+    thinking_callback: Callable[[str], None] | None = None,
 ) -> ChatSynthesisResult:
     """Build context, run the resolved LLM, fall back to deterministic QA on failure."""
     context = build_chat_context(
@@ -406,7 +414,11 @@ def synthesize_chat_response(
     )
     metadata = _response_metadata_from_context(context)
 
-    text, thinking = _synthesize_via_llm(context, thinking_enabled=thinking_enabled)
+    text, thinking = _synthesize_via_llm(
+        context,
+        thinking_enabled=thinking_enabled,
+        thinking_callback=thinking_callback,
+    )
     if text:
         return ChatSynthesisResult(
             response_text=text,

@@ -18,7 +18,7 @@ from app.services.manifest_lock import ManifestLockError, manifest_lock
 from app.storage import read_json, write_json
 
 TABULAR_EXTENSIONS = {".csv", ".xlsx", ".xls", ".json"}
-DOCUMENT_EXTENSIONS = {".pdf", ".docx", ".txt"}
+DOCUMENT_EXTENSIONS = {".pdf", ".docx", ".txt", ".md"}
 SUPPORTED_EXTENSIONS = TABULAR_EXTENSIONS | DOCUMENT_EXTENSIONS
 _MANIFEST_BACKUP_NAME = "manifest.json.bak"
 
@@ -66,6 +66,33 @@ def _infer_upload_filename(raw_path: Path) -> str:
     return f"upload{raw_path.suffix}"
 
 
+def _read_document_meta(ddir: Path) -> Dict[str, Any]:
+    meta_path = ddir / "meta.json"
+    if not meta_path.is_file():
+        return {}
+    try:
+        payload = read_json(meta_path, {})
+        return payload if isinstance(payload, dict) else {}
+    except Exception:
+        return {}
+
+
+def write_document_meta(
+    engagement_id: str,
+    document_id: str,
+    *,
+    filename: str,
+    content_type: str = "application/octet-stream",
+) -> None:
+    """Persist the original upload filename beside the raw blob for manifest repair."""
+    ddir = document_dir(engagement_id, document_id)
+    ddir.mkdir(parents=True, exist_ok=True)
+    write_json(
+        ddir / "meta.json",
+        {"filename": filename, "content_type": content_type},
+    )
+
+
 def _document_record_from_disk(engagement_id: str, document_id: str) -> Optional[Dict[str, Any]]:
     ddir = document_dir(engagement_id, document_id)
     if not ddir.is_dir():
@@ -76,9 +103,11 @@ def _document_record_from_disk(engagement_id: str, document_id: str) -> Optional
     raw_path = raw_files[0]
     suffix = raw_path.suffix.lower()
     stat = raw_path.stat()
+    meta = _read_document_meta(ddir)
+    filename = str(meta.get("filename") or "").strip() or _infer_upload_filename(raw_path)
     return {
         "document_id": document_id,
-        "filename": _infer_upload_filename(raw_path),
+        "filename": filename,
         "content_type": "application/octet-stream",
         "size_bytes": stat.st_size,
         "raw_path": str(raw_path),
@@ -93,12 +122,99 @@ def _document_record_from_disk(engagement_id: str, document_id: str) -> Optional
     }
 
 
-def _repair_manifest_documents(engagement_id: str, manifest: Dict[str, Any]) -> bool:
+def _normalize_document_records(manifest: Dict[str, Any]) -> bool:
+    """Fix inconsistent status flags left by older manifest repair/dedupe paths."""
+    changed = False
+    for doc in manifest.get("documents") or []:
+        if not isinstance(doc, dict):
+            continue
+        if (
+            doc.get("processed_at")
+            and not doc.get("error")
+            and str(doc.get("status") or "") != "ready"
+        ):
+            doc["status"] = "ready"
+            changed = True
+    if changed:
+        manifest["updated_at"] = _utc_now()
+    return changed
+
+
+def _dedupe_manifest_documents(manifest: Dict[str, Any]) -> bool:
+    """Collapse duplicate manifest rows that share the same document_id."""
+    docs = [d for d in (manifest.get("documents") or []) if isinstance(d, dict)]
+    if not docs:
+        return False
+
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    for doc in docs:
+        did = str(doc.get("document_id") or "").strip()
+        if not did:
+            continue
+        grouped.setdefault(did, []).append(doc)
+    if all(len(group) == 1 for group in grouped.values()):
+        return False
+
+    def _score(doc: Dict[str, Any]) -> int:
+        filename = str(doc.get("filename") or "")
+        score = 0
+        if filename and not filename.startswith("upload."):
+            score += 100
+        if doc.get("status") == "ready":
+            score += 50
+        if doc.get("processed_at"):
+            score += 10
+        if doc.get("line_count"):
+            score += 5
+        return score
+
+    merged: List[Dict[str, Any]] = []
+    for group in grouped.values():
+        best = max(group, key=_score)
+        for other in group:
+            if other is best:
+                continue
+            for key in (
+                "parse_backend",
+                "processed_at",
+                "text_preview",
+                "line_count",
+                "warnings",
+                "chunk_count",
+                "parent_count",
+                "indexed",
+                "index_backend",
+                "error",
+            ):
+                if not best.get(key) and other.get(key):
+                    best[key] = other[key]
+        if any(str(other.get("status") or "") == "ready" for other in group):
+            best["status"] = "ready"
+        merged.append(best)
+
+    manifest["documents"] = merged
+    manifest["updated_at"] = _utc_now()
+    logger.warning(
+        "manifest_deduped_documents engagement_id=%s before=%s after=%s",
+        manifest.get("engagement_id"),
+        len(docs),
+        len(merged),
+    )
+    return True
+
+
+def _repair_manifest_documents(
+    engagement_id: str,
+    manifest: Dict[str, Any],
+    *,
+    exclude_ids: Optional[set[str]] = None,
+) -> bool:
     """Ensure every on-disk document folder appears in the manifest."""
     docs_dir = engagement_dir(engagement_id) / "documents"
     if not docs_dir.is_dir():
         return False
     known = {str(d.get("document_id")) for d in (manifest.get("documents") or [])}
+    skip = exclude_ids or set()
     recovered: List[Dict[str, Any]] = []
     for path in docs_dir.iterdir():
         if not path.is_dir():
@@ -107,7 +223,7 @@ def _repair_manifest_documents(engagement_id: str, manifest: Dict[str, Any]) -> 
             uuid.UUID(path.name, version=4)
         except ValueError:
             continue
-        if path.name in known:
+        if path.name in known or path.name in skip:
             continue
         record = _document_record_from_disk(engagement_id, path.name)
         if record:
@@ -218,7 +334,9 @@ def read_engagement_manifest(engagement_id: str, *, auto_repair: bool = True) ->
         return manifest if isinstance(manifest, dict) else {}
 
     repaired_orphans = _repair_manifest_documents(engagement_id, manifest)
-    if auto_repair and (needs_rewrite or repaired_orphans):
+    deduped = _dedupe_manifest_documents(manifest)
+    normalized = _normalize_document_records(manifest)
+    if auto_repair and (needs_rewrite or repaired_orphans or deduped or normalized):
         write_engagement_manifest(engagement_id, manifest)
     return manifest
 
@@ -234,6 +352,8 @@ def repair_engagement_manifest(engagement_id: str) -> Dict[str, Any]:
         )
         manifest = _skeleton_manifest(engagement_id)
     _repair_manifest_documents(engagement_id, manifest)
+    _dedupe_manifest_documents(manifest)
+    _normalize_document_records(manifest)
     write_engagement_manifest(engagement_id, manifest)
     return manifest
 
@@ -308,7 +428,13 @@ def update_engagement_detection(engagement_id: str, detection: Dict[str, Any]) -
         return {}
 
     detected_company = str(detection.get("detected_company_name") or "").strip()
-    detected_industry = str(detection.get("detected_industry") or "").strip()
+    from app.services.engagement_sanity import is_placeholder_industry
+    from app.services.sector_packs import resolve_sector_pack_id
+
+    prior_detected_industry = str(manifest.get("detected_industry") or "").strip()
+    detected_industry = resolve_sector_pack_id(
+        str(detection.get("detected_industry") or "").strip()
+    )
     detected_revenue_raw = detection.get("detected_annual_revenue_cr")
     detected_revenue_cr: Optional[float] = None
     if detected_revenue_raw is not None:
@@ -337,7 +463,11 @@ def update_engagement_detection(engagement_id: str, detection: Dict[str, Any]) -
     if detected_company and current_company in ("", "New engagement") and should_auto_apply_company(detected_company):
         manifest["company_name"] = detected_company
     current_industry = str(manifest.get("industry") or "").strip()
-    if detected_industry and not current_industry:
+    if (
+        detected_industry
+        and is_placeholder_industry(current_industry)
+        and not prior_detected_industry
+    ):
         manifest["industry"] = detected_industry
     current_revenue = float(manifest.get("annual_revenue") or 0.0)
     if detected_revenue_cr is not None and current_revenue <= 0:
@@ -443,7 +573,13 @@ def add_document_record(
         manifest, _, parse_error = _parse_manifest_file(engagement_id)
         if parse_error or not manifest.get("engagement_id"):
             raise HTTPException(status_code=404, detail="Engagement not found")
-        _repair_manifest_documents(engagement_id, manifest)
+        _repair_manifest_documents(engagement_id, manifest, exclude_ids={document_id})
+        write_document_meta(
+            engagement_id,
+            document_id,
+            filename=filename,
+            content_type=content_type,
+        )
         suffix = Path(filename).suffix.lower()
         record: Dict[str, Any] = {
             "document_id": document_id,

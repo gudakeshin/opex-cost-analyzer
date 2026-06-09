@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+from app.services.engagement_detection import reconcile_detection_view
 from app.services.engagement_sanity import (
     company_names_align,
     compute_engagement_sanity,
     extract_company_from_context_text,
     extract_company_from_filename,
     extract_revenue_cr_from_context_text,
+    infer_industry_from_company_name,
+    industries_align,
     is_low_confidence_company_guess,
     is_placeholder_company,
+    is_placeholder_industry,
     pick_best_company_guess,
     should_auto_apply_company,
 )
@@ -126,3 +130,79 @@ def test_placeholder_company_skips_checks() -> None:
     assert sanity["engagement_company"] is None
     assert sanity["has_conflicts"] is False
     assert is_placeholder_company("New engagement")
+
+
+def test_industries_align_conglomerate_umbrella() -> None:
+    assert industries_align("fmcg_consumer", "conglomerate", strict=False)
+    assert not industries_align("bfsi_banks", "fmcg_consumer", strict=True)
+    assert industries_align("conglomerate", "fmcg_consumer", strict=True)
+
+
+def test_industry_mismatch_when_set_sector_conflicts_with_spend() -> None:
+    manifest = {
+        "company_name": "Indus Apex Bank Ltd",
+        "industry": "bfsi_banks",
+        "detected_industry": "conglomerate",
+        "detected_industry_label": "Conglomerate",
+        "detection_signals": {"industry_spend": "fmcg_consumer"},
+    }
+    sanity = compute_engagement_sanity(manifest)
+    assert sanity["has_conflicts"] is True
+    industry_conflicts = [c for c in sanity["conflicts"] if c["kind"] == "industry_mismatch"]
+    assert len(industry_conflicts) == 1
+    assert industry_conflicts[0]["engagement_industry"] == "bfsi_banks"
+    assert industry_conflicts[0]["detected_industry"] == "fmcg_consumer"
+    assert industry_conflicts[0]["industry_spend"] == "fmcg_consumer"
+
+
+def test_no_industry_conflict_when_detected_matches_set() -> None:
+    manifest = {
+        "company_name": "Prakrit Consumer Brands",
+        "industry": "fmcg_consumer",
+        "detected_industry": "fmcg_consumer",
+        "detection_signals": {"industry_spend": "fmcg_consumer"},
+    }
+    sanity = compute_engagement_sanity(manifest)
+    industry_conflicts = [c for c in sanity["conflicts"] if c["kind"] == "industry_mismatch"]
+    assert industry_conflicts == []
+
+
+def test_no_industry_conflict_for_placeholder_industry() -> None:
+    manifest = {
+        "industry": "manufacturing_diversified",
+        "detected_industry": "fmcg_consumer",
+        "detection_signals": {"industry_spend": "fmcg_consumer"},
+    }
+    sanity = compute_engagement_sanity(manifest)
+    industry_conflicts = [c for c in sanity["conflicts"] if c["kind"] == "industry_mismatch"]
+    assert industry_conflicts == []
+    assert is_placeholder_industry("manufacturing_diversified")
+
+
+def test_fmcg_set_with_conglomerate_detected_is_ok_without_spend_conflict() -> None:
+    manifest = {
+        "industry": "fmcg_consumer",
+        "detected_industry": "conglomerate",
+        "detection_signals": {"industry_spend": "fmcg_consumer"},
+    }
+    sanity = compute_engagement_sanity(manifest)
+    industry_conflicts = [c for c in sanity["conflicts"] if c["kind"] == "industry_mismatch"]
+    assert industry_conflicts == []
+
+
+def test_infer_industry_from_bank_company_name() -> None:
+    assert infer_industry_from_company_name("Indus Apex Bank Ltd") == "bfsi_banks"
+    assert infer_industry_from_company_name("Aranya Digital Services Ltd") == "it_ites"
+
+
+def test_reconcile_detection_view_fixes_bank_misclassified_as_it() -> None:
+    manifest = {
+        "company_name": "Indus Apex Bank Ltd",
+        "industry": "bfsi_banks",
+        "detected_industry": "it_ites",
+        "detected_industry_label": "IT / ITES",
+        "detection_signals": {"industry_llm": "it_ites", "industry_spend": "bfsi_banks"},
+    }
+    fixed = reconcile_detection_view(manifest)
+    assert fixed["detected_industry"] == "bfsi_banks"
+    assert fixed["detected_industry_label"] == "BFSI / Banks"

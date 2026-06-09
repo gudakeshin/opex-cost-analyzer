@@ -9,6 +9,11 @@ from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError as Futur
 from typing import Any, Dict, List, Tuple
 
 from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED, LLM_PROVIDER
+from app.services.llm_selection import (
+    get_resolved_llm_model,
+    get_resolved_llm_provider,
+    submit_with_context,
+)
 from app.opar.gemini_client import CHAT_RESPONSE_SYSTEM_PROMPT
 from app.opar.models import IntentClass
 
@@ -184,13 +189,22 @@ _AUDIENCE_HINTS = {
 }
 
 
+def _anthropic_http_timeout_seconds() -> float:
+    from app.config import llm_synthesis_timeout_seconds
+
+    return float(llm_synthesis_timeout_seconds()) + 15.0
+
+
 def _call_anthropic_native(
     system: str,
     user_content: str,
     max_tokens: int = 512,
-    model: str = "claude-sonnet-4-5-20250929",
+    model: str | None = None,
+    *,
+    http_timeout_s: float | None = None,
 ) -> str:
     """Call Anthropic directly — never routed through Gemini."""
+    active_model = model or get_resolved_llm_model(provider="anthropic")
     if os.getenv("PYTEST_CURRENT_TEST"):
         raise RuntimeError("Claude calls disabled during pytest runs")
     if not ANTHROPIC_ENABLED or not ANTHROPIC_API_KEY:
@@ -200,9 +214,10 @@ def _call_anthropic_native(
     except ImportError:
         raise RuntimeError("anthropic package not installed")
 
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    timeout = http_timeout_s if http_timeout_s is not None else _anthropic_http_timeout_seconds()
+    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY, timeout=timeout)
     response = client.messages.create(
-        model=model,
+        model=active_model,
         max_tokens=max_tokens,
         system=system,
         messages=[{"role": "user", "content": user_content}],
@@ -215,29 +230,59 @@ def _call_claude(
     system: str,
     user_content: str,
     max_tokens: int = 512,
-    model: str = "claude-sonnet-4-5-20250929",
+    model: str | None = None,
 ) -> str:
-    """Call LLM. Routes to Gemini when LLM_PROVIDER=gemini, else Anthropic."""
-    if LLM_PROVIDER == "gemini" and GEMINI_ENABLED:
-        from app.opar.gemini_client import call_gemini
-        return call_gemini(system=system, user_content=user_content, max_tokens=max_tokens)
+    """Call LLM. Preferred provider first, cross-provider fallback on failure."""
+    prefer_gemini = get_resolved_llm_provider() == "gemini"
+    if prefer_gemini and GEMINI_ENABLED:
+        try:
+            from app.opar.gemini_client import call_gemini
 
-    return _call_anthropic_native(
-        system, user_content, max_tokens=max_tokens, model=model
-    )
+            return call_gemini(
+                system=system, user_content=user_content, max_tokens=max_tokens, model=model
+            )
+        except Exception:
+            if ANTHROPIC_ENABLED:
+                return _call_anthropic_native(
+                    system, user_content, max_tokens=max_tokens, model=model
+                )
+            raise
+    if ANTHROPIC_ENABLED:
+        return _call_anthropic_native(
+            system, user_content, max_tokens=max_tokens, model=model
+        )
+    if GEMINI_ENABLED:
+        from app.opar.gemini_client import call_gemini
+
+        return call_gemini(
+            system=system, user_content=user_content, max_tokens=max_tokens, model=model
+        )
+    raise RuntimeError("No LLM provider configured")
 
 
 def _call_claude_with_thinking(
     system: str,
     user_content: str,
     max_tokens: int = 1800,
-    model: str = "claude-sonnet-4-5-20250929",
+    model: str | None = None,
     budget_tokens: int = 8000,
 ) -> Tuple[str, str | None]:
-    """Call LLM with extended thinking. Gemini Flash-Lite has no thinking — falls back to plain call."""
-    if LLM_PROVIDER == "gemini" and GEMINI_ENABLED:
-        from app.opar.gemini_client import call_gemini_with_thinking
-        return call_gemini_with_thinking(system=system, user_content=user_content, max_tokens=max_tokens)
+    """Call LLM with extended thinking. Preferred provider first, cross-provider fallback."""
+    active_model = model or get_resolved_llm_model(thinking=True, provider="anthropic")
+    prefer_gemini = get_resolved_llm_provider() == "gemini"
+    if prefer_gemini and GEMINI_ENABLED:
+        try:
+            from app.opar.gemini_client import call_gemini_with_thinking
+
+            return call_gemini_with_thinking(
+                system=system,
+                user_content=user_content,
+                max_tokens=max_tokens,
+                model=model,
+            )
+        except Exception:
+            if not ANTHROPIC_ENABLED:
+                raise
 
     if os.getenv("PYTEST_CURRENT_TEST"):
         raise RuntimeError("Claude calls disabled during pytest runs")
@@ -248,9 +293,12 @@ def _call_claude_with_thinking(
     except ImportError:
         raise RuntimeError("anthropic package not installed")
 
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    from app.config import llm_thinking_timeout_seconds
+
+    http_timeout = float(llm_thinking_timeout_seconds()) + 20.0
+    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY, timeout=http_timeout)
     response = client.messages.create(
-        model=model,
+        model=active_model,
         max_tokens=max_tokens + budget_tokens,
         system=system,
         messages=[{"role": "user", "content": user_content}],
@@ -392,7 +440,7 @@ def select_charts_claude(
         "using the profile numbers above)."
     )
     executor = ThreadPoolExecutor(max_workers=1)
-    future = executor.submit(_call_claude, _CHART_SELECTION_SYSTEM_PROMPT, user_prompt, 512)
+    future = submit_with_context(executor, _call_claude, _CHART_SELECTION_SYSTEM_PROMPT, user_prompt, 512)
     try:
         raw = future.result(timeout=10)
     except (FuturesTimeoutError, Exception):
@@ -421,8 +469,18 @@ def select_charts_claude(
     }
 
 
-# Pure UI artefacts — no narrative value for synthesis
-_SKIP_SKILLS = frozenset({"chart-builder", "document-contextualizer", "business-case-builder"})
+# Skills with no narrative value for synthesis (UI artefacts, security pipeline, exports).
+_SKIP_SKILLS = frozenset({
+    "chart-builder",
+    "document-contextualizer",
+    "business-case-builder",
+    "pii-stripper",
+    "data-classifier",
+    "llm-context-builder",
+    "data-validator",
+    "export-formatter",
+    "dashboard-builder",
+})
 
 _SPEND_PROFILER_KEYS = frozenset({
     "category_id", "category_name", "spend", "spend_pct",
@@ -485,6 +543,20 @@ def _slim_skill_outputs(skill_outputs: Dict[str, Any]) -> Dict[str, Any]:
             )[:5]
             slimmed[skill] = {k: v for k, v in output.items() if k != "opportunities"}
             slimmed[skill]["opportunities"] = top_opp
+
+        elif skill == "savings-modeler":
+            initiatives = output.get("initiatives", []) if isinstance(output.get("initiatives"), list) else []
+            slimmed[skill] = {k: v for k, v in output.items() if k != "initiatives"}
+            slimmed[skill]["initiatives"] = initiatives[:12]
+
+        elif skill == "root-cause-analyzer":
+            findings = (
+                output.get("root_cause_findings", [])
+                if isinstance(output.get("root_cause_findings"), list)
+                else []
+            )
+            slimmed[skill] = {k: v for k, v in output.items() if k != "root_cause_findings"}
+            slimmed[skill]["root_cause_findings"] = findings[:8]
 
         else:
             slimmed[skill] = output
@@ -570,18 +642,27 @@ def synthesize_chat_response_claude(
         "Answer the user's question from this context. Return markdown only.\n"
         f"{json.dumps(context, ensure_ascii=False)}"
     )
-    timeout_s = 35 if thinking_enabled else 8
+    from app.config import llm_synthesis_timeout_seconds, llm_thinking_timeout_seconds
+
+    payload_bytes = len(user_prompt)
+    timeout_s = (
+        llm_thinking_timeout_seconds()
+        if thinking_enabled
+        else llm_synthesis_timeout_seconds(payload_bytes)
+    )
     max_tokens = 2048 if thinking_enabled else 1024
     executor = ThreadPoolExecutor(max_workers=1)
     if thinking_enabled:
-        future: Future[Any] = executor.submit(
+        future: Future[Any] = submit_with_context(
+            executor,
             _call_claude_with_thinking,
             CHAT_RESPONSE_SYSTEM_PROMPT,
             user_prompt,
             max_tokens,
         )
     else:
-        future = executor.submit(
+        future = submit_with_context(
+            executor,
             _call_anthropic_native,
             CHAT_RESPONSE_SYSTEM_PROMPT,
             user_prompt,
@@ -596,6 +677,13 @@ def synthesize_chat_response_claude(
     except FuturesTimeoutError:
         future.cancel()
         executor.shutdown(wait=False, cancel_futures=True)
+        from app.config import logger
+
+        logger.warning(
+            '"synthesize_chat_response_claude timeout after %ss (thinking=%s)"',
+            timeout_s,
+            thinking_enabled,
+        )
         return None, None
     except Exception as exc:  # noqa: BLE001 — degrade to deterministic fallback
         from app.config import logger
@@ -604,6 +692,16 @@ def synthesize_chat_response_claude(
         return None, None
     finally:
         executor.shutdown(wait=False, cancel_futures=True)
+
+
+def _timeout_budget_seconds(payload: Dict[str, Any], strict_mode: bool = False) -> int:
+    from app.config import llm_synthesis_timeout_seconds
+
+    payload_bytes = len(json.dumps(payload, ensure_ascii=False))
+    base = llm_synthesis_timeout_seconds(payload_bytes)
+    if strict_mode:
+        base = int(base * 1.1)
+    return base
 
 
 def synthesize_analysis_claude(
@@ -662,19 +760,27 @@ def synthesize_analysis_claude(
         f"{json.dumps(payload, ensure_ascii=False)}\n"
         f"{strict_hint}"
     )
-    timeout_s = 35 if thinking_enabled else 8
+    from app.config import llm_thinking_timeout_seconds
+
+    timeout_s = (
+        llm_thinking_timeout_seconds()
+        if thinking_enabled
+        else _timeout_budget_seconds(payload, strict_mode=strict_mode)
+    )
     executor = ThreadPoolExecutor(max_workers=1)
     if thinking_enabled:
-        future: Future[Any] = executor.submit(
+        future: Future[Any] = submit_with_context(
+            executor,
             _call_claude_with_thinking,
             ANALYSIS_SYNTHESIS_SYSTEM_PROMPT,
             user_prompt,
-            1800,
-            "claude-sonnet-4-5-20250929",
+            2048,
+            None,
             thinking_budget_tokens,
         )
     else:
-        future = executor.submit(
+        future = submit_with_context(
+            executor,
             _call_claude,
             ANALYSIS_SYNTHESIS_SYSTEM_PROMPT,
             user_prompt,
@@ -685,6 +791,13 @@ def synthesize_analysis_claude(
     except FuturesTimeoutError:
         future.cancel()
         executor.shutdown(wait=False, cancel_futures=True)
+        from app.config import logger
+
+        logger.warning(
+            '"synthesize_analysis_claude timeout after %ss (thinking=%s)"',
+            timeout_s,
+            thinking_enabled,
+        )
         return None, None
     finally:
         if not future.cancelled():
@@ -697,19 +810,18 @@ def synthesize_analysis_claude(
 
     try:
         data = _extract_json(raw)
-    except Exception:
+    except Exception as exc:
+        from app.config import logger as _log
+
+        _log.warning(
+            '"synthesize_analysis_claude json_parse_failed error=%s raw_len=%d"',
+            exc,
+            len(raw or ""),
+        )
         return None, thinking_text
     if isinstance(data, dict):
         return data, thinking_text
     return None, thinking_text
-
-
-def _timeout_budget_seconds(payload: Dict[str, Any], strict_mode: bool = False) -> int:
-    payload_bytes = len(json.dumps(payload, ensure_ascii=False))
-    base = 8 if payload_bytes < 35_000 else 12 if payload_bytes < 75_000 else 16
-    if strict_mode:
-        base += 2
-    return max(8, min(22, base))
 
 
 def synthesize_analysis_claude_with_meta(
@@ -760,7 +872,8 @@ def synthesize_analysis_claude_with_meta(
 
     def _run_with_payload(in_payload: Dict[str, Any], timeout_s: int) -> Tuple[Dict[str, Any] | None, str | None]:
         executor = ThreadPoolExecutor(max_workers=1)
-        future = executor.submit(
+        future = submit_with_context(
+            executor,
             _call_claude,
             ANALYSIS_SYNTHESIS_SYSTEM_PROMPT,
             (
@@ -823,7 +936,8 @@ def draft_executive_communication_claude(
     audience = str((manifest.get("audience") or "cfo")).lower()
     audience_hint = _AUDIENCE_HINTS.get(audience, _AUDIENCE_HINTS["cfo"])
     executor = ThreadPoolExecutor(max_workers=1)
-    future = executor.submit(
+    future = submit_with_context(
+        executor,
         _call_claude,
         EXECUTIVE_COMMUNICATION_SYSTEM_PROMPT,
         (
@@ -915,11 +1029,10 @@ class ClaudeToolTransport:
         max_tokens: int = 4096,
         thinking_budget: int = 8000,
     ) -> None:
-        from app.config import ANTHROPIC_TOOL_MODEL
-
-        self.model = model or ANTHROPIC_TOOL_MODEL
-        self.max_tokens = max_tokens
         self.thinking_budget = thinking_budget
+        self.model = model or get_resolved_llm_model(provider="anthropic")
+        # Anthropic requires max_tokens > thinking.budget_tokens.
+        self.max_tokens = max(max_tokens, thinking_budget + 2048)
 
     def generate(
         self,

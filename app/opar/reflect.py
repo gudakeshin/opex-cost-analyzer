@@ -1,7 +1,7 @@
 """Reflect phase — thin orchestrator over validation, synthesis, and persistence."""
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 from app.config import UPLOAD_DIR
 from app.memory import MemoryStore
@@ -52,6 +52,14 @@ from app.storage import read_json
 
 _memory = MemoryStore()
 
+# Reflect-phase LLM paths — not deterministic skill fallbacks.
+_SYNTHESIS_DEGRADATION_KEYS = frozenset({"llm_advisory", "chat_synthesis"})
+
+
+def _skill_degradation_reasons(degradation_reasons: Dict[str, str]) -> Dict[str, str]:
+    return {k: v for k, v in degradation_reasons.items() if k not in _SYNTHESIS_DEGRADATION_KEYS}
+
+
 # Backward-compatible re-exports for tests and callers
 _advisory_quality_ok = advisory_quality_ok
 _compose_response_from_advisory = compose_response_from_advisory
@@ -64,6 +72,7 @@ def reflect(
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
     chat_history: list[dict[str, str]] | None = None,
+    thinking_callback: Callable[[str], None] | None = None,
 ) -> ReflectOutput:
     """Validate outputs (3-layer), compose response, persist memory, return ReflectOutput."""
     validated: Dict[str, Dict[str, Any]] = {}
@@ -146,23 +155,33 @@ def reflect(
             chat_history=chat_history,
             currency=reporting_currency,
             thinking_enabled=thinking_enabled,
+            thinking_callback=thinking_callback,
         )
         response = synthesis.response_text
         response_metadata = synthesis.response_metadata
         qa_used_llm = synthesis.used_llm
+        if not qa_used_llm:
+            degradation_reasons = {**degradation_reasons, "chat_synthesis": "provider_failed"}
         if synthesis.thinking_text:
             thinking_text = synthesis.thinking_text
     else:
         advisory_was_needed = needs_llm_advisory(ctx, composition_validated, category_focused=category_focused)
+        advisory_skip_reason: str | None = None
         if advisory_was_needed:
-            advisory_sections, thinking_text = generate_llm_advisory_sections(
+            advisory_sections, thinking_text, advisory_skip_reason = generate_llm_advisory_sections(
                 ctx,
                 manifest,
                 composition_validated,
                 thinking_enabled=thinking_enabled,
                 thinking_budget_tokens=thinking_budget_tokens,
                 category_focused=category_focused,
+                thinking_callback=thinking_callback,
             )
+            if advisory_skip_reason:
+                degradation_reasons = {
+                    **degradation_reasons,
+                    "llm_advisory": advisory_skip_reason,
+                }
         if advisory_sections is not None:
             response = compose_response_from_advisory(
                 advisory_sections,
@@ -188,10 +207,13 @@ def reflect(
                 chat_history=chat_history,
                 currency=reporting_currency,
                 thinking_enabled=thinking_enabled,
+                thinking_callback=thinking_callback,
             )
             response = synthesis.response_text
             response_metadata = synthesis.response_metadata
             qa_used_llm = synthesis.used_llm
+            if not qa_used_llm:
+                degradation_reasons = {**degradation_reasons, "chat_synthesis": "provider_failed"}
             if synthesis.thinking_text:
                 thinking_text = synthesis.thinking_text
         else:
@@ -261,7 +283,7 @@ def reflect(
         thinking_text=thinking_text,
         response_metadata=response_metadata,
         chart_specs=chart_specs,
-        degraded_mode=bool(degradation_reasons),
+        degraded_mode=bool(_skill_degradation_reasons(degradation_reasons)),
         fallback_reasons=degradation_reasons,
         next_options=next_options,
         replanner_log=replanner_log,

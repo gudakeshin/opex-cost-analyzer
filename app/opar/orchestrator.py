@@ -405,6 +405,7 @@ async def run_opar_loop(
     user_id: str,
     file_ids: list[str] | None = None,
     progress_callback: Callable[[str, str], None] | None = None,
+    thinking_callback: Callable[[str], None] | None = None,
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
     chat_history: list[dict[str, str]] | None = None,
@@ -416,6 +417,7 @@ async def run_opar_loop(
     try:
         return await _run_opar_loop_inner(
             msg, session_id, user_id, file_ids, progress_callback, progress,
+            thinking_callback=thinking_callback,
             thinking_enabled=thinking_enabled,
             thinking_budget_tokens=thinking_budget_tokens,
             chat_history=chat_history,
@@ -428,6 +430,7 @@ async def resume_opar_loop(
     checkpoint_id: str,
     answer: ClarificationAnswer,
     progress_callback: Callable[[str, str], None] | None = None,
+    thinking_callback: Callable[[str], None] | None = None,
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
     chat_history: list[dict[str, str]] | None = None,
@@ -456,6 +459,7 @@ async def resume_opar_loop(
         cp.file_ids,
         progress_callback,
         progress,
+        thinking_callback=thinking_callback,
         thinking_enabled=thinking_enabled,
         thinking_budget_tokens=thinking_budget_tokens,
         clarification_answer=clarification_answer,
@@ -475,6 +479,7 @@ async def _run_opar_loop_inner(
     file_ids: list[str] | None,
     progress_callback: Callable[[str, str], None] | None,
     progress: list[Dict[str, str]],
+    thinking_callback: Callable[[str], None] | None = None,
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
     clarification_answer: ClarificationAnswer | None = None,
@@ -633,7 +638,11 @@ async def _run_opar_loop_inner(
         _add_progress_step(progress, "plan", "Agent investigating with tools...")
         if progress_callback:
             progress_callback("plan", "Agent investigating with tools...")
-        agent_result = try_agent_run(ctx, progress_callback=progress_callback)
+        agent_result = try_agent_run(
+            ctx,
+            progress_callback=progress_callback,
+            thinking_callback=thinking_callback,
+        )
         if agent_result and agent_result.act_result and agent_result.exec_plan:
             _add_progress_step(
                 progress,
@@ -650,6 +659,7 @@ async def _run_opar_loop_inner(
                 thinking_enabled=thinking_enabled,
                 thinking_budget_tokens=thinking_budget_tokens,
                 chat_history=chat_history,
+                thinking_callback=thinking_callback,
             )
             meta = dict(result.response_metadata or {})
             meta["agent_trace"] = agent_result.agent_trace or []
@@ -723,6 +733,7 @@ async def _run_opar_loop_inner(
         thinking_enabled=thinking_enabled,
         thinking_budget_tokens=thinking_budget_tokens,
         chat_history=chat_history,
+        thinking_callback=thinking_callback,
     )
 
     result.progress_steps = progress

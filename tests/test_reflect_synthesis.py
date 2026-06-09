@@ -50,13 +50,13 @@ def test_needs_llm_advisory_true_for_category_focused_root_cause_without_value_b
 
 def test_generate_skipped_when_not_needed() -> None:
     ctx = ObserveContext(user_message="hello", intent_class="general_qa")
-    advisory, thinking = generate_llm_advisory_sections(ctx, {}, {}, category_focused=False)
+    advisory, thinking, _skip = generate_llm_advisory_sections(ctx, {}, {}, category_focused=False)
     assert advisory is None
     assert thinking is None
 
 
 def test_resolve_analysis_synthesizer_prefers_gemini_when_configured() -> None:
-    with patch("app.opar.reflect_advisory.LLM_PROVIDER", "gemini"), patch(
+    with patch("app.opar.reflect_advisory.get_resolved_llm_provider", return_value="gemini"), patch(
         "app.opar.reflect_advisory.GEMINI_ENABLED", True
     ):
         fn = resolve_analysis_synthesizer()
@@ -65,7 +65,7 @@ def test_resolve_analysis_synthesizer_prefers_gemini_when_configured() -> None:
 
 
 def test_resolve_analysis_synthesizer_falls_back_to_claude() -> None:
-    with patch("app.opar.reflect_advisory.LLM_PROVIDER", "anthropic"), patch(
+    with patch("app.opar.reflect_advisory.get_resolved_llm_provider", return_value="anthropic"), patch(
         "app.opar.reflect_advisory.ANTHROPIC_ENABLED", True
     ), patch("app.opar.reflect_advisory.GEMINI_ENABLED", False):
         fn = resolve_analysis_synthesizer()
@@ -96,6 +96,6 @@ def test_format_helpers_return_none_when_data_missing() -> None:
 
 def test_barrel_reexports_advisory_entry_points() -> None:
     ctx = ObserveContext(user_message="hello", intent_class="general_qa")
-    advisory, thinking = barrel_generate(ctx, {}, {}, category_focused=False)
+    advisory, thinking, _skip = barrel_generate(ctx, {}, {}, category_focused=False)
     assert advisory is None
     assert thinking is None

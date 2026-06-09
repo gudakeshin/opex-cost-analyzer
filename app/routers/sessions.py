@@ -381,12 +381,17 @@ async def analyze_session(session_id: str, payload: AnalyzeRequest) -> Dict[str,
         progress_cb = lambda phase, msg: progress_append(run_id, phase, msg)  # noqa: E731
 
     try:
+        from app.services.sector_packs import resolve_sector_pack_id
+
+        selected_industry = resolve_sector_pack_id(
+            payload.industry or manifest.get("industry") or ""
+        ) or (payload.industry or manifest.get("industry") or "")
         analysis = await asyncio.to_thread(
             run_core_pipeline,
             session_id=session_id,
             lines=spend_lines,
             docs_text=docs_text,
-            industry=payload.industry or manifest.get("industry") or "",
+            industry=selected_industry,
             annual_revenue=payload.annual_revenue or float(manifest.get("annual_revenue") or 0.0),
             company_name=payload.company_name or manifest.get("company_name"),
             wacc=float(manifest.get("wacc") or payload.wacc or 0.10),
@@ -408,8 +413,11 @@ async def analyze_session(session_id: str, payload: AnalyzeRequest) -> Dict[str,
     if analysis.get("company_name") and manifest.get("company_name") != analysis["company_name"]:
         manifest["company_name"] = analysis["company_name"]
         manifest_changed = True
-    if analysis.get("industry") and manifest.get("industry") != analysis["industry"]:
-        manifest["industry"] = analysis["industry"]
+    from app.services.engagement_sanity import is_placeholder_industry
+
+    analysis_industry = str(analysis.get("industry") or "").strip()
+    if analysis_industry and is_placeholder_industry(manifest.get("industry")):
+        manifest["industry"] = analysis_industry
         manifest_changed = True
     if analysis.get("annual_revenue") and not manifest.get("annual_revenue"):
         manifest["annual_revenue"] = analysis["annual_revenue"]
@@ -602,7 +610,9 @@ def patch_diagnostic_context(session_id: str, patch: DiagnosticContextPatch) -> 
     if patch.company_name is not None:
         manifest["company_name"] = patch.company_name
     if patch.industry is not None:
-        manifest["industry"] = patch.industry
+        from app.services.sector_packs import normalize_industry_selection
+
+        manifest["industry"] = normalize_industry_selection(patch.industry) or patch.industry
     if patch.annual_revenue_cr is not None:
         manifest["annual_revenue"] = patch.annual_revenue_cr * 10_000_000  # Cr → rupees
     if patch.deep_research_summary is not None:

@@ -124,7 +124,7 @@ def test_gemini_advisory_smoke_mocked() -> None:
     with patch("app.opar.reflect_advisory.GEMINI_ENABLED", True), patch(
         "app.opar.reflect_advisory.resolve_analysis_synthesizer", return_value=mock_synth
     ):
-        advisory, thinking = generate_llm_advisory_sections(ctx, {"currency": "INR"}, validated)
+        advisory, thinking, _skip = generate_llm_advisory_sections(ctx, {"currency": "INR"}, validated)
     assert advisory is not None
     assert thinking is None
     mock_synth.assert_called()

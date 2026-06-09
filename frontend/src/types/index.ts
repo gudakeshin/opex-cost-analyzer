@@ -174,6 +174,7 @@ export interface ChatMessage {
   progress_steps?: ProgressStep[];
   degraded_mode?: boolean;
   used_llm_synthesis?: boolean;
+  fallback_reasons?: Record<string, unknown>;
   artefacts?: Record<string, unknown> | string[];
   insight_snapshot?: AnalysisInsightSnapshot;
   analysis_trace?: AnalysisTraceStep[];
@@ -304,6 +305,12 @@ export interface EngagementSanityConflict {
   engagement_company?: string;
   detected_company?: string;
   detected_companies?: string[];
+  engagement_industry?: string;
+  engagement_industry_label?: string;
+  detected_industry?: string;
+  detected_industry_label?: string;
+  industry_spend?: string | null;
+  detected_industries?: string[];
   source?: string;
   signal_source?: string;
   message?: string;
@@ -321,6 +328,7 @@ export interface ChatProgressResponse {
   run_id: string;
   status: string;
   steps?: Array<{ phase?: string; message?: string; timestamp?: string }>;
+  thinking_text?: string | null;
   error?: string | null;
 }
 
@@ -381,7 +389,21 @@ export interface V1ChatPayload {
   currency?: string;
   audience?: string;
   thinking_mode?: 'standard' | 'extended';
+  llm_model?: string;
   chat_history?: ChatHistoryTurn[];
+}
+
+export interface LlmModelOption {
+  id: string;
+  label: string;
+  provider: string;
+  description?: string;
+}
+
+export interface LlmModelsResponse {
+  models: LlmModelOption[];
+  default_model_id: string;
+  default_provider: string;
 }
 
 export interface BusinessClarification {

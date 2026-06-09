@@ -30,16 +30,39 @@ function AssistantAvatar() {
   );
 }
 
-function LlmOfflineBanner() {
+function llmFallbackDetail(reasons?: Record<string, unknown>): string {
+  const advisory = String(reasons?.llm_advisory ?? '').trim();
+  if (advisory === 'token_budget_exceeded') {
+    return 'The analysis context was too large for live LLM synthesis, so a deterministic summary was used instead.';
+  }
+  if (advisory === 'synthesis_quality_low') {
+    return 'The LLM response did not meet quality checks, so a deterministic summary was used instead.';
+  }
+  if (advisory === 'provider_unavailable' || advisory === 'provider_failed') {
+    return (
+      'The LLM call failed (timeout or API error). Select Claude Sonnet 4.6 in the model ' +
+      'dropdown if Gemini credits are depleted, confirm API keys in .env, then retry.'
+    );
+  }
+  const chat = String(reasons?.chat_synthesis ?? '').trim();
+  if (chat === 'provider_failed') {
+    return (
+      'Chat LLM synthesis failed. Use Claude Sonnet 4.6 (Gemini prepay credits may be depleted) ' +
+      'or retry after confirming API keys.'
+    );
+  }
+  return 'Using deterministic answers from cached spend data. Check API keys, credits, and model selection for richer responses.';
+}
+
+function LlmOfflineBanner({ reasons }: { reasons?: Record<string, unknown> }) {
   return (
     <div
       className="mb-3 rounded-lg border border-amber-300/80 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-950"
       role="status"
     >
-      <span className="font-semibold">LLM unavailable</span>
+      <span className="font-semibold">LLM synthesis skipped</span>
       {' — '}
-      Using offline answers from cached spend data. Restore Gemini or Anthropic API credits for
-      richer, question-specific responses.
+      {llmFallbackDetail(reasons)}
     </div>
   );
 }
@@ -205,7 +228,9 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
             )}
           </div>
         )}
-        {!isUser && message.used_llm_synthesis === false && <LlmOfflineBanner />}
+        {!isUser && message.used_llm_synthesis === false && (
+          <LlmOfflineBanner reasons={message.fallback_reasons} />
+        )}
         {isUser ? (
           <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
         ) : (

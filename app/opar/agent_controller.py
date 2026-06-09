@@ -5,7 +5,8 @@ import json
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional
 
-from app.config import LLM_PROVIDER, logger
+from app.config import logger
+from app.services.llm_selection import get_resolved_llm_provider, model_for_provider
 from app.opar.agent_runtime import ToolCall, agent_loop_available, run_tool_loop
 from app.opar.models import ActResult, ExecutionPlan, ObserveContext
 from app.opar.tools.catalog import dispatch_tool_call, get_tool_catalog
@@ -42,21 +43,35 @@ class AgentRunResult:
     fallback_reason: str | None = None
 
 
-def _build_transport():
-    if LLM_PROVIDER == "gemini":
-        from app.config import GEMINI_ENABLED
+def _iter_transports():
+    """Preferred LLM transport first, then cross-provider fallback."""
+    from app.config import ANTHROPIC_ENABLED, GEMINI_ENABLED
 
-        if GEMINI_ENABLED:
+    prefer_gemini = get_resolved_llm_provider() == "gemini"
+    gemini_model = model_for_provider("gemini")
+    anthropic_model = model_for_provider("anthropic")
+    transports = []
+    from app.opar.gemini_client import is_gemini_quota_exhausted
+
+    if prefer_gemini:
+        if GEMINI_ENABLED and not is_gemini_quota_exhausted():
             from app.opar.gemini_client import GeminiToolTransport
 
-            return GeminiToolTransport()
-    from app.config import ANTHROPIC_ENABLED
+            transports.append(GeminiToolTransport(model=gemini_model))
+        if ANTHROPIC_ENABLED:
+            from app.opar.claude_client import ClaudeToolTransport
 
-    if ANTHROPIC_ENABLED:
-        from app.opar.claude_client import ClaudeToolTransport
+            transports.append(ClaudeToolTransport(model=anthropic_model))
+    else:
+        if ANTHROPIC_ENABLED:
+            from app.opar.claude_client import ClaudeToolTransport
 
-        return ClaudeToolTransport()
-    return None
+            transports.append(ClaudeToolTransport(model=anthropic_model))
+        if GEMINI_ENABLED and not is_gemini_quota_exhausted():
+            from app.opar.gemini_client import GeminiToolTransport
+
+            transports.append(GeminiToolTransport(model=gemini_model))
+    return transports
 
 
 def _build_user_message(ctx: ObserveContext) -> str:
@@ -83,14 +98,15 @@ def run_agent_controller(
     ctx: ObserveContext,
     *,
     progress_callback: Callable[[str, str], None] | None = None,
+    thinking_callback: Callable[[str], None] | None = None,
     transport: Any | None = None,
 ) -> AgentRunResult:
     """Execute the agent tool loop. Returns success=False when caller should fallback."""
     if not agent_loop_available():
         return AgentRunResult(success=False, fallback_reason="agent_loop_unavailable")
 
-    active_transport = transport or _build_transport()
-    if active_transport is None:
+    transports = [transport] if transport is not None else _iter_transports()
+    if not transports:
         return AgentRunResult(success=False, fallback_reason="no_llm_transport")
 
     session = ToolSessionContext(ctx=ctx)
@@ -100,18 +116,33 @@ def run_agent_controller(
             progress_callback("act", f"Agent tool: {call.name}")
         return dispatch_tool_call(session, call)
 
-    try:
-        loop_result = run_tool_loop(
-            system=_AGENT_SYSTEM,
-            messages=[{"role": "user", "content": _build_user_message(ctx)}],
-            tools=get_tool_catalog(),
-            dispatch=dispatch,
-            transport=active_transport,
-            thinking=True,
+    last_exc: Exception | None = None
+    for active_transport in transports:
+        try:
+            loop_result = run_tool_loop(
+                system=_AGENT_SYSTEM,
+                messages=[{"role": "user", "content": _build_user_message(ctx)}],
+                tools=get_tool_catalog(),
+                dispatch=dispatch,
+                transport=active_transport,
+                thinking=True,
+                thinking_callback=thinking_callback,
+            )
+            break
+        except Exception as exc:
+            last_exc = exc
+            logger.warning(
+                '"agent_controller failed session=%s transport=%s err=%s"',
+                ctx.session_id,
+                type(active_transport).__name__,
+                exc,
+            )
+            loop_result = None
+    else:
+        return AgentRunResult(
+            success=False,
+            fallback_reason=str(last_exc)[:200] if last_exc else "all_transports_failed",
         )
-    except Exception as exc:
-        logger.warning('"agent_controller failed session=%s err=%s"', ctx.session_id, exc)
-        return AgentRunResult(success=False, fallback_reason=str(exc)[:200])
 
     if not session.skill_outputs and not session.opportunity_assessment:
         return AgentRunResult(
@@ -144,9 +175,14 @@ def try_agent_run(
     ctx: ObserveContext,
     *,
     progress_callback: Callable[[str, str], None] | None = None,
+    thinking_callback: Callable[[str], None] | None = None,
 ) -> Optional[AgentRunResult]:
     """Attempt agent path; returns None to signal deterministic fallback."""
-    result = run_agent_controller(ctx, progress_callback=progress_callback)
+    result = run_agent_controller(
+        ctx,
+        progress_callback=progress_callback,
+        thinking_callback=thinking_callback,
+    )
     if result.success:
         return result
     logger.info(
