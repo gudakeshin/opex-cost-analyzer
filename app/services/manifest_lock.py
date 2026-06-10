@@ -47,6 +47,11 @@ class ManifestLock:
                 logger.info('"manifest_lock backend=redis"')
             except Exception as exc:
                 logger.warning('"manifest_lock redis_unavailable error=%s using=local"', exc)
+        if self._redis is None:
+            logger.warning(
+                '"manifest_lock backend=local — in-process only; '
+                'concurrent writes WILL race with >1 worker/replica (set REDIS_URL)"'
+            )
 
     def _local_lock(self, engagement_id: str) -> threading.RLock:
         with self._local_guard:

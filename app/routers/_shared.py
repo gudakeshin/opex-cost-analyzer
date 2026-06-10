@@ -106,6 +106,11 @@ class _SessionLockBackend:
                 logger.info('"session_lock backend=redis"')
             except Exception as exc:
                 logger.warning('"session_lock redis_unavailable error=%s using=local"', exc)
+        if self._redis is None:
+            logger.warning(
+                '"session_lock backend=local — in-process only; '
+                'concurrent writes WILL race with >1 worker/replica (set REDIS_URL)"'
+            )
 
     @contextlib.asynccontextmanager
     async def acquire(self, session_id: str):  # type: ignore[return]

@@ -1,0 +1,15 @@
+# Install once with:  pip install pre-commit && pre-commit install
+# Blocks commits containing API keys/secrets (the .env safety net, enforced
+# mechanically instead of by convention).
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.3
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^app/
