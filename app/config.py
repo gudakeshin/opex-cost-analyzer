@@ -35,14 +35,27 @@ class _RequestIdFilter(logging.Filter):
 # Structured logging — JSON format suitable for ECS / CloudWatch / stdout
 # ---------------------------------------------------------------------------
 _LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
-logging.basicConfig(
-    level=getattr(logging, _LOG_LEVEL, logging.INFO),
-    format='{"ts":"%(asctime)s","level":"%(levelname)s","logger":"%(name)s","rid":"%(request_id)s","msg":%(message)s}',
-)
+_LOG_FORMAT = '{"ts":"%(asctime)s","level":"%(levelname)s","logger":"%(name)s","rid":"%(request_id)s","msg":%(message)s}'
+
+
+def _configure_logging() -> None:
+    logging.basicConfig(
+        level=getattr(logging, _LOG_LEVEL, logging.INFO),
+        format=_LOG_FORMAT,
+    )
+    logging.getLogger("opex").addFilter(_RequestIdFilter())
+    logging.getLogger().addFilter(_RequestIdFilter())
+    # Logger-level filters only run for records created on those exact loggers.
+    # Records from child loggers ("opex.*") and third-party libraries propagate
+    # straight to the root *handlers*, so the filter must also sit on the
+    # handlers — otherwise the format's %(request_id)s raises KeyError.
+    for handler in logging.getLogger().handlers:
+        if not any(isinstance(f, _RequestIdFilter) for f in handler.filters):
+            handler.addFilter(_RequestIdFilter())
+
+
+_configure_logging()
 logger = logging.getLogger("opex")
-logger.addFilter(_RequestIdFilter())
-# Propagate the filter to the root logger so all child loggers pick it up.
-logging.getLogger().addFilter(_RequestIdFilter())
 
 
 def _load_env_file() -> None:

@@ -129,6 +129,7 @@ Return ONLY valid JSON with this schema:
 
 Constraints:
 - Include 2-4 recommendations max.
+- Be economical: evidence bullets, callouts and quick wins under 25 words each; the JSON must be complete and parseable — never let verbosity push the response past the output limit.
 - Rank by modeled impact (mid_case_savings descending).
 - Every recommendation must include at least 2 evidence bullets.
 - Every recommendation must include at least 1 concrete transaction example from provided transaction_examples_by_category.
@@ -229,6 +230,14 @@ def _call_anthropic_native(
             "anthropic", active_model,
             getattr(usage, "input_tokens", 0),
             getattr(usage, "output_tokens", 0),
+        )
+    if getattr(response, "stop_reason", None) == "max_tokens":
+        from app.config import logger as _log
+
+        _log.warning(
+            '"anthropic response truncated at max_tokens=%d model=%s — output may be unparseable"',
+            max_tokens,
+            active_model,
         )
     text = getattr(response.content[0], "text", "") if response.content else ""
     return text.strip()
@@ -371,6 +380,15 @@ def _call_claude_with_thinking(
             "anthropic", active_model,
             getattr(usage, "input_tokens", 0),
             getattr(usage, "output_tokens", 0),
+        )
+    if getattr(response, "stop_reason", None) == "max_tokens":
+        from app.config import logger as _log
+
+        _log.warning(
+            '"anthropic thinking response truncated at max_tokens=%d (budget=%d) model=%s"',
+            max_tokens + budget_tokens,
+            budget_tokens,
+            active_model,
         )
     text = ""
     thinking = ""
@@ -813,6 +831,13 @@ def _scale_thinking_budget(payload: Dict[str, Any], budget: int) -> int:
     return budget
 
 
+# Strict-mode advisory JSON (250+ word category section, 3+ levers with evidence,
+# quick wins, callouts, 30/60/90 plan) measures 2.2–3k output tokens; a lower cap
+# truncates mid-JSON (stop_reason=max_tokens) and the parse failure degrades the
+# whole turn to provider_failed.
+_ADVISORY_MAX_OUTPUT_TOKENS = 4096
+
+
 def _timeout_budget_seconds(payload: Dict[str, Any], strict_mode: bool = False) -> int:
     from app.config import llm_synthesis_timeout_seconds
 
@@ -874,10 +899,21 @@ def synthesize_analysis_claude(
             "Explain the causal mechanism, not just the gap. "
             "Make it self-contained — a CFO must be able to act on it without reading anything else.\n"
         )
+    # This call's output is consumed only as AdvisorySections (normalize_advisory_sections
+    # drops recommendations/assumptions/citations) — suppress those fields so the response
+    # fits the output cap instead of truncating mid-JSON on data-rich engagements.
+    advisory_hint = (
+        "\nOUTPUT BUDGET (overrides schema constraints above):\n"
+        '- Return "recommendations", "assumptions" and "citations" as empty arrays [] — '
+        "this consumer does not read them; put all insight into the other fields.\n"
+        "- Cap category_focus_section at 400 words. Keep every other string under 60 words.\n"
+        "- The complete JSON must close properly well within the output limit.\n"
+    )
     user_prompt = (
         "Synthesize recommendations from this JSON context:\n"
         f"{json.dumps(payload, ensure_ascii=False)}\n"
         f"{strict_hint}"
+        f"{advisory_hint}"
     )
     from app.config import llm_thinking_timeout_seconds, logger as _log
 
@@ -896,7 +932,7 @@ def synthesize_analysis_claude(
             _call_claude_with_thinking,
             ANALYSIS_SYNTHESIS_SYSTEM_PROMPT,
             user_prompt,
-            2048,
+            _ADVISORY_MAX_OUTPUT_TOKENS,
             None,
             effective_budget,
         )
@@ -906,7 +942,7 @@ def synthesize_analysis_claude(
             _call_claude,
             ANALYSIS_SYNTHESIS_SYSTEM_PROMPT,
             user_prompt,
-            1800,
+            _ADVISORY_MAX_OUTPUT_TOKENS,
         )
     try:
         result = future.result(timeout=timeout_s)
@@ -1044,7 +1080,7 @@ def synthesize_analysis_claude_with_meta(
                 f"{json.dumps(in_payload, ensure_ascii=False)}\n"
                 f"{strict_hint}"
             ),
-            1800,
+            _ADVISORY_MAX_OUTPUT_TOKENS,
         )
         try:
             raw = future.result(timeout=timeout_s)
