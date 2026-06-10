@@ -168,11 +168,35 @@ def advisory_quality_ok(advisory: AdvisorySections, category_focused: bool = Fal
     return True
 
 
-def _estimate_tokens(payload: Dict[str, Any]) -> int:
+def _estimate_tokens(payload: Any) -> int:
     try:
         return len(json.dumps(payload, default=str)) // _CHARS_PER_TOKEN
     except Exception:
         return 0
+
+
+def _drop_largest_to_budget(
+    skill_outputs: Dict[str, Any], overshoot_tokens: int
+) -> Tuple[Dict[str, Any], List[str]]:
+    """Drop the largest skill payloads until ~overshoot_tokens are reclaimed.
+
+    Degraded synthesis over the remaining skills beats no synthesis at all —
+    the deterministic fallback is strictly worse than an LLM narrative built
+    from a partial skill set.
+    """
+    sizes = sorted(
+        ((skill, _estimate_tokens(output)) for skill, output in skill_outputs.items()),
+        key=lambda kv: kv[1],
+        reverse=True,
+    )
+    dropped: List[str] = []
+    reclaimed = 0
+    for skill, size in sizes:
+        if reclaimed >= overshoot_tokens:
+            break
+        dropped.append(skill)
+        reclaimed += size
+    return {k: v for k, v in skill_outputs.items() if k not in dropped}, dropped
 
 
 def generate_llm_advisory_sections(
@@ -213,26 +237,41 @@ def generate_llm_advisory_sections(
 
     slim_skill_outputs = _slim_skill_outputs(validated)
     doc_chunks = retrieved_context if retrieved_context else _truncate_doc_chunks(docs, max_chunks=2)
-    estimated_tokens = _estimate_tokens({
-        "user_message": ctx.user_message,
-        "session_context": {
-            "company_name": manifest.get("company_name"),
-            "industry": manifest.get("industry"),
-            "annual_revenue": manifest.get("annual_revenue"),
-            "currency": manifest.get("currency"),
-        },
-        "skill_outputs": slim_skill_outputs,
-        "document_chunks": doc_chunks,
-        "transaction_examples": tx_examples,
-    })
+
+    def _payload_estimate(outputs: Dict[str, Any]) -> int:
+        return _estimate_tokens({
+            "user_message": ctx.user_message,
+            "session_context": {
+                "company_name": manifest.get("company_name"),
+                "industry": manifest.get("industry"),
+                "annual_revenue": manifest.get("annual_revenue"),
+                "currency": manifest.get("currency"),
+            },
+            "skill_outputs": outputs,
+            "document_chunks": doc_chunks,
+            "transaction_examples": tx_examples,
+        })
+
+    estimated_tokens = _payload_estimate(slim_skill_outputs)
     logger.info("llm_token_budget estimated_tokens=%d limit=%d", estimated_tokens, _LLM_TOKEN_LIMIT)
     if estimated_tokens > _LLM_TOKEN_LIMIT:
+        slim_skill_outputs, dropped = _drop_largest_to_budget(
+            slim_skill_outputs, estimated_tokens - _LLM_TOKEN_LIMIT
+        )
+        estimated_tokens = _payload_estimate(slim_skill_outputs)
+        if estimated_tokens > _LLM_TOKEN_LIMIT or not slim_skill_outputs:
+            logger.warning(
+                "llm_token_budget_exceeded estimated_tokens=%d limit=%d; skipping LLM synthesis",
+                estimated_tokens,
+                _LLM_TOKEN_LIMIT,
+            )
+            return None, None, "token_budget_exceeded"
         logger.warning(
-            "llm_token_budget_exceeded estimated_tokens=%d limit=%d; skipping LLM synthesis",
+            "llm_token_budget_degraded dropped=%s estimated_tokens=%d limit=%d",
+            ",".join(dropped),
             estimated_tokens,
             _LLM_TOKEN_LIMIT,
         )
-        return None, None, "token_budget_exceeded"
 
     if category_focused is None:
         category_focused = bool(

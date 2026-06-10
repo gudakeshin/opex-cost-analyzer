@@ -575,13 +575,57 @@ _SPEND_PROFILER_KEYS = frozenset({
     "fixed_spend", "variable_spend",
 })
 
+# Initiative fields the synthesis prompt can actually use: identification,
+# financials, confidence/risk, and narrative rationale. UI-only enrichment
+# (execution_playbook, change_management, kpis, owner, provenance, vendors)
+# is rendered by InitiativeDrawer from the full skill output — sending it to
+# the LLM only burns token budget.
+_INITIATIVE_SYNTHESIS_KEYS = frozenset({
+    "category_id", "category_name", "lever", "lever_name", "lever_family",
+    "gross_savings", "net_savings", "cost_to_achieve",
+    "annualized_run_rate_savings", "ebitda_impact", "irr_pct",
+    "payback_months", "tco_adjusted",
+    "confidence", "savings_type", "horizon", "bounce_back_risk",
+    "org_change_risk", "sustainability_score", "base_execution_probability",
+    "business_rationale", "root_cause", "diagnostic_signals", "assumptions",
+    "risks", "phasing_narrative",
+})
+
+# Compact view of root-cause eligible levers — drops execution_playbook and
+# condition_precedents, which together make the full list ~67 kB of JSON.
+_ELIGIBLE_LEVER_KEYS = frozenset({
+    "lever_id", "lever_name", "lever_family", "eligibility_score",
+    "root_cause_match", "trigger_signals", "sustainability_score",
+    "bounce_back_risk",
+})
+
+
+def _slim_eligible_levers(levers: Any) -> List[Dict[str, Any]]:
+    """Compact the lever-eligibility table to top 8 levers by score.
+
+    The full table (34 levers x playbook + condition precedents) is ~67 kB of
+    JSON and appears in BOTH savings-modeler (eligible_levers) and
+    root-cause-analyzer (eligible_levers_summary).
+    """
+    if not isinstance(levers, list):
+        return []
+    top = sorted(
+        (lv for lv in levers if isinstance(lv, dict)),
+        key=lambda r: float(r.get("eligibility_score", 0) or 0),
+        reverse=True,
+    )[:8]
+    return [{k: v for k, v in lv.items() if k in _ELIGIBLE_LEVER_KEYS} for lv in top]
+
 
 def _slim_skill_outputs(skill_outputs: Dict[str, Any]) -> Dict[str, Any]:
-    """Trim large arrays within each skill to top-N rows; keep all analytical skills.
+    """Trim each skill's output to what the synthesis prompt can use.
 
-    The payload bulk comes from array lengths, NOT from skill count.
-    Trimming arrays keeps payload ~21 kB (well under the 35 kB fast-path threshold)
-    while preserving every analytical signal the synthesis prompt needs.
+    Payload bulk comes from two places: array lengths AND per-row enrichment
+    fields (initiative playbooks/RACI/provenance, lever playbooks). Both are
+    trimmed here — arrays to top-N rows, rows to synthesis-relevant keys —
+    so the full 26-skill payload stays well inside the reflect-advisory
+    token budget (_LLM_TOKEN_LIMIT) instead of skipping LLM synthesis.
+    Idempotent: re-slimming an already-slimmed payload is a no-op.
     """
     slimmed: Dict[str, Any] = {}
     for skill, output in skill_outputs.items():
@@ -632,8 +676,19 @@ def _slim_skill_outputs(skill_outputs: Dict[str, Any]) -> Dict[str, Any]:
 
         elif skill == "savings-modeler":
             initiatives = output.get("initiatives", []) if isinstance(output.get("initiatives"), list) else []
-            slimmed[skill] = {k: v for k, v in output.items() if k != "initiatives"}
-            slimmed[skill]["initiatives"] = initiatives[:12]
+            slimmed[skill] = {
+                k: v for k, v in output.items()
+                if k not in {"initiatives", "eligible_levers"}
+            }
+            slimmed[skill]["initiatives"] = [
+                {k: v for k, v in init.items() if k in _INITIATIVE_SYNTHESIS_KEYS}
+                for init in initiatives[:12]
+                if isinstance(init, dict)
+            ]
+            if output.get("eligible_levers"):
+                slimmed[skill]["eligible_levers"] = _slim_eligible_levers(
+                    output.get("eligible_levers")
+                )
 
         elif skill == "root-cause-analyzer":
             findings = (
@@ -641,8 +696,46 @@ def _slim_skill_outputs(skill_outputs: Dict[str, Any]) -> Dict[str, Any]:
                 if isinstance(output.get("root_cause_findings"), list)
                 else []
             )
-            slimmed[skill] = {k: v for k, v in output.items() if k != "root_cause_findings"}
+            slimmed[skill] = {
+                k: v for k, v in output.items()
+                if k not in {"root_cause_findings", "eligible_levers_summary"}
+            }
             slimmed[skill]["root_cause_findings"] = findings[:8]
+            if output.get("eligible_levers_summary"):
+                slimmed[skill]["eligible_levers_summary"] = _slim_eligible_levers(
+                    output.get("eligible_levers_summary")
+                )
+
+        elif skill == "sme-critique":
+            # Compact mirror of _slim_sme_critique's needs so the dedicated
+            # sme_critique_data field still resolves probe questions when the
+            # synthesizer re-slims an already-slimmed payload.
+            critiques = (
+                output.get("initiative_critiques", [])
+                if isinstance(output.get("initiative_critiques"), list)
+                else []
+            )
+            slim_critiques = []
+            for c in critiques[:5]:
+                if not isinstance(c, dict):
+                    continue
+                probes = c.get("probe_questions", []) if isinstance(c.get("probe_questions"), list) else []
+                slim_critiques.append({
+                    "category_name": c.get("category_name"),
+                    "lever": c.get("lever"),
+                    "sme_verdict": c.get("sme_verdict"),
+                    "evidence_maturity": c.get("evidence_maturity"),
+                    "critical_risk": c.get("critical_risk"),
+                    "probe_questions": [
+                        {"question": p.get("question"), "why_critical": p.get("why_critical")}
+                        for p in probes[:1]
+                        if isinstance(p, dict)
+                    ],
+                })
+            slimmed[skill] = {
+                "critique_summary": output.get("critique_summary", {}),
+                "initiative_critiques": slim_critiques,
+            }
 
         else:
             slimmed[skill] = output
