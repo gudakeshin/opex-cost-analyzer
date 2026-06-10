@@ -44,8 +44,22 @@ def test_needs_llm_advisory_true_for_category_focused_root_cause_without_value_b
     }
     with patch("app.opar.reflect_advisory.GEMINI_ENABLED", True):
         assert needs_llm_advisory(ctx, validated, category_focused=True) is True
-        # Without category focus, the narrower value-bridge/savings-modeler gate still applies.
-        assert needs_llm_advisory(ctx, validated, category_focused=False) is False
+        assert needs_llm_advisory(ctx, validated, category_focused=False) is True
+
+
+def test_needs_llm_advisory_true_for_drill_down_with_spend_profiler_only() -> None:
+    ctx = ObserveContext(
+        user_message="What are the top savings opportunities?",
+        intent_class="drill_down",
+    )
+    validated = {
+        "spend-profiler": {
+            "category_profile": [{"category_name": "IT", "spend": 500_000}],
+            "total_spend": 5_000_000,
+        },
+    }
+    with patch("app.opar.reflect_advisory.ANTHROPIC_ENABLED", True):
+        assert needs_llm_advisory(ctx, validated) is True
 
 
 def test_generate_skipped_when_not_needed() -> None:

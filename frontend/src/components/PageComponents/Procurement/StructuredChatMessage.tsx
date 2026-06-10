@@ -30,6 +30,12 @@ function AssistantAvatar() {
   );
 }
 
+function hasSynthesisSkipReason(reasons?: Record<string, unknown>): boolean {
+  const advisory = String(reasons?.llm_advisory ?? '').trim();
+  const chat = String(reasons?.chat_synthesis ?? '').trim();
+  return Boolean(advisory || chat);
+}
+
 function llmFallbackDetail(reasons?: Record<string, unknown>): string {
   const advisory = String(reasons?.llm_advisory ?? '').trim();
   if (advisory === 'token_budget_exceeded') {
@@ -40,8 +46,9 @@ function llmFallbackDetail(reasons?: Record<string, unknown>): string {
   }
   if (advisory === 'provider_unavailable' || advisory === 'provider_failed') {
     return (
-      'The LLM call failed (timeout or API error). Select Claude Sonnet 4.6 in the model ' +
-      'dropdown if Gemini credits are depleted, confirm API keys in .env, then retry.'
+      'Live LLM narrative synthesis did not complete (often extended-thinking timeout on large ' +
+      'engagements). A deterministic summary was used instead. Try Claude Sonnet 4.6 in the model ' +
+      'dropdown, turn Thinking off for faster synthesis, or retry after confirming API keys in .env.'
     );
   }
   const chat = String(reasons?.chat_synthesis ?? '').trim();
@@ -228,7 +235,7 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
             )}
           </div>
         )}
-        {!isUser && message.used_llm_synthesis === false && (
+        {!isUser && message.used_llm_synthesis === false && hasSynthesisSkipReason(message.fallback_reasons) && (
           <LlmOfflineBanner reasons={message.fallback_reasons} />
         )}
         {isUser ? (

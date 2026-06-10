@@ -27,6 +27,25 @@ _DEEP_ANALYSIS_SKILLS = frozenset({
     "value-bridge-calculator",
 })
 
+_ANALYSIS_INTENTS = frozenset({
+    "benchmark",
+    "value_bridge",
+    "business_case",
+    "savings_plan",
+    "drill_down",
+    "sensitivity",
+})
+
+
+def _has_spend_context(validated: Dict[str, Dict[str, Any]]) -> bool:
+    profile = validated.get("spend-profiler")
+    if not isinstance(profile, dict):
+        return False
+    if float(profile.get("total_spend", 0) or 0) > 0:
+        return True
+    cats = profile.get("category_profile")
+    return isinstance(cats, list) and len(cats) > 0
+
 # The concrete synthesizers (claude/gemini) accept several optional keyword
 # arguments (strict_mode, thinking_enabled, transaction_examples, …) on top of
 # the positional payload. Use an open (...) parameter list so callers may pass
@@ -48,16 +67,14 @@ def needs_llm_advisory(
         return False
     has_value_modeling = "value-bridge-calculator" in validated or "savings-modeler" in validated
     has_deep_analysis = any(skill in validated for skill in _DEEP_ANALYSIS_SKILLS)
-    if not has_value_modeling and not (category_focused and has_deep_analysis):
+    has_rich_context = has_value_modeling or has_deep_analysis or _has_spend_context(validated)
+    if not has_rich_context:
         return False
     if ctx.wants_executive_narrative:
         return True
     if category_focused:
         return True
-    if ctx.intent_class in {
-        "benchmark", "value_bridge", "business_case", "savings_plan",
-        "drill_down", "sensitivity",
-    }:
+    if ctx.intent_class in _ANALYSIS_INTENTS:
         return True
     return bool(validated.get("value-bridge-calculator"))
 
@@ -273,6 +290,36 @@ def generate_llm_advisory_sections(
             break
     if best_effort is not None:
         return best_effort, captured_thinking, None
+    # Extended thinking on large contexts often exceeds the wall-clock budget — retry fast path.
+    if not had_any_raw and thinking_enabled:
+        synth_kwargs["thinking_enabled"] = False
+        for synthesize in synthesizers:
+            for strict_mode in mode_order:
+                try:
+                    raw, thinking_text = synthesize(
+                        ctx.user_message,
+                        **synth_kwargs,
+                        strict_mode=strict_mode,
+                    )
+                except Exception as exc:
+                    logger.warning("llm_advisory_synthesizer_error error=%s", exc)
+                    raw, thinking_text = None, None
+                if raw is not None:
+                    had_any_raw = True
+                advisory = normalize_advisory_sections(raw or {})
+                if not advisory:
+                    continue
+                if advisory_quality_ok(advisory, category_focused=category_focused):
+                    return advisory, captured_thinking, None
+                if (
+                    len((advisory.executive_takeaway or "").strip()) >= 60
+                    and len(advisory.business_levers) >= (2 if category_focused else 1)
+                ):
+                    best_effort = advisory
+            if best_effort is not None:
+                break
+        if best_effort is not None:
+            return best_effort, captured_thinking, None
     if not had_any_raw and best_effort is None:
         return None, captured_thinking, "provider_failed"
     return None, captured_thinking, "synthesis_quality_low"

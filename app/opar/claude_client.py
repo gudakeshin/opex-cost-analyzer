@@ -684,6 +684,11 @@ def synthesize_chat_response_claude(
             timeout_s,
             thinking_enabled,
         )
+        if thinking_enabled:
+            from app.config import logger as _log
+
+            _log.info('"synthesize_chat_response_claude retrying without extended thinking"')
+            return synthesize_chat_response_claude(context, thinking_enabled=False)
         return None, None
     except Exception as exc:  # noqa: BLE001 — degrade to deterministic fallback
         from app.config import logger
@@ -692,6 +697,16 @@ def synthesize_chat_response_claude(
         return None, None
     finally:
         executor.shutdown(wait=False, cancel_futures=True)
+
+
+def _scale_thinking_budget(payload: Dict[str, Any], budget: int) -> int:
+    """Reduce extended-thinking budget for large synthesis payloads."""
+    size = len(json.dumps(payload, ensure_ascii=False, default=str))
+    if size > 55_000:
+        return min(budget, 3_500)
+    if size > 40_000:
+        return min(budget, 5_000)
+    return budget
 
 
 def _timeout_budget_seconds(payload: Dict[str, Any], strict_mode: bool = False) -> int:
@@ -760,8 +775,11 @@ def synthesize_analysis_claude(
         f"{json.dumps(payload, ensure_ascii=False)}\n"
         f"{strict_hint}"
     )
-    from app.config import llm_thinking_timeout_seconds
+    from app.config import llm_thinking_timeout_seconds, logger as _log
 
+    effective_budget = (
+        _scale_thinking_budget(payload, thinking_budget_tokens) if thinking_enabled else thinking_budget_tokens
+    )
     timeout_s = (
         llm_thinking_timeout_seconds()
         if thinking_enabled
@@ -776,7 +794,7 @@ def synthesize_analysis_claude(
             user_prompt,
             2048,
             None,
-            thinking_budget_tokens,
+            effective_budget,
         )
     else:
         future = submit_with_context(
@@ -791,13 +809,26 @@ def synthesize_analysis_claude(
     except FuturesTimeoutError:
         future.cancel()
         executor.shutdown(wait=False, cancel_futures=True)
-        from app.config import logger
-
-        logger.warning(
+        _log.warning(
             '"synthesize_analysis_claude timeout after %ss (thinking=%s)"',
             timeout_s,
             thinking_enabled,
         )
+        if thinking_enabled:
+            _log.info('"synthesize_analysis_claude retrying without extended thinking"')
+            return synthesize_analysis_claude(
+                user_message,
+                manifest,
+                model_manifest,
+                skill_outputs,
+                docs_text,
+                transaction_examples=transaction_examples,
+                strict_mode=strict_mode,
+                thinking_enabled=False,
+                thinking_budget_tokens=thinking_budget_tokens,
+                deep_research_summary=deep_research_summary,
+                retrieved_context=retrieved_context,
+            )
         return None, None
     finally:
         if not future.cancelled():
@@ -811,16 +842,44 @@ def synthesize_analysis_claude(
     try:
         data = _extract_json(raw)
     except Exception as exc:
-        from app.config import logger as _log
-
         _log.warning(
             '"synthesize_analysis_claude json_parse_failed error=%s raw_len=%d"',
             exc,
             len(raw or ""),
         )
+        if thinking_enabled:
+            _log.info('"synthesize_analysis_claude retrying without extended thinking after parse failure"')
+            return synthesize_analysis_claude(
+                user_message,
+                manifest,
+                model_manifest,
+                skill_outputs,
+                docs_text,
+                transaction_examples=transaction_examples,
+                strict_mode=strict_mode,
+                thinking_enabled=False,
+                thinking_budget_tokens=thinking_budget_tokens,
+                deep_research_summary=deep_research_summary,
+                retrieved_context=retrieved_context,
+            )
         return None, thinking_text
     if isinstance(data, dict):
         return data, thinking_text
+    if thinking_enabled:
+        _log.info('"synthesize_analysis_claude retrying without extended thinking after empty JSON"')
+        return synthesize_analysis_claude(
+            user_message,
+            manifest,
+            model_manifest,
+            skill_outputs,
+            docs_text,
+            transaction_examples=transaction_examples,
+            strict_mode=strict_mode,
+            thinking_enabled=False,
+            thinking_budget_tokens=thinking_budget_tokens,
+            deep_research_summary=deep_research_summary,
+            retrieved_context=retrieved_context,
+        )
     return None, thinking_text
 
 
