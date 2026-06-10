@@ -1,14 +1,16 @@
-from __future__ import annotations
-
+# NOTE: no `from __future__ import annotations` here — slowapi's @limiter.limit
+# wrapper cannot resolve postponed annotations (List[UploadFile] etc.) because
+# FastAPI evaluates them against the wrapper's __globals__, not this module's.
 import asyncio
 import os
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List
 
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 
 from app.config import MAX_UPLOAD_MB
+from app.ratelimit import RATE_LIMIT_LLM, limiter
 from app.opar.hitl.clarification_tool import ClarificationAnswer
 from app.opar.orchestrator import (
     CheckpointAlreadyResumedError,
@@ -38,6 +40,7 @@ from app.opar.hitl.probe_answers import (
 )
 from app.opar.probe_intelligence import synthesize_probe_answer_acknowledgment
 from app.schemas import ChatRequest, ClarificationResumeRequest, ProbeAnswerRequest, V1ChatRequest
+from app.security.auth import check_session_owner
 from app.services.llm_selection import llm_selection_context
 from app.services.compliance import append_audit_event
 from app.services.ingestion import infer_tabular_schema, parse_document
@@ -109,7 +112,9 @@ def _serialize_chat_history(history: Any) -> list[dict[str, str]] | None:
 
 
 @router.post("/api/v1/chat/with-files")
+@limiter.limit(RATE_LIMIT_LLM)
 async def chat_v1_with_files(
+    request: Request,
     message: str = Form(...),
     session_id: str = Form(...),
     user_id: str | None = Form(None),
@@ -123,6 +128,7 @@ async def chat_v1_with_files(
     files: List[UploadFile] = File(default=[]),
 ) -> Dict[str, Any]:
     validate_session_id(session_id)
+    check_session_owner(request, session_id)
     if not session_dir(session_id).exists():
         raise HTTPException(status_code=404, detail="Session not found")
     run_id = run_id or str(uuid.uuid4())
@@ -246,8 +252,10 @@ async def chat_v1_with_files(
 
 
 @router.post("/api/v1/chat")
-async def chat_v1_opar(payload: V1ChatRequest) -> Dict[str, Any]:
+@limiter.limit(RATE_LIMIT_LLM)
+async def chat_v1_opar(request: Request, payload: V1ChatRequest) -> Dict[str, Any]:
     validate_session_id(payload.session_id)
+    check_session_owner(request, payload.session_id)
     if not session_dir(payload.session_id).exists():
         raise HTTPException(status_code=404, detail="Session not found")
     run_id = payload.run_id or str(uuid.uuid4())
@@ -299,7 +307,8 @@ async def chat_v1_opar(payload: V1ChatRequest) -> Dict[str, Any]:
 
 
 @router.post("/api/v1/chat/resume")
-async def chat_v1_resume(payload: ClarificationResumeRequest) -> Dict[str, Any]:
+@limiter.limit(RATE_LIMIT_LLM)
+async def chat_v1_resume(request: Request, payload: ClarificationResumeRequest) -> Dict[str, Any]:
     if not payload.has_answer():
         raise HTTPException(
             status_code=422,
@@ -389,8 +398,10 @@ async def chat_v1_resume(payload: ClarificationResumeRequest) -> Dict[str, Any]:
 
 
 @router.post("/api/v1/chat/probe-answer")
-async def chat_v1_probe_answer(payload: ProbeAnswerRequest) -> Dict[str, Any]:
+@limiter.limit(RATE_LIMIT_LLM)
+async def chat_v1_probe_answer(request: Request, payload: ProbeAnswerRequest) -> Dict[str, Any]:
     validate_session_id(payload.session_id)
+    check_session_owner(request, payload.session_id)
     if not session_dir(payload.session_id).exists():
         raise HTTPException(status_code=404, detail="Session not found")
 
@@ -469,8 +480,9 @@ def chat_v1_progress(run_id: str) -> Dict[str, Any]:
 
 
 @router.post("/api/v1/chat/plan")
-def chat_v1_plan_preview(payload: V1ChatRequest) -> Dict[str, Any]:
+def chat_v1_plan_preview(request: Request, payload: V1ChatRequest) -> Dict[str, Any]:
     validate_session_id(payload.session_id)
+    check_session_owner(request, payload.session_id)
     if not session_dir(payload.session_id).exists():
         raise HTTPException(status_code=404, detail="Session not found")
     manifest = read_manifest(payload.session_id)
@@ -493,7 +505,8 @@ def chat_v1_plan_preview(payload: V1ChatRequest) -> Dict[str, Any]:
 
 @router.post("/api/chat/{session_id}")
 @router.post("/api/v1/chat/{session_id}")
-async def chat_with_planner(session_id: str, payload: ChatRequest) -> Dict[str, Any]:
+@limiter.limit(RATE_LIMIT_LLM)
+async def chat_with_planner(request: Request, session_id: str, payload: ChatRequest) -> Dict[str, Any]:
     validate_session_id(session_id)
     if not session_dir(session_id).exists():
         raise HTTPException(status_code=404, detail="Session not found")

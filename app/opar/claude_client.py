@@ -8,7 +8,8 @@ import re
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from typing import Any, Dict, List, Tuple
 
-from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED, LLM_PROVIDER
+from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED
+from app.metrics import record_llm_usage
 from app.services.llm_selection import (
     get_resolved_llm_model,
     get_resolved_llm_provider,
@@ -222,6 +223,13 @@ def _call_anthropic_native(
         system=system,
         messages=[{"role": "user", "content": user_content}],
     )
+    usage = getattr(response, "usage", None)
+    if usage is not None:
+        record_llm_usage(
+            "anthropic", active_model,
+            getattr(usage, "input_tokens", 0),
+            getattr(usage, "output_tokens", 0),
+        )
     text = getattr(response.content[0], "text", "") if response.content else ""
     return text.strip()
 
@@ -257,6 +265,59 @@ def _call_claude(
         return call_gemini(
             system=system, user_content=user_content, max_tokens=max_tokens, model=model
         )
+    raise RuntimeError("No LLM provider configured")
+
+
+async def call_claude_async(
+    system: str,
+    user_content: str,
+    max_tokens: int = 512,
+    model: str | None = None,
+    *,
+    http_timeout_s: float | None = None,
+) -> str:
+    """Async Claude call using AsyncAnthropic — does not occupy a thread-pool slot.
+
+    Falls back to Gemini (via asyncio.to_thread) when Anthropic is unavailable.
+    Raises RuntimeError if no provider is configured.
+    """
+    import asyncio as _asyncio
+
+    if os.getenv("PYTEST_CURRENT_TEST"):
+        raise RuntimeError("Claude calls disabled during pytest runs")
+
+    active_model = model or get_resolved_llm_model(provider="anthropic")
+
+    if ANTHROPIC_ENABLED and ANTHROPIC_API_KEY:
+        try:
+            import anthropic as _anthropic
+        except ImportError:
+            raise RuntimeError("anthropic package not installed")
+
+        timeout = http_timeout_s if http_timeout_s is not None else _anthropic_http_timeout_seconds()
+        client = _anthropic.AsyncAnthropic(api_key=ANTHROPIC_API_KEY, timeout=timeout)
+        response = await client.messages.create(
+            model=active_model,
+            max_tokens=max_tokens,
+            system=system,
+            messages=[{"role": "user", "content": user_content}],
+        )
+        usage = getattr(response, "usage", None)
+        if usage is not None:
+            record_llm_usage(
+                "anthropic", active_model,
+                getattr(usage, "input_tokens", 0),
+                getattr(usage, "output_tokens", 0),
+            )
+        text = getattr(response.content[0], "text", "") if response.content else ""
+        return text.strip()
+
+    if GEMINI_ENABLED:
+        from app.opar.gemini_client import call_gemini
+        return await _asyncio.to_thread(
+            call_gemini, system=system, user_content=user_content, max_tokens=max_tokens, model=model
+        )
+
     raise RuntimeError("No LLM provider configured")
 
 
@@ -304,6 +365,13 @@ def _call_claude_with_thinking(
         messages=[{"role": "user", "content": user_content}],
         thinking={"type": "enabled", "budget_tokens": budget_tokens},
     )
+    usage = getattr(response, "usage", None)
+    if usage is not None:
+        record_llm_usage(
+            "anthropic", active_model,
+            getattr(usage, "input_tokens", 0),
+            getattr(usage, "output_tokens", 0),
+        )
     text = ""
     thinking = ""
     for block in response.content:
@@ -697,6 +765,42 @@ def synthesize_chat_response_claude(
         return None, None
     finally:
         executor.shutdown(wait=False, cancel_futures=True)
+
+
+async def synthesize_chat_response_claude_async(
+    context: Dict[str, Any],
+) -> Tuple[str | None, str | None]:
+    """Async version of synthesize_chat_response_claude — uses AsyncAnthropic directly.
+
+    Avoids occupying a thread-pool slot for the I/O-bound API call.
+    Returns (None, None) on any failure so the caller can fall back to deterministic.
+    """
+    if not ANTHROPIC_ENABLED:
+        return None, None
+    if os.getenv("PYTEST_CURRENT_TEST"):
+        return None, None
+    user_prompt = (
+        "Answer the user's question from this context. Return markdown only.\n"
+        f"{json.dumps(context, ensure_ascii=False)}"
+    )
+    from app.config import llm_synthesis_timeout_seconds
+
+    import asyncio as _asyncio
+    timeout_s = llm_synthesis_timeout_seconds(len(user_prompt))
+    try:
+        text = await _asyncio.wait_for(
+            call_claude_async(
+                CHAT_RESPONSE_SYSTEM_PROMPT,
+                user_prompt,
+                max_tokens=1024,
+            ),
+            timeout=timeout_s,
+        )
+        return (text or "").strip() or None, None
+    except Exception as exc:  # noqa: BLE001
+        from app.config import logger as _log
+        _log.warning('"synthesize_chat_response_claude_async failed error=%s"', exc)
+        return None, None
 
 
 def _scale_thinking_budget(payload: Dict[str, Any], budget: int) -> int:
@@ -1124,6 +1228,14 @@ class ClaudeToolTransport:
             kwargs["thinking"] = {"type": "enabled", "budget_tokens": self.thinking_budget}
 
         response = client.messages.create(**kwargs)
+
+        usage = getattr(response, "usage", None)
+        if usage is not None:
+            record_llm_usage(
+                "anthropic", self.model,
+                getattr(usage, "input_tokens", 0),
+                getattr(usage, "output_tokens", 0),
+            )
 
         text_parts: list[str] = []
         thinking_parts: list[str] = []

@@ -1,5 +1,6 @@
-from __future__ import annotations
-
+# NOTE: no `from __future__ import annotations` here — slowapi's @limiter.limit
+# wrapper cannot resolve postponed annotations (List[UploadFile] etc.) because
+# FastAPI evaluates them against the wrapper's __globals__, not this module's.
 import asyncio
 import uuid
 from datetime import datetime, timezone
@@ -10,6 +11,7 @@ from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 from fastapi.responses import Response
 
 from app.config import DATA_DIR, MAX_UPLOAD_MB, UPLOAD_DIR, logger
+from app.ratelimit import RATE_LIMIT_LLM, limiter
 from app.routers._shared import (
     _memory,
     merge_context_into_manifest,
@@ -23,6 +25,7 @@ from app.routers._shared import (
     write_manifest,
 )
 from app.schemas import AnalyzeRequest, DiagnosticContextPatch, SessionCreateRequest, SessionManifestPatch
+from app.security.auth import current_principal, visible_to_principal
 from app.services.analysis import load_taxonomy, run_core_pipeline
 from app.services.compliance import append_audit_event
 from app.services.engagement_sanity import apply_engagement_sanity_to_manifest
@@ -32,11 +35,9 @@ from app.services.engagements_store import (
     read_engagement_manifest,
     register_session_on_engagement,
 )
-from app.services.ingestion import infer_tabular_schema
 from app.skills.model_contextualizer import (
     build_workbook_manifest,
     compute_file_fingerprint,
-    maybe_interpret_workbook_on_upload,
     should_run_model_contextualizer,
 )
 
@@ -221,9 +222,10 @@ def download_spend_template() -> Response:
 
 @router.post("/api/sessions")
 @router.post("/api/v1/sessions")
-def create_session(payload: SessionCreateRequest) -> Dict[str, Any]:
+def create_session(request: Request, payload: SessionCreateRequest) -> Dict[str, Any]:
     session_id = str(uuid.uuid4())
     session_dir(session_id).mkdir(parents=True, exist_ok=True)
+    owner = current_principal(request)
 
     engagement_id = (payload.engagement_id or "").strip()
     if engagement_id:
@@ -244,6 +246,7 @@ def create_session(payload: SessionCreateRequest) -> Dict[str, Any]:
             annual_revenue=payload.annual_revenue,
             currency=payload.currency or "INR",
             headcount=payload.headcount,
+            owner=owner,
         )
         engagement_id = eng_manifest["engagement_id"]
         company_name = payload.company_name
@@ -255,6 +258,7 @@ def create_session(payload: SessionCreateRequest) -> Dict[str, Any]:
     manifest: Dict[str, Any] = {
         "session_id": session_id,
         "engagement_id": engagement_id,
+        "owner": owner,
         "company_name": company_name,
         "industry": industry or "",
         "annual_revenue": annual_revenue,
@@ -268,9 +272,7 @@ def create_session(payload: SessionCreateRequest) -> Dict[str, Any]:
     }
     write_manifest(session_id, manifest)
     register_session_on_engagement(engagement_id, session_id)
-    append_audit_event(
-        f"session_created session_id={session_id} engagement_id={engagement_id}"
-    )
+    append_audit_event("session_created", session_id=session_id, engagement_id=engagement_id)
     return manifest
 
 
@@ -289,7 +291,8 @@ async def upload_file(session_id: str, request: Request, file: UploadFile = File
 
 @router.post("/api/analyze/{session_id}")
 @router.post("/api/v1/analyze/{session_id}")
-async def analyze_session(session_id: str, payload: AnalyzeRequest) -> Dict[str, Any]:
+@limiter.limit(RATE_LIMIT_LLM)
+async def analyze_session(request: Request, session_id: str, payload: AnalyzeRequest) -> Dict[str, Any]:
     validate_session_id(session_id)
     if not session_dir(session_id).exists():
         raise HTTPException(status_code=404, detail="Session not found")
@@ -425,7 +428,7 @@ async def analyze_session(session_id: str, payload: AnalyzeRequest) -> Dict[str,
     if manifest_changed:
         manifest.setdefault("gate_label", "Gate 2: Portfolio sign-off")
         write_manifest(session_id, manifest)
-    append_audit_event(f"analysis_completed session_id={session_id}")
+    append_audit_event("analysis_completed", session_id=session_id)
     return analysis
 
 
@@ -524,7 +527,7 @@ def get_session_schema(session_id: str) -> Dict[str, Any]:
 
 
 @router.get("/api/v1/sessions")
-def list_sessions() -> List[Dict[str, Any]]:
+def list_sessions(request: Request) -> List[Dict[str, Any]]:
     """Return a summary of all sessions, newest first. Used by the History page."""
     from app.storage import read_json as _read_json
     summaries: List[Dict[str, Any]] = []
@@ -542,6 +545,8 @@ def list_sessions() -> List[Dict[str, Any]]:
             continue
         try:
             manifest = _read_json(manifest_file, {})
+            if not visible_to_principal(request, manifest.get("owner")):
+                continue
             analysis = _memory.get("session", session_path.name)
             top_savings = None
             if analysis and isinstance(analysis, dict):
@@ -568,7 +573,8 @@ def list_sessions() -> List[Dict[str, Any]]:
 
 
 @router.post("/api/v1/analyze/{session_id}/incremental")
-async def incremental_analyze(session_id: str, files: List[UploadFile] = File(default=[])) -> Dict[str, Any]:
+@limiter.limit(RATE_LIMIT_LLM)
+async def incremental_analyze(request: Request, session_id: str, files: List[UploadFile] = File(default=[])) -> Dict[str, Any]:
     """Upload additional spend files and merge into an existing session."""
     validate_session_id(session_id)
     if not session_dir(session_id).exists():
@@ -598,7 +604,7 @@ async def incremental_analyze(session_id: str, files: List[UploadFile] = File(de
         result = run_incremental_pipeline(session_id=session_id, new_lines=new_lines)
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
-    append_audit_event(f"incremental_analysis session_id={session_id} lines_added={result.get('lines_added', 0)}")
+    append_audit_event("incremental_analysis", session_id=session_id, data={"lines_added": result.get("lines_added", 0)})
     return result
 
 
@@ -628,8 +634,8 @@ def patch_diagnostic_context(session_id: str, patch: DiagnosticContextPatch) -> 
     write_manifest(session_id, manifest)
     append_audit_event(
         "diagnostic_context_patched",
+        session_id=session_id,
         data={
-            "session_id": session_id,
             "has_deep_research": patch.deep_research_summary is not None,
             "has_diagnostic_result": patch.diagnostic_result is not None,
         },

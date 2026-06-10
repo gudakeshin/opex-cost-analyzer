@@ -76,6 +76,9 @@ class NormalizedSpendLine(BaseModel):
     conflict_flag: Optional[str] = None         # "tds_mismatch" | "gst_mismatch" | "vendor_duplicate" …
     conflict_resolution: Optional[str] = None   # Applied resolution strategy
     reconciled_amount: Optional[float] = None   # Canonical amount after conflict resolution
+    # Data-quality propagation (v2.3)
+    data_quality_score: float = 0.0             # 0.0–1.0; fraction of key fields populated at ingestion
+    is_credit_or_reversal: bool = False         # True when amount < 0 or description signals a credit/reversal
 
     @field_validator("fx_rate_to_reporting")
     @classmethod

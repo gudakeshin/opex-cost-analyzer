@@ -311,6 +311,10 @@ def _value_bridge_calculator(ctx: SkillContext) -> tuple[Dict[str, Any], str | N
     # seed data (0.55) widens bands, a client/sector-pack benchmark (0.85) tightens them.
     bench = _get_bench_resolved(ctx)
     specificity = float((bench.get("selected_dataset") or {}).get("specificity_score", 0.70))
+    # Pull portfolio data quality from savings-modeler summary (0.0–1.0; default 1.0)
+    savings_quality = float(
+        (savings_model or {}).get("summary", {}).get("portfolio_data_quality_score", 1.0)
+    )
     return _engine.value_bridge_calculator(
         peer,
         internal,
@@ -318,6 +322,7 @@ def _value_bridge_calculator(ctx: SkillContext) -> tuple[Dict[str, Any], str | N
         total,
         savings_model=savings_model,
         benchmark_specificity=specificity,
+        data_quality_score=savings_quality,
     ), None
 
 
@@ -620,7 +625,11 @@ def _dashboard_builder(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
 
 @register("export-formatter")
 def _export_formatter(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
-    from app.services.pmo_export import build_pmo_data, export_pmo_xlsx  # lazy
+    from app.services.pmo_export import (  # lazy
+        _BENCHMARK_DISCLAIMER,
+        build_pmo_data,
+        export_pmo_xlsx,
+    )
     from app.services.pipeline import pipeline_summary as get_pipeline_summary  # lazy
 
     # build_pmo_data(pipeline_summary, initiatives, *, company_name=...): the
@@ -629,7 +638,26 @@ def _export_formatter(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     savings = ctx.prior("savings-modeler")
     initiatives = savings.get("initiatives", []) if isinstance(savings, dict) else []
     summary = get_pipeline_summary()
-    pmo_data = build_pmo_data(summary, initiatives, company_name=ctx.company_name or "Client")
+
+    # Propagate benchmark disclaimer when the peer benchmarker used illustrative data.
+    peer = ctx.prior("peer-benchmarker")
+    uses_illustrative = False
+    if isinstance(peer, dict):
+        src = peer.get("benchmark_dataset", {})
+        if isinstance(src, dict):
+            uses_illustrative = "illustrative" in str(src.get("source_name", "")).lower()
+    benchmark_disclaimer = _BENCHMARK_DISCLAIMER if uses_illustrative else None
+
+    pmo_data = build_pmo_data(
+        summary,
+        initiatives,
+        company_name=ctx.company_name or "Client",
+        benchmark_disclaimer=benchmark_disclaimer,
+    )
     session_key = ctx.manifest.get("session_id") or "session"
     path = export_pmo_xlsx(pmo_data, filename=f"{session_key}_pmo_export.xlsx")
-    return {"export_url": f"/api/v1/exports/{path.name}", "filename": path.name}, None
+    return {
+        "export_url": f"/api/v1/exports/{path.name}",
+        "filename": path.name,
+        "uses_illustrative_benchmarks": uses_illustrative,
+    }, None

@@ -1,6 +1,7 @@
 """Engagement-scoped document management API."""
-from __future__ import annotations
-
+# NOTE: no `from __future__ import annotations` here — slowapi's @limiter.limit
+# wrapper cannot resolve postponed annotations (UploadFile etc.) because
+# FastAPI evaluates them against the wrapper's __globals__, not this module's.
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List
@@ -9,6 +10,7 @@ from fastapi import APIRouter, BackgroundTasks, File, HTTPException, Request, Up
 from fastapi.responses import FileResponse
 
 from app.config import MAX_UPLOAD_MB, logger
+from app.ratelimit import RATE_LIMIT_UPLOAD, limiter
 from app.routers._shared import (
     engagement_lock,
     utc_now_iso,
@@ -16,6 +18,7 @@ from app.routers._shared import (
     validate_engagement_id,
 )
 from app.schemas import EngagementCreateRequest, EngagementPatchRequest
+from app.security.auth import current_principal, visible_to_principal
 from app.services.analysis import load_taxonomy
 from app.services.compliance import append_audit_event
 from app.services.document_pipeline import (
@@ -32,7 +35,6 @@ from app.services.engagements_store import (
     ensure_engagement_exists,
     get_document_record,
     list_engagements,
-    read_engagement_manifest,
     repair_engagement_manifest,
     update_document_record,
     write_engagement_manifest,
@@ -49,7 +51,7 @@ def _run_document_pipeline(engagement_id: str, document_id: str, currency: str) 
             taxonomy=load_taxonomy(),
             reporting_currency=currency,
         )
-        append_audit_event(f"document_parsed engagement_id={engagement_id} document_id={document_id}")
+        append_audit_event("document_parsed", engagement_id=engagement_id, data={"document_id": document_id})
         # Refresh the engagement's auto-detected company/industry recommendation
         # from everything parsed so far. Off the request path (background task);
         # the LLM contextualizer is cached by content hash inside detection.
@@ -64,26 +66,29 @@ def _run_document_pipeline(engagement_id: str, document_id: str, currency: str) 
     except Exception as exc:
         logger.warning("background document pipeline failed: %s", exc)
         append_audit_event(
-            f"document_failed engagement_id={engagement_id} document_id={document_id} error={exc}"
+            "document_failed",
+            engagement_id=engagement_id,
+            data={"document_id": document_id, "error": str(exc)},
         )
 
 
 @router.post("/api/v1/engagements")
-def create_engagement(payload: EngagementCreateRequest) -> Dict[str, Any]:
+def create_engagement(request: Request, payload: EngagementCreateRequest) -> Dict[str, Any]:
     manifest = create_engagement_manifest(
         company_name=payload.company_name,
         industry=payload.industry,
         annual_revenue=payload.annual_revenue,
         currency=payload.currency or "INR",
         headcount=payload.headcount,
+        owner=current_principal(request),
     )
-    append_audit_event(f"engagement_created engagement_id={manifest['engagement_id']}")
+    append_audit_event("engagement_created", engagement_id=manifest["engagement_id"])
     return manifest
 
 
 @router.get("/api/v1/engagements")
-def get_engagements() -> List[Dict[str, Any]]:
-    return list_engagements()
+def get_engagements(request: Request) -> List[Dict[str, Any]]:
+    return [m for m in list_engagements() if visible_to_principal(request, m.get("owner"))]
 
 
 @router.get("/api/v1/engagements/{engagement_id}")
@@ -124,7 +129,7 @@ def repair_manifest(engagement_id: str) -> Dict[str, Any]:
     if not engagement_dir(engagement_id).exists():
         raise HTTPException(status_code=404, detail="Engagement not found")
     manifest = repair_engagement_manifest(engagement_id)
-    append_audit_event(f"manifest_repaired engagement_id={engagement_id}")
+    append_audit_event("manifest_repaired", engagement_id=engagement_id)
     docs = manifest.get("documents") or []
     return {
         "repaired": True,
@@ -178,6 +183,7 @@ def download_raw_document(engagement_id: str, document_id: str) -> FileResponse:
 
 
 @router.post("/api/v1/engagements/{engagement_id}/documents")
+@limiter.limit(RATE_LIMIT_UPLOAD)
 async def upload_document(
     engagement_id: str,
     request: Request,
@@ -223,7 +229,9 @@ async def upload_document(
         raw_path.write_bytes(content)
 
     append_audit_event(
-        f"document_uploaded engagement_id={engagement_id} document_id={document_id} file={safe_filename}"
+        "document_uploaded",
+        engagement_id=engagement_id,
+        data={"document_id": document_id, "file": safe_filename},
     )
     background_tasks.add_task(_run_document_pipeline, engagement_id, document_id, currency)
     return {"document": record, "status": "pending"}
@@ -234,12 +242,14 @@ def remove_document(engagement_id: str, document_id: str) -> Dict[str, Any]:
     validate_engagement_id(engagement_id)
     validate_document_id(document_id)
     delete_document(engagement_id, document_id)
-    append_audit_event(f"document_deleted engagement_id={engagement_id} document_id={document_id}")
+    append_audit_event("document_deleted", engagement_id=engagement_id, data={"document_id": document_id})
     return {"deleted": document_id}
 
 
 @router.post("/api/v1/engagements/{engagement_id}/documents/{document_id}/reprocess")
+@limiter.limit(RATE_LIMIT_UPLOAD)
 async def reprocess_document(
+    request: Request,
     engagement_id: str,
     document_id: str,
     background_tasks: BackgroundTasks,

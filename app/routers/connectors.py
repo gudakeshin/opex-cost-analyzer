@@ -49,6 +49,8 @@ async def ingest_connector(
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 
     append_audit_event(
-        f"connector_ingest session_id={payload.session_id} type={connector_type} rows={result.get('row_count', 0)}"
+        "connector_ingest",
+        session_id=payload.session_id,
+        data={"connector_type": connector_type, "row_count": result.get("row_count", 0)},
     )
     return result

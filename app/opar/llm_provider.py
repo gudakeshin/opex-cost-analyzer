@@ -22,6 +22,7 @@ import os
 from typing import Any, Dict, Optional
 
 from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED, LLM_PROVIDER, ROOT_DIR, logger
+from app.metrics import record_llm_usage
 
 # ---------------------------------------------------------------------------
 # Mode resolution
@@ -170,6 +171,13 @@ def _call_m2(
             system=system,
             messages=[{"role": "user", "content": user_content}],
         )
+        usage = getattr(response, "usage", None)
+        if usage is not None:
+            record_llm_usage(
+                "anthropic", "claude-sonnet-4-6",
+                getattr(usage, "input_tokens", 0),
+                getattr(usage, "output_tokens", 0),
+            )
         return getattr(response.content[0], "text", "").strip() if response.content else None
     except Exception as exc:
         logger.warning('"llm_provider M2 call failed: %s"', exc)

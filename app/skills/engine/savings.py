@@ -5,6 +5,7 @@ from collections import Counter, defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
 from app.models import NormalizedSpendLine
+from app.opar.numeric_provenance import tag_deterministic
 
 from ._loaders import _get_model_params
 from .lever_rules import build_line_flags, build_signal_corpus
@@ -108,10 +109,21 @@ def savings_modeler(
     cost_to_achieve_inputs = cost_to_achieve_inputs or {}
     root_by_cat = {x["category_id"]: x for x in root_cause_outputs.get("root_cause_findings", [])}
 
+    # Portfolio data-quality score: mean of per-line scores; excludes credits/reversals from baseline
+    if spend_lines:
+        baseline_lines = [ln for ln in spend_lines if not ln.is_credit_or_reversal]
+        portfolio_quality = (
+            sum(ln.data_quality_score for ln in baseline_lines) / len(baseline_lines)
+            if baseline_lines else 1.0
+        )
+    else:
+        baseline_lines = None
+        portfolio_quality = 1.0
+
     root_cause_list = root_cause_outputs.get("root_cause_findings", [])
     profile = spend_profile or {}
     signal_corpus = build_signal_corpus(profile, document_context)
-    line_flags = build_line_flags(spend_lines) if spend_lines else None
+    line_flags = build_line_flags(baseline_lines) if baseline_lines else None
     eligible_levers = resolve_eligible_levers(
         industry=industry,
         spend_profile=profile,
@@ -286,6 +298,18 @@ def savings_modeler(
             "payback_months": payback_months,
             "irr_pct": irr_pct,
         }
+        # Numeric provenance: all figures in this initiative are deterministic outputs
+        # from the value-bridge gap, phasing curves, and model parameters — no LLM adjustment.
+        initiative_dict["provenance"] = {
+            "addressable_gap":  tag_deterministic(round(gap, 2),          field="addressable_gap"),
+            "p50":              tag_deterministic(round(y1 + y2 + y3, 2), field="p50_3yr"),
+            "npv_pretax":       tag_deterministic(round(npv_pretax, 2),   field="npv_pretax"),
+            "npv_aftertax":     tag_deterministic(round(npv_aftertax, 2), field="npv_aftertax"),
+            "cta_total":        tag_deterministic(round(cta_total, 2),    field="cta_total"),
+            "irr_pct":          tag_deterministic(irr_pct or 0.0,         field="irr_pct"),
+            "method":           "deterministic_skill",
+            "model_version":    _get_model_params().get("model_version", "1.0"),
+        }
         # EBITDA basis-point framing — savings as bps of annual revenue (CFO lens).
         revenue_base = float(annual_revenue or 0.0)
         ebitda_bps = round((run_rate_savings / revenue_base) * 10000, 1) if revenue_base else None
@@ -342,6 +366,16 @@ def savings_modeler(
                 round((total_run_rate / float(annual_revenue)) * 10000, 1) if annual_revenue else None
             ),
             "horizon_summary": dict(Counter(i.get("horizon", "structural") for i in initiatives)),
+            # Data quality context — consumed by value_bridge and frontend
+            "portfolio_data_quality_score": round(portfolio_quality, 3),
+            "credit_or_reversal_lines_excluded": (
+                len(spend_lines) - len(baseline_lines)
+                if spend_lines and baseline_lines is not None else 0
+            ),
+            "confidence_band_quality_note": (
+                "Confidence bands widened due to low field-coverage in source data."
+                if portfolio_quality < 0.60 else None
+            ),
         },
     }
 
@@ -389,19 +423,22 @@ def build_raw_rows(
     return raw_rows
 
 
-def _band_factors(sustainability_score: float, benchmark_specificity: float = 0.70) -> Tuple[float, float]:
-    """Confidence-band multipliers that widen as sustainability or benchmark
-    specificity fall — a signed contract should not carry the same uncertainty as a
-    behavioural lever, nor seed data the same as a client benchmark.
+def _band_factors(
+    sustainability_score: float,
+    benchmark_specificity: float = 0.70,
+    data_quality_score: float = 1.0,
+) -> Tuple[float, float]:
+    """Confidence-band multipliers that widen as sustainability, benchmark
+    specificity, or source data quality fall.
 
-    Base low=0.80 / high=1.20 at sustainability=0.65, specificity=0.70.
-    Lower sustainability or specificity widens the band (low ↓, high ↑); clamped to
-    [0.60, 1.50].
+    Base low=0.80 / high=1.20 at sustainability=0.65, specificity=0.70, quality=1.0.
+    Any shortfall widens the band (low ↓, high ↑); clamped to [0.55, 1.55].
     """
     sust_adj = 0.25 * (0.65 - sustainability_score)   # positive = riskier saving
     spec_adj = 0.15 * (0.70 - benchmark_specificity)   # positive = less specific data
-    low = max(0.60, 0.80 - sust_adj - spec_adj)
-    high = min(1.50, 1.20 + sust_adj + spec_adj)
+    qual_adj = 0.20 * (1.0 - data_quality_score)       # positive = lower fill-ratio
+    low = max(0.55, 0.80 - sust_adj - spec_adj - qual_adj)
+    high = min(1.55, 1.20 + sust_adj + spec_adj + qual_adj)
     return round(low, 3), round(high, 3)
 
 
@@ -413,6 +450,7 @@ def value_bridge_calculator(
     savings_model: Dict[str, Any] | None = None,
     committed_initiatives: List[Dict[str, Any]] | None = None,
     benchmark_specificity: float = 0.70,
+    data_quality_score: float = 1.0,
 ) -> Dict[str, Any]:
     vb_cfg = _get_model_params().get("defaults", {}).get("value_bridge", {})
     dedup_mid_factor = float(vb_cfg.get("dedup_mid_factor", 0.75))
@@ -434,7 +472,7 @@ def value_bridge_calculator(
             already = committed_lookup.get((cat, lever), 0.0)
             deduped_mid = max(0.0, gross - already)
             low_factor, high_factor = _band_factors(
-                float(item.get("sustainability_score", 0.65)), benchmark_specificity
+                float(item.get("sustainability_score", 0.65)), benchmark_specificity, data_quality_score
             )
             deduped_low = deduped_mid * low_factor
             deduped_high = deduped_mid * high_factor
@@ -482,7 +520,7 @@ def value_bridge_calculator(
     low = mid = high = 0.0
     # No per-category sustainability in the raw-rows fallback — apply a single
     # category-average band using the default sustainability and the run specificity.
-    low_factor, high_factor = _band_factors(0.65, benchmark_specificity)
+    low_factor, high_factor = _band_factors(0.65, benchmark_specificity, data_quality_score)
     for cat, values in merged.items():
         combined = values["peer"] + values["internal"] + values["heuristic"]
         deduped_mid = combined * dedup_mid_factor

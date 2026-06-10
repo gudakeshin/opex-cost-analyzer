@@ -54,7 +54,7 @@ def delete_memory(scope: str, key: str) -> Dict[str, str]:
     if "/" in key or "\\" in key or ".." in key:
         raise HTTPException(status_code=400, detail="Invalid key")
     _memory.delete(scope, key)
-    append_audit_event(f"memory_deleted scope={scope} key={key}")
+    append_audit_event("memory_deleted", data={"scope": scope, "key": key})
     return {"status": "deleted", "scope": scope, "key": key}
 
 
@@ -99,7 +99,8 @@ def teardown_engagement(engagement_id: str) -> Dict[str, Any]:
         },
     }
     append_audit_event(
-        f"engagement_teardown engagement_id={engagement_id} records_deleted={receipt['records_deleted']}",
+        "engagement_teardown",
+        engagement_id=engagement_id,
         data=receipt,
     )
     return receipt
