@@ -709,33 +709,66 @@ async def _run_opar_loop_inner(
         no_data.progress_steps = progress
         return no_data
 
-    _add_progress_step(progress, "act", f"Running {exec_plan.total_skills} analysis steps...")
-    if progress_callback:
-        progress_callback("act", f"Running {exec_plan.total_skills} analysis steps...")
-    act_result = await act(exec_plan, ctx, progress_callback=progress_callback)
-    succeeded = len([s for s in exec_plan.tasks if s.skill_name in act_result.skill_outputs and s.skill_name not in act_result.errors])
-    failed_count = len(act_result.errors)
-    degraded_count = len(getattr(act_result, "degradation_reasons", {}) or {})
-    summary = f"Execution complete: {succeeded} succeeded, {failed_count} failed"
-    if degraded_count:
-        summary += f", {degraded_count} degraded"
-    _add_progress_step(progress, "act", summary)
+    # Act + Reflect — re-entered up to _MAX_REPLAN_CYCLES times when the
+    # reflect-gate replanner fires (e.g. low peer evidence → internal-only mode,
+    # low coverage → add missing core skills).  Bounded to prevent runaway loops.
+    _MAX_REPLAN_CYCLES = 2
+    replan_cycle = 0
+    while True:
+        _add_progress_step(
+            progress, "act",
+            f"Running {exec_plan.total_skills} analysis steps"
+            + (f" (replan cycle {replan_cycle})" if replan_cycle else "") + "...",
+        )
+        if progress_callback:
+            progress_callback(
+                "act",
+                f"Running {exec_plan.total_skills} analysis steps"
+                + (f" (replan cycle {replan_cycle})" if replan_cycle else "") + "...",
+            )
+        act_result = await act(exec_plan, ctx, progress_callback=progress_callback)
+        succeeded = len([s for s in exec_plan.tasks if s.skill_name in act_result.skill_outputs and s.skill_name not in act_result.errors])
+        failed_count = len(act_result.errors)
+        degraded_count = len(getattr(act_result, "degradation_reasons", {}) or {})
+        summary = f"Execution complete: {succeeded} succeeded, {failed_count} failed"
+        if degraded_count:
+            summary += f", {degraded_count} degraded"
+        _add_progress_step(progress, "act", summary)
 
-    _add_progress_step(progress, "reflect", "Validating and summarizing results...")
-    if progress_callback:
-        progress_callback("reflect", "Validating and summarizing results...")
-    # reflect() owns response composition for general_qa as well — when only the
-    # profiler/doc-contextualizer ran, reflect's QA_LOOKUP mode produces the
-    # focused answer directly (see app/opar/reflect.py::_is_qa_lookup). The
-    # orchestrator no longer post-processes / overwrites reflect output.
-    result = reflect(
-        act_result, exec_plan, ctx,
-        thinking_enabled=thinking_enabled,
-        thinking_budget_tokens=thinking_budget_tokens,
-        chat_history=chat_history,
-        thinking_callback=thinking_callback,
-    )
+        _add_progress_step(progress, "reflect", "Validating and summarizing results...")
+        if progress_callback:
+            progress_callback("reflect", "Validating and summarizing results...")
+        # reflect() owns response composition for general_qa as well — when only the
+        # profiler/doc-contextualizer ran, reflect's QA_LOOKUP mode produces the
+        # focused answer directly (see app/opar/reflect.py::_is_qa_lookup). The
+        # orchestrator no longer post-processes / overwrites reflect output.
+        result = reflect(
+            act_result, exec_plan, ctx,
+            thinking_enabled=thinking_enabled,
+            thinking_budget_tokens=thinking_budget_tokens,
+            chat_history=chat_history,
+            thinking_callback=thinking_callback,
+        )
+
+        # Close the agentic loop: if the reflect-gate replanner produced a
+        # revised plan AND we haven't hit the cycle cap, re-run Act+Reflect.
+        if result.replan_output is not None and replan_cycle < _MAX_REPLAN_CYCLES:
+            replan_cycle += 1
+            exec_plan = result.replan_output
+            result.replan_output = None  # prevent downstream consumers from re-triggering
+            logger.info(
+                '"opar_replan session_id=%s cycle=%d skills=%d"',
+                session_id, replan_cycle, exec_plan.total_skills,
+            )
+            _add_progress_step(
+                progress, "plan",
+                f"Replanner adjusted plan (cycle {replan_cycle}): "
+                + ", ".join(t.skill_name for t in exec_plan.tasks[:5])
+                + ("..." if exec_plan.total_skills > 5 else ""),
+            )
+            continue
+        break
 
     result.progress_steps = progress
-    logger.info('"opar_complete session_id=%s loop_complete=%s"', session_id, result.loop_complete)
+    logger.info('"opar_complete session_id=%s loop_complete=%s replan_cycles=%d"', session_id, result.loop_complete, replan_cycle)
     return result

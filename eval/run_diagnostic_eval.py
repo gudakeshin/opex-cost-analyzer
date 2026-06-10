@@ -1331,6 +1331,11 @@ def _to_json(report: EvalReport, dimension_results: List[DimensionResult]) -> Di
     return {
         "eval_name": "Diagnostic Feature Eval",
         "eval_date": report.eval_date,
+        "score_type": "structural",
+        "scope": (
+            "Diagnostic skill wiring and output schema completeness. "
+            "Does NOT validate analytical accuracy of diagnostic outputs."
+        ),
         "platform_version": report.platform_version,
         "overall_score": report.overall_score,
         "passed": report.passed,
@@ -1376,6 +1381,9 @@ def _to_markdown(report: EvalReport, dimension_results: List[DimensionResult]) -
         f"",
         f"**Date:** {report.eval_date}  |  **Version:** {report.platform_version}  "
         f"|  **Overall Score:** {report.overall_score}/10",
+        f"",
+        f"> ⚠️ **SCORE TYPE: STRUCTURAL** — Measures diagnostic skill wiring and output schema "
+        f"completeness. Does NOT validate analytical accuracy. See `run_llm_judge_eval.py`.",
         f"",
         "## Summary",
         "",

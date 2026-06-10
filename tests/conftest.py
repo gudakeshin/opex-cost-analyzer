@@ -1,14 +1,26 @@
 from __future__ import annotations
 
+import os
 import shutil
+import sys
 import uuid
 from pathlib import Path
 from typing import Any, Callable
 
+# Ensure project root is on sys.path so that `eval.*` and `app.*` are both importable
+# regardless of which directory pytest was invoked from.
+_PROJECT_ROOT = Path(__file__).parent.parent
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
+# TestClient sends every request from one IP, so per-IP limits would trip
+# across the suite. Must be set before app.main (→ app.ratelimit) is imported.
+os.environ.setdefault("RATE_LIMIT_ENABLED", "false")
+
+from app.main import app  # noqa: E402
 from app.models import NormalizedSpendLine, SessionAnalysisState
 from app.storage import ensure_dirs
 

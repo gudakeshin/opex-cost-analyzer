@@ -979,6 +979,10 @@ def build_report(report: EvalReport) -> str:
         f"**Overall score**: {report.overall_score:.2f}/10  ",
         f"**Status**: {'PASS ✓' if report.passed else 'FAIL ✗'}",
         f"",
+        f"> ⚠️ **SCORE TYPE: STRUCTURAL** — This score measures skill wiring, API route coverage,",
+        f"> and OPAR completeness. It does NOT validate whether analysis content is correct.",
+        f"> See `run_llm_judge_eval.py` for content-quality assessment.",
+        f"",
         f"---",
         f"",
         f"## Domain Summary",
@@ -1169,6 +1173,11 @@ def main() -> int:
         "overall_score": eval_report.overall_score,
         "passed": eval_report.passed,
         "eval_date": eval_report.eval_date,
+        "score_type": "structural",
+        "scope": (
+            "Structural completeness: skill wiring, API routes, OPAR coverage, infrastructure "
+            "readiness. Does NOT validate whether the analysis content is analytically correct."
+        ),
         "dimensions": [
             {
                 "dimension_id": d.dimension_id,

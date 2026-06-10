@@ -231,6 +231,9 @@ class ReflectOutput(BaseModel):
 
     # Phase 3: replanner + quality gate + regulatory events
     replanner_log: List[Dict[str, Any]] = Field(default_factory=list)  # decisions made by replanner
+    # When the replanner fires, this carries the revised plan so the orchestrator
+    # can re-enter Act without a second Observe+Plan round-trip (bounded: max 2 cycles).
+    replan_output: Optional["ExecutionPlan"] = None
     gate2_blocked: bool = False
     gate2_narrative: str = ""
     regulatory_events: List[Dict[str, Any]] = Field(default_factory=list)

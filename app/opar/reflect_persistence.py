@@ -185,6 +185,8 @@ def record_advisory_provenance(
     if not advisory_sections or not advisory_sections.executive_takeaway:
         return None
     try:
+        from app.llm.prompts import prompt_version_map
+
         return record_llm_narrative(
             narrative=advisory_sections.executive_takeaway,
             engagement_id=getattr(ctx, "engagement_id", ctx.session_id),
@@ -193,6 +195,7 @@ def record_advisory_provenance(
             prompt_text=ctx.user_message,
             model_version="claude-sonnet-4-6",
             seed=0,
+            metadata={"prompt_versions": prompt_version_map()},
         )
     except Exception:
         return None

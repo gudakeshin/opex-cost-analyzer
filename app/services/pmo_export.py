@@ -46,6 +46,20 @@ _RACI_MATRIX = [
 ]
 
 
+_BENCHMARK_DISCLAIMER = (
+    "Benchmark data sourced from internal calibration models. "
+    "Figures are illustrative and based on sector-level heuristics — not licensed third-party data "
+    "(e.g. Gartner, Hackett Group, NASSCOM). "
+    "All savings estimates should be independently validated before client presentation or board submission."
+)
+
+_DEFAULT_DISCLAIMER = (
+    "Savings figures are model outputs based on spend profiling and sector benchmarks. "
+    "P10/P50/P90 ranges represent scenario bounds, not guaranteed outcomes. "
+    "All numbers should be reviewed and validated by a qualified FP&A professional prior to use."
+)
+
+
 def build_pmo_data(
     pipeline_summary: Dict[str, Any],
     initiatives: List[Dict[str, Any]],
@@ -53,6 +67,7 @@ def build_pmo_data(
     start_date: Optional[date] = None,
     company_name: str = "Client",
     engagement_weeks: int = 12,
+    benchmark_disclaimer: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Build structured PMO data from pipeline and initiative lists.
@@ -100,6 +115,8 @@ def build_pmo_data(
     total_variance = round(total_p50 - total_ftc, 1)
     at_risk = [r for r in tracker_rows if cast(float, r["variance_cr"]) < -0.5]
 
+    disclaimer_text = benchmark_disclaimer or _DEFAULT_DISCLAIMER
+
     return {
         "type": "pmo_toolkit",
         "generated_on": str(date.today()),
@@ -118,6 +135,7 @@ def build_pmo_data(
             "at_risk_initiatives": [r["initiative_name"] for r in at_risk],
             "at_risk_count": len(at_risk),
         },
+        "disclaimer": disclaimer_text,
     }
 
 
@@ -190,6 +208,15 @@ def export_pmo_xlsx(pmo: Dict[str, Any], filename: str) -> Path:
     for i, (k, v) in enumerate(rows, 2):
         ws4.cell(row=i, column=1, value=k)
         ws4.cell(row=i, column=2, value=v)
+
+    # --- Sheet 5: Disclaimer ---
+    ws5 = wb.create_sheet("Disclaimer")
+    ws5.cell(row=1, column=1, value="Disclaimer").font = Font(bold=True, size=13)
+    ws5.cell(row=2, column=1, value=pmo.get("disclaimer", _DEFAULT_DISCLAIMER))
+    ws5.cell(row=2, column=1).alignment = Alignment(wrap_text=True)
+    ws5.column_dimensions["A"].width = 100
+    ws5.cell(row=4, column=1, value=f"Generated: {pmo.get('generated_on', str(date.today()))}")
+    ws5.cell(row=5, column=1, value=f"Company: {pmo.get('company', 'Client')}")
 
     wb.save(path)
     return path

@@ -544,6 +544,11 @@ def _build_report(dim_results: Dict[str, DimensionResult], fixture_count: int, j
 def _write_json(report: EvalReport, dim_results: Dict[str, DimensionResult], path: Path) -> None:
     payload = {
         "eval_date": report.eval_date,
+        "score_type": "structural",
+        "scope": (
+            "Document ingestion pipeline quality: parse, schema inference, sheet selection, "
+            "normalization, chunking, retrieval. Does NOT validate downstream analytical accuracy."
+        ),
         "platform_version": report.platform_version,
         "overall_score": round(report.overall_score, 3),
         "passed": report.passed,
@@ -584,6 +589,9 @@ def _write_markdown(report: EvalReport, path: Path) -> None:
         "> Scores the document ingestion pipeline — parse → schema inference → sheet "
         "selection → normalization → hierarchical chunking → retrieval — against synthetic "
         "golden fixtures. DP-01..06 and DP-08 are deterministic; DP-07 uses a provider-agnostic LLM judge.",
+        ">",
+        "> ⚠️ **SCORE TYPE: STRUCTURAL** — Pipeline correctness, not analytical quality. "
+        "Does NOT validate savings recommendations. See `run_llm_judge_eval.py`.",
         "",
     ]
     for dr in report.domain_results:

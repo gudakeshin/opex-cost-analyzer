@@ -118,6 +118,7 @@ def reflect(
 
     loop_complete, next_trigger = _determine_loop_control(validated, failed, ctx, plan)
     replanner_log: List[Dict[str, Any]] = []
+    replan_output = None
     replannable_skills = {"peer-benchmarker", "root-cause-analyzer", "savings-modeler", "value-bridge-calculator"}
     replannable_intents = {"benchmark", "value_bridge", "business_case", "drill_down", "savings_plan", "sensitivity"}
     if ctx.intent_class in replannable_intents and any(t.skill_name in replannable_skills for t in plan.tasks):
@@ -125,8 +126,10 @@ def reflect(
             from app.opar.plan import replan
 
             _new_plan, replanner_log = replan(ctx, validated, plan)
-            if replanner_log and not next_trigger:
-                next_trigger = "Additional analysis steps are available based on reflect-gate quality checks."
+            if replanner_log:
+                replan_output = _new_plan
+                if not next_trigger:
+                    next_trigger = "Additional analysis steps are available based on reflect-gate quality checks."
         except Exception:
             replanner_log = []
 
@@ -287,6 +290,7 @@ def reflect(
         fallback_reasons=degradation_reasons,
         next_options=next_options,
         replanner_log=replanner_log,
+        replan_output=replan_output,
         gate2_blocked=gate2_blocked,
         gate2_narrative=gate2_narrative,
         regulatory_events=reg_events,
