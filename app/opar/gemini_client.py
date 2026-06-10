@@ -8,6 +8,15 @@ import time
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from typing import Any, Dict, List, Tuple
 
+from app.config import (
+    AGENT_THINKING_BUDGET,
+    GEMINI_API_KEY,
+    GEMINI_ENABLED,
+    logger,
+)
+from app.services.llm_selection import get_resolved_llm_model, submit_with_context
+from app.opar.agent_runtime import ToolCall, ToolDefinition, ToolLoopTransport
+
 _GEMINI_QUOTA_EXHAUSTED_UNTIL: float = 0.0
 _GEMINI_QUOTA_COOLDOWN_S = 300
 
@@ -28,18 +37,6 @@ def _maybe_mark_gemini_quota_error(exc: BaseException) -> bool:
         mark_gemini_quota_exhausted()
         return True
     return False
-
-from app.config import (
-    AGENT_THINKING_BUDGET,
-    GEMINI_API_KEY,
-    GEMINI_ENABLED,
-    GEMINI_MODEL,
-    GEMINI_THINKING_MODEL,
-    GEMINI_TOOL_MODEL,
-    logger,
-)
-from app.services.llm_selection import get_resolved_llm_model, submit_with_context
-from app.opar.agent_runtime import ToolCall, ToolDefinition, ToolLoopTransport
 
 CHAT_RESPONSE_SYSTEM_PROMPT = """You are an FP&A copilot embedded in an OpEx cost intelligence platform.
 Answer the user's question using ONLY the JSON context provided. Never invent numbers, suppliers, or categories.

@@ -141,6 +141,7 @@ describe('analysisInsights', () => {
     const session: SessionResponse = {
       session_id: 'x',
       skill_outputs: {
+        'spend-profiler': { total_spend: 1000, category_profile: [] },
         'sme-critique': {
           portfolio_probes: [
             {

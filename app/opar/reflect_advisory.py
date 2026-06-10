@@ -242,6 +242,7 @@ def generate_llm_advisory_sections(
     best_effort: AdvisorySections | None = None
     captured_thinking: str | None = None
     # Extended-thinking calls are slow — one quality pass avoids doubling wall-clock time.
+    mode_order: tuple[bool, ...]
     if thinking_enabled:
         mode_order = (True,) if category_focused else (False,)
     else:

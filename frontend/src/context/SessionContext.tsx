@@ -55,6 +55,7 @@ function engagementFromManifest(manifest: SessionManifest): EngagementMeta {
   );
   const revenue = manifest.annual_revenue;
   return {
+    engagement_id: manifest.engagement_id,
     company_name: manifest.company_name || defaultEngagement.company_name,
     industry: manifest.industry || defaultEngagement.industry,
     currency: manifest.currency || 'INR',

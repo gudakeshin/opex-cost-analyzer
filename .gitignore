@@ -39,3 +39,18 @@ node_modules/
 .vscode/
 .cursor/
 *.swp
+
+# Microsoft Office lock files (created when a doc is open; should never be committed)
+~$*
+
+# Large binary assets — use git-lfs or external storage instead of committing directly
+*.pptx
+*.xlsx
+*.docx
+# Exceptions: small intentional fixtures and shipped deliverables
+!tests/fixtures/**/*.xlsx
+!tests/fixtures/**/*.docx
+!tests/eval/golden/**/*.xlsx
+!tests/eval/golden/**/*.docx
+!data/samples/*.xlsx
+!deliverables/*.pptx

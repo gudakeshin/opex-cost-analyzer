@@ -389,6 +389,7 @@ def create_engagement_manifest(
     currency: str | None = None,
     headcount: float | None = None,
     engagement_id: str | None = None,
+    owner: str | None = None,
 ) -> Dict[str, Any]:
     if engagement_id:
         try:
@@ -401,6 +402,7 @@ def create_engagement_manifest(
     (root / "documents").mkdir(parents=True, exist_ok=True)
     manifest: Dict[str, Any] = {
         "engagement_id": eid,
+        "owner": owner,
         "company_name": company_name or "New engagement",
         "industry": industry or "",
         "annual_revenue": annual_revenue,
@@ -531,6 +533,7 @@ def list_engagements() -> List[Dict[str, Any]]:
             docs = manifest.get("documents") or []
             summaries.append({
                 "engagement_id": manifest["engagement_id"],
+                "owner": manifest.get("owner"),
                 "company_name": manifest.get("company_name") or "Unknown",
                 "industry": manifest.get("industry") or "",
                 "currency": manifest.get("currency") or "INR",

@@ -16,7 +16,8 @@ def _resolve_reporting_currency(analysis: Dict[str, Any]) -> str:
         val = analysis.get(key)
         if val:
             return str(val).upper()
-    manifest = analysis.get("manifest") if isinstance(analysis.get("manifest"), dict) else {}
+    manifest_raw = analysis.get("manifest")
+    manifest = manifest_raw if isinstance(manifest_raw, dict) else {}
     for key in ("reporting_currency", "currency"):
         val = manifest.get(key)
         if val:
@@ -481,7 +482,7 @@ def _render_priority_actions_docx(doc: Document, actions: list) -> None:
 
 
 # Keys whose value is a list-of-dicts needing a structured renderer.
-_STRUCTURED_DOCX = {
+_STRUCTURED_DOCX: Dict[str, Any] = {
     "initiative_details": _render_initiative_details_docx,
     "business_levers": _render_business_levers_docx,
     "priority_actions_30_60_90": _render_priority_actions_docx,

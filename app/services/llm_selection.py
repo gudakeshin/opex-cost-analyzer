@@ -6,7 +6,7 @@ import contextvars
 from concurrent.futures import Future, ThreadPoolExecutor
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Callable, Generator, Literal, ParamSpec, TypeVar
+from typing import Callable, Generator, Literal, ParamSpec, TypeVar, cast
 
 from app.config import (
     ANTHROPIC_ENABLED,
@@ -148,7 +148,7 @@ def get_resolved_llm_model(*, thinking: bool = False, provider: Provider | None 
     active = provider or get_resolved_llm_provider()  # type: ignore[arg-type]
     if active not in ("anthropic", "gemini"):
         active = "anthropic"
-    return model_for_provider(active, thinking=thinking)
+    return model_for_provider(cast(Provider, active), thinking=thinking)
 
 
 @contextmanager

@@ -144,6 +144,9 @@ def run_agent_controller(
             fallback_reason=str(last_exc)[:200] if last_exc else "all_transports_failed",
         )
 
+    if loop_result is None:
+        return AgentRunResult(success=False, fallback_reason="agent_loop_returned_no_result")
+
     if not session.skill_outputs and not session.opportunity_assessment:
         return AgentRunResult(
             success=False,

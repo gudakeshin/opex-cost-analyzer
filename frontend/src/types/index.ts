@@ -353,6 +353,7 @@ export interface SessionSummary {
 }
 
 export interface EngagementMeta {
+  engagement_id?: string;
   company_name: string;
   industry: string;
   currency: string;
