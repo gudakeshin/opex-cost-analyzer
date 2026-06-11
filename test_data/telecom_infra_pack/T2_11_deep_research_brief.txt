@@ -1,0 +1,7 @@
+Deep Research Brief — Indian telecom cost structure (Pragati Telecom Networks)
+
+Telecom EBITDA margins: 26-34% for large operators. Network opex (managed services + energy): 40-50% of total opex. Energy as % network opex: 30-40%; diesel dependency at 8000+ rural sites. Spectrum usage charges: 3-5% of revenue (statutory, non-addressable).
+
+Peer observations: Solar/hybrid at tower sites: 18-28% diesel cost reduction. RAN sharing (passive): 8-15% site opex reduction. AI-RAN managed services: 6-12% RAN opex reduction. BSS/OSS consolidation: 10-18% IT opex reduction. Roaming optimisation: 5-10% interconnect savings.
+
+Constraints: Ericsson/Nokia contracts 5-year with 12-15% exit penalty — locked until 2027-28. DoT 5G rollout obligations non-deferrable. TRAI levies statutory. Rural coverage mandate constrains tower shutdowns.

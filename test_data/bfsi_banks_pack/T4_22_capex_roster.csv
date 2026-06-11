@@ -1,0 +1,25 @@
+asset_class,fiscal_period,amount,currency,status
+Branch fit-out & renovation,FY23-Q1,192113955,INR,actual
+Branch fit-out & renovation,FY23-Q2,213459951,INR,actual
+Branch fit-out & renovation,FY23-Q3,202786953,INR,actual
+Branch fit-out & renovation,FY23-Q4,230536747,INR,actual
+Branch fit-out & renovation,FY24-Q1,226267548,INR,actual
+Branch fit-out & renovation,FY24-Q2,232671346,INR,actual
+ATM deployment,FY23-Q1,350770177,INR,actual
+ATM deployment,FY23-Q2,389744642,INR,actual
+ATM deployment,FY23-Q3,370257409,INR,actual
+ATM deployment,FY23-Q4,420924213,INR,actual
+ATM deployment,FY24-Q1,413129320,INR,actual
+ATM deployment,FY24-Q2,424821659,INR,actual
+Core banking upgrade,FY23-Q1,142687216,INR,actual
+Core banking upgrade,FY23-Q2,158541352,INR,actual
+Core banking upgrade,FY23-Q3,150614284,INR,actual
+Core banking upgrade,FY23-Q4,171224660,INR,actual
+Core banking upgrade,FY24-Q1,168053833,INR,actual
+Core banking upgrade,FY24-Q2,172810073,INR,actual
+Cybersecurity infra,FY23-Q1,240153615,INR,actual
+Cybersecurity infra,FY23-Q2,266837350,INR,actual
+Cybersecurity infra,FY23-Q3,253495482,INR,actual
+Cybersecurity infra,FY23-Q4,288184338,INR,actual
+Cybersecurity infra,FY24-Q1,282847591,INR,actual
+Cybersecurity infra,FY24-Q2,290852711,INR,actual

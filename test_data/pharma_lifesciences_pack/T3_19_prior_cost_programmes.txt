@@ -1,0 +1,12 @@
+FY23 — Project APIRight
+- Dual-source API strategy (China API replaced with India): ~24 Cr run-rate saved.
+- Cold chain carrier renegotiation: ~14 Cr saved. STATUS: in baseline.
+
+FY24 — Project RegSmart
+- CRO panel consolidation (8 to 3 CROs): planned 18 Cr, realised 15 Cr (quality dependencies slowed).
+- Field force productivity tools (CRM + digital detailing): planned 14 Cr, realised 18 Cr (exceeded — rep count reduced).
+- GMP audit vendor rationalisation: planned 8 Cr, realised 7 Cr.
+- STATUS: largely complete; in FY25 baseline.
+
+In-flight FY25
+- Continuous manufacturing (2 products): ~20 Cr manufacturing cost targeted, ~5 Cr booked YTD.

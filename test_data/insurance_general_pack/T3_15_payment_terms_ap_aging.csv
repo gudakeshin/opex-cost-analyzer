@@ -1,0 +1,6 @@
+vendor,payment_terms_days,invoice_date,payment_date,amount,currency,aging_bucket
+GIC Re,45,2025-01-10,2025-02-26,420000000,INR,0-30
+Munich Re India,60,2025-01-05,2025-03-10,245000000,INR,31-60
+TCS Insurance,30,2025-01-18,2025-02-15,170000000,INR,61-90
+PolicyBazaar,30,2025-01-20,2025-02-18,205000000,INR,0-30
+IBM India,7,2025-01-01,2025-01-07,80000000,INR,31-60

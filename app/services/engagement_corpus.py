@@ -39,7 +39,7 @@ def _load_session_files(
                 )
             elif suffix == ".json":
                 lines.extend(parse_spend_json(path, taxonomy))
-            elif suffix in (".pdf", ".docx", ".txt"):
+            elif suffix in (".pdf", ".docx", ".txt", ".md"):
                 text = parse_document(path)
                 if text.strip():
                     docs_text.append(f"## {path.name}\n{text.strip()}")

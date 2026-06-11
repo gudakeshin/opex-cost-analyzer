@@ -1,0 +1,7 @@
+Vistaar Capital Partners Ltd — Diagnostic URLs (synthetic/illustrative)
+
+1. Investor relations: https://www.vistaarcapital.example/investors
+2. SEBI AMC filings: https://www.sebi.example/mutual-fund/vistaar
+3. AMFI data: https://www.amfiindia.example/spages/aum-data
+4. NSE: https://www.nseindia.example/get-quotes/equity?symbol=VISTAARCAP
+5. Analyst: https://research.example/indian-amc-cost-efficiency-fy25

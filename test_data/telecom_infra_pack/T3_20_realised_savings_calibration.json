@@ -1,0 +1,38 @@
+[
+  {
+    "engagement_id": "eng-ptnl-fy24",
+    "initiative_id": "INI-1",
+    "lever_id": "ran_sharing",
+    "pack_id": "telecom_infra",
+    "planned_p50_cr": 42.0,
+    "realised_cr": 38.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Passive RAN sharing with Indus Towers on 6200 co-located sites; 8-12% site energy and maintenance savings."
+  },
+  {
+    "engagement_id": "eng-ptnl-fy24",
+    "initiative_id": "INI-2",
+    "lever_id": "bss_oss_consolidation",
+    "pack_id": "telecom_infra",
+    "planned_p50_cr": 28.0,
+    "realised_cr": 32.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Amdocs licence rationalisation; decommissioned 3 legacy billing modules \u2014 exceeded plan by 14%."
+  },
+  {
+    "engagement_id": "eng-ptnl-fy24",
+    "initiative_id": "INI-3",
+    "lever_id": "roaming_settlement",
+    "pack_id": "telecom_infra",
+    "planned_p50_cr": 18.0,
+    "realised_cr": 14.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "medium",
+    "notes": "Roaming settlement disputes with 2 international carriers delayed benefit realisation; arbitration ongoing."
+  }
+]

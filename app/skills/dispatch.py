@@ -307,12 +307,22 @@ def _value_bridge_calculator(ctx: SkillContext) -> tuple[Dict[str, Any], str | N
     heuristic = ctx.prior("heuristic-analyzer")
     total = profile.get("total_spend", 0.0)
     savings_model = ctx.prior_results.get("savings-modeler")
+    # Feed the resolved benchmark's specificity into the confidence-band width:
+    # seed data (0.55) widens bands, a client/sector-pack benchmark (0.85) tightens them.
+    bench = _get_bench_resolved(ctx)
+    specificity = float((bench.get("selected_dataset") or {}).get("specificity_score", 0.70))
+    # Pull portfolio data quality from savings-modeler summary (0.0–1.0; default 1.0)
+    savings_quality = float(
+        (savings_model or {}).get("summary", {}).get("portfolio_data_quality_score", 1.0)
+    )
     return _engine.value_bridge_calculator(
         peer,
         internal,
         heuristic,
         total,
         savings_model=savings_model,
+        benchmark_specificity=specificity,
+        data_quality_score=savings_quality,
     ), None
 
 
@@ -372,14 +382,23 @@ def _chart_builder(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     from app.services.spend_charts import build_spend_profile_chart_html  # lazy
 
     profile = _get_profile(ctx)
-    chart_plan = _engine.chart_builder(profile, user_message=ctx.user_message or None)
+    chart_plan = _engine.chart_builder(
+        profile,
+        user_message=ctx.user_message or None,
+        reporting_currency=ctx.reporting_currency,
+    )
     session_key = (
         ctx.manifest.get("session_id")
         or ctx.manifest.get("turn_id")
         or "session"
     )
     chart_filename = f"{session_key}_spend_profile_chart.html"
-    chart_path = build_spend_profile_chart_html(profile, chart_plan, filename=chart_filename)
+    chart_path = build_spend_profile_chart_html(
+        profile,
+        chart_plan,
+        filename=chart_filename,
+        reporting_currency=ctx.reporting_currency,
+    )
     return {**chart_plan, "chart_url": f"/api/exports/{chart_path.name}"}, None
 
 
@@ -388,15 +407,21 @@ def _business_case_builder(ctx: SkillContext) -> tuple[Dict[str, Any], str | Non
     from app.services.business_case import build_business_case  # lazy
 
     profile = _get_profile(ctx)
+    skill_outputs = dict(ctx.prior_results)
+    if profile:
+        skill_outputs.setdefault("spend-profiler", profile)
     bridge = ctx.prior("value-bridge-calculator")
+    if bridge:
+        skill_outputs.setdefault("value-bridge-calculator", bridge)
     analysis = {
         "company_name": ctx.company_name,
         "industry": ctx.industry,
         "annual_revenue": ctx.annual_revenue,
-        "skill_outputs": {
-            "value-bridge-calculator": bridge,
-            "spend-profiler": profile,
-        },
+        "reporting_currency": ctx.reporting_currency,
+        "engagement_id": ctx.manifest.get("engagement_id"),
+        "model_manifest": ctx.model_manifest,
+        "manifest": ctx.manifest,
+        "skill_outputs": skill_outputs,
     }
     return {"business_case": build_business_case(analysis)}, None
 
@@ -600,7 +625,11 @@ def _dashboard_builder(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
 
 @register("export-formatter")
 def _export_formatter(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
-    from app.services.pmo_export import build_pmo_data, export_pmo_xlsx  # lazy
+    from app.services.pmo_export import (  # lazy
+        _BENCHMARK_DISCLAIMER,
+        build_pmo_data,
+        export_pmo_xlsx,
+    )
     from app.services.pipeline import pipeline_summary as get_pipeline_summary  # lazy
 
     # build_pmo_data(pipeline_summary, initiatives, *, company_name=...): the
@@ -609,7 +638,26 @@ def _export_formatter(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     savings = ctx.prior("savings-modeler")
     initiatives = savings.get("initiatives", []) if isinstance(savings, dict) else []
     summary = get_pipeline_summary()
-    pmo_data = build_pmo_data(summary, initiatives, company_name=ctx.company_name or "Client")
+
+    # Propagate benchmark disclaimer when the peer benchmarker used illustrative data.
+    peer = ctx.prior("peer-benchmarker")
+    uses_illustrative = False
+    if isinstance(peer, dict):
+        src = peer.get("benchmark_dataset", {})
+        if isinstance(src, dict):
+            uses_illustrative = "illustrative" in str(src.get("source_name", "")).lower()
+    benchmark_disclaimer = _BENCHMARK_DISCLAIMER if uses_illustrative else None
+
+    pmo_data = build_pmo_data(
+        summary,
+        initiatives,
+        company_name=ctx.company_name or "Client",
+        benchmark_disclaimer=benchmark_disclaimer,
+    )
     session_key = ctx.manifest.get("session_id") or "session"
     path = export_pmo_xlsx(pmo_data, filename=f"{session_key}_pmo_export.xlsx")
-    return {"export_url": f"/api/v1/exports/{path.name}", "filename": path.name}, None
+    return {
+        "export_url": f"/api/v1/exports/{path.name}",
+        "filename": path.name,
+        "uses_illustrative_benchmarks": uses_illustrative,
+    }, None

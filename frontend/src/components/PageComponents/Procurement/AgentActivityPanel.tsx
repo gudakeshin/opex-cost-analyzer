@@ -8,6 +8,7 @@ interface AgentActivityPanelProps {
   runId?: string;
   loading?: boolean;
   degradedMode?: boolean;
+  fallbackReasons?: Record<string, unknown>;
   pipelineLabel?: string;
 }
 
@@ -16,6 +17,7 @@ export const AgentActivityPanel: React.FC<AgentActivityPanelProps> = ({
   runId,
   loading,
   degradedMode,
+  fallbackReasons,
   pipelineLabel,
 }) => (
   <div>
@@ -29,7 +31,12 @@ export const AgentActivityPanel: React.FC<AgentActivityPanelProps> = ({
         <span>OPAR agent running…</span>
       </div>
     ) : (
-      <LogicTrace steps={steps} runId={runId} degradedMode={degradedMode} />
+      <LogicTrace
+        steps={steps}
+        runId={runId}
+        degradedMode={degradedMode}
+        fallbackReasons={fallbackReasons}
+      />
     )}
   </div>
 );

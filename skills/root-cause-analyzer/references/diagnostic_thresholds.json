@@ -33,6 +33,20 @@
       "caps_research_url": "https://www.capsresearch.org/benchmarking/",
       "disclaimer": "The 20% threshold is an internal platform design choice. CAPS Research and Hackett are directional references, not the source of this specific threshold."
     },
+    "maverick_spend_tiers": {
+      "warning": { "value": 0.15, "label": "Elevated", "narrative": "15–25% maverick — compliance programme recommended" },
+      "elevated": { "value": 0.25, "label": "Significant", "narrative": "25–40% maverick — P2P controls and approval workflow required" },
+      "critical": { "value": 0.40, "label": "Critical", "narrative": ">40% maverick — spend visibility gap; baseline unreliable" },
+      "best_in_class": { "value": 0.05, "label": "World-class target", "source": "Hackett Group AP Benchmarking 2024" },
+      "source_type": "internal_calibration",
+      "rationale": "Graduated tiers based on Hackett world-class (<5%), average (15%), and poor (>25%) thresholds. 40% critical flag = baseline integrity risk."
+    },
+    "supplier_fragmentation_min_spend": {
+      "value": 50000000,
+      "currency": "reporting",
+      "note": "₹5 Crore (or equivalent in reporting currency) — categories below this floor are excluded from fragmentation flagging regardless of HHI, to avoid noise initiatives in executive dashboards.",
+      "source_type": "internal_calibration"
+    },
     "cost_per_transaction_max": {
       "value": 1000.0,
       "currency": "INR",

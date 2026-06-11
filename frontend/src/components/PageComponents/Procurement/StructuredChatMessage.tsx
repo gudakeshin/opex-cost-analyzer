@@ -6,7 +6,8 @@ import { DynamicCharts } from './DynamicCharts';
 import { ProbeQuestionsBlock } from './ProbeQuestionsBlock';
 import { ThinkingBlock } from './ThinkingBlock';
 import { Markdown } from '../../Common/Markdown';
-import { artefactLinks, renderChatMarkdown } from '../../../utils/chatMarkdown';
+import { AssistantMessageBody } from './AssistantMessageBody';
+import { artefactLinks } from '../../../utils/chatMarkdown';
 import { filterProbeNextOptions, mergeLiveSpendIntoSnapshot, shouldShowSpendInsightBlock } from '../../../utils/analysisInsights';
 import type { AnalysisInsightSnapshot, ChatMessage } from '../../../types';
 
@@ -27,6 +28,50 @@ function AssistantAvatar() {
     >
       AI
     </span>
+  );
+}
+
+function hasSynthesisSkipReason(reasons?: Record<string, unknown>): boolean {
+  const advisory = String(reasons?.llm_advisory ?? '').trim();
+  const chat = String(reasons?.chat_synthesis ?? '').trim();
+  return Boolean(advisory || chat);
+}
+
+function llmFallbackDetail(reasons?: Record<string, unknown>): string {
+  const advisory = String(reasons?.llm_advisory ?? '').trim();
+  if (advisory === 'token_budget_exceeded') {
+    return 'The analysis context was too large for live LLM synthesis, so a deterministic summary was used instead.';
+  }
+  if (advisory === 'synthesis_quality_low') {
+    return 'The LLM response did not meet quality checks, so a deterministic summary was used instead.';
+  }
+  if (advisory === 'provider_unavailable' || advisory === 'provider_failed') {
+    return (
+      'Live LLM narrative synthesis did not complete (often extended-thinking timeout on large ' +
+      'engagements). A deterministic summary was used instead. Try Claude Sonnet 4.6 in the model ' +
+      'dropdown, turn Thinking off for faster synthesis, or retry after confirming API keys in .env.'
+    );
+  }
+  const chat = String(reasons?.chat_synthesis ?? '').trim();
+  if (chat === 'provider_failed') {
+    return (
+      'Chat LLM synthesis failed. Use Claude Sonnet 4.6 (Gemini prepay credits may be depleted) ' +
+      'or retry after confirming API keys.'
+    );
+  }
+  return 'Using deterministic answers from cached spend data. Check API keys, credits, and model selection for richer responses.';
+}
+
+function LlmOfflineBanner({ reasons }: { reasons?: Record<string, unknown> }) {
+  return (
+    <div
+      className="mb-3 rounded-lg border border-amber-300/80 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-950"
+      role="status"
+    >
+      <span className="font-semibold">LLM synthesis skipped</span>
+      {' — '}
+      {llmFallbackDetail(reasons)}
+    </div>
   );
 }
 
@@ -80,19 +125,19 @@ function AdvisorySections({ sections }: { sections: Record<string, unknown> }) {
       {takeaway && (
         <div>
           <p className="text-xs font-bold uppercase text-brand-muted">Executive takeaway</p>
-          <p className="text-xs mt-0.5 leading-relaxed">{renderChatMarkdown(takeaway)}</p>
+          <Markdown className="text-xs leading-relaxed">{takeaway}</Markdown>
         </div>
       )}
       {smeQualification && (
         <div>
           <p className="text-xs font-bold uppercase text-brand-muted">SME qualification</p>
-          <p className="text-xs mt-0.5 leading-relaxed">{renderChatMarkdown(smeQualification)}</p>
+          <Markdown className="text-xs leading-relaxed">{smeQualification}</Markdown>
         </div>
       )}
       {categoryFocus && (
         <div>
           <p className="text-xs font-bold uppercase text-brand-muted">Category focus</p>
-          <p className="text-xs mt-0.5 leading-relaxed">{renderChatMarkdown(categoryFocus)}</p>
+          <Markdown className="text-xs leading-relaxed">{categoryFocus}</Markdown>
         </div>
       )}
       {quickWins.length > 0 && (
@@ -166,6 +211,8 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
 }) => {
   const isUser = message.role === 'user';
   const sections = message.advisory_sections;
+  const presentation = message.presentation;
+  const hasPresentationBlocks = Boolean(presentation?.blocks && presentation.blocks.length > 0);
   const urls = artefactLinks(message.artefacts);
   const spendSnapshot = mergeLiveSpendIntoSnapshot(message.insight_snapshot, liveSnapshot ?? null);
   const probeSnapshot = spendSnapshot ?? message.insight_snapshot ?? liveSnapshot;
@@ -186,10 +233,18 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
             {message.degraded_mode && (
               <span className="text-[10px] uppercase font-bold text-amber-700">Degraded</span>
             )}
+            {message.used_llm_synthesis === false && (
+              <span className="text-[10px] uppercase font-bold text-amber-700">Offline</span>
+            )}
           </div>
+        )}
+        {!isUser && message.used_llm_synthesis === false && hasSynthesisSkipReason(message.fallback_reasons) && (
+          <LlmOfflineBanner reasons={message.fallback_reasons} />
         )}
         {isUser ? (
           <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+        ) : hasPresentationBlocks && presentation ? (
+          <AssistantMessageBody presentation={presentation} currency={currency} />
         ) : (
           <Markdown className="text-sm leading-relaxed">{message.content}</Markdown>
         )}
@@ -226,7 +281,7 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
             />
           )}
 
-        {!isUser && sections && typeof sections === 'object' && (
+        {!isUser && !hasPresentationBlocks && sections && typeof sections === 'object' && (
           <AdvisorySections sections={sections} />
         )}
 

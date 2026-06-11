@@ -106,6 +106,11 @@ class _SessionLockBackend:
                 logger.info('"session_lock backend=redis"')
             except Exception as exc:
                 logger.warning('"session_lock redis_unavailable error=%s using=local"', exc)
+        if self._redis is None:
+            logger.warning(
+                '"session_lock backend=local — in-process only; '
+                'concurrent writes WILL race with >1 worker/replica (set REDIS_URL)"'
+            )
 
     @contextlib.asynccontextmanager
     async def acquire(self, session_id: str):  # type: ignore[return]
@@ -151,8 +156,10 @@ def session_lock(session_id: str):
 
 
 def engagement_lock(engagement_id: str):
-    """Reuse session lock backend keyed by engagement_id."""
-    return _session_lock_backend.acquire(engagement_id)
+    """Async manifest lock — shared with all engagement manifest mutations."""
+    from app.services.manifest_lock import manifest_lock
+
+    return manifest_lock.acquire_async(engagement_id)
 
 
 def merge_context_into_manifest(
@@ -169,9 +176,13 @@ def merge_context_into_manifest(
     if company_name is not None and manifest.get("company_name") != company_name:
         manifest["company_name"] = company_name
         changed = True
-    if industry is not None and manifest.get("industry") != industry:
-        manifest["industry"] = industry
-        changed = True
+    if industry is not None:
+        from app.services.sector_packs import normalize_industry_selection
+
+        normalized = normalize_industry_selection(industry)
+        if normalized and manifest.get("industry") != normalized:
+            manifest["industry"] = normalized
+            changed = True
     if annual_revenue is not None:
         rev = max(float(annual_revenue), 0.0)
         if float(manifest.get("annual_revenue") or 0.0) != rev:
@@ -249,6 +260,27 @@ class _ProgressStore:
                     entry["steps"].append(step)
                     entry["updated_at"] = utc_now_iso()
 
+    def append_thinking(self, run_id: str, chunk: str) -> None:
+        """Append model reasoning text for live progress polling."""
+        text = (chunk or "").strip()
+        if not text:
+            return
+        if self._redis:
+            raw = self._redis.get(self._key(run_id))
+            if raw:
+                entry = json.loads(raw)
+                prev = str(entry.get("thinking_text") or "").strip()
+                entry["thinking_text"] = f"{prev}\n\n{text}" if prev else text
+                entry["updated_at"] = utc_now_iso()
+                self._redis.setex(self._key(run_id), self._TTL_S, json.dumps(entry))
+        else:
+            with self._lock:
+                entry = self._local.get(run_id)
+                if entry:
+                    prev = str(entry.get("thinking_text") or "").strip()
+                    entry["thinking_text"] = f"{prev}\n\n{text}" if prev else text
+                    entry["updated_at"] = utc_now_iso()
+
     def complete(self, run_id: str, *, failed: bool = False, error: str | None = None) -> None:
         if self._redis:
             raw = self._redis.get(self._key(run_id))
@@ -284,6 +316,10 @@ def progress_init(run_id: str, session_id: str) -> None:
 
 def progress_append(run_id: str, phase: str, message: str) -> None:
     _progress.append(run_id, phase, message)
+
+
+def progress_append_thinking(run_id: str, chunk: str) -> None:
+    _progress.append_thinking(run_id, chunk)
 
 
 def progress_complete(run_id: str, *, failed: bool = False, error: str | None = None) -> None:

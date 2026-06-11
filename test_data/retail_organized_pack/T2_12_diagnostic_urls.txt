@@ -1,0 +1,7 @@
+Bharat Bazaar Retail Ltd — Diagnostic URLs (synthetic/illustrative)
+
+1. Investor relations: https://www.bharatbazaar.example/investors
+2. Annual report: https://www.bharatbazaar.example/ir/annual-report-fy25.pdf
+3. NSE: https://www.nseindia.example/get-quotes/equity?symbol=BBRL
+4. Retailer association: https://ficci.in/example/retail-committee
+5. Store locator data: https://www.bharatbazaar.example/stores

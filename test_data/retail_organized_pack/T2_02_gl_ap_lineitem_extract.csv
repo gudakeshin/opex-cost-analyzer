@@ -1,0 +1,65 @@
+gl_code,cost_center,vendor,description,amount,currency,fiscal_period,amount_type,business_unit,geo,legal_entity,source_system,source_record_id,gst_treatment,gstin,lease_treatment,related_party
+510010,CC-COSTO-001,ITC Agribusiness,ITC Agribusiness services — Cost of Goods Sold,384851244,INR,2023-Q2,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100001,itc_eligible,27AABCI1234A1Z1,,no
+510010,CC-COSTO-001,ITC Agribusiness,ITC Agribusiness services — Cost of Goods Sold,392548268,INR,2023-Q3,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100002,itc_eligible,27AABCI1234A1Z1,,no
+510010,CC-COSTO-001,ITC Agribusiness,ITC Agribusiness services — Cost of Goods Sold,400245293,INR,2023-Q4,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100003,itc_eligible,27AABCI1234A1Z1,,no
+510010,CC-COSTO-001,ITC Agribusiness,ITC Agribusiness services — Cost of Goods Sold,407942318,INR,2024-Q1,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100004,itc_eligible,27AABCI1234A1Z1,,no
+510010,CC-COSTO-001,ITC Agribusiness,ITC Agribusiness services — Cost of Goods Sold,415639343,INR,2024-Q2,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100005,itc_eligible,27AABCI1234A1Z1,,no
+510010,CC-COSTO-001,ITC Agribusiness,ITC Agribusiness services — Cost of Goods Sold,423336368,INR,2024-Q3,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100006,itc_eligible,27AABCI1234A1Z1,,no
+510010,CC-COSTO-001,ITC Agribusiness,ITC Agribusiness services — Cost of Goods Sold,431033393,INR,2024-Q4,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100007,itc_eligible,27AABCI1234A1Z1,,no
+510010,CC-COSTO-001,ITC Agribusiness,ITC Agribusiness services — Cost of Goods Sold,438730418,INR,2025-Q1,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100008,itc_eligible,27AABCI1234A1Z1,,no
+510010,CC-COSTO-001,Hindustan Unilever,Hindustan Unilever services — Cost of Goods Sold,350233054,INR,2023-Q2,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100009,itc_eligible,27AABCH5678H1Z4,,no
+510010,CC-COSTO-001,Hindustan Unilever,Hindustan Unilever services — Cost of Goods Sold,357237715,INR,2023-Q3,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100010,itc_eligible,27AABCH5678H1Z4,,no
+510010,CC-COSTO-001,Hindustan Unilever,Hindustan Unilever services — Cost of Goods Sold,364242376,INR,2023-Q4,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100011,itc_eligible,27AABCH5678H1Z4,,no
+510010,CC-COSTO-001,Hindustan Unilever,Hindustan Unilever services — Cost of Goods Sold,371247037,INR,2024-Q1,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100012,itc_eligible,27AABCH5678H1Z4,,no
+510010,CC-COSTO-001,Hindustan Unilever,Hindustan Unilever services — Cost of Goods Sold,378251698,INR,2024-Q2,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100013,itc_eligible,27AABCH5678H1Z4,,no
+510010,CC-COSTO-001,Hindustan Unilever,Hindustan Unilever services — Cost of Goods Sold,385256359,INR,2024-Q3,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100014,itc_eligible,27AABCH5678H1Z4,,no
+510010,CC-COSTO-001,Hindustan Unilever,Hindustan Unilever services — Cost of Goods Sold,392261020,INR,2024-Q4,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100015,itc_eligible,27AABCH5678H1Z4,,no
+510010,CC-COSTO-001,Hindustan Unilever,Hindustan Unilever services — Cost of Goods Sold,399265681,INR,2025-Q1,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100016,itc_eligible,27AABCH5678H1Z4,,no
+510010,CC-COSTO-001,Procter & Gamble India,Procter & Gamble India services — Cost of Goods Sold,266196073,INR,2023-Q2,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100017,itc_eligible,27AABCP9012P1Z7,,no
+510010,CC-COSTO-001,Procter & Gamble India,Procter & Gamble India services — Cost of Goods Sold,271519994,INR,2023-Q3,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100018,itc_eligible,27AABCP9012P1Z7,,no
+510010,CC-COSTO-001,Procter & Gamble India,Procter & Gamble India services — Cost of Goods Sold,276843915,INR,2023-Q4,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100019,itc_eligible,27AABCP9012P1Z7,,no
+510010,CC-COSTO-001,Procter & Gamble India,Procter & Gamble India services — Cost of Goods Sold,282167837,INR,2024-Q1,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100020,itc_eligible,27AABCP9012P1Z7,,no
+510010,CC-COSTO-001,Procter & Gamble India,Procter & Gamble India services — Cost of Goods Sold,287491758,INR,2024-Q2,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100021,itc_eligible,27AABCP9012P1Z7,,no
+510010,CC-COSTO-001,Procter & Gamble India,Procter & Gamble India services — Cost of Goods Sold,292815680,INR,2024-Q3,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100022,itc_eligible,27AABCP9012P1Z7,,no
+510010,CC-COSTO-001,Procter & Gamble India,Procter & Gamble India services — Cost of Goods Sold,298139601,INR,2024-Q4,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100023,itc_eligible,27AABCP9012P1Z7,,no
+510010,CC-COSTO-001,Procter & Gamble India,Procter & Gamble India services — Cost of Goods Sold,303463523,INR,2025-Q1,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100024,itc_eligible,27AABCP9012P1Z7,,no
+510010,CC-COSTO-001,Nestle India,Nestle India services — Cost of Goods Sold,92010971,INR,2023-Q2,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100025,itc_eligible,27AABCN3456N1Z0,,no
+510010,CC-COSTO-001,Nestle India,Nestle India services — Cost of Goods Sold,93851190,INR,2023-Q3,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100026,itc_eligible,27AABCN3456N1Z0,,no
+510010,CC-COSTO-001,Nestle India,Nestle India services — Cost of Goods Sold,95691409,INR,2023-Q4,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100027,itc_eligible,27AABCN3456N1Z0,,no
+510010,CC-COSTO-001,Nestle India,Nestle India services — Cost of Goods Sold,97531629,INR,2024-Q1,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100028,itc_eligible,27AABCN3456N1Z0,,no
+510010,CC-COSTO-001,Nestle India,Nestle India services — Cost of Goods Sold,99371848,INR,2024-Q2,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100029,itc_eligible,27AABCN3456N1Z0,,no
+510010,CC-COSTO-001,Nestle India,Nestle India services — Cost of Goods Sold,101212068,INR,2024-Q3,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100030,itc_eligible,27AABCN3456N1Z0,,no
+510010,CC-COSTO-001,Nestle India,Nestle India services — Cost of Goods Sold,103052287,INR,2024-Q4,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100031,itc_eligible,27AABCN3456N1Z0,,no
+510010,CC-COSTO-001,Nestle India,Nestle India services — Cost of Goods Sold,104892506,INR,2025-Q1,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100032,itc_eligible,27AABCN3456N1Z0,,no
+520010,CC-STORE-001,CBRE India (Leasing),CBRE India (Leasing) services — Store Operations & Occupancy,345466730,INR,2023-Q2,actual,Store,India,BBRL-IN,SAP,SAP-AP-100033,itc_eligible,27AABCC7890C1Z3,,no
+520010,CC-STORE-001,CBRE India (Leasing),CBRE India (Leasing) services — Store Operations & Occupancy,352376064,INR,2023-Q3,actual,Store,India,BBRL-IN,SAP,SAP-AP-100034,itc_eligible,27AABCC7890C1Z3,,no
+520010,CC-STORE-001,CBRE India (Leasing),CBRE India (Leasing) services — Store Operations & Occupancy,359285399,INR,2023-Q4,actual,Store,India,BBRL-IN,SAP,SAP-AP-100035,itc_eligible,27AABCC7890C1Z3,,no
+520010,CC-STORE-001,CBRE India (Leasing),CBRE India (Leasing) services — Store Operations & Occupancy,366194733,INR,2024-Q1,actual,Store,India,BBRL-IN,SAP,SAP-AP-100036,itc_eligible,27AABCC7890C1Z3,,no
+520010,CC-STORE-001,CBRE India (Leasing),CBRE India (Leasing) services — Store Operations & Occupancy,373104068,INR,2024-Q2,actual,Store,India,BBRL-IN,SAP,SAP-AP-100037,itc_eligible,27AABCC7890C1Z3,,no
+520010,CC-STORE-001,CBRE India (Leasing),CBRE India (Leasing) services — Store Operations & Occupancy,380013403,INR,2024-Q3,actual,Store,India,BBRL-IN,SAP,SAP-AP-100038,itc_eligible,27AABCC7890C1Z3,,no
+520010,CC-STORE-001,CBRE India (Leasing),CBRE India (Leasing) services — Store Operations & Occupancy,386922737,INR,2024-Q4,actual,Store,India,BBRL-IN,SAP,SAP-AP-100039,itc_eligible,27AABCC7890C1Z3,,no
+520010,CC-STORE-001,CBRE India (Leasing),CBRE India (Leasing) services — Store Operations & Occupancy,393832072,INR,2025-Q1,actual,Store,India,BBRL-IN,SAP,SAP-AP-100040,itc_eligible,27AABCC7890C1Z3,,no
+530010,CC-LOGIST-001,Delhivery Ltd,Delhivery Ltd services — Logistics & Supply Chain,224141930,INR,2023-Q2,actual,Logistics,India,BBRL-IN,SAP,SAP-AP-100041,itc_eligible,07AABCD1111L1Z9,,no
+530010,CC-LOGIST-001,Delhivery Ltd,Delhivery Ltd services — Logistics & Supply Chain,228624768,INR,2023-Q3,actual,Logistics,India,BBRL-IN,SAP,SAP-AP-100042,itc_eligible,07AABCD1111L1Z9,,no
+530010,CC-LOGIST-001,Delhivery Ltd,Delhivery Ltd services — Logistics & Supply Chain,233107607,INR,2023-Q4,actual,Logistics,India,BBRL-IN,SAP,SAP-AP-100043,itc_eligible,07AABCD1111L1Z9,,no
+530010,CC-LOGIST-001,Delhivery Ltd,Delhivery Ltd services — Logistics & Supply Chain,237590445,INR,2024-Q1,actual,Logistics,India,BBRL-IN,SAP,SAP-AP-100044,itc_eligible,07AABCD1111L1Z9,,no
+530010,CC-LOGIST-001,Delhivery Ltd,Delhivery Ltd services — Logistics & Supply Chain,242073284,INR,2024-Q2,actual,Logistics,India,BBRL-IN,SAP,SAP-AP-100045,itc_eligible,07AABCD1111L1Z9,,no
+530010,CC-LOGIST-001,Delhivery Ltd,Delhivery Ltd services — Logistics & Supply Chain,246556123,INR,2024-Q3,actual,Logistics,India,BBRL-IN,SAP,SAP-AP-100046,itc_eligible,07AABCD1111L1Z9,,no
+530010,CC-LOGIST-001,Delhivery Ltd,Delhivery Ltd services — Logistics & Supply Chain,251038961,INR,2024-Q4,actual,Logistics,India,BBRL-IN,SAP,SAP-AP-100047,itc_eligible,07AABCD1111L1Z9,,no
+530010,CC-LOGIST-001,Delhivery Ltd,Delhivery Ltd services — Logistics & Supply Chain,255521800,INR,2025-Q1,actual,Logistics,India,BBRL-IN,SAP,SAP-AP-100048,itc_eligible,07AABCD1111L1Z9,,no
+510010,CC-COSTO-001,MSME Food Suppliers,MSME Food Suppliers services — Cost of Goods Sold,97635562,INR,2023-Q2,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100049,itc_eligible,27AABCM2222F1Z6,,no
+510010,CC-COSTO-001,MSME Food Suppliers,MSME Food Suppliers services — Cost of Goods Sold,99588273,INR,2023-Q3,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100050,itc_eligible,27AABCM2222F1Z6,,no
+510010,CC-COSTO-001,MSME Food Suppliers,MSME Food Suppliers services — Cost of Goods Sold,101540984,INR,2023-Q4,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100051,itc_eligible,27AABCM2222F1Z6,,no
+510010,CC-COSTO-001,MSME Food Suppliers,MSME Food Suppliers services — Cost of Goods Sold,103493695,INR,2024-Q1,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100052,itc_eligible,27AABCM2222F1Z6,,no
+510010,CC-COSTO-001,MSME Food Suppliers,MSME Food Suppliers services — Cost of Goods Sold,105446406,INR,2024-Q2,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100053,itc_eligible,27AABCM2222F1Z6,,no
+510010,CC-COSTO-001,MSME Food Suppliers,MSME Food Suppliers services — Cost of Goods Sold,107399118,INR,2024-Q3,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100054,itc_eligible,27AABCM2222F1Z6,,no
+510010,CC-COSTO-001,MSME Food Suppliers,MSME Food Suppliers services — Cost of Goods Sold,109351829,INR,2024-Q4,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100055,itc_eligible,27AABCM2222F1Z6,,no
+510010,CC-COSTO-001,MSME Food Suppliers,MSME Food Suppliers services — Cost of Goods Sold,111304540,INR,2025-Q1,actual,Cost,India,BBRL-IN,SAP,SAP-AP-100056,itc_eligible,27AABCM2222F1Z6,,no
+540010,CC-TECHNO-001,Infosys BPM (Retail Tech),Infosys BPM (Retail Tech) services — Technology & Digital,131030686,INR,2023-Q2,actual,Technology,India,BBRL-IN,SAP,SAP-AP-100057,itc_eligible,29AABCI3333R1Z2,,no
+540010,CC-TECHNO-001,Infosys BPM (Retail Tech),Infosys BPM (Retail Tech) services — Technology & Digital,133651299,INR,2023-Q3,actual,Technology,India,BBRL-IN,SAP,SAP-AP-100058,itc_eligible,29AABCI3333R1Z2,,no
+540010,CC-TECHNO-001,Infosys BPM (Retail Tech),Infosys BPM (Retail Tech) services — Technology & Digital,136271913,INR,2023-Q4,actual,Technology,India,BBRL-IN,SAP,SAP-AP-100059,itc_eligible,29AABCI3333R1Z2,,no
+540010,CC-TECHNO-001,Infosys BPM (Retail Tech),Infosys BPM (Retail Tech) services — Technology & Digital,138892527,INR,2024-Q1,actual,Technology,India,BBRL-IN,SAP,SAP-AP-100060,itc_eligible,29AABCI3333R1Z2,,no
+540010,CC-TECHNO-001,Infosys BPM (Retail Tech),Infosys BPM (Retail Tech) services — Technology & Digital,141513140,INR,2024-Q2,actual,Technology,India,BBRL-IN,SAP,SAP-AP-100061,itc_eligible,29AABCI3333R1Z2,,no
+540010,CC-TECHNO-001,Infosys BPM (Retail Tech),Infosys BPM (Retail Tech) services — Technology & Digital,144133754,INR,2024-Q3,actual,Technology,India,BBRL-IN,SAP,SAP-AP-100062,itc_eligible,29AABCI3333R1Z2,,no
+540010,CC-TECHNO-001,Infosys BPM (Retail Tech),Infosys BPM (Retail Tech) services — Technology & Digital,146754368,INR,2024-Q4,actual,Technology,India,BBRL-IN,SAP,SAP-AP-100063,itc_eligible,29AABCI3333R1Z2,,no
+540010,CC-TECHNO-001,Infosys BPM (Retail Tech),Infosys BPM (Retail Tech) services — Technology & Digital,149374982,INR,2025-Q1,actual,Technology,India,BBRL-IN,SAP,SAP-AP-100064,itc_eligible,29AABCI3333R1Z2,,no

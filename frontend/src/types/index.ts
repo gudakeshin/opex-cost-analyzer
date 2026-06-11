@@ -163,16 +163,49 @@ export interface AnalysisTraceStep {
   metrics?: Record<string, unknown>;
 }
 
+export interface SupplierRow {
+  supplier: string;
+  spend?: number | null;
+  share_of_category?: number | null;
+  note?: string | null;
+}
+
+export interface CategoryInsightData {
+  category_id: string;
+  category_name: string;
+  spend?: number | null;
+  spend_pct_revenue?: number | null;
+  benchmark_gap?: string | null;
+  addressable_gap?: number | null;
+  top_suppliers?: SupplierRow[];
+  concentration_hhi?: number | null;
+  suggested_actions?: string[];
+}
+
+export interface PresentationBlock {
+  kind: string;
+  title?: string;
+  data: Record<string, unknown>;
+}
+
+export interface AssistantPayload {
+  blocks: PresentationBlock[];
+  narrative_markdown?: string;
+}
+
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   thinking?: string;
   advisory_sections?: Record<string, unknown>;
+  presentation?: AssistantPayload;
   quality_signals?: QualitySignals;
   next_options?: ChatNextOption[];
   run_id?: string;
   progress_steps?: ProgressStep[];
   degraded_mode?: boolean;
+  used_llm_synthesis?: boolean;
+  fallback_reasons?: Record<string, unknown>;
   artefacts?: Record<string, unknown> | string[];
   insight_snapshot?: AnalysisInsightSnapshot;
   analysis_trace?: AnalysisTraceStep[];
@@ -303,6 +336,12 @@ export interface EngagementSanityConflict {
   engagement_company?: string;
   detected_company?: string;
   detected_companies?: string[];
+  engagement_industry?: string;
+  engagement_industry_label?: string;
+  detected_industry?: string;
+  detected_industry_label?: string;
+  industry_spend?: string | null;
+  detected_industries?: string[];
   source?: string;
   signal_source?: string;
   message?: string;
@@ -320,6 +359,7 @@ export interface ChatProgressResponse {
   run_id: string;
   status: string;
   steps?: Array<{ phase?: string; message?: string; timestamp?: string }>;
+  thinking_text?: string | null;
   error?: string | null;
 }
 
@@ -344,6 +384,7 @@ export interface SessionSummary {
 }
 
 export interface EngagementMeta {
+  engagement_id?: string;
   company_name: string;
   industry: string;
   currency: string;
@@ -356,6 +397,7 @@ export interface EngagementMeta {
   detected_company_name?: string;
   detected_industry?: string;
   detected_industry_label?: string;
+  detected_annual_revenue_cr?: number;
 }
 
 export interface ChatHistoryTurn {
@@ -379,7 +421,21 @@ export interface V1ChatPayload {
   currency?: string;
   audience?: string;
   thinking_mode?: 'standard' | 'extended';
+  llm_model?: string;
   chat_history?: ChatHistoryTurn[];
+}
+
+export interface LlmModelOption {
+  id: string;
+  label: string;
+  provider: string;
+  description?: string;
+}
+
+export interface LlmModelsResponse {
+  models: LlmModelOption[];
+  default_model_id: string;
+  default_provider: string;
 }
 
 export interface BusinessClarification {
@@ -393,8 +449,10 @@ export interface V1ChatResponse {
   thinking?: string;
   artefacts?: Record<string, unknown>;
   advisory_sections?: Record<string, unknown>;
+  presentation?: AssistantPayload;
   quality_signals?: QualitySignals;
   degraded_mode?: boolean;
+  used_llm_synthesis?: boolean;
   fallback_reasons?: Record<string, unknown>;
   loop_complete?: boolean;
   next_loop_trigger?: string;
@@ -418,6 +476,8 @@ export interface ChatPlanPreview {
   clarification?: BusinessClarification;
   clarification_required?: boolean;
   clarification_prompt?: string;
+  /** "agentic" when the agent tool-loop will select skills at runtime; "deterministic" for static planner. */
+  execution_mode?: string;
   [key: string]: unknown;
 }
 
@@ -594,6 +654,29 @@ export interface Initiative {
   cost_behaviour?: number;
   condition_precedents?: string[];
   assumptions?: Array<Record<string, unknown>>;
+  // Business-perspective detail (Layer A/B enrichment from the business case builder).
+  business_rationale?: string;
+  owner_role?: string;
+  business_sponsor?: string;
+  affected_vendors?: Array<{
+    supplier: string;
+    spend?: number;
+    share_of_category_pct?: number;
+    avg_payment_terms_days?: number | null;
+  }>;
+  contract_levers?: string[];
+  risks?: Array<{ risk: string; severity?: string; mitigation?: string }>;
+  kpis?: Array<{ metric: string; cadence?: string }>;
+  change_management?: {
+    stakeholders?: string[];
+    comms_cadence?: string;
+    resistance_points?: string[];
+  };
+  execution_playbook?: Array<Record<string, unknown>>;
+  phasing_narrative?: string;
+  evidence?: string[];
+  payback_months?: number;
+  irr_pct?: number;
   [key: string]: unknown;
 }
 

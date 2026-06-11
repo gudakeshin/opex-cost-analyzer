@@ -126,7 +126,8 @@
         "Direct booking conversion data (website traffic, conversion rate, booking value)",
         "Loyalty program enrolment and redemption data",
         "Competitor channel mix and rate parity compliance data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "fnb_procurement_optimization",
@@ -213,7 +214,8 @@
         "Food cost ratio by outlet type and menu category",
         "Vendor pricing and minimum order quantity by commodity",
         "Wastage and spoilage data by item and kitchen section"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "energy_per_key_reduction",
@@ -300,7 +302,8 @@
         "BMS and HVAC system specifications and age",
         "Occupancy rate and seasonality pattern",
         "Capital cost estimates for energy efficiency upgrades"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "housekeeping_optimization",
@@ -386,7 +389,8 @@
         "Occupancy rate by month and season",
         "Housekeeping cost per occupied room by property",
         "Outsourced housekeeping pricing and SLA benchmarks"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "revenue_management_optimization",
@@ -473,7 +477,8 @@
         "PMS and channel manager integration capability",
         "Corporate account rate agreements and production data",
         "Demand forecast accuracy and pace data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

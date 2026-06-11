@@ -1,0 +1,50 @@
+[
+  {
+    "supplier": "Infosys",
+    "description": "IT managed services Q1",
+    "amount": 3200000,
+    "category": "IT",
+    "date": "2025-01-15",
+    "currency": "INR"
+  },
+  {
+    "supplier": "AWS",
+    "description": "Cloud hosting",
+    "amount": 2100000,
+    "category": "IT",
+    "date": "2025-02-10",
+    "currency": "INR"
+  },
+  {
+    "supplier": "Deloitte",
+    "description": "Advisory engagement",
+    "amount": 1800000,
+    "category": "Professional Services",
+    "date": "2025-02-20",
+    "currency": "INR"
+  },
+  {
+    "supplier": "MakeMyTrip",
+    "description": "Air travel bookings",
+    "amount": 950000,
+    "category": "Travel",
+    "date": "2025-03-05",
+    "currency": "INR"
+  },
+  {
+    "supplier": "WeWork",
+    "description": "Office space lease",
+    "amount": 1400000,
+    "category": "Facilities",
+    "date": "2025-03-12",
+    "currency": "INR"
+  },
+  {
+    "supplier": "Staples",
+    "description": "Office supplies",
+    "amount": 250000,
+    "category": "Procurement",
+    "date": "2025-03-18",
+    "currency": "INR"
+  }
+]

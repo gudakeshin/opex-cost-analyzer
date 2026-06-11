@@ -1,0 +1,38 @@
+[
+  {
+    "engagement_id": "eng-uil-fy24",
+    "initiative_id": "INI-1",
+    "lever_id": "solar_rooftop",
+    "pack_id": "manufacturing_diversified",
+    "planned_p50_cr": 18.0,
+    "realised_cr": 14.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "medium",
+    "notes": "Solar phase 1 delayed by 3 months; partial-year savings booked."
+  },
+  {
+    "engagement_id": "eng-uil-fy24",
+    "initiative_id": "INI-2",
+    "lever_id": "maintenance_vendor_rationalisation",
+    "pack_id": "manufacturing_diversified",
+    "planned_p50_cr": 16.0,
+    "realised_cr": 19.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Volume discount from 8-vendor panel exceeded plan."
+  },
+  {
+    "engagement_id": "eng-uil-fy24",
+    "initiative_id": "INI-3",
+    "lever_id": "subcontracting_rate",
+    "pack_id": "manufacturing_diversified",
+    "planned_p50_cr": 22.0,
+    "realised_cr": 18.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "medium",
+    "notes": "Labour cost inflation in machining vendors partially offset rate negotiation savings."
+  }
+]

@@ -35,7 +35,7 @@ def update_skill(name: str, payload: SkillEditRequest) -> Dict[str, str]:
     if not path.exists():
         raise HTTPException(status_code=404, detail="Skill not found")
     path.write_text(payload.content, encoding="utf-8")
-    append_audit_event(f"skill_updated skill={name}")
+    append_audit_event("skill_updated", data={"skill": name})
     return {"status": "updated"}
 
 
@@ -48,7 +48,7 @@ def create_skill(payload: SkillCreateRequest) -> Dict[str, str]:
     if skill_path.exists():
         raise HTTPException(status_code=400, detail="Skill already exists")
     skill_path.write_text(payload.content, encoding="utf-8")
-    append_audit_event(f"skill_created skill={payload.name}")
+    append_audit_event("skill_created", data={"skill": payload.name})
     return {"status": "created", "name": payload.name}
 
 

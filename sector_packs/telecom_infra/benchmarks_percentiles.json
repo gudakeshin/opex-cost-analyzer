@@ -49,52 +49,103 @@
       "label": "Telecom & Infrastructure (India)",
       "categories": {
         "OUTSOURCED": {
-          "P25": 30.0, "P50": 38.0, "P75": 45.0, "P90": 55.0,
+          "P25": 30.0,
+          "P50": 38.0,
+          "P75": 45.0,
+          "P90": 55.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Network operating costs: tower rental, inter-connect charges, roaming, network O&M. Airtel FY25: ~38%, Jio FY25: ~35%. Indus Towers: energy + maintenance ~48% of tower revenue."
         },
         "HR": {
-          "P25": 4.5, "P50": 7.0, "P75": 10.0, "P90": 15.0,
+          "P25": 4.5,
+          "P50": 7.0,
+          "P75": 10.0,
+          "P90": 15.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Employee costs % of revenue. Jio FY25: ~5%, Airtel FY25: 6.9%, Indus Towers: 3.6%. TRAI: industry average 5-8% of revenues for large operators."
         },
         "POWER_ENERGY": {
-          "P25": 8.0, "P50": 12.0, "P75": 17.0, "P90": 24.0,
+          "P25": 8.0,
+          "P50": 12.0,
+          "P75": 17.0,
+          "P90": 24.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Energy for network operations (towers, data centres). Indus Towers FY25: energy 35.7% of tower revenue. Telecom operators: energy 10-15% of total revenue. TRAI: energy cost management as key profitability driver."
         },
         "FIN_SVCS": {
-          "P25": 10.0, "P50": 13.5, "P75": 18.0, "P90": 24.0,
+          "P25": 10.0,
+          "P50": 13.5,
+          "P75": 18.0,
+          "P90": 24.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Licence fees + spectrum usage charges (SUC). TRAI: AGR-linked licence fee 8% + SUC 3-5% = 11-13% of AGR. DoT regulatory levies. Airtel FY25: licence fees ~13.8% of revenue."
         },
         "IT": {
-          "P25": 2.0, "P50": 3.5, "P75": 5.5, "P90": 8.0,
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.5,
+          "P90": 8.0,
           "unit": "% of revenue",
           "confidence": "published_research",
           "source_note": "IT/OSS/BSS systems, cloud, cybersecurity. GSMA India 2024: telecom IT 3-5% of revenue. Network virtualisation (NFV/SDN) investment increasing IT spend. Jio cloud-native stack at lower end."
         },
         "PLANT_MAINTENANCE": {
-          "P25": 2.5, "P50": 4.5, "P75": 7.0, "P90": 11.0,
+          "P25": 2.5,
+          "P50": 4.5,
+          "P75": 7.0,
+          "P90": 11.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Network R&M, tower maintenance. Indus Towers FY25: maintenance 12.5% of tower revenue. Telecom operators: 3-5% of revenue on network maintenance."
         },
         "MARKETING": {
-          "P25": 2.0, "P50": 3.5, "P75": 5.5, "P90": 9.0,
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.5,
+          "P90": 9.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Sales, customer acquisition, brand. Airtel FY25: sales & marketing ~3.5%, Jio: ~2.5% (digital-first). TRAI: industry average 3-5% of revenue on S&M."
         },
         "FACILITIES": {
-          "P25": 0.5, "P50": 1.0, "P75": 1.8, "P90": 3.0,
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 1.8,
+          "P90": 3.0,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Corporate and customer service offices. INTERNAL_CALIBRATION."
+        },
+        "NETWORK_OPEX": {
+          "P25": 18,
+          "P50": 25,
+          "P75": 32,
+          "P90": 40,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "RAN/transmission/site O&M + energy as a distinct line; internal calibration (complements OUTSOURCED)."
+        },
+        "SPECTRUM_LICENSING": {
+          "P25": 4,
+          "P50": 7,
+          "P75": 11,
+          "P90": 15,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Spectrum usage charges, licence fees and regulatory levies as % of revenue; internal calibration."
+        },
+        "TOWER_INFRA": {
+          "P25": 8,
+          "P50": 12,
+          "P75": 16,
+          "P90": 21,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Passive tower infrastructure rental/lease as % of revenue; internal calibration."
         }
       }
     }

@@ -103,10 +103,123 @@ export const InitiativeDrawer: React.FC<InitiativeDrawerProps> = ({
           </section>
         )}
 
+        {initiative.business_rationale && (
+          <section>
+            <p className="font-semibold text-brand-navy mb-1">Business rationale</p>
+            <p className="text-brand-ink">{initiative.business_rationale}</p>
+          </section>
+        )}
+
         {initiative.root_cause && (
           <section>
             <p className="font-semibold text-brand-navy mb-1">Root cause</p>
             <p className="text-brand-ink">{initiative.root_cause}</p>
+          </section>
+        )}
+
+        {(initiative.owner_role || initiative.business_sponsor) && (
+          <section className="space-y-1">
+            <p className="font-semibold text-brand-navy">Owner &amp; accountability</p>
+            {initiative.owner_role && (
+              <p><span className="text-brand-muted">Owner:</span> {initiative.owner_role}</p>
+            )}
+            {initiative.business_sponsor && (
+              <p><span className="text-brand-muted">Sponsor:</span> {initiative.business_sponsor}</p>
+            )}
+          </section>
+        )}
+
+        {initiative.affected_vendors && initiative.affected_vendors.length > 0 && (
+          <section>
+            <p className="font-semibold text-brand-navy mb-2">Affected vendors</p>
+            <ul className="space-y-1 text-brand-ink">
+              {initiative.affected_vendors.map((v, i) => (
+                <li key={i} className="flex justify-between gap-3">
+                  <span>{v.supplier}</span>
+                  <span className="text-brand-muted tabular-nums">
+                    {v.share_of_category_pct != null ? `${v.share_of_category_pct}% of category` : ''}
+                    {v.avg_payment_terms_days != null ? ` · ${v.avg_payment_terms_days}d terms` : ''}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {initiative.contract_levers && initiative.contract_levers.length > 0 && (
+          <section>
+            <p className="font-semibold text-brand-navy mb-2">Contract &amp; commercial levers</p>
+            <ul className="list-disc pl-5 space-y-1 text-brand-ink">
+              {initiative.contract_levers.map((c, i) => (
+                <li key={i}>{c}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {initiative.risks && initiative.risks.length > 0 && (
+          <section>
+            <p className="font-semibold text-brand-navy mb-2">Risks &amp; mitigations</p>
+            <ul className="space-y-2 text-brand-ink">
+              {initiative.risks.map((r, i) => (
+                <li key={i} className="p-2 border border-brand-border rounded-lg bg-white">
+                  <p className="font-medium flex items-start gap-2">
+                    {r.severity && (
+                      <Badge tone={r.severity === 'high' ? 'error' : r.severity === 'medium' ? 'warning' : 'default'}>
+                        {r.severity}
+                      </Badge>
+                    )}
+                    <span>{r.risk}</span>
+                  </p>
+                  {r.mitigation && (
+                    <p className="text-xs text-brand-muted mt-1">Mitigation: {r.mitigation}</p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {initiative.kpis && initiative.kpis.length > 0 && (
+          <section>
+            <p className="font-semibold text-brand-navy mb-2">KPIs</p>
+            <ul className="list-disc pl-5 space-y-1 text-brand-ink">
+              {initiative.kpis.map((k, i) => (
+                <li key={i}>
+                  {k.metric}
+                  {k.cadence && <span className="text-brand-muted"> ({k.cadence})</span>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {initiative.change_management?.stakeholders && initiative.change_management.stakeholders.length > 0 && (
+          <section className="space-y-1">
+            <p className="font-semibold text-brand-navy">Change management</p>
+            <p>
+              <span className="text-brand-muted">Stakeholders:</span>{' '}
+              {initiative.change_management.stakeholders.join(', ')}
+            </p>
+            {initiative.change_management.comms_cadence && (
+              <p>
+                <span className="text-brand-muted">Cadence:</span>{' '}
+                {initiative.change_management.comms_cadence}
+              </p>
+            )}
+            {initiative.change_management.resistance_points && initiative.change_management.resistance_points.length > 0 && (
+              <p>
+                <span className="text-brand-muted">Resistance:</span>{' '}
+                {initiative.change_management.resistance_points.join('; ')}
+              </p>
+            )}
+          </section>
+        )}
+
+        {initiative.phasing_narrative && (
+          <section>
+            <p className="font-semibold text-brand-navy mb-1">Phasing</p>
+            <p className="text-brand-ink">{initiative.phasing_narrative}</p>
           </section>
         )}
 

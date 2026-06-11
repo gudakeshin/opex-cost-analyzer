@@ -1,0 +1,7 @@
+Pragati Telecom Networks Ltd — Diagnostic URLs (synthetic/illustrative)
+
+1. Investor relations: https://www.pragatitelecom.example/investors
+2. Annual report: https://www.pragatitelecom.example/ir/annual-report-fy25.pdf
+3. NSE: https://www.nseindia.example/get-quotes/equity?symbol=PTNL
+4. TRAI: https://trai.gov.in/example/ptnl-qos-report-q4fy25
+5. DoT spectrum: https://dot.gov.in/example/ptnl-spectrum-holding

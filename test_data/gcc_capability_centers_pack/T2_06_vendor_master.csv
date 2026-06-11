@@ -1,0 +1,11 @@
+vendor,vendor_category,gstin,vendor_pan,msme_flag,spend_category,legal_entity,related_party
+TeamLease Digital,large,29AABCT5678L1Z9,AABCT5678L,no,Talent & Staffing,MGSI-IN,no
+Quess Corp,large,29AABCQ1234A1Z5,AABCQ1234A,no,Talent & Staffing,MGSI-IN,no
+Embassy Office Parks,large,27AABCE8821O1Z2,AABCE8821O,no,Real Estate & Facilities,MGSI-IN,no
+RMZ Corp,large,27AABCR5541R1Z5,AABCR5541R,no,Real Estate & Facilities,MGSI-IN,no
+Microsoft India,large,29AABCM2345I1Z8,AABCM2345I,no,Technology Infrastructure,MGSI-IN,no
+AWS India,large,,,no,Technology Infrastructure,MGS-US,no
+Coursera India,large,27AABCC7711C1Z1,AABCC7711C,no,Learning & Development,MGSI-IN,no
+ISS Facility Services,large,27AABCI3321F1Z4,AABCI3321F,no,Real Estate & Facilities,MGSI-IN,no
+Sodexo India,large,27AABCS6621S1Z7,AABCS6621S,no,Real Estate & Facilities,MGSI-IN,no
+KPMG India,large,29AABCK3201F1Z9,AABCK3201F,no,Compliance & Advisory,MGSI-IN,no

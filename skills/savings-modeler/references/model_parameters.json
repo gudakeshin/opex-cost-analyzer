@@ -82,7 +82,8 @@
         "GL spend by category (36 months)",
         "Vendor master with contract end dates",
         "Peer or should-cost benchmark"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "process_standardization": {
       "lever_name": "Process Standardisation",
@@ -143,7 +144,8 @@
         "Process volume metrics",
         "FTE effort or cost allocation by process",
         "Baseline cycle times"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "demand_management": {
       "lever_name": "Demand Management",
@@ -209,7 +211,8 @@
         "Transaction-level spend with requester/BU",
         "Approval workflow configuration",
         "Policy exception log"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     "supplier_consolidation": {
       "lever_name": "Supplier Consolidation",
@@ -284,7 +287,8 @@
         "GL spend by category (36 months)",
         "Vendor master with contract end dates",
         "Peer or should-cost benchmark"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "automation": {
       "lever_name": "Process Automation (RPA / AI)",
@@ -348,7 +352,8 @@
         "Process inventory with volumes",
         "Application landscape",
         "Labour cost per process"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "payment_terms": {
       "lever_name": "Payment Terms Optimisation",
@@ -409,7 +414,8 @@
         "AP aging by supplier",
         "Payment terms master",
         "Supplier credit/risk ratings"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     "maverick_compliance": {
       "lever_name": "Maverick Spend Compliance",
@@ -475,7 +481,8 @@
         "Transaction-level spend with requester/BU",
         "Approval workflow configuration",
         "Policy exception log"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     "insourcing": {
       "lever_name": "Insourcing / Repatriation",
@@ -553,7 +560,8 @@
         "GL spend by category (36 months)",
         "Vendor master with contract end dates",
         "Peer or should-cost benchmark"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "outsourcing": {
       "lever_name": "Strategic Outsourcing / BPO",
@@ -631,7 +639,8 @@
         "GL spend by category (36 months)",
         "Vendor master with contract end dates",
         "Peer or should-cost benchmark"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "internal_best_practice": {
       "lever_name": "Internal Best Practice Roll-Out",
@@ -692,7 +701,8 @@
         "Process volume metrics",
         "FTE effort or cost allocation by process",
         "Baseline cycle times"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "tail_spend_automation": {
       "lever_name": "Tail Spend Automation",
@@ -753,7 +763,8 @@
         "Process inventory with volumes",
         "Application landscape",
         "Labour cost per process"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "should_cost_modeling": {
       "lever_name": "Should-Cost Modelling",
@@ -828,7 +839,8 @@
         "GL spend by category (36 months)",
         "Vendor master with contract end dates",
         "Peer or should-cost benchmark"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "zero_based_rebaseline": {
       "lever_name": "Zero-Based Budget Rebaseline",
@@ -894,7 +906,8 @@
         "Transaction-level spend with requester/BU",
         "Approval workflow configuration",
         "Policy exception log"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     "shared_services_consolidation": {
       "lever_name": "Shared Services Consolidation",
@@ -967,7 +980,8 @@
         "Current chargeback or recharge model for shared services",
         "SLA benchmark data for comparable SSC operations",
         "Location cost analysis (talent, real estate, infrastructure) for SSC hub"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     "geographic_arbitrage": {
       "lever_name": "Geographic Arbitrage / Nearshoring",
@@ -1028,7 +1042,8 @@
         "Org chart and FTE roster",
         "Compensation bands",
         "Benchmark spans and layers"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     "rebate_pricing_recovery": {
       "lever_name": "Rebate & Pricing Compliance Recovery",
@@ -1103,7 +1118,8 @@
         "GL spend by category (36 months)",
         "Vendor master with contract end dates",
         "Peer or should-cost benchmark"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "specification_optimization": {
       "lever_name": "Specification Optimisation / Design-to-Value",
@@ -1169,7 +1185,8 @@
         "Transaction-level spend with requester/BU",
         "Approval workflow configuration",
         "Policy exception log"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     "license_rightsizing": {
       "lever_name": "Software License Right-Sizing",
@@ -1242,7 +1259,8 @@
         "Contract renewal dates and pricing tiers by vendor",
         "Headcount forecast for planning period",
         "Vendor audit exposure and licence true-up obligations"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "cloud_finops": {
       "lever_name": "Cloud FinOps / Reserved Instance Optimisation",
@@ -1315,7 +1333,8 @@
         "Tagging hygiene report and resource inventory",
         "Reserved instance and savings plan coverage and utilisation",
         "Non-production environment inventory and usage pattern"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "subcontractor_optimization": {
       "lever_name": "Subcontractor / Delivery Cost Optimisation",
@@ -1388,7 +1407,8 @@
         "Vendor performance data (SLA compliance, defect rate, on-time delivery)",
         "Statement of Work quality assessment by contract",
         "Internal bench vs subcontractor skills overlap analysis"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "predictive_maintenance": {
       "lever_name": "Predictive / Condition-Based Maintenance",
@@ -1461,7 +1481,8 @@
         "Historian/SCADA data for instrumented assets (vibration, temperature, pressure)",
         "Current PM frequency schedule and inspection outcomes",
         "Unplanned outage log with duration and production impact"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "mode_shift_logistics": {
       "lever_name": "Logistics Mode Shift (Air → Road / Rail / Ocean)",
@@ -1534,7 +1555,8 @@
         "Rail/coastal shipping network connectivity to key origin-destination pairs",
         "Carrier rate cards and contract terms by mode",
         "Inventory holding cost and service-level trade-off data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "store_labor_optimization": {
       "lever_name": "Store / Field Labour Optimisation",
@@ -1607,7 +1629,8 @@
         "Labour cost per store (permanent, part-time, casual)",
         "Transactions per hour by department and store format",
         "Union contract terms and flexibility provisions"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     "claims_automation": {
       "lever_name": "Claims Processing Automation",
@@ -1680,7 +1703,8 @@
         "FNOL data: channel mix (agent, digital, call centre) and data completeness at intake",
         "Policy admin system and claims management system integration architecture",
         "IRDAI compliance requirements for automated adjudication"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "energy_loss_reduction": {
       "lever_name": "Distribution Loss Reduction (AT&C / Technical)",
@@ -1758,7 +1782,8 @@
         "Conductor specifications and age profile for high-loss feeders",
         "Smart meter installation status and AMI coverage by zone",
         "SERC-mandated AT&C loss reduction targets by year"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "gst_itc_recovery": {
       "lever_name": "GST Input Tax Credit Recovery",
@@ -1831,7 +1856,8 @@
         "Vendor GSTIN compliance status and filing history",
         "ERP GST configuration and tax code mapping",
         "Prior-year tax authority ITC mismatch notices if any"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     "network_opex_optimization": {
       "lever_name": "Network OPEX Optimisation (Telecom / Utilities)",
@@ -1904,7 +1930,8 @@
         "Network equipment age profile and maintenance cost",
         "RAN managed service contract terms and SLA performance",
         "TRAI network performance indicators (CAGR trends, EBITDA benchmarks)"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "clinical_trial_efficiency": {
       "lever_name": "Clinical Trial Efficiency",
@@ -1977,7 +2004,8 @@
         "CRO performance data (enrolment rate, protocol deviations, budget adherence)",
         "CTMS data: site performance, screen fail rates, and enrolment milestones",
         "DCT technology readiness assessment"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     "shared_services_center": {
       "lever_name": "Group Shared Services Centre (Conglomerate)",
@@ -2050,7 +2078,8 @@
         "ERP/technology landscape across business units",
         "Chargeback/recharge model and inter-company billing data",
         "Location analysis for SSC hub (cost, talent, infrastructure)"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     "corporate_overhead_right_size": {
       "lever_name": "Corporate Overhead Right-Sizing",
@@ -2128,7 +2157,8 @@
         "Peer benchmark: corporate overhead % of revenue for listed conglomerates",
         "Group revenue and EBITDA trend (3 years)",
         "Org chart with span-of-control data by function"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     "benefits_cost_optimization": {
       "lever_name": "Employee Benefits Cost Optimisation",
@@ -2194,7 +2224,8 @@
         "Transaction-level spend with requester/BU",
         "Approval workflow configuration",
         "Policy exception log"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     "contingent_workforce_optimization": {
       "lever_name": "Contingent Workforce Mix Optimisation (SOW vs T&M vs Augmentation)",
@@ -2260,7 +2291,8 @@
         "Transaction-level spend with requester/BU",
         "Approval workflow configuration",
         "Policy exception log"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     "consulting_spend_governance": {
       "lever_name": "Consulting Spend Governance & ROI Tracking",
@@ -2326,7 +2358,8 @@
         "Transaction-level spend with requester/BU",
         "Approval workflow configuration",
         "Policy exception log"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     "legal_spend_optimization": {
       "lever_name": "Legal Spend Optimisation (Matter Management & Outside Counsel Guidelines)",
@@ -2392,7 +2425,8 @@
         "Transaction-level spend with requester/BU",
         "Approval workflow configuration",
         "Policy exception log"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     "ld_rationalization": {
       "lever_name": "Learning & Development (L&D) Cost Rationalisation",
@@ -2458,7 +2492,8 @@
         "Transaction-level spend with requester/BU",
         "Approval workflow configuration",
         "Policy exception log"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     "agency_fee_optimization": {
       "lever_name": "Marketing Agency Fee Model Optimisation (Retainer vs Project vs Performance)",
@@ -2524,7 +2559,8 @@
         "Transaction-level spend with requester/BU",
         "Approval workflow configuration",
         "Policy exception log"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     "saas_sprawl_audit": {
       "lever_name": "SaaS Sprawl Audit & Rationalisation (Unauthorised & Duplicate Subscriptions)",
@@ -2585,7 +2621,8 @@
         "Process inventory with volumes",
         "Application landscape",
         "Labour cost per process"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "hyperscaler_commitment_optimization": {
       "lever_name": "Hyperscaler Commitment Tier Optimisation (Reserved Instance / Savings Plans / CUD)",
@@ -2646,7 +2683,8 @@
         "Process inventory with volumes",
         "Application landscape",
         "Labour cost per process"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "martech_rationalization": {
       "lever_name": "Marketing Technology (MarTech) Stack Rationalisation",
@@ -2707,7 +2745,8 @@
         "Process inventory with volumes",
         "Application landscape",
         "Labour cost per process"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "p2p_o2c_automation": {
       "lever_name": "Procure-to-Pay / Order-to-Cash Process Automation",
@@ -2771,7 +2810,8 @@
         "Process inventory with volumes",
         "Application landscape",
         "Labour cost per process"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "insurance_premium_optimization": {
       "lever_name": "Corporate Insurance Premium Optimisation (D&O, E&O, Property, Cyber)",
@@ -2832,7 +2872,8 @@
         "AP aging by supplier",
         "Payment terms master",
         "Supplier credit/risk ratings"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     "bank_fee_optimization": {
       "lever_name": "Bank Fee & Treasury Cost Optimisation",
@@ -2893,7 +2934,8 @@
         "AP aging by supplier",
         "Payment terms master",
         "Supplier credit/risk ratings"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     "space_utilization_optimization": {
       "lever_name": "Office Space Utilisation Analytics & Right-Sizing",
@@ -2954,7 +2996,8 @@
         "Org chart and FTE roster",
         "Compensation bands",
         "Benchmark spans and layers"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     "lease_restructuring": {
       "lever_name": "Lease Restructuring (Early Termination / Sublease / Rent Abatement)",
@@ -3015,7 +3058,8 @@
         "AP aging by supplier",
         "Payment terms master",
         "Supplier credit/risk ratings"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     "cost_governance": {
       "lever_name": "Continuous Cost Governance & Category Management Programme",
@@ -3076,7 +3120,8 @@
         "Process volume metrics",
         "FTE effort or cost allocation by process",
         "Baseline cycle times"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     "cost_avoidance": {
       "lever_name": "Cost Avoidance (Budget-Year Savings)",
@@ -3142,7 +3187,8 @@
         "Transaction-level spend with requester/BU",
         "Approval workflow configuration",
         "Policy exception log"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     }
   },
   "phasing_curves": {
@@ -3504,6 +3550,11 @@
       "dedup_mid_factor": 0.75,
       "low_factor": 0.8,
       "high_factor": 1.2
+    },
+    "bounce_back_rates_by_risk": {
+      "high": 0.8,
+      "medium": 0.4,
+      "low": 0.15
     }
   },
   "lever_family_defaults_note": "execution_playbook/diagnostic_signals/required_data_fields on each lever; seeded via scripts/seed_lever_playbooks.py"

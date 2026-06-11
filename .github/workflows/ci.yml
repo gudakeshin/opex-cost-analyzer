@@ -67,6 +67,23 @@ jobs:
         run: PYTHONPATH=. pytest tests/ -m "not llm_judge" -q --tb=short --cov=app --cov-fail-under=70 --cov-report=term-missing
 
   # -----------------------------------------------------------------------
+  # Secret scan — fail the build if API keys/credentials are committed
+  # -----------------------------------------------------------------------
+  secret-scan:
+    name: Secret Scan (gitleaks)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # scan full history, not just the tip commit
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # -----------------------------------------------------------------------
   # Security audit — scan for known CVEs in dependencies
   # -----------------------------------------------------------------------
   security-audit:

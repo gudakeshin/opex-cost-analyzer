@@ -235,3 +235,152 @@ def test_update_engagement_detection_auto_applies_only_when_unset(monkeypatch, t
     assert manifest["industry"] == "manufacturing_diversified"
     assert manifest["detected_company_name"] == "Acme"
     assert manifest["detected_industry"] == "it_ites"
+
+
+def test_context_doc_company_overrides_budget_filename(monkeypatch, tmp_path) -> None:
+    _patch_engagements_dir(monkeypatch, tmp_path)
+    eid = str(uuid.uuid4())
+    spend_id, ctx_id = "d-spend", "d-ctx"
+    create_engagement_manifest(engagement_id=eid)
+
+    _write_markdown_cache(
+        eid,
+        ctx_id,
+        "Aranya Digital Services Ltd — FY26 Cost Optimisation Mandate (CFO memo)\n",
+    )
+
+    manifest = create_engagement_manifest(engagement_id=eid)
+    manifest["documents"] = [
+        _ready_doc(
+            document_id=spend_id,
+            filename="T2_04_budget_vs_actual_fy25.csv",
+            role="spend_tabular",
+        ),
+        _ready_doc(
+            document_id=ctx_id,
+            filename="T2_09_budget_memo.txt",
+            role="context_doc",
+        ),
+    ]
+    write_engagement_manifest(eid, manifest)
+
+    monkeypatch.setattr(
+        "app.services.engagement_detection.profiler.document_contextualizer",
+        lambda texts: {
+            "inferred_industry": "it_ites",
+            "inferred_company_name": "Aranya Digital Services Ltd",
+        },
+    )
+
+    result = detect_engagement_profile(eid)
+    assert result["detected_company_name"] == "Aranya Digital Services Ltd"
+    assert "T2_09_budget_memo.txt" in result["source_documents"]["company"]
+    assert result["company_llm"] == "Aranya Digital Services Ltd"
+
+
+def test_hul_spend_only_does_not_recommend_abbreviation(monkeypatch, tmp_path) -> None:
+    _patch_engagements_dir(monkeypatch, tmp_path)
+    eid = str(uuid.uuid4())
+    create_engagement_manifest(engagement_id=eid, company_name="New engagement")
+
+    manifest = create_engagement_manifest(engagement_id=eid)
+    manifest["documents"] = [
+        _ready_doc(
+            document_id="d1",
+            filename="hul_india_pnl_expense_fy25.csv",
+            role="spend_tabular",
+        ),
+        _ready_doc(
+            document_id="d2",
+            filename="hul_india_spend_ledger_fy25.csv",
+            role="spend_tabular",
+        ),
+    ]
+    write_engagement_manifest(eid, manifest)
+
+    result = detect_engagement_profile(eid)
+    assert result["detected_company_name"] == ""
+
+
+def test_update_engagement_detection_does_not_auto_apply_hul(monkeypatch, tmp_path) -> None:
+    _patch_engagements_dir(monkeypatch, tmp_path)
+    eid = str(uuid.uuid4())
+    create_engagement_manifest(engagement_id=eid, company_name="New engagement", industry="")
+
+    updated = update_engagement_detection(
+        eid,
+        {
+            "detected_company_name": "hul",
+            "detected_industry": "fmcg_consumer",
+            "detected_industry_label": "FMCG / Consumer",
+            "industry_source": "spend",
+            "industry_llm": "",
+            "industry_spend": "fmcg_consumer",
+            "context_text_hash": "",
+            "source_documents": {},
+        },
+    )
+    assert updated["detected_company_name"] == "hul"
+    assert updated["company_name"] == "New engagement"
+
+
+def test_revenue_detected_from_annual_report_context(monkeypatch, tmp_path) -> None:
+    _patch_engagements_dir(monkeypatch, tmp_path)
+    eid = str(uuid.uuid4())
+    ctx_id = "d-ctx"
+    create_engagement_manifest(engagement_id=eid)
+
+    _write_markdown_cache(
+        eid,
+        ctx_id,
+        "Aranya Digital Services Ltd — Annual Report FY25\n\n"
+        "FY25 consolidated revenue was ₹18,400 Cr (FY24: ₹16,900 Cr).\n",
+    )
+
+    manifest = create_engagement_manifest(engagement_id=eid)
+    manifest["documents"] = [
+        _ready_doc(document_id=ctx_id, filename="annual_report.txt", role="context_doc"),
+    ]
+    write_engagement_manifest(eid, manifest)
+
+    monkeypatch.setattr(
+        "app.services.engagement_detection.profiler.document_contextualizer",
+        lambda texts: {
+            "inferred_industry": "it_ites",
+            "inferred_company_name": "Aranya Digital Services Ltd",
+            "inferred_annual_revenue_cr": 18400,
+        },
+    )
+
+    result = detect_engagement_profile(eid)
+    assert result["detected_annual_revenue_cr"] == 18400.0
+    assert "annual_report.txt" in result["source_documents"]["revenue"]
+
+    updated = update_engagement_detection(eid, result)
+    assert updated["detected_annual_revenue_cr"] == 18400.0
+    assert updated["annual_revenue"] == 18400.0 * 10_000_000
+
+
+@pytest.mark.parametrize(
+    "engagement_id,expected_company,expected_revenue",
+    [
+        (
+            "96c43951-61ee-4a02-be96-97da04836f55",
+            "Aranya Digital Services Ltd",
+            18400.0,
+        ),
+        (
+            "931ef522-703e-417b-bdff-358ece84b7e2",
+            "",
+            None,
+        ),
+    ],
+)
+def test_real_engagement_regression_fixtures(engagement_id, expected_company, expected_revenue) -> None:
+    from pathlib import Path
+
+    if not Path(f"data/engagements/{engagement_id}/manifest.json").exists():
+        pytest.skip("fixture engagement not present")
+    result = detect_engagement_profile(engagement_id)
+    assert result["detected_company_name"] == expected_company
+    assert result.get("detected_annual_revenue_cr") == expected_revenue

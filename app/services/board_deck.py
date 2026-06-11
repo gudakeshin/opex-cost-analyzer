@@ -149,11 +149,16 @@ def build_board_deck(
             "initiatives": [
                 {
                     "name": i.get("category_name", i.get("category_id", "?")),
+                    "lever": i.get("lever_name") or i.get("lever"),
                     "p10_cr": round(float(i.get("p10") or 0) / 1e7, 1),
                     "p50_cr": round(float(i.get("p50") or 0) / 1e7, 1),
                     "p90_cr": round(float(i.get("p90") or 0) / 1e7, 1),
                     "irr_pct": i.get("irr_pct"),
                     "payback_months": i.get("payback_months"),
+                    # Business perspective (Layer A enrichment).
+                    "owner": i.get("owner_role") or "TBD",
+                    "top_risk": (i.get("risks") or [{}])[0].get("risk") if i.get("risks") else None,
+                    "top_vendor": (i.get("affected_vendors") or [{}])[0].get("supplier") if i.get("affected_vendors") else None,
                 }
                 for i in initiatives[:6]
             ],

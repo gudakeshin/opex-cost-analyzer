@@ -12,7 +12,16 @@ describe('engagementContext', () => {
     ).toBe('it_ites');
   });
 
-  it('uses detected industry when manifest is empty and engagement is placeholder', () => {
+  it('prefers engagement industry over detected when manifest is empty', () => {
+    expect(
+      effectiveAnalysisIndustry(
+        { session_id: '', industry: '' },
+        { industry: 'bfsi_banks', detected_industry: 'it_ites' },
+      ),
+    ).toBe('bfsi_banks');
+  });
+
+  it('uses detected industry when manifest and engagement are empty/placeholder', () => {
     expect(
       effectiveAnalysisIndustry({ session_id: '', industry: '' }, { industry: 'manufacturing_diversified', detected_industry: 'it_ites' }),
     ).toBe('it_ites');

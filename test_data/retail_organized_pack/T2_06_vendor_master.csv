@@ -1,0 +1,11 @@
+vendor,vendor_category,gstin,vendor_pan,msme_flag,spend_category,legal_entity,related_party
+ITC Agribusiness,large,27AABCI1234A1Z1,AABCI1234A,no,Cost of Goods Sold,BBRL-IN,no
+Hindustan Unilever,large,27AABCH5678H1Z4,AABCH5678H,no,Cost of Goods Sold,BBRL-IN,no
+Procter & Gamble India,large,27AABCP9012P1Z7,AABCP9012P,no,Cost of Goods Sold,BBRL-IN,no
+Nestle India,large,27AABCN3456N1Z0,AABCN3456N,no,Cost of Goods Sold,BBRL-IN,no
+CBRE India (Leasing),large,27AABCC7890C1Z3,AABCC7890C,no,Store Operations & Occupancy,BBRL-IN,no
+Delhivery Ltd,large,07AABCD1111L1Z9,AABCD1111L,no,Logistics & Supply Chain,BBRL-IN,no
+MSME Food Suppliers,msme,27AABCM2222F1Z6,AABCM2222F,yes,Cost of Goods Sold,BBRL-IN,no
+Infosys BPM (Retail Tech),large,29AABCI3333R1Z2,AABCI3333R,no,Technology & Digital,BBRL-IN,no
+Dentsu India,large,27AABCD4444D1Z5,AABCD4444D,no,Marketing & Promotions,BBRL-IN,no
+Blue Dart Express,large,27AABCB5555E1Z8,AABCB5555E,no,Logistics & Supply Chain,BBRL-IN,no

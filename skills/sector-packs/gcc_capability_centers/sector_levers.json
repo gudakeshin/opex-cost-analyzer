@@ -133,7 +133,8 @@
         "CoE governance model and bot ownership framework",
         "Security and data-privacy requirements for automated processes",
         "FTE cost by function and process to calculate automation ROI"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "attrition_reduction_retention",
@@ -221,7 +222,8 @@
         "Compensation benchmarking data (NASSCOM, Aon Hewitt, or equivalent)",
         "Recruitment and onboarding cost per hire by band",
         "Productivity ramp curve by role (time to full contribution)"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "seat_utilization_optimization",
@@ -309,7 +311,8 @@
         "Lease terms, WALE, and break-clause positions by facility",
         "Facilities cost breakdown (rent, power, housekeeping, security) per seat",
         "Parent hybrid work policy requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "shared_services_consolidation",
@@ -398,7 +401,8 @@
         "Current chargeback or recharge model for shared services",
         "SLA benchmark data for comparable SSC operations",
         "Location cost analysis (talent, real estate, infrastructure) for SSC hub"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "parent_recharge_rationalization",
@@ -487,7 +491,8 @@
         "Comparable market rates for each recharged service category",
         "Form 3CEB and TP documentation",
         "Ind AS 115 revenue recognition treatment for recharged services"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     {
       "lever_id": "vendor_managed_services_shift",
@@ -575,7 +580,8 @@
         "SLA performance data (uptime, response time, resolution time)",
         "Existing vendor contracts and performance data",
         "TUPE-equivalent obligations and transfer requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "upskilling_pyramid_rebalancing",
@@ -651,7 +657,8 @@
         "Process volume metrics",
         "FTE effort or cost allocation by process",
         "Baseline cycle times"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "cloud_infra_modernization",
@@ -739,7 +746,8 @@
         "Network connectivity and security requirements for cloud migration",
         "FinOps maturity assessment and tagging hygiene status",
         "Parent/HQ cloud strategy and vendor preference"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "bench_management_optimization",
@@ -826,7 +834,8 @@
         "External hiring pipeline and job requisitions",
         "Training and upskilling program catalog",
         "Bench cost (CTC for undeployed FTEs) per quarter"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "parent_scope_rationalization",
@@ -914,7 +923,8 @@
         "Parent satisfaction scores and strategic expectation documentation",
         "Competitive landscape: alternative delivery options by scope category",
         "GCC 3-year roadmap and parent alignment"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "perks_benefits_rationalisation",
@@ -990,7 +1000,8 @@
         "Process volume metrics",
         "FTE effort or cost allocation by process",
         "Baseline cycle times"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "genai_augmented_productivity",
@@ -1079,7 +1090,8 @@
         "Software development metrics (velocity, cycle time, defect rate)",
         "Parent GenAI policy and data-handling guidelines",
         "Pilot design framework and measurement methodology"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "tier2_location_strategy",
@@ -1168,7 +1180,8 @@
         "Attrition benchmarks by location",
         "SEZ/STPI availability and incentive structure for target city",
         "Real estate availability and cost per sq ft in Tier-2 candidate cities"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "sez_stpi_tax_optimisation",
@@ -1257,7 +1270,8 @@
         "STPI/SEZ unit approval documents and scope",
         "Bond register and utilisation rate",
         "Monthly software export invoice data by client and currency"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     {
       "lever_id": "chargeback_model_transformation",
@@ -1346,7 +1360,8 @@
         "BU demand data by service type and volume",
         "Intercompany billing configuration in ERP",
         "Parent finance accounting policy for intercompany services"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     {
       "lever_id": "org_span_control_optimisation",
@@ -1434,7 +1449,8 @@
         "NASSCOM or peer GCC benchmark for management structure",
         "Single-direct-report manager inventory",
         "Cost by band (manager vs IC) for overhead ratio calculation"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "shadow_it_saas_elimination",
@@ -1522,7 +1538,8 @@
         "SaaS contract and licence data (vendor, users, cost, renewal date)",
         "Security risk classification for shadow IT applications",
         "Procurement policy for software purchases"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "recruitment_cost_optimisation",
@@ -1598,7 +1615,8 @@
         "Process volume metrics",
         "FTE effort or cost allocation by process",
         "Baseline cycle times"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     }
   ]
 }

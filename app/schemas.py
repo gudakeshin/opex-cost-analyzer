@@ -54,6 +54,49 @@ class EngagementPatchRequest(BaseModel):
     headcount: float | None = None
 
 
+class EngagementDocumentRecord(BaseModel):
+    """On-disk document registry entry stored inside engagement manifest.json."""
+
+    model_config = {"extra": "allow"}
+
+    document_id: str
+    filename: str
+    content_type: str = "application/octet-stream"
+    size_bytes: int = 0
+    raw_path: str = ""
+    role: str = "context_doc"
+    status: str = "pending"
+    parse_backend: str | None = None
+    error: str | None = None
+    uploaded_at: str | None = None
+    processed_at: str | None = None
+    text_preview: str | None = None
+    line_count: int = 0
+
+
+class EngagementManifest(BaseModel):
+    """Validated engagement manifest payload before atomic write."""
+
+    model_config = {"extra": "allow"}
+
+    engagement_id: str
+    company_name: str = "New engagement"
+    industry: str = ""
+    annual_revenue: float = 0.0
+    currency: str = "INR"
+    headcount: float | None = None
+    detected_company_name: str = ""
+    detected_industry: str = ""
+    detected_industry_label: str = ""
+    detected_annual_revenue_cr: float | None = None
+    detection_signals: Dict[str, Any] = {}
+    context_text_hash: str = ""
+    created_at: str = ""
+    updated_at: str = ""
+    session_ids: List[str] = []
+    documents: List[EngagementDocumentRecord] = []
+
+
 class SessionCreateRequest(_FinancialParamsMixin):
     company_name: str | None = None
     industry: str | None = None
@@ -117,6 +160,7 @@ class V1ChatRequest(BaseModel):
     audience: str | None = None
     headcount: float | None = None
     thinking_mode: str | None = None  # "standard" | "extended"
+    llm_model: str | None = None  # e.g. claude-sonnet-4-6, gemini-2.5-flash
     chat_history: List[ChatHistoryTurn] | None = None
 
 
@@ -144,6 +188,7 @@ class ClarificationResumeRequest(BaseModel):
     free_text: str | None = None
     run_id: str | None = None
     thinking_mode: str | None = None  # "standard" | "extended"
+    llm_model: str | None = None
     company_name: str | None = None
     industry: str | None = None
     annual_revenue: float | None = None
@@ -185,6 +230,22 @@ class InitiativeCreateRequest(BaseModel):
     owner_email: str | None = None
     committed_date: str | None = None
     target_realization_date: str | None = None
+    # Business-perspective detail (optional — populated by the business-case builder).
+    business_rationale: str | None = None
+    affected_vendors: list = []
+    contract_levers: list = []
+    owner_role: str | None = None
+    business_sponsor: str | None = None
+    risks: list = []
+    kpis: list = []
+    change_management: dict = {}
+    execution_playbook: list = []
+    phasing_narrative: str | None = None
+    evidence: list = []
+    p50_savings: float | None = None
+    ebitda_bps: float | None = None
+    payback_months: float | None = None
+    irr_pct: float | None = None
 
 
 class InitiativeStageRequest(BaseModel):

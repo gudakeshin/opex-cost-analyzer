@@ -1,0 +1,25 @@
+asset_class,fiscal_period,amount,currency,status
+Manufacturing facility expansion,FY23-Q1,230954136,INR,actual
+Manufacturing facility expansion,FY23-Q2,256615707,INR,actual
+Manufacturing facility expansion,FY23-Q3,243784921,INR,actual
+Manufacturing facility expansion,FY23-Q4,277144963,INR,actual
+Manufacturing facility expansion,FY24-Q1,272012649,INR,actual
+Manufacturing facility expansion,FY24-Q2,279711120,INR,actual
+Test & inspection equipment,FY23-Q1,97409176,INR,actual
+Test & inspection equipment,FY23-Q2,108232418,INR,actual
+Test & inspection equipment,FY23-Q3,102820797,INR,actual
+Test & inspection equipment,FY23-Q4,116891011,INR,actual
+Test & inspection equipment,FY24-Q1,114726363,INR,actual
+Test & inspection equipment,FY24-Q2,117973335,INR,actual
+Digital manufacturing tools,FY23-Q1,353778093,INR,actual
+Digital manufacturing tools,FY23-Q2,393086770,INR,actual
+Digital manufacturing tools,FY23-Q3,373432431,INR,actual
+Digital manufacturing tools,FY23-Q4,424533711,INR,actual
+Digital manufacturing tools,FY24-Q1,416671976,INR,actual
+Digital manufacturing tools,FY24-Q2,428464579,INR,actual
+Safety infrastructure,FY23-Q1,188949845,INR,actual
+Safety infrastructure,FY23-Q2,209944273,INR,actual
+Safety infrastructure,FY23-Q3,199447059,INR,actual
+Safety infrastructure,FY23-Q4,226739814,INR,actual
+Safety infrastructure,FY24-Q1,222540929,INR,actual
+Safety infrastructure,FY24-Q2,228839257,INR,actual

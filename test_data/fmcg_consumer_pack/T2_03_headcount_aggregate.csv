@@ -1,0 +1,46 @@
+business_unit,function,location,band,headcount
+Foods & Beverages,Operations,India,Entry (B1-B2),360
+Foods & Beverages,Operations,India,Mid (B3-B4),280
+Foods & Beverages,Operations,India,Senior (B5-B6),120
+Foods & Beverages,Finance,India,Entry (B1-B2),360
+Foods & Beverages,Finance,India,Mid (B3-B4),280
+Foods & Beverages,Finance,India,Senior (B5-B6),120
+Foods & Beverages,HR,India,Entry (B1-B2),360
+Foods & Beverages,HR,India,Mid (B3-B4),280
+Foods & Beverages,HR,India,Senior (B5-B6),120
+Personal Care,Operations,India,Entry (B1-B2),450
+Personal Care,Operations,India,Mid (B3-B4),350
+Personal Care,Operations,India,Senior (B5-B6),150
+Personal Care,Finance,India,Entry (B1-B2),450
+Personal Care,Finance,India,Mid (B3-B4),350
+Personal Care,Finance,India,Senior (B5-B6),150
+Personal Care,HR,India,Entry (B1-B2),450
+Personal Care,HR,India,Mid (B3-B4),350
+Personal Care,HR,India,Senior (B5-B6),150
+Home Care,Operations,India,Entry (B1-B2),540
+Home Care,Operations,India,Mid (B3-B4),420
+Home Care,Operations,India,Senior (B5-B6),180
+Home Care,Finance,India,Entry (B1-B2),540
+Home Care,Finance,India,Mid (B3-B4),420
+Home Care,Finance,India,Senior (B5-B6),180
+Home Care,HR,India,Entry (B1-B2),540
+Home Care,HR,India,Mid (B3-B4),420
+Home Care,HR,India,Senior (B5-B6),180
+Baby & Health,Operations,India,Entry (B1-B2),630
+Baby & Health,Operations,India,Mid (B3-B4),489
+Baby & Health,Operations,India,Senior (B5-B6),210
+Baby & Health,Finance,India,Entry (B1-B2),630
+Baby & Health,Finance,India,Mid (B3-B4),489
+Baby & Health,Finance,India,Senior (B5-B6),210
+Baby & Health,HR,India,Entry (B1-B2),630
+Baby & Health,HR,India,Mid (B3-B4),489
+Baby & Health,HR,India,Senior (B5-B6),210
+Modern Trade,Operations,India,Entry (B1-B2),720
+Modern Trade,Operations,India,Mid (B3-B4),560
+Modern Trade,Operations,India,Senior (B5-B6),240
+Modern Trade,Finance,India,Entry (B1-B2),720
+Modern Trade,Finance,India,Mid (B3-B4),560
+Modern Trade,Finance,India,Senior (B5-B6),240
+Modern Trade,HR,India,Entry (B1-B2),720
+Modern Trade,HR,India,Mid (B3-B4),560
+Modern Trade,HR,India,Senior (B5-B6),240

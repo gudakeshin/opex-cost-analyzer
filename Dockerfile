@@ -30,4 +30,7 @@ USER opex
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+# Default to a single worker: session/manifest locks fall back to in-process
+# locks when REDIS_URL is unset, which cannot synchronize across workers.
+# Set UVICORN_WORKERS>1 ONLY together with REDIS_URL (startup fails fast otherwise).
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers ${UVICORN_WORKERS:-1}"]

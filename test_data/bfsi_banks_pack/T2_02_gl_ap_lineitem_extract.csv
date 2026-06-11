@@ -1,0 +1,65 @@
+gl_code,cost_center,vendor,description,amount,currency,fiscal_period,amount_type,business_unit,geo,legal_entity,source_system,source_record_id,gst_treatment,gstin,lease_treatment,related_party
+510010,CC-IT&C-001,Infosys Finacle,Infosys Finacle services — IT & Core Banking,85703961,INR,2023-Q2,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100001,itc_eligible,29AABCI4861A1Z3,,no
+510010,CC-IT&C-001,Infosys Finacle,Infosys Finacle services — IT & Core Banking,87418040,INR,2023-Q3,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100002,itc_eligible,29AABCI4861A1Z3,,no
+510010,CC-IT&C-001,Infosys Finacle,Infosys Finacle services — IT & Core Banking,89132119,INR,2023-Q4,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100003,itc_eligible,29AABCI4861A1Z3,,no
+510010,CC-IT&C-001,Infosys Finacle,Infosys Finacle services — IT & Core Banking,90846198,INR,2024-Q1,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100004,itc_eligible,29AABCI4861A1Z3,,no
+510010,CC-IT&C-001,Infosys Finacle,Infosys Finacle services — IT & Core Banking,92560277,INR,2024-Q2,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100005,itc_eligible,29AABCI4861A1Z3,,no
+510010,CC-IT&C-001,Infosys Finacle,Infosys Finacle services — IT & Core Banking,94274357,INR,2024-Q3,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100006,itc_eligible,29AABCI4861A1Z3,,no
+510010,CC-IT&C-001,Infosys Finacle,Infosys Finacle services — IT & Core Banking,95988436,INR,2024-Q4,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100007,itc_eligible,29AABCI4861A1Z3,,no
+510010,CC-IT&C-001,Infosys Finacle,Infosys Finacle services — IT & Core Banking,97702515,INR,2025-Q1,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100008,itc_eligible,29AABCI4861A1Z3,,no
+510010,CC-IT&C-001,TCS BaNCS,TCS BaNCS services — IT & Core Banking,248544931,INR,2023-Q2,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100009,itc_eligible,27AABCT3518Q1Z6,,no
+510010,CC-IT&C-001,TCS BaNCS,TCS BaNCS services — IT & Core Banking,253515829,INR,2023-Q3,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100010,itc_eligible,27AABCT3518Q1Z6,,no
+510010,CC-IT&C-001,TCS BaNCS,TCS BaNCS services — IT & Core Banking,258486728,INR,2023-Q4,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100011,itc_eligible,27AABCT3518Q1Z6,,no
+510010,CC-IT&C-001,TCS BaNCS,TCS BaNCS services — IT & Core Banking,263457626,INR,2024-Q1,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100012,itc_eligible,27AABCT3518Q1Z6,,no
+510010,CC-IT&C-001,TCS BaNCS,TCS BaNCS services — IT & Core Banking,268428525,INR,2024-Q2,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100013,itc_eligible,27AABCT3518Q1Z6,,no
+510010,CC-IT&C-001,TCS BaNCS,TCS BaNCS services — IT & Core Banking,273399424,INR,2024-Q3,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100014,itc_eligible,27AABCT3518Q1Z6,,no
+510010,CC-IT&C-001,TCS BaNCS,TCS BaNCS services — IT & Core Banking,278370322,INR,2024-Q4,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100015,itc_eligible,27AABCT3518Q1Z6,,no
+510010,CC-IT&C-001,TCS BaNCS,TCS BaNCS services — IT & Core Banking,283341221,INR,2025-Q1,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100016,itc_eligible,27AABCT3518Q1Z6,,no
+510010,CC-IT&C-001,IBM India,IBM India services — IT & Core Banking,464348927,INR,2023-Q2,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100017,itc_eligible,29AABCI5553A1ZB,,no
+510010,CC-IT&C-001,IBM India,IBM India services — IT & Core Banking,473635905,INR,2023-Q3,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100018,itc_eligible,29AABCI5553A1ZB,,no
+510010,CC-IT&C-001,IBM India,IBM India services — IT & Core Banking,482922884,INR,2023-Q4,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100019,itc_eligible,29AABCI5553A1ZB,,no
+510010,CC-IT&C-001,IBM India,IBM India services — IT & Core Banking,492209862,INR,2024-Q1,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100020,itc_eligible,29AABCI5553A1ZB,,no
+510010,CC-IT&C-001,IBM India,IBM India services — IT & Core Banking,501496841,INR,2024-Q2,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100021,itc_eligible,29AABCI5553A1ZB,,no
+510010,CC-IT&C-001,IBM India,IBM India services — IT & Core Banking,510783819,INR,2024-Q3,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100022,itc_eligible,29AABCI5553A1ZB,,no
+510010,CC-IT&C-001,IBM India,IBM India services — IT & Core Banking,520070798,INR,2024-Q4,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100023,itc_eligible,29AABCI5553A1ZB,,no
+510010,CC-IT&C-001,IBM India,IBM India services — IT & Core Banking,529357776,INR,2025-Q1,actual,IT,India,IABL-IN,Oracle,Oracle-AP-100024,itc_eligible,29AABCI5553A1ZB,,no
+520010,CC-ATM&-001,NCR Corporation India,NCR Corporation India services — ATM & Cash Management,331024292,INR,2023-Q2,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100025,itc_eligible,27AABCN2345M1Z2,,no
+520010,CC-ATM&-001,NCR Corporation India,NCR Corporation India services — ATM & Cash Management,337644777,INR,2023-Q3,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100026,itc_eligible,27AABCN2345M1Z2,,no
+520010,CC-ATM&-001,NCR Corporation India,NCR Corporation India services — ATM & Cash Management,344265263,INR,2023-Q4,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100027,itc_eligible,27AABCN2345M1Z2,,no
+520010,CC-ATM&-001,NCR Corporation India,NCR Corporation India services — ATM & Cash Management,350885749,INR,2024-Q1,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100028,itc_eligible,27AABCN2345M1Z2,,no
+520010,CC-ATM&-001,NCR Corporation India,NCR Corporation India services — ATM & Cash Management,357506235,INR,2024-Q2,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100029,itc_eligible,27AABCN2345M1Z2,,no
+520010,CC-ATM&-001,NCR Corporation India,NCR Corporation India services — ATM & Cash Management,364126721,INR,2024-Q3,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100030,itc_eligible,27AABCN2345M1Z2,,no
+520010,CC-ATM&-001,NCR Corporation India,NCR Corporation India services — ATM & Cash Management,370747207,INR,2024-Q4,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100031,itc_eligible,27AABCN2345M1Z2,,no
+520010,CC-ATM&-001,NCR Corporation India,NCR Corporation India services — ATM & Cash Management,377367692,INR,2025-Q1,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100032,itc_eligible,27AABCN2345M1Z2,,no
+520010,CC-ATM&-001,CMS Info Systems,CMS Info Systems services — ATM & Cash Management,371108632,INR,2023-Q2,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100033,itc_eligible,27AABCC9912K1Z5,,no
+520010,CC-ATM&-001,CMS Info Systems,CMS Info Systems services — ATM & Cash Management,378530804,INR,2023-Q3,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100034,itc_eligible,27AABCC9912K1Z5,,no
+520010,CC-ATM&-001,CMS Info Systems,CMS Info Systems services — ATM & Cash Management,385952977,INR,2023-Q4,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100035,itc_eligible,27AABCC9912K1Z5,,no
+520010,CC-ATM&-001,CMS Info Systems,CMS Info Systems services — ATM & Cash Management,393375149,INR,2024-Q1,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100036,itc_eligible,27AABCC9912K1Z5,,no
+520010,CC-ATM&-001,CMS Info Systems,CMS Info Systems services — ATM & Cash Management,400797322,INR,2024-Q2,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100037,itc_eligible,27AABCC9912K1Z5,,no
+520010,CC-ATM&-001,CMS Info Systems,CMS Info Systems services — ATM & Cash Management,408219495,INR,2024-Q3,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100038,itc_eligible,27AABCC9912K1Z5,,no
+520010,CC-ATM&-001,CMS Info Systems,CMS Info Systems services — ATM & Cash Management,415641667,INR,2024-Q4,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100039,itc_eligible,27AABCC9912K1Z5,,no
+520010,CC-ATM&-001,CMS Info Systems,CMS Info Systems services — ATM & Cash Management,423063840,INR,2025-Q1,actual,ATM,India,IABL-IN,Oracle,Oracle-AP-100040,itc_eligible,27AABCC9912K1Z5,,no
+530010,CC-BRANCH-001,Jones Lang LaSalle,Jones Lang LaSalle services — Branch Operations,177172852,INR,2023-Q2,actual,Branch,India,IABL-IN,Oracle,Oracle-AP-100041,itc_eligible,29AABCJ3215P1Z8,ind_as_116,no
+530010,CC-BRANCH-001,Jones Lang LaSalle,Jones Lang LaSalle services — Branch Operations,180716309,INR,2023-Q3,actual,Branch,India,IABL-IN,Oracle,Oracle-AP-100042,itc_eligible,29AABCJ3215P1Z8,ind_as_116,no
+530010,CC-BRANCH-001,Jones Lang LaSalle,Jones Lang LaSalle services — Branch Operations,184259766,INR,2023-Q4,actual,Branch,India,IABL-IN,Oracle,Oracle-AP-100043,itc_eligible,29AABCJ3215P1Z8,ind_as_116,no
+530010,CC-BRANCH-001,Jones Lang LaSalle,Jones Lang LaSalle services — Branch Operations,187803223,INR,2024-Q1,actual,Branch,India,IABL-IN,Oracle,Oracle-AP-100044,itc_eligible,29AABCJ3215P1Z8,ind_as_116,no
+530010,CC-BRANCH-001,Jones Lang LaSalle,Jones Lang LaSalle services — Branch Operations,191346680,INR,2024-Q2,actual,Branch,India,IABL-IN,Oracle,Oracle-AP-100045,itc_eligible,29AABCJ3215P1Z8,ind_as_116,no
+530010,CC-BRANCH-001,Jones Lang LaSalle,Jones Lang LaSalle services — Branch Operations,194890137,INR,2024-Q3,actual,Branch,India,IABL-IN,Oracle,Oracle-AP-100046,itc_eligible,29AABCJ3215P1Z8,ind_as_116,no
+530010,CC-BRANCH-001,Jones Lang LaSalle,Jones Lang LaSalle services — Branch Operations,198433594,INR,2024-Q4,actual,Branch,India,IABL-IN,Oracle,Oracle-AP-100047,itc_eligible,29AABCJ3215P1Z8,ind_as_116,no
+530010,CC-BRANCH-001,Jones Lang LaSalle,Jones Lang LaSalle services — Branch Operations,201977051,INR,2025-Q1,actual,Branch,India,IABL-IN,Oracle,Oracle-AP-100048,itc_eligible,29AABCJ3215P1Z8,ind_as_116,no
+540010,CC-PROFES-001,KPMG India,KPMG India services — Professional Services & Compliance,398768199,INR,2023-Q2,actual,Professional,India,IABL-IN,Oracle,Oracle-AP-100049,itc_eligible,29AABCK3201F1Z9,,no
+540010,CC-PROFES-001,KPMG India,KPMG India services — Professional Services & Compliance,406743562,INR,2023-Q3,actual,Professional,India,IABL-IN,Oracle,Oracle-AP-100050,itc_eligible,29AABCK3201F1Z9,,no
+540010,CC-PROFES-001,KPMG India,KPMG India services — Professional Services & Compliance,414718926,INR,2023-Q4,actual,Professional,India,IABL-IN,Oracle,Oracle-AP-100051,itc_eligible,29AABCK3201F1Z9,,no
+540010,CC-PROFES-001,KPMG India,KPMG India services — Professional Services & Compliance,422694290,INR,2024-Q1,actual,Professional,India,IABL-IN,Oracle,Oracle-AP-100052,itc_eligible,29AABCK3201F1Z9,,no
+540010,CC-PROFES-001,KPMG India,KPMG India services — Professional Services & Compliance,430669654,INR,2024-Q2,actual,Professional,India,IABL-IN,Oracle,Oracle-AP-100053,itc_eligible,29AABCK3201F1Z9,,no
+540010,CC-PROFES-001,KPMG India,KPMG India services — Professional Services & Compliance,438645018,INR,2024-Q3,actual,Professional,India,IABL-IN,Oracle,Oracle-AP-100054,itc_eligible,29AABCK3201F1Z9,,no
+540010,CC-PROFES-001,KPMG India,KPMG India services — Professional Services & Compliance,446620382,INR,2024-Q4,actual,Professional,India,IABL-IN,Oracle,Oracle-AP-100055,itc_eligible,29AABCK3201F1Z9,,no
+540010,CC-PROFES-001,KPMG India,KPMG India services — Professional Services & Compliance,454595746,INR,2025-Q1,actual,Professional,India,IABL-IN,Oracle,Oracle-AP-100056,itc_eligible,29AABCK3201F1Z9,,no
+550010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Customer Acquisition,421294146,INR,2023-Q2,actual,Marketing,India,IABL-IN,Oracle,Oracle-AP-100057,itc_eligible,27AABCO4521L1Z3,,no
+550010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Customer Acquisition,429720028,INR,2023-Q3,actual,Marketing,India,IABL-IN,Oracle,Oracle-AP-100058,itc_eligible,27AABCO4521L1Z3,,no
+550010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Customer Acquisition,438145911,INR,2023-Q4,actual,Marketing,India,IABL-IN,Oracle,Oracle-AP-100059,itc_eligible,27AABCO4521L1Z3,,no
+550010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Customer Acquisition,446571794,INR,2024-Q1,actual,Marketing,India,IABL-IN,Oracle,Oracle-AP-100060,itc_eligible,27AABCO4521L1Z3,,no
+550010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Customer Acquisition,454997677,INR,2024-Q2,actual,Marketing,India,IABL-IN,Oracle,Oracle-AP-100061,itc_eligible,27AABCO4521L1Z3,,no
+550010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Customer Acquisition,463423560,INR,2024-Q3,actual,Marketing,India,IABL-IN,Oracle,Oracle-AP-100062,itc_eligible,27AABCO4521L1Z3,,no
+550010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Customer Acquisition,471849443,INR,2024-Q4,actual,Marketing,India,IABL-IN,Oracle,Oracle-AP-100063,itc_eligible,27AABCO4521L1Z3,,no
+550010,CC-MARKET-001,Ogilvy India,Ogilvy India services — Marketing & Customer Acquisition,480275326,INR,2025-Q1,actual,Marketing,India,IABL-IN,Oracle,Oracle-AP-100064,itc_eligible,27AABCO4521L1Z3,,no

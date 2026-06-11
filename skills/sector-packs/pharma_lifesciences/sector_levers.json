@@ -125,7 +125,8 @@
         "CRO performance data (enrolment rate, protocol deviations, budget adherence)",
         "CTMS data: site performance, screen fail rates, and enrolment milestones",
         "DCT technology readiness assessment"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "manufacturing_cogs",
@@ -211,7 +212,8 @@
         "API price trends and supplier concentration data",
         "ANDA/NDA site and supplier qualification status",
         "Regulatory filing requirements for alternate supplier qualification"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "sales_force_sizing",
@@ -296,7 +298,8 @@
         "Rep cost by grade and territory (salary, travel, allowances)",
         "Coverage index and call frequency benchmarks by specialty",
         "Market share data by product and territory"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "digital_rep_model",
@@ -381,7 +384,8 @@
         "Cost per interaction by channel (in-person vs digital vs virtual)",
         "TRx correlation data by engagement channel for comparable HCP segments",
         "Rep utilisation and call frequency data from SFA system"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "market_access_rebate_mgmt",
@@ -466,7 +470,8 @@
         "Rebate contract terms and accrual data by customer",
         "Contract management system capability assessment",
         "Competitor pricing and formulary access data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "tech_platform_consolidation",
@@ -550,7 +555,8 @@
         "Veeva or alternative enterprise platform capability map",
         "Integration architecture and cost for current system-to-system feeds",
         "Regulatory validation requirements (21 CFR Part 11, GAMP5) for platform changes"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "expiry_risk_reduction",
@@ -634,7 +640,8 @@
         "Historical write-off data by SKU and reason code",
         "Production schedule and build-to-stock vs make-to-order split",
         "Shelf-life extension regulatory feasibility by product"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "regulatory_submission_efficiency",
@@ -707,7 +714,8 @@
         "Process volume metrics",
         "FTE effort or cost allocation by process",
         "Baseline cycle times"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "pharmacovigilance_automation",
@@ -792,7 +800,8 @@
         "CDSCO and ICH E2B compliance requirements for electronic submission",
         "PV database (Argus/ArisG) and E2B gateway capability assessment",
         "AI medical coding tool options and validation requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

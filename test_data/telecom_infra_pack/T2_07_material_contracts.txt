@@ -1,0 +1,9 @@
+Pragati Telecom Networks Ltd — Material Contracts FY25
+
+1) Ericsson India — RAN managed services: to 2028-03-31; 21280 Cr committed; 120-day notice; 15% exit. Largely locked.
+2) Nokia Solutions — core & transport: to 2027-09-30; 12160 Cr; 120-day notice; 12% exit. Locked.
+3) Tata Power (Tower Energy) — energy supply: to 2026-12-31; 13680 Cr; 90-day notice; 10% exit. Partially renegotiable.
+4) Amdocs India — BSS/OSS: to 2027-03-31; 4560 Cr; 120-day notice; 12% exit. Locked short-term.
+5) AWS India — cloud: to 2026-09-30; 2280 Cr; 60-day notice; 8% exit. Renegotiable.
+
+Addressability: Tata Power renegotiable (solar PPA replacement). AWS near-term exit window. Ericsson & Nokia locked to 2027-28.

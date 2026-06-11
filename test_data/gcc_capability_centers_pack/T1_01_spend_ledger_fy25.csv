@@ -1,0 +1,11 @@
+supplier,description,amount,currency,category,gl_code,spend_date,business_unit,country
+TeamLease Digital,Contract tech talent — Technology CoE FY25,1360000000,INR,Talent & Staffing,510010,2024-12-01,Technology CoE,India
+Quess Corp,Contract operations staff — Finance & Ops,820000000,INR,Talent & Staffing,510011,2024-11-15,Finance & Accounting,India
+Embassy Office Parks,Bengaluru SEZ campus lease & facilities,1020000000,INR,Real Estate & Facilities,520010,2025-01-01,Corporate,India
+RMZ Corp,Hyderabad technology park lease,680000000,INR,Real Estate & Facilities,520011,2025-01-01,Corporate,India
+Microsoft India,M365 E5 & Azure enterprise licences,580000000,INR,Technology Infrastructure,530010,2024-12-20,Technology CoE,India
+AWS India,Cloud compute & storage — dev/test environments,420000000,INR,Technology Infrastructure,530011,2025-01-15,Technology CoE,US
+Coursera India,Enterprise learning platform & content licences,180000000,INR,Learning & Development,540010,2024-09-01,HR Shared Services,India
+ISS Facility Services,Housekeeping pantry security — Bengaluru campus,280000000,INR,Real Estate & Facilities,520012,2025-02-01,Corporate,India
+Sodexo India,Cafeteria & meal services — campuses,320000000,INR,Real Estate & Facilities,520013,2025-01-08,Corporate,India
+KPMG India,Statutory audit & transfer-pricing advisory,220000000,INR,Compliance & Advisory,550010,2024-08-01,Corporate,India

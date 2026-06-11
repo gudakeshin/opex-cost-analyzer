@@ -1,0 +1,97 @@
+category,fiscal_period,amount_type,amount,currency
+Medical Consumables & Supplies,2024-01,budget,761069065,INR
+Medical Consumables & Supplies,2024-01,actual,860008043,INR
+Medical Consumables & Supplies,2024-02,budget,764855478,INR
+Medical Consumables & Supplies,2024-02,actual,795449697,INR
+Medical Consumables & Supplies,2024-03,budget,768641891,INR
+Medical Consumables & Supplies,2024-03,actual,814760404,INR
+Medical Consumables & Supplies,2024-04,budget,772428305,INR
+Medical Consumables & Supplies,2024-04,actual,733806889,INR
+Medical Consumables & Supplies,2024-05,budget,776214718,INR
+Medical Consumables & Supplies,2024-05,actual,799501159,INR
+Medical Consumables & Supplies,2024-06,budget,780001131,INR
+Medical Consumables & Supplies,2024-06,actual,756601097,INR
+Medical Consumables & Supplies,2024-07,budget,783787544,INR
+Medical Consumables & Supplies,2024-07,actual,815139045,INR
+Medical Consumables & Supplies,2024-08,budget,787573958,INR
+Medical Consumables & Supplies,2024-08,actual,779698218,INR
+Medical Consumables & Supplies,2024-09,budget,791360371,INR
+Medical Consumables & Supplies,2024-09,actual,838841993,INR
+Medical Consumables & Supplies,2024-10,budget,795146784,INR
+Medical Consumables & Supplies,2024-10,actual,779243848,INR
+Medical Consumables & Supplies,2024-11,budget,798933197,INR
+Medical Consumables & Supplies,2024-11,actual,846869188,INR
+Medical Consumables & Supplies,2024-12,budget,802719611,INR
+Medical Consumables & Supplies,2024-12,actual,834828395,INR
+Pharmacy & Drugs,2024-01,budget,521185306,INR
+Pharmacy & Drugs,2024-01,actual,568091983,INR
+Pharmacy & Drugs,2024-02,budget,523778268,INR
+Pharmacy & Drugs,2024-02,actual,502827137,INR
+Pharmacy & Drugs,2024-03,budget,526371230,INR
+Pharmacy & Drugs,2024-03,actual,552689791,INR
+Pharmacy & Drugs,2024-04,budget,528964191,INR
+Pharmacy & Drugs,2024-04,actual,539543474,INR
+Pharmacy & Drugs,2024-05,budget,531557153,INR
+Pharmacy & Drugs,2024-05,actual,574081725,INR
+Pharmacy & Drugs,2024-06,budget,534150115,INR
+Pharmacy & Drugs,2024-06,actual,539491616,INR
+Pharmacy & Drugs,2024-07,budget,536743077,INR
+Pharmacy & Drugs,2024-07,actual,531375646,INR
+Pharmacy & Drugs,2024-08,budget,539336038,INR
+Pharmacy & Drugs,2024-08,actual,604056362,INR
+Pharmacy & Drugs,2024-09,budget,541929000,INR
+Pharmacy & Drugs,2024-09,actual,606960479,INR
+Pharmacy & Drugs,2024-10,budget,544521962,INR
+Pharmacy & Drugs,2024-10,actual,582638499,INR
+Pharmacy & Drugs,2024-11,budget,547114923,INR
+Pharmacy & Drugs,2024-11,actual,536172624,INR
+Pharmacy & Drugs,2024-12,budget,549707885,INR
+Pharmacy & Drugs,2024-12,actual,593684515,INR
+Biomedical Equipment Maintenance,2024-01,budget,966506946,INR
+Biomedical Equipment Maintenance,2024-01,actual,1072822710,INR
+Biomedical Equipment Maintenance,2024-02,budget,971315438,INR
+Biomedical Equipment Maintenance,2024-02,actual,990741746,INR
+Biomedical Equipment Maintenance,2024-03,budget,976123930,INR
+Biomedical Equipment Maintenance,2024-03,actual,1005407647,INR
+Biomedical Equipment Maintenance,2024-04,budget,980932423,INR
+Biomedical Equipment Maintenance,2024-04,actual,951504450,INR
+Biomedical Equipment Maintenance,2024-05,budget,985740915,INR
+Biomedical Equipment Maintenance,2024-05,actual,946311278,INR
+Biomedical Equipment Maintenance,2024-06,budget,990549407,INR
+Biomedical Equipment Maintenance,2024-06,actual,1129226323,INR
+Biomedical Equipment Maintenance,2024-07,budget,995357899,INR
+Biomedical Equipment Maintenance,2024-07,actual,1035172214,INR
+Biomedical Equipment Maintenance,2024-08,budget,1000166392,INR
+Biomedical Equipment Maintenance,2024-08,actual,1110184695,INR
+Biomedical Equipment Maintenance,2024-09,budget,1004974884,INR
+Biomedical Equipment Maintenance,2024-09,actual,1015024632,INR
+Biomedical Equipment Maintenance,2024-10,budget,1009783376,INR
+Biomedical Equipment Maintenance,2024-10,actual,959294207,INR
+Biomedical Equipment Maintenance,2024-11,budget,1014591868,INR
+Biomedical Equipment Maintenance,2024-11,actual,1075467380,INR
+Biomedical Equipment Maintenance,2024-12,budget,1019400361,INR
+Biomedical Equipment Maintenance,2024-12,actual,1019400361,INR
+Facility Management,2024-01,budget,676154418,INR
+Facility Management,2024-01,actual,689677506,INR
+Facility Management,2024-02,budget,679518370,INR
+Facility Management,2024-02,actual,665928002,INR
+Facility Management,2024-03,budget,682882322,INR
+Facility Management,2024-03,actual,717026438,INR
+Facility Management,2024-04,budget,686246275,INR
+Facility Management,2024-04,actual,761733365,INR
+Facility Management,2024-05,budget,689610227,INR
+Facility Management,2024-05,actual,758571249,INR
+Facility Management,2024-06,budget,692974179,INR
+Facility Management,2024-06,actual,658325470,INR
+Facility Management,2024-07,budget,696338132,INR
+Facility Management,2024-07,actual,786862089,INR
+Facility Management,2024-08,budget,699702084,INR
+Facility Management,2024-08,actual,671714000,INR
+Facility Management,2024-09,budget,703066036,INR
+Facility Management,2024-09,actual,689004715,INR
+Facility Management,2024-10,budget,706429989,INR
+Facility Management,2024-10,actual,798265887,INR
+Facility Management,2024-11,budget,709793941,INR
+Facility Management,2024-11,actual,738185698,INR
+Facility Management,2024-12,budget,713157893,INR
+Facility Management,2024-12,actual,812999998,INR

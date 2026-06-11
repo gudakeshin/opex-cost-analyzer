@@ -1,0 +1,6 @@
+vendor,payment_terms_days,invoice_date,payment_date,amount,currency,aging_bucket
+CBRE India (Leasing),45,2025-01-10,2025-02-26,2800000000,INR,0-30
+Infosys BPM (Retail Tech),60,2025-01-05,2025-03-10,373333333,INR,31-60
+Delhivery Ltd,30,2025-01-18,2025-02-15,420000000,INR,61-90
+Dentsu India,30,2025-01-20,2025-02-18,210000000,INR,0-30
+Blue Dart Express,7,2025-01-01,2025-01-07,155000000,INR,31-60

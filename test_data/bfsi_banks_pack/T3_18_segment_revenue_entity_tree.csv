@@ -1,0 +1,7 @@
+legal_entity,parent_entity,business_unit,segment_revenue_inr_cr,geo
+IABL-IN,,Retail Banking,12800,India
+IABL-IN,,Corporate Banking,9600,India
+IABL-IN,,Treasury,5120,India
+IABL-IN,,Digital Banking,3200,India
+IABL-IN,,Insurance Broking,1280,India
+IABL-GB,IABL-IN,Retail Banking,1920,UK

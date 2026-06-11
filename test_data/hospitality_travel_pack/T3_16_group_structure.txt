@@ -1,0 +1,9 @@
+Surya Hospitality & Resorts Ltd — Group Structure
+
+SHRL-IN: India parent (28 properties domestic; NSE/BSE listed). ERP: Oracle Hospitality + SAP.
+SHRL-MV: Surya Maldives Resorts Pvt Ltd (Maldives; 6 resorts; USD-functional). ERP: Oracle Hospitality.
+SHRL-UAE: Surya Hotels UAE LLC (UAE; 4 properties; AED-functional). ERP: SAP ECC.
+
+Entity tree: SHRL-IN > SHRL-MV (100%), SHRL-UAE (100%)
+
+Intercompany: management fees and brand royalties charged by SHRL-IN to overseas entities at arm's-length. IC flagged related_party=yes. Overseas entities USD/AED-functional; FX translation at closing rate for consolidation.

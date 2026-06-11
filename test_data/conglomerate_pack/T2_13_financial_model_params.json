@@ -1,0 +1,11 @@
+{
+  "company": "Bharat Ventures Group Ltd",
+  "sector": "conglomerate",
+  "wacc": 0.13,
+  "effective_tax_rate": 0.2517,
+  "reporting_currency": "INR",
+  "annual_revenue_inr_cr": 45000,
+  "discount_rate": 0.13,
+  "execution_rate_pct": 70,
+  "notes": "WACC and tax rate per FY25 board pack for Bharat Ventures Group Ltd."
+}

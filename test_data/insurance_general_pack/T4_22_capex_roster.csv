@@ -1,0 +1,25 @@
+asset_class,fiscal_period,amount,currency,status
+Core insurance platform modernisation,FY23-Q1,284567261,INR,actual
+Core insurance platform modernisation,FY23-Q2,316185846,INR,actual
+Core insurance platform modernisation,FY23-Q3,300376553,INR,actual
+Core insurance platform modernisation,FY23-Q4,341480713,INR,actual
+Core insurance platform modernisation,FY24-Q1,335156996,INR,actual
+Core insurance platform modernisation,FY24-Q2,344642572,INR,actual
+Digital claims app,FY23-Q1,134697217,INR,actual
+Digital claims app,FY23-Q2,149663575,INR,actual
+Digital claims app,FY23-Q3,142180396,INR,actual
+Digital claims app,FY23-Q4,161636661,INR,actual
+Digital claims app,FY24-Q1,158643389,INR,actual
+Digital claims app,FY24-Q2,163133296,INR,actual
+Fraud analytics engine,FY23-Q1,320564765,INR,actual
+Fraud analytics engine,FY23-Q2,356183073,INR,actual
+Fraud analytics engine,FY23-Q3,338373919,INR,actual
+Fraud analytics engine,FY23-Q4,384677718,INR,actual
+Fraud analytics engine,FY24-Q1,377554057,INR,actual
+Fraud analytics engine,FY24-Q2,388239549,INR,actual
+Telematics motor device rollout,FY23-Q1,167325420,INR,actual
+Telematics motor device rollout,FY23-Q2,185917134,INR,actual
+Telematics motor device rollout,FY23-Q3,176621277,INR,actual
+Telematics motor device rollout,FY23-Q4,200790504,INR,actual
+Telematics motor device rollout,FY24-Q1,197072162,INR,actual
+Telematics motor device rollout,FY24-Q2,202649676,INR,actual

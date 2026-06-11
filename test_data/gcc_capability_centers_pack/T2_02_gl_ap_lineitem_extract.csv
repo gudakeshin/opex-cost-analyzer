@@ -1,0 +1,65 @@
+gl_code,cost_center,vendor,description,amount,currency,fiscal_period,amount_type,business_unit,geo,legal_entity,source_system,source_record_id,gst_treatment,gstin,lease_treatment,related_party
+510010,CC-TALENT-001,TeamLease Digital,TeamLease Digital services — Talent & Staffing,187481316,INR,2023-Q2,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100001,itc_eligible,29AABCT5678L1Z9,,no
+510010,CC-TALENT-001,TeamLease Digital,TeamLease Digital services — Talent & Staffing,191230942,INR,2023-Q3,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100002,itc_eligible,29AABCT5678L1Z9,,no
+510010,CC-TALENT-001,TeamLease Digital,TeamLease Digital services — Talent & Staffing,194980568,INR,2023-Q4,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100003,itc_eligible,29AABCT5678L1Z9,,no
+510010,CC-TALENT-001,TeamLease Digital,TeamLease Digital services — Talent & Staffing,198730194,INR,2024-Q1,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100004,itc_eligible,29AABCT5678L1Z9,,no
+510010,CC-TALENT-001,TeamLease Digital,TeamLease Digital services — Talent & Staffing,202479821,INR,2024-Q2,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100005,itc_eligible,29AABCT5678L1Z9,,no
+510010,CC-TALENT-001,TeamLease Digital,TeamLease Digital services — Talent & Staffing,206229447,INR,2024-Q3,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100006,itc_eligible,29AABCT5678L1Z9,,no
+510010,CC-TALENT-001,TeamLease Digital,TeamLease Digital services — Talent & Staffing,209979073,INR,2024-Q4,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100007,itc_eligible,29AABCT5678L1Z9,,no
+510010,CC-TALENT-001,TeamLease Digital,TeamLease Digital services — Talent & Staffing,213728700,INR,2025-Q1,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100008,itc_eligible,29AABCT5678L1Z9,,no
+510010,CC-TALENT-001,Quess Corp,Quess Corp services — Talent & Staffing,168662733,INR,2023-Q2,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100009,itc_eligible,29AABCQ1234A1Z5,,no
+510010,CC-TALENT-001,Quess Corp,Quess Corp services — Talent & Staffing,172035987,INR,2023-Q3,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100010,itc_eligible,29AABCQ1234A1Z5,,no
+510010,CC-TALENT-001,Quess Corp,Quess Corp services — Talent & Staffing,175409242,INR,2023-Q4,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100011,itc_eligible,29AABCQ1234A1Z5,,no
+510010,CC-TALENT-001,Quess Corp,Quess Corp services — Talent & Staffing,178782496,INR,2024-Q1,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100012,itc_eligible,29AABCQ1234A1Z5,,no
+510010,CC-TALENT-001,Quess Corp,Quess Corp services — Talent & Staffing,182155751,INR,2024-Q2,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100013,itc_eligible,29AABCQ1234A1Z5,,no
+510010,CC-TALENT-001,Quess Corp,Quess Corp services — Talent & Staffing,185529006,INR,2024-Q3,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100014,itc_eligible,29AABCQ1234A1Z5,,no
+510010,CC-TALENT-001,Quess Corp,Quess Corp services — Talent & Staffing,188902260,INR,2024-Q4,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100015,itc_eligible,29AABCQ1234A1Z5,,no
+510010,CC-TALENT-001,Quess Corp,Quess Corp services — Talent & Staffing,192275515,INR,2025-Q1,actual,Talent,India,MGSI-IN,Oracle,Oracle-AP-100016,itc_eligible,29AABCQ1234A1Z5,,no
+520010,CC-REALE-001,Embassy Office Parks,Embassy Office Parks services — Real Estate & Facilities,286464453,INR,2023-Q2,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100017,itc_eligible,27AABCE8821O1Z2,,no
+520010,CC-REALE-001,Embassy Office Parks,Embassy Office Parks services — Real Estate & Facilities,292193742,INR,2023-Q3,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100018,itc_eligible,27AABCE8821O1Z2,,no
+520010,CC-REALE-001,Embassy Office Parks,Embassy Office Parks services — Real Estate & Facilities,297923031,INR,2023-Q4,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100019,itc_eligible,27AABCE8821O1Z2,,no
+520010,CC-REALE-001,Embassy Office Parks,Embassy Office Parks services — Real Estate & Facilities,303652320,INR,2024-Q1,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100020,itc_eligible,27AABCE8821O1Z2,,no
+520010,CC-REALE-001,Embassy Office Parks,Embassy Office Parks services — Real Estate & Facilities,309381609,INR,2024-Q2,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100021,itc_eligible,27AABCE8821O1Z2,,no
+520010,CC-REALE-001,Embassy Office Parks,Embassy Office Parks services — Real Estate & Facilities,315110898,INR,2024-Q3,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100022,itc_eligible,27AABCE8821O1Z2,,no
+520010,CC-REALE-001,Embassy Office Parks,Embassy Office Parks services — Real Estate & Facilities,320840187,INR,2024-Q4,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100023,itc_eligible,27AABCE8821O1Z2,,no
+520010,CC-REALE-001,Embassy Office Parks,Embassy Office Parks services — Real Estate & Facilities,326569476,INR,2025-Q1,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100024,itc_eligible,27AABCE8821O1Z2,,no
+520010,CC-REALE-001,RMZ Corp,RMZ Corp services — Real Estate & Facilities,230759808,INR,2023-Q2,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100025,itc_eligible,27AABCR5541R1Z5,,no
+520010,CC-REALE-001,RMZ Corp,RMZ Corp services — Real Estate & Facilities,235375004,INR,2023-Q3,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100026,itc_eligible,27AABCR5541R1Z5,,no
+520010,CC-REALE-001,RMZ Corp,RMZ Corp services — Real Estate & Facilities,239990200,INR,2023-Q4,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100027,itc_eligible,27AABCR5541R1Z5,,no
+520010,CC-REALE-001,RMZ Corp,RMZ Corp services — Real Estate & Facilities,244605396,INR,2024-Q1,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100028,itc_eligible,27AABCR5541R1Z5,,no
+520010,CC-REALE-001,RMZ Corp,RMZ Corp services — Real Estate & Facilities,249220592,INR,2024-Q2,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100029,itc_eligible,27AABCR5541R1Z5,,no
+520010,CC-REALE-001,RMZ Corp,RMZ Corp services — Real Estate & Facilities,253835788,INR,2024-Q3,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100030,itc_eligible,27AABCR5541R1Z5,,no
+520010,CC-REALE-001,RMZ Corp,RMZ Corp services — Real Estate & Facilities,258450984,INR,2024-Q4,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100031,itc_eligible,27AABCR5541R1Z5,,no
+520010,CC-REALE-001,RMZ Corp,RMZ Corp services — Real Estate & Facilities,263066181,INR,2025-Q1,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100032,itc_eligible,27AABCR5541R1Z5,,no
+530010,CC-TECHNO-001,Microsoft India,Microsoft India services — Technology Infrastructure,194348059,INR,2023-Q2,actual,Technology,India,MGSI-IN,Oracle,Oracle-AP-100033,itc_eligible,29AABCM2345I1Z8,,no
+530010,CC-TECHNO-001,Microsoft India,Microsoft India services — Technology Infrastructure,198235020,INR,2023-Q3,actual,Technology,India,MGSI-IN,Oracle,Oracle-AP-100034,itc_eligible,29AABCM2345I1Z8,,no
+530010,CC-TECHNO-001,Microsoft India,Microsoft India services — Technology Infrastructure,202121981,INR,2023-Q4,actual,Technology,India,MGSI-IN,Oracle,Oracle-AP-100035,itc_eligible,29AABCM2345I1Z8,,no
+530010,CC-TECHNO-001,Microsoft India,Microsoft India services — Technology Infrastructure,206008942,INR,2024-Q1,actual,Technology,India,MGSI-IN,Oracle,Oracle-AP-100036,itc_eligible,29AABCM2345I1Z8,,no
+530010,CC-TECHNO-001,Microsoft India,Microsoft India services — Technology Infrastructure,209895903,INR,2024-Q2,actual,Technology,India,MGSI-IN,Oracle,Oracle-AP-100037,itc_eligible,29AABCM2345I1Z8,,no
+530010,CC-TECHNO-001,Microsoft India,Microsoft India services — Technology Infrastructure,213782864,INR,2024-Q3,actual,Technology,India,MGSI-IN,Oracle,Oracle-AP-100038,itc_eligible,29AABCM2345I1Z8,,no
+530010,CC-TECHNO-001,Microsoft India,Microsoft India services — Technology Infrastructure,217669826,INR,2024-Q4,actual,Technology,India,MGSI-IN,Oracle,Oracle-AP-100039,itc_eligible,29AABCM2345I1Z8,,no
+530010,CC-TECHNO-001,Microsoft India,Microsoft India services — Technology Infrastructure,221556787,INR,2025-Q1,actual,Technology,India,MGSI-IN,Oracle,Oracle-AP-100040,itc_eligible,29AABCM2345I1Z8,,no
+530010,CC-TECHNO-001,AWS India,AWS India services — Technology Infrastructure,441512652,INR,2023-Q2,actual,Technology,US,MGS-US,SAP,SAP-AP-100041,not_applicable,,,no
+530010,CC-TECHNO-001,AWS India,AWS India services — Technology Infrastructure,450342905,INR,2023-Q3,actual,Technology,US,MGS-US,SAP,SAP-AP-100042,not_applicable,,,no
+530010,CC-TECHNO-001,AWS India,AWS India services — Technology Infrastructure,459173158,INR,2023-Q4,actual,Technology,US,MGS-US,SAP,SAP-AP-100043,not_applicable,,,no
+530010,CC-TECHNO-001,AWS India,AWS India services — Technology Infrastructure,468003411,INR,2024-Q1,actual,Technology,US,MGS-US,SAP,SAP-AP-100044,not_applicable,,,no
+530010,CC-TECHNO-001,AWS India,AWS India services — Technology Infrastructure,476833664,INR,2024-Q2,actual,Technology,US,MGS-US,SAP,SAP-AP-100045,not_applicable,,,no
+530010,CC-TECHNO-001,AWS India,AWS India services — Technology Infrastructure,485663917,INR,2024-Q3,actual,Technology,US,MGS-US,SAP,SAP-AP-100046,not_applicable,,,no
+530010,CC-TECHNO-001,AWS India,AWS India services — Technology Infrastructure,494494170,INR,2024-Q4,actual,Technology,US,MGS-US,SAP,SAP-AP-100047,not_applicable,,,no
+530010,CC-TECHNO-001,AWS India,AWS India services — Technology Infrastructure,503324423,INR,2025-Q1,actual,Technology,US,MGS-US,SAP,SAP-AP-100048,not_applicable,,,no
+540010,CC-LEARNI-001,Coursera India,Coursera India services — Learning & Development,255862377,INR,2023-Q2,actual,Learning,India,MGSI-IN,Oracle,Oracle-AP-100049,itc_eligible,27AABCC7711C1Z1,,no
+540010,CC-LEARNI-001,Coursera India,Coursera India services — Learning & Development,260979624,INR,2023-Q3,actual,Learning,India,MGSI-IN,Oracle,Oracle-AP-100050,itc_eligible,27AABCC7711C1Z1,,no
+540010,CC-LEARNI-001,Coursera India,Coursera India services — Learning & Development,266096872,INR,2023-Q4,actual,Learning,India,MGSI-IN,Oracle,Oracle-AP-100051,itc_eligible,27AABCC7711C1Z1,,no
+540010,CC-LEARNI-001,Coursera India,Coursera India services — Learning & Development,271214119,INR,2024-Q1,actual,Learning,India,MGSI-IN,Oracle,Oracle-AP-100052,itc_eligible,27AABCC7711C1Z1,,no
+540010,CC-LEARNI-001,Coursera India,Coursera India services — Learning & Development,276331367,INR,2024-Q2,actual,Learning,India,MGSI-IN,Oracle,Oracle-AP-100053,itc_eligible,27AABCC7711C1Z1,,no
+540010,CC-LEARNI-001,Coursera India,Coursera India services — Learning & Development,281448614,INR,2024-Q3,actual,Learning,India,MGSI-IN,Oracle,Oracle-AP-100054,itc_eligible,27AABCC7711C1Z1,,no
+540010,CC-LEARNI-001,Coursera India,Coursera India services — Learning & Development,286565862,INR,2024-Q4,actual,Learning,India,MGSI-IN,Oracle,Oracle-AP-100055,itc_eligible,27AABCC7711C1Z1,,no
+540010,CC-LEARNI-001,Coursera India,Coursera India services — Learning & Development,291683109,INR,2025-Q1,actual,Learning,India,MGSI-IN,Oracle,Oracle-AP-100056,itc_eligible,27AABCC7711C1Z1,,no
+520010,CC-REALE-001,ISS Facility Services,ISS Facility Services services — Real Estate & Facilities,323818205,INR,2023-Q2,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100057,itc_eligible,27AABCI3321F1Z4,,no
+520010,CC-REALE-001,ISS Facility Services,ISS Facility Services services — Real Estate & Facilities,330294569,INR,2023-Q3,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100058,itc_eligible,27AABCI3321F1Z4,,no
+520010,CC-REALE-001,ISS Facility Services,ISS Facility Services services — Real Estate & Facilities,336770933,INR,2023-Q4,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100059,itc_eligible,27AABCI3321F1Z4,,no
+520010,CC-REALE-001,ISS Facility Services,ISS Facility Services services — Real Estate & Facilities,343247297,INR,2024-Q1,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100060,itc_eligible,27AABCI3321F1Z4,,no
+520010,CC-REALE-001,ISS Facility Services,ISS Facility Services services — Real Estate & Facilities,349723661,INR,2024-Q2,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100061,itc_eligible,27AABCI3321F1Z4,,no
+520010,CC-REALE-001,ISS Facility Services,ISS Facility Services services — Real Estate & Facilities,356200025,INR,2024-Q3,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100062,itc_eligible,27AABCI3321F1Z4,,no
+520010,CC-REALE-001,ISS Facility Services,ISS Facility Services services — Real Estate & Facilities,362676389,INR,2024-Q4,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100063,itc_eligible,27AABCI3321F1Z4,,no
+520010,CC-REALE-001,ISS Facility Services,ISS Facility Services services — Real Estate & Facilities,369152753,INR,2025-Q1,actual,Real,India,MGSI-IN,Oracle,Oracle-AP-100064,itc_eligible,27AABCI3321F1Z4,,no

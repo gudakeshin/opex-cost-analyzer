@@ -125,7 +125,8 @@
         "Network equipment age profile and maintenance cost",
         "RAN managed service contract terms and SLA performance",
         "TRAI network performance indicators (CAGR trends, EBITDA benchmarks)"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "tower_sharing",
@@ -211,7 +212,8 @@
         "Sale-leaseback valuation assumptions and market comparables",
         "TRAI sharing regulations and GLR pass-through framework",
         "Network rollout plan and new site requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "spectrum_efficiency",
@@ -297,7 +299,8 @@
         "Spectral efficiency benchmarks by equipment vendor and technology",
         "2G/3G traffic migration timeline and customer base",
         "Spectrum auction schedule and estimated pricing by band"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "customer_service_automation",
@@ -383,7 +386,8 @@
         "Cost per contact by channel (agent, IVR, digital)",
         "BSS system API capability for real-time data in chatbot flows",
         "NPS and CSAT by contact reason and resolution channel"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "churn_reduction",
@@ -468,7 +472,8 @@
         "Network complaint and NPS data by geography and segment",
         "Retention offer history and response rate",
         "Customer LTV model by segment"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "roaming_cost_optimization",
@@ -554,7 +559,8 @@
         "IPX hub connectivity and migration readiness",
         "Inadvertent roaming incident log and cost",
         "TRAI roaming tariff regulations"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "it_bss_oss_modernization",
@@ -640,7 +646,8 @@
         "Revenue assurance report with leakage estimate",
         "IT OPEX breakdown (BSS/OSS maintenance, licensing, managed services)",
         "Cloud-native or SaaS BSS vendor options and migration feasibility"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "energy_management",
@@ -726,7 +733,8 @@
         "Solar and BESS feasibility data by site geography",
         "Grid reliability metrics by region",
         "Energy cost and carbon intensity targets"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "workforce_productivity",
@@ -811,7 +819,8 @@
         "Territory allocation and customer concentration data",
         "FSO tool options and integration with workforce management system",
         "Field engineer compensation structure and variable pay policy"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

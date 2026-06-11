@@ -130,7 +130,8 @@
         "Contract terms, SLA, and break-clause provisions",
         "NAV error/restatement history",
         "SEBI/AMFI compliance requirement mapping"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "trading_technology_optimization",
@@ -217,7 +218,8 @@
         "Trading volume by asset class and broker",
         "OMS/EMS vendor contracts and SLAs",
         "TCA analysis output for top-20 brokers"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "compliance_automation",
@@ -309,7 +311,8 @@
         "RegTech vendor landscape and integration requirements",
         "Late/restated filing history with root cause",
         "SEBI/IRDAI technical specification for digital filing"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "performance_attribution_tech",
@@ -394,7 +397,8 @@
         "Performance attribution vendor options and pricing",
         "OMS and portfolio management system integration architecture",
         "Client reporting SLA requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "research_cost_management",
@@ -480,7 +484,8 @@
         "Portfolio manager research utilisation and feedback by provider",
         "MiFID II/SEBI compliance framework for research payments",
         "Research management platform options and integration requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

@@ -1,0 +1,6 @@
+supplier,category,contract_status,contract_expiry_date,auto_renewal_notice_days,early_exit_penalty_pct,min_purchase_commitment,currency
+Ericsson India,Network Operations & Energy,in_contract,2028-03-31,120,15,21280000000,INR
+Nokia Solutions India,Network Operations & Energy,in_contract,2027-09-30,120,12,12160000000,INR
+Amdocs India,IT & Digital Infrastructure,in_contract,2027-03-31,120,12,4560000000,INR
+Tata Power (Tower Energy),Network Operations & Energy,in_contract,2026-12-31,90,10,13680000000,INR
+AWS India,IT & Digital Infrastructure,in_contract,2026-09-30,60,8,2280000000,INR

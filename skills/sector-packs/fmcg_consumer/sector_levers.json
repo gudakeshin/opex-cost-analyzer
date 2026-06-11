@@ -127,7 +127,8 @@
         "Supplier concentration data (number of qualified sources per key material)",
         "Commodity price indices for key materials",
         "Formulation specification constraints from R&D"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "sku_rationalization",
@@ -213,7 +214,8 @@
         "Retailer ranging and space allocation by SKU",
         "Consumer research on SKU redundancy within portfolio",
         "Inventory level and days-on-hand by SKU"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "pricing_architecture",
@@ -297,7 +299,8 @@
         "Competitor RSP and price-pack architecture by segment",
         "Consumer price sensitivity research by segment",
         "Channel margin structure (distributor, retailer) by format"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "trade_terms_optimization",
@@ -381,7 +384,8 @@
         "Days Sales Outstanding (DSO) by channel and key account",
         "Scheme ROI data (sales lift vs scheme cost)",
         "Competitor trade terms benchmark (qualitative/channel insights)"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "warehouse_automation",
@@ -467,7 +471,8 @@
         "Pick error and returns rate by SKU category",
         "Warehouse footprint and lease terms by facility",
         "Automation technology vendor options and capex estimates"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "mode_shift_logistics",
@@ -553,7 +558,8 @@
         "Rail/coastal shipping network connectivity to key origin-destination pairs",
         "Carrier rate cards and contract terms by mode",
         "Inventory holding cost and service-level trade-off data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "private_label_expansion",
@@ -638,7 +644,8 @@
         "Consumer research on PL acceptance by category",
         "Manufacturer shortlist with capacity and compliance data",
         "Competitor PL pricing and ranging data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "demand_planning_accuracy",
@@ -722,7 +729,8 @@
         "Sell-out data from key retail accounts or Nielsen/IRI",
         "S&OP meeting cadence and consensus forecast process description",
         "Safety stock policy and inventory days-on-hand by SKU"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "assortment_optimization",
@@ -807,7 +815,8 @@
         "In-stock (OSA) monitoring data by SKU and store",
         "Category margin by SKU and pack size",
         "Consumer basket composition and cross-purchase data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

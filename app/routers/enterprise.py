@@ -1008,6 +1008,11 @@ def start_deep_research_endpoint(req: DeepResearchStartRequest) -> Dict[str, Any
         try:
             manifest = read_manifest(req.session_id)
             manifest["deep_research_interaction_id"] = interaction_id
+            # Persist the research subject so the completion handler can render an
+            # accurate document header (revenue here is already in ₹ Cr).
+            manifest["deep_research_company_name"] = req.company_name
+            manifest["deep_research_industry"] = req.industry
+            manifest["deep_research_annual_revenue_cr"] = req.annual_revenue_cr
             if req.research_prompt:
                 manifest["deep_research_prompt"] = req.research_prompt.strip()
             write_manifest(req.session_id, manifest)
@@ -1064,6 +1069,64 @@ def poll_deep_research_endpoint(
             )
         except Exception as exc:
             logger.warning('"deep_research_manifest_save_failed","error":"%s"', exc)
+
+        # Save the research output as a markdown document in the engagement folder
+        # and run it through the standard parse + index pipeline so it becomes
+        # durable, RAG-retrievable context picked up by all downstream analysis.
+        try:
+            from app.services.deep_research_prompt import build_research_markdown
+            from app.services.document_pipeline import ingest_markdown_document
+            from app.services.engagements_store import (
+                backfill_engagement_for_session,
+                delete_document,
+            )
+
+            manifest = read_manifest(session_id)
+            engagement_id = backfill_engagement_for_session(session_id, manifest)
+            currency = str(manifest.get("currency") or "INR")
+            company_name = str(
+                manifest.get("deep_research_company_name")
+                or manifest.get("company_name")
+                or "Company"
+            )
+            industry = str(
+                manifest.get("deep_research_industry") or manifest.get("industry") or ""
+            )
+            revenue_cr = float(manifest.get("deep_research_annual_revenue_cr") or 0.0)
+
+            md_body = build_research_markdown(
+                company_name,
+                industry,
+                revenue_cr,
+                summary=summary,
+                full_report=full_report,
+                sources=result.get("sources") or [],
+            )
+            filename = f"Deep Research — {company_name} Industry & Business Context.md"
+
+            # Replace the prior auto-generated research doc so only the latest
+            # industry/business context lives in the corpus.
+            prior_id = manifest.get("deep_research_document_id")
+            if prior_id:
+                try:
+                    delete_document(engagement_id, str(prior_id))
+                except Exception:
+                    pass  # already gone — ignore
+
+            new_doc_id = ingest_markdown_document(
+                engagement_id, md_body, filename, reporting_currency=currency
+            )
+            manifest["engagement_id"] = engagement_id
+            manifest["deep_research_document_id"] = new_doc_id
+            write_manifest(session_id, manifest)
+            logger.info(
+                '"deep_research_doc_ingested","session_id":"%s","engagement_id":"%s","document_id":"%s"',
+                session_id,
+                engagement_id,
+                new_doc_id,
+            )
+        except Exception as exc:
+            logger.warning('"deep_research_doc_ingest_failed","error":"%s"', exc)
 
     append_audit_event(
         "deep_research_completed",

@@ -1,0 +1,12 @@
+FY23 — Project SeatsRight
+- Hybrid work policy: seat ratio reduced from 1:1 to 0.7:1; ~35 Cr run-rate saved on FM costs.
+- Contract staff rate renegotiation: ~22 Cr saved. STATUS: in baseline.
+
+FY24 — Project CloudSmart
+- M365 E5 licence audit (shelfware removal): planned 18 Cr, realised 14 Cr (some E5 features still needed).
+- AWS reserved instance + savings plans: planned 22 Cr, realised 26 Cr (exceeded).
+- Cafeteria vendor renegotiation: planned 8 Cr, realised 9 Cr.
+- STATUS: complete; in FY25 baseline.
+
+In-flight FY25
+- Hyderabad campus right-sizing (2 floors surplus): ~24 Cr targeted, ~6 Cr booked YTD.

@@ -1,5 +1,7 @@
 {
-  "eval_date": "2026-06-06",
+  "eval_date": "2026-06-10",
+  "score_type": "structural",
+  "scope": "Structural quality: schema compliance, numerical faithfulness, output completeness, causal-field presence. Does NOT validate whether recommendations are analytically correct or savings assumptions match real-world data. See run_llm_judge_eval.py for content-quality assessment.",
   "platform_version": "v2.1",
   "overall_score": 9.685,
   "passed": true,

@@ -1,3 +1,4 @@
+import { sectorLabel } from '../constants/sectors';
 import type { SessionManifest } from '../types';
 
 export interface EngagementSanityConflict {
@@ -6,6 +7,12 @@ export interface EngagementSanityConflict {
   engagement_company?: string;
   detected_company?: string;
   detected_companies?: string[];
+  engagement_industry?: string;
+  engagement_industry_label?: string;
+  detected_industry?: string;
+  detected_industry_label?: string;
+  industry_spend?: string | null;
+  detected_industries?: string[];
   source?: string;
   signal_source?: string;
   message?: string;
@@ -45,8 +52,15 @@ export function conflictDismissKey(
   conflict: EngagementSanityConflict,
 ): string {
   const sid = sessionId ?? 'none';
-  const det = conflict.detected_company ?? conflict.detected_companies?.join('|') ?? '';
-  return `${sid}:${conflict.kind}:${conflict.engagement_company ?? ''}:${det}:${conflict.source ?? ''}`;
+  const det =
+    conflict.detected_company ??
+    conflict.detected_companies?.join('|') ??
+    conflict.detected_industry ??
+    conflict.detected_industries?.join('|') ??
+    '';
+  const engagement =
+    conflict.engagement_company ?? conflict.engagement_industry ?? '';
+  return `${sid}:${conflict.kind}:${engagement}:${det}:${conflict.source ?? conflict.signal_source ?? ''}`;
 }
 
 export function primaryDetectedCompany(
@@ -56,6 +70,38 @@ export function primaryDetectedCompany(
     if (c.detected_company) return c.detected_company;
   }
   return null;
+}
+
+export function primaryDetectedIndustry(
+  conflicts: EngagementSanityConflict[],
+): string | null {
+  const industryConflict = conflicts.find((c) => c.kind === 'industry_mismatch');
+  return industryConflict?.detected_industry ?? null;
+}
+
+export function primaryDetectedIndustryLabel(
+  conflicts: EngagementSanityConflict[],
+): string | null {
+  const industryConflict = conflicts.find((c) => c.kind === 'industry_mismatch');
+  if (!industryConflict) return null;
+  return (
+    industryConflict.detected_industry_label ??
+    sectorLabel(industryConflict.detected_industry)
+  );
+}
+
+export function engagementIndustryLabel(
+  conflicts: EngagementSanityConflict[],
+  manifest?: SessionManifest | null,
+): string | null {
+  const industryConflict = conflicts.find((c) => c.kind === 'industry_mismatch');
+  if (industryConflict?.engagement_industry_label) {
+    return industryConflict.engagement_industry_label;
+  }
+  if (industryConflict?.engagement_industry) {
+    return sectorLabel(industryConflict.engagement_industry);
+  }
+  return manifest?.industry ? sectorLabel(manifest.industry) : null;
 }
 
 export function conflictSummaryMessage(conflicts: EngagementSanityConflict[]): string {

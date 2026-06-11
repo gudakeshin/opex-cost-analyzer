@@ -1,0 +1,11 @@
+{
+  "company": "Surya Hospitality & Resorts Ltd",
+  "sector": "hospitality_travel",
+  "wacc": 0.125,
+  "effective_tax_rate": 0.2517,
+  "reporting_currency": "INR",
+  "annual_revenue_inr_cr": 5200,
+  "discount_rate": 0.125,
+  "execution_rate_pct": 70,
+  "notes": "WACC and tax rate per FY25 board pack for Surya Hospitality & Resorts Ltd."
+}

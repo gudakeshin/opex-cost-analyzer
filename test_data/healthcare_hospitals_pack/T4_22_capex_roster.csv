@@ -1,0 +1,25 @@
+asset_class,fiscal_period,amount,currency,status
+New hospital tower construction,FY23-Q1,276940884,INR,actual
+New hospital tower construction,FY23-Q2,307712094,INR,actual
+New hospital tower construction,FY23-Q3,292326489,INR,actual
+New hospital tower construction,FY23-Q4,332329061,INR,actual
+New hospital tower construction,FY24-Q1,326174819,INR,actual
+New hospital tower construction,FY24-Q2,335406182,INR,actual
+MRI & CT scanner replacement,FY23-Q1,140654677,INR,actual
+MRI & CT scanner replacement,FY23-Q2,156282975,INR,actual
+MRI & CT scanner replacement,FY23-Q3,148468826,INR,actual
+MRI & CT scanner replacement,FY23-Q4,168785613,INR,actual
+MRI & CT scanner replacement,FY24-Q1,165659953,INR,actual
+MRI & CT scanner replacement,FY24-Q2,170348442,INR,actual
+EMR system implementation,FY23-Q1,133758399,INR,actual
+EMR system implementation,FY23-Q2,148620444,INR,actual
+EMR system implementation,FY23-Q3,141189421,INR,actual
+EMR system implementation,FY23-Q4,160510079,INR,actual
+EMR system implementation,FY24-Q1,157537670,INR,actual
+EMR system implementation,FY24-Q2,161996283,INR,actual
+Ambulance fleet expansion,FY23-Q1,245127251,INR,actual
+Ambulance fleet expansion,FY23-Q2,272363613,INR,actual
+Ambulance fleet expansion,FY23-Q3,258745432,INR,actual
+Ambulance fleet expansion,FY23-Q4,294152702,INR,actual
+Ambulance fleet expansion,FY24-Q1,288705429,INR,actual
+Ambulance fleet expansion,FY24-Q2,296876338,INR,actual

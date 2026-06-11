@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
@@ -10,6 +11,7 @@ from app.config import logger
 from app.models import NormalizedSpendLine
 from app.services.engagements_store import (
     SUPPORTED_EXTENSIONS,
+    add_document_record,
     document_dir,
     document_parsed_dir,
     get_document_record,
@@ -73,6 +75,48 @@ def reindex_engagement(engagement_id: str) -> Dict[str, Any]:
         summary["chunks"] += stats["chunk_count"]
         summary["parents"] += stats["parent_count"]
     return summary
+
+
+def ingest_markdown_document(
+    engagement_id: str,
+    markdown: str,
+    filename: str,
+    *,
+    reporting_currency: str = "INR",
+    content_type: str = "text/markdown",
+) -> str:
+    """Write an in-memory markdown doc into the engagement folder and run the
+    standard parse + index pipeline synchronously. Returns the new document_id.
+
+    Mirrors the upload flow in ``app/routers/engagements.py`` so the document is
+    indistinguishable from a user-uploaded one and is picked up by analysis via
+    ``load_engagement_corpus``.
+    """
+    from app.services.analysis import load_taxonomy
+
+    document_id = str(uuid.uuid4())
+    ddir = document_dir(engagement_id, document_id)
+    raw_path = ddir / "raw.md"
+    payload = markdown.encode("utf-8")
+
+    # Register manifest + meta before raw bytes land on disk (see engagements upload).
+    add_document_record(
+        engagement_id,
+        document_id=document_id,
+        filename=filename,
+        content_type=content_type,
+        size_bytes=len(payload),
+        raw_path=str(raw_path),
+    )
+    raw_path.write_bytes(payload)
+
+    process_engagement_document(
+        engagement_id,
+        document_id,
+        taxonomy=load_taxonomy(),
+        reporting_currency=reporting_currency,
+    )
+    return document_id
 
 
 def process_engagement_document(
@@ -144,7 +188,7 @@ def process_engagement_document(
             )
             text_preview = f"Parsed {line_count} spend lines from JSON"
 
-        elif suffix == ".txt":
+        elif suffix in (".txt", ".md"):
             text = raw_path.read_text(encoding="utf-8", errors="ignore")
             (parsed_dir / "markdown.md").write_text(text, encoding="utf-8")
             role = "context_doc"

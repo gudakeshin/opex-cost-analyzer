@@ -10,7 +10,8 @@ describe('buildDefaultDeepResearchPrompt', () => {
     expect(prompt).toContain('₹1,50,000 Cr');
     expect(prompt).toContain('Company-specific developments');
     expect(prompt).toContain('Peer and competitive landscape');
-    expect(prompt).toContain('Sector and macro context');
+    expect(prompt).toContain('Macro context');
+    expect(prompt).toContain('Industry deep-dive');
     expect(prompt).toContain('Implications for cost optimization');
   });
 });

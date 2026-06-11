@@ -1,0 +1,25 @@
+asset_class,fiscal_period,amount,currency,status
+5G spectrum & rollout,FY23-Q1,298117820,INR,actual
+5G spectrum & rollout,FY23-Q2,331242023,INR,actual
+5G spectrum & rollout,FY23-Q3,314679921,INR,actual
+5G spectrum & rollout,FY23-Q4,357741384,INR,actual
+5G spectrum & rollout,FY24-Q1,351116544,INR,actual
+5G spectrum & rollout,FY24-Q2,361053805,INR,actual
+Fiber backhaul expansion,FY23-Q1,298101743,INR,actual
+Fiber backhaul expansion,FY23-Q2,331224159,INR,actual
+Fiber backhaul expansion,FY23-Q3,314662951,INR,actual
+Fiber backhaul expansion,FY23-Q4,357722091,INR,actual
+Fiber backhaul expansion,FY24-Q1,351097608,INR,actual
+Fiber backhaul expansion,FY24-Q2,361034333,INR,actual
+Data centre build,FY23-Q1,232399307,INR,actual
+Data centre build,FY23-Q2,258221453,INR,actual
+Data centre build,FY23-Q3,245310380,INR,actual
+Data centre build,FY23-Q4,278879169,INR,actual
+Data centre build,FY24-Q1,273714740,INR,actual
+Data centre build,FY24-Q2,281461383,INR,actual
+Tower upgrades & green energy,FY23-Q1,285105941,INR,actual
+Tower upgrades & green energy,FY23-Q2,316784379,INR,actual
+Tower upgrades & green energy,FY23-Q3,300945160,INR,actual
+Tower upgrades & green energy,FY23-Q4,342127129,INR,actual
+Tower upgrades & green energy,FY24-Q1,335791441,INR,actual
+Tower upgrades & green energy,FY24-Q2,345294973,INR,actual

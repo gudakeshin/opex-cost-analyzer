@@ -1,0 +1,6 @@
+supplier,category,contract_status,contract_expiry_date,auto_renewal_notice_days,early_exit_penalty_pct,min_purchase_commitment,currency
+Divi Laboratories,API & Raw Materials,in_contract,2026-09-30,90,8,4320000000,INR
+Laurus Labs,API & Raw Materials,in_contract,2026-03-31,60,5,2940000000,INR
+IQVIA India,Regulatory & Quality,in_contract,2027-03-31,120,15,1620000000,INR
+Jubilant Biosys,Contract Research & Manufacturing,in_contract,2026-12-31,90,12,1860000000,INR
+DHL Supply Chain,Logistics & Cold Chain,in_contract,2026-06-30,60,10,1440000000,INR

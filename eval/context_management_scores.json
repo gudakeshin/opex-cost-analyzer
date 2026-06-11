@@ -1,0 +1,813 @@
+{
+  "eval_date": "2026-06-11",
+  "score_type": "structural",
+  "scope": "Context-management mechanics: synthesis token budgeting/degradation, payload slimming, relevance filtering, chat-history windowing, RAG context packing. Does NOT validate answer quality. CM-03/CM-04/CM-10 are honest-gap probes.",
+  "platform_version": "v2.1",
+  "overall_score": 9.433,
+  "passed": true,
+  "fixture_count": 6,
+  "llm_judge_active": true,
+  "known_gap_dimensions": [
+    "CM-03",
+    "CM-04",
+    "CM-10"
+  ],
+  "domains": [
+    {
+      "name": "synthesis_budget",
+      "display": "Synthesis Token Budget",
+      "weight": 0.35,
+      "score": 9.361,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "CM-01",
+          "name": "Slimming Efficiency & Whitelist Integrity",
+          "weight": 0.22,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "size_reduction": {
+              "raw_chars": 434677,
+              "slim_chars": 45157,
+              "ratio": 0.104,
+              "points": 2.0
+            },
+            "forbidden_keys_leaked": [],
+            "skip_skills_leaked": [],
+            "top_n_caps": {
+              "categories<=8": true,
+              "initiatives<=12": true,
+              "sm_levers<=8": true,
+              "rc_levers<=8": true,
+              "period_trends<=6": true,
+              "pt_opps<=5": true,
+              "critiques<=5": true,
+              "top_suppliers<=2": true
+            },
+            "idempotent": true,
+            "sme_view_stable": true
+          },
+          "remediation": "Tighten _slim_skill_outputs / whitelists in app/opar/claude_client.py; keep new initiative/lever fields out of the payload unless added to _INITIATIVE_SYNTHESIS_KEYS."
+        },
+        {
+          "id": "CM-02",
+          "name": "Budget Gate Degradation",
+          "weight": 0.2,
+          "threshold": 8.0,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "degrade_over_budget": {
+              "skip_reason": "provider_failed",
+              "synthesizer_called": true,
+              "kept_skills": [
+                "spend-profiler"
+              ]
+            },
+            "drop_largest_ordering": {
+              "overshoot_5k": [
+                "big"
+              ],
+              "overshoot_11k": [
+                "big",
+                "medium"
+              ]
+            },
+            "irreducible_hard_skip": {
+              "skip_reason": "token_budget_exceeded",
+              "synthesizer_calls": 0
+            }
+          },
+          "remediation": "Fix the gate in reflect_advisory.generate_llm_advisory_sections: degrade via _drop_largest_to_budget before skipping; hard-skip only when irreducible."
+        },
+        {
+          "id": "CM-03",
+          "name": "Core-Skill Survival Under Degradation",
+          "weight": 0.12,
+          "threshold": 6.0,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "core_protection": [
+              {
+                "scenario": "savings_modeler_vs_internal_benchmarker",
+                "dropped": [
+                  "internal-benchmarker"
+                ],
+                "core_dropped": [],
+                "protected": true
+              },
+              {
+                "scenario": "spend_profiler_vs_peer_benchmarker",
+                "dropped": [
+                  "peer-benchmarker"
+                ],
+                "core_dropped": [],
+                "protected": true
+              },
+              {
+                "scenario": "value_bridge_vs_temporal",
+                "dropped": [
+                  "temporal-analyzer"
+                ],
+                "core_dropped": [],
+                "protected": true
+              }
+            ],
+            "core_skills": [
+              "evidence-gatherer",
+              "savings-modeler",
+              "sme-critique",
+              "spend-profiler",
+              "value-bridge-calculator"
+            ],
+            "must_drop_core_case": {
+              "kept": [
+                "sme-critique"
+              ],
+              "dropped": [
+                "spend-profiler",
+                "savings-modeler"
+              ],
+              "viable": true
+            },
+            "dropped_list_complete": true
+          },
+          "remediation": "Make _drop_largest_to_budget (app/opar/reflect_advisory.py) sort non-core skills first and touch _CORE_SYNTHESIS_SKILLS only when the overshoot is otherwise unreclaimable."
+        },
+        {
+          "id": "CM-04",
+          "name": "Budget Estimate Completeness",
+          "weight": 0.16,
+          "threshold": 6.0,
+          "score": 8.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "estimate_vs_actual": {
+              "gate_estimated_tokens": 13451,
+              "actual_prompt_tokens_chars4": 13452,
+              "unbudgeted_overhead_pct": 0.0,
+              "points": 4.0,
+              "note": "overhead = system prompt + model_manifest + deep_research_context + sme_critique_data + strict/advisory hints, none of which the gate estimates"
+            },
+            "chars4_vs_regex": {
+              "cases": {
+                "full_payload": {
+                  "chars4_estimate": 108669,
+                  "regex_reference": 94245,
+                  "drift_pct": 15.3,
+                  "within_15pct": false
+                },
+                "small_dense": {
+                  "chars4_estimate": 102,
+                  "regex_reference": 9,
+                  "drift_pct": 1033.3,
+                  "within_15pct": false
+                },
+                "large_dense": {
+                  "chars4_estimate": 10002,
+                  "regex_reference": 9,
+                  "drift_pct": 111033.3,
+                  "within_15pct": false
+                }
+              },
+              "hits": 0,
+              "points": 0.0
+            },
+            "estimator_robustness": {
+              "monotonic": true,
+              "circular_payload_estimate": 3,
+              "circular_conservative": true,
+              "real_payload_nonzero": true
+            }
+          },
+          "remediation": "Extend _payload_estimate in generate_llm_advisory_sections to cover model_manifest, sme_critique_data, deep_research_context and a system-prompt allowance; make _estimate_tokens conservative (non-zero) on unserializable payloads."
+        },
+        {
+          "id": "CM-05",
+          "name": "End-to-End Oversized Chain",
+          "weight": 0.2,
+          "threshold": 8.0,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "preslim_estimated_tokens": 108669,
+            "limit": 80000,
+            "skip_reason": "provider_failed",
+            "synthesizer_called": true,
+            "sent_estimated_tokens": 8003,
+            "available_analyses_count": 15,
+            "manifest_disjoint": true,
+            "kept_skills": [
+              "evidence-gatherer",
+              "internal-benchmarker",
+              "peer-benchmarker",
+              "peer-disclosure-miner",
+              "savings-modeler",
+              "sme-critique",
+              "spend-profiler",
+              "value-bridge-calculator"
+            ]
+          },
+          "remediation": "Keep select_relevant_outputs + _slim_skill_outputs + the budget gate composing so a full 26-skill payload never hard-skips; check whitelist coverage when adding skills."
+        },
+        {
+          "id": "CM-13",
+          "name": "Token Estimate vs Real API Count",
+          "weight": 0.1,
+          "threshold": 6.0,
+          "score": 6.81,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "real_input_tokens": 14612,
+            "chars4_estimate": 11289,
+            "drift_pct": 22.7,
+            "direction": "underestimates",
+            "model": "claude-sonnet-4-6"
+          },
+          "remediation": "Calibrate _CHARS_PER_TOKEN (or switch to the count_tokens API pre-flight) so the budget gate's estimate tracks real input tokens."
+        }
+      ]
+    },
+    {
+      "name": "relevance_filtering",
+      "display": "Relevance Filtering",
+      "weight": 0.25,
+      "score": 10.0,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "CM-06",
+          "name": "Capability Detection Accuracy",
+          "weight": 0.3,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "per_query": {
+              "benchmark my IT spend against industry peers": {
+                "detected": [
+                  "benchmarking"
+                ],
+                "expected": [
+                  "benchmarking"
+                ],
+                "jaccard": 1.0
+              },
+              "what savings opportunities exist and what's the NPV": {
+                "detected": [
+                  "value_modeling"
+                ],
+                "expected": [
+                  "value_modeling"
+                ],
+                "jaccard": 1.0
+              },
+              "show budget vs actual variance": {
+                "detected": [
+                  "variance_analysis"
+                ],
+                "expected": [
+                  "variance_analysis"
+                ],
+                "jaccard": 1.0
+              },
+              "how has spend trended month on month": {
+                "detected": [
+                  "temporal_trend"
+                ],
+                "expected": [
+                  "temporal_trend"
+                ],
+                "jaccard": 1.0
+              },
+              "can we shift payment terms and lift DPO": {
+                "detected": [
+                  "working_capital"
+                ],
+                "expected": [
+                  "working_capital"
+                ],
+                "jaccard": 1.0
+              },
+              "why is logistics cost so high": {
+                "detected": [
+                  "root_cause"
+                ],
+                "expected": [
+                  "root_cause"
+                ],
+                "jaccard": 1.0
+              },
+              "plot a chart of spend split": {
+                "detected": [
+                  "visualization"
+                ],
+                "expected": [
+                  "visualization"
+                ],
+                "jaccard": 1.0
+              },
+              "which columns map to which schema roles": {
+                "detected": [
+                  "schema_lookup"
+                ],
+                "expected": [
+                  "schema_lookup"
+                ],
+                "jaccard": 1.0
+              },
+              "what constraints do our contracts impose": {
+                "detected": [
+                  "document_context"
+                ],
+                "expected": [
+                  "document_context"
+                ],
+                "jaccard": 1.0
+              },
+              "prepare an executive readout for the CFO": {
+                "detected": [
+                  "executive_narrative"
+                ],
+                "expected": [
+                  "executive_narrative"
+                ],
+                "jaccard": 1.0
+              },
+              "break down spend by supplier": {
+                "detected": [
+                  "supplier_breakdown"
+                ],
+                "expected": [
+                  "supplier_breakdown"
+                ],
+                "jaccard": 1.0
+              },
+              "compare quarter trends for travel by vendor": {
+                "detected": [
+                  "benchmarking",
+                  "supplier_breakdown",
+                  "temporal_trend"
+                ],
+                "expected": [
+                  "benchmarking",
+                  "supplier_breakdown",
+                  "temporal_trend"
+                ],
+                "jaccard": 1.0
+              },
+              "hello": {
+                "detected": [],
+                "expected": [],
+                "jaccard": 1.0
+              },
+              "thanks, sounds good": {
+                "detected": [],
+                "expected": [],
+                "jaccard": 1.0
+              }
+            },
+            "cases": 14
+          },
+          "remediation": "Extend the token lists in observe._detect_query_capabilities for the missed phrasing."
+        },
+        {
+          "id": "CM-07",
+          "name": "Relevance Selection Precision/Recall",
+          "weight": 0.4,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "per_case": {
+              "benchmarking_only": {
+                "selected": [
+                  "evidence-gatherer",
+                  "internal-benchmarker",
+                  "peer-benchmarker",
+                  "savings-modeler",
+                  "sme-critique",
+                  "spend-profiler",
+                  "value-bridge-calculator"
+                ],
+                "expected": [
+                  "evidence-gatherer",
+                  "internal-benchmarker",
+                  "peer-benchmarker",
+                  "savings-modeler",
+                  "sme-critique",
+                  "spend-profiler",
+                  "value-bridge-calculator"
+                ],
+                "precision": 1.0,
+                "recall": 1.0,
+                "score": 10.0
+              },
+              "value_modeling_only": {
+                "selected": [
+                  "evidence-gatherer",
+                  "savings-modeler",
+                  "sme-critique",
+                  "spend-profiler",
+                  "value-bridge-calculator"
+                ],
+                "expected": [
+                  "evidence-gatherer",
+                  "savings-modeler",
+                  "sme-critique",
+                  "spend-profiler",
+                  "value-bridge-calculator"
+                ],
+                "precision": 1.0,
+                "recall": 1.0,
+                "score": 10.0
+              },
+              "variance_plus_trend": {
+                "selected": [
+                  "bva-analyzer",
+                  "evidence-gatherer",
+                  "savings-modeler",
+                  "sme-critique",
+                  "spend-profiler",
+                  "temporal-analyzer",
+                  "value-bridge-calculator"
+                ],
+                "expected": [
+                  "bva-analyzer",
+                  "evidence-gatherer",
+                  "savings-modeler",
+                  "sme-critique",
+                  "spend-profiler",
+                  "temporal-analyzer",
+                  "value-bridge-calculator"
+                ],
+                "precision": 1.0,
+                "recall": 1.0,
+                "score": 10.0
+              },
+              "working_capital_with_category": {
+                "selected": [
+                  "evidence-gatherer",
+                  "payment-terms-optimizer",
+                  "root-cause-analyzer",
+                  "savings-modeler",
+                  "sme-critique",
+                  "spend-profiler",
+                  "value-bridge-calculator"
+                ],
+                "expected": [
+                  "evidence-gatherer",
+                  "payment-terms-optimizer",
+                  "root-cause-analyzer",
+                  "savings-modeler",
+                  "sme-critique",
+                  "spend-profiler",
+                  "value-bridge-calculator"
+                ],
+                "precision": 1.0,
+                "recall": 1.0,
+                "score": 10.0
+              },
+              "root_cause_only": {
+                "selected": [
+                  "evidence-gatherer",
+                  "root-cause-analyzer",
+                  "savings-modeler",
+                  "sme-critique",
+                  "spend-profiler",
+                  "value-bridge-calculator"
+                ],
+                "expected": [
+                  "evidence-gatherer",
+                  "root-cause-analyzer",
+                  "savings-modeler",
+                  "sme-critique",
+                  "spend-profiler",
+                  "value-bridge-calculator"
+                ],
+                "precision": 1.0,
+                "recall": 1.0,
+                "score": 10.0
+              },
+              "supplier_breakdown_only": {
+                "selected": [
+                  "evidence-gatherer",
+                  "savings-modeler",
+                  "sme-critique",
+                  "spend-profiler",
+                  "value-bridge-calculator",
+                  "vendor-master-builder"
+                ],
+                "expected": [
+                  "evidence-gatherer",
+                  "savings-modeler",
+                  "sme-critique",
+                  "spend-profiler",
+                  "value-bridge-calculator",
+                  "vendor-master-builder"
+                ],
+                "precision": 1.0,
+                "recall": 1.0,
+                "score": 10.0
+              }
+            }
+          },
+          "remediation": "Update _CAPABILITY_SKILL_MAP / _CORE_SYNTHESIS_SKILLS in reflect_advisory.py so the capability maps to the skills the synthesis prompt needs."
+        },
+        {
+          "id": "CM-08",
+          "name": "Manifest Completeness & Bypass Correctness",
+          "weight": 0.3,
+          "threshold": 8.0,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "set_identity": {
+              "benchmarking_only": true,
+              "value_modeling_only": true,
+              "variance_plus_trend": true,
+              "working_capital_with_category": true,
+              "root_cause_only": true,
+              "supplier_breakdown_only": true
+            },
+            "headlines": {
+              "all_nonempty": true,
+              "count_checks": {
+                "temporal-analyzer": {
+                  "got": "period-over-period trends across 7 periods",
+                  "expected": "period-over-period trends across 7 periods",
+                  "match": true
+                },
+                "bva-analyzer": {
+                  "got": "budget-vs-actuals variance for 9 categories",
+                  "expected": "budget-vs-actuals variance for 9 categories",
+                  "match": true
+                },
+                "payment-terms-optimizer": {
+                  "got": "4 payment-terms / working-capital opportunities",
+                  "expected": "4 payment-terms / working-capital opportunities",
+                  "match": true
+                }
+              }
+            },
+            "bypasses": {
+              "deliverable_intents": true,
+              "agent_path": true,
+              "no_or_unknown_capabilities": true,
+              "deterministic": true
+            }
+          },
+          "remediation": "Preserve the select_relevant_outputs contract: selected \u222a excluded \u222a skip-skills == validated, full passthrough for deliverables/agent path/unknown capabilities."
+        }
+      ]
+    },
+    {
+      "name": "retrieval_context",
+      "display": "Retrieval Context (RAG)",
+      "weight": 0.25,
+      "score": 8.625,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "CM-11",
+          "name": "RAG Packing, Auto-Merge & Fallback",
+          "weight": 0.55,
+          "threshold": 7.0,
+          "score": 7.5,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "parents": 9,
+            "children": 9,
+            "auto_merge": {
+              "merged_parent_blocks": 0,
+              "block_levels": [
+                [
+                  "child",
+                  null
+                ]
+              ]
+            },
+            "char_budget": {
+              "default_total": 2836,
+              "default_budget": 8000,
+              "default_ok": true,
+              "custom_total": 1408,
+              "custom_ok": true
+            },
+            "formatting": {
+              "blocks": 3,
+              "first_label": "[rag_corpus.md \u203a Procurement Context Memo \u2014 Aranya Digital Services > Contract Escalations]"
+            },
+            "graceful_empties": true,
+            "fallback_truncation": {
+              "chunks": 2,
+              "max_len": 1200
+            }
+          },
+          "remediation": "Check _auto_merge thresholds/char budget and retrieve_context formatting in app/services/document_index.py; keep empty-input short-circuits."
+        },
+        {
+          "id": "CM-12",
+          "name": "Retrieval Relevance",
+          "weight": 0.45,
+          "threshold": 6.0,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "hit_rate": 1.0,
+            "mrr": 1.0,
+            "hits": 8,
+            "total": 8,
+            "per_query": [
+              {
+                "query": "oracle auto-escalation clause percentage",
+                "expect": "12 percent",
+                "hit": true,
+                "rank": 1
+              },
+              {
+                "query": "zenmark net-60 working capital release",
+                "expect": "4.2 crore",
+                "hit": true,
+                "rank": 1
+              },
+              {
+                "query": "trifecta travel desk consolidation airfare saving",
+                "expect": "18 percent",
+                "hit": true,
+                "rank": 1
+              },
+              {
+                "query": "when does the cloudspire enterprise agreement renew",
+                "expect": "September 2026",
+                "hit": true,
+                "rank": 1
+              },
+              {
+                "query": "velmora msme payment rule",
+                "expect": "45-day",
+                "hit": true,
+                "rank": 1
+              },
+              {
+                "query": "harbourline insurance premium increase",
+                "expect": "22 percent",
+                "hit": true,
+                "rank": 1
+              },
+              {
+                "query": "northgate lease break clause date",
+                "expect": "March 2027",
+                "hit": true,
+                "rank": 1
+              },
+              {
+                "query": "unclaimed kavetail rebates value",
+                "expect": "2.1 crore",
+                "hit": true,
+                "rank": 1
+              }
+            ]
+          },
+          "remediation": "Improve retrieval recall \u2014 chunk granularity, keyword/embedding scoring, or auto-merge thresholds in document_index."
+        }
+      ]
+    },
+    {
+      "name": "conversational_context",
+      "display": "Conversational Context",
+      "weight": 0.15,
+      "score": 10.0,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "CM-09",
+          "name": "Chat Window & Field Caps",
+          "weight": 0.55,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "window": {
+              "turn_count": 3,
+              "labels": [
+                "t44",
+                "t46",
+                "t48"
+              ],
+              "expected_labels": [
+                "t44",
+                "t46",
+                "t48"
+              ]
+            },
+            "content_caps": {
+              "max_turn_chars": 800
+            },
+            "malformed_turns_skipped": true,
+            "slice_caps": {
+              "categories": true,
+              "pt_opportunities": true,
+              "initiatives": true,
+              "value_matrix": true,
+              "root_findings": true,
+              "renewals": true,
+              "context_summary": true
+            },
+            "non_dict_outputs_safe": true,
+            "doc_excerpt_limits": [
+              4,
+              2
+            ]
+          },
+          "remediation": "Keep build_chat_context windowing (last 6 turns \u00d7 800 chars) and per-field slices; guard non-dict skill outputs."
+        },
+        {
+          "id": "CM-10",
+          "name": "Chat Context Boundedness",
+          "weight": 0.45,
+          "threshold": 7.5,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "per_field": {
+              "recent_turns": {
+                "many_items_bounded": true,
+                "fat_content_bounded": true,
+                "credit": 1.0
+              },
+              "categories": {
+                "many_items_bounded": true,
+                "fat_content_bounded": true,
+                "credit": 1.0
+              },
+              "payment_terms_opportunities": {
+                "many_items_bounded": true,
+                "fat_content_bounded": true,
+                "credit": 1.0
+              },
+              "document_context": {
+                "many_items_bounded": true,
+                "fat_content_bounded": true,
+                "credit": 1.0
+              },
+              "deep_research_summary": {
+                "fat_content_bounded": true,
+                "credit": 1.0
+              },
+              "business_override_note": {
+                "fat_content_bounded": true,
+                "credit": 1.0
+              },
+              "probe_answers": {
+                "many_items_bounded": true,
+                "fat_content_bounded": true,
+                "credit": 1.0
+              },
+              "portfolio_probes": {
+                "many_items_bounded": true,
+                "fat_content_bounded": true,
+                "credit": 1.0
+              }
+            },
+            "unbounded_fields": [],
+            "bounded_contribution_chars": 5000,
+            "note": "no overall token gate exists in build_chat_context"
+          },
+          "remediation": "Add per-field char caps in build_chat_context for deep_research_summary, business_override_note, probe answer/probe item contents and slimmed-row string fields, plus an overall _estimate_tokens gate analogous to reflect_advisory's."
+        }
+      ]
+    }
+  ],
+  "top_gaps": [],
+  "remediation_roadmap": []
+}

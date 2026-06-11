@@ -88,49 +88,7 @@ def compose_response_from_advisory(
                     lines.append(f"  - Why this is credible: {first_evidence}")
                 lines.append("- Leadership decision needed: confirm execution ownership and the first 30-60-90 day governance milestones.")
         lines.append("")
-    if advisory.category_focus_section:
-        lines.append("**Focused optimization view**")
-        lines.append(advisory.category_focus_section)
-        lines.append("")
-    if category_focused and advisory.business_levers:
-        lines.append("**Focused category recommendations**")
-        for lever in advisory.business_levers[:4]:
-            lines.append(f"- **{lever.lever_name}**: {lever.what_changes}")
-        lines.append("")
-        lines.append("**Business logic with specifics**")
-        for lever in advisory.business_levers[:4]:
-            lines.append(f"- **{lever.lever_name}**")
-            lines.append(f"  - Why this releases value: {lever.why_it_works}")
-            if lever.evidence:
-                lines.append(f"  - Evidence anchor: {lever.evidence[0]}")
-            if len(lever.evidence) > 1:
-                lines.append(f"  - Additional specificity: {lever.evidence[1]}")
-        lines.append("")
-    if advisory.quick_wins_from_data:
-        lines.append("**From your data: quick wins**")
-        for x in advisory.quick_wins_from_data[:5]:
-            lines.append(f"- {x}")
-        lines.append("")
-    if advisory.business_levers and not category_focused:
-        lines.append("**Business levers (what should change)**")
-        for lever in advisory.business_levers[:4]:
-            lines.append(f"- **{lever.lever_name}**: {lever.what_changes}")
-            lines.append(f"  - Why it works: {lever.why_it_works}")
-            if lever.evidence:
-                lines.append(f"  - Evidence: {lever.evidence[0]}")
-                if len(lever.evidence) > 1:
-                    lines.append(f"  - Additional evidence: {lever.evidence[1]}")
-            lines.append("  - Value-release logic: convert the measured gap into codified operating/commercial changes and lock savings into run-rate.")
-        lines.append("")
-    if advisory.executive_callouts:
-        lines.append("**Executive call-outs**")
-        for c in advisory.executive_callouts[:3]:
-            lines.append(f"- {c}")
-        lines.append("")
-    if advisory.priority_actions_30_60_90:
-        lines.append("**30-60-90 day actions**")
-        for a in advisory.priority_actions_30_60_90[:3]:
-            lines.append(f"- Day {a.timeline}: {a.action} ({a.expected_impact})")
+    # Structured sections render via presentation.blocks — see assemble_assistant_payload.
     return "\n".join(lines).strip()
 def format_business_case_for_chat(bc: Dict[str, Any]) -> str:
     """Format business case dict for display in chat (no docx created)."""
@@ -141,13 +99,29 @@ def format_business_case_for_chat(bc: Dict[str, Any]) -> str:
         lines.append(f"**{title}**")
         if isinstance(value, str):
             lines.append(value)
+        elif isinstance(value, dict) and "headers" in value and "rows" in value:
+            headers = [str(h) for h in value.get("headers", [])]
+            if headers:
+                lines.append("| " + " | ".join(headers) + " |")
+                lines.append("| " + " | ".join("---" for _ in headers) + " |")
+                for row in value.get("rows", []):
+                    cells = [str(c) for c in row[: len(headers)]]
+                    while len(cells) < len(headers):
+                        cells.append("")
+                    lines.append("| " + " | ".join(cells) + " |")
         elif isinstance(value, list):
             for item in value:
                 if isinstance(item, dict) and "deduped_mid_savings" in item:
                     cat = item.get("category_id", item.get("category_name", ""))
                     lines.append(f"• {cat}: {format_currency(float(item.get('deduped_mid_savings', 0) or 0))} savings")
+                elif isinstance(item, dict) and item.get("lever_name"):
+                    cat = item.get("category_name") or item.get("category_id") or ""
+                    lever = item.get("lever_name") or item.get("lever") or "Initiative"
+                    npv = item.get("net_npv")
+                    npv_txt = f" · NPV {format_currency(float(npv))}" if npv is not None else ""
+                    lines.append(f"• **{lever}** ({cat}){npv_txt}")
                 elif isinstance(item, dict):
-                    lines.append(f"• {item}")
+                    lines.append(f"• {item.get('action') or item.get('lever_name') or item}")
                 else:
                     lines.append(f"• {item}")
         else:

@@ -26,15 +26,51 @@ def test_needs_llm_advisory_true_for_value_bridge_intent() -> None:
         assert needs_llm_advisory(ctx, validated) is True
 
 
+def test_needs_llm_advisory_true_for_category_focused_root_cause_without_value_bridge() -> None:
+    """A "what drives spend in <category>" turn runs root-cause-analyzer/peer-benchmarker
+    but not necessarily value-bridge-calculator/savings-modeler — it still warrants an
+    LLM narrative when the question is category-focused, so it isn't left to the generic
+    whole-portfolio build_response_text fallback."""
+    ctx = ObserveContext(
+        user_message="What drives spend in HR & Recruitment?",
+        intent_class="value_bridge",
+        explicit_category="HR & Recruitment",
+        query_capabilities=["root_cause", "value_modeling"],
+    )
+    validated = {
+        "spend-profiler": {"category_profile": [], "total_spend": 1_000_000},
+        "root-cause-analyzer": {"root_cause_findings": []},
+        "peer-benchmarker": {"comparisons": []},
+    }
+    with patch("app.opar.reflect_advisory.GEMINI_ENABLED", True):
+        assert needs_llm_advisory(ctx, validated, category_focused=True) is True
+        assert needs_llm_advisory(ctx, validated, category_focused=False) is True
+
+
+def test_needs_llm_advisory_true_for_drill_down_with_spend_profiler_only() -> None:
+    ctx = ObserveContext(
+        user_message="What are the top savings opportunities?",
+        intent_class="drill_down",
+    )
+    validated = {
+        "spend-profiler": {
+            "category_profile": [{"category_name": "IT", "spend": 500_000}],
+            "total_spend": 5_000_000,
+        },
+    }
+    with patch("app.opar.reflect_advisory.ANTHROPIC_ENABLED", True):
+        assert needs_llm_advisory(ctx, validated) is True
+
+
 def test_generate_skipped_when_not_needed() -> None:
     ctx = ObserveContext(user_message="hello", intent_class="general_qa")
-    advisory, thinking = generate_llm_advisory_sections(ctx, {}, {}, category_focused=False)
+    advisory, thinking, _skip = generate_llm_advisory_sections(ctx, {}, {}, category_focused=False)
     assert advisory is None
     assert thinking is None
 
 
 def test_resolve_analysis_synthesizer_prefers_gemini_when_configured() -> None:
-    with patch("app.opar.reflect_advisory.LLM_PROVIDER", "gemini"), patch(
+    with patch("app.opar.reflect_advisory.get_resolved_llm_provider", return_value="gemini"), patch(
         "app.opar.reflect_advisory.GEMINI_ENABLED", True
     ):
         fn = resolve_analysis_synthesizer()
@@ -43,7 +79,7 @@ def test_resolve_analysis_synthesizer_prefers_gemini_when_configured() -> None:
 
 
 def test_resolve_analysis_synthesizer_falls_back_to_claude() -> None:
-    with patch("app.opar.reflect_advisory.LLM_PROVIDER", "anthropic"), patch(
+    with patch("app.opar.reflect_advisory.get_resolved_llm_provider", return_value="anthropic"), patch(
         "app.opar.reflect_advisory.ANTHROPIC_ENABLED", True
     ), patch("app.opar.reflect_advisory.GEMINI_ENABLED", False):
         fn = resolve_analysis_synthesizer()
@@ -74,6 +110,6 @@ def test_format_helpers_return_none_when_data_missing() -> None:
 
 def test_barrel_reexports_advisory_entry_points() -> None:
     ctx = ObserveContext(user_message="hello", intent_class="general_qa")
-    advisory, thinking = barrel_generate(ctx, {}, {}, category_focused=False)
+    advisory, thinking, _skip = barrel_generate(ctx, {}, {}, category_focused=False)
     assert advisory is None
     assert thinking is None

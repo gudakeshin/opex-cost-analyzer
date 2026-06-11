@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from typing import Any, Dict, List, Tuple
 
@@ -11,23 +12,45 @@ from app.config import (
     AGENT_THINKING_BUDGET,
     GEMINI_API_KEY,
     GEMINI_ENABLED,
-    GEMINI_MODEL,
-    GEMINI_THINKING_MODEL,
-    GEMINI_TOOL_MODEL,
     logger,
 )
+from app.services.llm_selection import get_resolved_llm_model, submit_with_context
 from app.opar.agent_runtime import ToolCall, ToolDefinition, ToolLoopTransport
+
+_GEMINI_QUOTA_EXHAUSTED_UNTIL: float = 0.0
+_GEMINI_QUOTA_COOLDOWN_S = 300
+
+
+def is_gemini_quota_exhausted() -> bool:
+    return time.time() < _GEMINI_QUOTA_EXHAUSTED_UNTIL
+
+
+def mark_gemini_quota_exhausted(cooldown_s: int = _GEMINI_QUOTA_COOLDOWN_S) -> None:
+    global _GEMINI_QUOTA_EXHAUSTED_UNTIL
+    _GEMINI_QUOTA_EXHAUSTED_UNTIL = time.time() + max(cooldown_s, 30)
+    logger.warning('"gemini_quota_exhausted cooldown_s=%d"', cooldown_s)
+
+
+def _maybe_mark_gemini_quota_error(exc: BaseException) -> bool:
+    msg = str(exc).upper()
+    if "429" in msg or "RESOURCE_EXHAUSTED" in msg or "QUOTA" in msg:
+        mark_gemini_quota_exhausted()
+        return True
+    return False
 
 CHAT_RESPONSE_SYSTEM_PROMPT = """You are an FP&A copilot embedded in an OpEx cost intelligence platform.
 Answer the user's question using ONLY the JSON context provided. Never invent numbers, suppliers, or categories.
 
 Rules:
-- Match the user's exact analytical dimension (supplier, geo, category, payment terms, etc.).
+- Answer the user's *actual* question first — do not default to a portfolio spend summary unless they asked for one.
+- Match the user's exact analytical dimension (supplier, geo, category, payment terms, savings lever, contract renewal, etc.).
+- If they ask about contract renegotiation, renewals, or a savings lever, use modeled_initiatives, value_matrix_rows, contract_renewals, and document_context — not spend totals alone.
 - If they ask for a supplier breakdown, list ranked suppliers with spend amounts and % of category — never substitute a category portfolio breakdown.
 - If they ask for geo/region breakdown, use top_geos data.
+- Use document_excerpts and document_context.constraints when the question references contracts, policies, or uploaded documents.
 - Use the reporting currency from session_context when formatting money (₹ Cr for INR).
 - Write concise markdown: short intro, then a ranked list or table, then 1-2 insight bullets if warranted.
-- If data for the requested dimension is missing, say so clearly and suggest what upload would help.
+- If data for the requested dimension is missing, say so clearly and suggest running value-at-the-table analysis or uploading a contract register.
 - Do not mention JSON, prompts, or internal system mechanics.
 """
 
@@ -51,18 +74,24 @@ def call_gemini(
     model: str | None = None,
 ) -> str:
     """Call Gemini via google-genai SDK and return response text."""
+    if is_gemini_quota_exhausted():
+        raise RuntimeError("Gemini quota exhausted (cached)")
     from google.genai import types  # type: ignore
 
-    active_model = model or GEMINI_MODEL
+    active_model = model or get_resolved_llm_model(provider="gemini")
     client = _genai_client()
-    response = client.models.generate_content(
-        model=active_model,
-        contents=user_content,
-        config=types.GenerateContentConfig(
-            system_instruction=system,
-            max_output_tokens=max_tokens,
-        ),
-    )
+    try:
+        response = client.models.generate_content(
+            model=active_model,
+            contents=user_content,
+            config=types.GenerateContentConfig(
+                system_instruction=system,
+                max_output_tokens=max_tokens,
+            ),
+        )
+    except Exception as exc:
+        _maybe_mark_gemini_quota_error(exc)
+        raise
     text = getattr(response, "text", None) or ""
     logger.debug('"gemini call ok","model":"%s","tokens":%d}', active_model, max_tokens)
     return text.strip()
@@ -76,20 +105,26 @@ def call_gemini_with_thinking(
     thinking_budget: int | None = None,
 ) -> Tuple[str, str | None]:
     """Call a Gemini 2.5 reasoning model with thinking budget enabled."""
+    if is_gemini_quota_exhausted():
+        raise RuntimeError("Gemini quota exhausted (cached)")
     from google.genai import types  # type: ignore
 
-    active_model = model or GEMINI_THINKING_MODEL
+    active_model = model or get_resolved_llm_model(thinking=True, provider="gemini")
     budget = thinking_budget if thinking_budget is not None else AGENT_THINKING_BUDGET
     client = _genai_client()
-    response = client.models.generate_content(
-        model=active_model,
-        contents=user_content,
-        config=types.GenerateContentConfig(
-            system_instruction=system,
-            max_output_tokens=max_tokens,
-            thinking_config=types.ThinkingConfig(thinking_budget=budget),
-        ),
-    )
+    try:
+        response = client.models.generate_content(
+            model=active_model,
+            contents=user_content,
+            config=types.GenerateContentConfig(
+                system_instruction=system,
+                max_output_tokens=max_tokens,
+                thinking_config=types.ThinkingConfig(thinking_budget=budget),
+            ),
+        )
+    except Exception as exc:
+        _maybe_mark_gemini_quota_error(exc)
+        raise
     thinking_parts: list[str] = []
     candidate = response.candidates[0] if getattr(response, "candidates", None) else None
     if candidate and getattr(candidate, "content", None):
@@ -114,7 +149,7 @@ class GeminiToolTransport(ToolLoopTransport):
         thinking_budget: int | None = None,
         max_output_tokens: int = 4096,
     ) -> None:
-        self.model = model or GEMINI_TOOL_MODEL
+        self.model = model or get_resolved_llm_model(provider="gemini")
         self.thinking_budget = thinking_budget if thinking_budget is not None else AGENT_THINKING_BUDGET
         self.max_output_tokens = max_output_tokens
 
@@ -241,18 +276,27 @@ def synthesize_chat_response_gemini(
         "Answer the user's question from this context. Return markdown only.\n"
         f"{json.dumps(context, ensure_ascii=False)}"
     )
-    timeout_s = 35 if thinking_enabled else 8
+    from app.config import llm_synthesis_timeout_seconds, llm_thinking_timeout_seconds
+
+    payload_bytes = len(user_prompt)
+    timeout_s = (
+        llm_thinking_timeout_seconds()
+        if thinking_enabled
+        else llm_synthesis_timeout_seconds(payload_bytes)
+    )
     max_tokens = 2048 if thinking_enabled else 1024
     executor = ThreadPoolExecutor(max_workers=1)
     if thinking_enabled:
-        future: Future[Any] = executor.submit(
+        future: Future[Any] = submit_with_context(
+            executor,
             call_gemini_with_thinking,
             CHAT_RESPONSE_SYSTEM_PROMPT,
             user_prompt,
             max_tokens,
         )
     else:
-        future = executor.submit(
+        future = submit_with_context(
+            executor,
             call_gemini,
             CHAT_RESPONSE_SYSTEM_PROMPT,
             user_prompt,
@@ -288,6 +332,7 @@ def synthesize_analysis_gemini(
     thinking_budget_tokens: int = 8000,
     deep_research_summary: str | None = None,
     retrieved_context: List[str] | None = None,
+    available_analyses: List[Dict[str, str]] | None = None,
 ) -> Tuple[Dict[str, Any] | None, str | None]:
     """Synthesize executive recommendations via Gemini (mirrors synthesize_analysis_claude)."""
     if not GEMINI_ENABLED:
@@ -302,7 +347,7 @@ def synthesize_analysis_gemini(
         _truncate_doc_chunks,
     )
 
-    payload = {
+    payload: Dict[str, Any] = {
         "user_message": user_message,
         "session_context": {
             "company_name": manifest.get("company_name"),
@@ -317,6 +362,8 @@ def synthesize_analysis_gemini(
     }
     if deep_research_summary:
         payload["deep_research_context"] = deep_research_summary
+    if available_analyses:
+        payload["available_analyses"] = available_analyses
     sme_data = _slim_sme_critique(skill_outputs.get("sme-critique"))
     if sme_data:
         payload["sme_critique_data"] = sme_data
@@ -329,22 +376,31 @@ def synthesize_analysis_gemini(
             "- Each business lever must include specific operational/commercial changes.\n"
             "- Include at least 2 executive_callouts with concrete numbers.\n"
             "- Include at least 3 quick_wins_from_data.\n"
-            "- If the user question targets a specific category: `category_focus_section` MUST be "
-            "a decision-memo-quality analysis of at least 250 words. Write 3-5 paragraphs. "
-            "Name the exact suppliers and amounts from the data. Do NOT write a single sentence. "
-            "Explain the causal mechanism, not just the gap. "
-            "Make it self-contained — a CFO must be able to act on it without reading anything else.\n"
+            "- `category_focus_section` MUST be structured causal prose (200-450 words): ## subheadings "
+            "with 2-3 sentence paragraphs under each — not bullet-only, not a data dump. "
+            "Single category: ## Why the gap exists, ## What should change, ## Leadership decision. "
+            "Portfolio: one ## [Category name] section per priority category. "
+            "Explain mechanism and leadership decision; supplier names only when illustrating causality.\n"
         )
     user_prompt = (
         "Synthesize recommendations from this JSON context:\n"
         f"{json.dumps(payload, ensure_ascii=False)}\n"
         f"{strict_hint}"
     )
-    timeout_s = 35 if thinking_enabled else 8
+    from app.opar.claude_client import _timeout_budget_seconds
+
+    from app.config import llm_thinking_timeout_seconds
+
+    timeout_s = (
+        llm_thinking_timeout_seconds()
+        if thinking_enabled
+        else _timeout_budget_seconds(payload, strict_mode=strict_mode)
+    )
     max_tokens = 1800
     executor = ThreadPoolExecutor(max_workers=1)
     if thinking_enabled:
-        future: Future[Any] = executor.submit(
+        future: Future[Any] = submit_with_context(
+            executor,
             call_gemini_with_thinking,
             ANALYSIS_SYNTHESIS_SYSTEM_PROMPT,
             user_prompt,
@@ -352,7 +408,8 @@ def synthesize_analysis_gemini(
             thinking_budget=thinking_budget_tokens,
         )
     else:
-        future = executor.submit(
+        future = submit_with_context(
+            executor,
             call_gemini,
             ANALYSIS_SYNTHESIS_SYSTEM_PROMPT,
             user_prompt,

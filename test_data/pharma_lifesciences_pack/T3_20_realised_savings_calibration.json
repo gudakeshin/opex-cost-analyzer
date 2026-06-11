@@ -1,0 +1,38 @@
+[
+  {
+    "engagement_id": "eng-zpl-fy24",
+    "initiative_id": "INI-1",
+    "lever_id": "cro_panel_consolidation",
+    "pack_id": "pharma_lifesciences",
+    "planned_p50_cr": 18.0,
+    "realised_cr": 15.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "medium",
+    "notes": "Quality dependencies slowed panel reduction; 3 CROs retained vs target 3 (different therapeutic areas)."
+  },
+  {
+    "engagement_id": "eng-zpl-fy24",
+    "initiative_id": "INI-2",
+    "lever_id": "field_force_productivity",
+    "pack_id": "pharma_lifesciences",
+    "planned_p50_cr": 14.0,
+    "realised_cr": 18.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "CRM + digital detailing reduced headcount requirement; exceeded plan."
+  },
+  {
+    "engagement_id": "eng-zpl-fy24",
+    "initiative_id": "INI-3",
+    "lever_id": "gmp_audit_rationalisation",
+    "pack_id": "pharma_lifesciences",
+    "planned_p50_cr": 8.0,
+    "realised_cr": 7.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "SGS consolidated as preferred QC vendor; minor saving vs plan."
+  }
+]

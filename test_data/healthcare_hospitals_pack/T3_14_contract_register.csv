@@ -1,0 +1,6 @@
+supplier,category,contract_status,contract_expiry_date,auto_renewal_notice_days,early_exit_penalty_pct,min_purchase_commitment,currency
+Siemens Healthineers,Biomedical Equipment Maintenance,in_contract,2027-03-31,120,15,1740000000,INR
+GE Healthcare India,Biomedical Equipment Maintenance,in_contract,2026-09-30,90,12,1260000000,INR
+3M India,Medical Consumables & Supplies,in_contract,2026-06-30,60,5,2760000000,INR
+Johnson & Johnson India,Medical Consumables & Supplies,in_contract,2026-03-31,60,8,2340000000,INR
+ISS Facility Services,Facility Management,in_contract,2026-12-31,90,10,1140000000,INR

@@ -32,17 +32,27 @@ SECTOR_PACK_TO_BENCHMARK: Dict[str, str] = {
     "hospitality_travel": "retail_consumer",
     "pharma_lifesciences": "healthcare",
     "healthcare_hospitals": "healthcare",
-    "energy_utilities": "manufacturing",
-    "telecom_infra": "technology",
+    "energy_utilities": "energy_utilities",
+    "telecom_infra": "telecom_infra",
     "manufacturing_diversified": "manufacturing",
     "psu_cpse": "manufacturing",
     "conglomerate": "manufacturing",
 }
 
+# Packs that still borrow a coarser industry's percentiles (no dedicated benchmark
+# key of their own). Resolution surfaces a benchmark_confidence_note for these so
+# downstream readers know the peer comparison is approximate. telecom_infra,
+# energy_utilities and gcc_capability_centers now map to themselves and are excluded.
+FALLBACK_MAPPINGS: Dict[str, str] = {
+    pack: bench for pack, bench in SECTOR_PACK_TO_BENCHMARK.items() if pack != bench
+}
+
 
 def benchmark_industry_for(industry: str) -> str:
     """Resolve a sector-pack id (or raw industry) to a benchmark-registry key."""
-    key = (industry or "").strip()
+    from app.services.sector_packs import resolve_sector_pack_id
+
+    key = resolve_sector_pack_id(industry) or (industry or "").strip()
     result = SECTOR_PACK_TO_BENCHMARK.get(key, key)
     if result == key and key and key not in SECTOR_PACK_TO_BENCHMARK.values():
         from app.config import logger
@@ -458,14 +468,28 @@ def resolve_benchmark_payload(
     Select the best dataset for a run and resolve the actual benchmark payload.
 
     Resolution order:
-    1. Sector-pack-specific benchmarks_percentiles.json (highest priority — public_disclosure data)
-    2. Best uploaded/registered dataset from registry
-    3. Global seed (industry_benchmarks.json) — fallback
+    1. Registered dataset from registry with specificity_score > 0.85 (licensed/custom data wins)
+    2. Sector-pack-specific benchmarks_percentiles.json (public-disclosure defaults)
+    3. Best uploaded/registered dataset (lower specificity)
+    4. Global seed (industry_benchmarks.json) — fallback
+
+    A deliberately-registered external dataset (specificity > 0.85) overrides sector-pack defaults
+    so that clients who upload licensed benchmark data get it honoured.
 
     Falls back to seed benchmarks if the selected dataset has no readable data file.
     """
-    # 1. Sector-pack-specific percentile file (takes priority over registry + seed)
-    if industry and industry in SECTOR_PACK_TO_BENCHMARK:
+    bench_key = benchmark_industry_for(industry)
+    selection = select_best_dataset(industry=bench_key, categories=categories, annual_revenue=annual_revenue)
+
+    # Check whether the best registered dataset has high enough specificity to
+    # override the sector-pack default. specificity > 0.85 indicates a licensed
+    # or deliberately-uploaded external dataset — honour it over the public-disclosure
+    # sector-pack percentiles (which sit at 0.85).
+    best_registered = selection.get("selected")
+    best_spec = float((best_registered or {}).get("specificity_score") or 0.0)
+    use_sector_pack = best_spec <= 0.85 and industry and industry in SECTOR_PACK_TO_BENCHMARK
+
+    if use_sector_pack:
         pack_data = _load_sector_pack_benchmarks(industry)
         if pack_data:
             selected_meta = _sector_pack_dataset_meta(industry, pack_data)
@@ -481,9 +505,7 @@ def resolve_benchmark_payload(
                 "candidates": [{"dataset_id": selected_meta["dataset_id"], "source": selected_meta["source"], "score": 0.85}],
             }
 
-    bench_key = benchmark_industry_for(industry)
-    selection = select_best_dataset(industry=bench_key, categories=categories, annual_revenue=annual_revenue)
-    selected = selection.get("selected") or _load_seed_dataset()
+    selected = best_registered or _load_seed_dataset()
     payload = read_json(SEED_PATH, {})
     data_ref = selected.get("data_file_ref")
     if data_ref:
@@ -501,9 +523,15 @@ def resolve_benchmark_payload(
         benchmarks = dict(benchmarks)
         benchmarks[industry] = benchmarks[bench_key]
         payload = {**payload, "benchmarks": benchmarks}
+    selection_rationale = dict(selection.get("selection_rationale", {}))
+    if industry in FALLBACK_MAPPINGS:
+        selection_rationale["benchmark_confidence_note"] = (
+            f"'{industry}' has no dedicated benchmark set; comparison uses "
+            f"'{FALLBACK_MAPPINGS[industry]}' percentiles as an approximation."
+        )
     return {
         "benchmark_data": payload,
         "selected_dataset": selected,
-        "selection_rationale": selection.get("selection_rationale", {}),
+        "selection_rationale": selection_rationale,
         "candidates": selection.get("candidates", []),
     }

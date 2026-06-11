@@ -1,0 +1,257 @@
+{
+  "eval_date": "2026-06-07",
+  "platform_version": "v2.1",
+  "overall_score": 9.912,
+  "passed": true,
+  "fixture_count": 7,
+  "llm_judge_active": false,
+  "domains": [
+    {
+      "name": "parse_normalize",
+      "display": "Parse & Normalize",
+      "weight": 0.45,
+      "score": 10.0,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "DP-01",
+          "name": "Parse Success Rate",
+          "weight": 0.3,
+          "threshold": 9.0,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "parsed": 7,
+            "total": 7,
+            "errors": {}
+          },
+          "remediation": "Inspect parse_document / parse_spend_file_with_report for the failing format; add a parser branch or fix the reader."
+        },
+        {
+          "id": "DP-02",
+          "name": "Schema Role Accuracy",
+          "weight": 0.3,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "clean_spend.csv": {
+              "correct": 5,
+              "expected": 5,
+              "score": 10.0
+            },
+            "multi_sheet.xlsx": {
+              "correct": 4,
+              "expected": 4,
+              "score": 10.0
+            }
+          },
+          "remediation": "Extend the token lists in ingestion.infer_tabular_schema role_map so the column header maps to the right semantic_role."
+        },
+        {
+          "id": "DP-03",
+          "name": "Sheet Selection Correctness",
+          "weight": 0.15,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "multi_sheet.xlsx": {
+              "selected": {
+                "name": "Transactions",
+                "role": "transaction_ledger",
+                "header_row": 0
+              },
+              "expected_ledger": "Transactions",
+              "score": 10.0
+            }
+          },
+          "remediation": "Tune ingestion.score_workbook_sheets header/role heuristics so the transaction ledger outranks summary/assumptions sheets."
+        },
+        {
+          "id": "DP-04",
+          "name": "Normalization Fidelity",
+          "weight": 0.25,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "clean_spend.csv": {
+              "line_count_ok": true,
+              "total_ok": true,
+              "currency_ok": true,
+              "score": 10.0
+            },
+            "multi_sheet.xlsx": {
+              "line_count_ok": true,
+              "total_ok": true,
+              "currency_ok": true,
+              "score": 10.0
+            },
+            "spend.json": {
+              "line_count_ok": true,
+              "total_ok": true,
+              "currency_ok": true,
+              "score": 10.0
+            }
+          },
+          "remediation": "Check _dataframe_to_spend_lines amount coercion and currency capture; ensure all data rows normalize to NormalizedSpendLine."
+        }
+      ]
+    },
+    {
+      "name": "chunk_retrieve",
+      "display": "Chunk & Retrieve",
+      "weight": 0.35,
+      "score": 9.75,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "DP-05",
+          "name": "Chunk Structure Integrity",
+          "weight": 0.4,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "context_memo.txt": {
+              "parents": 5,
+              "children": 8,
+              "empty": 0,
+              "orphans": 0,
+              "score": 10.0
+            },
+            "notes.txt": {
+              "parents": 1,
+              "children": 1,
+              "empty": 0,
+              "orphans": 0,
+              "score": 10.0
+            },
+            "context_memo.docx": {
+              "parents": 1,
+              "children": 1,
+              "empty": 0,
+              "orphans": 0,
+              "score": 10.0
+            }
+          },
+          "remediation": "Review chunking.split_markdown_hierarchical: avoid empty children, propagate heading_path, keep child sizes under DOC_CHILD_CHARS, split table rows."
+        },
+        {
+          "id": "DP-06",
+          "name": "Retrieval Precision",
+          "weight": 0.4,
+          "threshold": 6.0,
+          "score": 9.5,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "hit_rate": 1.0,
+            "mrr": 0.88,
+            "hits": 4,
+            "total": 4,
+            "per_fixture": {
+              "context_memo.txt": [
+                {
+                  "query": "IT & Technology annual spend in the cost summary",
+                  "hit": true,
+                  "rank": 2
+                },
+                {
+                  "query": "When does the Oracle maintenance contract renew?",
+                  "hit": true,
+                  "rank": 1
+                }
+              ],
+              "notes.txt": [
+                {
+                  "query": "How many regional travel desks are there?",
+                  "hit": true,
+                  "rank": 1
+                }
+              ],
+              "context_memo.docx": [
+                {
+                  "query": "Oracle contract renewal date",
+                  "hit": true,
+                  "rank": 1
+                }
+              ]
+            }
+          },
+          "remediation": "Improve retrieval recall \u2014 chunk granularity, keyword/embedding scoring, or auto-merge thresholds in document_index."
+        },
+        {
+          "id": "DP-07",
+          "name": "Parse Fidelity (LLM judge)",
+          "weight": 0.2,
+          "threshold": 6.0,
+          "score": 0.0,
+          "passed": true,
+          "skipped": true,
+          "gap": 6.0,
+          "evidence": {
+            "note": "skipped \u2014 no LLM provider (set ANTHROPIC_API_KEY or GEMINI_API_KEY)"
+          },
+          "remediation": "Improve extraction fidelity (enable LlamaParse for PDF/DOCX, or fix native parse_document) so headings/numbers survive."
+        }
+      ]
+    },
+    {
+      "name": "quality_signals",
+      "display": "Quality Signals",
+      "weight": 0.2,
+      "score": 10.0,
+      "passed": true,
+      "dimensions": [
+        {
+          "id": "DP-08",
+          "name": "Quality-Flag Capture",
+          "weight": 1.0,
+          "threshold": 7.0,
+          "score": 10.0,
+          "passed": true,
+          "skipped": false,
+          "gap": 0.0,
+          "evidence": {
+            "clean_spend.csv": {
+              "flags_present": true,
+              "zero_spend_warning_ok": true,
+              "score": 10.0
+            },
+            "multi_sheet.xlsx": {
+              "flags_present": true,
+              "zero_spend_warning_ok": true,
+              "score": 10.0
+            },
+            "spend.json": {
+              "flags_present": true,
+              "zero_spend_warning_ok": true,
+              "score": 10.0
+            },
+            "malformed.csv": {
+              "flags_present": true,
+              "zero_spend_warning_ok": true,
+              "score": 10.0
+            }
+          },
+          "remediation": "Ensure _enrich_ingestion_report sets rows_parsed/rows_with_amount/total_amount and raises zero_spend_warning + warnings on bad input."
+        }
+      ]
+    }
+  ],
+  "top_gaps": [],
+  "remediation_roadmap": []
+}

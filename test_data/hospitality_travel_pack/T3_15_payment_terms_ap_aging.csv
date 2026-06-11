@@ -1,0 +1,6 @@
+vendor,payment_terms_days,invoice_date,payment_date,amount,currency,aging_bucket
+Booking.com,45,2025-01-10,2025-02-26,195000000,INR,0-30
+Siemens Building Tech,60,2025-01-05,2025-03-10,120000000,INR,31-60
+Oracle Hospitality,30,2025-01-18,2025-02-15,70000000,INR,61-90
+Johnson Controls,30,2025-01-20,2025-02-18,80000000,INR,0-30
+ISS Facility Services,7,2025-01-01,2025-01-07,80000000,INR,31-60

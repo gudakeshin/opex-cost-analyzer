@@ -703,6 +703,13 @@ def _build_report(
 def _write_json(report: EvalReport, path: Path, raw_scores: Dict) -> None:
     payload = {
         "eval_date": report.eval_date,
+        "score_type": "structural",
+        "scope": (
+            "Structural quality: schema compliance, numerical faithfulness, output "
+            "completeness, causal-field presence. Does NOT validate whether recommendations "
+            "are analytically correct or savings assumptions match real-world data. "
+            "See run_llm_judge_eval.py for content-quality assessment."
+        ),
         "platform_version": report.platform_version,
         "overall_score": round(report.overall_score, 3),
         "passed": report.passed,
@@ -751,6 +758,11 @@ def _write_markdown(report: EvalReport, path: Path, dim_results: Optional[Dict[s
         f"Scenarios run: {report.scenario_run_count} | Scenarios successfully executed: {report.scenario_pass_count}",
         f"",
         f"> This eval scores the quality of skill outputs (numerical faithfulness, recommendation specificity, evidence grounding, priority ranking, coverage completeness, causal reasoning, decision memo quality, action timeframe clarity) by running the analysis pipeline against 5 golden spend scenarios. No LLM calls are made by the scorer — all checks are deterministic.",
+        f">",
+        f"> ⚠️ **SCORE TYPE: STRUCTURAL** — This score measures schema compliance and structural",
+        f"> output integrity. It does NOT validate whether recommendations are analytically correct",
+        f"> or that savings assumptions reflect real-world data. See `run_llm_judge_eval.py` (LJ-01..05)",
+        f"> for content-quality assessment.",
         f"",
     ]
 

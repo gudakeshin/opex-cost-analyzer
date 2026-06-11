@@ -1,0 +1,11 @@
+supplier,description,amount,currency,category,gl_code,spend_date,business_unit,country
+ITC Agribusiness,Staples & packaged foods procurement — food & grocery FY25,6720000000,INR,Cost of Goods Sold,510010,2024-12-01,Food & Grocery,India
+Hindustan Unilever,"FMCG products — soaps, homecare, personal care",5040000000,INR,Cost of Goods Sold,510011,2024-11-15,Food & Grocery,India
+Procter & Gamble India,P&G product range — homecare & personal care,3780000000,INR,Cost of Goods Sold,510012,2024-10-05,General Merchandise,India
+CBRE India (Leasing),Store lease & occupancy — 480 stores,3360000000,INR,Store Operations & Occupancy,520010,2024-09-12,Corporate,India
+Nestle India,"Beverages, dairy & confectionery",2520000000,INR,Cost of Goods Sold,510013,2024-08-20,Food & Grocery,India
+Delhivery Ltd,Last-mile & fulfilment logistics FY25,1680000000,INR,Logistics & Supply Chain,530010,2024-07-01,E-Commerce,India
+MSME Food Suppliers,Fresh produce & regional staples — localised sourcing,1260000000,INR,Cost of Goods Sold,510014,2024-06-15,Food & Grocery,India
+Infosys BPM (Retail Tech),"Retail POS, inventory management & e-comm platform",1120000000,INR,Technology & Digital,540010,2025-01-10,Corporate,India
+Dentsu India,Marketing campaigns — brand & trade promotions,840000000,INR,Marketing & Promotions,550010,2025-02-01,Corporate,India
+Blue Dart Express,Express delivery — electronics & fashion,620000000,INR,Logistics & Supply Chain,530011,2024-05-01,E-Commerce,India

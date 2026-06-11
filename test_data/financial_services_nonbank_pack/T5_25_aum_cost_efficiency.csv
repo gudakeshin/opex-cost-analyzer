@@ -1,0 +1,7 @@
+segment,product_type,aum_inr_cr,revenue_inr_cr,distribution_cost_bps,tech_cost_bps,compliance_cost_bps,total_opex_bps
+Asset Management,Equity Active,82000,1480,54,28,14,118
+Asset Management,Debt,52000,520,38,18,10,82
+Asset Management,Hybrid,28000,420,46,22,12,98
+Asset Management,Index & ETF,23000,92,12,8,6,38
+Wealth Management,HNI Portfolio,8200,842,28,35,18,108
+Wealth Management,Family Office,3800,468,18,42,22,118

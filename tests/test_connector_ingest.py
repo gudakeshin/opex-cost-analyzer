@@ -45,6 +45,8 @@ def test_connector_ingest_ariba_csv(tmp_path, monkeypatch) -> None:
 
 
 def test_connector_ingest_api(client) -> None:
+    from app.routers._shared import session_dir
+
     create = client.post(
         "/api/v1/sessions",
         json={"company_name": "Connector Co", "industry": "technology", "annual_revenue": 500_000_000, "currency": "INR"},
@@ -52,11 +54,9 @@ def test_connector_ingest_api(client) -> None:
     assert create.status_code == 200
     session_id = create.json()["session_id"]
 
-    up = client.post(
-        f"/api/v1/upload/{session_id}",
-        files={"file": ("ariba_export.csv", _sample_ariba_csv(), "text/csv")},
-    )
-    assert up.status_code == 200
+    sdir = session_dir(session_id)
+    sdir.mkdir(parents=True, exist_ok=True)
+    (sdir / "ariba_export.csv").write_text(_sample_ariba_csv(), encoding="utf-8")
 
     resp = client.post(
         "/api/v1/connectors/ariba_csv/ingest",

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import time
 
+from tests.session_test_utils import seed_session_upload
+
 from app.services.cache import (
     CostRoomCache,
     MID_CAP_LIMIT,
@@ -154,12 +156,8 @@ def test_performance_smoke_upload_and_analyze_under_budget(client) -> None:
     session_id = session.json()["session_id"]
 
     start_upload = time.perf_counter()
-    up = client.post(
-        f"/api/upload/{session_id}",
-        files={"file": ("perf_spend.csv", _generate_csv(), "text/csv")},
-    )
+    seed_session_upload(session_id, "perf_spend.csv", _generate_csv(), "text/csv")
     upload_secs = time.perf_counter() - start_upload
-    assert up.status_code == 200
     # Generous bound: shared CI runners are 2-3x slower than dev machines; this
     # smoke test guards against gross regressions, not a tight SLO.
     assert upload_secs < 20.0
@@ -175,13 +173,33 @@ def test_performance_smoke_upload_and_analyze_under_budget(client) -> None:
 
 
 def test_rejects_file_larger_than_50mb(client) -> None:
-    session = client.post("/api/sessions", json={"company_name": "Big File Co"})
-    session_id = session.json()["session_id"]
+    create = client.post(
+        "/api/v1/engagements",
+        json={
+            "company_name": "Big File Co",
+            "industry": "technology",
+            "annual_revenue": 1_000_000_000,
+            "currency": "INR",
+        },
+    )
+    assert create.status_code == 200
+    engagement_id = create.json()["engagement_id"]
     too_large = b"a" * (51 * 1024 * 1024)
     response = client.post(
-        f"/api/upload/{session_id}",
+        f"/api/v1/engagements/{engagement_id}/documents",
         files={"file": ("too_large.txt", too_large, "text/plain")},
     )
     assert response.status_code == 413
     assert "File exceeds" in response.text
+
+
+def test_session_upload_endpoint_deprecated(client) -> None:
+    session = client.post("/api/sessions", json={"company_name": "Legacy Co"})
+    session_id = session.json()["session_id"]
+    response = client.post(
+        f"/api/v1/upload/{session_id}",
+        files={"file": ("legacy.csv", b"a,b\n1,2", "text/csv")},
+    )
+    assert response.status_code == 410
+    assert "deprecated" in response.json()["detail"].lower()
 

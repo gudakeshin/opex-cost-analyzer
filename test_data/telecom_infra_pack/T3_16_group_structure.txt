@@ -1,0 +1,9 @@
+Pragati Telecom Networks Ltd — Group Structure
+
+PTNL-IN: India parent (NSE/BSE listed; promoter 51.4% stake; FII 28.2%). ERP: SAP S4HANA.
+PTNL-INFRA: Pragati Tower Infrastructure Ltd (India; passive tower subsidiary — 42000 towers). ERP: Oracle Fusion.
+PTNL-DATA: Pragati Data Networks Ltd (India; fiber & enterprise connectivity). ERP: SAP S4HANA.
+
+Entity tree: PTNL-IN > PTNL-INFRA (100%), PTNL-DATA (100%)
+
+Governance: SEBI LODR. DoT-licensed telecom entity — regulatory change risk. Related-party: PTNL-IN pays tower rental to PTNL-INFRA (arm's-length; TRAI monitored). Ind AS 116 applies to co-location agreements. IC flagged related_party=yes for intra-group tower rental.

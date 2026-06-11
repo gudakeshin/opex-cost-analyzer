@@ -1,0 +1,11 @@
+supplier,description,amount,currency,category,gl_code,spend_date,business_unit,country
+Mahindra Logistics,Plant-to-plant & finished goods freight — auto components FY25,1820000000,INR,Logistics & Freight,510010,2024-12-10,Auto Components,India
+Blue Dart Express,Express freight & imports customs clearance,980000000,INR,Logistics & Freight,510011,2024-11-20,Capital Goods,India
+Tata Power,Industrial electricity — Pune & Nashik plants,1260000000,INR,Energy & Utilities,520010,2025-01-15,Auto Components,India
+Adani Electricity,Industrial power — Ahmedabad plant,840000000,INR,Energy & Utilities,520011,2024-10-05,Specialty Chemicals,India
+SKF India,Bearings & precision components — maintenance spares,620000000,INR,Maintenance & Spares,530010,2024-09-12,Auto Components,India
+Bosch India,Electronic control units & tooling maintenance,580000000,INR,Maintenance & Spares,530011,2024-08-20,Auto Components,India
+Quippo Industrial,Subcontract machining & fabrication — capital goods,760000000,INR,Contract Manufacturing & Subcontracting,540010,2024-07-01,Capital Goods,India
+DB Schenker India,International freight & warehousing — export orders,680000000,INR,Logistics & Freight,510012,2024-06-15,Capital Goods,Germany
+EY India,Statutory audit & indirect tax advisory,380000000,INR,Professional Services,550010,2024-05-01,Corporate,India
+KPMG India,Internal audit & risk advisory,280000000,INR,Professional Services,550011,2025-02-01,Corporate,India

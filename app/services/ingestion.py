@@ -709,6 +709,52 @@ def _compute_file_hash(file_path: Path) -> str:
     return h.hexdigest()
 
 
+# ---------------------------------------------------------------------------
+# Data-quality helpers (v2.3)
+# ---------------------------------------------------------------------------
+
+_CREDIT_TOKENS: frozenset = frozenset([
+    "credit", "reversal", "refund", "rebate", "return", "adjustment",
+    "clawback", "write-back", "writeback", "contra",
+])
+
+
+def _compute_line_quality_score(
+    supplier: str,
+    description: str,
+    category_id: str,
+    gl_code: Optional[str],
+    cost_center: Optional[str],
+    spend_date: Optional[str],
+) -> float:
+    """Return 0.0–1.0: fraction of key fields populated for a spend line.
+
+    Weights: supplier 0.25 | description 0.20 | category 0.25 | gl 0.10 | cc 0.10 | date 0.10
+    """
+    score = 0.0
+    if supplier and supplier not in ("Unknown", ""):
+        score += 0.25
+    if description and description not in ("N/A", ""):
+        score += 0.20
+    if category_id and category_id not in ("uncategorized", "other", ""):
+        score += 0.25
+    if gl_code:
+        score += 0.10
+    if cost_center:
+        score += 0.10
+    if spend_date:
+        score += 0.10
+    return round(min(1.0, score), 3)
+
+
+def _is_credit_or_reversal(amount: float, description: str) -> bool:
+    """True when the line is a credit memo, reversal, or refund."""
+    if amount < 0:
+        return True
+    desc_lower = description.lower()
+    return any(token in desc_lower for token in _CREDIT_TOKENS)
+
+
 def infer_tabular_schema(file_path: Path) -> Dict[str, Any]:
     frame = _read_tabular(file_path)
     columns = [str(c) for c in frame.columns]
@@ -1110,6 +1156,16 @@ def _dataframe_to_spend_lines(
         is_addressable = _compute_addressable(spend_type, related_party_flag)
         is_intercompany = True if related_party_flag or spend_type == "intercompany" else None
 
+        line_quality = _compute_line_quality_score(
+            supplier or "Unknown",
+            description or "N/A",
+            category_id,
+            gl_code,
+            cost_center,
+            date_raw,
+        )
+        credit_flag = _is_credit_or_reversal(amount, description or "")
+
         out.append(
             NormalizedSpendLine(
                 row_id=row_id_start + i,
@@ -1148,6 +1204,9 @@ def _dataframe_to_spend_lines(
                 # Classification
                 spend_type=cast(Literal["opex", "capex", "lease", "statutory", "intercompany"], spend_type),
                 is_addressable=is_addressable,
+                # Data quality (v2.3)
+                data_quality_score=line_quality,
+                is_credit_or_reversal=credit_flag,
             )
         )
     return out, mapping_note
@@ -1161,12 +1220,23 @@ def _enrich_ingestion_report(
     """Attach spend-quality flags so the UI can warn on zero-total ingests."""
     total_amount = sum(float(line.amount) for line in lines)
     rows_with_amount = sum(1 for line in lines if float(line.amount) != 0.0)
+    credit_count = sum(1 for line in lines if line.is_credit_or_reversal)
+    avg_quality = (
+        round(sum(line.data_quality_score for line in lines) / len(lines), 3)
+        if lines else 0.0
+    )
     quality: Dict[str, Any] = {
         "rows_parsed": len(lines),
         "rows_with_amount": rows_with_amount,
         "total_amount": round(total_amount, 2),
         "zero_spend_warning": total_amount == 0.0
         and (len(lines) > 0 or int(report.pop("_empty_parse_rows", 0) or 0) > 0),
+        "avg_line_quality_score": avg_quality,
+        "credit_or_reversal_count": credit_count,
+        "data_quality_note": (
+            "Low field-coverage detected — confidence bands will be widened."
+            if avg_quality < 0.60 else None
+        ),
     }
     if mapping_note:
         quality["column_mapping_note"] = mapping_note
@@ -1495,7 +1565,7 @@ def parse_document(file_path: Path, ocr_lang: str = "eng") -> str:
     Falls back to text extraction (no OCR) when pytesseract is not installed.
     """
     suffix = file_path.suffix.lower()
-    if suffix == ".txt":
+    if suffix in (".txt", ".md"):
         return file_path.read_text(encoding="utf-8", errors="ignore")
     if suffix == ".docx":
         doc = Document(file_path)

@@ -1,0 +1,6 @@
+supplier,category,contract_status,contract_expiry_date,auto_renewal_notice_days,early_exit_penalty_pct,min_purchase_commitment,currency
+Booking.com,Marketing & Distribution,in_contract,2026-03-31,90,0,2340000000,INR
+Siemens Building Tech,Property Maintenance & Utilities,in_contract,2027-03-31,120,12,1440000000,INR
+Oracle Hospitality,Technology & PMS,in_contract,2027-09-30,180,20,840000000,INR
+Johnson Controls,Property Maintenance & Utilities,in_contract,2026-06-30,90,10,960000000,INR
+ISS Facility Services,Staffing,rolling,,30,0,0,INR

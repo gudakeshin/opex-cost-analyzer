@@ -1,0 +1,3 @@
+Sahyadri Power & Utilities Ltd — FY26 Cost Mandate
+
+From: MD & CEO. Controllable O&M cost per MW grew 6% in FY25 above CERC normative. Target: controllable OpEx per MW to 170-175 Lakhs by FY27. Reduction: 6-10% addressable O&M and technology spend. Spare parts: inventory days from 68 to 50. Hurdle: 24-month payback, WACC 12.0%. Tax 25.17%. Re-forecast freeze 2026-07-01. Run-rate savings preferred. Constraints: no deferral of statutory safety inspections or RPO. GE/Siemens exit penalties must be fully modelled. SCADA change: parallel-run one full quarter before cutover.

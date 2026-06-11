@@ -58,6 +58,23 @@ def list_available_packs() -> List[str]:
     )
 
 
+def resolve_sector_pack_id(industry: str) -> str:
+    """Map a user-selected or detected industry label to a sector pack id."""
+    from app.skills.engine._loaders import _resolve_pack_id
+
+    return _resolve_pack_id((industry or "").strip())
+
+
+def normalize_industry_selection(industry: str | None) -> str | None:
+    """Normalize a user industry choice to a sector pack id for storage and analysis."""
+    if industry is None:
+        return None
+    stripped = industry.strip()
+    if not stripped:
+        return None
+    return resolve_sector_pack_id(stripped) or stripped
+
+
 @lru_cache(maxsize=32)
 def _load_pack_cached(pack_id: str) -> Dict[str, Any]:
     pack_dir = _SECTOR_PACKS_ROOT / pack_id
@@ -211,6 +228,8 @@ def run_regression_test(pack_id: str) -> Dict[str, Any]:
         sector_levers = _load_json(skills_levers_path).get("sector_specific_levers", [])
     bad_p50: List[str] = []
     bad_playbook: List[str] = []
+    bad_effort: List[str] = []
+    bad_applicability: List[str] = []
     for lv in sector_levers:
         lid = lv.get("lever_id", "?")
         sr = lv.get("savings_range_pct") or {}
@@ -219,12 +238,24 @@ def run_regression_test(pack_id: str) -> Dict[str, Any]:
         for field in ("execution_playbook", "diagnostic_signals", "required_data_fields"):
             if not lv.get(field):
                 bad_playbook.append(f"{lid}.{field}")
+        # effort_weeks is aliased over implementation_weeks in code — accept either.
+        ew = lv.get("effort_weeks") or lv.get("implementation_weeks") or {}
+        if not ew.get("p50"):
+            bad_effort.append(lid)
+        if lv.get("applicability_threshold_pct") is None:
+            bad_applicability.append(lid)
     checks["lever_p50_present"] = len(bad_p50) == 0
     checks["lever_playbook_fields"] = len(bad_playbook) == 0
+    checks["lever_effort_weeks"] = len(bad_effort) == 0
+    checks["lever_applicability_threshold"] = len(bad_applicability) == 0
     if bad_p50:
         errors.append(f"Sector levers missing savings_range_pct.p50: {bad_p50}")
     if bad_playbook:
         errors.append(f"Sector levers missing playbook fields: {bad_playbook[:10]}")
+    if bad_effort:
+        errors.append(f"Sector levers missing effort_weeks/implementation_weeks.p50: {bad_effort}")
+    if bad_applicability:
+        errors.append(f"Sector levers missing applicability_threshold_pct: {bad_applicability}")
 
     passed = all(checks.values())
     return {"passed": passed, "pack_id": pack_id, "version": pack["version"], "checks": checks, "errors": errors}

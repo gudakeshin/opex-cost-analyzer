@@ -1,0 +1,38 @@
+[
+  {
+    "engagement_id": "eng-bbrl-fy24",
+    "initiative_id": "INI-1",
+    "lever_id": "lease_renegotiation",
+    "pack_id": "retail_organized",
+    "planned_p50_cr": 36.0,
+    "realised_cr": 32.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Lease renegotiation on 80 stores; landlords agreed 8-12% rent reduction in exchange for extended lease terms."
+  },
+  {
+    "engagement_id": "eng-bbrl-fy24",
+    "initiative_id": "INI-2",
+    "lever_id": "logistics_redesign",
+    "pack_id": "retail_organized",
+    "planned_p50_cr": 24.0,
+    "realised_cr": 28.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Hub-spoke redesign exceeded plan; Delhivery cross-docking reduced last-mile cost per order by 14%."
+  },
+  {
+    "engagement_id": "eng-bbrl-fy24",
+    "initiative_id": "INI-3",
+    "lever_id": "shrinkage_reduction",
+    "pack_id": "retail_organized",
+    "planned_p50_cr": 18.0,
+    "realised_cr": 14.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "medium",
+    "notes": "Tagging & surveillance investment delivered partial shrinkage reduction; full benefit expected FY26."
+  }
+]

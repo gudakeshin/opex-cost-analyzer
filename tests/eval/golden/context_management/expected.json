@@ -1,0 +1,25 @@
+{
+ "preslim_token_band": [
+  90000,
+  120000
+ ],
+ "llm_token_limit": 80000,
+ "skip_skills": [
+  "business-case-builder",
+  "chart-builder",
+  "dashboard-builder",
+  "data-classifier",
+  "data-validator",
+  "document-contextualizer",
+  "export-formatter",
+  "llm-context-builder",
+  "pii-stripper"
+ ],
+ "core_synthesis_skills": [
+  "evidence-gatherer",
+  "savings-modeler",
+  "sme-critique",
+  "spend-profiler",
+  "value-bridge-calculator"
+ ]
+}

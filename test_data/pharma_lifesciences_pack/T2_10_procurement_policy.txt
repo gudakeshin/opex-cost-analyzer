@@ -1,0 +1,8 @@
+Zenith Pharma Ltd — Procurement Policy
+
+1) Three bids above 50 Lakh for APIs, CROs, and logistics. USFDA/EMA-approved suppliers mandatory for regulated market APIs.
+2) API dual-sourcing mandatory for top 20 molecules (geopolitical risk); single-source requires CPO + CMC sign-off.
+3) GMP-certified laboratories only for QC testing; ISO 17025 accreditation mandatory.
+4) Cold chain: GDP-certified carriers only; temperature excursion risk assessment before carrier change.
+5) MSME API vendors: 45-day payment.
+6) FY26 target: reduce API vendor count from 48 to 28; CRO panel from 6 to 3.

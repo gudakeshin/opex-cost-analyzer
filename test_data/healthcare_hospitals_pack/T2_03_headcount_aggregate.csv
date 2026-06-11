@@ -1,0 +1,46 @@
+business_unit,function,location,band,headcount
+Multi-Speciality Hospitals,Operations,India,Entry (B1-B2),360
+Multi-Speciality Hospitals,Operations,India,Mid (B3-B4),280
+Multi-Speciality Hospitals,Operations,India,Senior (B5-B6),120
+Multi-Speciality Hospitals,Finance,India,Entry (B1-B2),360
+Multi-Speciality Hospitals,Finance,India,Mid (B3-B4),280
+Multi-Speciality Hospitals,Finance,India,Senior (B5-B6),120
+Multi-Speciality Hospitals,HR,India,Entry (B1-B2),360
+Multi-Speciality Hospitals,HR,India,Mid (B3-B4),280
+Multi-Speciality Hospitals,HR,India,Senior (B5-B6),120
+Diagnostics,Operations,India,Entry (B1-B2),450
+Diagnostics,Operations,India,Mid (B3-B4),350
+Diagnostics,Operations,India,Senior (B5-B6),150
+Diagnostics,Finance,India,Entry (B1-B2),450
+Diagnostics,Finance,India,Mid (B3-B4),350
+Diagnostics,Finance,India,Senior (B5-B6),150
+Diagnostics,HR,India,Entry (B1-B2),450
+Diagnostics,HR,India,Mid (B3-B4),350
+Diagnostics,HR,India,Senior (B5-B6),150
+Pharmacy,Operations,India,Entry (B1-B2),540
+Pharmacy,Operations,India,Mid (B3-B4),420
+Pharmacy,Operations,India,Senior (B5-B6),180
+Pharmacy,Finance,India,Entry (B1-B2),540
+Pharmacy,Finance,India,Mid (B3-B4),420
+Pharmacy,Finance,India,Senior (B5-B6),180
+Pharmacy,HR,India,Entry (B1-B2),540
+Pharmacy,HR,India,Mid (B3-B4),420
+Pharmacy,HR,India,Senior (B5-B6),180
+Homecare,Operations,India,Entry (B1-B2),630
+Homecare,Operations,India,Mid (B3-B4),489
+Homecare,Operations,India,Senior (B5-B6),210
+Homecare,Finance,India,Entry (B1-B2),630
+Homecare,Finance,India,Mid (B3-B4),489
+Homecare,Finance,India,Senior (B5-B6),210
+Homecare,HR,India,Entry (B1-B2),630
+Homecare,HR,India,Mid (B3-B4),489
+Homecare,HR,India,Senior (B5-B6),210
+Telemedicine,Operations,India,Entry (B1-B2),720
+Telemedicine,Operations,India,Mid (B3-B4),560
+Telemedicine,Operations,India,Senior (B5-B6),240
+Telemedicine,Finance,India,Entry (B1-B2),720
+Telemedicine,Finance,India,Mid (B3-B4),560
+Telemedicine,Finance,India,Senior (B5-B6),240
+Telemedicine,HR,India,Entry (B1-B2),720
+Telemedicine,HR,India,Mid (B3-B4),560
+Telemedicine,HR,India,Senior (B5-B6),240

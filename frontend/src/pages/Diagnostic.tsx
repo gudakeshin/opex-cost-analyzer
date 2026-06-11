@@ -25,8 +25,8 @@ import { useSession } from '../context/SessionContext';
 import {
   buildDiagnosticContextPatch,
   formStateFromManifest,
-  isDiagnosticResponse,
   parseUrlsText,
+  sessionDiagnosticResult,
 } from '../utils/diagnosticPersistence';
 import type {
   DiagnosticContextPatch,
@@ -61,7 +61,8 @@ const FORM_SAVE_DEBOUNCE_MS = 500;
 
 export const Diagnostic: React.FC = () => {
   const navigate = useNavigate();
-  const { sessionId, engagementId, ensureSession, refreshEngagement, engagement } = useSession();
+  const { sessionId, engagementId, ensureSessionForEngagement, refreshEngagement, engagement } =
+    useSession();
   const [activeSid, setActiveSid] = useState<string | null>(sessionId);
   const [hydrating, setHydrating] = useState(true);
   const [manifest, setManifest] = useState<SessionManifest | null>(null);
@@ -69,7 +70,7 @@ export const Diagnostic: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState('');
   const [industry, setIndustry] = useState('manufacturing_diversified');
-  const [revenueCr, setRevenueCr] = useState('5000');
+  const [revenueCr, setRevenueCr] = useState('');
   const [urlsText, setUrlsText] = useState('');
   const [result, setResult] = useState<DiagnosticResponse | null>(null);
   const [deepResearchSummary, setDeepResearchSummary] = useState<string | null>(null);
@@ -105,13 +106,17 @@ export const Diagnostic: React.FC = () => {
   );
 
   useEffect(() => {
+    engagementHydratedRef.current = false;
+  }, [engagementId]);
+
+  useEffect(() => {
     let cancelled = false;
 
     (async () => {
       setHydrating(true);
       skipFormSaveRef.current = true;
       try {
-        const sid = await ensureSession();
+        const sid = await ensureSessionForEngagement(engagementId ?? undefined);
         if (cancelled) return;
         setActiveSid(sid);
 
@@ -119,24 +124,28 @@ export const Diagnostic: React.FC = () => {
         if (cancelled) return;
         setManifest(m);
 
-        const form = formStateFromManifest(m, {
-          company_name: engagement.company_name,
-          industry: engagement.industry,
-          annual_revenue_cr: engagement.annual_revenue_cr,
-          detected_company_name: engagement.detected_company_name,
-          detected_industry: engagement.detected_industry,
-        });
+        const staleOpts = {
+          sessionEngagementId: m.engagement_id,
+          activeEngagementId: engagementId ?? undefined,
+        };
+        const form = formStateFromManifest(
+          m,
+          {
+            company_name: engagement.company_name,
+            industry: engagement.industry,
+            annual_revenue_cr: engagement.annual_revenue_cr,
+            detected_company_name: engagement.detected_company_name,
+            detected_industry: engagement.detected_industry,
+            detected_annual_revenue_cr: engagement.detected_annual_revenue_cr,
+          },
+          staleOpts,
+        );
         setCompanyName(form.companyName);
         setIndustry(form.industry);
         setRevenueCr(form.revenueCr);
         setUrlsText(form.urlsText);
 
-        if (m.diagnostic_result && isDiagnosticResponse(m.diagnostic_result)) {
-          setResult(m.diagnostic_result);
-        } else {
-          setResult(null);
-        }
-
+        setResult(sessionDiagnosticResult(m, staleOpts));
         setDeepResearchSummary(m.deep_research_summary ?? null);
       } catch {
         if (!cancelled) {
@@ -153,7 +162,7 @@ export const Diagnostic: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [sessionId, ensureSession]);
+  }, [sessionId, engagementId, ensureSessionForEngagement, engagement]);
 
   // Pre-fill form from engagement metadata (once, after hydration, only if form is empty)
   useEffect(() => {
@@ -173,6 +182,12 @@ export const Diagnostic: React.FC = () => {
     if (!industry && effectiveIndustry) setIndustry(effectiveIndustry);
     if (engagement.annual_revenue_cr && engagement.annual_revenue_cr > 0) {
       setRevenueCr(String(engagement.annual_revenue_cr));
+    } else if (
+      engagement.detected_annual_revenue_cr &&
+      engagement.detected_annual_revenue_cr > 0 &&
+      !revenueCr
+    ) {
+      setRevenueCr(String(engagement.detected_annual_revenue_cr));
     }
   }, [
     hydrating,
@@ -181,8 +196,10 @@ export const Diagnostic: React.FC = () => {
     engagement.industry,
     engagement.detected_industry,
     engagement.annual_revenue_cr,
+    engagement.detected_annual_revenue_cr,
     companyName,
     industry,
+    revenueCr,
   ]);
 
   // Fetch engagement document count for the context banner
@@ -230,11 +247,13 @@ export const Diagnostic: React.FC = () => {
   const handleStartSession = async () => {
     setHandoffLoading(true);
     try {
-      const sid = activeSid ?? (await ensureSession());
+      const sid = activeSid ?? (await ensureSessionForEngagement(engagementId ?? undefined));
       const patch: DiagnosticContextPatch = {
         company_name: companyName.trim() || undefined,
         industry,
-        annual_revenue_cr: parseFloat(revenueCr) || 5000,
+        annual_revenue_cr: revenueCr.trim()
+          ? parseFloat(revenueCr) || undefined
+          : undefined,
         diagnostic_urls: parseUrlsText(urlsText),
       };
       if (result) {
@@ -257,16 +276,21 @@ export const Diagnostic: React.FC = () => {
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!companyName.trim()) return;
+    const parsedRevenue = parseFloat(revenueCr);
+    if (!revenueCr.trim() || Number.isNaN(parsedRevenue) || parsedRevenue <= 0) {
+      setError('Enter annual revenue (₹ Cr) before running the diagnostic.');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const sid = activeSid ?? (await ensureSession());
+      const sid = activeSid ?? (await ensureSessionForEngagement(engagementId ?? undefined));
       setActiveSid(sid);
 
       const payload: DiagnosticRequest = {
         company_name: companyName.trim(),
         industry,
-        annual_revenue_cr: parseFloat(revenueCr) || 5000,
+        annual_revenue_cr: parsedRevenue,
         urls: parseUrlsText(urlsText),
         ...(engagementId ? { engagement_id: engagementId } : {}),
       };
@@ -403,12 +427,30 @@ export const Diagnostic: React.FC = () => {
                 />
               )}
             </div>
-            <Input
-              label="Annual Revenue (₹ Cr)"
-              type="number"
-              value={revenueCr}
-              onChange={(e) => setRevenueCr(e.target.value)}
-            />
+            <div>
+              <Input
+                label="Annual Revenue (₹ Cr)"
+                type="number"
+                value={revenueCr}
+                onChange={(e) => setRevenueCr(e.target.value)}
+                placeholder="Enter annual revenue…"
+                required
+              />
+              {engagement.detected_annual_revenue_cr != null &&
+                engagement.detected_annual_revenue_cr > 0 && (
+                  <RecommendedBadge
+                    className="mt-1"
+                    label={`${engagement.detected_annual_revenue_cr.toLocaleString('en-IN')} Cr`}
+                    matches={
+                      revenueCr.trim() !== '' &&
+                      parseFloat(revenueCr) === engagement.detected_annual_revenue_cr
+                    }
+                    onApply={() =>
+                      setRevenueCr(String(engagement.detected_annual_revenue_cr))
+                    }
+                  />
+                )}
+            </div>
             <div>
               <label className="block text-sm font-medium text-brand-ink mb-2">
                 Source URLs (one per line, optional)
@@ -451,7 +493,7 @@ export const Diagnostic: React.FC = () => {
                 key={`${activeSid ?? ''}-${manifest?.deep_research_interaction_id ?? 'none'}`}
                 companyName={companyName}
                 industry={industry}
-                revenueCr={parseFloat(revenueCr) || 5000}
+                revenueCr={parseFloat(revenueCr) || 0}
                 sessionId={activeSid}
                 onSummaryReady={handleDeepResearchReady}
                 initialInteractionId={manifest?.deep_research_interaction_id}

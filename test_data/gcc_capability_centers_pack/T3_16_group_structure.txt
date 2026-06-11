@@ -1,0 +1,7 @@
+Meridian Global Services India Pvt Ltd — Group Structure
+
+MGSI-IN: India GCC (wholly owned subsidiary of Meridian Global Inc, USA). ERP: Oracle ERP Cloud + Workday.
+MGS-US: Meridian Global Inc (US parent; Fortune 500). ERP: SAP S4HANA.
+MGS-UK: Meridian Global UK Ltd (UK operating entity). ERP: SAP S4HANA.
+
+MGSI-IN is a cost-plus entity: all costs recharged to MGS-US at cost + 12% markup per TP policy. IC recharge flagged related_party=yes (GL 640099). FEMA compliance for repatriation. Transfer pricing annually documented per Indian TP rules (Section 92 IT Act).

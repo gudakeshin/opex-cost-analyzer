@@ -1,8 +1,8 @@
 # OpEx Platform Feature Completeness Eval
 
-**Eval date**: 2026-06-05  
+**Eval date**: 2026-06-08  
 **Platform version**: 2.0  
-**Overall score**: 9.57/10  
+**Overall score**: 9.18/10  
 **Status**: PASS ✓
 
 ---
@@ -11,30 +11,35 @@
 
 | Domain | Score | Status |
 |--------|-------|--------|
-| Skill Pipeline Completeness (w=0.35) | 9.08/10 | PASS ✓ |
+| Skill Pipeline Completeness (w=0.35) | 9.11/10 | PASS ✓ |
 | Frontend-Backend API Connectivity (w=0.35) | 10.00/10 | PASS ✓ |
-| OPAR Loop Completeness (w=0.20) | 10.00/10 | PASS ✓ |
+| OPAR Loop Completeness (w=0.20) | 8.00/10 | PASS ✓ |
 | Infrastructure Completeness (w=0.10) | 8.95/10 | PASS ✓ |
 
 ---
 
 ## Top Gaps (ranked by severity)
 
+### OPAR_03 — Quality Gate Coverage in Reflect
+- **Score**: 3.33/10 (threshold 8.0, gap 4.67)
+- **Finding**: 1/3 required quality gate symbols present in reflect.py
+- **Remediation**: Add quality gate logic referencing: ['validate_core_skill_outputs', 'peer_benchmarker'] in app/opar/reflect.py.
+
 ### SP_02 — Dispatch Handler Implementation Depth
-- **Score**: 5.41/10 (threshold 8.0, gap 2.60)
-- **Finding**: 20/37 handlers have ≥5 non-blank lines (implemented)
+- **Score**: 5.53/10 (threshold 8.0, gap 2.47)
+- **Finding**: 21/38 handlers have ≥5 non-blank lines (implemented)
 - **Remediation**: Flesh out stub handlers for: ['spend-profiler', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].
 
 ---
 
 ## Skill Pipeline Completeness
 
-Domain score: **9.08/10** (PASS ✓)
+Domain score: **9.11/10** (PASS ✓)
 
 | Dimension | Score | Threshold | Status |
 |-----------|-------|-----------|--------|
 | Skill Directory-to-Dispatch Parity | 10.00 | 9.0 | ✓ |
-| Dispatch Handler Implementation Depth | 5.41 | 8.0 | ✗ |
+| Dispatch Handler Implementation Depth | 5.53 | 8.0 | ✗ |
 | Skill Output Contract Coverage | 10.00 | 7.0 | ✓ |
 | OPAR Intent-to-Plan Mapping Coverage | 10.00 | 8.0 | ✓ |
 
@@ -42,19 +47,19 @@ Domain score: **9.08/10** (PASS ✓)
 
 **Score**: 10.00/10 (threshold 9.0) — PASS ✓
 
-**Finding**: 36/36 skills registered in dispatch.py
+**Finding**: 37/37 skills registered in dispatch.py
 
-**Detail**: Found 36 skills/ dirs with SKILL.md. 36 are registered via @register() in dispatch.py. Unregistered (dead code): none.
+**Detail**: Found 37 skills/ dirs with SKILL.md. 37 are registered via @register() in dispatch.py. Unregistered (dead code): none.
 
 **Remediation**: All skills registered. Add CI parity check to prevent future drift.
 
 ### SP_02 — Dispatch Handler Implementation Depth
 
-**Score**: 5.41/10 (threshold 8.0) — FAIL ✗
+**Score**: 5.53/10 (threshold 8.0) — FAIL ✗
 
-**Finding**: 20/37 handlers have ≥5 non-blank lines (implemented)
+**Finding**: 21/38 handlers have ≥5 non-blank lines (implemented)
 
-**Detail**: Checked 37 @register() handlers. 20 have ≥5 non-blank lines indicating real logic. Potential stubs: ['spend-profiler', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].
+**Detail**: Checked 38 @register() handlers. 21 have ≥5 non-blank lines indicating real logic. Potential stubs: ['spend-profiler', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].
 
 **Remediation**: Flesh out stub handlers for: ['spend-profiler', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].
 
@@ -62,9 +67,9 @@ Domain score: **9.08/10** (PASS ✓)
 
 **Score**: 10.00/10 (threshold 7.0) — PASS ✓
 
-**Finding**: 37/37 registered skills have output contracts (or intentionally use inline dict)
+**Finding**: 38/38 registered skills have output contracts (or intentionally use inline dict)
 
-**Detail**: Checked contracts.py for Output class per registered skill. Skills missing a dedicated contract class: none. Skills intentionally using inline dict (no dedicated class): ['my-new-skill', 'root-cause-analyzer', 'savings-modeler', 'data-validator', 'sme-critique', 'chart-builder', 'business-case-builder', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'brsr-cobenefit-calculator', 'scenario-modeler', 'value-to-shareholder-bridge', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler', 'zbb-modeler', 'cost-to-serve-analyzer', 'dashboard-builder', 'export-formatter'].
+**Detail**: Checked contracts.py for Output class per registered skill. Skills missing a dedicated contract class: none. Skills intentionally using inline dict (no dedicated class): ['my-new-skill', 'root-cause-analyzer', 'savings-modeler', 'data-validator', 'evidence-gatherer', 'sme-critique', 'chart-builder', 'business-case-builder', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'brsr-cobenefit-calculator', 'scenario-modeler', 'value-to-shareholder-bridge', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler', 'zbb-modeler', 'cost-to-serve-analyzer', 'dashboard-builder', 'export-formatter'].
 
 **Remediation**: Contract coverage adequate. Consider adding classes for inline-dict skills.
 
@@ -95,9 +100,9 @@ Domain score: **10.00/10** (PASS ✓)
 
 **Score**: 10.00/10 (threshold 9.0) — PASS ✓
 
-**Finding**: 40/40 unique frontend API calls resolve to a backend route
+**Finding**: 41/41 unique frontend API calls resolve to a backend route
 
-**Detail**: Scanned all .tsx/.ts files under frontend/src for apiGet/apiPost/apiPut/apiUpload calls and href=/api/... links. Found 40 unique paths. Unresolved (would 404): none.
+**Detail**: Scanned all .tsx/.ts files under frontend/src for apiGet/apiPost/apiPut/apiUpload calls and href=/api/... links. Found 41 unique paths. Unresolved (would 404): none.
 
 **Remediation**: All frontend calls resolve. No broken links.
 
@@ -115,7 +120,7 @@ Domain score: **10.00/10** (PASS ✓)
 
 **Score**: 10.00/10 (threshold 6.0) — PASS ✓
 
-**Finding**: 40/40 unique frontend API calls use /api/v1/ prefix
+**Finding**: 41/41 unique frontend API calls use /api/v1/ prefix
 
 **Detail**: Backend marks /api/ (unversioned) paths as deprecated (Sunset: 2027-01-01). 0 frontend calls still use the deprecated /api/ prefix: [].
 
@@ -135,13 +140,13 @@ Domain score: **10.00/10** (PASS ✓)
 
 ## OPAR Loop Completeness
 
-Domain score: **10.00/10** (PASS ✓)
+Domain score: **8.00/10** (PASS ✓)
 
 | Dimension | Score | Threshold | Status |
 |-----------|-------|-----------|--------|
 | Phase Module Non-Empty Coverage | 10.00 | 9.0 | ✓ |
 | Intent Handler Coverage in Plan | 10.00 | 8.0 | ✓ |
-| Quality Gate Coverage in Reflect | 10.00 | 8.0 | ✓ |
+| Quality Gate Coverage in Reflect | 3.33 | 8.0 | ✗ |
 
 ### OPAR_01 — Phase Module Non-Empty Coverage
 
@@ -149,7 +154,7 @@ Domain score: **10.00/10** (PASS ✓)
 
 **Finding**: 4/4 OPAR phase modules exist with >100 lines
 
-**Detail**: Checked app/opar/observe.py, plan.py, act.py, reflect.py for existence and line count >100. Thin/missing: none. observe: 610 lines, plan: 686 lines, act: 332 lines, reflect: 1755 lines
+**Detail**: Checked app/opar/observe.py, plan.py, act.py, reflect.py for existence and line count >100. Thin/missing: none. observe: 741 lines, plan: 762 lines, act: 332 lines, reflect: 273 lines
 
 **Remediation**: All 4 OPAR phase modules are substantively implemented.
 
@@ -165,13 +170,13 @@ Domain score: **10.00/10** (PASS ✓)
 
 ### OPAR_03 — Quality Gate Coverage in Reflect
 
-**Score**: 10.00/10 (threshold 8.0) — PASS ✓
+**Score**: 3.33/10 (threshold 8.0) — FAIL ✗
 
-**Finding**: 3/3 required quality gate symbols present in reflect.py
+**Finding**: 1/3 required quality gate symbols present in reflect.py
 
-**Detail**: Searched reflect.py for ['validate_core_skill_outputs', 'savings', 'peer_benchmarker']. Present: ['validate_core_skill_outputs', 'savings', 'peer_benchmarker']. Missing: none.
+**Detail**: Searched reflect.py for ['validate_core_skill_outputs', 'savings', 'peer_benchmarker']. Present: ['savings']. Missing: ['validate_core_skill_outputs', 'peer_benchmarker'].
 
-**Remediation**: All required quality gate references present in reflect.py.
+**Remediation**: Add quality gate logic referencing: ['validate_core_skill_outputs', 'peer_benchmarker'] in app/opar/reflect.py.
 
 ---
 
@@ -219,5 +224,8 @@ Domain score: **8.95/10** (PASS ✓)
 
 ## Remediation Roadmap
 
-**1.** `sp_02` — Flesh out stub handlers for: ['spend-profiler', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].  
-*Closes gap of 2.6 pts (severity 0.1816)*
+**1.** `opar_03` — Add quality gate logic referencing: ['validate_core_skill_outputs', 'peer_benchmarker'] in app/opar/reflect.py.  
+*Closes gap of 4.7 pts (severity 0.2800)*
+
+**2.** `sp_02` — Flesh out stub handlers for: ['spend-profiler', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].  
+*Closes gap of 2.5 pts (severity 0.1732)*

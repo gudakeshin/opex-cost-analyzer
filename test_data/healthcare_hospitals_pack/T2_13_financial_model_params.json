@@ -1,0 +1,11 @@
+{
+  "company": "Aarogya Health Network Ltd",
+  "sector": "healthcare_hospitals",
+  "wacc": 0.12,
+  "effective_tax_rate": 0.2517,
+  "reporting_currency": "INR",
+  "annual_revenue_inr_cr": 8500,
+  "discount_rate": 0.12,
+  "execution_rate_pct": 70,
+  "notes": "WACC and tax rate per FY25 board pack for Aarogya Health Network Ltd."
+}

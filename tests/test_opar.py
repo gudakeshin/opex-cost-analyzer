@@ -37,6 +37,10 @@ def test_classify_intent_rule_based() -> None:
     assert _classify_intent_rule_based("hello") == ("general_qa", None)
     assert _classify_intent_rule_based("what can you do?") == ("general_qa", None)
     assert _classify_intent_rule_based("tell me about my results") == ("general_qa", None)
+    assert _classify_intent_rule_based("Give me the details of the contract renegotiations") == (
+        "savings_plan",
+        None,
+    )
 
 
 def test_classify_intent_with_meta_returns_confidence() -> None:
@@ -202,6 +206,16 @@ def test_should_use_cached_qa_fastpath_allows_simple_lookup() -> None:
         query_capabilities=[],
     )
     assert _should_use_cached_qa_fastpath(ctx, ctx.user_message) is True
+
+
+def test_should_use_cached_qa_fastpath_blocks_contract_detail_questions() -> None:
+    ctx = ObserveContext(
+        session_id="s1",
+        user_message="Give me the details of the contract renegotiations",
+        intent_class="general_qa",
+        query_capabilities=["document_context", "value_modeling"],
+    )
+    assert _should_use_cached_qa_fastpath(ctx, ctx.user_message) is False
 
 
 def test_answer_general_qa_savings_priorities_includes_sme_critique() -> None:

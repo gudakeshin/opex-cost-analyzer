@@ -1,0 +1,46 @@
+business_unit,function,location,band,headcount
+Power Projects,Operations,India,Entry (B1-B2),360
+Power Projects,Operations,India,Mid (B3-B4),280
+Power Projects,Operations,India,Senior (B5-B6),120
+Power Projects,Finance,India,Entry (B1-B2),360
+Power Projects,Finance,India,Mid (B3-B4),280
+Power Projects,Finance,India,Senior (B5-B6),120
+Power Projects,HR,India,Entry (B1-B2),360
+Power Projects,HR,India,Mid (B3-B4),280
+Power Projects,HR,India,Senior (B5-B6),120
+Industrial Systems,Operations,India,Entry (B1-B2),450
+Industrial Systems,Operations,India,Mid (B3-B4),350
+Industrial Systems,Operations,India,Senior (B5-B6),150
+Industrial Systems,Finance,India,Entry (B1-B2),450
+Industrial Systems,Finance,India,Mid (B3-B4),350
+Industrial Systems,Finance,India,Senior (B5-B6),150
+Industrial Systems,HR,India,Entry (B1-B2),450
+Industrial Systems,HR,India,Mid (B3-B4),350
+Industrial Systems,HR,India,Senior (B5-B6),150
+Infrastructure,Operations,India,Entry (B1-B2),540
+Infrastructure,Operations,India,Mid (B3-B4),420
+Infrastructure,Operations,India,Senior (B5-B6),180
+Infrastructure,Finance,India,Entry (B1-B2),540
+Infrastructure,Finance,India,Mid (B3-B4),420
+Infrastructure,Finance,India,Senior (B5-B6),180
+Infrastructure,HR,India,Entry (B1-B2),540
+Infrastructure,HR,India,Mid (B3-B4),420
+Infrastructure,HR,India,Senior (B5-B6),180
+Defence & Aerospace,Operations,India,Entry (B1-B2),630
+Defence & Aerospace,Operations,India,Mid (B3-B4),489
+Defence & Aerospace,Operations,India,Senior (B5-B6),210
+Defence & Aerospace,Finance,India,Entry (B1-B2),630
+Defence & Aerospace,Finance,India,Mid (B3-B4),489
+Defence & Aerospace,Finance,India,Senior (B5-B6),210
+Defence & Aerospace,HR,India,Entry (B1-B2),630
+Defence & Aerospace,HR,India,Mid (B3-B4),489
+Defence & Aerospace,HR,India,Senior (B5-B6),210
+Services,Operations,India,Entry (B1-B2),720
+Services,Operations,India,Mid (B3-B4),560
+Services,Operations,India,Senior (B5-B6),240
+Services,Finance,India,Entry (B1-B2),720
+Services,Finance,India,Mid (B3-B4),560
+Services,Finance,India,Senior (B5-B6),240
+Services,HR,India,Entry (B1-B2),720
+Services,HR,India,Mid (B3-B4),560
+Services,HR,India,Senior (B5-B6),240

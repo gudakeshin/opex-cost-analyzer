@@ -15,7 +15,7 @@
       },
       {
         "source_name": "Hackett Group",
-        "publication_title": "Hackett Group World-Class Performance Study \u2014 Finance & Procurement Benchmarks",
+        "publication_title": "Hackett Group World-Class Performance Study — Finance & Procurement Benchmarks",
         "publication_year": 2024,
         "url": "https://www.thehackettgroup.com/research/",
         "source_type": "published_research",
@@ -24,7 +24,7 @@
       },
       {
         "source_name": "Internal consulting framework",
-        "publication_title": "Cross-engagement OpEx benchmark synthesis \u2014 India & Global",
+        "publication_title": "Cross-engagement OpEx benchmark synthesis — India & Global",
         "publication_year": 2025,
         "source_type": "internal_calibration",
         "confidence": "internal",
@@ -32,8 +32,8 @@
       }
     ],
     "date_accessed": "2025-01-15",
-    "refresh_cycle": "Annual \u2014 next review due 2026-01",
-    "confidence_overall": "illustrative \u2014 not licensed production data. Values are reference ranges suitable for diagnostic benchmarking; should not be cited as authoritative in client deliverables without licensed data enrichment."
+    "refresh_cycle": "Annual — next review due 2026-01",
+    "confidence_overall": "illustrative — not licensed production data. Values are reference ranges suitable for diagnostic benchmarking; should not be cited as authoritative in client deliverables without licensed data enrichment."
   },
   "size_bands": {
     "small": {
@@ -212,6 +212,26 @@
           "P90": 12.0,
           "confidence": "illustrative",
           "source_note": "Intercompany charges; BSE related-party transaction disclosures."
+        },
+        "CLOUD_INFRA": {
+          "P25": 3.0,
+          "P50": 5.5,
+          "P75": 8.0,
+          "P90": 11.0,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Public-cloud + hosting spend as % of revenue for SaaS/tech firms."
+        },
+        "CUSTOMER_SUCCESS": {
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.0,
+          "P90": 7.0,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Customer success / support org cost as % of revenue."
         }
       }
     },
@@ -319,7 +339,7 @@
           "P75": 0.2,
           "P90": 0.4,
           "confidence": "illustrative",
-          "source_note": "Minimal \u2014 card/statement packaging only."
+          "source_note": "Minimal — card/statement packaging only."
         },
         "RND": {
           "P25": 0.3,
@@ -368,6 +388,16 @@
           "P90": 18.0,
           "confidence": "illustrative",
           "source_note": "Holding company charges, group IT recharges; BSE related-party disclosures."
+        },
+        "REGULATORY_COMPLIANCE": {
+          "P25": 1.5,
+          "P50": 2.5,
+          "P75": 4.0,
+          "P90": 6.0,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Compliance, audit and regulatory-reporting opex as % of revenue for BFSI."
         }
       }
     },
@@ -524,6 +554,16 @@
           "P90": 15.0,
           "confidence": "illustrative",
           "source_note": "Group recharges; BSE related-party transaction analysis FY24."
+        },
+        "RAW_MATERIALS": {
+          "P25": 30,
+          "P50": 42,
+          "P75": 52,
+          "P90": 60,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Direct materials as % of revenue; internal calibration across Indian discrete + process manufacturers."
         }
       }
     },
@@ -666,6 +706,36 @@
           "P90": 9.0,
           "confidence": "illustrative",
           "source_note": "Hospital group intercompany charges; BSE healthcare related-party disclosures."
+        },
+        "CLINICAL_SUPPLIES": {
+          "P25": 12,
+          "P50": 18,
+          "P75": 24,
+          "P90": 30,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Consumables, pharma and clinical supplies as % of revenue for Indian hospital chains."
+        },
+        "MEDICAL_DEVICES": {
+          "P25": 6,
+          "P50": 9,
+          "P75": 13,
+          "P90": 17,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Capex-amortised + rental medical devices/equipment as % of revenue."
+        },
+        "CLINICAL_STAFFING": {
+          "P25": 18,
+          "P50": 25,
+          "P75": 32,
+          "P90": 40,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Clinical staff (doctors, nursing, allied) cost as % of revenue."
         }
       }
     },
@@ -815,6 +885,26 @@
           "P90": 12.0,
           "confidence": "illustrative",
           "source_note": "Group franchise fees, shared services; BSE FMCG related-party disclosures."
+        },
+        "STORE_OPERATIONS": {
+          "P25": 8,
+          "P50": 12,
+          "P75": 16,
+          "P90": 20,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Store running cost (labour, utilities, upkeep) as % of revenue for organised retail."
+        },
+        "TRADE_SPEND": {
+          "P25": 5,
+          "P50": 9,
+          "P75": 14,
+          "P90": 18,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Trade/promotional spend and channel incentives as % of revenue."
         }
       }
     },
@@ -905,6 +995,429 @@
           "P75": 0.5,
           "P90": 0.9,
           "confidence": "illustrative"
+        },
+        "TALENT_ACQUISITION": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.0,
+          "P90": 4.5,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Recruitment, hiring and onboarding cost as % of revenue/operating budget for GCCs."
+        },
+        "SEAT_COST": {
+          "P25": 4.0,
+          "P50": 6.0,
+          "P75": 8.5,
+          "P90": 11.0,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Fully-loaded seat cost (real estate + IT + facilities per seat) as % of revenue."
+        }
+      }
+    },
+    "telecom_infra": {
+      "label": "Telecom & Digital Infrastructure (India)",
+      "categories": {
+        "IT": {
+          "P25": 4.5,
+          "P50": 6.2,
+          "P75": 8.5,
+          "P90": 11.0,
+          "unit": "% of revenue",
+          "confidence": "illustrative"
+        },
+        "PROF_SVCS": {
+          "P25": 1.0,
+          "P50": 2.2,
+          "P75": 3.8,
+          "P90": 5.5,
+          "confidence": "illustrative"
+        },
+        "FACILITIES": {
+          "P25": 1.5,
+          "P50": 2.8,
+          "P75": 4.2,
+          "P90": 6.0,
+          "confidence": "illustrative"
+        },
+        "TRAVEL": {
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.0,
+          "P90": 3.5,
+          "confidence": "illustrative"
+        },
+        "MARKETING": {
+          "P25": 5.0,
+          "P50": 8.0,
+          "P75": 12.0,
+          "P90": 18.0,
+          "confidence": "illustrative"
+        },
+        "HR": {
+          "P25": 1.0,
+          "P50": 1.8,
+          "P75": 2.8,
+          "P90": 4.0,
+          "confidence": "illustrative"
+        },
+        "TELECOM": {
+          "P25": 0.3,
+          "P50": 0.8,
+          "P75": 1.5,
+          "P90": 2.5,
+          "confidence": "illustrative"
+        },
+        "INSURANCE": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 1.5,
+          "confidence": "illustrative"
+        },
+        "OFFICE": {
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.6,
+          "P90": 1.0,
+          "confidence": "illustrative"
+        },
+        "POWER_ENERGY": {
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.2,
+          "P90": 2.0,
+          "confidence": "illustrative",
+          "source_note": "Office/data-centre power; BEE energy intensity benchmarks."
+        },
+        "PLANT_MAINTENANCE": {
+          "P25": 0.1,
+          "P50": 0.2,
+          "P75": 0.4,
+          "P90": 0.8,
+          "confidence": "illustrative",
+          "source_note": "Minimal physical plant; data-centre maintenance benchmarks."
+        },
+        "LOGISTICS_INDIA": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 2.0,
+          "confidence": "illustrative",
+          "source_note": "Device shipping, hardware logistics; CRISIL Logistics benchmark."
+        },
+        "BANKING_TREASURY": {
+          "P25": 0.1,
+          "P50": 0.2,
+          "P75": 0.4,
+          "P90": 0.7,
+          "confidence": "illustrative",
+          "source_note": "Bank charges, FX, treasury ops; RBI service-charge disclosures."
+        },
+        "PACKAGING": {
+          "P25": 0.0,
+          "P50": 0.1,
+          "P75": 0.2,
+          "P90": 0.4,
+          "confidence": "illustrative",
+          "source_note": "Negligible for most tech firms; hardware OEMs higher end."
+        },
+        "RND": {
+          "P25": 5.0,
+          "P50": 10.0,
+          "P75": 15.0,
+          "P90": 22.0,
+          "confidence": "illustrative",
+          "source_note": "Tech companies invest heavily in R&D; Nasscom IT industry benchmarks."
+        },
+        "CONTINGENT": {
+          "P25": 3.0,
+          "P50": 5.5,
+          "P75": 8.5,
+          "P90": 13.0,
+          "confidence": "illustrative",
+          "source_note": "Contractor/gig workforce heavy in IT; Staffing Industry Analysts (SIA)."
+        },
+        "FIN_SVCS": {
+          "P25": 0.3,
+          "P50": 0.5,
+          "P75": 0.9,
+          "P90": 1.4,
+          "confidence": "illustrative",
+          "source_note": "Finance/accounting ops; Hackett Group G&A benchmark."
+        },
+        "OUTSOURCED": {
+          "P25": 5.0,
+          "P50": 9.0,
+          "P75": 14.0,
+          "P90": 20.0,
+          "confidence": "illustrative",
+          "source_note": "BPO, outsourced support functions; NASSCOM ITES benchmark."
+        },
+        "BRSR_ESG": {
+          "P25": 0.1,
+          "P50": 0.2,
+          "P75": 0.5,
+          "P90": 0.9,
+          "confidence": "illustrative",
+          "source_note": "BRSR reporting, sustainability audit, ESG ratings; SEBI BRSR framework."
+        },
+        "RELATED_PARTY": {
+          "P25": 0.5,
+          "P50": 2.0,
+          "P75": 5.0,
+          "P90": 12.0,
+          "confidence": "illustrative",
+          "source_note": "Intercompany charges; BSE related-party transaction disclosures."
+        },
+        "CLOUD_INFRA": {
+          "P25": 3.0,
+          "P50": 5.5,
+          "P75": 8.0,
+          "P90": 11.0,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Public-cloud + hosting spend as % of revenue for SaaS/tech firms."
+        },
+        "CUSTOMER_SUCCESS": {
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.0,
+          "P90": 7.0,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Customer success / support org cost as % of revenue."
+        },
+        "NETWORK_OPEX": {
+          "P25": 18,
+          "P50": 25,
+          "P75": 32,
+          "P90": 40,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Network operations (RAN/transmission/energy/site O&M) as % of revenue for telecom."
+        },
+        "SPECTRUM_LICENSING": {
+          "P25": 4,
+          "P50": 7,
+          "P75": 11,
+          "P90": 15,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Spectrum usage charges, licence fees and regulatory levies as % of revenue."
+        },
+        "TOWER_INFRA": {
+          "P25": 8,
+          "P50": 12,
+          "P75": 16,
+          "P90": 21,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Passive tower infrastructure rental/lease as % of revenue."
+        }
+      }
+    },
+    "energy_utilities": {
+      "label": "Energy & Utilities (India)",
+      "categories": {
+        "IT": {
+          "P25": 1.0,
+          "P50": 1.8,
+          "P75": 3.0,
+          "P90": 4.5,
+          "confidence": "illustrative"
+        },
+        "PROF_SVCS": {
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.5,
+          "P90": 4.0,
+          "confidence": "illustrative"
+        },
+        "FACILITIES": {
+          "P25": 2.5,
+          "P50": 4.5,
+          "P75": 7.0,
+          "P90": 10.0,
+          "confidence": "illustrative"
+        },
+        "TRAVEL": {
+          "P25": 0.3,
+          "P50": 0.8,
+          "P75": 1.5,
+          "P90": 2.5,
+          "confidence": "illustrative"
+        },
+        "MARKETING": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.5,
+          "P90": 5.0,
+          "confidence": "illustrative"
+        },
+        "HR": {
+          "P25": 0.8,
+          "P50": 1.5,
+          "P75": 2.5,
+          "P90": 3.5,
+          "confidence": "illustrative"
+        },
+        "LOGISTICS": {
+          "P25": 3.0,
+          "P50": 5.5,
+          "P75": 8.0,
+          "P90": 12.0,
+          "confidence": "illustrative"
+        },
+        "TELECOM": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 1.8,
+          "confidence": "illustrative"
+        },
+        "INSURANCE": {
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 1.8,
+          "P90": 2.5,
+          "confidence": "illustrative"
+        },
+        "POWER_ENERGY": {
+          "P25": 2.5,
+          "P50": 4.2,
+          "P75": 7.0,
+          "P90": 10.0,
+          "confidence": "illustrative",
+          "source_note": "Energy-intensive; CEA sector energy consumption + BEE PAT scheme benchmarks."
+        },
+        "PLANT_MAINTENANCE": {
+          "P25": 1.2,
+          "P50": 2.0,
+          "P75": 3.5,
+          "P90": 5.5,
+          "confidence": "illustrative",
+          "source_note": "Key driver for asset-heavy plants; CII Maintenance Excellence benchmarks."
+        },
+        "LOGISTICS_INDIA": {
+          "P25": 4.0,
+          "P50": 6.5,
+          "P75": 9.5,
+          "P90": 13.0,
+          "confidence": "illustrative",
+          "source_note": "Inbound + outbound; CRISIL India Logistics Report, DPIIT trade facilitation data."
+        },
+        "BANKING_TREASURY": {
+          "P25": 0.1,
+          "P50": 0.2,
+          "P75": 0.5,
+          "P90": 0.9,
+          "confidence": "illustrative",
+          "source_note": "Bank charges, LC/guarantee fees, FX; RBI MSME credit cost disclosures."
+        },
+        "PACKAGING": {
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.5,
+          "P90": 8.0,
+          "confidence": "illustrative",
+          "source_note": "Significant for FMCG & pharma sub-sectors; FICCI packaging industry data."
+        },
+        "RND": {
+          "P25": 1.0,
+          "P50": 2.5,
+          "P75": 4.5,
+          "P90": 7.0,
+          "confidence": "illustrative",
+          "source_note": "Engineering R&D varies widely; DSIR annual R&D statistics for India manufacturing."
+        },
+        "CONTINGENT": {
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.5,
+          "P90": 8.0,
+          "confidence": "illustrative",
+          "source_note": "Contract labour (CLRA); EPFO data + industry body benchmarks."
+        },
+        "FIN_SVCS": {
+          "P25": 0.3,
+          "P50": 0.5,
+          "P75": 0.8,
+          "P90": 1.2,
+          "confidence": "illustrative",
+          "source_note": "Finance function cost; Hackett Group Finance Benchmark Study 2024."
+        },
+        "OUTSOURCED": {
+          "P25": 3.0,
+          "P50": 6.0,
+          "P75": 10.0,
+          "P90": 15.0,
+          "confidence": "illustrative",
+          "source_note": "BPO, IT services, payroll; NASSCOM IT outsourcing benchmark."
+        },
+        "BRSR_ESG": {
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.6,
+          "P90": 1.2,
+          "confidence": "illustrative",
+          "source_note": "Scope 1/2/3 audit, BRSR disclosures; SEBI top-1000 company BRSR filings."
+        },
+        "RELATED_PARTY": {
+          "P25": 1.0,
+          "P50": 3.0,
+          "P75": 7.0,
+          "P90": 15.0,
+          "confidence": "illustrative",
+          "source_note": "Group recharges; BSE related-party transaction analysis FY24."
+        },
+        "RAW_MATERIALS": {
+          "P25": 30,
+          "P50": 42,
+          "P75": 52,
+          "P90": 60,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Direct materials as % of revenue; internal calibration across Indian discrete + process manufacturers."
+        },
+        "FUEL_GENERATION": {
+          "P25": 30,
+          "P50": 40,
+          "P75": 50,
+          "P90": 60,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Fuel and generation cost (coal/gas/renewables) as % of revenue for power/utilities."
+        },
+        "GRID_MAINTENANCE": {
+          "P25": 4,
+          "P50": 6,
+          "P75": 9,
+          "P90": 12,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Transmission & distribution network maintenance as % of revenue."
+        },
+        "T&D_LOSSES": {
+          "P25": 3,
+          "P50": 5,
+          "P75": 8,
+          "P90": 12,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Aggregate technical & commercial (AT&C) loss cost as % of revenue."
         }
       }
     }

@@ -127,7 +127,8 @@
         "Labour cost per store (permanent, part-time, casual)",
         "Transactions per hour by department and store format",
         "Union contract terms and flexibility provisions"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "category_management",
@@ -213,7 +214,8 @@
         "Supplier co-investment and trade terms by category",
         "In-stock (OSA) data by category and SKU",
         "Planogram compliance monitoring data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "shrinkage_reduction",
@@ -298,7 +300,8 @@
         "POS exception data (voids, refunds, no-sales by cashier)",
         "RFID and EAS coverage map by store",
         "Historical LP investment vs shrinkage reduction correlation"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "private_label",
@@ -383,7 +386,8 @@
         "Consumer research on PL acceptance by category",
         "Manufacturer shortlist with production capacity and compliance data",
         "Competitor PL pricing and ranging data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "omnichannel_fulfillment",
@@ -468,7 +472,8 @@
         "Customer geography and order density by pin code",
         "OMS capability assessment for real-time routing",
         "Dark store operational model and capex/opex estimate"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "markdown_optimization",
@@ -552,7 +557,8 @@
         "Demand forecast accuracy for seasonal categories",
         "Category margin (with and without markdown) by season",
         "Clearance deadline requirements by category"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "loyalty_program_efficiency",
@@ -637,7 +643,8 @@
         "Points earn/burn ratio and breakage rate",
         "Member segmentation by spend tier and redemption behaviour",
         "Basket size uplift data: member vs non-member by category"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "supply_chain_direct_sourcing",
@@ -722,7 +729,8 @@
         "Quality specifications and cold chain requirements by category",
         "DC logistics connectivity to potential direct sourcing locations",
         "Contract farming regulatory requirements and templates"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "store_network_optimization",
@@ -808,7 +816,8 @@
         "Lease terms: WALE, break-clause dates, and exit cost by store",
         "Store age and format classification",
         "New store investment return hurdles and pipeline"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

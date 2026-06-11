@@ -1,0 +1,9 @@
+Prakrit Consumer Brands Ltd — Group Structure
+
+PCBL-IN: India parent (BSE/NSE listed). ERP: SAP S4HANA + Coupa.
+PCBL-BD: Prakrit Consumer Bangladesh Pvt Ltd (Bangladesh; Foods & Personal Care). ERP: SAP ECC.
+PCBL-NP: Prakrit Consumer Nepal Pvt Ltd (Nepal; Foods). ERP: SAP ECC.
+
+Entity tree: PCBL-IN > PCBL-BD (100%), PCBL-NP (85%)
+
+Intercompany: PCBL-IN supplies finished goods to PCBL-BD/NP at transfer prices; royalty charged on brand use (3% of net sales). IC flagged related_party=yes. Royalties and intercompany supplies eliminated on consolidation.

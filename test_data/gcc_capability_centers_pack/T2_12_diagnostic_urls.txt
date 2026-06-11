@@ -1,0 +1,7 @@
+Meridian Global Services India Pvt Ltd — Diagnostic URLs (synthetic/illustrative)
+
+1. NASSCOM GCC tracker: https://www.nasscom.example/gcc-tracker/meridian
+2. STPI registration: https://www.stpi.in/example/mgsi
+3. Parent IR: https://www.meridianglobal.example/investors
+4. MCA21 filing: https://www.mca.gov.in/example/mgsi
+5. CBRE India RE report: https://www.cbre.example/india/office-market-fy25

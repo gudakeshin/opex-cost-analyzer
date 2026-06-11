@@ -1,0 +1,7 @@
+supplier,category,contract_status,contract_expiry_date,auto_renewal_notice_days,early_exit_penalty_pct,min_purchase_commitment,currency
+Infosys Finacle,IT & Core Banking,in_contract,2028-03-31,180,20,6720000000,INR
+TCS BaNCS,IT & Core Banking,in_contract,2027-09-30,120,15,4080000000,INR
+IBM India,IT & Core Banking,in_contract,2026-12-31,90,10,2940000000,INR
+NCR Corporation India,ATM & Cash Management,in_contract,2026-06-30,90,12,2280000000,INR
+CMS Info Systems,ATM & Cash Management,in_contract,2025-09-30,60,0,1920000000,INR
+KPMG India,Professional Services & Compliance,rolling,,30,0,0,INR

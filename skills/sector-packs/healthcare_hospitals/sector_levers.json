@@ -127,7 +127,8 @@
         "Agency/locum spend by vendor and specialty (12 months)",
         "NABH staffing norm requirements by bed type",
         "Nurse turnover and tenure data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "medical_supplies_procurement",
@@ -214,7 +215,8 @@
         "Spend by vendor and category (12 months)",
         "HIS requisition and inventory management configuration",
         "Existing GPO or group purchasing membership details"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "pharmacy_cost_optimization",
@@ -301,7 +303,8 @@
         "Pharmacy vendor contracts and pricing",
         "Prescribing pattern data by physician and specialty",
         "Drug expiry and wastage report (12 months)"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "revenue_cycle_automation",
@@ -388,7 +391,8 @@
         "Revenue cycle FTE count and time allocation by activity",
         "HIS/billing system architecture and integration capability",
         "Payer contract terms and adjudication rules by payer"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "clinical_space_utilization",
@@ -474,7 +478,8 @@
         "Revenue per procedure by OT room and specialty",
         "Staffing model for OT and procedure rooms",
         "Bed occupancy rate by ward and specialty"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "medical_equipment_rationalization",
@@ -560,7 +565,8 @@
         "AMC contract terms by vendor and equipment type",
         "Sharing feasibility assessment (location proximity, scheduling compatibility)",
         "NABH and clinical requirement for dedicated vs shared equipment"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

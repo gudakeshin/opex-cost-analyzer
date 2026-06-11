@@ -1,11 +1,12 @@
 """Reflect phase — thin orchestrator over validation, synthesis, and persistence."""
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 from app.config import UPLOAD_DIR
 from app.memory import MemoryStore
 from app.opar.chat_synthesis import synthesize_chat_response
+from app.opar.presentation import assemble_assistant_payload
 from app.opar.visualization import build_chart_specs
 from app.opar.models import (
     ActResult,
@@ -52,6 +53,14 @@ from app.storage import read_json
 
 _memory = MemoryStore()
 
+# Reflect-phase LLM paths — not deterministic skill fallbacks.
+_SYNTHESIS_DEGRADATION_KEYS = frozenset({"llm_advisory", "chat_synthesis"})
+
+
+def _skill_degradation_reasons(degradation_reasons: Dict[str, str]) -> Dict[str, str]:
+    return {k: v for k, v in degradation_reasons.items() if k not in _SYNTHESIS_DEGRADATION_KEYS}
+
+
 # Backward-compatible re-exports for tests and callers
 _advisory_quality_ok = advisory_quality_ok
 _compose_response_from_advisory = compose_response_from_advisory
@@ -64,6 +73,7 @@ def reflect(
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
     chat_history: list[dict[str, str]] | None = None,
+    thinking_callback: Callable[[str], None] | None = None,
 ) -> ReflectOutput:
     """Validate outputs (3-layer), compose response, persist memory, return ReflectOutput."""
     validated: Dict[str, Dict[str, Any]] = {}
@@ -109,6 +119,7 @@ def reflect(
 
     loop_complete, next_trigger = _determine_loop_control(validated, failed, ctx, plan)
     replanner_log: List[Dict[str, Any]] = []
+    replan_output = None
     replannable_skills = {"peer-benchmarker", "root-cause-analyzer", "savings-modeler", "value-bridge-calculator"}
     replannable_intents = {"benchmark", "value_bridge", "business_case", "drill_down", "savings_plan", "sensitivity"}
     if ctx.intent_class in replannable_intents and any(t.skill_name in replannable_skills for t in plan.tasks):
@@ -116,8 +127,10 @@ def reflect(
             from app.opar.plan import replan
 
             _new_plan, replanner_log = replan(ctx, validated, plan)
-            if replanner_log and not next_trigger:
-                next_trigger = "Additional analysis steps are available based on reflect-gate quality checks."
+            if replanner_log:
+                replan_output = _new_plan
+                if not next_trigger:
+                    next_trigger = "Additional analysis steps are available based on reflect-gate quality checks."
         except Exception:
             replanner_log = []
 
@@ -136,6 +149,7 @@ def reflect(
     response_metadata: Dict[str, Any] = {}
     qa_used_llm = False
     advisory_sections: AdvisorySections | None = None
+    presentation = None
     thinking_text: str | None = None
 
     if is_qa_lookup(ctx, validated, composition_validated):
@@ -146,30 +160,85 @@ def reflect(
             chat_history=chat_history,
             currency=reporting_currency,
             thinking_enabled=thinking_enabled,
+            thinking_callback=thinking_callback,
         )
         response = synthesis.response_text
         response_metadata = synthesis.response_metadata
         qa_used_llm = synthesis.used_llm
+        if getattr(synthesis, "presentation", None):
+            presentation = synthesis.presentation
+        if not qa_used_llm:
+            degradation_reasons = {**degradation_reasons, "chat_synthesis": "provider_failed"}
         if synthesis.thinking_text:
             thinking_text = synthesis.thinking_text
     else:
-        if needs_llm_advisory(ctx, composition_validated, category_focused=category_focused):
-            advisory_sections, thinking_text = generate_llm_advisory_sections(
+        advisory_was_needed = needs_llm_advisory(ctx, composition_validated, category_focused=category_focused)
+        advisory_skip_reason: str | None = None
+        if advisory_was_needed:
+            advisory_sections, thinking_text, advisory_skip_reason = generate_llm_advisory_sections(
                 ctx,
                 manifest,
                 composition_validated,
                 thinking_enabled=thinking_enabled,
                 thinking_budget_tokens=thinking_budget_tokens,
                 category_focused=category_focused,
+                thinking_callback=thinking_callback,
+                agent_path=getattr(plan, "source", "planner") == "agent",
             )
+            if advisory_skip_reason:
+                degradation_reasons = {
+                    **degradation_reasons,
+                    "llm_advisory": advisory_skip_reason,
+                }
         if advisory_sections is not None:
-            response = compose_response_from_advisory(
-                advisory_sections,
-                composition_validated,
-                include_executive_takeaway=bool(ctx.wants_executive_narrative),
-                include_business_case_metrics=bool(ctx.intent_class == "business_case"),
-                category_focused=category_focused,
+            presentation = assemble_assistant_payload(
+                advisory_sections, composition_validated, ctx
             )
+            response = presentation.narrative_markdown
+            if not response.strip():
+                response = compose_response_from_advisory(
+                    advisory_sections,
+                    composition_validated,
+                    include_executive_takeaway=bool(ctx.wants_executive_narrative),
+                    include_business_case_metrics=bool(ctx.intent_class == "business_case"),
+                    category_focused=category_focused,
+                )
+            elif not presentation.blocks:
+                bands_only = compose_response_from_advisory(
+                    advisory_sections,
+                    composition_validated,
+                    include_executive_takeaway=bool(ctx.wants_executive_narrative),
+                    include_business_case_metrics=bool(ctx.intent_class == "business_case"),
+                    category_focused=category_focused,
+                )
+                if bands_only and bands_only != response:
+                    response = f"{response}\n\n{bands_only}".strip()
+        elif advisory_was_needed and category_focused:
+            # The question targets a specific category (e.g. "what drives spend
+            # in HR & Recruitment?") and warranted an LLM narrative, but synthesis
+            # failed or produced low-quality output. build_response_text composes
+            # from whatever portfolio-wide skill outputs happen to be cached
+            # (conflicts/spend-profile/benchmark/BvA) regardless of the category
+            # asked about — answer the user's actual question via the query-aware
+            # chat synthesis path instead. (Portfolio-wide asks like "calculate
+            # value bridge" still get build_response_text's value-bridge summary,
+            # which is the right composer for that broader request.)
+            synthesis = synthesize_chat_response(
+                ctx,
+                manifest,
+                composition_validated,
+                chat_history=chat_history,
+                currency=reporting_currency,
+                thinking_enabled=thinking_enabled,
+                thinking_callback=thinking_callback,
+            )
+            response = synthesis.response_text
+            response_metadata = synthesis.response_metadata
+            qa_used_llm = synthesis.used_llm
+            if not qa_used_llm:
+                degradation_reasons = {**degradation_reasons, "chat_synthesis": "provider_failed"}
+            if synthesis.thinking_text:
+                thinking_text = synthesis.thinking_text
         else:
             response = build_response_text(composition_validated, failed, plan, ctx)
 
@@ -237,13 +306,15 @@ def reflect(
         thinking_text=thinking_text,
         response_metadata=response_metadata,
         chart_specs=chart_specs,
-        degraded_mode=bool(degradation_reasons),
+        degraded_mode=bool(_skill_degradation_reasons(degradation_reasons)),
         fallback_reasons=degradation_reasons,
         next_options=next_options,
         replanner_log=replanner_log,
+        replan_output=replan_output,
         gate2_blocked=gate2_blocked,
         gate2_narrative=gate2_narrative,
         regulatory_events=reg_events,
         forced_regulatory_decision=forced_reg_decision,
         narrative_provenance_tag=provenance_tag,
+        presentation=presentation.model_dump() if presentation else None,
     )

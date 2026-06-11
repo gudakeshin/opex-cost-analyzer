@@ -1,0 +1,6 @@
+supplier,category,contract_status,contract_expiry_date,auto_renewal_notice_days,early_exit_penalty_pct,min_purchase_commitment,currency
+L&T Construction,Contract Labour & Subcontracting,in_contract,2026-12-31,90,10,6720000000,INR
+Steel Authority of India,Materials & Components,in_contract,2026-03-31,60,5,5040000000,INR
+BHEL Forge,Materials & Components,in_contract,2026-09-30,90,8,3360000000,INR
+ABB India,Maintenance & Repair,in_contract,2027-03-31,120,12,1740000000,INR
+NTPC Power Supply,Energy & Utilities,in_contract,2027-09-30,180,15,1260000000,INR
