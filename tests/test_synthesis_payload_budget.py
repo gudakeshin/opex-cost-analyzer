@@ -16,7 +16,9 @@ from app.opar.claude_client import (
 )
 from app.opar.models import ObserveContext
 from app.opar.reflect_advisory import (
+    _CORE_SYNTHESIS_SKILLS,
     _drop_largest_to_budget,
+    _estimate_synthesis_payload,
     generate_llm_advisory_sections,
 )
 
@@ -163,6 +165,72 @@ def test_slim_skill_outputs_idempotent() -> None:
     once = _slim_skill_outputs(payload)
     twice = _slim_skill_outputs(once)
     assert once == twice
+
+
+def test_drop_largest_protects_core_when_non_core_suffices() -> None:
+    def blob(tokens: int) -> dict:
+        return {"blob": "x" * (tokens * 4)}
+
+    scenarios = [
+        {"outputs": {"savings-modeler": blob(12_000), "internal-benchmarker": blob(10_000),
+                     "bva-analyzer": blob(2_000)}, "overshoot": 8_000},
+        {"outputs": {"spend-profiler": blob(9_000), "peer-benchmarker": blob(8_000),
+                     "temporal-analyzer": blob(2_000)}, "overshoot": 7_000},
+        {"outputs": {"value-bridge-calculator": blob(11_000), "temporal-analyzer": blob(10_000),
+                     "vendor-master-builder": blob(3_000)}, "overshoot": 9_000},
+    ]
+    for sc in scenarios:
+        _kept, dropped = _drop_largest_to_budget(sc["outputs"], sc["overshoot"])
+        assert not (set(dropped) & _CORE_SYNTHESIS_SKILLS), f"core dropped: {dropped}"
+
+
+def test_drop_largest_still_drops_core_when_only_core_remain() -> None:
+    def blob(tokens: int) -> dict:
+        return {"blob": "x" * (tokens * 4)}
+
+    all_core = {
+        "spend-profiler": blob(10_000),
+        "savings-modeler": blob(8_000),
+        "sme-critique": blob(6_000),
+    }
+    kept, dropped = _drop_largest_to_budget(all_core, overshoot_tokens=12_000)
+    assert kept
+    assert dropped
+    assert set(all_core) - set(kept) == set(dropped)
+
+
+def test_estimate_synthesis_payload_matches_synthesizer_keys() -> None:
+    ctx = ObserveContext(
+        user_message="benchmark IT spend",
+        intent_class="benchmark",
+        model_manifest={"business_model": "B2B"},
+        deep_research_summary="industry context",
+    )
+    manifest = {"company_name": "Acme", "industry": "it", "currency": "INR"}
+    outputs = {
+        "spend-profiler": {"total_spend": 1},
+        "sme-critique": {
+            "critique_summary": {"verdicts": {"proceed": 1}},
+            "initiative_critiques": [{
+                "category_name": "IT", "lever": "consolidation", "sme_verdict": "proceed",
+                "evidence_maturity": "high", "critical_risk": None,
+                "probe_questions": [{"question": "q", "why_critical": "w"}],
+            }],
+        },
+    }
+    estimated = _estimate_synthesis_payload(
+        ctx=ctx,
+        manifest=manifest,
+        skill_outputs=outputs,
+        doc_chunks=["doc chunk"],
+        transaction_examples={"IT": [{"supplier": "X", "amount": 1}]},
+        available_analyses=[{"skill": "peer-benchmarker", "headline": "3 comparisons"}],
+    )
+    assert "model_manifest" in estimated
+    assert "deep_research_context" in estimated
+    assert "sme_critique_data" in estimated
+    assert "transaction_examples_by_category" in estimated
+    assert "available_analyses" in estimated
 
 
 def test_drop_largest_to_budget_drops_biggest_first() -> None:

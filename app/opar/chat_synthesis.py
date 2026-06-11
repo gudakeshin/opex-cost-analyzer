@@ -8,6 +8,7 @@ composer (``qa_lookup.answer_general_qa``) is the offline / timeout / pytest fal
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
 
@@ -15,6 +16,7 @@ from app.config import (
     ANTHROPIC_ENABLED,
     GEMINI_ENABLED,
     LLM_CHAT_SYNTHESIS_ENABLED,
+    logger,
 )
 from app.services.llm_selection import get_resolved_llm_provider
 from app.opar.category_resolver import match_category_from_query
@@ -23,6 +25,13 @@ from app.opar.models import ObserveContext
 from app.opar.qa_lookup import aggregate_portfolio_suppliers, answer_general_qa, _parse_top_limit
 
 BreakdownDimension = Literal["supplier", "geo", "category", "payment_terms", "none"]
+
+_CHAT_CONTEXT_TOKEN_LIMIT = 32_000
+
+
+def _truncate_str(value: Any, max_len: int) -> str:
+    text = str(value or "")
+    return text if len(text) <= max_len else text[:max_len]
 
 # A chat synthesizer takes the structured context dict and returns (text, thinking).
 ChatSynthesizer = Callable[..., Tuple[Optional[str], Optional[str]]]
@@ -156,19 +165,55 @@ def extract_query_dimensions(msg: str, categories: List[Dict[str, Any]]) -> Quer
 
 
 def _slim_category_row(row: Dict[str, Any]) -> Dict[str, Any]:
+    top_suppliers = []
+    for sup in row.get("top_suppliers", [])[:10]:
+        if not isinstance(sup, dict):
+            continue
+        top_suppliers.append({
+            **{k: v for k, v in sup.items() if k not in ("supplier", "note")},
+            "supplier": _truncate_str(sup.get("supplier"), 120),
+            "note": _truncate_str(sup.get("note"), 120),
+        })
     return {
         "category_id": row.get("category_id"),
-        "category_name": row.get("category_name"),
+        "category_name": _truncate_str(row.get("category_name"), 120),
         "spend": row.get("spend"),
         "line_count": row.get("line_count"),
         "share_of_total": row.get("share_of_total"),
         "addressable_spend": row.get("addressable_spend"),
         "supplier_count": row.get("supplier_count"),
-        "top_suppliers": row.get("top_suppliers", [])[:10],
+        "top_suppliers": top_suppliers,
         "top_geos": row.get("top_geos", [])[:8],
         "hhi": row.get("hhi"),
         "concentration_flag": row.get("concentration_flag"),
     }
+
+
+def _slim_pt_opportunity_row(row: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "supplier": _truncate_str(row.get("supplier"), 120),
+        "current_terms_days": row.get("current_terms_days"),
+        "target_terms_days": row.get("target_terms_days"),
+        "annual_cash_value": row.get("annual_cash_value"),
+        "note": _truncate_str(row.get("note"), 200),
+    }
+
+
+def _slim_probe_answer(row: Dict[str, Any]) -> Dict[str, Any]:
+    slim = {k: row[k] for k in row if k in ("question", "answer", "probe_id", "why_critical")}
+    for key in ("question", "answer", "why_critical"):
+        if key in slim:
+            slim[key] = _truncate_str(slim[key], 400)
+    return slim
+
+
+def _slim_portfolio_probe(row: Dict[str, Any]) -> Dict[str, Any]:
+    slim = dict(row)
+    if "question" in slim:
+        slim["question"] = _truncate_str(slim["question"], 300)
+    if "why_critical" in slim:
+        slim["why_critical"] = _truncate_str(slim["why_critical"], 200)
+    return slim
 
 
 def _portfolio_summary(profile: Dict[str, Any]) -> Dict[str, Any]:
@@ -179,7 +224,7 @@ def _portfolio_summary(profile: Dict[str, Any]) -> Dict[str, Any]:
         "category_count": len(categories),
         "top_categories": [
             {
-                "category_name": c.get("category_name"),
+                "category_name": _truncate_str(c.get("category_name"), 120),
                 "spend": c.get("spend"),
                 "share_of_total": (
                     float(c.get("spend", 0) or 0) / float(profile.get("total_spend", 1) or 1) * 100
@@ -216,6 +261,64 @@ def _slim_value_matrix_row(row: Dict[str, Any]) -> Dict[str, Any]:
         "payback_months": row.get("payback_months"),
         "confidence": row.get("confidence"),
     }
+
+
+def _trim_chat_context_to_budget(context: Dict[str, Any]) -> Dict[str, Any]:
+    """Shrink lowest-priority fields until the serialized context fits the chat budget."""
+    from app.opar.reflect_advisory import _estimate_tokens
+
+    if _estimate_tokens(context) <= _CHAT_CONTEXT_TOKEN_LIMIT:
+        return context
+
+    trimmed = json.loads(json.dumps(context, default=str))
+    before = _estimate_tokens(trimmed)
+
+    def over() -> bool:
+        return _estimate_tokens(trimmed) > _CHAT_CONTEXT_TOKEN_LIMIT
+
+    if over():
+        trimmed["deep_research_summary"] = None
+    if over():
+        trimmed["business_override_note"] = None
+    if over():
+        probe_ctx = trimmed.get("probe_context") or {}
+        probe_ctx["probe_answers"] = []
+        probe_ctx["portfolio_probes"] = []
+        trimmed["probe_context"] = probe_ctx
+    if over():
+        trimmed["document_excerpts"] = []
+    if over():
+        trimmed["document_context"] = {}
+    if over():
+        spend = trimmed.get("spend_data") or {}
+        spend["categories"] = (spend.get("categories") or [])[:4]
+        for cat in spend.get("categories") or []:
+            if isinstance(cat, dict):
+                cat["top_suppliers"] = (cat.get("top_suppliers") or [])[:2]
+        spend["payment_terms_opportunities"] = (spend.get("payment_terms_opportunities") or [])[:2]
+        trimmed["spend_data"] = spend
+    if over():
+        trimmed["recent_turns"] = (trimmed.get("recent_turns") or [])[-2:]
+    if over():
+        trimmed["modeled_initiatives"] = (trimmed.get("modeled_initiatives") or [])[:4]
+        trimmed["value_matrix_rows"] = (trimmed.get("value_matrix_rows") or [])[:4]
+        trimmed["root_cause_findings"] = (trimmed.get("root_cause_findings") or [])[:4]
+
+    after = _estimate_tokens(trimmed)
+    if after > _CHAT_CONTEXT_TOKEN_LIMIT:
+        logger.warning(
+            "chat_context_budget_trim still_over estimated_tokens=%d limit=%d",
+            after,
+            _CHAT_CONTEXT_TOKEN_LIMIT,
+        )
+    else:
+        logger.warning(
+            "chat_context_budget_trim applied before=%d after=%d limit=%d",
+            before,
+            after,
+            _CHAT_CONTEXT_TOKEN_LIMIT,
+        )
+    return trimmed
 
 
 def _fetch_document_excerpts(engagement_id: str, query: str, limit: int = 2) -> List[str]:
@@ -274,9 +377,11 @@ def build_chat_context(
     )
     focus_category_detail = _slim_category_row(matched_row) if matched_row else {}
     pt_skill = skill_outputs.get("payment-terms-optimizer", {}) if isinstance(skill_outputs, dict) else {}
-    payment_terms_opportunities = (
-        pt_skill.get("opportunities", [])[:5] if isinstance(pt_skill, dict) else []
-    )
+    payment_terms_opportunities = [
+        _slim_pt_opportunity_row(o)
+        for o in (pt_skill.get("opportunities", [])[:5] if isinstance(pt_skill, dict) else [])
+        if isinstance(o, dict)
+    ]
 
     recent_turns = []
     if chat_history:
@@ -288,7 +393,10 @@ def build_chat_context(
 
     engagement_id = ctx.engagement_id or str(manifest.get("engagement_id") or "")
     doc_limit = 4 if "contract" in (ctx.user_message or "").lower() else 2
-    doc_excerpts = _fetch_document_excerpts(engagement_id, ctx.user_message, limit=doc_limit)
+    doc_excerpts = [
+        _truncate_str(excerpt, 1200)
+        for excerpt in _fetch_document_excerpts(engagement_id, ctx.user_message, limit=doc_limit)
+    ]
 
     savings_model = skill_outputs.get("savings-modeler", {}) if isinstance(skill_outputs, dict) else {}
     initiatives = (
@@ -316,11 +424,12 @@ def build_chat_context(
     doc_ctx_skill = skill_outputs.get("document-contextualizer", {}) if isinstance(skill_outputs, dict) else {}
     document_context = {}
     if isinstance(doc_ctx_skill, dict):
+        raw_constraints = doc_ctx_skill.get("constraints") or []
         document_context = {
-            "context_summary": str(doc_ctx_skill.get("context_summary") or "")[:1200],
-            "constraints": (doc_ctx_skill.get("constraints") or [])[:8]
-            if isinstance(doc_ctx_skill.get("constraints"), list)
-            else [],
+            "context_summary": _truncate_str(doc_ctx_skill.get("context_summary"), 1200),
+            "constraints": [
+                _truncate_str(c, 200) for c in raw_constraints[:8]
+            ] if isinstance(raw_constraints, list) else [],
         }
     contract_skill = skill_outputs.get("contract-lifecycle-manager", {}) if isinstance(skill_outputs, dict) else {}
     contract_renewals = (
@@ -334,12 +443,19 @@ def build_chat_context(
     if isinstance(sme, dict):
         raw_probes = sme.get("portfolio_probes") or sme.get("top_probes") or []
         if isinstance(raw_probes, list):
-            portfolio_probes = [p for p in raw_probes if isinstance(p, dict)][:5]
+            portfolio_probes = [_slim_portfolio_probe(p) for p in raw_probes if isinstance(p, dict)][:5]
     probe_answers = manifest.get("probe_answers") if isinstance(manifest.get("probe_answers"), list) else []
     if not probe_answers and getattr(ctx, "probe_answers", None):
         probe_answers = ctx.probe_answers
+    slim_probe_answers = [
+        _slim_probe_answer(a) for a in (probe_answers[:10] if isinstance(probe_answers, list) else [])
+        if isinstance(a, dict)
+    ]
 
-    return {
+    deep_research = manifest.get("deep_research_summary") or ctx.deep_research_summary
+    business_note = manifest.get("business_override_note") or ctx.business_override_note
+
+    context = {
         "user_message": ctx.user_message,
         "session_context": {
             "company_name": manifest.get("company_name"),
@@ -372,11 +488,11 @@ def build_chat_context(
             "payment_terms_opportunities": payment_terms_opportunities,
         },
         "portfolio_summary": _portfolio_summary(profile) if isinstance(profile, dict) else {},
-        "deep_research_summary": manifest.get("deep_research_summary"),
-        "business_override_note": manifest.get("business_override_note") or ctx.business_override_note,
+        "deep_research_summary": _truncate_str(deep_research, 1200) if deep_research else None,
+        "business_override_note": _truncate_str(business_note, 1200) if business_note else None,
         "probe_context": {
             "portfolio_probes": portfolio_probes,
-            "probe_answers": probe_answers[:10] if isinstance(probe_answers, list) else [],
+            "probe_answers": slim_probe_answers,
         },
         "recent_turns": recent_turns,
         "document_excerpts": doc_excerpts,
@@ -387,6 +503,7 @@ def build_chat_context(
         "root_cause_findings": root_findings,
         "contract_renewals": contract_renewals,
     }
+    return _trim_chat_context_to_budget(context)
 
 
 def _response_metadata_from_context(context: Dict[str, Any]) -> Dict[str, Any]:

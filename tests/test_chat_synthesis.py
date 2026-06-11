@@ -399,6 +399,70 @@ def test_synthesize_chat_response_contract_question_uses_deterministic_when_llm_
     assert "Contract renegotiation" in result.response_text
 
 
+def test_build_chat_context_truncates_oversized_manifest_fields() -> None:
+    fat = "z" * 200_000
+    ctx = ObserveContext(user_message="summarize spend", intent_class="drill_down")
+    manifest = {
+        "deep_research_summary": fat,
+        "business_override_note": fat,
+        "probe_answers": [{"answer": fat}],
+    }
+    with patch("app.opar.chat_synthesis._fetch_document_excerpts", lambda *a, **k: []):
+        context = build_chat_context(ctx, manifest, {}, currency="INR")
+    assert len(context["deep_research_summary"]) <= 1200
+    assert len(context["business_override_note"]) <= 1200
+    assert len(context["probe_context"]["probe_answers"][0]["answer"]) <= 400
+
+
+def test_build_chat_context_fat_row_strings_bounded() -> None:
+    fat = "n" * 200_000
+    ctx = ObserveContext(user_message="payment terms", intent_class="drill_down")
+    skill_outputs = {
+        "spend-profiler": {
+            "total_spend": 1_000_000,
+            "category_profile": [{
+                "category_id": "IT",
+                "category_name": fat,
+                "spend": 500_000,
+                "top_suppliers": [{"supplier": "S1", "spend": 100, "note": fat}],
+            }],
+        },
+        "payment-terms-optimizer": {
+            "opportunities": [{"supplier": "Zenmark", "note": fat, "annual_cash_value": 1}],
+        },
+    }
+    with patch("app.opar.chat_synthesis._fetch_document_excerpts", lambda *a, **k: []):
+        context = build_chat_context(ctx, {}, skill_outputs, currency="INR")
+    cat = context["spend_data"]["categories"][0]
+    assert len(cat["category_name"]) <= 120
+    assert len(cat["top_suppliers"][0]["note"]) <= 120
+    assert len(context["spend_data"]["payment_terms_opportunities"][0]["note"]) <= 200
+
+
+def test_build_chat_context_overall_budget_trim() -> None:
+    fat = "b" * 200_000
+    ctx = ObserveContext(user_message="overview", intent_class="drill_down")
+    manifest = {"deep_research_summary": fat, "probe_answers": [{"answer": fat} for _ in range(10)]}
+    history = [{"role": "user", "content": fat} for _ in range(6)]
+    skill_outputs = {
+        "spend-profiler": {
+            "total_spend": 1_000_000,
+            "category_profile": [
+                {"category_id": f"C{i}", "category_name": fat, "spend": 10_000,
+                 "top_suppliers": [{"supplier": f"S{j}", "note": fat} for j in range(10)]}
+                for i in range(12)
+            ],
+        },
+        "document-contextualizer": {"context_summary": fat, "constraints": [fat] * 8},
+    }
+    with patch("app.opar.chat_synthesis._fetch_document_excerpts", lambda *a, **k: [fat] * 4):
+        context = build_chat_context(ctx, manifest, skill_outputs, chat_history=history, currency="INR")
+    from app.opar.reflect_advisory import _estimate_tokens
+    from app.opar.chat_synthesis import _CHAT_CONTEXT_TOKEN_LIMIT
+
+    assert _estimate_tokens(context) <= _CHAT_CONTEXT_TOKEN_LIMIT
+
+
 @patch("app.opar.hitl.clarification_generator._call_clarification_gemini")
 def test_hitl_clarification_uses_gemini(mock_gemini) -> None:
     from app.opar.hitl.clarification_generator import generate_business_clarification

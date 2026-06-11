@@ -275,20 +275,87 @@ def _estimate_tokens(payload: Any) -> int:
     try:
         return len(json.dumps(payload, default=str)) // _CHARS_PER_TOKEN
     except Exception:
-        return 0
+        return max(1, len(str(payload)) // _CHARS_PER_TOKEN)
 
 
-def _drop_largest_to_budget(
-    skill_outputs: Dict[str, Any], overshoot_tokens: int
+_ADVISORY_HINT = (
+    "\nOUTPUT BUDGET (overrides schema constraints above):\n"
+    '- Return "recommendations", "assumptions" and "citations" as empty arrays [] — '
+    "this consumer does not read them; put all insight into the other fields.\n"
+    "- Cap category_focus_section at 400 words. Keep every other string under 60 words.\n"
+    "- The complete JSON must close properly well within the output limit.\n"
+)
+_STRICT_HINT_TEMPLATE = (
+    "\nSTRICT QUALITY MODE:\n"
+    "- At least 3 business_levers.\n"
+    "- Each business lever must include specific operational/commercial changes.\n"
+    "- Include at least 2 executive_callouts with concrete numbers.\n"
+    "- Include at least 3 quick_wins_from_data.\n"
+    "- If the user question targets a specific category: `category_focus_section` MUST be "
+    "a decision-memo-quality analysis of at least 250 words. Write 3-5 paragraphs. "
+    "Name the exact suppliers and amounts from the data. Do NOT write a single sentence. "
+    "Explain the causal mechanism, not just the gap. "
+    "Make it self-contained — a CFO must be able to act on it without reading anything else.\n"
+)
+
+
+def _estimate_synthesis_payload(
+    *,
+    ctx: ObserveContext,
+    manifest: Dict[str, Any],
+    skill_outputs: Dict[str, Any],
+    doc_chunks: List[str],
+    transaction_examples: Dict[str, List[Dict[str, Any]]] | None,
+    available_analyses: List[Dict[str, str]] | None,
+) -> Dict[str, Any]:
+    """Mirror the JSON body synthesize_analysis_claude serializes into the user prompt."""
+    from app.opar.claude_client import _slim_sme_critique, _slim_transaction_examples
+
+    payload: Dict[str, Any] = {
+        "user_message": ctx.user_message,
+        "session_context": {
+            "company_name": manifest.get("company_name"),
+            "industry": manifest.get("industry"),
+            "annual_revenue": manifest.get("annual_revenue"),
+            "currency": manifest.get("currency"),
+        },
+        "model_manifest": ctx.model_manifest or {},
+        "skill_outputs": skill_outputs,
+        "document_chunks": doc_chunks,
+        "transaction_examples_by_category": _slim_transaction_examples(transaction_examples),
+    }
+    if ctx.deep_research_summary:
+        payload["deep_research_context"] = ctx.deep_research_summary
+    if available_analyses:
+        payload["available_analyses"] = available_analyses
+    sme_data = _slim_sme_critique(skill_outputs.get("sme-critique"))
+    if sme_data:
+        payload["sme_critique_data"] = sme_data
+    return payload
+
+
+def _synthesis_prompt_token_estimate(
+    payload: Dict[str, Any],
+    *,
+    strict_mode: bool,
+) -> int:
+    """Full input tokens: system prompt + user prompt wrapper, JSON body, and hints."""
+    from app.opar.claude_client import ANALYSIS_SYNTHESIS_SYSTEM_PROMPT
+
+    user_prompt = (
+        "Synthesize recommendations from this JSON context:\n"
+        f"{json.dumps(payload, ensure_ascii=False)}"
+        f"{_STRICT_HINT_TEMPLATE if strict_mode else ''}"
+        f"{_ADVISORY_HINT}"
+    )
+    return (len(ANALYSIS_SYNTHESIS_SYSTEM_PROMPT) + len(user_prompt)) // _CHARS_PER_TOKEN
+
+
+def _drop_largest_from_pool(
+    pool: Dict[str, Any], overshoot_tokens: int
 ) -> Tuple[Dict[str, Any], List[str]]:
-    """Drop the largest skill payloads until ~overshoot_tokens are reclaimed.
-
-    Degraded synthesis over the remaining skills beats no synthesis at all —
-    the deterministic fallback is strictly worse than an LLM narrative built
-    from a partial skill set.
-    """
     sizes = sorted(
-        ((skill, _estimate_tokens(output)) for skill, output in skill_outputs.items()),
+        ((skill, _estimate_tokens(output)) for skill, output in pool.items()),
         key=lambda kv: kv[1],
         reverse=True,
     )
@@ -299,7 +366,29 @@ def _drop_largest_to_budget(
             break
         dropped.append(skill)
         reclaimed += size
-    return {k: v for k, v in skill_outputs.items() if k not in dropped}, dropped
+    return {k: v for k, v in pool.items() if k not in dropped}, dropped
+
+
+def _drop_largest_to_budget(
+    skill_outputs: Dict[str, Any], overshoot_tokens: int
+) -> Tuple[Dict[str, Any], List[str]]:
+    """Drop skill payloads until ~overshoot_tokens are reclaimed.
+
+    Non-core skills are dropped first (largest first within each tier). Core
+    synthesis skills are sacrificed only when the overshoot cannot be reclaimed
+    from non-core skills alone.
+    """
+    non_core = {k: v for k, v in skill_outputs.items() if k not in _CORE_SYNTHESIS_SKILLS}
+    core = {k: v for k, v in skill_outputs.items() if k in _CORE_SYNTHESIS_SKILLS}
+
+    kept_nc, dropped = _drop_largest_from_pool(non_core, overshoot_tokens)
+    reclaimed = sum(_estimate_tokens(skill_outputs[s]) for s in dropped)
+    if reclaimed >= overshoot_tokens:
+        return {**kept_nc, **core}, dropped
+
+    remaining = overshoot_tokens - reclaimed
+    kept_core, dropped_core = _drop_largest_from_pool(core, remaining)
+    return {**kept_nc, **kept_core}, dropped + dropped_core
 
 
 def generate_llm_advisory_sections(
@@ -352,20 +441,25 @@ def generate_llm_advisory_sections(
     slim_skill_outputs = _slim_skill_outputs(relevant_outputs)
     doc_chunks = retrieved_context if retrieved_context else _truncate_doc_chunks(docs, max_chunks=2)
 
+    if category_focused is None:
+        estimate_category_focused = bool(
+            validated.get("savings-modeler") or validated.get("value-bridge-calculator")
+        )
+    else:
+        estimate_category_focused = category_focused
+    # First synthesizer attempt uses strict_mode when category_focused (non-thinking path).
+    estimate_strict_first = estimate_category_focused and not thinking_enabled
+
     def _payload_estimate(outputs: Dict[str, Any]) -> int:
-        return _estimate_tokens({
-            "user_message": ctx.user_message,
-            "session_context": {
-                "company_name": manifest.get("company_name"),
-                "industry": manifest.get("industry"),
-                "annual_revenue": manifest.get("annual_revenue"),
-                "currency": manifest.get("currency"),
-            },
-            "skill_outputs": outputs,
-            "document_chunks": doc_chunks,
-            "transaction_examples": tx_examples,
-            "available_analyses": available_analyses,
-        })
+        body = _estimate_synthesis_payload(
+            ctx=ctx,
+            manifest=manifest,
+            skill_outputs=outputs,
+            doc_chunks=doc_chunks,
+            transaction_examples=tx_examples,
+            available_analyses=available_analyses,
+        )
+        return _synthesis_prompt_token_estimate(body, strict_mode=estimate_strict_first)
 
     estimated_tokens = _payload_estimate(slim_skill_outputs)
     logger.info("llm_token_budget estimated_tokens=%d limit=%d", estimated_tokens, _LLM_TOKEN_LIMIT)
