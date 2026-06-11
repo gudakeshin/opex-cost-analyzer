@@ -132,6 +132,7 @@ class ChatSynthesisResult:
     response_metadata: Dict[str, Any] = field(default_factory=dict)
     thinking_text: str | None = None
     used_llm: bool = False
+    presentation: Any = None
 
 
 def extract_query_dimensions(msg: str, categories: List[Dict[str, Any]]) -> QueryDimensions:
@@ -530,18 +531,23 @@ def synthesize_chat_response(
         ctx, manifest, skill_outputs, chat_history=chat_history, currency=currency
     )
     metadata = _response_metadata_from_context(context)
+    from app.opar.presentation import assemble_assistant_payload
+    pres = assemble_assistant_payload(None, skill_outputs, ctx)
+
 
     text, thinking = _synthesize_via_llm(
         context,
         thinking_enabled=thinking_enabled,
         thinking_callback=thinking_callback,
     )
+    pres_out = pres if pres.blocks else None
     if text:
         return ChatSynthesisResult(
             response_text=text,
             response_metadata=metadata,
             thinking_text=thinking,
             used_llm=True,
+            presentation=pres_out,
         )
 
     fallback = answer_general_qa(ctx.user_message, skill_outputs, currency=currency)
@@ -549,4 +555,5 @@ def synthesize_chat_response(
         response_text=fallback,
         response_metadata=metadata,
         used_llm=False,
+        presentation=pres_out,
     )

@@ -6,7 +6,8 @@ import { DynamicCharts } from './DynamicCharts';
 import { ProbeQuestionsBlock } from './ProbeQuestionsBlock';
 import { ThinkingBlock } from './ThinkingBlock';
 import { Markdown } from '../../Common/Markdown';
-import { artefactLinks, renderChatMarkdown } from '../../../utils/chatMarkdown';
+import { AssistantMessageBody } from './AssistantMessageBody';
+import { artefactLinks } from '../../../utils/chatMarkdown';
 import { filterProbeNextOptions, mergeLiveSpendIntoSnapshot, shouldShowSpendInsightBlock } from '../../../utils/analysisInsights';
 import type { AnalysisInsightSnapshot, ChatMessage } from '../../../types';
 
@@ -124,19 +125,19 @@ function AdvisorySections({ sections }: { sections: Record<string, unknown> }) {
       {takeaway && (
         <div>
           <p className="text-xs font-bold uppercase text-brand-muted">Executive takeaway</p>
-          <p className="text-xs mt-0.5 leading-relaxed">{renderChatMarkdown(takeaway)}</p>
+          <Markdown className="text-xs leading-relaxed">{takeaway}</Markdown>
         </div>
       )}
       {smeQualification && (
         <div>
           <p className="text-xs font-bold uppercase text-brand-muted">SME qualification</p>
-          <p className="text-xs mt-0.5 leading-relaxed">{renderChatMarkdown(smeQualification)}</p>
+          <Markdown className="text-xs leading-relaxed">{smeQualification}</Markdown>
         </div>
       )}
       {categoryFocus && (
         <div>
           <p className="text-xs font-bold uppercase text-brand-muted">Category focus</p>
-          <p className="text-xs mt-0.5 leading-relaxed">{renderChatMarkdown(categoryFocus)}</p>
+          <Markdown className="text-xs leading-relaxed">{categoryFocus}</Markdown>
         </div>
       )}
       {quickWins.length > 0 && (
@@ -210,6 +211,8 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
 }) => {
   const isUser = message.role === 'user';
   const sections = message.advisory_sections;
+  const presentation = message.presentation;
+  const hasPresentationBlocks = Boolean(presentation?.blocks && presentation.blocks.length > 0);
   const urls = artefactLinks(message.artefacts);
   const spendSnapshot = mergeLiveSpendIntoSnapshot(message.insight_snapshot, liveSnapshot ?? null);
   const probeSnapshot = spendSnapshot ?? message.insight_snapshot ?? liveSnapshot;
@@ -240,6 +243,8 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
         )}
         {isUser ? (
           <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+        ) : hasPresentationBlocks && presentation ? (
+          <AssistantMessageBody presentation={presentation} currency={currency} />
         ) : (
           <Markdown className="text-sm leading-relaxed">{message.content}</Markdown>
         )}
@@ -276,7 +281,7 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
             />
           )}
 
-        {!isUser && sections && typeof sections === 'object' && (
+        {!isUser && !hasPresentationBlocks && sections && typeof sections === 'object' && (
           <AdvisorySections sections={sections} />
         )}
 

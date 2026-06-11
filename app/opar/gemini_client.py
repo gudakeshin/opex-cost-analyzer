@@ -376,11 +376,11 @@ def synthesize_analysis_gemini(
             "- Each business lever must include specific operational/commercial changes.\n"
             "- Include at least 2 executive_callouts with concrete numbers.\n"
             "- Include at least 3 quick_wins_from_data.\n"
-            "- If the user question targets a specific category: `category_focus_section` MUST be "
-            "a decision-memo-quality analysis of at least 250 words. Write 3-5 paragraphs. "
-            "Name the exact suppliers and amounts from the data. Do NOT write a single sentence. "
-            "Explain the causal mechanism, not just the gap. "
-            "Make it self-contained — a CFO must be able to act on it without reading anything else.\n"
+            "- `category_focus_section` MUST be structured causal prose (200-450 words): ## subheadings "
+            "with 2-3 sentence paragraphs under each — not bullet-only, not a data dump. "
+            "Single category: ## Why the gap exists, ## What should change, ## Leadership decision. "
+            "Portfolio: one ## [Category name] section per priority category. "
+            "Explain mechanism and leadership decision; supplier names only when illustrating causality.\n"
         )
     user_prompt = (
         "Synthesize recommendations from this JSON context:\n"

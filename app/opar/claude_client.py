@@ -84,7 +84,7 @@ Return ONLY valid JSON with this schema:
 {
   "executive_takeaway": "string",
   "quick_wins_from_data": ["string"],
-  "category_focus_section": "string — REQUIRED when the question targets a specific spend category. Write 3-5 substantive paragraphs as a standalone CFO decision memo covering ALL of: (1) what the data shows NOW about this category—spend magnitude, addressable portion, and specific gap vs. peers or budget using exact numbers from inputs; (2) WHICH specific suppliers, lanes, or geographies are driving the issue—name them explicitly; (3) WHAT exact commercial, policy, or operational change should happen and WHY that specific mechanism releases value; (4) the financial outcome tied to modeled numbers; (5) execution dependency or leadership decision required. This must be self-contained, not a single sentence. Leave as empty string '' only when the question is not category-specific.",
+  "category_focus_section": "markdown string — structured causal prose (paragraphs under ## subheadings, not bullet-only and not a data table). Spend/supplier figures render in separate UI cards — explain mechanism in prose, naming suppliers only when illustrating why spend is elevated. Single category: ## Why the gap exists, ## What should change, ## Leadership decision (2-3 sentences each). Portfolio/multi-category: one ## [Category name] section per priority category (up to 3) with the same causal arc in prose. 200-450 words. Leave '' only when the question is purely procedural with no spend/benchmark context.",
   "business_levers": [
     {
       "lever_name": "string",
@@ -145,14 +145,7 @@ Constraints:
   4) what financial/business outcome to expect,
   5) what decision is required from leadership.
 - Avoid vague language; write like an experienced FP&A advisor preparing a decision memo.
-- When the user question targets a specific spend category, you MUST populate `category_focus_section` with a substantive 3-5 paragraph decision memo (minimum 250 words). This is the primary deliverable for category-focused asks — it must stand alone as something a CFO can read and act on. Rules:
-  - Paragraph 1: State what the data shows — name the exact spend, addressable fraction, and measured gap vs. benchmark or budget (use numbers from skill outputs).
-  - Paragraph 2: Name the specific suppliers, sub-categories, geographies, or payment terms patterns driving the issue — never leave these as generic "the data shows a gap".
-  - Paragraph 3: State the exact commercial/policy/operational action to take. Not "optimize" or "improve" — write what specifically changes (e.g. "renegotiate Oracle maintenance contracts from Net-30 to Net-60", "shift 18% of air freight to ocean for lanes with 5+ day lead time buffer").
-  - Paragraph 4: Explain the causal mechanism — why this specific action creates the financial outcome. Connect the action to the number.
-  - Paragraph 5: State the execution risk, dependency, or leadership decision required.
-  - Do NOT duplicate this narrative into executive_takeaway; executive_takeaway should be brief context when category_focus_section is populated.
-- When NOT category-focused, leave `category_focus_section` as an empty string.
+- Populate `category_focus_section` whenever the user asks about spend drivers, benchmark gaps, savings opportunities, or category performance — including portfolio-wide questions. Write readable causal prose: ## subheadings with short paragraphs (not walls of text, not bullet-only lists). Explain *why* the gap exists (root cause), *what* commercial/operational change closes it, and *what* leadership must decide. Do NOT restate spend tables — those appear in structured category cards. Keep executive_takeaway to 2-4 sentences when category_focus_section carries the causal depth.
 - Avoid section headers like "Top recommendations" for category-focused asks; frame as focused category actions.
 - If `deep_research_context` is present in the input, treat it as verified background research on this company/industry. Use it to strengthen evidence citations and benchmark references — do not contradict it.
 - If `available_analyses` is present, it lists analyses that ran but were not included in this context. When one is needed to answer well, say so explicitly (e.g. "temporal trend analysis is available — ask to include it") — NEVER invent its numbers.
@@ -990,11 +983,11 @@ def synthesize_analysis_claude(
             "- Each business lever must include specific operational/commercial changes.\n"
             "- Include at least 2 executive_callouts with concrete numbers.\n"
             "- Include at least 3 quick_wins_from_data.\n"
-            "- If the user question targets a specific category: `category_focus_section` MUST be "
-            "a decision-memo-quality analysis of at least 250 words. Write 3-5 paragraphs. "
-            "Name the exact suppliers and amounts from the data. Do NOT write a single sentence. "
-            "Explain the causal mechanism, not just the gap. "
-            "Make it self-contained — a CFO must be able to act on it without reading anything else.\n"
+            "- `category_focus_section` MUST be structured causal prose (200-450 words): ## subheadings "
+            "with 2-3 sentence paragraphs under each — not bullet-only, not a data dump. "
+            "Single category: ## Why the gap exists, ## What should change, ## Leadership decision. "
+            "Portfolio: one ## [Category name] section per priority category. "
+            "Explain mechanism and leadership decision; supplier names only when illustrating causality.\n"
         )
     # This call's output is consumed only as AdvisorySections (normalize_advisory_sections
     # drops recommendations/assumptions/citations) — suppress those fields so the response
@@ -1159,11 +1152,11 @@ def synthesize_analysis_claude_with_meta(
             "- Each business lever must include specific operational/commercial changes.\n"
             "- Include at least 2 executive_callouts with concrete numbers.\n"
             "- Include at least 3 quick_wins_from_data.\n"
-            "- If the user question targets a specific category: `category_focus_section` MUST be "
-            "a decision-memo-quality analysis of at least 250 words. Write 3-5 paragraphs. "
-            "Name the exact suppliers and amounts from the data. Do NOT write a single sentence. "
-            "Explain the causal mechanism, not just the gap. "
-            "Make it self-contained — a CFO must be able to act on it without reading anything else.\n"
+            "- `category_focus_section` MUST be structured causal prose (200-450 words): ## subheadings "
+            "with 2-3 sentence paragraphs under each — not bullet-only, not a data dump. "
+            "Single category: ## Why the gap exists, ## What should change, ## Leadership decision. "
+            "Portfolio: one ## [Category name] section per priority category. "
+            "Explain mechanism and leadership decision; supplier names only when illustrating causality.\n"
         )
 
     def _run_with_payload(in_payload: Dict[str, Any], timeout_s: int) -> Tuple[Dict[str, Any] | None, str | None]:

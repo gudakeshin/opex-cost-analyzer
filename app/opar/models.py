@@ -185,6 +185,19 @@ class AdvisoryActionItem(BaseModel):
     expected_impact: str
 
 
+class AdvisoryRecommendation(BaseModel):
+    category_id: str = ""
+    category_name: str = ""
+    lever: str = ""
+    priority: int = 0
+    financials: Dict[str, Any] = Field(default_factory=dict)
+    confidence: Dict[str, Any] = Field(default_factory=dict)
+    evidence: List[Dict[str, Any]] = Field(default_factory=list)
+    examples: List[Dict[str, Any]] = Field(default_factory=list)
+    risks: List[str] = Field(default_factory=list)
+    decisions_required: List[str] = Field(default_factory=list)
+
+
 class AdvisorySections(BaseModel):
     executive_takeaway: str = ""
     category_focus_section: str = ""
@@ -193,6 +206,7 @@ class AdvisorySections(BaseModel):
     executive_callouts: List[str] = Field(default_factory=list)
     priority_actions_30_60_90: List[AdvisoryActionItem] = Field(default_factory=list)
     sme_qualification_narrative: str = ""
+    recommendations: List[AdvisoryRecommendation] = Field(default_factory=list)
 
 
 class ReflectOutput(BaseModel):
@@ -211,6 +225,7 @@ class ReflectOutput(BaseModel):
     response_text: str = ""
     response_artefacts: List[str] = Field(default_factory=list)
     advisory_sections: AdvisorySections | None = None
+    presentation: Any = None  # AssistantPayload from app.opar.presentation
     quality_signals: Dict[str, Any] = Field(default_factory=dict)
     used_llm_synthesis: bool = False
     thinking_text: str | None = None

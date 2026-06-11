@@ -163,11 +163,42 @@ export interface AnalysisTraceStep {
   metrics?: Record<string, unknown>;
 }
 
+export interface SupplierRow {
+  supplier: string;
+  spend?: number | null;
+  share_of_category?: number | null;
+  note?: string | null;
+}
+
+export interface CategoryInsightData {
+  category_id: string;
+  category_name: string;
+  spend?: number | null;
+  spend_pct_revenue?: number | null;
+  benchmark_gap?: string | null;
+  addressable_gap?: number | null;
+  top_suppliers?: SupplierRow[];
+  concentration_hhi?: number | null;
+  suggested_actions?: string[];
+}
+
+export interface PresentationBlock {
+  kind: string;
+  title?: string;
+  data: Record<string, unknown>;
+}
+
+export interface AssistantPayload {
+  blocks: PresentationBlock[];
+  narrative_markdown?: string;
+}
+
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   thinking?: string;
   advisory_sections?: Record<string, unknown>;
+  presentation?: AssistantPayload;
   quality_signals?: QualitySignals;
   next_options?: ChatNextOption[];
   run_id?: string;
@@ -418,6 +449,7 @@ export interface V1ChatResponse {
   thinking?: string;
   artefacts?: Record<string, unknown>;
   advisory_sections?: Record<string, unknown>;
+  presentation?: AssistantPayload;
   quality_signals?: QualitySignals;
   degraded_mode?: boolean;
   used_llm_synthesis?: boolean;

@@ -6,6 +6,7 @@ from typing import Any, Callable, Dict, List
 from app.config import UPLOAD_DIR
 from app.memory import MemoryStore
 from app.opar.chat_synthesis import synthesize_chat_response
+from app.opar.presentation import assemble_assistant_payload
 from app.opar.visualization import build_chart_specs
 from app.opar.models import (
     ActResult,
@@ -148,6 +149,7 @@ def reflect(
     response_metadata: Dict[str, Any] = {}
     qa_used_llm = False
     advisory_sections: AdvisorySections | None = None
+    presentation = None
     thinking_text: str | None = None
 
     if is_qa_lookup(ctx, validated, composition_validated):
@@ -163,6 +165,8 @@ def reflect(
         response = synthesis.response_text
         response_metadata = synthesis.response_metadata
         qa_used_llm = synthesis.used_llm
+        if getattr(synthesis, "presentation", None):
+            presentation = synthesis.presentation
         if not qa_used_llm:
             degradation_reasons = {**degradation_reasons, "chat_synthesis": "provider_failed"}
         if synthesis.thinking_text:
@@ -187,13 +191,28 @@ def reflect(
                     "llm_advisory": advisory_skip_reason,
                 }
         if advisory_sections is not None:
-            response = compose_response_from_advisory(
-                advisory_sections,
-                composition_validated,
-                include_executive_takeaway=bool(ctx.wants_executive_narrative),
-                include_business_case_metrics=bool(ctx.intent_class == "business_case"),
-                category_focused=category_focused,
+            presentation = assemble_assistant_payload(
+                advisory_sections, composition_validated, ctx
             )
+            response = presentation.narrative_markdown
+            if not response.strip():
+                response = compose_response_from_advisory(
+                    advisory_sections,
+                    composition_validated,
+                    include_executive_takeaway=bool(ctx.wants_executive_narrative),
+                    include_business_case_metrics=bool(ctx.intent_class == "business_case"),
+                    category_focused=category_focused,
+                )
+            elif not presentation.blocks:
+                bands_only = compose_response_from_advisory(
+                    advisory_sections,
+                    composition_validated,
+                    include_executive_takeaway=bool(ctx.wants_executive_narrative),
+                    include_business_case_metrics=bool(ctx.intent_class == "business_case"),
+                    category_focused=category_focused,
+                )
+                if bands_only and bands_only != response:
+                    response = f"{response}\n\n{bands_only}".strip()
         elif advisory_was_needed and category_focused:
             # The question targets a specific category (e.g. "what drives spend
             # in HR & Recruitment?") and warranted an LLM narrative, but synthesis
@@ -297,4 +316,5 @@ def reflect(
         regulatory_events=reg_events,
         forced_regulatory_decision=forced_reg_decision,
         narrative_provenance_tag=provenance_tag,
+        presentation=presentation.model_dump() if presentation else None,
     )
