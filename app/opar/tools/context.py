@@ -164,4 +164,5 @@ class ToolSessionContext:
             user_summary="Agent-selected analysis path",
             estimated_duration="agent",
             requires_approval=False,
+            source="agent",
         )

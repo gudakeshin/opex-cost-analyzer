@@ -27,6 +27,14 @@ export const PlanApprovalModal: React.FC<PlanApprovalModalProps> = ({
     <p className="text-sm text-gray-600 mb-4">
       Human-in-the-loop: confirm the planned skills before the Act phase executes.
     </p>
+    {plan?.execution_mode === 'agentic' && (
+      <div className="mb-3 flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800">
+        <span className="mt-0.5 shrink-0">⚡</span>
+        <span>
+          <strong>Adaptive execution:</strong> an agent will discover and run the most relevant skills for your data at runtime. The list below shows likely candidates — actual skills may differ.
+        </span>
+      </div>
+    )}
     {plan?.user_summary ? (
       <p className="text-sm text-gray-900 whitespace-pre-wrap border-l-4 border-brand-green bg-gray-50 rounded-r-lg pl-4 py-2">
         {plan.user_summary}

@@ -11,6 +11,109 @@ from app.opar.models import AdvisorySections, ObserveContext
 _LLM_TOKEN_LIMIT = 80_000
 _CHARS_PER_TOKEN = 4
 
+# ── Relevance-filtered synthesis context ─────────────────────────────────────
+# query_capabilities (observe._detect_query_capabilities / LLM intent classify)
+# → skills whose outputs the synthesis prompt needs for that capability.
+# Skills not selected still ran — they are surfaced as an `available_analyses`
+# manifest so the LLM knows they exist and never invents their numbers.
+_CAPABILITY_SKILL_MAP: Dict[str, frozenset[str]] = {
+    "benchmarking": frozenset({
+        "peer-benchmarker", "internal-benchmarker", "peer-disclosure-miner",
+    }),
+    "value_modeling": frozenset({
+        "savings-modeler", "value-bridge-calculator", "heuristic-analyzer",
+        "scenario-modeler", "cost-to-serve-analyzer",
+    }),
+    "variance_analysis": frozenset({"bva-analyzer"}),
+    "temporal_trend": frozenset({"temporal-analyzer"}),
+    "working_capital": frozenset({
+        "payment-terms-optimizer", "indian-tax-optimizer", "msme-compliance-checker",
+    }),
+    "root_cause": frozenset({"root-cause-analyzer"}),
+    "visualization": frozenset(),       # charts come from visualization.py, not context
+    "schema_lookup": frozenset(),       # answered by qa_lookup, not advisory
+    "document_context": frozenset({"document-contextualizer"}),
+    "executive_narrative": frozenset({
+        "sme-critique", "evidence-gatherer", "value-to-shareholder-bridge",
+        "brsr-cobenefit-calculator",
+    }),
+    "supplier_breakdown": frozenset({
+        "vendor-master-builder", "consolidation-analyzer", "conflict-detector",
+    }),
+}
+
+# Always in context: the synthesis prompt's hard constraints (evidence ≥2 per
+# recommendation, transaction examples, SME qualification narrative) draw on
+# these regardless of which capability the question matched.
+_CORE_SYNTHESIS_SKILLS = frozenset({
+    "spend-profiler", "savings-modeler", "value-bridge-calculator",
+    "sme-critique", "evidence-gatherer",
+})
+
+# Deliverable intents keep full breadth — the deliverable *is* the breadth.
+_DELIVERABLE_INTENTS = frozenset({"business_case", "export_business_case"})
+
+
+def _manifest_headline(skill: str, output: Any) -> str:
+    """One-line description of an excluded skill output for available_analyses."""
+    if not isinstance(output, dict):
+        return "output available"
+    if skill == "temporal-analyzer":
+        n = len(output.get("period_trends", []) or [])
+        return f"period-over-period trends across {n} periods"
+    if skill == "bva-analyzer":
+        n = len(output.get("variances", []) or [])
+        return f"budget-vs-actuals variance for {n} categories"
+    if skill == "payment-terms-optimizer":
+        n = len(output.get("opportunities", []) or [])
+        return f"{n} payment-terms / working-capital opportunities"
+    if skill == "peer-benchmarker":
+        n = len(output.get("comparisons", []) or output.get("benchmark_gaps", []) or [])
+        return f"peer benchmark comparisons for {n} categories"
+    if skill == "root-cause-analyzer":
+        n = len(output.get("root_cause_findings", []) or [])
+        return f"{n} root-cause findings with eligible levers"
+    for count_key in ("opportunities", "findings", "comparisons", "items", "results"):
+        items = output.get(count_key)
+        if isinstance(items, list) and items:
+            return f"{len(items)} {count_key} available"
+    return "output available"
+
+
+def select_relevant_outputs(
+    ctx: ObserveContext,
+    validated: Dict[str, Dict[str, Any]],
+    *,
+    agent_path: bool = False,
+) -> Tuple[Dict[str, Dict[str, Any]], List[Dict[str, str]]]:
+    """Filter skill outputs entering the synthesis prompt by question relevance.
+
+    Conservative by design (the June-2026 keyword-prefilter regression showed
+    under-inclusion silently degrades answers): full context is kept whenever
+    the turn is a deliverable, capabilities are unknown, or the agent path
+    already selected skills progressively. Excluded skills return as an
+    `available_analyses` manifest, never silently dropped.
+    """
+    capabilities = [c for c in (ctx.query_capabilities or []) if c in _CAPABILITY_SKILL_MAP]
+    if agent_path or ctx.intent_class in _DELIVERABLE_INTENTS or not capabilities:
+        return dict(validated), []
+
+    from app.opar.claude_client import _SKIP_SKILLS
+
+    keep = set(_CORE_SYNTHESIS_SKILLS)
+    for cap in capabilities:
+        keep |= _CAPABILITY_SKILL_MAP[cap]
+    if ctx.explicit_category:
+        keep.add("root-cause-analyzer")
+
+    selected = {k: v for k, v in validated.items() if k in keep}
+    excluded = [
+        {"skill": k, "headline": _manifest_headline(k, v)}
+        for k, v in validated.items()
+        if k not in keep and k not in _SKIP_SKILLS
+    ]
+    return selected, excluded
+
 # Skills whose presence indicates a deep, category-level analysis ran (peer/
 # internal benchmarking, root-cause, variance/trend, value modeling). When the
 # user's question is category-focused and any of these ran, the answer should
@@ -208,6 +311,7 @@ def generate_llm_advisory_sections(
     thinking_budget_tokens: int = 8000,
     category_focused: bool | None = None,
     thinking_callback: Callable[[str], None] | None = None,
+    agent_path: bool = False,
 ) -> Tuple[AdvisorySections | None, str | None, str | None]:
     if not needs_llm_advisory(ctx, validated, category_focused=bool(category_focused)):
         return None, None, None
@@ -235,7 +339,17 @@ def generate_llm_advisory_sections(
 
     from app.opar.claude_client import _slim_skill_outputs, _truncate_doc_chunks
 
-    slim_skill_outputs = _slim_skill_outputs(validated)
+    relevant_outputs, available_analyses = select_relevant_outputs(
+        ctx, validated, agent_path=agent_path
+    )
+    if available_analyses:
+        logger.info(
+            "llm_context_relevance selected=%d excluded=%d capabilities=%s",
+            len(relevant_outputs),
+            len(available_analyses),
+            ",".join(ctx.query_capabilities or []),
+        )
+    slim_skill_outputs = _slim_skill_outputs(relevant_outputs)
     doc_chunks = retrieved_context if retrieved_context else _truncate_doc_chunks(docs, max_chunks=2)
 
     def _payload_estimate(outputs: Dict[str, Any]) -> int:
@@ -250,6 +364,7 @@ def generate_llm_advisory_sections(
             "skill_outputs": outputs,
             "document_chunks": doc_chunks,
             "transaction_examples": tx_examples,
+            "available_analyses": available_analyses,
         })
 
     estimated_tokens = _payload_estimate(slim_skill_outputs)
@@ -296,6 +411,7 @@ def generate_llm_advisory_sections(
         "thinking_budget_tokens": thinking_budget_tokens,
         "deep_research_summary": ctx.deep_research_summary,
         "retrieved_context": retrieved_context,
+        "available_analyses": available_analyses,
     }
     had_any_raw = False
     for synthesize in synthesizers:

@@ -179,6 +179,7 @@ def reflect(
                 thinking_budget_tokens=thinking_budget_tokens,
                 category_focused=category_focused,
                 thinking_callback=thinking_callback,
+                agent_path=getattr(plan, "source", "planner") == "agent",
             )
             if advisory_skip_reason:
                 degradation_reasons = {

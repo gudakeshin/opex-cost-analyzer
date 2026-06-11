@@ -155,6 +155,7 @@ Constraints:
 - When NOT category-focused, leave `category_focus_section` as an empty string.
 - Avoid section headers like "Top recommendations" for category-focused asks; frame as focused category actions.
 - If `deep_research_context` is present in the input, treat it as verified background research on this company/industry. Use it to strengthen evidence citations and benchmark references — do not contradict it.
+- If `available_analyses` is present, it lists analyses that ran but were not included in this context. When one is needed to answer well, say so explicitly (e.g. "temporal trend analysis is available — ask to include it") — NEVER invent its numbers.
 - When `sme_critique_data` is present in the input: populate `sme_qualification_narrative` with 2–4 sentences written as a Deloitte senior manager who just reviewed the output. For each initiative flagged as probe_first or insufficient_data, name the category, state the specific evidence gap, and explain what risk that creates for the saving. Be direct and specific — do NOT hedge with "it may be possible". Example tone: "The IT Cloud consolidation saving assumes contracts are up for renewal, but no contract register was provided — if locked beyond 18 months, this saving is FY27+ at best." Leave sme_qualification_narrative as empty string if no sme_critique_data is present or all initiatives are verdict=proceed.
 """
 
@@ -953,6 +954,7 @@ def synthesize_analysis_claude(
     thinking_budget_tokens: int = 8000,
     deep_research_summary: str | None = None,
     retrieved_context: List[str] | None = None,
+    available_analyses: List[Dict[str, str]] | None = None,
 ) -> Tuple[Dict[str, Any] | None, str | None]:
     """Synthesize executive recommendations from deterministic skill outputs.
 
@@ -960,7 +962,7 @@ def synthesize_analysis_claude(
     """
     if not GEMINI_ENABLED and not ANTHROPIC_ENABLED:
         return None, None
-    payload = {
+    payload: Dict[str, Any] = {
         "user_message": user_message,
         "session_context": {
             "company_name": manifest.get("company_name"),
@@ -975,6 +977,8 @@ def synthesize_analysis_claude(
     }
     if deep_research_summary:
         payload["deep_research_context"] = deep_research_summary
+    if available_analyses:
+        payload["available_analyses"] = available_analyses
     sme_data = _slim_sme_critique(skill_outputs.get("sme-critique"))
     if sme_data:
         payload["sme_critique_data"] = sme_data

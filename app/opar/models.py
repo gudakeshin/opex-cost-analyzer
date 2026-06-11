@@ -124,6 +124,9 @@ class ExecutionPlan(BaseModel):
     user_summary: str = ""
     estimated_duration: str = ""
     requires_approval: bool = False
+    # "planner" (static rule-based) or "agent" (tool-loop selected skills
+    # progressively — synthesis context filtering must not re-filter them).
+    source: str = "planner"
 
 
 class SkillTrace(BaseModel):

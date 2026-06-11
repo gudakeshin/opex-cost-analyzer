@@ -380,16 +380,40 @@ def run_opar_plan_preview(
         }
     exec_plan = plan(ctx)
     planned_skills = [t.skill_name for t in exec_plan.tasks]
+    user_summary = exec_plan.user_summary
+    execution_mode = "deterministic"
+    if _should_use_agent_path(ctx):
+        # Execution will take the agent tool-loop, not the static plan — show
+        # the semantic-discovery candidates the agent is likely to run so the
+        # user confirms what actually executes. The static plan remains the
+        # fallback if the agent fails at runtime.
+        execution_mode = "agentic"
+        user_summary = (
+            "An adaptive agent will discover and run the analysis skills your "
+            "data supports, then assemble the result with executive-ready outputs."
+        )
+        try:
+            from app.skills.discovery import discover_relevant_skills
+
+            candidates = [
+                c["name"] for c in discover_relevant_skills(ctx.user_message, k=8)
+                if isinstance(c, dict) and c.get("name")
+            ]
+            if candidates:
+                planned_skills = candidates
+        except Exception as exc:
+            logger.debug('"plan_preview skill discovery unavailable: %s"', exc)
     return {
         "hitl_required": False,
         "checkpoint_id": None,
         "clarification": None,
         "clarification_required": False,
         "clarification_prompt": None,
-        "user_summary": exec_plan.user_summary,
+        "user_summary": user_summary,
         "estimated_duration": exec_plan.estimated_duration,
         "requires_approval": exec_plan.requires_approval,
         "requires_confirmation": exec_plan.requires_approval,
+        "execution_mode": execution_mode,
         "planned_skills": planned_skills,
         "plan": {
             "total_skills": exec_plan.total_skills,
@@ -632,6 +656,7 @@ async def _run_opar_loop_inner(
     # ------------------------------------------------------------------
     # Agent controller (M2/M3): tool-use investigation before reflect
     # ------------------------------------------------------------------
+    agent_fallback_reason: str | None = None
     if _should_use_agent_path(ctx):
         from app.opar.agent_controller import try_agent_run
 
@@ -649,6 +674,12 @@ async def _run_opar_loop_inner(
                 "act",
                 f"Agent ran {len(agent_result.exec_plan.tasks)} skill(s) via tools.",
             )
+            if agent_result.backstop_skills:
+                _add_progress_step(
+                    progress,
+                    "act",
+                    "Completeness backstop ran: " + ", ".join(agent_result.backstop_skills),
+                )
             _add_progress_step(progress, "reflect", "Validating and summarizing results...")
             if progress_callback:
                 progress_callback("reflect", "Validating and summarizing results...")
@@ -665,12 +696,21 @@ async def _run_opar_loop_inner(
             meta["agent_trace"] = agent_result.agent_trace or []
             meta["agent_summary"] = agent_result.agent_summary
             meta["agent_path"] = True
+            if agent_result.backstop_skills:
+                meta["backstop_skills"] = agent_result.backstop_skills
             result.response_metadata = meta
             if agent_result.thinking_text:
                 result.thinking_text = agent_result.thinking_text
             result.progress_steps = progress
             logger.info('"opar_agent_complete session_id=%s"', session_id)
             return result
+        agent_fallback_reason = (
+            getattr(agent_result, "fallback_reason", None) if agent_result else None
+        ) or "agent_returned_no_result"
+        _add_progress_step(
+            progress, "plan",
+            f"Agent path unavailable ({agent_fallback_reason}) — using deterministic plan.",
+        )
 
     # ------------------------------------------------------------------
     # Deterministic fallback: Plan → Act → Reflect
@@ -770,5 +810,10 @@ async def _run_opar_loop_inner(
         break
 
     result.progress_steps = progress
+    if agent_fallback_reason:
+        meta = dict(result.response_metadata or {})
+        meta["agent_path"] = False
+        meta["agent_fallback_reason"] = agent_fallback_reason
+        result.response_metadata = meta
     logger.info('"opar_complete session_id=%s loop_complete=%s replan_cycles=%d"', session_id, result.loop_complete, replan_cycle)
     return result

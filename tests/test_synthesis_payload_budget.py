@@ -205,6 +205,48 @@ def test_generate_degrades_instead_of_skipping_when_over_budget() -> None:
     assert "spend-profiler" in captured["skill_outputs"]
 
 
+def test_available_analyses_passed_to_synthesizer() -> None:
+    """Excluded skills must appear in available_analyses in the synthesizer call.
+
+    Uses intent_class="benchmark" (in _ANALYSIS_INTENTS) so needs_llm_advisory
+    returns True and the synthesizer is actually called.  query_capabilities=
+    ["benchmarking"] maps peer-benchmarker into context and leaves bva-analyzer
+    (only in variance_analysis) as an excluded manifest entry.
+    """
+    captured: dict = {}
+
+    def fake_synthesize(user_message, **kwargs):
+        captured["available_analyses"] = kwargs.get("available_analyses")
+        captured["skill_outputs"] = kwargs.get("skill_outputs")
+        return None, None
+
+    ctx = ObserveContext(
+        user_message="benchmark my IT spend vs peers",
+        intent_class="benchmark",
+        query_capabilities=["benchmarking"],
+    )
+    validated = {
+        "spend-profiler": {"category_profile": [{"cat": "IT"}], "total_spend": 1_000_000},
+        "peer-benchmarker": {"comparisons": [{"cat": "IT"}]},
+        # bva-analyzer: only in variance_analysis capability — excluded for benchmarking query
+        "bva-analyzer": {"variances": [{"cat": "IT"}, {"cat": "HR"}]},
+    }
+    with patch("app.opar.reflect_advisory.ANTHROPIC_ENABLED", True), patch(
+        "app.opar.reflect_advisory._iter_analysis_synthesizers",
+        return_value=[fake_synthesize],
+    ):
+        generate_llm_advisory_sections(ctx, {}, validated)
+
+    aa = captured.get("available_analyses") or []
+    skill_outputs = captured.get("skill_outputs") or {}
+    # peer-benchmarker in context (matched benchmarking capability)
+    assert "peer-benchmarker" in skill_outputs, f"skill_outputs keys={list(skill_outputs)}"
+    # bva-analyzer excluded from context (wrong capability)
+    assert "bva-analyzer" not in skill_outputs
+    # bva-analyzer surfaced as available_analyses manifest entry
+    assert any(e.get("skill") == "bva-analyzer" for e in aa), f"available_analyses={aa}"
+
+
 def test_generate_skips_when_budget_unreachable() -> None:
     """If even an empty skill set exceeds the budget, keep the hard skip."""
     calls = []

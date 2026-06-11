@@ -332,6 +332,7 @@ def synthesize_analysis_gemini(
     thinking_budget_tokens: int = 8000,
     deep_research_summary: str | None = None,
     retrieved_context: List[str] | None = None,
+    available_analyses: List[Dict[str, str]] | None = None,
 ) -> Tuple[Dict[str, Any] | None, str | None]:
     """Synthesize executive recommendations via Gemini (mirrors synthesize_analysis_claude)."""
     if not GEMINI_ENABLED:
@@ -346,7 +347,7 @@ def synthesize_analysis_gemini(
         _truncate_doc_chunks,
     )
 
-    payload = {
+    payload: Dict[str, Any] = {
         "user_message": user_message,
         "session_context": {
             "company_name": manifest.get("company_name"),
@@ -361,6 +362,8 @@ def synthesize_analysis_gemini(
     }
     if deep_research_summary:
         payload["deep_research_context"] = deep_research_summary
+    if available_analyses:
+        payload["available_analyses"] = available_analyses
     sme_data = _slim_sme_critique(skill_outputs.get("sme-critique"))
     if sme_data:
         payload["sme_critique_data"] = sme_data

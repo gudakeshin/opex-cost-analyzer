@@ -444,6 +444,8 @@ export interface ChatPlanPreview {
   clarification?: BusinessClarification;
   clarification_required?: boolean;
   clarification_prompt?: string;
+  /** "agentic" when the agent tool-loop will select skills at runtime; "deterministic" for static planner. */
+  execution_mode?: string;
   [key: string]: unknown;
 }
 

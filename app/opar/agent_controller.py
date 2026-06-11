@@ -41,6 +41,20 @@ class AgentRunResult:
     thinking_text: str | None = None
     agent_trace: List[Dict[str, Any]] | None = None
     fallback_reason: str | None = None
+    # Skills the deliverable-completeness backstop ran because the agent
+    # didn't invoke them (business_case closure guarantee).
+    backstop_skills: List[str] | None = None
+
+
+# A business case must always rest on this dependency closure, however the
+# agent chose to investigate. Order matters: invoke_skill resolves upstream
+# dependencies, so listing them upstream-first avoids redundant resolution.
+_BC_REQUIRED_SKILLS: tuple[str, ...] = (
+    "spend-profiler",
+    "savings-modeler",
+    "value-bridge-calculator",
+    "business-case-builder",
+)
 
 
 def _iter_transports():
@@ -161,6 +175,26 @@ def run_agent_controller(
         if opps:
             session.skill_outputs["savings-modeler"]["opportunities"] = opps
 
+    backstop_skills: List[str] = []
+    if ctx.intent_class == "business_case":
+        # Deliverable-completeness backstop: the agent owns business_case, but
+        # an under-selecting run must not ship a business case missing its
+        # numeric closure — run whatever is missing deterministically.
+        for required in _BC_REQUIRED_SKILLS:
+            if required in session.skill_outputs:
+                continue
+            try:
+                session.invoke_skill(required)
+                backstop_skills.append(required)
+            except Exception as exc:
+                session.degradation_reasons[f"backstop:{required}"] = str(exc)[:160]
+        if backstop_skills:
+            logger.info(
+                '"agent_bc_backstop session=%s skills=%s"',
+                ctx.session_id,
+                ",".join(backstop_skills),
+            )
+
     act_result = session.to_act_result()
     exec_plan = session.to_execution_plan()
 
@@ -171,6 +205,7 @@ def run_agent_controller(
         agent_summary=loop_result.final_text,
         thinking_text=loop_result.thinking_text,
         agent_trace=session.agent_trace,
+        backstop_skills=backstop_skills or None,
     )
 
 
@@ -180,7 +215,9 @@ def try_agent_run(
     progress_callback: Callable[[str, str], None] | None = None,
     thinking_callback: Callable[[str], None] | None = None,
 ) -> Optional[AgentRunResult]:
-    """Attempt agent path; returns None to signal deterministic fallback."""
+    """Attempt agent path. On failure returns the result with success=False and
+    fallback_reason set (act_result is None) so the caller can record why the
+    deterministic plan ran instead."""
     result = run_agent_controller(
         ctx,
         progress_callback=progress_callback,
@@ -193,4 +230,4 @@ def try_agent_run(
         ctx.session_id,
         result.fallback_reason,
     )
-    return None
+    return result
