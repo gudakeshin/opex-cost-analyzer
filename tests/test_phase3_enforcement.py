@@ -320,12 +320,21 @@ class TestRegWatcher:
         assert len(events) == 0
 
     def test_surface_at_reflect_gate_forced_decision(self):
+        import os
         from app.services.reg_watcher import surface_at_reflect_gate
-        # "professional_services" matches GST event
-        result = surface_at_reflect_gate(["professional_services"], engagement_week=3)
-        assert result["forced_decision"] is True
-        assert result["gate_week"] == 3
-        assert "decision_prompt" in result
+        prev = os.environ.get("REG_WATCHER_LIVE")
+        os.environ["REG_WATCHER_LIVE"] = "1"
+        try:
+            # "professional_services" matches GST baseline event
+            result = surface_at_reflect_gate(["professional_services"], engagement_week=3)
+            assert result["forced_decision"] is True
+            assert result["gate_week"] == 3
+            assert "decision_prompt" in result
+        finally:
+            if prev is None:
+                os.environ.pop("REG_WATCHER_LIVE", None)
+            else:
+                os.environ["REG_WATCHER_LIVE"] = prev
 
     def test_surface_at_reflect_gate_no_match(self):
         from app.services.reg_watcher import surface_at_reflect_gate

@@ -118,6 +118,7 @@ def persist_session_analysis(
     manifest: Dict[str, Any],
     reporting_currency: str,
     advisory_sections: AdvisorySections | None,
+    regulatory_events: List[Dict[str, Any]] | None = None,
 ) -> None:
     if not validated:
         return
@@ -153,6 +154,8 @@ def persist_session_analysis(
         "skills_run_this_turn": list(validated.keys()),
         "updated_at": datetime.now(timezone.utc).isoformat(),
     })
+    if regulatory_events is not None:
+        analysis_snapshot["regulatory_events"] = regulatory_events
     if "spend-profiler" in validated:
         from app.services.spend_base import repair_spend_base_if_needed
 

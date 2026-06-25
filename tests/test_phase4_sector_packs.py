@@ -154,6 +154,16 @@ class TestSectorPackLoader:
         assert "RBI" in pack["regulatory_layer"]
         assert "KYC" in pack["regulatory_layer"]
 
+    def test_pharma_regulatory_layer(self):
+        pack = load_pack("pharma_lifesciences")
+        assert "CDSCO" in pack["regulatory_layer"]
+        assert "pharmacovigilance" in pack["regulatory_layer"].lower()
+
+    def test_telecom_regulatory_layer(self):
+        pack = load_pack("telecom_infra")
+        assert "TRAI" in pack["regulatory_layer"]
+        assert "spectrum" in pack["regulatory_layer"].lower()
+
     def test_manufacturing_benchmark_sources(self):
         pack = load_pack("manufacturing_diversified")
         bs = pack["benchmark_sources"]
@@ -173,6 +183,7 @@ class TestSectorPackRegression:
         assert result["checks"]["taxonomy_non_empty"]
         assert result["checks"]["peer_set_non_empty"]
         assert result["checks"]["version_semver"]
+        assert result["checks"]["regulatory_layer_present"]
 
     @pytest.mark.parametrize("pack_id", [
         "insurance_general", "it_ites", "pharma_lifesciences",

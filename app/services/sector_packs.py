@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import threading as _threading
 from functools import lru_cache
 from pathlib import Path
@@ -47,6 +48,57 @@ def _load_json(path: Path) -> Any:
         return json.load(f)
 
 
+def pack_dir(pack_id: str) -> Path:
+    return _SECTOR_PACKS_ROOT / pack_id
+
+
+def pack_levers_list(sector_levers: Dict[str, Any] | None) -> List[Dict[str, Any]]:
+    """Return lever rows from either ``levers`` or ``sector_specific_levers`` key."""
+    if not sector_levers:
+        return []
+    for key in ("levers", "sector_specific_levers"):
+        rows = sector_levers.get(key)
+        if isinstance(rows, list) and rows:
+            return [r for r in rows if isinstance(r, dict)]
+    return []
+
+
+def pack_file_counts(pack_id: str) -> Dict[str, int]:
+    """Lightweight asset counts without requiring a complete pack load."""
+    d = pack_dir(pack_id)
+    counts = {
+        "peer_count": 0,
+        "lever_count": 0,
+        "kpi_count": 0,
+        "category_count": 0,
+        "taxonomy_count": 0,
+    }
+    if not d.is_dir():
+        return counts
+    peer_path = d / "peer_set.json"
+    if peer_path.exists():
+        counts["peer_count"] = len(_load_json(peer_path).get("peers", []))
+    lev_path = d / "sector_levers.json"
+    if lev_path.exists():
+        counts["lever_count"] = len(pack_levers_list(_load_json(lev_path)))
+    kpi_path = d / "kpi_pack.json"
+    if kpi_path.exists():
+        kpis = _load_json(kpi_path)
+        counts["kpi_count"] = len(kpis) if isinstance(kpis, list) else 0
+    bench_path = d / "benchmarks_percentiles.json"
+    if bench_path.exists():
+        bench = _load_json(bench_path)
+        cats = (bench.get("benchmarks", {}).get(pack_id, {}).get("categories") or {})
+        counts["category_count"] = len(cats)
+    tax_path = d / "taxonomy_extension.json"
+    if tax_path.exists():
+        tax = _load_json(tax_path)
+        counts["taxonomy_count"] = len(tax.get("additional_categories", [])) + len(
+            tax.get("overrides", [])
+        )
+    return counts
+
+
 def list_available_packs() -> List[str]:
     """Return pack IDs for all directories that contain pack_manifest.yaml."""
     if not _SECTOR_PACKS_ROOT.exists():
@@ -73,6 +125,65 @@ def normalize_industry_selection(industry: str | None) -> str | None:
     if not stripped:
         return None
     return resolve_sector_pack_id(stripped) or stripped
+
+
+_TRIGGER_TABLE_ROW = re.compile(
+    r"^\|\s*(?P<trigger>[^|]+?)\s*\|\s*(?P<categories>[^|]+?)\s*\|\s*(?P<severity>[^|]+?)\s*\|\s*$"
+)
+
+
+def parse_regulatory_triggers(regulatory_md: str) -> List[Dict[str, Any]]:
+    """Parse the Regulatory Event Triggers markdown table from regulatory_layer.md."""
+    if not regulatory_md:
+        return []
+    triggers: List[Dict[str, Any]] = []
+    in_table = False
+    for line in regulatory_md.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("| Trigger"):
+            in_table = True
+            continue
+        if not in_table:
+            continue
+        if stripped.startswith("|---"):
+            continue
+        if not stripped.startswith("|"):
+            break
+        match = _TRIGGER_TABLE_ROW.match(stripped)
+        if not match:
+            continue
+        trigger = match.group("trigger").strip()
+        categories_raw = match.group("categories").strip()
+        severity = match.group("severity").strip().upper()
+        if categories_raw.lower() == "all":
+            category_ids: List[str] = ["all"]
+        else:
+            category_ids = [c.strip() for c in categories_raw.split(",") if c.strip()]
+        triggers.append({
+            "trigger": trigger,
+            "category_ids": category_ids,
+            "severity": severity,
+        })
+    return triggers
+
+
+def get_pack_regulatory_context(pack_id: str) -> Dict[str, Any]:
+    """Return regulatory layer text, parsed triggers, and manifest regulatory bodies."""
+    resolved = resolve_sector_pack_id(pack_id) or pack_id
+    if not resolved or not (pack_dir(resolved) / "pack_manifest.yaml").exists():
+        return {"pack_id": pack_id, "regulatory_layer": "", "triggers": [], "regulatory_bodies": []}
+    pack = load_pack(resolved)
+    regulatory_layer = pack.get("regulatory_layer") or ""
+    manifest = pack.get("manifest") or {}
+    bodies = manifest.get("regulatory_bodies") or []
+    if not isinstance(bodies, list):
+        bodies = [bodies]
+    return {
+        "pack_id": resolved,
+        "regulatory_layer": regulatory_layer,
+        "triggers": parse_regulatory_triggers(regulatory_layer),
+        "regulatory_bodies": bodies,
+    }
 
 
 @lru_cache(maxsize=32)
@@ -256,6 +367,12 @@ def run_regression_test(pack_id: str) -> Dict[str, Any]:
         errors.append(f"Sector levers missing effort_weeks/implementation_weeks.p50: {bad_effort}")
     if bad_applicability:
         errors.append(f"Sector levers missing applicability_threshold_pct: {bad_applicability}")
+
+    status = str(pack.get("status") or pack["manifest"].get("status") or "scaffold")
+    has_regulatory = bool((pack.get("regulatory_layer") or "").strip())
+    checks["regulatory_layer_present"] = has_regulatory
+    if status == "full" and not has_regulatory:
+        errors.append("regulatory_layer.md is required for status=full packs")
 
     passed = all(checks.values())
     return {"passed": passed, "pack_id": pack_id, "version": pack["version"], "checks": checks, "errors": errors}

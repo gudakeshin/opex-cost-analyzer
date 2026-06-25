@@ -84,6 +84,8 @@ def _opar_response(result: Any, run_id: str, session_id: str | None = None) -> D
         "run_id": run_id,
         "hitl_required": getattr(result, "hitl_required", False),
         "checkpoint_id": getattr(result, "checkpoint_id", None),
+        "regulatory_events": getattr(result, "regulatory_events", None) or [],
+        "forced_regulatory_decision": getattr(result, "forced_regulatory_decision", False),
         "clarification": (
             result.clarification.model_dump()
             if getattr(result, "clarification", None) is not None
@@ -91,6 +93,10 @@ def _opar_response(result: Any, run_id: str, session_id: str | None = None) -> D
         ),
         "response_metadata": getattr(result, "response_metadata", None) or {},
         "charts": getattr(result, "chart_specs", None) or [],
+        "suggested_outputs": [
+            s.model_dump() if hasattr(s, "model_dump") else s
+            for s in (getattr(result, "suggested_outputs", None) or [])
+        ],
     }
 
 

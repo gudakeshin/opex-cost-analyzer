@@ -338,6 +338,7 @@ def _run_gate2_check(
 def _run_reg_watcher(
     validated: Dict[str, Dict[str, Any]],
     ctx: ObserveContext,
+    manifest: Dict[str, Any] | None = None,
 ) -> tuple[bool, List[Dict[str, Any]], str]:
     """Surface regulatory events relevant to active spend categories.
 
@@ -353,7 +354,18 @@ def _run_reg_watcher(
     ]
     if not categories:
         return False, [], ""
-    result = surface_at_reflect_gate(categories, engagement_week=ctx.engagement_week)
+    pack_id = None
+    if manifest:
+        from app.services.sector_packs import resolve_sector_pack_id
+
+        industry = str(manifest.get("industry") or "").strip()
+        if industry:
+            pack_id = resolve_sector_pack_id(industry) or industry
+    result = surface_at_reflect_gate(
+        categories,
+        engagement_week=ctx.engagement_week,
+        pack_id=pack_id,
+    )
     return (
         result["forced_decision"],
         result["events"],

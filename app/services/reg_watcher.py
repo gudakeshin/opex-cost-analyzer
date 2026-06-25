@@ -9,6 +9,7 @@ unacknowledged HIGH-severity event matches an active initiative category.
 from __future__ import annotations
 
 import json
+import os
 import threading
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
@@ -150,9 +151,9 @@ def acknowledge_event(event_id: str, *, acknowledged_by: str) -> bool:
     return found
 
 
-# --------------------------------------------------------------------------- #
-# Core query interface                                                           #
-# --------------------------------------------------------------------------- #
+def _live_feeds_enabled() -> bool:
+    """Phase 4 live HTTP polling — off by default; sample catalogue is advisory only."""
+    return os.environ.get("REG_WATCHER_LIVE", "").strip().lower() in ("1", "true", "yes")
 
 def get_active_events(
     *,
@@ -195,10 +196,57 @@ def get_active_events(
     return results
 
 
+def _trigger_matches_categories(trigger: Dict[str, Any], active_category_ids: List[str]) -> bool:
+    """Return True when a pack trigger applies to at least one active category."""
+    trigger_cats = [c.lower() for c in (trigger.get("category_ids") or [])]
+    active = [c.lower() for c in active_category_ids if c]
+    if not active:
+        return False
+    if "all" in trigger_cats:
+        return True
+    return bool(set(trigger_cats).intersection(active))
+
+
+def surface_pack_regulatory_events(
+    pack_id: str,
+    active_category_ids: List[str],
+) -> List[Dict[str, Any]]:
+    """Convert sector-pack regulatory triggers into event-like dicts for active categories."""
+    from app.services.sector_packs import get_pack_regulatory_context
+
+    if not pack_id or not active_category_ids:
+        return []
+    ctx = get_pack_regulatory_context(pack_id)
+    bodies = ctx.get("regulatory_bodies") or []
+    source = str(bodies[0]) if bodies else "SECTOR_PACK"
+    events: List[Dict[str, Any]] = []
+    for idx, trigger in enumerate(ctx.get("triggers") or []):
+        if not _trigger_matches_categories(trigger, active_category_ids):
+            continue
+        severity = str(trigger.get("severity") or SEVERITY_MEDIUM).upper()
+        events.append({
+            "event_id": f"PACK_{ctx.get('pack_id', pack_id)}_{idx}",
+            "source": source,
+            "title": str(trigger.get("trigger") or "Sector regulatory trigger"),
+            "summary": (
+                f"Sector-pack regulatory watch item for {ctx.get('pack_id', pack_id)}: "
+                f"{trigger.get('trigger', '')}. Review initiative addressability and compliance assumptions."
+            ),
+            "effective_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+            "severity": severity,
+            "affected_categories": list(trigger.get("category_ids") or []),
+            "acknowledged": False,
+            "origin": "sector_pack_trigger",
+            "pack_id": ctx.get("pack_id", pack_id),
+        })
+    return events
+
+
 def surface_at_reflect_gate(
     active_category_ids: List[str],
     *,
     engagement_week: int = 1,
+    pack_id: str | None = None,
 ) -> Dict[str, Any]:
     """Determine whether a forced decision is required at this Reflect gate.
 
@@ -208,16 +256,36 @@ def surface_at_reflect_gate(
       decision_prompt   — human-readable prompt to surface in the UI
       gate_week         — current engagement week
     """
-    matching = get_active_events(categories=active_category_ids, severity_filter=SEVERITY_HIGH)
-    forced = len(matching) > 0
-    if forced:
+    baseline_high = get_active_events(categories=active_category_ids, severity_filter=SEVERITY_HIGH)
+    pack_events = surface_pack_regulatory_events(pack_id, active_category_ids) if pack_id else []
+    pack_high = [ev for ev in pack_events if ev.get("severity") == SEVERITY_HIGH]
+    matching: List[Dict[str, Any]] = list(baseline_high)
+    seen_ids = {ev.get("event_id") for ev in matching}
+    for ev in pack_events:
+        if ev.get("event_id") not in seen_ids:
+            matching.append(ev)
+            seen_ids.add(ev.get("event_id"))
+    live = _live_feeds_enabled()
+    # Sample catalogue events are visible for awareness but do not force HITL until live feeds are on.
+    forced = live and (len(baseline_high) > 0 or len(pack_high) > 0)
+    catalogue_note = (
+        "Live regulatory feeds enabled — unacknowledged HIGH events can block the gate."
+        if live
+        else "Sample catalogue only (set REG_WATCHER_LIVE=1 for live feed gating)."
+    )
+    if matching:
         prompt = (
-            f"Week {engagement_week} gate — regulatory events require a decision before proceeding:\n"
+            f"Week {engagement_week} gate — {len(matching)} regulatory event(s) match active categories "
+            f"({catalogue_note}):\n"
             + "\n".join(
                 f"• [{ev['source']}] {ev['title']}: {ev['summary']}"
                 for ev in matching[:3]
             )
-            + "\nAcknowledge each event or adjust initiative assumptions before Gate-2."
+            + (
+                "\nAcknowledge each event or adjust initiative assumptions before Gate-2."
+                if forced
+                else "\nReview for awareness — gate is not blocked in sample-catalogue mode."
+            )
         )
     else:
         prompt = f"Week {engagement_week} gate — no unacknowledged HIGH-severity regulatory events affecting active categories."
@@ -227,4 +295,6 @@ def surface_at_reflect_gate(
         "events": matching,
         "decision_prompt": prompt,
         "gate_week": engagement_week,
+        "event_source_mode": "live_feeds" if live else "sample_catalogue",
+        "catalogue_note": catalogue_note,
     }

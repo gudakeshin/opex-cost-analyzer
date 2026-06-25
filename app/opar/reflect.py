@@ -255,6 +255,9 @@ def reflect(
                 )
             response = (response + "\n" + "\n".join(evidence_lines)).strip()
 
+    gate2_blocked, gate2_narrative = _run_gate2_check(validated, ctx)
+    forced_reg_decision, reg_events, _reg_prompt = _run_reg_watcher(validated, ctx, manifest=manifest)
+
     persist_session_analysis(
         ctx=ctx,
         act_result=act_result,
@@ -262,11 +265,9 @@ def reflect(
         manifest=manifest,
         reporting_currency=reporting_currency,
         advisory_sections=advisory_sections,
+        regulatory_events=reg_events,
     )
     persist_conflict_manifest(ctx.session_id, validated)
-
-    gate2_blocked, gate2_narrative = _run_gate2_check(validated, ctx)
-    forced_reg_decision, reg_events, _reg_prompt = _run_reg_watcher(validated, ctx)
     artefacts, next_options = build_next_options(
         ctx,
         validated,
@@ -317,4 +318,5 @@ def reflect(
         forced_regulatory_decision=forced_reg_decision,
         narrative_provenance_tag=provenance_tag,
         presentation=presentation.model_dump() if presentation else None,
+        suggested_outputs=list(plan.suggested_outputs or []),
     )

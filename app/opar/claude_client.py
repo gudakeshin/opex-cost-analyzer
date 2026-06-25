@@ -935,6 +935,33 @@ def _timeout_budget_seconds(payload: Dict[str, Any], strict_mode: bool = False) 
     return base
 
 
+_REGULATORY_CONTEXT_HINT = (
+    "If regulatory_context is present, cite applicable in-force regulations when discussing "
+    "addressability, compliance spend, and initiative risks."
+)
+
+
+def _regulatory_context_for_manifest(manifest: Dict[str, Any]) -> str:
+    """Load truncated sector-pack regulatory layer for LLM synthesis payloads."""
+    industry = str(manifest.get("industry") or "").strip()
+    if not industry:
+        return ""
+    try:
+        from app.services.sector_packs import get_pack_regulatory_context
+
+        ctx = get_pack_regulatory_context(industry)
+        layer = str(ctx.get("regulatory_layer") or "").strip()
+        return layer[:2500] if layer else ""
+    except Exception:
+        return ""
+
+
+def _attach_regulatory_context(payload: Dict[str, Any], manifest: Dict[str, Any]) -> None:
+    regulatory = _regulatory_context_for_manifest(manifest)
+    if regulatory:
+        payload["regulatory_context"] = regulatory
+
+
 def synthesize_analysis_claude(
     user_message: str,
     manifest: Dict[str, Any],
@@ -972,6 +999,7 @@ def synthesize_analysis_claude(
         payload["deep_research_context"] = deep_research_summary
     if available_analyses:
         payload["available_analyses"] = available_analyses
+    _attach_regulatory_context(payload, manifest)
     sme_data = _slim_sme_critique(skill_outputs.get("sme-critique"))
     if sme_data:
         payload["sme_critique_data"] = sme_data
@@ -1004,6 +1032,7 @@ def synthesize_analysis_claude(
         f"{json.dumps(payload, ensure_ascii=False)}\n"
         f"{strict_hint}"
         f"{advisory_hint}"
+        f"\n{_REGULATORY_CONTEXT_HINT}\n"
     )
     from app.config import llm_thinking_timeout_seconds, logger as _log
 
@@ -1144,6 +1173,7 @@ def synthesize_analysis_claude_with_meta(
     sme_data = _slim_sme_critique(skill_outputs.get("sme-critique"))
     if sme_data:
         payload["sme_critique_data"] = sme_data
+    _attach_regulatory_context(payload, manifest)
     strict_hint = ""
     if strict_mode:
         strict_hint = (
@@ -1168,7 +1198,8 @@ def synthesize_analysis_claude_with_meta(
             (
                 "Synthesize recommendations from this JSON context:\n"
                 f"{json.dumps(in_payload, ensure_ascii=False)}\n"
-                f"{strict_hint}"
+                f"{strict_hint}\n"
+                f"{_REGULATORY_CONTEXT_HINT}\n"
             ),
             _ADVISORY_MAX_OUTPUT_TOKENS,
         )
@@ -1222,6 +1253,7 @@ def draft_executive_communication_claude(
         "model_manifest": model_manifest or {},
         "skill_outputs": _slim_skill_outputs(skill_outputs),
     }
+    _attach_regulatory_context(payload, manifest)
     audience = str((manifest.get("audience") or "cfo")).lower()
     audience_hint = _AUDIENCE_HINTS.get(audience, _AUDIENCE_HINTS["cfo"])
     executor = ThreadPoolExecutor(max_workers=1)
@@ -1232,7 +1264,8 @@ def draft_executive_communication_claude(
         (
             f"Target audience: {audience}\n"
             f"Audience style hint: {audience_hint}\n\n"
-            f"Draft executive communication from this JSON context:\n{json.dumps(payload, ensure_ascii=False)}"
+            f"Draft executive communication from this JSON context:\n{json.dumps(payload, ensure_ascii=False)}\n"
+            f"{_REGULATORY_CONTEXT_HINT}"
         ),
         1200,
     )
@@ -1275,6 +1308,68 @@ def draft_executive_communication_claude_with_meta(
     if out is None:
         return None, "timeout"
     return out, None
+
+
+_DECLARATIVE_SYSTEM_PROMPT = (
+    "You are an OpEx analysis skill executing inside a deterministic pipeline. "
+    "Follow the skill instruction prompt precisely. Return ONLY valid JSON — no markdown, no prose."
+)
+
+
+def run_declarative_skill_claude_with_meta(
+    skill_name: str,
+    instruction_prompt: str,
+    user_message: str,
+    manifest: Dict[str, Any],
+    upstream_outputs: Dict[str, Any],
+    docs_text: List[str] | None = None,
+) -> Tuple[Dict[str, Any] | None, str | None]:
+    """Generic declarative skill runtime — shared client, retry, and degradation semantics."""
+    if not ANTHROPIC_ENABLED:
+        return None, "provider_disabled"
+    payload = {
+        "skill_name": skill_name,
+        "user_message": user_message,
+        "session_context": {
+            "company_name": manifest.get("company_name"),
+            "industry": manifest.get("industry"),
+            "annual_revenue": manifest.get("annual_revenue"),
+            "currency": manifest.get("currency") or manifest.get("reporting_currency"),
+        },
+        "upstream_outputs": upstream_outputs,
+        "document_chunks": _truncate_doc_chunks(docs_text or [], max_chunks=2),
+    }
+    executor = ThreadPoolExecutor(max_workers=1)
+    future = submit_with_context(
+        executor,
+        _call_claude,
+        _DECLARATIVE_SYSTEM_PROMPT,
+        (
+            f"Skill instruction:\n{instruction_prompt}\n\n"
+            f"Context JSON:\n{json.dumps(payload, ensure_ascii=False)}"
+        ),
+        1200,
+    )
+    try:
+        raw = future.result(timeout=12)
+    except FuturesTimeoutError:
+        future.cancel()
+        executor.shutdown(wait=False, cancel_futures=True)
+        return None, "timeout"
+    except Exception:
+        future.cancel()
+        executor.shutdown(wait=False, cancel_futures=True)
+        return None, "provider_unavailable"
+    finally:
+        if not future.cancelled():
+            executor.shutdown(wait=True, cancel_futures=True)
+    try:
+        data = _extract_json(raw)
+    except Exception:
+        return None, "schema_parse_fail"
+    if isinstance(data, dict):
+        return data, None
+    return None, "schema_parse_fail"
 
 
 def interpret_workbook_structure_claude_with_meta(
