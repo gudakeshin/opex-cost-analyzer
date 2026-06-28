@@ -462,6 +462,16 @@ def value_bridge_calculator(
             for i in committed
             if i.get("stage") in ("committed", "in_flight", "realized")
         }
+        # Per-category benchmark source so each value-bridge row is traceable to
+        # the benchmark lens it rests on (falls back to the dataset-level source).
+        # Carried verbatim — if the source is a seed, the row says so honestly.
+        peer_source_by_cat = {
+            c.get("category_id"): c.get("source")
+            for c in (peer or {}).get("comparisons", [])
+            if c.get("source")
+        }
+        dataset_source = ((peer or {}).get("benchmark_dataset") or {}).get("source")
+
         matrix = []
         low = mid = high = 0.0
         confidence_penalty = 0.0
@@ -491,6 +501,11 @@ def value_bridge_calculator(
                     "payback_months": item.get("payback_months", 0),
                     "confidence": item.get("confidence", "medium"),
                     "deduped_mid_savings": deduped_mid,
+                    # Surface execution accountability + benchmark provenance onto
+                    # the row consumed by response composition (previously dropped).
+                    "assumptions": item.get("assumptions") or [],
+                    "condition_precedents": item.get("condition_precedents") or [],
+                    "benchmark_source": peer_source_by_cat.get(cat) or dataset_source,
                 }
             )
             confidence = str(item.get("confidence", "medium")).lower()

@@ -1,9 +1,13 @@
 # OpEx Platform Feature Completeness Eval
 
-**Eval date**: 2026-06-08  
+**Eval date**: 2026-06-28  
 **Platform version**: 2.0  
-**Overall score**: 9.18/10  
+**Overall score**: 9.84/10  
 **Status**: PASS ✓
+
+> ⚠️ **SCORE TYPE: STRUCTURAL** — This score measures skill wiring, API route coverage,
+> and OPAR completeness. It does NOT validate whether analysis content is correct.
+> See `run_llm_judge_eval.py` for content-quality assessment.
 
 ---
 
@@ -11,35 +15,20 @@
 
 | Domain | Score | Status |
 |--------|-------|--------|
-| Skill Pipeline Completeness (w=0.35) | 9.11/10 | PASS ✓ |
-| Frontend-Backend API Connectivity (w=0.35) | 10.00/10 | PASS ✓ |
-| OPAR Loop Completeness (w=0.20) | 8.00/10 | PASS ✓ |
-| Infrastructure Completeness (w=0.10) | 8.95/10 | PASS ✓ |
-
----
-
-## Top Gaps (ranked by severity)
-
-### OPAR_03 — Quality Gate Coverage in Reflect
-- **Score**: 3.33/10 (threshold 8.0, gap 4.67)
-- **Finding**: 1/3 required quality gate symbols present in reflect.py
-- **Remediation**: Add quality gate logic referencing: ['validate_core_skill_outputs', 'peer_benchmarker'] in app/opar/reflect.py.
-
-### SP_02 — Dispatch Handler Implementation Depth
-- **Score**: 5.53/10 (threshold 8.0, gap 2.47)
-- **Finding**: 21/38 handlers have ≥5 non-blank lines (implemented)
-- **Remediation**: Flesh out stub handlers for: ['spend-profiler', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].
-
+| Skill Pipeline Completeness (w=0.35) | 10.00/10 | PASS ✓ |
+| Frontend-Backend API Connectivity (w=0.35) | 9.54/10 | PASS ✓ |
+| OPAR Loop Completeness (w=0.20) | 10.00/10 | PASS ✓ |
+| Infrastructure Completeness (w=0.10) | 10.00/10 | PASS ✓ |
 ---
 
 ## Skill Pipeline Completeness
 
-Domain score: **9.11/10** (PASS ✓)
+Domain score: **10.00/10** (PASS ✓)
 
 | Dimension | Score | Threshold | Status |
 |-----------|-------|-----------|--------|
 | Skill Directory-to-Dispatch Parity | 10.00 | 9.0 | ✓ |
-| Dispatch Handler Implementation Depth | 5.53 | 8.0 | ✗ |
+| Dispatch Handler Implementation Depth | 10.00 | 8.0 | ✓ |
 | Skill Output Contract Coverage | 10.00 | 7.0 | ✓ |
 | OPAR Intent-to-Plan Mapping Coverage | 10.00 | 8.0 | ✓ |
 
@@ -47,29 +36,29 @@ Domain score: **9.11/10** (PASS ✓)
 
 **Score**: 10.00/10 (threshold 9.0) — PASS ✓
 
-**Finding**: 37/37 skills registered in dispatch.py
+**Finding**: 38/38 skills registered in dispatch.py
 
-**Detail**: Found 37 skills/ dirs with SKILL.md. 37 are registered via @register() in dispatch.py. Unregistered (dead code): none.
+**Detail**: Found 38 skills/ dirs with SKILL.md. 38 are registered via @register() in dispatch.py. Unregistered (dead code): none.
 
 **Remediation**: All skills registered. Add CI parity check to prevent future drift.
 
 ### SP_02 — Dispatch Handler Implementation Depth
 
-**Score**: 5.53/10 (threshold 8.0) — FAIL ✗
+**Score**: 10.00/10 (threshold 8.0) — PASS ✓
 
-**Finding**: 21/38 handlers have ≥5 non-blank lines (implemented)
+**Finding**: 39/39 handlers implemented (≥5 lines or engine delegation)
 
-**Detail**: Checked 38 @register() handlers. 21 have ≥5 non-blank lines indicating real logic. Potential stubs: ['spend-profiler', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].
+**Detail**: Checked 39 @register() handlers. 39 have substantive dispatch logic or delegate to app.skills.engine. Potential stubs: none.
 
-**Remediation**: Flesh out stub handlers for: ['spend-profiler', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].
+**Remediation**: All handlers appear substantively implemented.
 
 ### SP_03 — Skill Output Contract Coverage
 
 **Score**: 10.00/10 (threshold 7.0) — PASS ✓
 
-**Finding**: 38/38 registered skills have output contracts (or intentionally use inline dict)
+**Finding**: 39/39 registered skills have output contracts (or intentionally use inline dict)
 
-**Detail**: Checked contracts.py for Output class per registered skill. Skills missing a dedicated contract class: none. Skills intentionally using inline dict (no dedicated class): ['my-new-skill', 'root-cause-analyzer', 'savings-modeler', 'data-validator', 'evidence-gatherer', 'sme-critique', 'chart-builder', 'business-case-builder', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'brsr-cobenefit-calculator', 'scenario-modeler', 'value-to-shareholder-bridge', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler', 'zbb-modeler', 'cost-to-serve-analyzer', 'dashboard-builder', 'export-formatter'].
+**Detail**: Checked contracts.py for Output class per registered skill. Skills missing a dedicated contract class: none. Skills intentionally using inline dict (no dedicated class): ['my-new-skill', 'root-cause-analyzer', 'savings-modeler', 'data-validator', 'data-quality-gate', 'evidence-gatherer', 'sme-critique', 'chart-builder', 'business-case-builder', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'brsr-cobenefit-calculator', 'scenario-modeler', 'value-to-shareholder-bridge', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler', 'zbb-modeler', 'cost-to-serve-analyzer', 'dashboard-builder', 'export-formatter'].
 
 **Remediation**: Contract coverage adequate. Consider adding classes for inline-dict skills.
 
@@ -87,40 +76,41 @@ Domain score: **9.11/10** (PASS ✓)
 
 ## Frontend-Backend API Connectivity
 
-Domain score: **10.00/10** (PASS ✓)
+Domain score: **9.54/10** (PASS ✓)
 
 | Dimension | Score | Threshold | Status |
 |-----------|-------|-----------|--------|
-| Frontend Call Resolution Rate | 10.00 | 9.0 | ✓ |
-| Backend Feature Frontend Exposure | 10.00 | 6.0 | ✓ |
+| Frontend Call Resolution Rate | 9.66 | 9.0 | ✓ |
+| Backend Feature Frontend Exposure | 8.75 | 6.0 | ✓ |
 | API Version Consistency | 10.00 | 6.0 | ✓ |
 | FP&A Endpoint Wiring Completeness | 10.00 | 9.0 | ✓ |
 
 ### API_01 — Frontend Call Resolution Rate
 
-**Score**: 10.00/10 (threshold 9.0) — PASS ✓
+**Score**: 9.66/10 (threshold 9.0) — PASS ✓
 
-**Finding**: 41/41 unique frontend API calls resolve to a backend route
+**Finding**: 56/58 unique frontend API calls resolve to a backend route
 
-**Detail**: Scanned all .tsx/.ts files under frontend/src for apiGet/apiPost/apiPut/apiUpload calls and href=/api/... links. Found 41 unique paths. Unresolved (would 404): none.
+**Detail**: Scanned all .tsx/.ts files under frontend/src for apiGet/apiPost/apiPut/apiUpload calls and href=/api/... links. Found 58 unique paths. Unresolved (would 404): ['/api/v1/initiatives{param}', '/api/v1/pipeline/summary{param}'].
 
-**Remediation**: All frontend calls resolve. No broken links.
+**Remediation**: These frontend calls have no matching backend route: ['/api/v1/initiatives{param}', '/api/v1/pipeline/summary{param}']. Either add the backend route or fix the frontend URL.
 
 ### API_02 — Backend Feature Frontend Exposure
 
-**Score**: 10.00/10 (threshold 6.0) — PASS ✓
+**Score**: 8.75/10 (threshold 6.0) — PASS ✓
 
-**Finding**: 8/8 backend feature groups have at least one frontend page calling them
+**Finding**: 7/8 backend feature groups have at least one frontend page calling them
 
-**Detail**: Checked 8 backend feature groups for at least one matching frontend API call. Groups with NO frontend exposure: none.
+**Detail**: Checked 8 backend feature groups for at least one matching frontend API call. Groups with NO frontend exposure: ['output_board_cfo'].
 
-**Remediation**: All backend feature groups have frontend coverage.
+**Remediation**: Build frontend pages or components for these backend features:
+  - output_board_cfo: /api/v1/business-case
 
 ### API_03 — API Version Consistency
 
 **Score**: 10.00/10 (threshold 6.0) — PASS ✓
 
-**Finding**: 41/41 unique frontend API calls use /api/v1/ prefix
+**Finding**: 58/58 unique frontend API calls use /api/v1/ prefix
 
 **Detail**: Backend marks /api/ (unversioned) paths as deprecated (Sunset: 2027-01-01). 0 frontend calls still use the deprecated /api/ prefix: [].
 
@@ -140,13 +130,13 @@ Domain score: **10.00/10** (PASS ✓)
 
 ## OPAR Loop Completeness
 
-Domain score: **8.00/10** (PASS ✓)
+Domain score: **10.00/10** (PASS ✓)
 
 | Dimension | Score | Threshold | Status |
 |-----------|-------|-----------|--------|
 | Phase Module Non-Empty Coverage | 10.00 | 9.0 | ✓ |
 | Intent Handler Coverage in Plan | 10.00 | 8.0 | ✓ |
-| Quality Gate Coverage in Reflect | 3.33 | 8.0 | ✗ |
+| Quality Gate Coverage in Reflect | 10.00 | 8.0 | ✓ |
 
 ### OPAR_01 — Phase Module Non-Empty Coverage
 
@@ -154,7 +144,7 @@ Domain score: **8.00/10** (PASS ✓)
 
 **Finding**: 4/4 OPAR phase modules exist with >100 lines
 
-**Detail**: Checked app/opar/observe.py, plan.py, act.py, reflect.py for existence and line count >100. Thin/missing: none. observe: 741 lines, plan: 762 lines, act: 332 lines, reflect: 273 lines
+**Detail**: Checked app/opar/observe.py, plan.py, act.py, reflect.py for existence and line count >100. Thin/missing: none. observe: 741 lines, plan: 1017 lines, act: 351 lines, reflect: 322 lines
 
 **Remediation**: All 4 OPAR phase modules are substantively implemented.
 
@@ -170,25 +160,25 @@ Domain score: **8.00/10** (PASS ✓)
 
 ### OPAR_03 — Quality Gate Coverage in Reflect
 
-**Score**: 3.33/10 (threshold 8.0) — FAIL ✗
+**Score**: 10.00/10 (threshold 8.0) — PASS ✓
 
-**Finding**: 1/3 required quality gate symbols present in reflect.py
+**Finding**: 3/3 required quality gate symbols present across 11 reflect*.py module(s)
 
-**Detail**: Searched reflect.py for ['validate_core_skill_outputs', 'savings', 'peer_benchmarker']. Present: ['savings']. Missing: ['validate_core_skill_outputs', 'peer_benchmarker'].
+**Detail**: Searched 11 reflect*.py module(s) for ['validate_core_skill_outputs', 'savings', 'peer_benchmarker']. Present: ['validate_core_skill_outputs', 'savings', 'peer_benchmarker']. Missing: none.
 
-**Remediation**: Add quality gate logic referencing: ['validate_core_skill_outputs', 'peer_benchmarker'] in app/opar/reflect.py.
+**Remediation**: All required quality gate references present in app/opar/reflect*.py modules.
 
 ---
 
 ## Infrastructure Completeness
 
-Domain score: **8.95/10** (PASS ✓)
+Domain score: **10.00/10** (PASS ✓)
 
 | Dimension | Score | Threshold | Status |
 |-----------|-------|-----------|--------|
 | Connector Method Completeness | 10.00 | 8.0 | ✓ |
 | Health Endpoint Coverage | 10.00 | 9.0 | ✓ |
-| Rate Limit Coverage for LLM Endpoints | 7.00 | 6.0 | ✓ |
+| Rate Limit Coverage for LLM Endpoints | 10.00 | 6.0 | ✓ |
 
 ### INFRA_01 — Connector Method Completeness
 
@@ -212,20 +202,10 @@ Domain score: **8.95/10** (PASS ✓)
 
 ### INFRA_03 — Rate Limit Coverage for LLM Endpoints
 
-**Score**: 7.00/10 (threshold 6.0) — PASS ✓
+**Score**: 10.00/10 (threshold 6.0) — PASS ✓
 
-**Finding**: Global limiter: ✓ (+7), per-route limiter in chat: ✗ (+3)
+**Finding**: Global limiter: ✓ (+7), per-route limiter in chat: ✓ (+3)
 
-**Detail**: Checked main.py for Limiter() instantiation (global rate limiting) and chat.py for @limiter.limit() per-route decorators on LLM endpoints.
+**Detail**: Checked for a Limiter() instantiation (in main.py or app/ratelimit.py) attached via app.state.limiter in main.py, and chat.py for @limiter.limit() per-route decorators on LLM endpoints.
 
-**Remediation**: Add @limiter.limit('10/minute') to each chat route handler.
-
----
-
-## Remediation Roadmap
-
-**1.** `opar_03` — Add quality gate logic referencing: ['validate_core_skill_outputs', 'peer_benchmarker'] in app/opar/reflect.py.  
-*Closes gap of 4.7 pts (severity 0.2800)*
-
-**2.** `sp_02` — Flesh out stub handlers for: ['spend-profiler', 'bva-analyzer', 'temporal-analyzer', 'internal-benchmarker', 'data-validator', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler'].  
-*Closes gap of 2.5 pts (severity 0.1732)*
+**Remediation**: Rate limiting fully configured.

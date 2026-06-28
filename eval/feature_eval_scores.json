@@ -1,7 +1,9 @@
 {
-  "overall_score": 9.182,
+  "overall_score": 9.839,
   "passed": true,
-  "eval_date": "2026-06-08",
+  "eval_date": "2026-06-28",
+  "score_type": "structural",
+  "scope": "Structural completeness: skill wiring, API routes, OPAR coverage, infrastructure readiness. Does NOT validate whether the analysis content is analytically correct.",
   "dimensions": [
     {
       "dimension_id": "sp_01",
@@ -11,10 +13,10 @@
       "threshold_pass": 9.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "37/37 skills registered in dispatch.py",
+      "finding_summary": "38/38 skills registered in dispatch.py",
       "evidence": {
-        "total_skill_dirs_with_SKILL_md": 37,
-        "registered_count": 37,
+        "total_skill_dirs_with_SKILL_md": 38,
+        "registered_count": 38,
         "registered": [
           "analysis-synthesizer",
           "assumption-register",
@@ -28,6 +30,7 @@
           "cost-to-serve-analyzer",
           "dashboard-builder",
           "data-classifier",
+          "data-quality-gate",
           "data-validator",
           "document-contextualizer",
           "evidence-gatherer",
@@ -61,33 +64,15 @@
       "dimension_id": "sp_02",
       "name": "Dispatch Handler Implementation Depth",
       "domain": "skill_pipeline",
-      "raw_score": 5.526,
+      "raw_score": 10.0,
       "threshold_pass": 8.0,
-      "passed": false,
-      "gap": 2.474,
-      "finding_summary": "21/38 handlers have \u22655 non-blank lines (implemented)",
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "39/39 handlers implemented (\u22655 lines or engine delegation)",
       "evidence": {
-        "total_registered": 38,
-        "implemented_count": 21,
-        "stubs": [
-          "spend-profiler",
-          "bva-analyzer",
-          "temporal-analyzer",
-          "internal-benchmarker",
-          "data-validator",
-          "pii-stripper",
-          "data-classifier",
-          "llm-context-builder",
-          "assumption-register",
-          "indian-tax-optimizer",
-          "peer-disclosure-miner",
-          "conflict-detector",
-          "vendor-master-builder",
-          "consolidation-analyzer",
-          "msme-compliance-checker",
-          "contract-lifecycle-manager",
-          "gstr-reconciler"
-        ]
+        "total_registered": 39,
+        "implemented_count": 39,
+        "stubs": []
       }
     },
     {
@@ -98,16 +83,17 @@
       "threshold_pass": 7.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "38/38 registered skills have output contracts (or intentionally use inline dict)",
+      "finding_summary": "39/39 registered skills have output contracts (or intentionally use inline dict)",
       "evidence": {
-        "total_registered": 38,
-        "with_contract_or_intentionally_none": 38,
+        "total_registered": 39,
+        "with_contract_or_intentionally_none": 39,
         "missing_contract_class": [],
         "intentionally_no_dedicated_class": [
           "my-new-skill",
           "root-cause-analyzer",
           "savings-modeler",
           "data-validator",
+          "data-quality-gate",
           "evidence-gatherer",
           "sme-critique",
           "chart-builder",
@@ -187,15 +173,18 @@
       "dimension_id": "api_01",
       "name": "Frontend Call Resolution Rate",
       "domain": "api_connectivity",
-      "raw_score": 10.0,
+      "raw_score": 9.655,
       "threshold_pass": 9.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "41/41 unique frontend API calls resolve to a backend route",
+      "finding_summary": "56/58 unique frontend API calls resolve to a backend route",
       "evidence": {
-        "total_unique_frontend_calls": 41,
-        "resolved_count": 41,
-        "unresolved": [],
+        "total_unique_frontend_calls": 58,
+        "resolved_count": 56,
+        "unresolved": [
+          "/api/v1/initiatives{param}",
+          "/api/v1/pipeline/summary{param}"
+        ],
         "resolved": [
           "/api/v1/engagements/{param}",
           "/api/v1/sessions/{param}/status",
@@ -207,8 +196,15 @@
           "/api/v1/diagnostic/deep-research/{param}{param}",
           "/api/v1/diagnostic/deep-research",
           "/api/v1/conflicts/{param}",
+          "/api/v1/benchmarks/{param}/coverage",
+          "/api/v1/sector-packs/{param}/detail",
+          "/api/v1/benchmarks",
+          "/api/v1/benchmarks/upload",
+          "/api/v1/benchmarks/select",
+          "/api/v1/benchmarks/peer-sets",
           "/api/v1/compliance/audit-log",
           "/api/v1/chat/progress/{param}",
+          "/api/v1/llm/models",
           "/api/v1/engagements/{param}/documents",
           "/api/v1/chat",
           "/api/v1/chat/plan",
@@ -219,25 +215,33 @@
           "/api/v1/samples/spend-ledger.csv",
           "/api/v1/samples/pnl-expense.xlsx",
           "/api/v1/diagnostic/company-research",
-          "/api/v1/initiatives",
-          "/api/v1/pipeline/summary",
           "/api/v1/sensitivity/{param}{param}",
           "/api/v1/trends/{param}",
           "/api/v1/bva/{param}",
           "/api/v1/payment-terms/{param}",
           "/api/v1/cost-to-serve",
+          "/api/v1/initiatives/{param}/milestones",
+          "/api/v1/initiatives/{param}/provenance",
           "/api/v1/initiatives/{param}/stage",
           "/api/v1/initiatives/{param}/reject",
-          "/api/v1/conflicts/resolve",
-          "/api/v1/business-case/{param}",
-          "/api/v1/consolidate/{param}",
-          "/api/v1/initiatives/{param}/milestones",
           "/api/v1/initiatives/{param}/actuals",
+          "/api/v1/conflicts/resolve",
+          "/api/v1/board-deck/{param}",
+          "/api/v1/pmo-export/{param}",
+          "/api/v1/consolidate/{param}",
           "/api/v1/engagements/{param}/documents/{param}/reprocess",
-          "/api/v1/benchmarks",
           "/api/v1/sector-packs",
+          "/api/v1/workbench/catalog",
+          "/api/v1/workbench/runs",
+          "/api/v1/workbench/preview",
+          "/api/v1/workbench/progress/{param}",
+          "/api/v1/workbench/runs/{param}/promote",
           "/api/v1/skills",
-          "/api/v1/skills/{param}"
+          "/api/v1/skills/catalog/dependencies",
+          "/api/v1/skills/{param}",
+          "/api/v1/skills/discover",
+          "/api/v1/skills/reindex",
+          "/api/v1/skills/structured"
         ]
       }
     },
@@ -245,14 +249,14 @@
       "dimension_id": "api_02",
       "name": "Backend Feature Frontend Exposure",
       "domain": "api_connectivity",
-      "raw_score": 10.0,
+      "raw_score": 8.75,
       "threshold_pass": 6.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "8/8 backend feature groups have at least one frontend page calling them",
+      "finding_summary": "7/8 backend feature groups have at least one frontend page calling them",
       "evidence": {
         "total_feature_groups": 8,
-        "exposed_count": 8,
+        "exposed_count": 7,
         "exposure_detail": {
           "benchmarks_api": true,
           "sector_packs": true,
@@ -260,10 +264,12 @@
           "initiative_actuals": true,
           "enterprise_consolidation": true,
           "cost_to_serve": true,
-          "output_board_cfo": true,
+          "output_board_cfo": false,
           "incremental_analyze": true
         },
-        "not_exposed": []
+        "not_exposed": [
+          "output_board_cfo"
+        ]
       }
     },
     {
@@ -274,16 +280,20 @@
       "threshold_pass": 6.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "41/41 unique frontend API calls use /api/v1/ prefix",
+      "finding_summary": "58/58 unique frontend API calls use /api/v1/ prefix",
       "evidence": {
-        "total_unique_calls": 41,
-        "v1_prefixed_count": 41,
+        "total_unique_calls": 58,
+        "v1_prefixed_count": 58,
         "unversioned_count": 0,
         "v1_calls": [
           "/api/v1/analyze/{param}",
           "/api/v1/analyze/{param}/incremental",
           "/api/v1/benchmarks",
-          "/api/v1/business-case/{param}",
+          "/api/v1/benchmarks/peer-sets",
+          "/api/v1/benchmarks/select",
+          "/api/v1/benchmarks/upload",
+          "/api/v1/benchmarks/{param}/coverage",
+          "/api/v1/board-deck/{param}",
           "/api/v1/bva/{param}",
           "/api/v1/chat",
           "/api/v1/chat/plan",
@@ -302,25 +312,38 @@
           "/api/v1/engagements/{param}",
           "/api/v1/engagements/{param}/documents",
           "/api/v1/engagements/{param}/documents/{param}/reprocess",
-          "/api/v1/initiatives",
           "/api/v1/initiatives/{param}/actuals",
           "/api/v1/initiatives/{param}/milestones",
+          "/api/v1/initiatives/{param}/provenance",
           "/api/v1/initiatives/{param}/reject",
           "/api/v1/initiatives/{param}/stage",
+          "/api/v1/initiatives{param}",
+          "/api/v1/llm/models",
           "/api/v1/payment-terms/{param}",
-          "/api/v1/pipeline/summary",
+          "/api/v1/pipeline/summary{param}",
+          "/api/v1/pmo-export/{param}",
           "/api/v1/samples/pnl-expense.xlsx",
           "/api/v1/samples/spend-ledger.csv",
           "/api/v1/sector-packs",
+          "/api/v1/sector-packs/{param}/detail",
           "/api/v1/sensitivity/{param}{param}",
           "/api/v1/sessions",
           "/api/v1/sessions/{param}",
           "/api/v1/sessions/{param}/manifest",
           "/api/v1/sessions/{param}/status",
           "/api/v1/skills",
+          "/api/v1/skills/catalog/dependencies",
+          "/api/v1/skills/discover",
+          "/api/v1/skills/reindex",
+          "/api/v1/skills/structured",
           "/api/v1/skills/{param}",
           "/api/v1/template/spend-csv",
-          "/api/v1/trends/{param}"
+          "/api/v1/trends/{param}",
+          "/api/v1/workbench/catalog",
+          "/api/v1/workbench/preview",
+          "/api/v1/workbench/progress/{param}",
+          "/api/v1/workbench/runs",
+          "/api/v1/workbench/runs/{param}/promote"
         ],
         "unversioned_calls": []
       }
@@ -375,15 +398,15 @@
           },
           "plan": {
             "exists": true,
-            "line_count": 762
+            "line_count": 1017
           },
           "act": {
             "exists": true,
-            "line_count": 332
+            "line_count": 351
           },
           "reflect": {
             "exists": true,
-            "line_count": 273
+            "line_count": 322
           }
         },
         "thin_or_missing": []
@@ -408,11 +431,11 @@
       "dimension_id": "opar_03",
       "name": "Quality Gate Coverage in Reflect",
       "domain": "opar_loop",
-      "raw_score": 3.333,
+      "raw_score": 10.0,
       "threshold_pass": 8.0,
-      "passed": false,
-      "gap": 4.667,
-      "finding_summary": "1/3 required quality gate symbols present in reflect.py",
+      "passed": true,
+      "gap": 0.0,
+      "finding_summary": "3/3 required quality gate symbols present across 11 reflect*.py module(s)",
       "evidence": {
         "required_checks": [
           "validate_core_skill_outputs",
@@ -420,11 +443,23 @@
           "peer_benchmarker"
         ],
         "present": [
-          "savings"
-        ],
-        "missing": [
           "validate_core_skill_outputs",
+          "savings",
           "peer_benchmarker"
+        ],
+        "missing": [],
+        "modules_scanned": [
+          "app/opar/reflect.py",
+          "app/opar/reflect_advisory.py",
+          "app/opar/reflect_compose.py",
+          "app/opar/reflect_conflicts.py",
+          "app/opar/reflect_context.py",
+          "app/opar/reflect_currency.py",
+          "app/opar/reflect_focus.py",
+          "app/opar/reflect_persistence.py",
+          "app/opar/reflect_recommendations.py",
+          "app/opar/reflect_synthesis.py",
+          "app/opar/reflect_validation.py"
         ]
       }
     },
@@ -485,14 +520,16 @@
       "dimension_id": "infra_03",
       "name": "Rate Limit Coverage for LLM Endpoints",
       "domain": "infrastructure",
-      "raw_score": 7.0,
+      "raw_score": 10.0,
       "threshold_pass": 6.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "Global limiter: \u2713 (+7), per-route limiter in chat: \u2717 (+3)",
+      "finding_summary": "Global limiter: \u2713 (+7), per-route limiter in chat: \u2713 (+3)",
       "evidence": {
-        "global_limiter_in_main": true,
-        "per_route_limiter_in_chat": false
+        "global_limiter": true,
+        "limiter_instantiated": true,
+        "limiter_attached_in_main": true,
+        "per_route_limiter_in_chat": true
       }
     }
   ]
