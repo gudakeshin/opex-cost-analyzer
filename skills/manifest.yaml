@@ -1,0 +1,370 @@
+skills:
+- name: document-contextualizer
+  tier: Outputs & Reporting
+  parallel_group: 0
+  depends_on: []
+  estimated_tokens: 300
+  kind: ingestion
+  weight: light
+  runtime: python
+  status: active
+- name: spend-profiler
+  tier: Diagnostics
+  parallel_group: 0
+  depends_on: []
+  estimated_tokens: 500
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: bva-analyzer
+  tier: Diagnostics
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 500
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: chart-builder
+  tier: Outputs & Reporting
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 300
+  kind: output
+  weight: light
+  runtime: python
+  status: active
+- name: consolidation-analyzer
+  tier: Enterprise Data
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 500
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: contract-lifecycle-manager
+  tier: Enterprise Data
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 500
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: cost-to-serve-analyzer
+  tier: Enterprise Data
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 500
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: dashboard-builder
+  tier: Outputs & Reporting
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 300
+  kind: output
+  weight: light
+  runtime: python
+  status: active
+- name: data-quality-gate
+  tier: Diagnostics
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 200
+  kind: quality_gate
+  weight: light
+  runtime: python
+  status: active
+- name: gstr-reconciler
+  tier: Compliance & India
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 400
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: heuristic-analyzer
+  tier: Benchmarking
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 500
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: internal-benchmarker
+  tier: Diagnostics
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 600
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: msme-compliance-checker
+  tier: Compliance & India
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 400
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: payment-terms-optimizer
+  tier: Working Capital
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 450
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: peer-benchmarker
+  tier: Benchmarking
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 800
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: peer-disclosure-miner
+  tier: Benchmarking
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 400
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: temporal-analyzer
+  tier: Diagnostics
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 500
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: vendor-master-builder
+  tier: Enterprise Data
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 400
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: conflict-detector
+  tier: Enterprise Data
+  parallel_group: 2
+  depends_on:
+  - spend-profiler
+  - peer-benchmarker
+  estimated_tokens: 400
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: indian-tax-optimizer
+  tier: Compliance & India
+  parallel_group: 2
+  depends_on:
+  - spend-profiler
+  - peer-benchmarker
+  estimated_tokens: 500
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: root-cause-analyzer
+  tier: Savings & Value
+  parallel_group: 2
+  depends_on:
+  - spend-profiler
+  - peer-benchmarker
+  estimated_tokens: 650
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: zbb-modeler
+  tier: Savings & Value
+  parallel_group: 2
+  depends_on:
+  - spend-profiler
+  - peer-benchmarker
+  estimated_tokens: 700
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: brsr-cobenefit-calculator
+  tier: Compliance & India
+  parallel_group: 3
+  depends_on:
+  - spend-profiler
+  - savings-modeler
+  estimated_tokens: 500
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: savings-modeler
+  tier: Savings & Value
+  parallel_group: 3
+  depends_on:
+  - peer-benchmarker
+  - internal-benchmarker
+  - root-cause-analyzer
+  - heuristic-analyzer
+  estimated_tokens: 900
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: evidence-gatherer
+  tier: Savings & Value
+  parallel_group: 4
+  depends_on:
+  - savings-modeler
+  - spend-profiler
+  - root-cause-analyzer
+  - peer-benchmarker
+  estimated_tokens: 400
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: scenario-modeler
+  tier: Strategic
+  parallel_group: 4
+  depends_on:
+  - savings-modeler
+  estimated_tokens: 600
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: value-bridge-calculator
+  tier: Savings & Value
+  parallel_group: 4
+  depends_on:
+  - peer-benchmarker
+  - internal-benchmarker
+  - savings-modeler
+  - heuristic-analyzer
+  estimated_tokens: 700
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: assumption-register
+  tier: Savings & Value
+  parallel_group: 5
+  depends_on:
+  - value-bridge-calculator
+  estimated_tokens: 300
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: business-case-builder
+  tier: Outputs & Reporting
+  parallel_group: 5
+  depends_on:
+  - value-bridge-calculator
+  estimated_tokens: 1500
+  kind: output
+  weight: light
+  runtime: python
+  status: active
+- name: data-validator
+  tier: Savings & Value
+  parallel_group: 5
+  depends_on:
+  - value-bridge-calculator
+  estimated_tokens: 200
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: sme-critique
+  tier: Savings & Value
+  parallel_group: 5
+  depends_on:
+  - savings-modeler
+  - spend-profiler
+  - peer-benchmarker
+  - root-cause-analyzer
+  - evidence-gatherer
+  estimated_tokens: 300
+  kind: quality_gate
+  weight: light
+  runtime: python
+  status: active
+- name: value-to-shareholder-bridge
+  tier: Strategic
+  parallel_group: 5
+  depends_on:
+  - value-bridge-calculator
+  estimated_tokens: 600
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: analysis-synthesizer
+  tier: Outputs & Reporting
+  parallel_group: 6
+  depends_on:
+  - value-bridge-calculator
+  - data-validator
+  - document-contextualizer
+  estimated_tokens: 1200
+  kind: output
+  weight: light
+  runtime: python
+  status: active
+- name: export-formatter
+  tier: Outputs & Reporting
+  parallel_group: 6
+  depends_on:
+  - business-case-builder
+  - value-bridge-calculator
+  estimated_tokens: 400
+  kind: output
+  weight: heavy
+  runtime: python
+  status: active
+- name: executive-communication
+  tier: Outputs & Reporting
+  parallel_group: 7
+  depends_on:
+  - analysis-synthesizer
+  estimated_tokens: 900
+  kind: output
+  weight: light
+  runtime: python
+  status: active

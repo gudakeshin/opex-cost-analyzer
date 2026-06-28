@@ -39,6 +39,7 @@ export function formStateFromManifest(
   engagement?: {
     company_name?: string;
     industry?: string;
+    industry_user_set?: boolean;
     annual_revenue_cr?: number;
     detected_company_name?: string;
     detected_industry?: string;
@@ -66,14 +67,14 @@ export function formStateFromManifest(
           ? companyFromDetected
           : '';
 
+  const engagementIndustry =
+    engagement?.industry_user_set && engagement?.industry
+      ? engagement.industry
+      : engagement?.detected_industry || engagement?.industry;
+
   const industry = stale
-    ? engagement?.detected_industry ||
-      engagement?.industry ||
-      'manufacturing_diversified'
-    : manifest.industry ||
-      engagement?.detected_industry ||
-      engagement?.industry ||
-      'manufacturing_diversified';
+    ? engagementIndustry || 'manufacturing_diversified'
+    : manifest.industry || engagementIndustry || 'manufacturing_diversified';
 
   const revenueCr = stale
     ? engagement?.annual_revenue_cr != null && engagement.annual_revenue_cr > 0

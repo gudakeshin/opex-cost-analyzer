@@ -104,6 +104,7 @@ from .evidence import (
     resolve_structured_indexes,
 )
 from .sme_critique import sme_critique_analyzer
+from .data_quality_gate import data_quality_gate
 
 # strategic — scenario modeler, shareholder bridge, peer disclosure miner,
 #              contract lifecycle, conflict detector, cost-to-serve, ZBB
@@ -174,6 +175,7 @@ __all__ = [
     "build_raw_rows",
     "value_bridge_calculator",
     "data_validator",
+    "data_quality_gate",
     # fpa
     "bva_analyzer",
     "temporal_analyzer",

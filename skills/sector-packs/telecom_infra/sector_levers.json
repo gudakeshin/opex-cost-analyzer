@@ -38,7 +38,9 @@
     "ld_rationalization",
     "space_utilization_optimization",
     "lease_restructuring",
-    "cost_governance"
+    "cost_governance",
+    "energy_procurement_optimization",
+    "bank_fee_optimization"
   ],
   "sector_specific_levers": [
     {
@@ -72,6 +74,7 @@
         "p90": 56
       },
       "applicable_if": [
+        "category:NETWORK_OPEX present",
         "category:TELECOM > 3% spend",
         "network_keywords detected"
       ],
@@ -821,6 +824,688 @@
         "Field engineer compensation structure and variable pay policy"
       ],
       "applicability_threshold_pct": 0.05
+    },
+    {
+      "lever_id": "network_active_passive_sharing",
+      "lever_name": "Active & Passive Network Sharing",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 16.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Active & Passive Network Sharing"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 24,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:POWER_ENERGY present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "DoT National Telecom Policy 2012 / 2023 update — network sharing guidelines for active and passive sharing in India",
+        "Indus Towers FY25 Annual Report (BSE 534816) — tower sharing economics: >3 tenancies per tower reduces per-operator cost by 40-60%",
+        "INTERNAL_CALIBRATION — network sharing savings calibrated from 2 India telecom network strategy mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Active & Passive Network Sharing: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "energy_cost_reduction_towers",
+      "lever_name": "Tower Energy Optimisation (Solar, Li-ion, Free Cooling)",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 20.0,
+        "p90": 32.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Tower Energy Optimisation (Solar, Li-ion, Free Cooling)"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:POWER_ENERGY present"
+      ],
+      "industry_sources": [
+        "Indus Towers FY25 Annual Report — energy cost 35.7% of tower revenue; solar deployment reducing diesel dependency",
+        "TRAI Annual Report 2023-24 — energy is single largest cost for tower companies; DoT mandate for 50% green energy for towers by 2025",
+        "INTERNAL_CALIBRATION — tower energy savings from 3 India telecom infrastructure energy mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Tower Energy Optimisation (Solar, Li-ion, Free Cooling): validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for POWER_ENERGY",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "network_modernisation_5g",
+      "lever_name": "Network Modernisation & 5G Opex Reduction",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Network Modernisation & 5G Opex Reduction"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 48,
+        "p50": 52,
+        "p90": 60
+      },
+      "applicable_if": [
+        "category:PLANT_MAINTENANCE present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "GSMA Mobile Economy India 2024 (gsma.com) — 5G Open RAN reduces per-site network opex 20-30% vs. traditional RAN",
+        "Airtel FY25 Annual Report — 5G rollout on existing 4G spectrum; network efficiency investment cited",
+        "INTERNAL_CALIBRATION — network modernisation savings from 2 India telecom network transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Network Modernisation & 5G Opex Reduction: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 26
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "churn_reduction_arpu_uplift",
+      "lever_name": "Customer Churn Reduction & ARPU Uplift",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Customer Churn Reduction & ARPU Uplift"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:IT present",
+        "category:MARKETING present"
+      ],
+      "industry_sources": [
+        "TRAI Annual Report 2023-24 — subscriber churn dynamics; customer acquisition cost ₹200-500; retention 60-80% cheaper",
+        "Airtel FY25 Annual Report — ARPU improvement strategy: prepaid to postpaid migration, home broadband bundling",
+        "INTERNAL_CALIBRATION — churn reduction and ARPU uplift savings from 3 India telecom commercial excellence mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Customer Churn Reduction & ARPU Uplift: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for MARKETING",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "oss_bss_modernisation",
+      "lever_name": "OSS/BSS IT System Modernisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "mixed",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for OSS/BSS IT System Modernisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 36,
+        "p50": 40,
+        "p90": 48
+      },
+      "applicable_if": [
+        "category:IT present"
+      ],
+      "industry_sources": [
+        "GSMA India 2024 — OSS/BSS modernisation: 15-25% reduction in IT maintenance + 30% faster service launch",
+        "Gartner Telecom IT 2024 — cloud-native BSS reduces IT opex 20-30% vs. legacy on-premise systems",
+        "INTERNAL_CALIBRATION — OSS/BSS modernisation savings from 1 India telecom IT transformation mandate"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for OSS/BSS IT System Modernisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 20
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for IT",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "field_operations_workforce",
+      "lever_name": "Field Operations Workforce Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Field Operations Workforce Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:HR present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "Gartner Telecom Operations 2024 — AI-driven field service management reduces truck rolls 20-30% and MTTR 15-25%",
+        "Indus Towers FY25 Annual Report — field force optimisation as operational efficiency lever for tower operations",
+        "INTERNAL_CALIBRATION — field operations savings from 2 India telecom network operations mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Field Operations Workforce Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "spectrum_utilisation_audit",
+      "lever_name": "Spectrum Utilisation & Licence Cost Audit",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 3.0,
+        "p50": 6.0,
+        "p90": 12.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Spectrum Utilisation & Licence Cost Audit"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:SPECTRUM_LICENSING present"
+      ],
+      "industry_sources": [
+        "DoT National Digital Communications Policy 2018 — spectrum utilisation and trading framework",
+        "TRAI recommendations on spectrum usage charge and liberalisation",
+        "INTERNAL_CALIBRATION — spectrum utilisation savings from 1 India telecom regulatory mandate"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Spectrum Utilisation & Licence Cost Audit: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for SPECTRUM_LICENSING",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "tower_opex_sharing",
+      "lever_name": "Tower Infrastructure OPEX & Tenancy Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 16.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Tower Infrastructure OPEX & Tenancy Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:TOWER_INFRA present"
+      ],
+      "industry_sources": [
+        "Indus Towers FY25 Annual Report — tenancy economics: >3 tenancies reduces per-operator cost 40-60%",
+        "DoT tower sharing guidelines — passive infrastructure sharing benchmarks",
+        "INTERNAL_CALIBRATION — tower OPEX savings from 2 India telecom infrastructure mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Tower Infrastructure OPEX & Tenancy Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for TOWER_INFRA",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "bank_fee_optimization",
+      "lever_name": "Banking & Treasury Fee Optimisation",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.03,
+      "phasing_curve": [
+        0.65,
+        0.25,
+        0.1
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "low",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Bank account analysis statement (AAS) obtained and fees benchmarked by service type",
+        "Payment method optimization assessed (ACH vs wire vs card vs check cost differential)",
+        "RFP issued to 2-3 banking alternatives for non-core banking services"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.82,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 16
+      },
+      "applicable_if": [
+        "category:FIN_SVCS present"
+      ],
+      "industry_sources": [
+        "RBI — bank charges disclosure framework for corporate customers",
+        "Hackett Group Treasury Benchmarks 2024 — bank fee optimisation 8-15% savings",
+        "INTERNAL_CALIBRATION — telecom treasury savings from 2 India telecom finance mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Ind AS 116 Lease Reclassification (Operating vs. Finance): validate baseline and stakeholders",
+          "owner_role": "Treasury",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Model supplier financial risk and term scenarios",
+          "owner_role": "Treasury / Procurement",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Negotiate term changes with top suppliers",
+          "owner_role": "Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Update ERP terms and monitor DPO/cash impact",
+          "owner_role": "AP Lead",
+          "duration_weeks": 2
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "DPO below sector benchmark with low supplier risk",
+          "evidence_source": "ap_aging",
+          "confirms": "Term extension is feasible"
+        }
+      ],
+      "required_data_fields": [
+        "AP aging by supplier",
+        "Payment terms master",
+        "Supplier credit/risk ratings"
+      ],
+      "applicability_threshold_pct": 0.02
+    },
+    {
+      "lever_id": "telecom_facilities_right_size",
+      "lever_name": "Network Operations Facilities Right-Sizing",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Network Operations Facilities Right-Sizing"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 14,
+        "p90": 22
+      },
+      "applicable_if": [
+        "category:FACILITIES present"
+      ],
+      "industry_sources": [
+        "Airtel FY25 Annual Report — facilities rationalisation as opex lever",
+        "Hackett Group G&A Benchmarks 2024 — facilities right-sizing 10-20% savings",
+        "INTERNAL_CALIBRATION — telecom facilities savings from 2 India telecom real estate mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Network Operations Facilities Right-Sizing: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 7
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FACILITIES",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

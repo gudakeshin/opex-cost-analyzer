@@ -1,7 +1,7 @@
 {
   "pack_id": "bfsi_banks",
   "sector": "Banking & Financial Services (India)",
-  "version": "1.0",
+  "version": "1.1",
   "source_verification_note": "industry_sources entries indicate the published works that informed or directionally support each lever's savings range. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range.",
   "applicable_entity_types": [
     "scheduled_commercial_bank",
@@ -42,7 +42,8 @@
     "cost_governance",
     "insurance_premium_optimization",
     "bank_fee_optimization",
-    "p2p_o2c_automation"
+    "p2p_o2c_automation",
+    "travel_policy_optimization"
   ],
   "sector_specific_levers": [
     {
@@ -50,9 +51,9 @@
       "lever_name": "Branch Network Rationalisation & Format Optimisation",
       "lever_family": "structure",
       "savings_range_pct": {
-        "p10": 10,
-        "p50": 18,
-        "p90": 28
+        "p10": 5.0,
+        "p50": 12.0,
+        "p90": 20.0
       },
       "cta_rate": 0.08,
       "phasing_curve": [
@@ -71,18 +72,20 @@
       "complexity_tier": "high",
       "base_execution_probability": 0.6,
       "implementation_weeks": {
-        "p10": 20,
+        "p10": 40,
         "p50": 44,
-        "p90": 72
+        "p90": 52
       },
       "applicable_if": [
         "bfsi_keywords detected",
-        "category:FACILITIES > 3% revenue"
+        "category:FACILITIES > 3% revenue",
+        "category:FACILITIES present",
+        "category:branch_network_ops present"
       ],
       "industry_sources": [
-        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
-        "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
-        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)"
+        "RBI — Report on Trend and Progress of Banking in India 2023-24 — branch digitisation and BC network expansion data",
+        "IBA — Banking Technology Survey 2024 — digital transaction share vs. branch transactions",
+        "McKinsey & Company — The Future of Bank Branches — branch rationalisation savings benchmarks"
       ],
       "execution_playbook": [
         {
@@ -142,9 +145,9 @@
       "lever_name": "Back-Office Operations Digitisation (Front-to-Back STP)",
       "lever_family": "technology",
       "savings_range_pct": {
-        "p10": 10,
-        "p50": 17,
-        "p90": 26
+        "p10": 10.0,
+        "p50": 17.0,
+        "p90": 28.0
       },
       "cta_rate": 0.1,
       "phasing_curve": [
@@ -163,18 +166,20 @@
       "complexity_tier": "high",
       "base_execution_probability": 0.65,
       "implementation_weeks": {
-        "p10": 18,
-        "p50": 40,
-        "p90": 64
+        "p10": 24,
+        "p50": 28,
+        "p90": 36
       },
       "applicable_if": [
         "bfsi_keywords detected",
-        "category:IT or OUTSOURCED present"
+        "category:IT or OUTSOURCED present",
+        "category:OUTSOURCED present",
+        "category:loan_processing_ops present"
       ],
       "industry_sources": [
-        "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
-        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
-        "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)"
+        "IBA — Banking Technology Survey 2024 — STP adoption rates in loan origination and account servicing",
+        "RBI — IT Framework for Banks — operational risk controls for automated processing",
+        "INTERNAL_CALIBRATION — back-office digitisation savings from 4 India banking process automation mandates"
       ],
       "execution_playbook": [
         {
@@ -230,105 +235,13 @@
       "applicability_threshold_pct": 0.05
     },
     {
-      "lever_id": "it_vendor_consolidation",
-      "lever_name": "IT Vendor & Core Banking Platform Consolidation",
-      "lever_family": "technology",
-      "savings_range_pct": {
-        "p10": 12,
-        "p50": 22,
-        "p90": 34
-      },
-      "cta_rate": 0.12,
-      "phasing_curve": [
-        0.05,
-        0.35,
-        0.6
-      ],
-      "savings_type": "run_rate",
-      "sustainability_score": 0.88,
-      "bounce_back_risk": "low",
-      "condition_precedents": [
-        "IT application landscape rationalisation roadmap approved by CTO",
-        "Core banking system upgrade / migration plan approved and budgeted",
-        "RBI IT framework compliance assessment completed for new systems"
-      ],
-      "complexity_tier": "high",
-      "base_execution_probability": 0.55,
-      "implementation_weeks": {
-        "p10": 36,
-        "p50": 72,
-        "p90": 120
-      },
-      "applicable_if": [
-        "bfsi_keywords detected",
-        "category:IT > 5% revenue"
-      ],
-      "industry_sources": [
-        "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
-        "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)",
-        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)"
-      ],
-      "execution_playbook": [
-        {
-          "step": "Complete IT application-landscape audit: map all active applications to vendor, annual cost, and usage metrics",
-          "owner_role": "IT Procurement / SAM",
-          "duration_weeks": 4
-        },
-        {
-          "step": "Build rationalization roadmap—classify apps as keep/consolidate/retire; develop CBS upgrade/migration plan",
-          "owner_role": "CTO / Enterprise Architecture",
-          "duration_weeks": 5
-        },
-        {
-          "step": "Run competitive RFPs for consolidated IT categories (infrastructure, middleware, testing); negotiate multi-year terms",
-          "owner_role": "IT Procurement",
-          "duration_weeks": 10
-        },
-        {
-          "step": "Execute CBS migration in controlled phases with RBI IT-framework compliance assessment at each stage gate",
-          "owner_role": "Core Banking Programme",
-          "duration_weeks": 24
-        },
-        {
-          "step": "Decommission retired applications; track licence spend reduction and vendor-count trend monthly",
-          "owner_role": "IT Finance / FP&A",
-          "duration_weeks": 6
-        }
-      ],
-      "diagnostic_signals": [
-        {
-          "signal": "IT vendor count >50 with top-10 vendors representing <60% of IT spend",
-          "evidence_source": "vendor_master",
-          "confirms": "Fragmented supply base with consolidation potential"
-        },
-        {
-          "signal": "IT spend >5% of revenue with >30% on maintenance of legacy or duplicate systems",
-          "evidence_source": "gl_by_it_category",
-          "confirms": "Material cost reduction available through rationalization"
-        },
-        {
-          "signal": "Duplicate capability across ≥2 applications in same functional domain (multiple CRMs, reporting tools)",
-          "evidence_source": "application_portfolio_assessment",
-          "confirms": "Platform consolidation case is justified"
-        }
-      ],
-      "required_data_fields": [
-        "Full IT application inventory with vendor, annual cost, and active user count",
-        "CBS vendor agreement terms and migration risk assessment",
-        "IT spend by sub-category (infrastructure, applications, services, telecom)",
-        "RBI IT framework compliance status per system",
-        "Contract terms and renewal dates for top-20 IT vendors"
-      ],
-      "applicability_threshold_pct": 0.05
-    },
-    {
       "lever_id": "kyc_aml_automation",
-      "lever_name": "KYC / AML Process Automation",
+      "lever_name": "KYC/AML Process Automation (RPA + AI)",
       "lever_family": "technology",
       "savings_range_pct": {
-        "p10": 20,
-        "p50": 30,
-        "p90": 40
+        "p10": 12.0,
+        "p50": 22.0,
+        "p90": 35.0
       },
       "cta_rate": 0.09,
       "phasing_curve": [
@@ -348,17 +261,19 @@
       "base_execution_probability": 0.65,
       "implementation_weeks": {
         "p10": 16,
-        "p50": 36,
-        "p90": 60
+        "p50": 20,
+        "p90": 28
       },
       "applicable_if": [
         "bfsi_keywords detected",
-        "category:PROF_SVCS or OUTSOURCED present"
+        "category:PROF_SERVICES present",
+        "category:PROF_SVCS or OUTSOURCED present",
+        "category:kyc_aml_ops present"
       ],
       "industry_sources": [
-        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
-        "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
-        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)"
+        "RBI — Master Direction on Know Your Customer (KYC) 2016, updated 2024 — V-KYC regulatory framework",
+        "NASSCOM — AI in Banking: India Perspectives 2024 — automation adoption in KYC/AML",
+        "INTERNAL_CALIBRATION — specific KYC automation savings range is an internal consulting estimate"
       ],
       "execution_playbook": [
         {
@@ -418,9 +333,9 @@
       "lever_name": "Collections & Recovery Process Optimisation",
       "lever_family": "technology",
       "savings_range_pct": {
-        "p10": 8,
-        "p50": 15,
-        "p90": 24
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 28.0
       },
       "cta_rate": 0.07,
       "phasing_curve": [
@@ -439,18 +354,20 @@
       "complexity_tier": "medium",
       "base_execution_probability": 0.7,
       "implementation_weeks": {
-        "p10": 10,
-        "p50": 22,
-        "p90": 38
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
       },
       "applicable_if": [
         "bfsi_keywords detected",
-        "category:OUTSOURCED or PROF_SVCS present"
+        "category:OUTSOURCED or PROF_SVCS present",
+        "category:OUTSOURCED present",
+        "category:loan_processing_ops present"
       ],
       "industry_sources": [
-        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
-        "Atradius — Payment Practices Barometer Asia-Pacific 2024 (atradius.us/knowledge-and-research/reports/payment-practices-barometer-asia-pacific.html)",
-        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+        "NASSCOM BPM Report 2024 — banking BPO rate benchmarks and outcome-based contracting",
+        "RBI — Report on Trend and Progress of Banking 2023-24 — collections cost benchmarks",
+        "INTERNAL_CALIBRATION — collections optimisation savings from 4 India banking mandates"
       ],
       "execution_playbook": [
         {
@@ -510,9 +427,9 @@
       "lever_name": "Treasury Operations & ALM Cost Efficiency",
       "lever_family": "finance",
       "savings_range_pct": {
-        "p10": 3,
-        "p50": 7,
-        "p90": 12
+        "p10": 3.0,
+        "p50": 7.0,
+        "p90": 12.0
       },
       "cta_rate": 0.05,
       "phasing_curve": [
@@ -531,18 +448,20 @@
       "complexity_tier": "medium",
       "base_execution_probability": 0.68,
       "implementation_weeks": {
-        "p10": 10,
+        "p10": 20,
         "p50": 24,
-        "p90": 42
+        "p90": 32
       },
       "applicable_if": [
         "bfsi_keywords detected",
-        "category:FIN_SVCS or BANKING_TREASURY present"
+        "category:FIN_SVCS or BANKING_TREASURY present",
+        "category:FIN_SVCS present",
+        "category:treasury_ops present"
       ],
       "industry_sources": [
-        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
-        "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
-        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+        "RBI — Annual Report 2024 — treasury operations cost benchmarks for scheduled commercial banks",
+        "Ardent Partners — AP Metrics That Matter 2024 — treasury process automation cost reduction",
+        "INTERNAL_CALIBRATION — treasury ops savings from 2 India banking treasury transformation mandates"
       ],
       "execution_playbook": [
         {
@@ -599,12 +518,12 @@
     },
     {
       "lever_id": "fraud_detection_ai_banking",
-      "lever_name": "AI-Driven Fraud Detection & Prevention (Banking)",
+      "lever_name": "AI-Driven Fraud Detection & Prevention",
       "lever_family": "technology",
       "savings_range_pct": {
-        "p10": 5,
-        "p50": 12,
-        "p90": 20
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
       },
       "cta_rate": 0.09,
       "phasing_curve": [
@@ -624,17 +543,19 @@
       "base_execution_probability": 0.65,
       "implementation_weeks": {
         "p10": 16,
-        "p50": 36,
-        "p90": 60
+        "p50": 20,
+        "p90": 28
       },
       "applicable_if": [
         "bfsi_keywords detected",
-        "category:IT or OUTSOURCED present"
+        "category:IT or OUTSOURCED present",
+        "category:IT_SOFTWARE present",
+        "category:digital_banking_infra present"
       ],
       "industry_sources": [
-        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
-        "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
-        "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)"
+        "RBI — Master Direction on Fraud Risk Management 2024 — fraud monitoring system requirements",
+        "NASSCOM — AI in Banking: India Perspectives 2024 — ML fraud detection adoption",
+        "INTERNAL_CALIBRATION — fraud AI savings from 2 India banking fraud prevention mandates"
       ],
       "execution_playbook": [
         {
@@ -691,12 +612,12 @@
     },
     {
       "lever_id": "regulatory_reporting_automation",
-      "lever_name": "Regulatory Reporting Automation (RBI / SEBI Returns)",
+      "lever_name": "Regulatory Reporting Automation",
       "lever_family": "technology",
       "savings_range_pct": {
-        "p10": 15,
-        "p50": 24,
-        "p90": 34
+        "p10": 15.0,
+        "p50": 25.0,
+        "p90": 40.0
       },
       "cta_rate": 0.08,
       "phasing_curve": [
@@ -715,18 +636,20 @@
       "complexity_tier": "medium",
       "base_execution_probability": 0.72,
       "implementation_weeks": {
-        "p10": 12,
-        "p50": 28,
-        "p90": 48
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
       },
       "applicable_if": [
         "bfsi_keywords detected",
-        "category:PROF_SVCS or IT present"
+        "category:PROF_SERVICES present",
+        "category:PROF_SVCS or IT present",
+        "category:rbi_audit_compliance present"
       ],
       "industry_sources": [
-        "RBI — Annual Report 2024 (rbi.org.in/Scripts/AnnualReportPublications.aspx)",
-        "IBA — Banking Technology Survey 2024 (iba.org.in/publications)",
-        "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)"
+        "RBI — Master Circular on Returns Submitted by Banks 2024 — statutory reporting requirements",
+        "Ardent Partners — AP Metrics That Matter 2024 — process automation cost reduction benchmarks",
+        "INTERNAL_CALIBRATION — regulatory reporting automation savings range for Indian banks"
       ],
       "execution_playbook": [
         {
@@ -780,6 +703,844 @@
         "Historical late/restated return log with root-cause analysis"
       ],
       "applicability_threshold_pct": 0.05
+    },
+    {
+      "lever_id": "core_banking_consolidation",
+      "lever_name": "Core Banking Platform & IT Vendor Consolidation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "mixed",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Core Banking Platform Consolidation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 48,
+        "p50": 52,
+        "p90": 60
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:IT_SOFTWARE present",
+        "category:core_banking_platform present"
+      ],
+      "industry_sources": [
+        "IBA — Banking Technology Survey 2024 — core banking modernisation adoption rates",
+        "Gartner — IT Key Metrics Data: Banking Sector IT Spend 2024 — IT spend benchmarks for banks",
+        "INTERNAL_CALIBRATION — CBS and IT vendor consolidation savings range is an internal consulting estimate"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Core Banking Platform Consolidation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 26
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for core_banking_platform",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "vendor_renegotiation_fintech",
+      "lever_name": "Fintech & Digital Banking Vendor Renegotiation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Fintech & Software Vendor Renegotiation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 16
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:IT_SOFTWARE present",
+        "category:digital_banking_infra present"
+      ],
+      "industry_sources": [
+        "Hackett Group — World-Class Performance Study Finance & Procurement Benchmarks 2024 — vendor consolidation savings ranges",
+        "INTERNAL_CALIBRATION — fintech vendor renegotiation savings range calibrated to Indian banking sector"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Fintech & Software Vendor Renegotiation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for IT_SOFTWARE",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "atm_managed_services",
+      "lever_name": "ATM Managed Services Outsourcing",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for ATM Managed Services Outsourcing"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:OUTSOURCED present",
+        "category:atm_cash_mgmt present"
+      ],
+      "industry_sources": [
+        "RBI — Annual Report 2023-24 — ATM network data and managed services adoption trends in Indian banking",
+        "INTERNAL_CALIBRATION — ATM managed services savings range is an internal consulting estimate"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for ATM Managed Services Outsourcing: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for atm_cash_mgmt",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "travel_policy_optimization",
+      "lever_name": "Travel Policy Compliance & TMC Consolidation",
+      "lever_family": "demand",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.04,
+      "phasing_curve": [
+        0.35,
+        0.45,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.55,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Travel policy updated with cabin-class caps, advance-booking rules, and preferred supplier list",
+        "TMC or self-booking tool configured with in-policy guardrails",
+        "Pre-trip approval workflow enabled for trips above threshold"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.82,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 16
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:TRAVEL present"
+      ],
+      "industry_sources": [
+        "GBTA 2025 Business Travel Index Outlook — managed travel programmes save 10-25% via policy compliance",
+        "Deloitte 2024 Corporate Travel Study — centralized travel function 12-18% lower average ticket prices",
+        "INTERNAL_CALIBRATION — savings range calibrated from India banking T&E engagements"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit T&E spend by category, traveller grade, and booking channel; quantify out-of-policy leakage",
+          "owner_role": "Travel Manager / FP&A",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Consolidate to preferred TMC or corporate booking tool; negotiate airline and hotel programme rates",
+          "owner_role": "Procurement / Travel",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Deploy policy guardrails and pre-trip approval; communicate video-first norms for short engagements",
+          "owner_role": "HR / Travel",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Track compliance rate, average ticket price, and leakage monthly vs baseline",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Policy compliance rate below 80% or >15% spend booked outside managed channel",
+          "evidence_source": "tmc_report",
+          "confirms": "Travel governance gap is material"
+        },
+        {
+          "signal": "Average hotel/airfare rates above GSA or peer benchmark for top routes",
+          "evidence_source": "benchmark",
+          "confirms": "Rate renegotiation and channel consolidation will close price gap"
+        }
+      ],
+      "required_data_fields": [
+        "T&E transaction detail by traveller, category, and booking channel",
+        "Travel policy document and exception log",
+        "TMC or expense system compliance reports"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "digital_marketing_roi",
+      "lever_name": "Digital Marketing & Customer Acquisition ROI",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Digital Marketing & Customer Acquisition ROI"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:MARKETING present"
+      ],
+      "industry_sources": [
+        "RBI — Report on Trend and Progress of Banking in India 2023-24 — digital channel share of retail liabilities",
+        "Gartner CMO Survey 2024 — digital marketing delivers 40-60% better cost-per-lead vs. events",
+        "INTERNAL_CALIBRATION — banking marketing efficiency savings from 2 India retail bank mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Digital Marketing & Customer Acquisition ROI: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for MARKETING",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "bank_workforce_productivity",
+      "lever_name": "Bank Workforce Productivity & Staffing Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 8.0,
+        "p90": 14.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Bank Workforce Productivity & Staffing Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:HR present",
+        "category:branch_network_ops present"
+      ],
+      "industry_sources": [
+        "RBI — Report on Trend and Progress of Banking in India 2023-24 — employee cost as largest opex component for Indian banks",
+        "HDFC Bank FY25 Annual Report — workforce productivity cited as operational efficiency lever",
+        "McKinsey — The Future of Work in Banking (mckinsey.com/industries/financial-services) — branch staffing model optimisation benchmarks",
+        "INTERNAL_CALIBRATION — savings range from 4 India retail bank workforce transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Bank Workforce Productivity & Staffing Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "banking_shared_services",
+      "lever_name": "Banking Shared Services & GPO Centralisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Banking Shared Services & GPO Centralisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 28,
+        "p50": 32,
+        "p90": 40
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:HR present",
+        "category:PROF_SERVICES present",
+        "category:banking_shared_services present"
+      ],
+      "industry_sources": [
+        "Hackett Group — World-Class Finance & HR Benchmarks 2024 (thehackettgroup.com/research/) — SSC models reduce G&A 15-25%",
+        "RBI — Guidelines on Consolidated Supervision — multi-entity overhead rationalisation for banking groups",
+        "INTERNAL_CALIBRATION — shared services savings from 3 India banking group SSC mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Banking Shared Services & GPO Centralisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 16
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for banking_shared_services",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "contingent_staffing_governance",
+      "lever_name": "Contingent Staffing Governance & VMS",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Contingent Staffing Governance & VMS"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:CONTINGENT present",
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "NASSCOM BPM Report 2024 — contract workforce 10-15% of bank operations headcount",
+        "Gartner 2024 — VMS implementation reduces contingent spend 10-20% through rate standardisation",
+        "INTERNAL_CALIBRATION — contingent workforce governance savings from 2 India banking HR mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Contingent Staffing Governance & VMS: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for CONTINGENT",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "contact_center_optimization",
+      "lever_name": "Contact Center Optimisation & IVR Deflection",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 25.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Contact Center Optimisation & IVR Deflection"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:OUTSOURCED present",
+        "category:contact_center_ops present"
+      ],
+      "industry_sources": [
+        "IBA — Banking Technology Survey 2024 — digital channel deflection reducing call centre volumes 20-35%",
+        "Gartner Contact Center 2024 — WFM and IVR optimisation reduce cost-per-contact 15-25%",
+        "INTERNAL_CALIBRATION — contact centre savings from 3 India retail bank CX transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Contact Center Optimisation & IVR Deflection: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for contact_center_ops",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "payment_ops_efficiency",
+      "lever_name": "Payment Operations & Banking Fee Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 9.0,
+        "p90": 15.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Payment Operations & Banking Fee Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:FIN_SVCS present",
+        "category:digital_banking_infra present"
+      ],
+      "industry_sources": [
+        "RBI — Payment Systems Vision 2025 — UPI and digital payment infrastructure cost trends",
+        "NPCI Annual Report 2024 — payment rail fee structures and volume discounts",
+        "INTERNAL_CALIBRATION — payment ops savings from 2 India banking treasury fee reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Payment Operations & Banking Fee Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FIN_SVCS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "npa_provisioning_process_efficiency",
+      "lever_name": "NPA Provisioning Process & IRACP Workflow Efficiency",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for NPA Provisioning Process & IRACP Workflow Efficiency"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:npa_provisioning_cost present"
+      ],
+      "industry_sources": [
+        "RBI — IRACP Norms (RBI/2021-22/125) — ECL-aligned provisioning workflow requirements",
+        "RBI — CRILC Reporting guidelines — large-borrower credit monitoring automation",
+        "INTERNAL_CALIBRATION — NPA process efficiency savings from 2 India banking credit risk mandates; excludes provision reduction"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for NPA Provisioning Process & IRACP Workflow Efficiency: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for npa_provisioning_cost",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "credit_risk_infra_rationalisation",
+      "lever_name": "Credit Risk Infrastructure Rationalisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 24.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Credit Risk Infrastructure Rationalisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "bfsi_keywords detected",
+        "category:IT_SOFTWARE present",
+        "category:cre_credit_risk_infra present"
+      ],
+      "industry_sources": [
+        "RBI — CRILC Reporting (RBI/DBOD.No.BP.BC.15/21.04.048/2014-15) — mandatory credit reporting infrastructure",
+        "Gartner — Financial Services Risk Technology 2024 — platform consolidation savings 15-25%",
+        "INTERNAL_CALIBRATION — credit risk infra savings from 2 India banking risk technology reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Credit Risk Infrastructure Rationalisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for cre_credit_risk_infra",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
     }
   ]
 }

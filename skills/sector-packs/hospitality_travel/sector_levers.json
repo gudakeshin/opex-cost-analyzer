@@ -38,7 +38,9 @@
     "ld_rationalization",
     "space_utilization_optimization",
     "lease_restructuring",
-    "cost_governance"
+    "cost_governance",
+    "energy_procurement_optimization",
+    "insurance_premium_optimization"
   ],
   "sector_specific_levers": [
     {
@@ -479,6 +481,619 @@
         "Demand forecast accuracy and pace data"
       ],
       "applicability_threshold_pct": 0.05
+    },
+    {
+      "lever_id": "energy_management_system",
+      "lever_name": "Energy Management & Renewable Transition",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 12.0,
+        "p50": 20.0,
+        "p90": 30.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Energy Management & Renewable Transition"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:POWER_ENERGY present"
+      ],
+      "industry_sources": [
+        "FHRAI India Hotel Industry Survey 2024 (fhrai.com) — energy 10-14% of hotel revenue; BMS reduces consumption 15-25%",
+        "IHCL FY25 Annual Report (BSE 500850) — Paathya sustainability programme: solar at 8 properties, energy intensity reduction target",
+        "INTERNAL_CALIBRATION — energy management savings calibrated from 4 India hotel energy transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Energy Management & Renewable Transition: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for POWER_ENERGY",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "revenue_management_occ",
+      "lever_name": "Revenue Management & OTA Channel Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 25.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Revenue Management & OTA Channel Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:IT present",
+        "category:MARKETING present"
+      ],
+      "industry_sources": [
+        "STR India Hotel Performance 2024 (str.com) — OTA commission 12-18% of OTA-sourced revenue; direct booking shift saves 10-15% of distribution cost",
+        "IHCL FY25 Annual Report — Taj.com and Tata Neu loyalty platform driving direct booking growth to reduce OTA dependency",
+        "INTERNAL_CALIBRATION — revenue management and OTA optimisation savings from 3 India hotel mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Revenue Management & OTA Channel Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for MARKETING",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "food_beverage_cost_control",
+      "lever_name": "F&B Cost Control & Menu Engineering",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 24.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for F&B Cost Control & Menu Engineering"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 16
+      },
+      "applicable_if": [
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "FHRAI 2024 (fhrai.com) — F&B cost 25-32% of F&B revenue; menu engineering and supplier consolidation saves 8-15%",
+        "Lemon Tree FY25 Annual Report (BSE 541233) — F&B cost management cited as key margin initiative",
+        "INTERNAL_CALIBRATION — F&B cost optimisation savings from 4 India hotel F&B mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for F&B Cost Control & Menu Engineering: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "workforce_cross_training",
+      "lever_name": "Workforce Optimisation & Cross-Training",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Workforce Optimisation & Cross-Training"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "FHRAI India Hotel Survey 2024 — employee cost 25-32% of revenue; cross-training reduces overtime and casual labour by 10-20%",
+        "IHCL FY25 Annual Report — Taj hospitality training programme and workforce flexibility cited as operational excellence pillar",
+        "INTERNAL_CALIBRATION — workforce optimisation savings from 4 India hotel operations mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Workforce Optimisation & Cross-Training: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "property_maintenance_preventive",
+      "lever_name": "Preventive Maintenance Programme",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 20.0,
+        "p90": 30.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Preventive Maintenance Programme"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:PLANT_MAINTENANCE present"
+      ],
+      "industry_sources": [
+        "FHRAI 2024 — maintenance 2-4% of hotel revenue; predictive maintenance reduces emergency repair cost 30-40%",
+        "EIH FY25 Annual Report (BSE 500840) — capital and maintenance efficiency cited as long-term profitability driver",
+        "INTERNAL_CALIBRATION — preventive maintenance savings from 2 India hotel facility management mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Preventive Maintenance Programme: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for PLANT_MAINTENANCE",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "technology_pms_modernisation",
+      "lever_name": "Property Management System (PMS) & Tech Stack Modernisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "mixed",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Property Management System (PMS) & Tech Stack Modernisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:IT present"
+      ],
+      "industry_sources": [
+        "Gartner Hospitality Technology 2024 (gartner.com) — cloud PMS reduces IT maintenance 25-35% vs. on-premise; integration reduces manual processes 30-40%",
+        "STR India 2024 — technology adoption as key differentiator for hotel groups in India",
+        "INTERNAL_CALIBRATION — PMS modernisation savings from 2 India hotel technology transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Property Management System (PMS) & Tech Stack Modernisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for IT",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "procurement_consolidation_hotel",
+      "lever_name": "Procurement Consolidation & Supplier Renegotiation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Procurement Consolidation & Supplier Renegotiation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:PLANT_MAINTENANCE present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "FHRAI 2024 — group procurement for hotel chains saves 10-18% vs. property-level purchasing",
+        "IHCL FY25 Annual Report — group procurement synergies from Taj hotel network across 200+ properties",
+        "INTERNAL_CALIBRATION — group procurement savings from 3 India hotel chain mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Procurement Consolidation & Supplier Renegotiation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "hotel_lease_optimisation",
+      "lever_name": "Hotel Lease & Occupancy Cost Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Hotel Lease & Occupancy Cost Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:FACILITIES present"
+      ],
+      "industry_sources": [
+        "FHRAI India Hotel Industry Survey 2024 — rent 5-18% of revenue depending on ownership model",
+        "Lemon Tree FY25 Annual Report — sale-leaseback and occupancy cost management",
+        "INTERNAL_CALIBRATION — hotel lease optimisation savings from 2 India hotel real estate mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Hotel Lease & Occupancy Cost Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FACILITIES",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "Hospitality Property & Liability Insurance Optimisation",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 16.0
+      },
+      "cta_rate": 0.03,
+      "phasing_curve": [
+        0.6,
+        0.3,
+        0.1
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Insurance audit completed — coverage adequacy vs. over-insurance assessed by peril",
+        "Market submissions prepared for competitive renewal (3+ carriers benchmarked)",
+        "Risk management improvements documented as leverage for premium negotiation"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:INSURANCE present"
+      ],
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — commercial property insurance market benchmarks",
+        "Marsh Hospitality Risk Report 2024 — portfolio insurance RFP savings 8-15%",
+        "INTERNAL_CALIBRATION — hospitality insurance savings from 2 India hotel risk reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Ind AS 116 Lease Reclassification (Operating vs. Finance): validate baseline and stakeholders",
+          "owner_role": "Treasury",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Model supplier financial risk and term scenarios",
+          "owner_role": "Treasury / Procurement",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Negotiate term changes with top suppliers",
+          "owner_role": "Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Update ERP terms and monitor DPO/cash impact",
+          "owner_role": "AP Lead",
+          "duration_weeks": 2
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "DPO below sector benchmark with low supplier risk",
+          "evidence_source": "ap_aging",
+          "confirms": "Term extension is feasible"
+        }
+      ],
+      "required_data_fields": [
+        "AP aging by supplier",
+        "Payment terms master",
+        "Supplier credit/risk ratings"
+      ],
+      "applicability_threshold_pct": 0.02
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

@@ -28,6 +28,7 @@ from app.schemas import AnalyzeRequest, DiagnosticContextPatch, SessionCreateReq
 from app.security.auth import current_principal, visible_to_principal
 from app.services.analysis import load_taxonomy, run_core_pipeline
 from app.services.compliance import append_audit_event
+from app.services.pipeline_seed import seed_initiatives_from_analysis
 from app.services.engagement_sanity import apply_engagement_sanity_to_manifest
 from app.services.engagement_corpus import load_analysis_corpus
 from app.services.engagements_store import (
@@ -131,6 +132,50 @@ def _dominant_currency(lines: List[Any]) -> str | None:
     if not totals:
         return None
     return max(totals, key=totals.__getitem__)
+
+
+def _run_summary_progress_steps(trace: List[Dict[str, Any]] | None) -> List[Dict[str, str]]:
+    rows = trace or []
+    if not rows:
+        return [
+            {"phase": "observe", "message": "Spend corpus loaded."},
+            {"phase": "act", "message": "Core analysis pipeline completed."},
+            {"phase": "reflect", "message": "Analysis complete."},
+        ]
+    out: List[Dict[str, str]] = []
+    for row in rows[:8]:
+        phase = str(row.get("phase") or "act")
+        title = str(row.get("title") or "").strip()
+        detail = str(row.get("detail") or "").strip()
+        msg = f"{title} — {detail}" if title and detail else (title or detail or "Pipeline step completed.")
+        out.append({"phase": phase, "message": msg})
+    if not out or out[-1].get("phase") != "reflect":
+        out.append({"phase": "reflect", "message": "Analysis complete."})
+    return out
+
+
+def _build_last_analysis_run(
+    analysis: Dict[str, Any],
+    *,
+    run_id: str | None,
+    pipeline_seeded: int,
+) -> Dict[str, Any]:
+    outputs = analysis.get("skill_outputs", {}) if isinstance(analysis, dict) else {}
+    spend_profiler = outputs.get("spend-profiler", {}) if isinstance(outputs, dict) else {}
+    savings = outputs.get("savings-modeler", {}) if isinstance(outputs, dict) else {}
+    initiatives = savings.get("initiatives", []) if isinstance(savings, dict) else []
+    trace = analysis.get("analysis_trace", []) if isinstance(analysis, dict) else []
+    return {
+        "run_id": run_id,
+        "status": "completed",
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "pipeline_seeded": int(pipeline_seeded or 0),
+        "trace_step_count": len(trace) if isinstance(trace, list) else 0,
+        "progress_steps": _run_summary_progress_steps(trace if isinstance(trace, list) else []),
+        "total_spend": float(spend_profiler.get("total_spend") or 0.0) if isinstance(spend_profiler, dict) else 0.0,
+        "modelled_initiatives": len(initiatives) if isinstance(initiatives, list) else 0,
+        "reporting_currency": analysis.get("reporting_currency") if isinstance(analysis, dict) else None,
+    }
 
 
 _TABULAR_SUFFIXES = {".csv", ".xlsx", ".xls", ".json"}
@@ -429,6 +474,28 @@ async def analyze_session(request: Request, session_id: str, payload: AnalyzeReq
         manifest.setdefault("gate_label", "Gate 2: Portfolio sign-off")
         write_manifest(session_id, manifest)
     append_audit_event("analysis_completed", session_id=session_id)
+    try:
+        user_id = (manifest.get("company_name") or "default").lower().replace(" ", "_").replace(".", "_")
+        created = seed_initiatives_from_analysis(analysis, session_id, user_id=user_id)
+        if created:
+            append_audit_event(f"pipeline_seeded session_id={session_id} initiatives={created}")
+        analysis["pipeline_seeded"] = created
+    except Exception as exc:
+        logger.warning("pipeline_seed_failed session_id=%s error=%s", session_id, exc)
+        analysis["pipeline_seeded"] = 0
+    run_summary = _build_last_analysis_run(
+        analysis,
+        run_id=run_id,
+        pipeline_seeded=int(analysis.get("pipeline_seeded") or 0),
+    )
+    analysis["last_analysis_run"] = run_summary
+    _memory.put("session", session_id, analysis)
+    meta = _memory.get("session_meta", session_id) or {}
+    if isinstance(meta, dict):
+        meta["last_analysis_run"] = run_summary
+        _memory.put("session_meta", session_id, meta)
+    manifest["last_analysis_run"] = run_summary
+    write_manifest(session_id, manifest)
     return analysis
 
 
@@ -479,6 +546,7 @@ async def patch_session_manifest(session_id: str, payload: SessionManifestPatch)
             annual_revenue=payload.annual_revenue,
             currency=payload.currency,
             audience=payload.audience,
+            peer_set_name=payload.peer_set_name,
         ):
             write_manifest(session_id, manifest)
     manifest.setdefault("session_id", session_id)

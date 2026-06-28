@@ -182,6 +182,25 @@ async def _act_async(
     from app.skills.engine import infer_industry_from_spend  # lazy — avoids circular import
 
     lines, docs_text, manifest = _load_session_data(ctx.session_id)
+
+    # Analysis Workbench: merge per-run assumption overrides onto a manifest copy
+    # before any skill reads it (wacc, effective_tax_rate, headcount, industry,
+    # segment_revenue, etc.). Control keys that are not manifest fields are skipped.
+    overrides = getattr(ctx, "workbench_overrides", None) or {}
+    if overrides:
+        manifest = dict(manifest)
+        for key, value in overrides.items():
+            if value is None or key in ("waive_spend_requirement", "business_override_note"):
+                continue
+            manifest[key] = value
+
+    # Analysis Workbench: preload a prior run's outputs so a chained run can build
+    # on them without re-executing upstream skills.
+    seed_outputs = getattr(ctx, "workbench_seed_outputs", None) or {}
+    for skill_name, output in seed_outputs.items():
+        if isinstance(output, dict) and skill_name not in results:
+            results[skill_name] = output
+
     headcount = float(manifest.get("headcount") or 0) or None
 
     # Auto-detect industry from spend patterns when not explicitly supplied

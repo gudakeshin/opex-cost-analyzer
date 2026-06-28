@@ -27,6 +27,15 @@ describe('engagementContext', () => {
     ).toBe('it_ites');
   });
 
+  it('does not let detected industry override an explicitly user-set placeholder-valued sector', () => {
+    expect(
+      effectiveAnalysisIndustry(
+        { session_id: '', industry: '' },
+        { industry: 'manufacturing_diversified', industry_user_set: true, detected_industry: 'it_ites' },
+      ),
+    ).toBe('manufacturing_diversified');
+  });
+
   it('effectiveEngagementIndustry prefers detected over placeholder default', () => {
     expect(
       effectiveEngagementIndustry({ industry: 'manufacturing_diversified', detected_industry: 'it_ites' }),
@@ -37,6 +46,16 @@ describe('engagementContext', () => {
     expect(
       effectiveEngagementIndustry({ industry: 'pharma_lifesciences', detected_industry: 'it_ites' }),
     ).toBe('pharma_lifesciences');
+  });
+
+  it('does not override an explicitly user-set placeholder-valued sector with detected', () => {
+    expect(
+      effectiveEngagementIndustry({
+        industry: 'manufacturing_diversified',
+        industry_user_set: true,
+        detected_industry: 'it_ites',
+      }),
+    ).toBe('manufacturing_diversified');
   });
 
   it('identifies placeholder industry', () => {

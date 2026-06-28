@@ -107,6 +107,21 @@
         "M&M FY25 Annual Report — integrated sustainability reporting and CSR spend of ₹1,800 Cr disclosed with outcome metrics",
         "INTERNAL_CALIBRATION — ESG programme efficiency savings from 2 India conglomerate sustainability mandates"
       ]
+    },
+    {
+      "lever_id": "group_energy_procurement",
+      "lever_name": "Group Energy Procurement & Industrial Utilities Optimisation",
+      "description": "Aggregate industrial power and fuel buying across group manufacturing entities; negotiate group PPAs and open-access contracts.",
+      "category_ids": ["POWER_ENERGY"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "BEE PAT Scheme results (beeindia.gov.in) — designated consumers achieve 10-20% energy cost reduction",
+        "CEA Annual Report 2023-24 — industrial tariff and open-access benchmarks",
+        "INTERNAL_CALIBRATION — group energy procurement savings from 2 India conglomerate energy mandates"
+      ]
     }
   ]
 }

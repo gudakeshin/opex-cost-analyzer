@@ -107,6 +107,66 @@
         "Apollo Hospitals FY25 Annual Report — revenue cycle management as operational priority; insurance receivables management cited",
         "INTERNAL_CALIBRATION — revenue cycle savings calibrated from 3 India hospital billing optimisation mandates"
       ]
+    },
+    {
+      "lever_id": "hospital_facilities_optimisation",
+      "lever_name": "Hospital Facilities & Lease Optimisation",
+      "description": "Rationalise non-clinical space; renegotiate leases; consolidate support services facilities across hospital network.",
+      "category_ids": ["FACILITIES"],
+      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "implementation_weeks": 14,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NABH Hospital Infrastructure Standards 2024 — facilities cost benchmarks for accredited hospitals",
+        "Apollo Hospitals FY25 Annual Report — network facilities management as opex lever",
+        "INTERNAL_CALIBRATION — hospital facilities savings from 2 India hospital real estate mandates"
+      ]
+    },
+    {
+      "lever_id": "biomedical_maintenance_amc",
+      "lever_name": "Biomedical Equipment AMC & Maintenance Optimisation",
+      "description": "Consolidate AMC contracts for imaging and critical care equipment; shift to predictive maintenance; standardise spare parts catalogue.",
+      "category_ids": ["PLANT_MAINTENANCE"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NABH Medical Equipment Management Standards 2024 — AMC governance requirements",
+        "Gartner Healthcare IT 2024 — predictive maintenance reduces biomedical downtime cost 20-30%",
+        "INTERNAL_CALIBRATION — biomedical AMC savings from 2 India hospital engineering mandates"
+      ]
+    },
+    {
+      "lever_id": "patient_acquisition_roi",
+      "lever_name": "Patient Acquisition & Marketing ROI Optimisation",
+      "description": "Shift from mass media to digital patient acquisition; measure cost-per-admission by channel; reduce low-ROI health camp spend.",
+      "category_ids": ["MARKETING"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NHA PM-JAY empanelment data — hospital marketing cost benchmarks for insurance-driven volumes",
+        "Gartner CMO Survey 2024 — healthcare digital marketing 40-60% better cost-per-lead",
+        "INTERNAL_CALIBRATION — hospital marketing ROI savings from 2 India hospital commercial mandates"
+      ]
+    },
+    {
+      "lever_id": "healthcare_compliance_advisory",
+      "lever_name": "Healthcare Compliance & Advisory Spend Governance",
+      "description": "Panel-firm governance for legal, NABH accreditation advisory, and regulatory consulting; cap duplicate compliance spend.",
+      "category_ids": ["PROF_SVCS"],
+      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NABH Accreditation Standards 2024 — compliance advisory cost benchmarks",
+        "Hackett Group G&A Benchmarks 2024 — advisory spend governance 10-18% savings",
+        "INTERNAL_CALIBRATION — healthcare advisory savings from 2 India hospital governance mandates"
+      ]
     }
   ]
 }

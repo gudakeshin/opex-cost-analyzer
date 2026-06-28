@@ -7,7 +7,7 @@
       "lever_id": "energy_efficiency_program",
       "lever_name": "Plant Energy Efficiency Programme",
       "description": "ISO 50001 audit + variable speed drives + waste heat recovery. Typical 12–22% energy bill reduction.",
-      "category_ids": ["energy_utilities_plant", "energy"],
+      "category_ids": ["FACILITIES"],
       "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 22.0,
       "implementation_weeks": 20,
       "brsr_principle": "P6",
@@ -22,7 +22,7 @@
       "lever_id": "logistics_network_redesign",
       "lever_name": "Outbound Logistics Network Redesign",
       "description": "Hub-and-spoke model; milk-run consolidation; 3PL contract renegotiation.",
-      "category_ids": ["outbound_logistics", "logistics"],
+      "category_ids": ["LOGISTICS"],
       "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
       "implementation_weeks": 16,
       "brsr_principle": "P6",
@@ -37,7 +37,7 @@
       "lever_id": "gst_itc_recovery",
       "lever_name": "GST ITC Leakage Recovery",
       "description": "Reconcile GSTR-2B vs purchase register; recover blocked credits under Sec 17(5) exclusions.",
-      "category_ids": ["raw_material_procurement", "energy_utilities_plant"],
+      "category_ids": ["RAW_MATERIALS"],
       "p10_pct": 2.0, "p50_pct": 4.0, "p90_pct": 8.0,
       "implementation_weeks": 8,
       "brsr_principle": "P1",
@@ -49,10 +49,70 @@
       ]
     },
     {
+      "lever_id": "rm_should_cost_bom",
+      "lever_name": "Should-Cost / Clean-Sheet BOM Modelling",
+      "description": "Build first-principles should-cost models for top BOM categories using commodity indices, process yields, and benchmark specs; use models to drive RFx and renegotiation.",
+      "category_ids": ["RAW_MATERIALS"],
+      "p10_pct": 3.0, "p50_pct": 6.0, "p90_pct": 10.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Hackett Group — World-Class Performance Study: Procurement Benchmarks 2024 (thehackettgroup.com/research/) — should-cost driven negotiation savings 3-8% on addressable spend",
+        "McKinsey & Company — Manufacturing Sourcing Excellence (mckinsey.com/capabilities/operations/our-insights) — clean-sheet costing for direct materials",
+        "INTERNAL_CALIBRATION — savings range calibrated from 4 India manufacturing BOM should-cost mandates"
+      ]
+    },
+    {
+      "lever_id": "rm_supplier_consolidation",
+      "lever_name": "Raw Material Supplier Consolidation & Rate Contracts",
+      "description": "Rationalise raw material vendor base; implement framework rate contracts, volume rebates, and quarterly business reviews with top-tier suppliers.",
+      "category_ids": ["RAW_MATERIALS"],
+      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Hackett Group — Supplier Base Rationalisation Benchmarks 2024 (thehackettgroup.com/research/) — 5-15% savings from strategic supplier consolidation",
+        "ACMA — Automotive Component Manufacturers Association Cost Reduction Programmes (acma.in) — vendor consolidation case studies in auto ancillary sector",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing procurement consolidation mandates"
+      ]
+    },
+    {
+      "lever_id": "rm_alternate_vendor_dual_sourcing",
+      "lever_name": "Alternate Vendor Qualification & Dual Sourcing",
+      "description": "Qualify domestic or import-substitute alternate vendors per key material; run competitive RFQ to restore pricing tension and reduce single-source dependency.",
+      "category_ids": ["RAW_MATERIALS"],
+      "p10_pct": 3.0, "p50_pct": 7.0, "p90_pct": 12.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CAPS Research — Dual Sourcing and Supply Risk Benchmarking (capsresearch.org/benchmarking/) — dual-source programmes deliver 4-12% price improvement",
+        "DPIIT — Production Linked Incentive (PLI) scheme domestic sourcing norms (dpiit.gov.in) — import substitution and alternate vendor qualification incentives",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing dual-sourcing mandates"
+      ]
+    },
+    {
+      "lever_id": "vave_design_to_cost",
+      "lever_name": "VAVE / Design-to-Cost Engineering",
+      "description": "Cross-functional Value Analysis / Value Engineering workshops on top cost drivers: material substitution, gauge reduction, process simplification, and spec right-sizing.",
+      "category_ids": ["RAW_MATERIALS"],
+      "p10_pct": 4.0, "p50_pct": 9.0, "p90_pct": 16.0,
+      "implementation_weeks": 28,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "SAVE International — Value Methodology Standard (value-eng.org) — VAVE programme savings norms 5-15% on targeted components",
+        "ACMA — Cost Reduction and VAVE Case Studies (acma.in) — auto ancillary VAVE programmes in India",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing VAVE workshops"
+      ]
+    },
+    {
       "lever_id": "mro_vendor_consolidation",
       "lever_name": "MRO Vendor Consolidation",
       "description": "Reduce MRO vendors 40%; framework contracts with quarterly rebates; VMI for top-20 SKUs.",
-      "category_ids": ["maintenance_spares"],
+      "category_ids": ["OUTSOURCED"],
       "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
       "implementation_weeks": 12,
       "brsr_principle": "P1",
@@ -67,7 +127,7 @@
       "lever_id": "contract_manufacturing_optimise",
       "lever_name": "Job Work & Contract Mfg Optimisation",
       "description": "Insource sub-optimal job-work where BEP positive; renegotiate utilisation-based contracts.",
-      "category_ids": ["contract_manufacturing"],
+      "category_ids": ["OUTSOURCED"],
       "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 20.0,
       "implementation_weeks": 24,
       "brsr_principle": "P6",
@@ -81,7 +141,7 @@
       "lever_id": "ind_as116_lease_reclassify",
       "lever_name": "Ind AS 116 Lease Reclassification",
       "description": "Identify short-term/low-value leases mis-classified as ROU; correct to P&L; recover cash flow.",
-      "category_ids": ["facilities", "inbound_logistics"],
+      "category_ids": ["FACILITIES", "LOGISTICS"],
       "p10_pct": 1.0, "p50_pct": 3.0, "p90_pct": 6.0,
       "implementation_weeks": 6,
       "brsr_principle": "P1",
@@ -90,6 +150,126 @@
         "ICAI — Ind AS 116 Leases — Implementation Guidance (icai.org) — statutory accounting standard with practical expedients for short-term and low-value leases",
         "MCA — Indian Accounting Standards Notification 2015, updated 2019 (mca.gov.in) — Ind AS 116 regulatory basis",
         "INTERNAL_CALIBRATION — 1-6% cash flow recovery range is an internal consulting estimate based on Ind AS 116 transition reviews"
+      ]
+    },
+    {
+      "lever_id": "mes_erp_rationalisation",
+      "lever_name": "MES / ERP & Plant Software Rationalisation",
+      "description": "Consolidate plant MES, ERP modules, and automation software licences; eliminate redundant vendor contracts across sites.",
+      "category_ids": ["IT_SOFTWARE"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Gartner IT Key Metrics 2024 (gartner.com) — manufacturing IT spend 1-2.5% of revenue; licence rationalisation saves 15-25%",
+        "McKinsey — Digital Manufacturing Operations (mckinsey.com/capabilities/operations) — MES consolidation reduces IT maintenance 20-30%",
+        "INTERNAL_CALIBRATION — plant software rationalisation savings from 3 India manufacturing IT mandates"
+      ]
+    },
+    {
+      "lever_id": "prof_services_governance",
+      "lever_name": "Consulting, Audit & Legal Spend Governance",
+      "description": "Implement panel-firm governance, competitive RFP for audit rotation, and consulting engagement ROI gates for plant and corporate advisory spend.",
+      "category_ids": ["PROF_SERVICES"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Hackett Group G&A Benchmarks 2024 (thehackettgroup.com) — world-class advisory spend governance reduces professional fees 10-20%",
+        "MCA — Statutory audit rotation requirements (mca.gov.in) — competitive audit tendering benchmarks",
+        "INTERNAL_CALIBRATION — professional services governance savings from 4 India manufacturing G&A mandates"
+      ]
+    },
+    {
+      "lever_id": "kaizen_smed_programme",
+      "lever_name": "Kaizen, SMED & Shop-Floor Continuous Improvement",
+      "description": "Establish loss-bucket analysis by line; run SMED on top changeover SKUs and Kaizen blitzes on highest-loss workstations; standardise visual management and tiered problem-solving.",
+      "category_ids": ["CONVERSION_COST"],
+      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CII — Manufacturing Excellence Awards & Lean Case Studies (cii.in) — Kaizen and SMED programmes reduce conversion cost 6-14%",
+        "Toyota Production System — SMED methodology benchmarks (lean.org) — changeover time reduction 50-90% on pilot lines",
+        "INTERNAL_CALIBRATION — savings range calibrated from 4 India manufacturing lean transformation mandates"
+      ]
+    },
+    {
+      "lever_id": "plant_oee_bottleneck_removal",
+      "lever_name": "OEE & Bottleneck Removal Programme",
+      "description": "Map availability, performance, and quality losses by line; remove bottleneck constraints via capacity balancing, minor stoppage elimination, and throughput optimisation.",
+      "category_ids": ["CONVERSION_COST"],
+      "p10_pct": 6.0, "p50_pct": 11.0, "p90_pct": 18.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "McKinsey & Company — Asset Productivity in Manufacturing (mckinsey.com/capabilities/operations/our-insights) — OEE improvement 6-14% of conversion cost",
+        "CII — National Manufacturing Competitiveness Council OEE benchmarks (cii.in) — world-class OEE 85% vs India median ~72%",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing OEE improvement mandates"
+      ]
+    },
+    {
+      "lever_id": "factory_automation",
+      "lever_name": "Factory Automation & Robotics",
+      "description": "Phased deployment of robotics, vision systems, AGVs, and PLC automation on stable, high-volume processes to reduce direct labour and defect rates.",
+      "category_ids": ["CONVERSION_COST"],
+      "p10_pct": 12.0, "p50_pct": 20.0, "p90_pct": 30.0,
+      "implementation_weeks": 60,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "McKinsey & Company — Automation in Manufacturing Operations (mckinsey.com/capabilities/operations/our-insights) — 12-30% direct labour reduction on automated lines",
+        "IFR — World Robotics Report India chapter (ifr.org) — industrial robot density and payback benchmarks",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing automation mandates"
+      ]
+    },
+    {
+      "lever_id": "industry_4_physical_ai",
+      "lever_name": "Industry 4.0 / Physical AI Shop-Floor Intelligence",
+      "description": "Instrument bottleneck lines with IoT sensors, MES integration, edge analytics, and computer-vision quality inspection to improve OEE, reduce COPQ, and enable predictive control.",
+      "category_ids": ["CONVERSION_COST"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "implementation_weeks": 36,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "McKinsey & Company — Digital Manufacturing and Industry 4.0 (mckinsey.com/capabilities/operations/our-insights) — 10-20% productivity improvement from digital shop-floor",
+        "NASSCOM — Industry 4.0 India Adoption Report (nasscom.in) — IoT, edge analytics, and computer vision use cases in Indian manufacturing",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing Industry 4.0 pilot programmes"
+      ]
+    },
+    {
+      "lever_id": "conversion_scrap_copq_reduction",
+      "lever_name": "Scrap, Rework & COPQ Reduction",
+      "description": "Establish Cost of Poor Quality baseline; deploy Six Sigma / SPC on critical parameters; reduce scrap, rework, and warranty costs through root-cause elimination.",
+      "category_ids": ["CONVERSION_COST"],
+      "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 22.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "ASQ — Cost of Poor Quality benchmarks (asq.org) — scrap and rework typically 2-8% of conversion cost in batch manufacturing",
+        "CII — Quality Excellence Awards case studies (cii.in) — Six Sigma COPQ reduction programmes",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing quality improvement mandates"
+      ]
+    },
+    {
+      "lever_id": "predictive_maintenance",
+      "lever_name": "Predictive / Condition-Based Maintenance",
+      "description": "Shift from time-based to sensor-led predictive maintenance; model remaining useful life on critical assets to reduce unplanned downtime and OEE losses.",
+      "category_ids": ["CONVERSION_COST"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Bureau of Energy Efficiency (BEE) — PAT Scheme maintenance excellence results (beeindia.gov.in) — predictive maintenance reduces downtime 12-25%",
+        "CII — Maintenance Excellence case studies (cii.in) — condition-based maintenance vs time-based benchmarks",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing predictive maintenance mandates"
       ]
     }
   ]

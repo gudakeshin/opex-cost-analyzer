@@ -38,7 +38,9 @@
     "ld_rationalization",
     "space_utilization_optimization",
     "lease_restructuring",
-    "cost_governance"
+    "cost_governance",
+    "brsr_reporting_efficiency",
+    "insurance_premium_optimization"
   ],
   "sector_specific_levers": [
     {
@@ -739,6 +741,903 @@
         "Emergency procurement log with premium cost data"
       ],
       "applicability_threshold_pct": 0.05
+    },
+    {
+      "lever_id": "renewable_transition",
+      "lever_name": "Renewable Energy Portfolio Expansion",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 12.0,
+        "p90": 22.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Renewable Energy Portfolio Expansion"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 100,
+        "p50": 104,
+        "p90": 112
+      },
+      "applicable_if": [
+        "category:POWER_ENERGY present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "CEA Annual Report 2023-24 (cea.nic.in) — RE generation cost ₹2.5-3.5/kWh vs thermal ₹4-6/kWh; fuel cost elimination on renewables",
+        "NTPC FY25 Annual Report (BSE 532555) — NTPC Green Energy expansion: target 60 GW RE by 2032; cost competitiveness vs. coal-based",
+        "INTERNAL_CALIBRATION — renewable transition savings from 3 India utility energy procurement mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Renewable Energy Portfolio Expansion: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 52
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for POWER_ENERGY",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "plant_load_factor_improvement",
+      "lever_name": "Thermal Plant Efficiency & PLF Improvement",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Thermal Plant Efficiency & PLF Improvement"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:PLANT_MAINTENANCE present",
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "CEA Annual Report 2023-24 — heat rate benchmarks: NTPC fleet 2,200-2,400 kcal/kWh; best units at 2,100 kcal/kWh. Each 100 kcal/kWh improvement saves ₹0.1-0.15/kWh in fuel",
+        "NTPC FY25 Annual Report — PLF improvement from 70% to 80% increases revenue 14% with same fixed cost base",
+        "INTERNAL_CALIBRATION — PLF improvement savings from 2 India thermal generation efficiency mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Thermal Plant Efficiency & PLF Improvement: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for PLANT_MAINTENANCE",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "procurement_fuel_optimisation",
+      "lever_name": "Fuel Procurement & Supply Chain Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 3.0,
+        "p50": 6.0,
+        "p90": 12.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Fuel Procurement & Supply Chain Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "MoPNG Coal India annual data (coalindia.in) — domestic coal price vs. imported; blending economics disclosed in NTPC fuel cost notes",
+        "NTPC FY25 Annual Report — fuel procurement strategy: coal supply from CIL + ECT; imported coal blending for coastal plants",
+        "INTERNAL_CALIBRATION — fuel procurement savings from 3 India power generation procurement mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Fuel Procurement & Supply Chain Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "at_c_loss_reduction",
+      "lever_name": "AT&C Loss Reduction (Distribution Companies)",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 20.0,
+        "p90": 35.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for AT&C Loss Reduction (Distribution Companies)"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 36,
+        "p50": 40,
+        "p90": 48
+      },
+      "applicable_if": [
+        "category:IT present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "MoPNG/MoP RDSS (Revamped Distribution Sector Scheme) 2021 — ₹3 Lakh Cr investment to reduce AT&C losses to <12-15% nationally",
+        "CEA Annual Report 2023-24 — best-performing DISCOMs (Gujarat, Maharashtra) at 10-12% AT&C losses vs national average 17-18%",
+        "INTERNAL_CALIBRATION — AT&C loss reduction savings from 2 India DISCOM transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for AT&C Loss Reduction (Distribution Companies): validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 20
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "contract_workforce_optimisation",
+      "lever_name": "Contract & Outsourced Services Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Contract & Outsourced Services Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:HR present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "NTPC FY25 Annual Report — O&M contracts and outsourced services detailed in significant accounting policies",
+        "CEA 2023-24 — O&M cost benchmarks for thermal generation ₹14-18 Lakh/MW/year; best-practice at ₹10-12 Lakh/MW",
+        "INTERNAL_CALIBRATION — O&M contract savings from 3 India utility operations mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Contract & Outsourced Services Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "scada_digital_grid",
+      "lever_name": "SCADA, Smart Grid & Digital Operations",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 25.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "mixed",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for SCADA, Smart Grid & Digital Operations"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 26,
+        "p50": 30,
+        "p90": 38
+      },
+      "applicable_if": [
+        "category:IT present",
+        "category:PLANT_MAINTENANCE present"
+      ],
+      "industry_sources": [
+        "MoPNG Smart Grid programme (mnre.gov.in) — RDSS scheme mandate: smart meters, SCADA for all feeders by 2025",
+        "Gartner Utilities IT 2024 — IoT-based predictive maintenance reduces unplanned outage cost 20-35%",
+        "INTERNAL_CALIBRATION — digital grid savings from 2 India utility technology transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for SCADA, Smart Grid & Digital Operations: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 15
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for IT",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "brsr_reporting_efficiency",
+      "lever_name": "BRSR / ESG Reporting & Assurance Efficiency",
+      "lever_family": "process",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.4,
+        0.4,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "low",
+      "org_change_risk": "medium",
+      "condition_precedents": [
+        "ESG data inventory mapped to BRSR Core KPI requirements",
+        "Group-level ESG data platform or shared service model evaluated",
+        "Assurance vs assessment route selected per SEBI glide path"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 16,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:BRSR_ESG present"
+      ],
+      "industry_sources": [
+        "SEBI BRSR Core Circular Jul 2023 (sebi.gov.in) — integrated reporting reduces per-entity assurance cost",
+        "NTPC FY25 Annual Report — sustainability reporting and ESG disclosures",
+        "INTERNAL_CALIBRATION — utility ESG reporting efficiency savings from 2 India power sector mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map BRSR Core KPI data sources across entities; identify duplication and manual collection effort",
+          "owner_role": "Sustainability / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Implement integrated ESG data platform or group reporting hub",
+          "owner_role": "IT / ESG",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Consolidate assurance providers and align to SEBI assessment standards where applicable",
+          "owner_role": "Company Secretary / ESG",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track cost per entity for BRSR preparation and assurance vs prior year",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "BRSR preparation cost rising faster than entity count; duplicate data collection across BUs",
+          "evidence_source": "esg_cost_tracker",
+          "confirms": "Integrated reporting platform will reduce per-entity cost"
+        },
+        {
+          "signal": "Multiple assurance providers across group entities without coordinated scope",
+          "evidence_source": "audit_register",
+          "confirms": "Assurance consolidation will reduce fees"
+        }
+      ],
+      "required_data_fields": [
+        "BRSR preparation and assurance cost by entity",
+        "ESG KPI data source inventory",
+        "SEBI applicability and glide-path status"
+      ],
+      "applicability_threshold_pct": 0.02
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "Plant & Asset Insurance Premium Optimisation",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 16.0
+      },
+      "cta_rate": 0.03,
+      "phasing_curve": [
+        0.6,
+        0.3,
+        0.1
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Insurance audit completed — coverage adequacy vs. over-insurance assessed by peril",
+        "Market submissions prepared for competitive renewal (3+ carriers benchmarked)",
+        "Risk management improvements documented as leverage for premium negotiation"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:INSURANCE present"
+      ],
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — industrial asset insurance market benchmarks",
+        "Marsh Global Risk Report 2024 — power sector insurance RFP savings 8-15%",
+        "INTERNAL_CALIBRATION — utility insurance savings from 2 India power sector risk reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Ind AS 116 Lease Reclassification (Operating vs. Finance): validate baseline and stakeholders",
+          "owner_role": "Treasury",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Model supplier financial risk and term scenarios",
+          "owner_role": "Treasury / Procurement",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Negotiate term changes with top suppliers",
+          "owner_role": "Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Update ERP terms and monitor DPO/cash impact",
+          "owner_role": "AP Lead",
+          "duration_weeks": 2
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "DPO below sector benchmark with low supplier risk",
+          "evidence_source": "ap_aging",
+          "confirms": "Term extension is feasible"
+        }
+      ],
+      "required_data_fields": [
+        "AP aging by supplier",
+        "Payment terms master",
+        "Supplier credit/risk ratings"
+      ],
+      "applicability_threshold_pct": 0.02
+    },
+    {
+      "lever_id": "utility_advisory_governance",
+      "lever_name": "Regulatory, Legal & Advisory Spend Governance",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 8.0,
+        "p90": 14.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Regulatory, Legal & Advisory Spend Governance"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:PROF_SVCS present"
+      ],
+      "industry_sources": [
+        "CERC regulatory framework — tariff and compliance advisory cost benchmarks",
+        "Hackett Group G&A Benchmarks 2024 — advisory spend governance 10-18% savings",
+        "INTERNAL_CALIBRATION — utility advisory governance savings from 2 India power sector mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Regulatory, Legal & Advisory Spend Governance: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for PROF_SVCS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "fuel_mix_optimisation",
+      "lever_name": "Fuel Mix & Generation Cost Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 3.0,
+        "p50": 6.0,
+        "p90": 12.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Fuel Mix & Generation Cost Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:FUEL_GENERATION present"
+      ],
+      "industry_sources": [
+        "CEA Annual Report 2023-24 — fuel cost benchmarks and heat rate data for thermal plants",
+        "NTPC FY25 Annual Report — fuel procurement and blending strategy disclosures",
+        "INTERNAL_CALIBRATION — fuel mix optimisation savings from 3 India generation procurement mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Fuel Mix & Generation Cost Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FUEL_GENERATION",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "grid_maintenance_predictive",
+      "lever_name": "Grid Maintenance & Predictive O&M",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Grid Maintenance & Predictive O&M"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:GRID_MAINTENANCE present"
+      ],
+      "industry_sources": [
+        "MoP RDSS scheme — grid modernisation and maintenance benchmarks for DISCOMs",
+        "Gartner Utilities IT 2024 — predictive maintenance reduces unplanned outage cost 20-35%",
+        "INTERNAL_CALIBRATION — grid maintenance savings from 2 India DISCOM O&M mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Grid Maintenance & Predictive O&M: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for GRID_MAINTENANCE",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "utility_facilities_right_size",
+      "lever_name": "Utility Facilities & Office Footprint Right-Sizing",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 8.0,
+        "p90": 14.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Utility Facilities & Office Footprint Right-Sizing"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 14,
+        "p90": 22
+      },
+      "applicable_if": [
+        "category:FACILITIES present"
+      ],
+      "industry_sources": [
+        "NTPC FY25 Annual Report — facilities and establishment cost disclosures",
+        "Hackett Group G&A Benchmarks 2024 — facilities right-sizing 10-18% savings",
+        "INTERNAL_CALIBRATION — utility facilities savings from 2 India power sector mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Utility Facilities & Office Footprint Right-Sizing: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 7
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FACILITIES",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "atc_loss_reduction",
+      "lever_name": "AT&C / T&D Loss Reduction Programme",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 25.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for AT&C / T&D Loss Reduction Programme"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 36,
+        "p50": 40,
+        "p90": 48
+      },
+      "applicable_if": [
+        "category:T&D_LOSSES present"
+      ],
+      "industry_sources": [
+        "MoP RDSS (Revamped Distribution Sector Scheme) 2021 — ₹3 Lakh Cr investment to reduce AT&C losses to <12-15%",
+        "CEA Annual Report 2023-24 — best-performing DISCOMs at 10-12% AT&C losses vs national average 17-18%",
+        "INTERNAL_CALIBRATION — T&D loss reduction savings from 2 India DISCOM transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for AT&C / T&D Loss Reduction Programme: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 20
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for T&D_LOSSES",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
     }
   ]
 }

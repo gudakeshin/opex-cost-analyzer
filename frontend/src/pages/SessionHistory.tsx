@@ -26,7 +26,7 @@ function formatRevenue(amount?: number, currency?: string): string {
 }
 
 export const SessionHistory: React.FC = () => {
-  const { setSessionId, sessionId } = useSession();
+  const { resumeSession, sessionId } = useSession();
   const navigate = useNavigate();
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,8 +39,8 @@ export const SessionHistory: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const resumeSession = (sid: string) => {
-    setSessionId(sid);
+  const handleResumeSession = (sid: string, eid?: string) => {
+    resumeSession(sid, eid ?? null);
     navigate('/');
   };
 
@@ -130,7 +130,7 @@ export const SessionHistory: React.FC = () => {
               <div className="flex gap-2 pt-1">
                 <button
                   type="button"
-                  onClick={() => resumeSession(s.session_id)}
+                  onClick={() => handleResumeSession(s.session_id, s.engagement_id)}
                   className="flex-1 text-xs px-3 py-1.5 rounded-lg bg-deloitte-green text-white font-medium hover:bg-[#6fa31e] transition-colors"
                 >
                   Resume →

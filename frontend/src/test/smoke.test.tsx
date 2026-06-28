@@ -174,7 +174,7 @@ test('CostRoom renders without crashing and shows page heading', () => {
       <CostRoom />
     </Wrapper>,
   );
-  expect(screen.getByText('Cost Room')).toBeInTheDocument();
+  expect(screen.getByText(/Live Cost Room/i)).toBeInTheDocument();
 });
 
 test('CostRoom renders EmptyPipeline heading and CTA buttons when no data', () => {

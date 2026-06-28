@@ -10,6 +10,7 @@ export default {
       colors: {
         brand: {
           green: '#86BC25',
+          'data-navy': '#16324F',
           navy: '#000000',
           'navy-light': '#53565A',
           ink: '#000000',

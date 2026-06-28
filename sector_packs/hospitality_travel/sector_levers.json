@@ -107,6 +107,36 @@
         "IHCL FY25 Annual Report — group procurement synergies from Taj hotel network across 200+ properties",
         "INTERNAL_CALIBRATION — group procurement savings from 3 India hotel chain mandates"
       ]
+    },
+    {
+      "lever_id": "hotel_lease_optimisation",
+      "lever_name": "Hotel Lease & Occupancy Cost Optimisation",
+      "description": "Renegotiate lease terms at renewal; optimise sale-leaseback structures; consolidate co-located back-office facilities.",
+      "category_ids": ["FACILITIES"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "FHRAI India Hotel Industry Survey 2024 — rent 5-18% of revenue depending on ownership model",
+        "Lemon Tree FY25 Annual Report — sale-leaseback and occupancy cost management",
+        "INTERNAL_CALIBRATION — hotel lease optimisation savings from 2 India hotel real estate mandates"
+      ]
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "Hospitality Property & Liability Insurance Optimisation",
+      "description": "Pool property, liability, and event cancellation insurance across hotel portfolio; competitive RFP.",
+      "category_ids": ["INSURANCE"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 16.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — commercial property insurance market benchmarks",
+        "Marsh Hospitality Risk Report 2024 — portfolio insurance RFP savings 8-15%",
+        "INTERNAL_CALIBRATION — hospitality insurance savings from 2 India hotel risk reviews"
+      ]
     }
   ]
 }

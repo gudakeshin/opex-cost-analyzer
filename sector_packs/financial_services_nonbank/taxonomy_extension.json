@@ -1,0 +1,14 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "origination_collections", "category_name": "Origination, Collections & Recovery Ops", "gl_prefix": "ORC"},
+    {"category_id": "fund_admin", "category_name": "Fund Administration & Custody Fees", "gl_prefix": "FAD"},
+    {"category_id": "regulatory_filings", "category_name": "SEBI / RBI Regulatory Filings & Audit", "gl_prefix": "REG"},
+    {"category_id": "brokerage_clearing", "category_name": "Brokerage Clearing & Exchange Charges", "gl_prefix": "BRK"},
+    {"category_id": "credit_bureau", "category_name": "Credit Bureau & KYC Verification", "gl_prefix": "KYC"}
+  ],
+  "overrides": [
+    {"category_id": "it", "category_name": "Core Banking / LOS / Trading Platforms"},
+    {"category_id": "prof_services", "category_name": "Audit, Legal & Actuarial Services"}
+  ]
+}

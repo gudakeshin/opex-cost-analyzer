@@ -406,11 +406,12 @@ def test_plan_rule_based_benchmark() -> None:
         user_id="u1",
     )
     exec_plan = _plan_rule_based(ctx)
-    assert len(exec_plan.tasks) == 3
+    assert len(exec_plan.tasks) == 4
     skill_names = [t.skill_name for t in exec_plan.tasks]
     assert "spend-profiler" in skill_names
     assert "peer-benchmarker" in skill_names
     assert "internal-benchmarker" in skill_names
+    assert "data-quality-gate" in skill_names
     assert "payment-terms-optimizer" not in skill_names
     assert "bva-analyzer" not in skill_names
     assert "temporal-analyzer" not in skill_names

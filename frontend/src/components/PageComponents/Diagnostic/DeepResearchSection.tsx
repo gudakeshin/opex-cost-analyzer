@@ -97,10 +97,16 @@ export const DeepResearchSection: React.FC<Props> = ({
         }
       } else if (data.status === 'failed') {
         stopPolling();
-        setError('Deep research job failed. Please try again.');
+        setError(data.error ?? 'Deep research job failed. Please try again.');
         setPhase('failed');
       } else if (data.status === 'in_progress') {
         setPhase('polling');
+      } else {
+        // Defensive: any unrecognized status must stop the poll loop so the UI
+        // can never hang indefinitely in "in progress".
+        stopPolling();
+        setError(data.error ?? 'Deep research ended in an unexpected state.');
+        setPhase('failed');
       }
     },
     [stopPolling, onSummaryReady, sessionId],

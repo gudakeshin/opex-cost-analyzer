@@ -1,0 +1,14 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "fb_cost_of_sales", "category_name": "Food & Beverage Cost of Sales", "gl_prefix": "FBC"},
+    {"category_id": "utilities_energy", "category_name": "Utilities, Energy & Water", "gl_prefix": "UTL"},
+    {"category_id": "property_occupancy", "category_name": "Property Rent, CAM & Lease Costs", "gl_prefix": "OCC"},
+    {"category_id": "guest_amenities", "category_name": "Guest Amenities & Housekeeping Supplies", "gl_prefix": "AMN"},
+    {"category_id": "ota_commission", "category_name": "OTA & Distribution Commission", "gl_prefix": "OTA"}
+  ],
+  "overrides": [
+    {"category_id": "hr", "category_name": "Employee Costs (front office, F&B, housekeeping)"},
+    {"category_id": "travel", "category_name": "Corporate Travel & Sales Visits"}
+  ]
+}

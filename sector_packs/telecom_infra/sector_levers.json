@@ -92,6 +92,81 @@
         "Indus Towers FY25 Annual Report — field force optimisation as operational efficiency lever for tower operations",
         "INTERNAL_CALIBRATION — field operations savings from 2 India telecom network operations mandates"
       ]
+    },
+    {
+      "lever_id": "network_opex_optimization",
+      "lever_name": "Network OPEX Optimisation",
+      "description": "Disaggregate network OPEX by cost driver; optimise RAN managed services, spares pooling, and passive infrastructure cost.",
+      "category_ids": ["NETWORK_OPEX"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "TRAI Annual Report 2023-24 — network opex benchmarks and EBITDA margins for Indian operators",
+        "GSMA Mobile Economy India 2024 — network cost optimisation levers for 5G rollout",
+        "INTERNAL_CALIBRATION — network OPEX savings from 2 India telecom network finance mandates"
+      ]
+    },
+    {
+      "lever_id": "spectrum_utilisation_audit",
+      "lever_name": "Spectrum Utilisation & Licence Cost Audit",
+      "description": "Audit spectrum holding vs traffic load; exit underutilised bands where permitted; optimise spectrum trading and liberalisation benefits.",
+      "category_ids": ["SPECTRUM_LICENSING"],
+      "p10_pct": 3.0, "p50_pct": 6.0, "p90_pct": 12.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "DoT National Digital Communications Policy 2018 — spectrum utilisation and trading framework",
+        "TRAI recommendations on spectrum usage charge and liberalisation",
+        "INTERNAL_CALIBRATION — spectrum utilisation savings from 1 India telecom regulatory mandate"
+      ]
+    },
+    {
+      "lever_id": "tower_opex_sharing",
+      "lever_name": "Tower Infrastructure OPEX & Tenancy Optimisation",
+      "description": "Increase tower tenancy ratio; renegotiate tower lease and energy pass-through; consolidate towerco contracts.",
+      "category_ids": ["TOWER_INFRA"],
+      "p10_pct": 8.0, "p50_pct": 16.0, "p90_pct": 28.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Indus Towers FY25 Annual Report — tenancy economics: >3 tenancies reduces per-operator cost 40-60%",
+        "DoT tower sharing guidelines — passive infrastructure sharing benchmarks",
+        "INTERNAL_CALIBRATION — tower OPEX savings from 2 India telecom infrastructure mandates"
+      ]
+    },
+    {
+      "lever_id": "bank_fee_optimization",
+      "lever_name": "Banking & Treasury Fee Optimisation",
+      "description": "Renegotiate bank charges, LC/BG fees, and cash management pricing; consolidate banking relationships.",
+      "category_ids": ["FIN_SVCS"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI — bank charges disclosure framework for corporate customers",
+        "Hackett Group Treasury Benchmarks 2024 — bank fee optimisation 8-15% savings",
+        "INTERNAL_CALIBRATION — telecom treasury savings from 2 India telecom finance mandates"
+      ]
+    },
+    {
+      "lever_id": "telecom_facilities_right_size",
+      "lever_name": "Network Operations Facilities Right-Sizing",
+      "description": "Rationalise NOC, exchange, and field office footprint; renegotiate leases for network operations facilities.",
+      "category_ids": ["FACILITIES"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 14,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Airtel FY25 Annual Report — facilities rationalisation as opex lever",
+        "Hackett Group G&A Benchmarks 2024 — facilities right-sizing 10-20% savings",
+        "INTERNAL_CALIBRATION — telecom facilities savings from 2 India telecom real estate mandates"
+      ]
     }
   ]
 }

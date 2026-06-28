@@ -25,6 +25,8 @@ from app.services.sector_packs import (
     list_available_packs,
     list_pack_overrides,
     load_pack,
+    pack_file_counts,
+    pack_levers_list,
     run_regression_test,
     set_pack_override,
 )
@@ -230,6 +232,7 @@ def get_metrics() -> Dict[str, Any]:
 def list_sector_packs() -> Dict[str, Any]:
     packs = []
     for pid in list_available_packs():
+        counts = pack_file_counts(pid)
         try:
             p = load_pack(pid)
             packs.append({
@@ -238,10 +241,42 @@ def list_sector_packs() -> Dict[str, Any]:
                 "version": p["version"],
                 "effective_from": p.get("effective_from", ""),
                 "status": p["status"],
+                "lever_count": counts["lever_count"],
+                "kpi_count": counts["kpi_count"],
+                "peer_count": counts["peer_count"],
+                "category_count": counts["category_count"],
+                "taxonomy_count": counts["taxonomy_count"],
             })
         except Exception as exc:
-            packs.append({"pack_id": pid, "error": str(exc)})
+            packs.append({
+                "pack_id": pid,
+                "error": str(exc),
+                "lever_count": counts["lever_count"],
+                "kpi_count": counts["kpi_count"],
+                "peer_count": counts["peer_count"],
+                "category_count": counts["category_count"],
+            })
     return {"packs": packs, "total": len(packs)}
+
+
+@router.get("/api/v1/sector-packs/{pack_id}/detail")
+def get_sector_pack_detail(pack_id: str) -> Dict[str, Any]:
+    from app.services.benchmarks import sector_pack_detail_payload
+
+    payload = sector_pack_detail_payload(pack_id)
+    if not payload:
+        raise HTTPException(status_code=404, detail=f"Sector pack not found: {pack_id}")
+    return payload
+
+
+@router.get("/api/v1/sector-packs/{pack_id}/benchmarks")
+def get_sector_pack_benchmarks(pack_id: str) -> Dict[str, Any]:
+    from app.services.benchmarks import sector_pack_benchmarks_payload
+
+    payload = sector_pack_benchmarks_payload(pack_id)
+    if not payload:
+        raise HTTPException(status_code=404, detail=f"No benchmark data for pack {pack_id}")
+    return payload
 
 
 @router.get("/api/v1/sector-packs/{pack_id}")
@@ -256,7 +291,7 @@ def get_sector_pack(pack_id: str) -> Dict[str, Any]:
         "version": p["version"],
         "effective_from": p.get("effective_from", ""),
         "status": p["status"],
-        "sector_levers_count": len(p.get("sector_levers", {}).get("sector_specific_levers", [])),
+        "sector_levers_count": len(pack_levers_list(p.get("sector_levers"))),
         "kpi_count": len(p.get("kpi_pack", [])),
         "peer_count": len(p.get("peer_set", {}).get("peers", [])),
     }
@@ -306,6 +341,7 @@ def cost_to_serve_endpoint(req: CostToServeRequest) -> Dict[str, Any]:
         segment_revenue=req.segment_revenue,
         annual_revenue=annual_revenue,
         headcount=headcount,
+        allocation_method=req.allocation_method,
     )
     append_audit_event("cost_to_serve_analysis", session_id=req.session_id)
     return result
@@ -1047,9 +1083,40 @@ def poll_deep_research_endpoint(
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
 
-    status = result["status"]
-    if status != "completed":
-        return {"status": status, "summary": None, "full_report": None, "sources": []}
+    raw_status = result["status"]
+    # Google's Interactions API can return any of: in_progress, requires_action,
+    # completed, failed, cancelled, incomplete, budget_exceeded. Normalize to the
+    # three states the client understands so the UI can never hang on an
+    # unrecognized terminal status.
+    if raw_status == "in_progress":
+        return {"status": "in_progress", "summary": None, "full_report": None, "sources": []}
+    if raw_status != "completed":
+        terminal_messages = {
+            "budget_exceeded": (
+                "Deep Research stopped: the Google account budget was exceeded "
+                "(Gemini credits depleted). Top up the account to run Deep Research."
+            ),
+            "cancelled": "Deep Research job was cancelled.",
+            "incomplete": "Deep Research job ended incomplete. Please try again.",
+            "requires_action": (
+                "Deep Research paused awaiting input, which isn't supported here. "
+                "Please try again."
+            ),
+            "failed": "Deep research job failed. Please try again.",
+        }
+        error = terminal_messages.get(raw_status, f"Deep research ended unexpectedly ({raw_status}).")
+        logger.warning(
+            '"deep_research_terminal_status","interaction_id":"%s","status":"%s"',
+            interaction_id,
+            raw_status,
+        )
+        return {
+            "status": "failed",
+            "error": error,
+            "summary": None,
+            "full_report": None,
+            "sources": [],
+        }
 
     full_report = result.get("output_text") or ""
     summary = _summarize_deep_research_llm(full_report)

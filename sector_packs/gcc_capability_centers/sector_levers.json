@@ -122,6 +122,66 @@
         "Gartner 2024 — digital learning platforms reduce training cost 40-60% vs instructor-led",
         "INTERNAL_CALIBRATION — training ROI optimisation savings from 3 GCC L&D transformation engagements"
       ]
+    },
+    {
+      "lever_id": "telecom_expense_management",
+      "lever_name": "Telecom Expense Management (TEM)",
+      "description": "Audit connectivity, mobile, and conferencing spend; consolidate carriers; eliminate unused circuits.",
+      "category_ids": ["TELECOM"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 22.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Gartner 2024 Market Guide for Telecom Expense Management Services — 15-30% recoverable waste",
+        "Everest Group GCC IT 2024 — connectivity cost benchmarks for India GCCs",
+        "INTERNAL_CALIBRATION — GCC TEM savings from 2 India GCC telecom audits"
+      ]
+    },
+    {
+      "lever_id": "travel_policy_optimization",
+      "lever_name": "Client Travel & Visa Cost Optimisation",
+      "description": "Consolidate TMC; enforce travel policy for client-site visits; optimise visa and relocation spend.",
+      "category_ids": ["TRAVEL"],
+      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "GBTA 2025 Business Travel Index Outlook — managed travel saves 10-25%",
+        "Genpact FY25 Annual Report — T&E ~2.2% of revenue; travel policy as GCC cost lever",
+        "INTERNAL_CALIBRATION — GCC travel savings from 3 India GCC travel mandates"
+      ]
+    },
+    {
+      "lever_id": "gcc_talent_branding_efficiency",
+      "lever_name": "Talent Branding & Recruitment Marketing Efficiency",
+      "description": "Shift to digital-first employer branding; consolidate recruitment marketing vendors; reduce agency dependency.",
+      "category_ids": ["MARKETING"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM GCC 2024 — talent branding as GCC differentiator; digital channels reduce cost-per-hire",
+        "Gartner CMO Survey 2024 — digital recruitment marketing 40-60% better cost-per-lead",
+        "INTERNAL_CALIBRATION — GCC recruitment marketing savings from 2 India GCC HR mandates"
+      ]
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "GCC Benefits & Insurance Premium Optimisation",
+      "description": "Competitive RFP for group health and professional indemnity; wellness programmes to reduce claims.",
+      "category_ids": ["INSURANCE"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — group health competitive RFP savings 15-25%",
+        "NASSCOM GCC 2024 — benefits cost as component of talent cost base",
+        "INTERNAL_CALIBRATION — GCC insurance savings from 3 India GCC benefits reviews"
+      ]
     }
   ]
 }

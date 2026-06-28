@@ -153,6 +153,10 @@ class SkillMetadata(BaseModel):
     status: str = "active"
     path: str
     description: str = ""
+    kind: Literal["analysis", "quality_gate", "output", "security", "ingestion"] = "analysis"
+    runtime: Literal["python", "declarative"] = "python"
+    discoverable: bool = True
+    weight: Literal["light", "heavy"] = "light"
 
 
 # ---------------------------------------------------------------------------

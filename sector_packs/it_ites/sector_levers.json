@@ -137,6 +137,51 @@
         "Gartner 2024 — VMS implementation reduces contingent spend 10-20% through rate standardisation and reduced agency mark-ups",
         "INTERNAL_CALIBRATION — contingent workforce governance savings from 3 IT sector workforce management engagements"
       ]
+    },
+    {
+      "lever_id": "telecom_expense_management",
+      "lever_name": "Telecom Expense Management (TEM)",
+      "description": "Audit mobile, data, and conferencing spend; eliminate zombie lines; renegotiate enterprise telecom agreements.",
+      "category_ids": ["TELECOM"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 22.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Gartner 2024 Market Guide for Telecom Expense Management Services — 15-30% recoverable waste",
+        "Nemertes Research — enterprise telecom benchmarks; invoice audit recovers 7-12%",
+        "INTERNAL_CALIBRATION — IT sector TEM savings from 3 India IT telecom audits"
+      ]
+    },
+    {
+      "lever_id": "office_supplies_consolidation",
+      "lever_name": "Office Supplies & Workplace Consumables Consolidation",
+      "description": "Consolidate office supplies, pantry, and print services to preferred suppliers with e-catalog integration.",
+      "category_ids": ["OFFICE"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 18.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Hackett Group Supplier Consolidation research — indirect purchased-cost savings scale with supplier reduction",
+        "Hackett/Ivalua P2P Study 2019 — office supplies as e-catalog category with 37% digital transaction potential",
+        "INTERNAL_CALIBRATION — office supplies consolidation savings from 2 India IT workplace mandates"
+      ]
+    },
+    {
+      "lever_id": "consulting_spend_governance",
+      "lever_name": "Consulting & Advisory Spend Governance",
+      "description": "Implement consulting engagement ROI gates, panel-firm governance, and competitive sourcing for strategy and audit advisory.",
+      "category_ids": ["PROF_SVCS"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Hackett Group G&A Benchmarks 2024 — consulting spend governance reduces advisory fees 10-20%",
+        "NASSCOM 2025 — IT services firms professional fees 0.5-1.5% of revenue",
+        "INTERNAL_CALIBRATION — consulting governance savings from 4 India IT advisory mandates"
+      ]
     }
   ]
 }

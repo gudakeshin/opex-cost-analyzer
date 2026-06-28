@@ -92,6 +92,36 @@
         "Shoppers Stop FY25 Annual Report — omnichannel investments as growth and efficiency enabler",
         "INTERNAL_CALIBRATION — omnichannel IT savings from 2 India organised retail technology mandates"
       ]
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "Retail Property & Inventory Insurance Optimisation",
+      "description": "Competitive RFP for property, inventory, and liability insurance; optimise deductibles and coverage limits across store network.",
+      "category_ids": ["INSURANCE"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — property and inventory insurance competitive RFP savings 12-22%",
+        "RAI India Retail 2024 — shrinkage and inventory insurance as material cost for organised retail",
+        "INTERNAL_CALIBRATION — retail insurance optimisation savings from 2 India retail risk reviews"
+      ]
+    },
+    {
+      "lever_id": "retail_compliance_audit_efficiency",
+      "lever_name": "Audit, Legal & Compliance Advisory Efficiency",
+      "description": "Consolidate legal and audit panel firms; standardise store compliance advisory; reduce duplicate statutory filings across entities.",
+      "category_ids": ["PROF_SVCS"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 16.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "SEBI LODR — listed retailer audit rotation and compliance cost disclosure",
+        "Hackett Group G&A Benchmarks 2024 — advisory spend governance 10-18% savings",
+        "INTERNAL_CALIBRATION — retail compliance advisory savings from 2 India organised retail mandates"
+      ]
     }
   ]
 }

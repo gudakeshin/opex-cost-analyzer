@@ -6,17 +6,59 @@ from typing import Any, Dict, List
 from fastapi import APIRouter, HTTPException
 
 from app.config import ROOT_DIR
-from app.schemas import SkillCreateRequest, SkillEditRequest
+from app.opar.plan import get_skill_dep_map
+from app.schemas import SkillCreateRequest, SkillDiscoverRequest, SkillEditRequest, SkillStructuredCreateRequest
 from app.services.compliance import append_audit_event
-from app.skills.registry import discover_skills
+from app.skills.dispatch import registered_skills
+from app.skills.registry import discover_skills, get_skill_meta, parse_skill_md
+from app.skills.taxonomy import TIER_MAP
 
 router = APIRouter()
+
+
+def _compose_skill_md(payload: SkillStructuredCreateRequest) -> str:
+    inputs_block = "\n".join(f"- `{inp}`" for inp in payload.inputs) or "- *(none)*"
+    outputs_block = "\n".join(f"- `{field}`" for field in payload.output_fields) or "- `result`"
+    return (
+        f"---\n"
+        f"name: {payload.name}\n"
+        f"description: \"{payload.description.replace(chr(34), chr(39))}\"\n"
+        f"kind: {payload.kind}\n"
+        f"runtime: {payload.runtime}\n"
+        f"discoverable: {'true' if payload.discoverable else 'false'}\n"
+        f"weight: {payload.weight}\n"
+        f"version: 0.1.0\n"
+        f"status: active\n"
+        f"---\n\n"
+        f"# {payload.name.replace('-', ' ').title()}\n\n"
+        f"{payload.instruction_prompt.strip()}\n\n"
+        f"## Inputs\n\n{inputs_block}\n\n"
+        f"## Outputs\n\n{outputs_block}\n"
+    )
+
+
+def _skill_execution_status(name: str) -> str:
+    meta = get_skill_meta(name)
+    if not meta:
+        return "missing"
+    runtime = meta.get("runtime") or "python"
+    if name in registered_skills():
+        return "python" if runtime == "python" else "declarative"
+    if runtime == "declarative":
+        return "declarative"
+    return "doc-only"
 
 
 @router.get("/api/skills")
 @router.get("/api/v1/skills")
 def list_skills() -> List[Dict[str, Any]]:
-    return [x.model_dump() for x in discover_skills()]
+    rows: List[Dict[str, Any]] = []
+    for item in discover_skills():
+        row = item.model_dump()
+        row["tier"] = TIER_MAP.get(item.name, "Other")
+        row["execution_status"] = _skill_execution_status(item.name)
+        rows.append(row)
+    return rows
 
 
 @router.get("/api/skills/{name}")
@@ -25,7 +67,13 @@ def get_skill(name: str) -> Dict[str, Any]:
     path = ROOT_DIR / "skills" / name / "SKILL.md"
     if not path.exists():
         raise HTTPException(status_code=404, detail="Skill not found")
-    return {"name": name, "path": str(path), "content": path.read_text(encoding="utf-8")}
+    meta = parse_skill_md(path)
+    return {
+        "name": name,
+        "path": str(path),
+        "content": path.read_text(encoding="utf-8"),
+        **{k: meta[k] for k in ("kind", "runtime", "discoverable", "weight", "tier", "inputs") if k in meta},
+    }
 
 
 @router.put("/api/skills/{name}")
@@ -50,6 +98,59 @@ def create_skill(payload: SkillCreateRequest) -> Dict[str, str]:
     skill_path.write_text(payload.content, encoding="utf-8")
     append_audit_event("skill_created", data={"skill": payload.name})
     return {"status": "created", "name": payload.name}
+
+
+@router.post("/api/skills/structured")
+@router.post("/api/v1/skills/structured")
+def create_structured_skill(payload: SkillStructuredCreateRequest) -> Dict[str, str]:
+    from app.skills.manifest import append_manifest_entry
+    from app.skills.taxonomy import TIER_MAP
+
+    content = _compose_skill_md(payload)
+    result = create_skill(SkillCreateRequest(name=payload.name, content=content))
+    append_manifest_entry({
+        "name": payload.name,
+        "tier": TIER_MAP.get(payload.name, "Other"),
+        "parallel_group": payload.parallel_group,
+        "depends_on": list(payload.depends_on or payload.inputs),
+        "estimated_tokens": 400,
+        "kind": payload.kind,
+        "weight": payload.weight,
+        "runtime": payload.runtime,
+        "status": "active",
+    })
+    return result
+
+
+@router.post("/api/skills/discover")
+@router.post("/api/v1/skills/discover")
+def discover_skills_api(payload: SkillDiscoverRequest) -> Dict[str, Any]:
+    from app.skills.discovery import discover_relevant_skills
+
+    hits = discover_relevant_skills(payload.query, k=payload.k, kind=payload.kind)
+    return {"query": payload.query, "results": hits}
+
+
+@router.post("/api/skills/reindex")
+@router.post("/api/v1/skills/reindex")
+def reindex_skills() -> Dict[str, str]:
+    from app.skills.discovery import clear_discovery_index
+
+    clear_discovery_index()
+    append_audit_event("skill_catalog_reindexed")
+    return {"status": "reindexed"}
+
+
+@router.get("/api/skills/catalog/dependencies")
+@router.get("/api/v1/skills/catalog/dependencies")
+def skill_dependencies() -> Dict[str, Any]:
+    dep_map = get_skill_dep_map()
+    return {
+        "skills": [
+            {"name": name, "parallel_group": group, "depends_on": deps}
+            for name, (group, deps, _tokens) in dep_map.items()
+        ]
+    }
 
 
 def _smoke_context():
@@ -99,7 +200,7 @@ def _smoke_context():
     for dep in (
         "spend-profiler", "document-contextualizer", "internal-benchmarker",
         "peer-benchmarker", "heuristic-analyzer", "root-cause-analyzer",
-        "savings-modeler", "value-bridge-calculator",
+        "savings-modeler", "value-bridge-calculator", "evidence-gatherer",
     ):
         try:
             out, _ = invoke_skill(dep, ctx)
@@ -114,12 +215,12 @@ def _smoke_context():
 def test_skill(name: str) -> Dict[str, Any]:
     if not (ROOT_DIR / "skills" / name / "SKILL.md").exists():
         raise HTTPException(status_code=404, detail="Skill not found")
-    from app.skills.dispatch import invoke_skill, registered_skills
+    from app.skills.dispatch import invoke_skill
 
     ts = datetime.now(timezone.utc).isoformat()
-    if name not in registered_skills():
-        # SKILL.md exists but there is no executable dispatch handler (e.g. a
-        # documentation-only or differently-dispatched skill like model-contextualizer).
+    meta = get_skill_meta(name)
+    is_declarative = bool(meta and meta.get("runtime") == "declarative")
+    if name not in registered_skills() and not is_declarative:
         return {
             "skill": name,
             "status": "skipped",
@@ -137,6 +238,7 @@ def test_skill(name: str) -> Dict[str, Any]:
             "test_run_at": ts,
             "degraded_reason": degraded,
             "output_keys": sorted(output.keys())[:12] if ok else [],
+            "runtime": meta.get("runtime") if meta else "python",
             "details": (
                 f"Executed on synthetic data; returned {len(output)} output field(s)."
                 if ok else "Handler returned a non-dict result."

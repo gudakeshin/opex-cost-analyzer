@@ -20,7 +20,7 @@ import { SECTOR_OPTIONS } from '../constants/sectors';
 import { useSession } from '../context/SessionContext';
 import { apiGet, apiPatch, apiPost, apiUpload, getApiErrorMessage } from '../hooks/useApi';
 import { friendlyErrorMessage } from '../utils/errorMessages';
-import { clearChatMessages, loadChatMessages, saveChatMessages } from '../utils/chatStorage';
+import { loadChatMessages, saveChatMessages } from '../utils/chatStorage';
 import { effectiveAnalysisIndustry } from '../utils/engagementContext';
 import {
   buildAnalyzeCompleteContent,
@@ -149,6 +149,20 @@ function progressStepsFromPoll(entry: ChatProgressResponse): ProgressStep[] {
   }));
 }
 
+function progressStepsFromTrace(trace?: AnalysisTraceStep[]): ProgressStep[] {
+  if (!trace?.length) {
+    return [{ phase: 'reflect', message: 'Analysis complete.' }];
+  }
+  const steps = trace.slice(0, 8).map((row) => ({
+    phase: row.phase || 'act',
+    message: row.detail ? `${row.title} — ${row.detail}` : row.title,
+  }));
+  if (!steps.some((s) => s.phase === 'reflect')) {
+    steps.push({ phase: 'reflect', message: 'Analysis complete.' });
+  }
+  return steps;
+}
+
 async function pollChatProgress(
   runId: string,
   onSteps: (steps: ProgressStep[]) => void,
@@ -238,6 +252,7 @@ export const ProcurementAnalysis: React.FC = () => {
   const [sectorUpdating, setSectorUpdating] = useState(false);
   const [thinkingMode, setThinkingMode] = useState(false);
   const [liveThinking, setLiveThinking] = useState('');
+  const [recoveryNotice, setRecoveryNotice] = useState<string | null>(null);
   const [llmModels, setLlmModels] = useState<LlmModelsResponse['models']>([]);
   const [selectedLlmModel, setSelectedLlmModel] = useState('');
   const [conflictResolving, setConflictResolving] = useState(false);
@@ -326,6 +341,7 @@ export const ProcurementAnalysis: React.FC = () => {
         const m = await apiGet<SessionManifest>(`/api/v1/sessions/${sessionId}/manifest`);
         if (cancelled) return;
         setManifest(m);
+        setRecoveryNotice(null);
 
         const stored = loadChatMessages(sessionId);
         if (stored.length > 0) {
@@ -342,12 +358,26 @@ export const ProcurementAnalysis: React.FC = () => {
           }
           const sess = await refreshSessionAnalysis();
           if (!cancelled && sess) {
+            const runSummary = (sess as SessionResponse).last_analysis_run;
+            if (runSummary?.run_id) {
+              setLastRunId(runSummary.run_id);
+            }
+            const fallbackSteps = runSummary?.progress_steps;
+            if ((!agentSteps || agentSteps.length === 0) && fallbackSteps?.length) {
+              setAgentSteps(fallbackSteps);
+              setLastSteps(fallbackSteps);
+            }
             const snapshot = extractInsightSnapshot(sess, m);
             if (snapshot && snapshot.total_spend > 0) {
               setMessages((prev) => {
                 if (chatHasInsightSnapshot(prev)) return prev;
                 const rawTrace = (sess as { analysis_trace?: unknown }).analysis_trace;
                 const trace = Array.isArray(rawTrace) ? (rawTrace as AnalysisTraceStep[]) : undefined;
+                if ((!trace || trace.length === 0) && fallbackSteps?.length) {
+                  setRecoveryNotice(
+                    'Recovered this analysis from saved session history. Detailed step trace was unavailable, so a summary timeline is shown.',
+                  );
+                }
                 const restored = buildRestoredInsightMessage(snapshot, m, trace);
                 return prev.length > 0 ? [restored, ...prev] : [restored];
               });
@@ -574,6 +604,7 @@ export const ProcurementAnalysis: React.FC = () => {
           insight_snapshot: insightSnap,
           show_peer_savings: showPeer,
           charts: res.charts,
+          suggested_outputs: res.suggested_outputs,
         },
       ]);
       maybeAutoOpenProbeModal(insightSnap, currentAnsweredProbeFamilies(), res.run_id);
@@ -976,6 +1007,7 @@ export const ProcurementAnalysis: React.FC = () => {
           insight_snapshot: insightSnap,
           show_peer_savings: showPeer,
           charts: res.charts,
+          suggested_outputs: res.suggested_outputs,
         },
       ]);
       maybeAutoOpenProbeModal(insightSnap, answeredProbeFamilies, res.run_id);
@@ -1024,6 +1056,8 @@ export const ProcurementAnalysis: React.FC = () => {
         ...(prev ?? []),
         { phase: 'reflect', message: 'Analysis complete.' },
       ]);
+      const fallbackSteps = progressStepsFromTrace(trace);
+      setLastSteps(fallbackSteps);
       setPipelineLabel(undefined);
       if (snapshot) {
         setMessages((prev) => [
@@ -1062,6 +1096,7 @@ export const ProcurementAnalysis: React.FC = () => {
       controller.abort();
       setError(getApiErrorMessage(err));
       setAgentSteps([{ phase: 'reflect', message: 'Analysis failed. See error above.' }]);
+      setLastSteps([{ phase: 'reflect', message: 'Analysis failed. See error above.' }]);
     } finally {
       setLoading(false);
     }
@@ -1141,12 +1176,13 @@ export const ProcurementAnalysis: React.FC = () => {
         audience: 'consultant',
         engagement_id: eid,
       });
-      if (sessionId) clearChatMessages(sessionId);
       setSessionId(res.session_id);
       setMessages([]);
       setManifest(res);
       setAgentSteps(undefined);
+      setLastSteps(undefined);
       setPipelineLabel(undefined);
+      setRecoveryNotice(null);
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {
@@ -1289,6 +1325,17 @@ export const ProcurementAnalysis: React.FC = () => {
             </Alert>
           </div>
         )}
+        {recoveryNotice && (
+          <div className="px-4 md:px-6 pt-3 shrink-0">
+            <Alert
+              variant="info"
+              title="Recovered analysis context"
+              onDismiss={() => setRecoveryNotice(null)}
+            >
+              {recoveryNotice}
+            </Alert>
+          </div>
+        )}
 
         <EngagementConflictBanner
           manifest={manifest}
@@ -1366,6 +1413,7 @@ export const ProcurementAnalysis: React.FC = () => {
                         message={msg}
                         liveSnapshot={insightSnapshot}
                         currency={engagement.currency || 'INR'}
+                        sessionId={sessionId || undefined}
                         onOptionClick={(text) => sendMessage(text)}
                         answeredProbeFamilies={answeredProbeFamilies}
                         onOpenProbes={

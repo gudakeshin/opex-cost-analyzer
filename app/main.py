@@ -38,7 +38,7 @@ from app.config import (
 )
 from app.opar.memory_adapter import get_memory_adapter_status
 from app.services.document_index import get_document_index_status
-from app.routers import benchmarks, chat, compliance, connectors, engagements, enterprise, llm, outputs, pipeline, sessions, skills
+from app.routers import benchmarks, chat, compliance, connectors, engagements, enterprise, llm, outputs, pipeline, sessions, skills, workbench
 from app.security.auth import auth_enabled, enforce_resource_owner, require_auth
 from app.storage import ensure_dirs
 from app.memory import MemoryStore as _MemoryStore
@@ -298,6 +298,7 @@ app.include_router(llm.router, dependencies=_auth)
 app.include_router(pipeline.router, dependencies=_auth)
 app.include_router(benchmarks.router, dependencies=_auth)
 app.include_router(skills.router, dependencies=_auth)
+app.include_router(workbench.router, dependencies=_auth)
 app.include_router(outputs.router, dependencies=_auth)
 app.include_router(compliance.router, dependencies=_auth)
 app.include_router(enterprise.router, dependencies=_auth)

@@ -128,7 +128,7 @@ export const BenchmarkGapsTable: React.FC<BenchmarkGapsTableProps> = ({
                       {formatPct(g.p50_pct)}
                     </td>
                     <td className={`${TD_CLASS} ${NUM_CLASS} text-right font-medium align-top`}>
-                      {headroom > 0 ? formatCr(headroom) : '—'}
+                      {headroom > 0 ? formatCr(headroom, { alreadyInCr: true }) : '—'}
                     </td>
                     <td className={`${TD_CLASS} max-w-md align-top`}>
                       {commentary && summary ? (

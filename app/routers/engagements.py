@@ -110,6 +110,7 @@ def patch_engagement(engagement_id: str, payload: EngagementPatchRequest) -> Dic
         from app.services.sector_packs import normalize_industry_selection
 
         manifest["industry"] = normalize_industry_selection(payload.industry) or payload.industry
+        manifest["industry_user_set"] = bool(manifest["industry"])
     if payload.annual_revenue is not None:
         manifest["annual_revenue"] = max(float(payload.annual_revenue), 0.0)
     if payload.currency is not None:

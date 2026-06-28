@@ -24,6 +24,7 @@ data/engagements/
 data/calibration/
 data/benchmarks/
 data/audit.log
+data/provenance/
 
 # Claude Code session state
 .claude/

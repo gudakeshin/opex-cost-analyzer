@@ -1,0 +1,19 @@
+{
+  "sector": "healthcare_hospitals",
+  "currency": "INR",
+  "peers": [
+    {"name": "Apollo Hospitals", "ticker": "APOLLOHOSP.NS", "exchange": "NSE", "revenue_cr": 19500},
+    {"name": "Fortis Healthcare", "ticker": "FORTIS.NS", "exchange": "NSE", "revenue_cr": 7200},
+    {"name": "Max Healthcare", "ticker": "MAXHEALTH.NS", "exchange": "NSE", "revenue_cr": 6800},
+    {"name": "Narayana Hrudayalaya", "ticker": "NH.NS", "exchange": "NSE", "revenue_cr": 5200},
+    {"name": "Dr. Lal PathLabs", "ticker": "LALPATHLAB.NS", "exchange": "NSE", "revenue_cr": 2400},
+    {"name": "Metropolis Healthcare", "ticker": "METROPOLIS.NS", "exchange": "NSE", "revenue_cr": 2100}
+  ],
+  "benchmark_metrics": {
+    "ebitda_margin_pct": {"p25": 12.0, "p50": 17.0, "p75": 22.0},
+    "employee_cost_to_revenue_pct": {"p25": 22.0, "p50": 28.0, "p75": 34.0},
+    "medical_consumables_to_revenue_pct": {"p25": 18.0, "p50": 24.0, "p75": 30.0}
+  },
+  "data_source": "BSE/NSE annual reports FY25",
+  "refresh_date": "2026-04-01"
+}

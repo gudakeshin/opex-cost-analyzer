@@ -9,7 +9,8 @@ import { Markdown } from '../../Common/Markdown';
 import { AssistantMessageBody } from './AssistantMessageBody';
 import { artefactLinks } from '../../../utils/chatMarkdown';
 import { filterProbeNextOptions, mergeLiveSpendIntoSnapshot, shouldShowSpendInsightBlock } from '../../../utils/analysisInsights';
-import type { AnalysisInsightSnapshot, ChatMessage } from '../../../types';
+import type { AnalysisInsightSnapshot, ChatMessage, SuggestedOutput } from '../../../types';
+import { apiPost } from '../../../hooks/useApi';
 
 interface StructuredChatMessageProps {
   message: ChatMessage;
@@ -18,6 +19,7 @@ interface StructuredChatMessageProps {
   answeredProbeFamilies?: Set<string>;
   currency?: string;
   liveSnapshot?: AnalysisInsightSnapshot | null;
+  sessionId?: string;
 }
 
 function AssistantAvatar() {
@@ -208,6 +210,7 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
   answeredProbeFamilies,
   currency,
   liveSnapshot,
+  sessionId,
 }) => {
   const isUser = message.role === 'user';
   const sections = message.advisory_sections;
@@ -297,6 +300,32 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
               >
                 {url.includes('chart') ? 'Open chart' : 'Open export'}
               </a>
+            ))}
+          </div>
+        )}
+
+        {!isUser && message.suggested_outputs && message.suggested_outputs.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {message.suggested_outputs.map((cta: SuggestedOutput) => (
+              <button
+                key={`${cta.skill}-${cta.endpoint}`}
+                type="button"
+                onClick={async () => {
+                  const ep = cta.endpoint.includes('{session_id}')
+                    ? cta.endpoint.replace('{session_id}', sessionId || '')
+                    : cta.endpoint;
+                  try {
+                    const res = await apiPost<{ export_url?: string; exports?: { docx?: string; pptx?: string } }>(ep, {});
+                    const url = String(res.export_url || res.exports?.docx || res.exports?.pptx || '');
+                    if (url) window.open(url.startsWith('/') ? url : url, '_blank');
+                  } catch {
+                    /* surfaced via parent error handling if wired */
+                  }
+                }}
+                className="text-xs px-3 py-1.5 rounded-full border border-deloitte-green text-deloitte-green hover:bg-emerald-50"
+              >
+                {cta.label}
+              </button>
             ))}
           </div>
         )}

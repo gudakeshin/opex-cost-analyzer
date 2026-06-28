@@ -1,0 +1,14 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "medical_consumables", "category_name": "Medical Consumables & Pharmacy", "gl_prefix": "MED"},
+    {"category_id": "diagnostics_reagents", "category_name": "Diagnostics Reagents & Lab Consumables", "gl_prefix": "LAB"},
+    {"category_id": "biomedical_maintenance", "category_name": "Biomedical Equipment Maintenance", "gl_prefix": "BME"},
+    {"category_id": "clinical_staff", "category_name": "Clinical & Nursing Staff Costs", "gl_prefix": "CLN"},
+    {"category_id": "regulatory_compliance", "category_name": "NABH / Regulatory Compliance", "gl_prefix": "REG"}
+  ],
+  "overrides": [
+    {"category_id": "facilities", "category_name": "Hospital Facilities, Utilities & Housekeeping"},
+    {"category_id": "it", "category_name": "HIS, EMR & Clinical IT Systems"}
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "sector": "bfsi_banks",
+  "version": "1.1",
+  "vintage_date": "2025-04-01",
+  "confidence_overall": "public_disclosure",
+  "source_metadata": {
+    "primary_sources": [
+      {
+        "source_name": "RBI Annual Report — Scheduled Commercial Banks Statistical Tables",
+        "url": "https://www.rbi.org.in/Scripts/AnnualReportPublications.aspx",
+        "publication_year": 2024,
+        "source_type": "published_research",
+        "notes": "Indian scheduled commercial bank cost-to-income ratio range: 40–55% (FY2024)."
+      },
+      {
+        "source_name": "HDFC Bank FY25 Annual Report (BSE: 500180)",
+        "url": "https://www.hdfcbank.com/personal/about-us/investor-relations",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Operating expenses ~₹58,000 Cr on total income ~₹2,40,000 Cr. IT and digital spend disclosed in notes."
+      },
+      {
+        "source_name": "ICICI Bank FY25 Annual Report (BSE: 532174)",
+        "url": "https://www.icicibank.com/about-us/investor-relations",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Employee expenses and technology spend as % of operating revenue from annual report segment notes."
+      },
+      {
+        "source_name": "State Bank of India FY25 Annual Report (BSE: 500112)",
+        "url": "https://sbi.co.in/web/investor-relations",
+        "publication_year": 2025,
+        "source_type": "public_disclosure",
+        "notes": "Employee benefit expense ~55% of total opex; technology spend disclosed in management discussion."
+      },
+      {
+        "source_name": "IBA Banking Technology Survey 2024",
+        "url": "https://www.iba.org.in/publications",
+        "publication_year": 2024,
+        "source_type": "published_research",
+        "notes": "KYC/AML automation adoption, core banking modernisation, and digital channel cost benchmarks."
+      }
+    ],
+    "methodology": "Generic spend categories (IT, travel, marketing, etc.) expressed as % of revenue from BSE annual reports. BFSI-specific and workforce categories expressed as % of total opex, consistent with RBI statistical tables and bank disclosure formats. Percentiles derived from 10 listed peer banks in peer_set.json.",
+    "sample_size": 10
+  },
+  "benchmarks": {
+    "bfsi_banks": {
+      "categories": {
+        "IT_SOFTWARE": {
+          "P25": 4.0, "P50": 7.0, "P75": 10.0, "P90": 14.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Bank IT spend as % of total income (BSE annual reports, IBA technology survey)."
+        },
+        "PROF_SERVICES": {
+          "P25": 1.0, "P50": 2.2, "P75": 3.5, "P90": 5.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Audit, legal, consulting, and rating fees for listed banks."
+        },
+        "FACILITIES": {
+          "P25": 2.0, "P50": 3.5, "P75": 5.0, "P90": 7.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Branch network rent and premises costs."
+        },
+        "TRAVEL": {
+          "P25": 0.3, "P50": 0.6, "P75": 1.0, "P90": 1.5,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Employee travel and entertainment."
+        },
+        "MARKETING": {
+          "P25": 1.5, "P50": 2.8, "P75": 4.5, "P90": 6.5,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Brand, customer acquisition, sponsorships."
+        },
+        "OUTSOURCED": {
+          "P25": 3.0, "P50": 5.5, "P75": 8.0, "P90": 11.0,
+          "unit": "% of revenue",
+          "confidence": "published_research",
+          "source_note": "BPO, collections, KYC processing outsourced to third parties."
+        },
+        "HR": {
+          "P25": 48.0, "P50": 55.0, "P75": 65.0, "P90": 72.0,
+          "unit": "% of opex",
+          "confidence": "public_disclosure",
+          "source_note": "Employee benefit expense as % of total operating expenses. peer_set staff_cost_to_total_opex_pct; HDFC/ICICI/SBI FY25 disclosures."
+        },
+        "CONTINGENT": {
+          "P25": 2.0, "P50": 4.5, "P75": 7.0, "P90": 10.0,
+          "unit": "% of opex",
+          "confidence": "published_research",
+          "source_note": "Contract tellers, collections agents, IT contractors as % of total opex. NASSCOM BPM and IBA workforce surveys."
+        },
+        "FIN_SVCS": {
+          "P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.5,
+          "unit": "% of opex",
+          "confidence": "public_disclosure",
+          "source_note": "Correspondent banking fees, payment rail charges, treasury transaction costs."
+        },
+        "kyc_aml_ops": {
+          "P25": 1.5, "P50": 3.0, "P75": 4.5, "P90": 6.0,
+          "unit": "% of opex",
+          "confidence": "published_research",
+          "source_note": "KYC/AML operations cost including V-KYC, transaction monitoring, and periodic re-KYC. IBA technology survey 2024."
+        },
+        "treasury_ops": {
+          "P25": 0.8, "P50": 1.5, "P75": 2.5, "P90": 3.5,
+          "unit": "% of opex",
+          "confidence": "public_disclosure",
+          "source_note": "Treasury and ALM operations FTE and system costs excluding SLR/CRR opportunity cost."
+        },
+        "npa_provisioning_cost": {
+          "P25": 12.0, "P50": 18.0, "P75": 25.0, "P90": 35.0,
+          "unit": "% of opex",
+          "confidence": "public_disclosure",
+          "source_note": "NPA provisions and write-offs as % of total opex. Aligns with npa_provision_to_opex KPI; RBI IRACP norms."
+        },
+        "cre_credit_risk_infra": {
+          "P25": 0.8, "P50": 1.8, "P75": 2.8, "P90": 4.0,
+          "unit": "% of opex",
+          "confidence": "published_research",
+          "source_note": "Credit risk infrastructure: CRILC, rating agency fees, bureau queries, risk analytics platforms."
+        },
+        "loan_processing_ops": {
+          "P25": 2.0, "P50": 4.0, "P75": 6.0, "P90": 8.5,
+          "unit": "% of opex",
+          "confidence": "published_research",
+          "source_note": "Loan origination, underwriting, and collections operations cost excluding provisions."
+        },
+        "contact_center_ops": {
+          "P25": 1.5, "P50": 3.0, "P75": 4.5, "P90": 6.5,
+          "unit": "% of opex",
+          "confidence": "published_research",
+          "source_note": "Contact centre and customer service operations including inbound/outbound voice and digital chat."
+        },
+        "core_banking_platform": {
+          "P25": 3.0, "P50": 5.5, "P75": 8.0, "P90": 11.0,
+          "unit": "% of opex",
+          "confidence": "published_research",
+          "source_note": "Core banking system licensing, maintenance, and CBS-related infrastructure as % of opex."
+        },
+        "digital_banking_infra": {
+          "P25": 1.5, "P50": 3.0, "P75": 5.0, "P90": 7.5,
+          "unit": "% of opex",
+          "confidence": "published_research",
+          "source_note": "Mobile banking, internet banking, UPI, and digital channel platform costs."
+        },
+        "branch_network_ops": {
+          "P25": 8.0, "P50": 12.0, "P75": 16.0, "P90": 22.0,
+          "unit": "% of opex",
+          "confidence": "public_disclosure",
+          "source_note": "Branch network operating costs including staff, utilities, and last-mile distribution."
+        },
+        "atm_cash_mgmt": {
+          "P25": 1.0, "P50": 2.0, "P75": 3.5, "P90": 5.0,
+          "unit": "% of opex",
+          "confidence": "public_disclosure",
+          "source_note": "ATM network operations, cash replenishment, and managed services. RBI annual report ATM statistics."
+        },
+        "rbi_audit_compliance": {
+          "P25": 1.0, "P50": 2.0, "P75": 3.5, "P90": 5.5,
+          "unit": "% of opex",
+          "confidence": "public_disclosure",
+          "source_note": "RBI audit, statutory compliance, and regulatory reporting FTE and system costs."
+        }
+      }
+    }
+  }
+}

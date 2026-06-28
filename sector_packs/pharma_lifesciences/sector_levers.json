@@ -107,6 +107,51 @@
         "USFDA 21 CFR Part 11 / EU Annex 11 requirements — electronic records and audit trail mandates driving IT consolidation",
         "INTERNAL_CALIBRATION — QMS IT modernisation savings from 2 India pharma GxP technology mandates"
       ]
+    },
+    {
+      "lever_id": "rnd_portfolio_rationalization",
+      "lever_name": "R&D Portfolio Rationalisation & CRO Governance",
+      "description": "Prioritise R&D projects by ROI; consolidate CRO and clinical trial vendors; exit low-ROI development programmes.",
+      "category_ids": ["RND"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Gartner Life Sciences R&D Portfolio Management 2024 — tail project rationalisation saves 10-18% of R&D spend",
+        "Dr. Reddy's FY25 Annual Report — R&D productivity and portfolio focus cited as strategic priority",
+        "INTERNAL_CALIBRATION — pharma R&D portfolio savings from 3 India pharma R&D mandates"
+      ]
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "Pharma Corporate & Product Liability Insurance Optimisation",
+      "description": "Competitive RFP for product liability, clinical trial, and property insurance; optimise deductibles.",
+      "category_ids": ["INSURANCE"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 16.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Marsh Life Sciences Risk Report 2024 — pharma insurance RFP savings 8-15%",
+        "IRDAI Annual Report 2023-24 — commercial insurance market benchmarks",
+        "INTERNAL_CALIBRATION — pharma insurance savings from 2 India pharma risk reviews"
+      ]
+    },
+    {
+      "lever_id": "qc_lab_facilities_optimisation",
+      "lever_name": "QC Lab & GMP Facilities Cost Optimisation",
+      "description": "Consolidate QC lab operations; energy-efficient HVAC for clean rooms; shared facilities across sites.",
+      "category_ids": ["FACILITIES"],
+      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "BEE PAT Scheme — pharma designated consumers energy efficiency benchmarks",
+        "CII Pharma Manufacturing Excellence 2024 — GMP facility cost optimisation case studies",
+        "INTERNAL_CALIBRATION — pharma facilities savings from 2 India pharma plant mandates"
+      ]
     }
   ]
 }

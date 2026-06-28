@@ -40,7 +40,8 @@
     "lease_restructuring",
     "cost_governance",
     "agency_fee_optimization",
-    "martech_rationalization"
+    "martech_rationalization",
+    "insurance_premium_optimization"
   ],
   "sector_specific_levers": [
     {
@@ -817,6 +818,753 @@
         "Consumer basket composition and cross-purchase data"
       ],
       "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "trade_marketing_roi",
+      "lever_name": "Trade Marketing & Promotions ROI Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Trade Marketing & Promotions ROI Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:MARKETING present"
+      ],
+      "industry_sources": [
+        "Nielsen India FMCG Intelligence 2024 — trade promotion ROI in Indian FMCG: 30-40% of trade spend generates <1x ROI; reallocation saves 10-20% of total trade budget",
+        "HUL FY25 Annual Report (BSE 500696) — advertising & promotion efficiency cited as strategic priority; A&P at 14% of revenue",
+        "INTERNAL_CALIBRATION — trade marketing optimisation savings from 4 India FMCG consumer goods mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Trade Marketing & Promotions ROI Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for MARKETING",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "distribution_network_optimisation",
+      "lever_name": "Distribution Network & Logistics Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 24.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Distribution Network & Logistics Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:LOGISTICS_INDIA present"
+      ],
+      "industry_sources": [
+        "CII Logistics India Report 2024 (cii.in) — FMCG logistics 8-12% of revenue; consolidation and direct shipment reduce cost 15-25%",
+        "HUL FY25 Annual Report — Project Ridhi initiative: distribution network optimisation reducing cost per case",
+        "INTERNAL_CALIBRATION — logistics optimisation savings from 5 India FMCG distribution transformation engagements"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Distribution Network & Logistics Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for LOGISTICS_INDIA",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "packaging_material_renegotiation",
+      "lever_name": "Packaging Material Cost Reduction",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 8.0,
+        "p90": 15.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Packaging Material Cost Reduction"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:PACKAGING present"
+      ],
+      "industry_sources": [
+        "FICCI FMCG Survey 2024 (ficci.in) — packaging material 8-14% of FMCG revenue; supplier consolidation saves 8-12%",
+        "HUL FY25 Annual Report — plastic packaging reduction and material efficiency as BRSR-linked cost initiative",
+        "INTERNAL_CALIBRATION — packaging cost reduction savings from 3 India FMCG procurement mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Packaging Material Cost Reduction: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for PACKAGING",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "contract_manufacturing_optimisation",
+      "lever_name": "Contract Manufacturing Strategy Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Contract Manufacturing Strategy Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "Dabur FY25 Annual Report (BSE 500096) — contract manufacturing disclosure; quality-linked CM contracts as strategic tool",
+        "HUL FY25 Annual Report — ~30% production outsourced to CMs; CM network efficiency as cost lever",
+        "INTERNAL_CALIBRATION — CM optimisation savings from 4 India FMCG sourcing mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Contract Manufacturing Strategy Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "revenue_management_pricing",
+      "lever_name": "Revenue Management & Pricing Analytics",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Revenue Management & Pricing Analytics"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:HR present",
+        "category:MARKETING present"
+      ],
+      "industry_sources": [
+        "Nielsen India 2024 — India FMCG SKU rationalisation: 20% of SKUs generate 80% of profit; tail SKU rationalisation improves margin 2-4pp",
+        "Marico FY25 Annual Report (BSE 531642) — focused portfolio strategy and pricing power cited as key margin lever",
+        "INTERNAL_CALIBRATION — pricing analytics savings calibrated from 3 India FMCG commercial excellence mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Revenue Management & Pricing Analytics: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for MARKETING",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "sales_force_effectiveness",
+      "lever_name": "Salesforce Effectiveness & Route-to-Market Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Salesforce Effectiveness & Route-to-Market Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "FICCI FMCG Survey 2024 (ficci.in) — salesforce productivity: outlet calls per day 15-25 (best-in-class) vs 8-12 (lagging)",
+        "HUL FY25 Annual Report — Winning in Many Indias programme: geographic coverage optimisation",
+        "INTERNAL_CALIBRATION — salesforce effectiveness savings from 5 India FMCG go-to-market mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Salesforce Effectiveness & Route-to-Market Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "supply_chain_inventory",
+      "lever_name": "Supply Chain Inventory & Working Capital Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 16.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Supply Chain Inventory & Working Capital Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:OUTSOURCED present",
+        "category:LOGISTICS_INDIA present"
+      ],
+      "industry_sources": [
+        "CII India Supply Chain Report 2024 — demand sensing reduces safety stock 15-20%; working capital improvement 10-15%",
+        "Dabur FY25 Annual Report — working capital management and supply chain efficiency cited as strategic priorities",
+        "INTERNAL_CALIBRATION — inventory optimisation savings from 4 India FMCG supply chain mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Supply Chain Inventory & Working Capital Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for LOGISTICS_INDIA",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "it_erp_rationalisation",
+      "lever_name": "ERP, DMS & Trade Analytics Rationalisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 24.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for ERP, DMS & Trade Analytics Rationalisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:IT present"
+      ],
+      "industry_sources": [
+        "Gartner Retail/CPG IT Benchmark 2024 — CPG companies 1-2% of revenue on IT; licence rationalisation saves 15-25%",
+        "HUL FY25 Annual Report — digital and analytics investments cited as efficiency enabler",
+        "INTERNAL_CALIBRATION — FMCG IT rationalisation savings from 2 India CPG technology mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for ERP, DMS & Trade Analytics Rationalisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for IT",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "corporate_office_right_sizing",
+      "lever_name": "Corporate Office & Sales Office Right-Sizing",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Corporate Office & Sales Office Right-Sizing"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 14,
+        "p90": 22
+      },
+      "applicable_if": [
+        "category:FACILITIES present"
+      ],
+      "industry_sources": [
+        "FICCI FMCG Survey 2024 — FMCG companies asset-light in offices; hybrid work reduces seat requirement 25-35%",
+        "Hackett Group G&A Benchmarks 2024 — facilities rationalisation saves 10-20% of occupancy cost",
+        "INTERNAL_CALIBRATION — office right-sizing savings from 2 India FMCG real estate mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Corporate Office & Sales Office Right-Sizing: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 7
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FACILITIES",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "audit_legal_governance",
+      "lever_name": "Audit, Legal & Regulatory Advisory Governance",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Audit, Legal & Regulatory Advisory Governance"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:PROF_SVCS present"
+      ],
+      "industry_sources": [
+        "SEBI LODR — statutory audit rotation and fee disclosure requirements for listed FMCG companies",
+        "Hackett Group G&A Benchmarks 2024 — advisory spend governance reduces professional fees 10-20%",
+        "INTERNAL_CALIBRATION — professional services governance savings from 3 India FMCG G&A mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Audit, Legal & Regulatory Advisory Governance: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for PROF_SVCS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "Corporate Insurance Premium Optimisation",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.03,
+      "phasing_curve": [
+        0.6,
+        0.3,
+        0.1
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Insurance audit completed — coverage adequacy vs. over-insurance assessed by peril",
+        "Market submissions prepared for competitive renewal (3+ carriers benchmarked)",
+        "Risk management improvements documented as leverage for premium negotiation"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:INSURANCE present"
+      ],
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 (irdai.gov.in) — group health competitive market; 15-25% premium reduction via RFP",
+        "Marsh Global Risk Report 2024 — corporate insurance benchmarking reduces over-insurance 10-18%",
+        "INTERNAL_CALIBRATION — insurance premium optimisation savings from 2 India FMCG benefits reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Ind AS 116 Lease Reclassification (Operating vs. Finance): validate baseline and stakeholders",
+          "owner_role": "Treasury",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Model supplier financial risk and term scenarios",
+          "owner_role": "Treasury / Procurement",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Negotiate term changes with top suppliers",
+          "owner_role": "Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Update ERP terms and monitor DPO/cash impact",
+          "owner_role": "AP Lead",
+          "duration_weeks": 2
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "DPO below sector benchmark with low supplier risk",
+          "evidence_source": "ap_aging",
+          "confirms": "Term extension is feasible"
+        }
+      ],
+      "required_data_fields": [
+        "AP aging by supplier",
+        "Payment terms master",
+        "Supplier credit/risk ratings"
+      ],
+      "applicability_threshold_pct": 0.02
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

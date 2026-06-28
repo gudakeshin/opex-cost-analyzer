@@ -8,6 +8,7 @@ All parsers return a normalised BenchmarkRecord list.
 """
 from __future__ import annotations
 
+import json
 import logging
 import os
 from dataclasses import dataclass, asdict
@@ -238,8 +239,63 @@ class CEAParser:
 
 
 # ---------------------------------------------------------------------------
-# Licensed source adapter stubs
+# Licensed source adapters
 # ---------------------------------------------------------------------------
+
+def _licensed_http_get(url: str, *, api_key: str, key_header: str = "Authorization") -> Any:
+    """Best-effort GET for licensed benchmark APIs. Returns parsed JSON or raises."""
+    import urllib.error
+    import urllib.request
+
+    headers = {key_header: f"Bearer {api_key}", "Accept": "application/json"}
+    req = urllib.request.Request(url, headers=headers, method="GET")
+    with urllib.request.urlopen(req, timeout=20) as resp:
+        return json.loads(resp.read().decode("utf-8"))
+
+
+def _records_from_payload(
+    payload: Any,
+    *,
+    source: str,
+    metric_id: str,
+    metric_name: str,
+    unit: str,
+    fiscal_year: str,
+    company_name: str = "aggregate",
+    ticker: Optional[str] = None,
+) -> List[BenchmarkRecord]:
+    """Normalize a licensed API payload into BenchmarkRecords when shape is known."""
+    if isinstance(payload, list):
+        rows = payload
+    elif isinstance(payload, dict):
+        rows = payload.get("data") or payload.get("results") or payload.get("records") or []
+    else:
+        return []
+    out: List[BenchmarkRecord] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        val = row.get("value") or row.get("metric_value")
+        if val is None:
+            continue
+        try:
+            out.append(
+                BenchmarkRecord(
+                    source=source,
+                    company_name=str(row.get("company_name") or row.get("name") or company_name),
+                    ticker=row.get("ticker") or ticker,
+                    fiscal_year=str(row.get("fiscal_year") or fiscal_year),
+                    metric_id=str(row.get("metric_id") or metric_id),
+                    metric_name=str(row.get("metric_name") or metric_name),
+                    value=float(val),
+                    unit=str(row.get("unit") or unit),
+                    confidence=float(row.get("confidence") or 0.85),
+                    notes=str(row.get("notes") or ""),
+                )
+            )
+        except (TypeError, ValueError):
+            continue
+    return out
 
 class CmieAdapter:
     """
@@ -258,12 +314,44 @@ class CmieAdapter:
         if not self.api_key:
             log.warning("CmieAdapter.fetch_peer_costs: No API key. Returning empty stub.")
             return []
-        raise NotImplementedError("Implement CMIE Prowess IQ HTTP calls when API key available.")
+        base = os.environ.get("CMIE_API_BASE", "https://prowessiq.cmie.com/api/v1").rstrip("/")
+        joined = ",".join(tickers[:20])
+        metric_q = ",".join(metrics[:10]) if metrics else "opex_pct"
+        url = f"{base}/peer-costs?tickers={joined}&metrics={metric_q}&year={fiscal_year}"
+        try:
+            payload = _licensed_http_get(url, api_key=self.api_key, key_header="X-API-Key")
+            return _records_from_payload(
+                payload,
+                source="CMIE_PROWESS",
+                metric_id="opex_pct",
+                metric_name="OpEx % of revenue",
+                unit="%",
+                fiscal_year=fiscal_year,
+            )
+        except Exception as exc:
+            log.warning("CmieAdapter.fetch_peer_costs failed: %s", exc)
+            return []
 
     def fetch_time_series(self, ticker: str, metric: str, years: int = 5) -> List[BenchmarkRecord]:
         if not self.api_key:
             return []
-        raise NotImplementedError("Implement CMIE time-series endpoint.")
+        base = os.environ.get("CMIE_API_BASE", "https://prowessiq.cmie.com/api/v1").rstrip("/")
+        url = f"{base}/time-series?ticker={ticker}&metric={metric}&years={years}"
+        try:
+            payload = _licensed_http_get(url, api_key=self.api_key, key_header="X-API-Key")
+            return _records_from_payload(
+                payload,
+                source="CMIE_PROWESS",
+                metric_id=metric,
+                metric_name=metric.replace("_", " ").title(),
+                unit="INR",
+                fiscal_year="FY25",
+                company_name=ticker,
+                ticker=ticker,
+            )
+        except Exception as exc:
+            log.warning("CmieAdapter.fetch_time_series failed: %s", exc)
+            return []
 
 
 class CapitalineAdapter:
@@ -281,7 +369,22 @@ class CapitalineAdapter:
     def fetch_segment_costs(self, company_ids: List[str], fiscal_year: str = "FY25") -> List[BenchmarkRecord]:
         if not self.api_key:
             return []
-        raise NotImplementedError("Implement Capitaline segment cost endpoint.")
+        base = os.environ.get("CAPITALINE_API_BASE", "https://api.capitaline.com/v1").rstrip("/")
+        ids = ",".join(company_ids[:20])
+        url = f"{base}/segment-costs?ids={ids}&year={fiscal_year}"
+        try:
+            payload = _licensed_http_get(url, api_key=self.api_key)
+            return _records_from_payload(
+                payload,
+                source="CAPITALINE",
+                metric_id="segment_opex_cr",
+                metric_name="Segment OpEx (₹ Cr)",
+                unit="INR_cr",
+                fiscal_year=fiscal_year,
+            )
+        except Exception as exc:
+            log.warning("CapitalineAdapter.fetch_segment_costs failed: %s", exc)
+            return []
 
 
 class CrisilAdapter:
@@ -299,7 +402,22 @@ class CrisilAdapter:
     def fetch_sector_benchmarks(self, sector_code: str, fiscal_year: str = "FY25") -> List[BenchmarkRecord]:
         if not self.api_key:
             return []
-        raise NotImplementedError("Implement CRISIL sector benchmark endpoint.")
+        base = os.environ.get("CRISIL_API_BASE", "https://api.crisil.com/research/v1").rstrip("/")
+        url = f"{base}/sector-benchmarks?sector={sector_code}&year={fiscal_year}"
+        try:
+            payload = _licensed_http_get(url, api_key=self.api_key)
+            return _records_from_payload(
+                payload,
+                source="CRISIL",
+                metric_id="sector_opex_pct",
+                metric_name="Sector median OpEx %",
+                unit="%",
+                fiscal_year=fiscal_year,
+                company_name=sector_code,
+            )
+        except Exception as exc:
+            log.warning("CrisilAdapter.fetch_sector_benchmarks failed: %s", exc)
+            return []
 
 
 class IcraAdapter:

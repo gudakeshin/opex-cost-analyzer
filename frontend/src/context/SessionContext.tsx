@@ -12,6 +12,7 @@ interface SessionContextValue {
   engagementId: string | null;
   setSessionId: (id: string | null) => void;
   setEngagementId: (id: string | null) => void;
+  resumeSession: (id: string, engagementId?: string | null) => void;
   ensureSession: () => Promise<string>;
   ensureSessionForEngagement: (targetEngagementId?: string) => Promise<string>;
   ensureEngagement: () => Promise<string>;
@@ -93,6 +94,15 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (engagementId) localStorage.setItem(ENGAGEMENT_STORAGE_KEY, engagementId);
     else localStorage.removeItem(ENGAGEMENT_STORAGE_KEY);
   }, [engagementId]);
+
+  // Whenever the active session changes (create/switch/delete engagement,
+  // resume, or mismatch-recreate), drop results derived from the previous
+  // session so one engagement never shows another's analysis/deep research.
+  useEffect(() => {
+    setHasAnalysis(false);
+    setSessionAnalysis(null);
+    setDeepResearchSummary(null);
+  }, [sessionId]);
 
   const refreshEngagementMeta = useCallback(async (eid: string) => {
     const detail = await apiGet<{
@@ -254,11 +264,6 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const setSessionId = useCallback((id: string | null) => {
     setSessionIdState(id);
-    if (!id) {
-      setHasAnalysis(false);
-      setSessionAnalysis(null);
-      setDeepResearchSummary(null);
-    }
   }, []);
 
   const setEngagementId = useCallback(
@@ -269,6 +274,23 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         refreshEngagementMeta(id).catch(() => undefined);
       } else {
         setEngagement(defaultEngagement);
+      }
+    },
+    [refreshEngagementMeta],
+  );
+
+  const resumeSession = useCallback(
+    (id: string, nextEngagementId?: string | null) => {
+      // History resume must keep session + engagement aligned in one transition.
+      // Using setEngagementId() here would clear session by design.
+      setSessionIdState(id);
+      if (nextEngagementId !== undefined) {
+        setEngagementIdState(nextEngagementId);
+        if (nextEngagementId) {
+          refreshEngagementMeta(nextEngagementId).catch(() => undefined);
+        } else {
+          setEngagement(defaultEngagement);
+        }
       }
     },
     [refreshEngagementMeta],
@@ -368,6 +390,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       engagementId,
       setSessionId,
       setEngagementId,
+      resumeSession,
       ensureSession,
       ensureSessionForEngagement,
       ensureEngagement,
@@ -390,6 +413,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       engagementId,
       setSessionId,
       setEngagementId,
+      resumeSession,
       ensureSession,
       ensureSessionForEngagement,
       ensureEngagement,

@@ -133,6 +133,7 @@ export const Diagnostic: React.FC = () => {
           {
             company_name: engagement.company_name,
             industry: engagement.industry,
+            industry_user_set: engagement.industry_user_set,
             annual_revenue_cr: engagement.annual_revenue_cr,
             detected_company_name: engagement.detected_company_name,
             detected_industry: engagement.detected_industry,
@@ -173,6 +174,7 @@ export const Diagnostic: React.FC = () => {
         : engagement.detected_company_name || '';
     const effectiveIndustry =
       engagement.detected_industry &&
+      !engagement.industry_user_set &&
       (!engagement.industry || engagement.industry === 'manufacturing_diversified')
         ? engagement.detected_industry
         : engagement.industry || engagement.detected_industry || '';
@@ -194,6 +196,7 @@ export const Diagnostic: React.FC = () => {
     engagement.company_name,
     engagement.detected_company_name,
     engagement.industry,
+    engagement.industry_user_set,
     engagement.detected_industry,
     engagement.annual_revenue_cr,
     engagement.detected_annual_revenue_cr,

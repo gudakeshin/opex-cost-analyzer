@@ -171,6 +171,7 @@ def merge_context_into_manifest(
     currency: str | None = None,
     audience: str | None = None,
     headcount: float | None = None,
+    peer_set_name: str | None = None,
 ) -> bool:
     changed = False
     if company_name is not None and manifest.get("company_name") != company_name:
@@ -199,6 +200,11 @@ def merge_context_into_manifest(
         normalized_hc = hc if hc > 0 else None
         if manifest.get("headcount") != normalized_hc:
             manifest["headcount"] = normalized_hc
+            changed = True
+    if peer_set_name is not None:
+        normalized_ps = peer_set_name.strip() or None
+        if manifest.get("peer_set_name") != normalized_ps:
+            manifest["peer_set_name"] = normalized_ps
             changed = True
     return changed
 

@@ -237,6 +237,36 @@ def test_update_engagement_detection_auto_applies_only_when_unset(monkeypatch, t
     assert manifest["detected_industry"] == "it_ites"
 
 
+def test_update_engagement_detection_never_overrides_explicit_user_choice(monkeypatch, tmp_path) -> None:
+    """Even when the user's explicit sector equals the placeholder value
+    ('manufacturing_diversified'), detection must not silently replace it."""
+    _patch_engagements_dir(monkeypatch, tmp_path)
+    eid = str(uuid.uuid4())
+    create_engagement_manifest(
+        engagement_id=eid,
+        company_name="Belrise",
+        industry="manufacturing_diversified",
+    )
+    manifest = update_engagement_detection(eid, {})
+    assert manifest["industry_user_set"] is True
+
+    updated = update_engagement_detection(
+        eid,
+        {
+            "detected_company_name": "Acme",
+            "detected_industry": "it_ites",
+            "detected_industry_label": "IT / ITES",
+            "industry_source": "llm",
+            "industry_llm": "it_ites",
+            "industry_spend": "",
+            "context_text_hash": "abc",
+            "source_documents": {},
+        },
+    )
+    assert updated["industry"] == "manufacturing_diversified"
+    assert updated["detected_industry"] == "it_ites"
+
+
 def test_context_doc_company_overrides_budget_filename(monkeypatch, tmp_path) -> None:
     _patch_engagements_dir(monkeypatch, tmp_path)
     eid = str(uuid.uuid4())

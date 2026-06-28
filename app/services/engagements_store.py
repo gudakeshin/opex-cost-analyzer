@@ -405,6 +405,7 @@ def create_engagement_manifest(
         "owner": owner,
         "company_name": company_name or "New engagement",
         "industry": industry or "",
+        "industry_user_set": bool(industry),
         "annual_revenue": annual_revenue,
         "currency": currency or "INR",
         "headcount": headcount if headcount and headcount > 0 else None,
@@ -468,6 +469,7 @@ def update_engagement_detection(engagement_id: str, detection: Dict[str, Any]) -
     if (
         detected_industry
         and is_placeholder_industry(current_industry)
+        and not manifest.get("industry_user_set")
         and not prior_detected_industry
     ):
         manifest["industry"] = detected_industry

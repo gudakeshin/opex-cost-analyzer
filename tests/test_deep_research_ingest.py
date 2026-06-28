@@ -4,6 +4,9 @@ from __future__ import annotations
 import uuid
 from unittest.mock import patch
 
+import pytest
+from fastapi import HTTPException
+
 
 def _fake_completed():
     return {
@@ -93,3 +96,90 @@ def test_poll_in_progress_does_not_ingest(tmp_path, monkeypatch):
 
     assert resp["status"] == "in_progress"
     assert "deep_research_document_id" not in read_manifest(sid)
+
+
+@pytest.mark.parametrize(
+    "raw_status",
+    ["failed", "cancelled", "incomplete", "requires_action", "budget_exceeded"],
+)
+def test_poll_terminal_statuses_normalize_to_failed(tmp_path, monkeypatch, raw_status):
+    """Every non-completed terminal status maps to status="failed" + a reason,
+    so the UI stops polling instead of hanging forever."""
+    monkeypatch.setattr("app.services.engagements_store.ENGAGEMENTS_DIR", tmp_path)
+    monkeypatch.setattr("app.routers.enterprise.DEEP_RESEARCH_ENABLED", True)
+
+    from app.routers import enterprise
+    from app.routers._shared import read_manifest
+
+    sid = str(uuid.uuid4())
+    with patch(
+        "app.opar.deep_research_client.poll_deep_research",
+        return_value={"status": raw_status},
+    ):
+        resp = enterprise.poll_deep_research_endpoint(f"int-{raw_status}", session_id=sid)
+
+    assert resp["status"] == "failed"
+    assert resp["error"]  # non-empty, human-readable reason
+    # A failed job never ingests a document.
+    assert "deep_research_document_id" not in read_manifest(sid)
+
+
+def test_poll_budget_exceeded_mentions_credits(monkeypatch, tmp_path):
+    monkeypatch.setattr("app.services.engagements_store.ENGAGEMENTS_DIR", tmp_path)
+    monkeypatch.setattr("app.routers.enterprise.DEEP_RESEARCH_ENABLED", True)
+
+    from app.routers import enterprise
+
+    with patch(
+        "app.opar.deep_research_client.poll_deep_research",
+        return_value={"status": "budget_exceeded"},
+    ):
+        resp = enterprise.poll_deep_research_endpoint("int-b", session_id=str(uuid.uuid4()))
+
+    assert resp["status"] == "failed"
+    assert "budget" in resp["error"].lower()
+
+
+def test_start_translates_runtime_error_to_503(monkeypatch):
+    """A Google API failure surfaces as a clean 503 with a readable message,
+    not an unhandled 500."""
+    monkeypatch.setattr("app.routers.enterprise.DEEP_RESEARCH_ENABLED", True)
+
+    from app.routers import enterprise
+    from app import schemas
+
+    def _boom(query):  # mimics the friendly RuntimeError raised by the SDK wrapper
+        raise RuntimeError(
+            "Deep Research could not run — the Google account quota/budget is exhausted "
+            "(Gemini credits depleted)."
+        )
+
+    with patch("app.opar.deep_research_client.start_deep_research", side_effect=_boom):
+        req = schemas.DeepResearchStartRequest(company_name="Acme", industry="telecom")
+        with pytest.raises(HTTPException) as excinfo:
+            enterprise.start_deep_research_endpoint(req)
+
+    assert excinfo.value.status_code == 503
+    detail = str(excinfo.value.detail).lower()
+    assert "quota" in detail or "budget" in detail
+
+
+def test_sdk_wrapper_translates_api_error_to_friendly_runtime_error(monkeypatch):
+    """start_deep_research converts a raw google-genai exception into a
+    friendly RuntimeError that the endpoint can surface."""
+    from app.opar import deep_research_client as drc
+
+    class _FakeInteractions:
+        def create(self, **kwargs):
+            raise Exception("429 RESOURCE_EXHAUSTED: quota exceeded for project")
+
+    class _FakeClient:
+        interactions = _FakeInteractions()
+
+    monkeypatch.setattr(drc, "_client", lambda: _FakeClient())
+
+    with pytest.raises(RuntimeError) as excinfo:
+        drc.start_deep_research("research query")
+
+    msg = str(excinfo.value).lower()
+    assert "quota" in msg or "budget" in msg or "depleted" in msg

@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from collections import defaultdict
 from datetime import date
+from difflib import SequenceMatcher
 from typing import Any, Dict, List, Optional, cast
 
 from app.models import NormalizedSpendLine
@@ -394,11 +395,41 @@ def conflict_detector(
 # Cost-to-Serve Analyzer
 # ---------------------------------------------------------------------------
 
+def _normalize_tokens(text: str) -> List[str]:
+    """Lowercase, strip punctuation (``I.T.`` → ``it``), split on whitespace."""
+    cleaned = re.sub(r"[^\w\s]", "", (text or "").lower())
+    return [t for t in cleaned.split() if t]
+
+
+def _match_segment_token(token: str, line_tokens: set) -> Optional[str]:
+    """Resolve one segment token against a line's tokens: 'exact', 'fuzzy', or None."""
+    if token in line_tokens:
+        return "exact"
+    # Substring containment mirrors the legacy full-text match ("enterprise"
+    # inside "enterprisewide" after hyphen stripping).
+    if len(token) >= 3 and any(token in lt for lt in line_tokens):
+        return "exact"
+    if len(token) >= 4:
+        for lt in line_tokens:
+            if abs(len(lt) - len(token)) <= 2 and SequenceMatcher(None, token, lt).ratio() >= 0.85:
+                return "fuzzy"
+    return None
+
+
+def _match_segment(seg_tokens: List[str], line_tokens: set) -> Optional[str]:
+    """Match a segment name against a spend line: 'direct', 'fuzzy', or None."""
+    qualities = [_match_segment_token(t, line_tokens) for t in seg_tokens]
+    if any(q is None for q in qualities):
+        return None
+    return "fuzzy" if "fuzzy" in qualities else "direct"
+
+
 def cost_to_serve_analyzer(
     lines: List[NormalizedSpendLine],
     segment_revenue: Optional[Dict[str, float]] = None,
     annual_revenue: float = 0.0,
     headcount: float = 0.0,
+    allocation_method: str = "revenue",
 ) -> Dict[str, Any]:
     """Map OpEx to customer/product/geography segments to surface per-unit cost drivers."""
     if not lines:
@@ -464,25 +495,47 @@ def cost_to_serve_analyzer(
     total_allocable = sum(ln.reporting_amount for ln in allocable)
     total_fixed = sum(ln.reporting_amount for ln in fixed_pool)
 
+    seg_tokens_map = {seg: _normalize_tokens(seg) for seg in segment_revenue}
     seg_direct: Dict[str, float] = {seg: 0.0 for seg in segment_revenue}
     unattributed: List[NormalizedSpendLine] = []
+    exact_matched_amount = 0.0
+    fuzzy_matched_amount = 0.0
     for ln in allocable:
-        text = ((ln.description or "") + " " + (ln.supplier or "")).lower()
-        matched = False
-        for seg in segment_revenue:
-            if seg.lower() in text:
-                seg_direct[seg] += ln.reporting_amount
-                matched = True
+        line_tokens = set(_normalize_tokens((ln.description or "") + " " + (ln.supplier or "")))
+        cc_compact = "".join(_normalize_tokens(ln.cost_center_id or ""))
+        matched_seg: Optional[str] = None
+        match_quality: Optional[str] = None
+        for seg, seg_tokens in seg_tokens_map.items():
+            if not seg_tokens:
+                continue
+            seg_compact = "".join(seg_tokens)
+            if cc_compact and (seg_compact in cc_compact or cc_compact in seg_compact):
+                matched_seg, match_quality = seg, "direct"
                 break
-        if not matched:
+            quality = _match_segment(seg_tokens, line_tokens)
+            if quality == "direct":
+                matched_seg, match_quality = seg, "direct"
+                break
+            if quality == "fuzzy" and matched_seg is None:
+                matched_seg, match_quality = seg, "fuzzy"
+        if matched_seg:
+            seg_direct[matched_seg] += ln.reporting_amount
+            if match_quality == "fuzzy":
+                fuzzy_matched_amount += ln.reporting_amount
+            else:
+                exact_matched_amount += ln.reporting_amount
+        else:
             unattributed.append(ln)
 
     total_indirect = sum(ln.reporting_amount for ln in unattributed)
 
     seg_indirect: Dict[str, float] = {}
     for seg, rev in segment_revenue.items():
-        rev_share = rev / total_seg_rev
-        seg_indirect[seg] = total_indirect * rev_share
+        if allocation_method == "equal":
+            share = 1.0 / max(len(segment_revenue), 1)
+        else:  # revenue proportion (default)
+            share = rev / total_seg_rev
+        seg_indirect[seg] = total_indirect * share
 
     segments = []
     total_allocated = 0.0
@@ -514,6 +567,12 @@ def cost_to_serve_analyzer(
         "total_opex_unallocated": round(total_fixed, 2),
         "fixed_cost_pool": round(total_fixed, 2),
         "direct_attribution_pct": round((total_allocable - total_indirect) / max(total_opex, 1) * 100, 2),
+        "attribution_quality": {
+            "direct_pct": round(exact_matched_amount / max(total_opex, 1) * 100, 2),
+            "fuzzy_matched_pct": round(fuzzy_matched_amount / max(total_opex, 1) * 100, 2),
+            "unattributed_pct": round(total_indirect / max(total_opex, 1) * 100, 2),
+            "allocation_method": allocation_method,
+        },
     }
 
 

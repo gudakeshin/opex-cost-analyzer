@@ -92,6 +92,111 @@
         "Gartner Utilities IT 2024 — IoT-based predictive maintenance reduces unplanned outage cost 20-35%",
         "INTERNAL_CALIBRATION — digital grid savings from 2 India utility technology transformation mandates"
       ]
+    },
+    {
+      "lever_id": "brsr_reporting_efficiency",
+      "lever_name": "BRSR / ESG Reporting & Assurance Efficiency",
+      "description": "Integrate ESG data platform for generation and distribution utilities; consolidate assurance for BRSR Core KPIs.",
+      "category_ids": ["BRSR_ESG"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "SEBI BRSR Core Circular Jul 2023 (sebi.gov.in) — integrated reporting reduces per-entity assurance cost",
+        "NTPC FY25 Annual Report — sustainability reporting and ESG disclosures",
+        "INTERNAL_CALIBRATION — utility ESG reporting efficiency savings from 2 India power sector mandates"
+      ]
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "Plant & Asset Insurance Premium Optimisation",
+      "description": "Competitive RFP for thermal plant, transmission, and asset insurance; optimise coverage vs risk retention.",
+      "category_ids": ["INSURANCE"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 16.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — industrial asset insurance market benchmarks",
+        "Marsh Global Risk Report 2024 — power sector insurance RFP savings 8-15%",
+        "INTERNAL_CALIBRATION — utility insurance savings from 2 India power sector risk reviews"
+      ]
+    },
+    {
+      "lever_id": "utility_advisory_governance",
+      "lever_name": "Regulatory, Legal & Advisory Spend Governance",
+      "description": "Cap external legal and regulatory advisory; panel-firm governance for CERC/SEBI compliance consulting.",
+      "category_ids": ["PROF_SVCS"],
+      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CERC regulatory framework — tariff and compliance advisory cost benchmarks",
+        "Hackett Group G&A Benchmarks 2024 — advisory spend governance 10-18% savings",
+        "INTERNAL_CALIBRATION — utility advisory governance savings from 2 India power sector mandates"
+      ]
+    },
+    {
+      "lever_id": "fuel_mix_optimisation",
+      "lever_name": "Fuel Mix & Generation Cost Optimisation",
+      "description": "Optimise coal/gas blending, inventory levels, and fuel supply contracts to reduce variable generation cost per kWh.",
+      "category_ids": ["FUEL_GENERATION"],
+      "p10_pct": 3.0, "p50_pct": 6.0, "p90_pct": 12.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CEA Annual Report 2023-24 — fuel cost benchmarks and heat rate data for thermal plants",
+        "NTPC FY25 Annual Report — fuel procurement and blending strategy disclosures",
+        "INTERNAL_CALIBRATION — fuel mix optimisation savings from 3 India generation procurement mandates"
+      ]
+    },
+    {
+      "lever_id": "grid_maintenance_predictive",
+      "lever_name": "Grid Maintenance & Predictive O&M",
+      "description": "Deploy predictive maintenance for transmission and distribution assets; consolidate AMC contracts; reduce emergency repair cost.",
+      "category_ids": ["GRID_MAINTENANCE"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "MoP RDSS scheme — grid modernisation and maintenance benchmarks for DISCOMs",
+        "Gartner Utilities IT 2024 — predictive maintenance reduces unplanned outage cost 20-35%",
+        "INTERNAL_CALIBRATION — grid maintenance savings from 2 India DISCOM O&M mandates"
+      ]
+    },
+    {
+      "lever_id": "utility_facilities_right_size",
+      "lever_name": "Utility Facilities & Office Footprint Right-Sizing",
+      "description": "Rationalise regional offices, substation support facilities, and corporate HQ footprint; renegotiate leases.",
+      "category_ids": ["FACILITIES"],
+      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "implementation_weeks": 14,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NTPC FY25 Annual Report — facilities and establishment cost disclosures",
+        "Hackett Group G&A Benchmarks 2024 — facilities right-sizing 10-18% savings",
+        "INTERNAL_CALIBRATION — utility facilities savings from 2 India power sector mandates"
+      ]
+    },
+    {
+      "lever_id": "atc_loss_reduction",
+      "lever_name": "AT&C / T&D Loss Reduction Programme",
+      "description": "Deploy smart metering, feeder separation, and theft detection to reduce technical and commercial T&D losses.",
+      "category_ids": ["T&D_LOSSES"],
+      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "implementation_weeks": 40,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "MoP RDSS (Revamped Distribution Sector Scheme) 2021 — ₹3 Lakh Cr investment to reduce AT&C losses to <12-15%",
+        "CEA Annual Report 2023-24 — best-performing DISCOMs at 10-12% AT&C losses vs national average 17-18%",
+        "INTERNAL_CALIBRATION — T&D loss reduction savings from 2 India DISCOM transformation mandates"
+      ]
     }
   ]
 }

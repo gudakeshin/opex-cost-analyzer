@@ -107,6 +107,12 @@ class ObserveContext(BaseModel):
     # Deep research context — populated from session manifest when available
     deep_research_summary: str | None = None
 
+    # Analysis Workbench: per-run assumption overrides (merged onto the session
+    # manifest at act time) and seed outputs (prior-run skill_outputs preloaded
+    # into act()'s results for chaining). Empty for the chat path.
+    workbench_overrides: Dict[str, Any] = Field(default_factory=dict)
+    workbench_seed_outputs: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
+
 
 class SkillTask(BaseModel):
     skill_name: str
@@ -117,6 +123,14 @@ class SkillTask(BaseModel):
     estimated_tokens: int = 0
 
 
+class SuggestedOutput(BaseModel):
+    """Heavy export or file artefact surfaced as a one-click CTA (not auto-run)."""
+    skill: str
+    label: str
+    endpoint: str
+    score: float = 0.0
+
+
 class ExecutionPlan(BaseModel):
     tasks: List[SkillTask] = Field(default_factory=list)
     total_skills: int = 0
@@ -124,6 +138,7 @@ class ExecutionPlan(BaseModel):
     user_summary: str = ""
     estimated_duration: str = ""
     requires_approval: bool = False
+    suggested_outputs: List[SuggestedOutput] = Field(default_factory=list)
     # "planner" (static rule-based) or "agent" (tool-loop selected skills
     # progressively — synthesis context filtering must not re-filter them).
     source: str = "planner"
@@ -246,6 +261,9 @@ class ReflectOutput(BaseModel):
 
     # LLM-suggested, data-backed charts rendered inline in the chat (see visualization.py)
     chart_specs: List[Dict[str, Any]] = Field(default_factory=list)
+
+    # Semantically matched heavy exports — one-click CTAs (not auto-run in pipeline)
+    suggested_outputs: List[SuggestedOutput] = Field(default_factory=list)
 
     # Phase 3: replanner + quality gate + regulatory events
     replanner_log: List[Dict[str, Any]] = Field(default_factory=list)  # decisions made by replanner

@@ -10,10 +10,13 @@
     {"category_id": "branch_network_ops", "category_name": "Branch Network & Last-Mile Operations", "gl_prefix": "BRN", "cost_nature": "distribution"},
     {"category_id": "digital_banking_infra", "category_name": "Digital Banking & Mobile Platform", "gl_prefix": "DIG", "cost_nature": "technology"},
     {"category_id": "atm_cash_mgmt", "category_name": "ATM Network & Cash Management", "gl_prefix": "ATM", "cost_nature": "operations"},
-    {"category_id": "loan_processing_ops", "category_name": "Loan Processing & Collections", "gl_prefix": "LPO", "cost_nature": "operations"}
+    {"category_id": "loan_processing_ops", "category_name": "Loan Processing & Collections", "gl_prefix": "LPO", "cost_nature": "operations"},
+    {"category_id": "contact_center_ops", "category_name": "Contact Center & Customer Service Operations", "gl_prefix": "CCO", "cost_nature": "operations"},
+    {"category_id": "banking_shared_services", "category_name": "Shared Services & GPO Centralisation", "gl_prefix": "SSC", "cost_nature": "overhead"}
   ],
   "overrides": [
     {"category_id": "it_software", "category_name": "IT Software & Fintech Licensing", "brsr_principle": "P6"},
-    {"category_id": "professional_services", "category_name": "Advisory, Legal & Rating Fees"}
+    {"category_id": "professional_services", "category_name": "Advisory, Legal & Rating Fees"},
+    {"category_id": "HR", "category_name": "Employee Benefits & Workforce Cost", "brsr_principle": "P3"}
   ]
 }

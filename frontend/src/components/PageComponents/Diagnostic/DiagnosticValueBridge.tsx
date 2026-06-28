@@ -83,9 +83,9 @@ function LeverUncertaintyControl({
   return (
     <div className="min-w-[168px] space-y-2">
       <div className="flex items-center justify-between gap-2 text-[10px] tabular-nums text-brand-muted">
-        <span>P10 {formatCr(p10, { bare: true })}</span>
+        <span>P10 {formatCr(p10, { bare: true, alreadyInCr: true })}</span>
         <span className="font-semibold text-brand-ink">{percentileScenarioShort(percentile)}</span>
-        <span>P90 {formatCr(p90, { bare: true })}</span>
+        <span>P90 {formatCr(p90, { bare: true, alreadyInCr: true })}</span>
       </div>
       <input
         id={id}
@@ -100,10 +100,10 @@ function LeverUncertaintyControl({
         aria-valuemin={PERCENTILE_MIN}
         aria-valuemax={PERCENTILE_MAX}
         aria-valuenow={percentile}
-        aria-valuetext={`${label} · ${formatCr(scenarioCr, { bare: true })} Cr/yr`}
+        aria-valuetext={`${label} · ${formatCr(scenarioCr, { bare: true, alreadyInCr: true })} Cr/yr`}
       />
       <p className="text-[10px] text-brand-muted leading-snug">
-        {formatCr(scenarioCr, { bare: true })} Cr/yr · {label}
+        {formatCr(scenarioCr, { bare: true, alreadyInCr: true })} Cr/yr · {label}
       </p>
     </div>
   );
@@ -130,7 +130,7 @@ function PortfolioBandSummary({
       <div
         className="relative h-2.5 w-full rounded-full bg-brand-surface-muted/80"
         role="img"
-        aria-label={`Portfolio band ${formatCr(p10, { bare: true })} to ${formatCr(p90, { bare: true })}, combined scenario ${formatCr(scenarioCr, { bare: true })}`}
+        aria-label={`Portfolio band ${formatCr(p10, { bare: true, alreadyInCr: true })} to ${formatCr(p90, { bare: true, alreadyInCr: true })}, combined scenario ${formatCr(scenarioCr, { bare: true, alreadyInCr: true })}`}
       >
         <div
           className="absolute inset-y-0 rounded-full bg-brand-green/20 border border-brand-green/25"
@@ -142,9 +142,9 @@ function PortfolioBandSummary({
         />
       </div>
       <div className="flex justify-between text-[10px] tabular-nums text-brand-muted">
-        <span>P10 {formatCr(p10, { bare: true })}</span>
-        <span>P50 {formatCr(p50, { bare: true })}</span>
-        <span>P90 {formatCr(p90, { bare: true })}</span>
+        <span>P10 {formatCr(p10, { bare: true, alreadyInCr: true })}</span>
+        <span>P50 {formatCr(p50, { bare: true, alreadyInCr: true })}</span>
+        <span>P90 {formatCr(p90, { bare: true, alreadyInCr: true })}</span>
       </div>
     </div>
   );
@@ -222,7 +222,7 @@ export const DiagnosticValueBridge: React.FC<DiagnosticValueBridgeProps> = ({
               Portfolio value
             </p>
             <p className="text-2xl font-bold tabular-nums text-brand-ink mt-1">
-              {formatCr(totalScenario)}
+              {formatCr(totalScenario, { alreadyInCr: true })}
               <span className="text-sm font-normal text-brand-muted"> /yr</span>
             </p>
             <p className="text-xs text-brand-muted mt-1">
@@ -237,12 +237,12 @@ export const DiagnosticValueBridge: React.FC<DiagnosticValueBridgeProps> = ({
               Savings range (P10–P90)
             </p>
             <p className="text-lg font-semibold tabular-nums text-brand-ink mt-1">
-              {formatCr(portfolio.totalP10, { bare: true })}
+              {formatCr(portfolio.totalP10, { bare: true, alreadyInCr: true })}
               <span className="text-brand-muted font-normal mx-1">→</span>
-              {formatCr(portfolio.totalP90, { bare: true })}
+              {formatCr(portfolio.totalP90, { bare: true, alreadyInCr: true })}
             </p>
             <p className="text-xs text-brand-muted mt-1">
-              {formatBandRange(portfolio.totalP10, portfolio.totalP90)} Cr/yr band
+              {formatBandRange(portfolio.totalP10, portfolio.totalP90, { alreadyInCr: true })} Cr/yr band
             </p>
           </div>
           <div>
@@ -263,7 +263,7 @@ export const DiagnosticValueBridge: React.FC<DiagnosticValueBridgeProps> = ({
             <div
               className="flex h-8 w-full overflow-hidden rounded-md border border-brand-border bg-white"
               role="img"
-              aria-label={`Value bridge of ${segments.length} levers totalling ${formatCr(totalScenario)}`}
+              aria-label={`Value bridge of ${segments.length} levers totalling ${formatCr(totalScenario, { alreadyInCr: true })}`}
             >
               {segments.map((segment) => (
                 <div
@@ -273,7 +273,7 @@ export const DiagnosticValueBridge: React.FC<DiagnosticValueBridgeProps> = ({
                     width: `${Math.max(segment.sharePct, segment.sharePct > 0 ? 0.8 : 0)}%`,
                     backgroundColor: segment.color,
                   }}
-                  title={`${segment.leverName}: ${formatCr(segment.scenarioCr, { perYear: true })} (${segment.sharePct.toFixed(1)}%)`}
+                  title={`${segment.leverName}: ${formatCr(segment.scenarioCr, { perYear: true, alreadyInCr: true })} (${segment.sharePct.toFixed(1)}%)`}
                 />
               ))}
             </div>
@@ -386,7 +386,7 @@ export const DiagnosticValueBridge: React.FC<DiagnosticValueBridgeProps> = ({
                       />
                     </td>
                     <td className={`${TD_CLASS} ${NUM_CLASS} text-right font-semibold`}>
-                      {formatCr(segment.scenarioCr, { bare: true })}
+                      {formatCr(segment.scenarioCr, { bare: true, alreadyInCr: true })}
                     </td>
                     <td className={`${TD_CLASS} ${NUM_CLASS} text-right text-brand-muted`}>
                       {segment.sharePct.toFixed(0)}%
@@ -431,7 +431,7 @@ export const DiagnosticValueBridge: React.FC<DiagnosticValueBridgeProps> = ({
                 />
               </td>
               <td className={`${TD_CLASS} ${NUM_CLASS} text-right font-bold`}>
-                {formatCr(totalScenario, { bare: true })}
+                {formatCr(totalScenario, { bare: true, alreadyInCr: true })}
               </td>
               <td className={`${TD_CLASS} ${NUM_CLASS} text-right text-brand-muted`}>100%</td>
             </tr>

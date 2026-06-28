@@ -159,6 +159,59 @@ export const Guidebook: React.FC = () => {
         ))}
       </div>
 
+      <section className="mt-12 mb-8" id="guidebook-cost-room">
+        <h2 className="text-lg font-bold text-brand-ink mb-2">Cost Room workflow</h2>
+        <p className="text-sm text-brand-muted mb-4">
+          The Live Cost Room is the Week 4+ initiative command center for consultants and executives. It
+          turns analysis outputs into a governable savings portfolio.
+        </p>
+        <Card className="bg-white border-brand-border mb-4">
+          <h3 className="text-sm font-semibold text-brand-ink mb-3">Analysis → Cost Room data flow</h3>
+          <ol className="text-sm text-brand-ink space-y-2 list-decimal list-inside">
+            <li>
+              Upload spend in <strong>Analysis</strong> and run OPAR analysis. Skill outputs (value bridge,
+              savings model, FP&amp;A analyzers) are stored in session memory.
+            </li>
+            <li>
+              When analysis completes, initiatives are <strong>seeded automatically</strong> into the pipeline
+              store from the business-case builder output.
+            </li>
+            <li>
+              Open <strong>Cost Room</strong> to filter the portfolio, toggle P10/P50/P90 bands, stress-test
+              macro scenarios, accept/defer/reject initiatives, and resolve data conflicts.
+            </li>
+            <li>
+              Drill into any initiative to view assumptions, source spend rows, uploaded files, milestones,
+              and record realized savings actuals.
+            </li>
+            <li>
+              Export the current view as a <strong>deck</strong> (business case DOCX) or <strong>Excel</strong>{' '}
+              PMO portfolio workbook from the trust footer.
+            </li>
+          </ol>
+        </Card>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Card className="bg-white border-brand-border">
+            <h3 className="text-sm font-semibold text-brand-ink mb-2">Consultant mode</h3>
+            <ul className="text-sm text-brand-muted space-y-1.5 list-disc list-inside">
+              <li>Accept / defer / reject with audit trail (AQS ≥ 0.65 for Gate-2 accept)</li>
+              <li>Data conflict resolution and exception inbox</li>
+              <li>FP&amp;A detail tabs: Trends, BvA, Payment Terms, Cost-to-Serve</li>
+              <li>Entity consolidation and full trust rail</li>
+            </ul>
+          </Card>
+          <Card className="bg-white border-brand-border">
+            <h3 className="text-sm font-semibold text-brand-ink mb-2">Executive mode</h3>
+            <ul className="text-sm text-brand-muted space-y-1.5 list-disc list-inside">
+              <li>Engagement context bar with company, gate, and audience toggle</li>
+              <li>Read-only portfolio with EBITDA bps, sustainability, and addressability dots</li>
+              <li>Scenario controls and value bridge for Audit Committee walkthroughs</li>
+              <li>Conflicts and FP&amp;A panels hidden for a cleaner C-suite view</li>
+            </ul>
+          </Card>
+        </div>
+      </section>
+
       <section className="mt-12 mb-8">
         <h2 className="text-lg font-bold text-brand-ink mb-2">Impact when data is missing</h2>
         <p className="text-sm text-brand-muted mb-4">

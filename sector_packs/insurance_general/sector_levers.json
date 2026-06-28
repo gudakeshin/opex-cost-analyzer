@@ -107,6 +107,36 @@
         "IRDAI Annual Report 2023-24 — expense-of-management ratio as regulatory metric; group-level efficiency initiatives",
         "INTERNAL_CALIBRATION — shared services savings calibrated from 2 insurance group G&A transformation mandates"
       ]
+    },
+    {
+      "lever_id": "travel_policy_optimization",
+      "lever_name": "Travel Policy Compliance & TMC Consolidation",
+      "description": "Consolidate travel management; enforce policy compliance for surveyor, branch, and corporate travel; video-first for internal meetings.",
+      "category_ids": ["TRAVEL"],
+      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "GBTA 2025 Business Travel Index Outlook (gbta.org) — managed travel programmes save 10-25% via policy compliance",
+        "IRDAI Annual Report 2023-24 — insurer T&E as component of expense-of-management ratio",
+        "INTERNAL_CALIBRATION — insurance T&E savings from 2 India general insurance travel mandates"
+      ]
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "Corporate & Reinsurance Premium Optimisation",
+      "description": "Optimise corporate insurance spend and reinsurance buy; competitive RFP for non-core property and D&O programmes.",
+      "category_ids": ["INSURANCE"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "GIC Re FY25 Annual Report — reinsurance market benchmarks for Indian insurers",
+        "Marsh Global Risk Report 2024 — corporate insurance RFP savings 10-20%",
+        "INTERNAL_CALIBRATION — insurer corporate insurance savings from 2 India insurance group risk reviews"
+      ]
     }
   ]
 }

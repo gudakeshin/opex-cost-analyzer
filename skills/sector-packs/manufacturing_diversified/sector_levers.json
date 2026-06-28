@@ -53,9 +53,9 @@
       "lever_name": "Predictive / Condition-Based Maintenance",
       "lever_family": "technology",
       "savings_range_pct": {
-        "p10": 18,
-        "p50": 26,
-        "p90": 35
+        "p10": 8,
+        "p50": 15,
+        "p90": 25
       },
       "cta_rate": 0.12,
       "phasing_curve": [
@@ -74,19 +74,19 @@
       "complexity_tier": "high",
       "base_execution_probability": 0.65,
       "implementation_weeks": {
-        "p10": 20,
-        "p50": 40,
-        "p90": 64
+        "p10": 12,
+        "p50": 24,
+        "p90": 36
       },
       "applicable_if": [
-        "category:PLANT_MAINTENANCE > 3% revenue",
-        "asset_intensive_keywords detected"
+        "asset_intensive_keywords detected",
+        "category:CONVERSION_COST present"
       ],
       "shared_lever": true,
       "industry_sources": [
-        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
-        "Deloitte — Real Estate Predictions 2025 (deloitte.com/insights/real-estate)",
-        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+        "Bureau of Energy Efficiency (BEE) — PAT Scheme maintenance excellence results (beeindia.gov.in) — predictive maintenance reduces downtime 12-25%",
+        "CII — Maintenance Excellence case studies (cii.in) — condition-based maintenance vs time-based benchmarks",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing predictive maintenance mandates"
       ],
       "execution_playbook": [
         {
@@ -105,24 +105,24 @@
           "duration_weeks": 6
         },
         {
-          "step": "Track OEE improvement, unplanned-outage reduction, and maintenance cost per MW; rebaseline after 6 months",
-          "owner_role": "FP&A / Asset Management",
+          "step": "Track OEE improvement, unplanned downtime hours, and maintenance cost per production unit; rebaseline after 6 months",
+          "owner_role": "FP&A / Manufacturing",
           "duration_weeks": 4
         }
       ],
       "diagnostic_signals": [
         {
-          "signal": "Unplanned outage rate >5% of planned generation hours for critical rotating equipment",
+          "signal": "Unplanned downtime >5% of scheduled production hours on bottleneck assets",
           "evidence_source": "cmms_outage_data",
-          "confirms": "Condition-based maintenance will reduce forced outage cost"
+          "confirms": "Condition-based maintenance will reduce conversion cost losses from downtime"
         },
         {
           "signal": "Preventive maintenance cost >30% of total maintenance budget with >40% of PMs yielding no defect found",
           "evidence_source": "cmms_maintenance_records",
-          "confirms": "Optimising PM frequency and shifting to PdM will reduce unnecessary maintenance"
+          "confirms": "Shifting to PdM will reduce unnecessary maintenance and improve OEE"
         },
         {
-          "signal": "Mean time between failures declining YoY for pumps, compressors, or transformers",
+          "signal": "Mean time between failures declining YoY for critical presses, furnaces, or CNC assets",
           "evidence_source": "asset_failure_history",
           "confirms": "Asset degradation trend justifies condition-monitoring investment"
         }
@@ -341,7 +341,8 @@
         "p90": 18
       },
       "applicable_if": [
-        "gst_treatment field present"
+        "gst_treatment field present",
+        "category:RAW_MATERIALS present"
       ],
       "shared_lever": true,
       "industry_sources": [
@@ -398,6 +399,351 @@
       "applicability_threshold_pct": 0.02
     },
     {
+      "lever_id": "rm_should_cost_bom",
+      "lever_name": "Should-Cost / Clean-Sheet BOM Modelling",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 3,
+        "p50": 6,
+        "p90": 10
+      },
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.76,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "BOM baseline validated for top-20 revenue SKUs or material categories",
+        "Should-cost models reviewed by category owner and plant engineering",
+        "Commodity index and freight-to-plant assumptions documented"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 14,
+        "p50": 20,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:RAW_MATERIALS present"
+      ],
+      "industry_sources": [
+        "Hackett Group — World-Class Performance Study: Procurement Benchmarks 2024 (thehackettgroup.com/research/) — should-cost driven negotiation savings 3-8% on addressable spend",
+        "McKinsey & Company — Manufacturing Sourcing Excellence (mckinsey.com/capabilities/operations/our-insights) — clean-sheet costing for direct materials",
+        "INTERNAL_CALIBRATION — savings range calibrated from 4 India manufacturing BOM should-cost mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Conduct BOM review for top-20 SKUs by revenue: map every material input to specification, supplier, unit price, process yield, and YoY cost trend",
+          "owner_role": "Supply Chain / Procurement",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Build should-cost models for primary material categories using commodity indices, casting/forging/machining cost drivers, and benchmark specs; identify yield-loss and freight-to-plant gaps",
+          "owner_role": "Strategic Sourcing / Plant Engineering",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Run competitive RFQ or renegotiation using should-cost as walk-away price; validate PPAP and BIS/FSSAI spec constraints before award",
+          "owner_role": "Procurement / Supplier Quality",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Lock indexed pricing agreements with quarterly reopeners; implement material cost variance reporting in monthly S&OP",
+          "owner_role": "Procurement / FP&A",
+          "duration_weeks": 3
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Raw material cost as % of revenue >55% vs sector P50 benchmark indicating procurement or specification gap",
+          "evidence_source": "cogs_breakdown",
+          "confirms": "Should-cost modelling will expose closable price gaps"
+        },
+        {
+          "signal": "Material price paid >8% above should-cost or commodity-indexed benchmark for ≥3 key inputs",
+          "evidence_source": "should_cost_gap_analysis",
+          "confirms": "Negotiation or spec reset can recover margin"
+        },
+        {
+          "signal": "No should-cost refresh in >18 months despite commodity volatility >10% on key inputs",
+          "evidence_source": "procurement_governance_records",
+          "confirms": "Stale pricing allows supplier margin creep"
+        }
+      ],
+      "required_data_fields": [
+        "Bill of materials for top-20 revenue SKUs with quantity per unit and unit prices",
+        "Material cost trend data (24 months) by input category",
+        "Commodity price indices for key materials (steel, aluminium, polymers, chemicals)",
+        "Process yield and scrap rates by production line",
+        "Freight-to-plant and import duty assumptions by supplier"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "rm_supplier_consolidation",
+      "lever_name": "Raw Material Supplier Consolidation & Rate Contracts",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 14
+      },
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.25,
+        0.45,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.74,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Spend segmentation completed (top-80% suppliers identified)",
+        "Supply risk assessment signed off for consolidated supplier panel",
+        "Framework rate contracts drafted with volume rebates and SLA clauses"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 16,
+        "p90": 28
+      },
+      "applicable_if": [
+        "supplier_count > 15",
+        "category:RAW_MATERIALS present"
+      ],
+      "industry_sources": [
+        "Hackett Group — Supplier Base Rationalisation Benchmarks 2024 (thehackettgroup.com/research/) — 5-15% savings from strategic supplier consolidation",
+        "ACMA — Cost Reduction Programmes (acma.in) — vendor consolidation case studies in auto ancillary sector",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing procurement consolidation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Segment raw material spend by supplier, category, and plant; calculate HHI and identify tail vendors contributing <2% spend each",
+          "owner_role": "Strategic Sourcing",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Rationalise vendor panel to strategic tier (top 60-70% spend); migrate tail spend to framework suppliers with rate contracts and quarterly rebates",
+          "owner_role": "Procurement / Supply Chain",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Negotiate volume-based pricing, payment terms, and VMI for top-20 material SKUs; implement supplier scorecards",
+          "owner_role": "Category Manager / Procurement",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Track savings run-rate, supplier OTIF, and price variance vs contract index monthly",
+          "owner_role": "FP&A / Procurement",
+          "duration_weeks": 2
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Raw material supplier count >2× peer benchmark with >40% of vendors each contributing <1% of category spend",
+          "evidence_source": "supplier_spend_report",
+          "confirms": "Tail-spend consolidation will improve leverage and pricing"
+        },
+        {
+          "signal": "No framework rate contract on materials representing >50% of RAW_MATERIALS spend",
+          "evidence_source": "contract_inventory",
+          "confirms": "Rate contracts will lock in competitive pricing"
+        },
+        {
+          "signal": "Supplier HHI <0.15 indicating highly fragmented supply base with weak negotiating position",
+          "evidence_source": "supplier_concentration_analysis",
+          "confirms": "Consolidation will restore pricing power"
+        }
+      ],
+      "required_data_fields": [
+        "Raw material spend by supplier, SKU, and plant (12 months)",
+        "Active contracts and expiry dates by material category",
+        "Supplier OTIF and quality rejection rates",
+        "Supplier count and spend concentration (HHI)",
+        "Volume forecast by material for negotiation leverage"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "rm_alternate_vendor_dual_sourcing",
+      "lever_name": "Alternate Vendor Qualification & Dual Sourcing",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 3,
+        "p50": 7,
+        "p90": 12
+      },
+      "cta_rate": 0.07,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.73,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Alternate vendor PPAP / qualification plan approved by QA",
+        "Import-substitute or domestic alternate spec validated by R&D",
+        "Dual-source risk assessment and inventory buffer policy agreed"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 24,
+        "p90": 40
+      },
+      "applicable_if": [
+        "category:RAW_MATERIALS present"
+      ],
+      "industry_sources": [
+        "CAPS Research — Dual Sourcing and Supply Risk Benchmarking (capsresearch.org/benchmarking/) — dual-source programmes deliver 4-12% price improvement",
+        "DPIIT — PLI scheme domestic sourcing norms (dpiit.gov.in) — import substitution incentives",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing dual-sourcing mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Identify single-source materials representing >30% of category value; map import vs domestic alternatives and qualification status",
+          "owner_role": "Strategic Sourcing / Supply Risk",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Run alternate vendor qualification (PPAP, lab testing, pilot lot) for top-5 single-source materials; document spec equivalence",
+          "owner_role": "Supplier Quality / R&D",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Execute competitive RFQ pitting incumbent vs qualified alternate; award split-volume or full switch based on TCO",
+          "owner_role": "Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Implement dual-source inventory policy and track price variance, lead-time risk, and savings run-rate",
+          "owner_role": "Supply Chain / FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Single-source dependency for >30% of raw material spend value creating supplier pricing leverage",
+          "evidence_source": "supply_risk_assessment",
+          "confirms": "Dual sourcing will restore competitive tension"
+        },
+        {
+          "signal": "Import-dependent materials with >15% landed-cost premium vs qualified domestic alternate",
+          "evidence_source": "landed_cost_analysis",
+          "confirms": "Import substitution or alternate vendor will reduce cost"
+        },
+        {
+          "signal": "No alternate vendor qualified in >24 months for critical single-source inputs",
+          "evidence_source": "ppap_qualification_register",
+          "confirms": "Qualification backlog is blocking competitive sourcing"
+        }
+      ],
+      "required_data_fields": [
+        "Single-source material list with spend value and qualification status",
+        "PPAP and lab test results for alternate vendors",
+        "Landed cost comparison (incumbent vs alternate incl. duty, freight, yield)",
+        "Lead time and MOQ constraints by supplier",
+        "PLI or domestic-content requirements if applicable"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "vave_design_to_cost",
+      "lever_name": "VAVE / Design-to-Cost Engineering",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4,
+        "p50": 9,
+        "p90": 16
+      },
+      "cta_rate": 0.07,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Cross-functional VA/VE workshop charter approved (R&D, sourcing, manufacturing, QA)",
+        "Top-20 cost drivers identified from BOM and process cost walk",
+        "Pilot lot validation plan for design alternatives signed off"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.68,
+      "implementation_weeks": {
+        "p10": 18,
+        "p50": 28,
+        "p90": 44
+      },
+      "applicable_if": [
+        "category:RAW_MATERIALS present"
+      ],
+      "industry_sources": [
+        "SAVE International — Value Methodology Standard (value-eng.org) — VAVE programme savings norms 5-15% on targeted components",
+        "ACMA — VAVE Case Studies (acma.in) — auto ancillary design-to-cost programmes in India",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing VAVE workshops"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Charter cross-functional VA/VE workshop; perform function analysis on top-20 BOM cost drivers (fasten, form, fit, finish)",
+          "owner_role": "R&D / Value Engineering",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Generate design alternatives: material substitution, gauge reduction, part consolidation, and process simplification; estimate cost impact per option",
+          "owner_role": "R&D / Plant Engineering / Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Run pilot lot production and validation testing (fatigue, corrosion, BIS/FSSAI compliance); obtain customer or internal sign-off",
+          "owner_role": "QA / R&D / Manufacturing",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Issue ECN; lock revised specs in ERP/BOM; track savings per component in monthly cost review",
+          "owner_role": "Engineering Change / FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "BOM component weight or material spec >15% above peer benchmark for same function",
+          "evidence_source": "bom_benchmarking",
+          "confirms": "Design-to-cost opportunity exists on over-engineered parts"
+        },
+        {
+          "signal": "No formal VAVE exercise in >24 months despite material cost inflation >8% cumulative",
+          "evidence_source": "engineering_change_log",
+          "confirms": "Spec drift has not been challenged by value engineering"
+        },
+        {
+          "signal": ">20% of BOM line items have not been cost-reviewed since original product launch",
+          "evidence_source": "bom_age_analysis",
+          "confirms": "Legacy specs are likely carrying excess cost"
+        }
+      ],
+      "required_data_fields": [
+        "BOM with function description and cost per component for top SKUs",
+        "Peer or competitor spec benchmarks by component category",
+        "ECN history and last cost-review date per part number",
+        "Pilot lot test results and customer approval requirements",
+        "Tooling and changeover cost impact for each design alternative"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
       "lever_id": "logistics_network_redesign",
       "lever_name": "Inbound / Outbound Logistics Network Redesign",
       "lever_family": "supply",
@@ -428,7 +774,8 @@
         "p90": 60
       },
       "applicable_if": [
-        "category:LOGISTICS or LOGISTICS_INDIA > 5% spend"
+        "category:LOGISTICS or LOGISTICS_INDIA > 5% spend",
+        "category:LOGISTICS present"
       ],
       "industry_sources": [
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
@@ -569,6 +916,264 @@
       "applicability_threshold_pct": 0.05
     },
     {
+      "lever_id": "kaizen_smed_programme",
+      "lever_name": "Kaizen, SMED & Shop-Floor Continuous Improvement",
+      "lever_family": "process",
+      "savings_range_pct": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 14
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.82,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Conversion cost/MT and OEE baseline established by production line",
+        "Top-10 loss buckets mapped (changeover, micro-stoppages, speed loss, scrap)",
+        "Kaizen champion network and tier-1/2 meeting cadence agreed"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 20,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:CONVERSION_COST present"
+      ],
+      "industry_sources": [
+        "CII — Manufacturing Excellence Awards & Lean Case Studies (cii.in) — Kaizen and SMED programmes reduce conversion cost 6-14%",
+        "Toyota Production System — SMED methodology benchmarks (lean.org) — changeover time reduction 50-90% on pilot lines",
+        "INTERNAL_CALIBRATION — savings range calibrated from 4 India manufacturing lean transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Establish conversion cost/MT and OEE baseline by line; map top-10 loss buckets using pareto analysis of downtime and scrap logs",
+          "owner_role": "Manufacturing / Industrial Engineering",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Run SMED on top changeover SKUs; conduct Kaizen blitz on highest-loss workstation with cross-functional team",
+          "owner_role": "Production / CI Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Standardise visual management, andon response, and daily tier-1/2 problem-solving boards on pilot lines",
+          "owner_role": "Plant Manager / CI Lead",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Lock standards in SOPs; track conversion cost/MT, OEE, and Kaizen savings register monthly; scale to remaining lines",
+          "owner_role": "FP&A / Manufacturing",
+          "duration_weeks": 6
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Changeover time >25% of available production hours on high-mix lines",
+          "evidence_source": "oee_loss_analysis",
+          "confirms": "SMED will materially reduce conversion cost per unit"
+        },
+        {
+          "signal": "OEE <72% with speed loss and minor stoppages as top-two loss categories",
+          "evidence_source": "oee_data",
+          "confirms": "Kaizen on micro-stoppages will improve throughput"
+        },
+        {
+          "signal": "No structured Kaizen programme or tier meeting cadence in plant operations",
+          "evidence_source": "operating_model_assessment",
+          "confirms": "CI infrastructure gap allows preventable conversion losses"
+        }
+      ],
+      "required_data_fields": [
+        "OEE and loss-bucket data by line (12 months)",
+        "Changeover time log by SKU and line",
+        "Conversion cost/MT or per-unit cost by product family",
+        "Downtime pareto by cause code",
+        "Kaizen idea pipeline and savings tracking register"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "plant_oee_bottleneck_removal",
+      "lever_name": "OEE & Bottleneck Removal Programme",
+      "lever_family": "process",
+      "savings_range_pct": {
+        "p10": 6,
+        "p50": 11,
+        "p90": 18
+      },
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.15,
+        0.45,
+        0.4
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.84,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "Theory-of-constraints analysis completed for each value stream",
+        "Bottleneck capacity uplift plan approved (equipment, staffing, or batch size)",
+        "OEE measurement standardised (availability × performance × quality)"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.68,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 24,
+        "p90": 40
+      },
+      "applicable_if": [
+        "category:CONVERSION_COST present"
+      ],
+      "industry_sources": [
+        "McKinsey & Company — Asset Productivity in Manufacturing (mckinsey.com/capabilities/operations/our-insights) — OEE improvement 6-14% of conversion cost",
+        "CII — National Manufacturing Competitiveness Council OEE benchmarks (cii.in) — world-class OEE 85% vs India median ~72%",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing OEE improvement mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map value streams and identify constraint/bottleneck operations using throughput accounting; quantify conversion cost impact of bottleneck idle time",
+          "owner_role": "Industrial Engineering / Operations",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Design bottleneck removal plan: capacity balancing, buffer sizing, batch-size optimisation, and minor stoppage elimination on constraint resource",
+          "owner_role": "Manufacturing Engineering",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Execute bottleneck projects (quick wins first); validate throughput uplift on pilot line before scale",
+          "owner_role": "Projects / Production",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Track OEE by line, conversion cost/MT, and bottleneck utilisation monthly; rebalance when constraint shifts",
+          "owner_role": "FP&A / Manufacturing",
+          "duration_weeks": 5
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Plant OEE <72% vs sector P50 benchmark with bottleneck utilisation >90% while upstream/downstream idle",
+          "evidence_source": "oee_data",
+          "confirms": "Bottleneck removal will unlock latent capacity and lower conversion cost/unit"
+        },
+        {
+          "signal": "Throughput limited by single process step on >60% of production days",
+          "evidence_source": "production_scheduling_data",
+          "confirms": "Constraint-focused investment will yield disproportionate savings"
+        },
+        {
+          "signal": "Conversion cost/MT trending up despite stable material prices indicating productivity loss",
+          "evidence_source": "conversion_cost_trend",
+          "confirms": "OEE programme will reverse productivity erosion"
+        }
+      ],
+      "required_data_fields": [
+        "OEE (availability, performance, quality) by line and shift (12 months)",
+        "Bottleneck identification and utilisation data",
+        "Conversion cost/MT or per-unit manufacturing cost trend",
+        "Production schedule and backlog data",
+        "Capital project options for constraint removal with ROI"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "industry_4_physical_ai",
+      "lever_name": "Industry 4.0 / Physical AI Shop-Floor Intelligence",
+      "lever_family": "technology",
+      "savings_range_pct": {
+        "p10": 8,
+        "p50": 15,
+        "p90": 24
+      },
+      "cta_rate": 0.1,
+      "phasing_curve": [
+        0.1,
+        0.35,
+        0.55
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.9,
+      "bounce_back_risk": "low",
+      "condition_precedents": [
+        "OT/IT architecture assessment completed for shop-floor connectivity",
+        "Top-3 bottleneck lines instrumented with sensors (vibration, temperature, vision, cycle-time)",
+        "MES or historian integration path defined for real-time OEE and defect data"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.62,
+      "implementation_weeks": {
+        "p10": 24,
+        "p50": 36,
+        "p90": 56
+      },
+      "applicable_if": [
+        "category:CONVERSION_COST present"
+      ],
+      "industry_sources": [
+        "McKinsey & Company — Digital Manufacturing and Industry 4.0 (mckinsey.com/capabilities/operations/our-insights) — 10-20% productivity improvement from digital shop-floor",
+        "NASSCOM — Industry 4.0 India Adoption Report (nasscom.in) — IoT, edge analytics, and computer vision use cases",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing Industry 4.0 pilot programmes"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Assess OT/IT maturity; instrument top-3 bottleneck lines with IoT sensors (vibration, temperature, cycle-time, vision) and connect to historian/MES",
+          "owner_role": "Manufacturing IT / Engineering",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Deploy edge analytics for real-time OEE, defect root-cause tagging, and anomaly alerts; integrate with production dashboards",
+          "owner_role": "Data Engineering / Operations",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Pilot computer-vision quality inspection or cobot assist on highest-COPQ station; validate false-positive rate and cycle-time impact",
+          "owner_role": "Manufacturing Engineering / QA",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Scale proven use cases with ROI gate; track conversion cost/MT, OEE, and defect rate monthly",
+          "owner_role": "FP&A / Digital Manufacturing Lead",
+          "duration_weeks": 10
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Manual data collection for OEE or quality with >24-hour lag preventing real-time intervention",
+          "evidence_source": "mes_maturity_assessment",
+          "confirms": "Digital instrumentation will enable faster loss elimination"
+        },
+        {
+          "signal": "Visual inspection defect escape rate >1% on manual QC stations",
+          "evidence_source": "quality_data",
+          "confirms": "Computer-vision inspection will reduce COPQ and conversion waste"
+        },
+        {
+          "signal": "No shop-floor IoT or edge analytics deployed despite OEE <70% on key lines",
+          "evidence_source": "technology_landscape_review",
+          "confirms": "Industry 4.0 investment gap vs peer digital maturity"
+        }
+      ],
+      "required_data_fields": [
+        "OEE and defect data availability and latency by line",
+        "Shop-floor sensor and PLC inventory",
+        "MES/historian integration status",
+        "COPQ by station (scrap, rework, inspection cost)",
+        "Pilot ROI model for vision/cobot/edge analytics use cases"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
       "lever_id": "factory_automation",
       "lever_name": "Factory Automation & Robotics",
       "lever_family": "technology",
@@ -599,13 +1204,13 @@
         "p90": 96
       },
       "applicable_if": [
-        "category:PLANT_MAINTENANCE or CONTINGENT present",
-        "headcount > 200"
+        "headcount > 200",
+        "category:CONVERSION_COST present"
       ],
       "industry_sources": [
-        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
-        "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)",
-        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+        "McKinsey & Company — Automation in Manufacturing Operations (mckinsey.com/capabilities/operations/our-insights) — 12-30% direct labour reduction on automated lines",
+        "IFR — World Robotics Report India chapter (ifr.org) — industrial robot density and payback benchmarks",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing automation mandates"
       ],
       "execution_playbook": [
         {
@@ -656,8 +1261,8 @@
       "applicability_threshold_pct": 0.05
     },
     {
-      "lever_id": "quality_waste_reduction",
-      "lever_name": "Quality Defect & Waste Reduction (Six Sigma / Lean)",
+      "lever_id": "conversion_scrap_copq_reduction",
+      "lever_name": "Scrap, Rework & COPQ Reduction",
       "lever_family": "process",
       "savings_range_pct": {
         "p10": 5,
@@ -674,9 +1279,9 @@
       "sustainability_score": 0.8,
       "bounce_back_risk": "medium",
       "condition_precedents": [
-        "Cost of poor quality (COPQ) baseline established (scrap, rework, warranty)",
+        "Cost of poor quality (COPQ) baseline established (scrap, rework, warranty, inspection)",
         "Six Sigma / Lean project charters approved for top defect causes",
-        "SPC (Statistical Process Control) deployed on critical parameters"
+        "SPC deployed on critical process parameters"
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.7,
@@ -686,47 +1291,462 @@
         "p90": 42
       },
       "applicable_if": [
-        "category:PLANT_MAINTENANCE or PACKAGING present"
+        "category:CONVERSION_COST present"
       ],
       "industry_sources": [
-        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
-        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+        "ASQ — Cost of Poor Quality benchmarks (asq.org) — scrap and rework typically 2-8% of conversion cost in batch manufacturing",
+        "CII — Quality Excellence Awards case studies (cii.in) — Six Sigma COPQ reduction programmes",
+        "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing quality improvement mandates"
       ],
       "execution_playbook": [
         {
-          "step": "Confirm scope for Quality Defect & Waste Reduction (Six Sigma / Lean): validate baseline and stakeholders",
-          "owner_role": "Transformation Lead",
+          "step": "Establish COPQ baseline: quantify scrap, rework, warranty, and excess inspection cost as % of conversion cost by line and SKU",
+          "owner_role": "Quality / FP&A",
           "duration_weeks": 3
         },
         {
-          "step": "Design target process and RACI",
-          "owner_role": "Process Owner",
+          "step": "Run defect pareto and root-cause analysis on top-5 COPQ drivers; charter Six Sigma or Lean projects with defined savings targets",
+          "owner_role": "Quality / Black Belt",
           "duration_weeks": 4
         },
         {
-          "step": "Pilot in one BU/geo and measure effort/cost delta",
-          "owner_role": "Operations",
-          "duration_weeks": 6
+          "step": "Deploy SPC on critical parameters; implement poke-yoke or error-proofing on highest-defect process steps",
+          "owner_role": "Manufacturing Engineering / QA",
+          "duration_weeks": 8
         },
         {
-          "step": "Scale rollout and update SOPs/training",
-          "owner_role": "HR / Ops",
-          "duration_weeks": 8
+          "step": "Track scrap rate %, rework hours, and COPQ monthly; sustain gains via control plans and layered process audits",
+          "owner_role": "Quality / Plant Manager",
+          "duration_weeks": 4
         }
       ],
       "diagnostic_signals": [
         {
-          "signal": "High FTE effort or cycle time vs benchmark",
-          "evidence_source": "operating_metrics",
-          "confirms": "Process inefficiency is material"
+          "signal": "Scrap and rework rate >3% of production volume vs sector P50 benchmark ~2.5%",
+          "evidence_source": "quality_data",
+          "confirms": "COPQ reduction will directly lower conversion cost"
+        },
+        {
+          "signal": "Repeat defect codes accounting for >60% of scrap with no closed-loop corrective action in >90 days",
+          "evidence_source": "defect_pareto_report",
+          "confirms": "Root-cause elimination projects will yield material savings"
+        },
+        {
+          "signal": "Rework labour hours >5% of direct labour on affected lines",
+          "evidence_source": "labour_cost_allocation",
+          "confirms": "Quality improvement will reduce hidden conversion cost"
         }
       ],
       "required_data_fields": [
-        "Process volume metrics",
-        "FTE effort or cost allocation by process",
-        "Baseline cycle times"
+        "Scrap and rework quantities by SKU, line, and defect code (12 months)",
+        "COPQ breakdown (scrap material, rework labour, warranty, inspection)",
+        "SPC capability data for critical parameters",
+        "Root-cause and corrective action log for top defects",
+        "Direct labour hours spent on rework by line"
       ],
       "applicability_threshold_pct": 0.05
+    },
+    {
+      "lever_id": "energy_efficiency_program",
+      "lever_name": "Plant Energy Efficiency Programme",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 22.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Plant Energy Efficiency Programme"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:FACILITIES present"
+      ],
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/) — industrial energy consumption benchmarks and efficiency improvement data",
+        "Bureau of Energy Efficiency (BEE) — Perform Achieve Trade (PAT) Scheme results (beeindia.gov.in/content/pat-cycle) — energy savings achieved by designated consumers",
+        "McKinsey & Company — Reducing Energy Consumption in Manufacturing (mckinsey.com/capabilities/operations/our-insights) — 10-25% energy savings potential in industrial settings"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Plant Energy Efficiency Programme: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FACILITIES",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "mro_vendor_consolidation",
+      "lever_name": "MRO Vendor Consolidation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 25.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for MRO Vendor Consolidation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "Hackett Group — World-Class Performance Study: Procurement Benchmarks 2024 (thehackettgroup.com/research/) — MRO supplier consolidation savings benchmarks",
+        "CAPS Research — MRO Procurement Benchmarking (capsresearch.org/benchmarking/) — maintenance spend under management benchmarks",
+        "INTERNAL_CALIBRATION — specific MRO consolidation savings range is an internal consulting estimate"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for MRO Vendor Consolidation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "contract_manufacturing_optimise",
+      "lever_name": "Job Work & Contract Mfg Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Job Work & Contract Mfg Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 24,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "McKinsey & Company — Make vs Buy in Manufacturing Operations (mckinsey.com/capabilities/operations/our-insights) — insourcing decision framework and savings potential",
+        "INTERNAL_CALIBRATION — contract manufacturing optimisation savings range is an internal consulting estimate for Indian diversified manufacturers"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Job Work & Contract Mfg Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "ind_as116_lease_reclassify",
+      "lever_name": "Ind AS 116 Lease Reclassification",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 1.0,
+        "p50": 3.0,
+        "p90": 6.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "one_time",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Ind AS 116 Lease Reclassification"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 6,
+        "p90": 14
+      },
+      "applicable_if": [
+        "category:FACILITIES present",
+        "category:LOGISTICS present"
+      ],
+      "industry_sources": [
+        "ICAI — Ind AS 116 Leases — Implementation Guidance (icai.org) — statutory accounting standard with practical expedients for short-term and low-value leases",
+        "MCA — Indian Accounting Standards Notification 2015, updated 2019 (mca.gov.in) — Ind AS 116 regulatory basis",
+        "INTERNAL_CALIBRATION — 1-6% cash flow recovery range is an internal consulting estimate based on Ind AS 116 transition reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Ind AS 116 Lease Reclassification: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FACILITIES",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "mes_erp_rationalisation",
+      "lever_name": "MES / ERP & Plant Software Rationalisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 24.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for MES / ERP & Plant Software Rationalisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:IT_SOFTWARE present"
+      ],
+      "industry_sources": [
+        "Gartner IT Key Metrics 2024 (gartner.com) — manufacturing IT spend 1-2.5% of revenue; licence rationalisation saves 15-25%",
+        "McKinsey — Digital Manufacturing Operations (mckinsey.com/capabilities/operations) — MES consolidation reduces IT maintenance 20-30%",
+        "INTERNAL_CALIBRATION — plant software rationalisation savings from 3 India manufacturing IT mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for MES / ERP & Plant Software Rationalisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for IT_SOFTWARE",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "prof_services_governance",
+      "lever_name": "Consulting, Audit & Legal Spend Governance",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Consulting, Audit & Legal Spend Governance"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:PROF_SERVICES present"
+      ],
+      "industry_sources": [
+        "Hackett Group G&A Benchmarks 2024 (thehackettgroup.com) — world-class advisory spend governance reduces professional fees 10-20%",
+        "MCA — Statutory audit rotation requirements (mca.gov.in) — competitive audit tendering benchmarks",
+        "INTERNAL_CALIBRATION — professional services governance savings from 4 India manufacturing G&A mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Consulting, Audit & Legal Spend Governance: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for PROF_SERVICES",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
     }
   ]
 }

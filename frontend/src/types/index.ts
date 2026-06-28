@@ -15,6 +15,13 @@ export interface ChatNextOption {
   message: string;
 }
 
+export interface SuggestedOutput {
+  skill: string;
+  label: string;
+  endpoint: string;
+  score?: number;
+}
+
 export interface CategoryInsightRow {
   category_id: string;
   category_name: string;
@@ -211,6 +218,7 @@ export interface ChatMessage {
   analysis_trace?: AnalysisTraceStep[];
   show_peer_savings?: boolean;
   charts?: ChartSpec[];
+  suggested_outputs?: SuggestedOutput[];
 }
 
 export interface SessionCreatePayload {
@@ -228,6 +236,17 @@ export interface SessionResponse {
   annual_revenue?: number;
   files?: unknown[];
   skill_outputs?: Record<string, unknown>;
+  last_analysis_run?: {
+    run_id?: string | null;
+    status?: string;
+    completed_at?: string;
+    pipeline_seeded?: number;
+    trace_step_count?: number;
+    progress_steps?: ProgressStep[];
+    total_spend?: number;
+    modelled_initiatives?: number;
+    reporting_currency?: string;
+  };
   [key: string]: unknown;
 }
 
@@ -387,6 +406,7 @@ export interface EngagementMeta {
   engagement_id?: string;
   company_name: string;
   industry: string;
+  industry_user_set?: boolean;
   currency: string;
   audience?: string;
   engagement_week: number;
@@ -465,6 +485,7 @@ export interface V1ChatResponse {
   clarification?: BusinessClarification;
   response_metadata?: ChatResponseMetadata;
   charts?: ChartSpec[];
+  suggested_outputs?: SuggestedOutput[];
 }
 
 export interface ChatPlanPreview {
@@ -618,16 +639,159 @@ export interface SkillMeta {
   name: string;
   path?: string;
   description?: string;
+  kind?: string;
+  runtime?: string;
+  discoverable?: boolean;
+  weight?: string;
+  tier?: string;
+  execution_status?: string;
+  version?: string;
+  status?: string;
 }
 
 export interface SkillDetail {
   name: string;
   path: string;
   content: string;
+  kind?: string;
+  runtime?: string;
+  discoverable?: boolean;
+  weight?: string;
+  tier?: string;
+  inputs?: string[];
+}
+
+export interface InitiativeProvenance {
+  initiative_id?: string;
+  category?: string;
+  lever?: string;
+  session_id?: string;
+  trace_steps?: Array<{ step: number; label: string; count?: number; value?: unknown; source?: string }>;
+  assumptions?: Array<Record<string, unknown>>;
+  source_spend_rows?: Array<Record<string, unknown>>;
+  source_files?: Array<{ filename?: string; path?: string; uploaded_at?: string; size_bytes?: number }>;
+  ingestion_summary?: unknown;
+  analysis_revision?: number;
+}
+
+// FP&A detail tab responses (Cost Room). Skill outputs are loosely shaped
+// dicts, so every field is optional with an index-signature escape hatch.
+export interface TrendPeriodPoint {
+  period?: string;
+  total_spend?: number;
+  spend?: number;
+  [key: string]: unknown;
+}
+
+export interface CategoryTrend {
+  category_id?: string;
+  category_name?: string;
+  trend_direction?: string;
+  change_pct?: number;
+  total_change?: number;
+  cagr_pct?: number;
+  annualized_run_rate?: number;
+  [key: string]: unknown;
+}
+
+export interface TrendsResponse {
+  temporal_available?: boolean;
+  reason?: string;
+  period_count?: number;
+  arr_basis?: string;
+  annualized_run_rate?: number;
+  cagr_pct?: number;
+  period_trends?: TrendPeriodPoint[];
+  category_trends?: CategoryTrend[];
+  [key: string]: unknown;
+}
+
+export interface BvaVariance {
+  category_id?: string;
+  category_name?: string;
+  actual_spend?: number;
+  budget_spend?: number;
+  total_variance?: number;
+  flag?: string;
+  [key: string]: unknown;
+}
+
+export interface BvaResponse {
+  bva_available?: boolean;
+  reason?: string;
+  total_actual?: number;
+  total_budget?: number;
+  total_variance?: number;
+  categories_over_budget?: number;
+  variances?: BvaVariance[];
+  decomposition_note?: string;
+  [key: string]: unknown;
+}
+
+export interface PaymentTermsOpportunity {
+  category_id?: string;
+  category_name?: string;
+  current_dpo_days?: number;
+  target_dpo_days?: number;
+  working_capital_release?: number;
+  annual_cash_value_at_wacc?: number;
+  [key: string]: unknown;
+}
+
+export interface PaymentTermsResponse {
+  payment_terms_available?: boolean;
+  reason?: string;
+  note?: string;
+  coverage_pct?: number;
+  total_working_capital_release?: number;
+  total_annual_cash_value?: number;
+  opportunity_count?: number;
+  opportunities?: PaymentTermsOpportunity[];
+  [key: string]: unknown;
+}
+
+export interface CostToServeDriver {
+  category_id?: string;
+  category_name?: string;
+  spend?: number;
+  pct_of_opex?: number;
+  [key: string]: unknown;
+}
+
+export interface CostToServeSegment {
+  segment?: string;
+  revenue?: number;
+  total_cost?: number;
+  direct_cost?: number;
+  indirect_cost_allocated?: number;
+  cost_pct_of_revenue?: number | null;
+  is_unprofitable?: boolean;
+  [key: string]: unknown;
+}
+
+export interface CostToServeResponse {
+  cost_to_serve_available?: boolean;
+  segment_revenue_provided?: boolean;
+  reason?: string;
+  cost_per_employee?: { total?: number; by_category?: Record<string, number> } | null;
+  top_cost_drivers?: CostToServeDriver[];
+  segments?: CostToServeSegment[];
+  unprofitable_segments?: string[];
+  total_opex_allocated?: number;
+  total_opex_unallocated?: number;
+  [key: string]: unknown;
+}
+
+export interface InitiativeChangeEntry {
+  ts?: string;
+  action?: string;
+  detail?: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 export interface Initiative {
   initiative_id: string;
+  change_log?: InitiativeChangeEntry[];
   category: string;
   lever: string;
   stage: string;
@@ -691,6 +855,8 @@ export interface SensitivityScenario {
 export interface SensitivityResponse {
   scenarios?: SensitivityScenario[];
   confidence_bands?: { low?: number; mid?: number; high?: number };
+  baseline_mid_savings?: number;
+  methodology_note?: string;
 }
 
 export interface PipelineSummary {
@@ -721,6 +887,7 @@ export interface DeepResearchSource {
 
 export interface DeepResearchStatusResponse {
   status: 'in_progress' | 'completed' | 'failed';
+  error?: string;
   summary?: string;
   full_report?: string;
   sources?: DeepResearchSource[];
@@ -735,4 +902,83 @@ export interface DiagnosticContextPatch {
   diagnostic_urls?: string[];
   diagnostic_result?: DiagnosticResponse;
   diagnostic_completed_at?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Analysis Workbench
+// ---------------------------------------------------------------------------
+
+export interface WorkbenchSkill {
+  name: string;
+  tier: string;
+  description: string;
+  parallel_group: number;
+  depends_on: string[];
+  params: string[];
+  data_requirements: string[];
+  degrades_without: string[];
+}
+
+export interface WorkbenchAssumptionField {
+  key: string;
+  label: string;
+  type: 'percent' | 'number' | 'int' | 'text';
+  default?: number | string;
+}
+
+export interface WorkbenchCatalog {
+  skills: WorkbenchSkill[];
+  tiers: string[];
+  assumptions: WorkbenchAssumptionField[];
+}
+
+export interface WorkbenchValidationIssue {
+  skill: string;
+  code: string;
+  message: string;
+  fixable_with?: string;
+}
+
+export interface WorkbenchValidation {
+  selected_skills: string[];
+  resolved_skills: string[];
+  added_deps: string[];
+  warnings: WorkbenchValidationIssue[];
+  blocking_errors: WorkbenchValidationIssue[];
+  blocked: boolean;
+  total_skills?: number;
+  estimated_duration?: string;
+}
+
+export interface WorkbenchHeadline {
+  total_spend?: number;
+  savings_low?: number;
+  savings_mid?: number;
+  savings_high?: number;
+  npv?: number;
+  initiative_count?: number;
+  ebitda_bps?: number;
+}
+
+export interface WorkbenchRun {
+  run_id: string;
+  engagement_id: string;
+  session_id: string;
+  user_id: string;
+  name: string;
+  selected_skills: string[];
+  resolved_skills: string[];
+  overrides: Record<string, unknown>;
+  seed_from_run_id: string | null;
+  parent_run_id: string | null;
+  status: 'draft' | 'running' | 'complete' | 'failed';
+  skill_outputs: Record<string, Record<string, unknown>>;
+  errors: Record<string, string>;
+  degradation_reasons?: Record<string, string>;
+  validation: WorkbenchValidation | Record<string, never>;
+  headline: WorkbenchHeadline;
+  reflect_summary?: string;
+  promoted_initiative_ids?: string[];
+  created_at: string;
+  completed_at: string | null;
 }

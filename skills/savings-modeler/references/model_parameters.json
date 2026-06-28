@@ -3189,6 +3189,251 @@
         "Policy exception log"
       ],
       "applicability_threshold_pct": 0.03
+    },
+    "travel_policy_optimization": {
+      "lever_name": "Travel Policy Compliance & TMC Consolidation",
+      "lever_family": "demand",
+      "phasing_curve": [0.35, 0.45, 0.2],
+      "savings_type": "run_rate",
+      "cta_rate": 0.04,
+      "sustainability_score": 0.55,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Travel policy updated with cabin-class caps, advance-booking rules, and preferred supplier list",
+        "TMC or self-booking tool configured with in-policy guardrails",
+        "Pre-trip approval workflow enabled for trips above threshold"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.82,
+      "implementation_weeks": { "p10": 4, "p50": 8, "p90": 14 },
+      "lever_id": "travel_policy_optimization",
+      "execution_playbook": [
+        { "step": "Audit T&E spend by category, traveller grade, and booking channel; quantify out-of-policy leakage", "owner_role": "Travel Manager / FP&A", "duration_weeks": 2 },
+        { "step": "Consolidate to preferred TMC or corporate booking tool; negotiate airline and hotel programme rates", "owner_role": "Procurement / Travel", "duration_weeks": 4 },
+        { "step": "Deploy policy guardrails and pre-trip approval; communicate video-first norms for short engagements", "owner_role": "HR / Travel", "duration_weeks": 3 },
+        { "step": "Track compliance rate, average ticket price, and leakage monthly vs baseline", "owner_role": "FP&A", "duration_weeks": 4 }
+      ],
+      "diagnostic_signals": [
+        { "signal": "Policy compliance rate below 80% or >15% spend booked outside managed channel", "evidence_source": "tmc_report", "confirms": "Travel governance gap is material" },
+        { "signal": "Average hotel/airfare rates above GSA or peer benchmark for top routes", "evidence_source": "benchmark", "confirms": "Rate renegotiation and channel consolidation will close price gap" }
+      ],
+      "required_data_fields": [
+        "T&E transaction detail by traveller, category, and booking channel",
+        "Travel policy document and exception log",
+        "TMC or expense system compliance reports"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    "telecom_expense_management": {
+      "lever_name": "Telecom Expense Management (TEM)",
+      "lever_family": "supply",
+      "phasing_curve": [0.25, 0.5, 0.25],
+      "savings_type": "run_rate",
+      "cta_rate": 0.05,
+      "sustainability_score": 0.75,
+      "bounce_back_risk": "low",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Telecom inventory audit completed — circuits, mobile lines, and unused services identified",
+        "Invoice audit process established for billing error recovery",
+        "Carrier contract renewal calendar mapped"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.78,
+      "implementation_weeks": { "p10": 6, "p50": 12, "p90": 20 },
+      "lever_id": "telecom_expense_management",
+      "execution_playbook": [
+        { "step": "Build telecom asset inventory: voice, data, mobile, and conferencing by site and cost centre", "owner_role": "IT / Telecom Manager", "duration_weeks": 3 },
+        { "step": "Run invoice audit for billing errors, zombie circuits, and duplicate services", "owner_role": "Finance / TEM vendor", "duration_weeks": 4 },
+        { "step": "Consolidate carriers and renegotiate enterprise agreements; right-size mobile plans", "owner_role": "Procurement / IT", "duration_weeks": 6 },
+        { "step": "Embed ongoing TEM monitoring and MACD governance", "owner_role": "IT Operations", "duration_weeks": 4 }
+      ],
+      "diagnostic_signals": [
+        { "signal": "Telecom spend per employee above industry median or invoice error rate >3%", "evidence_source": "tem_audit", "confirms": "TEM programme will recover waste" },
+        { "signal": ">10% of lines inactive or duplicate circuits across locations", "evidence_source": "inventory_report", "confirms": "Inventory rationalisation is high-ROI" }
+      ],
+      "required_data_fields": [
+        "Telecom invoices by carrier and service type (12 months)",
+        "Circuit and mobile line inventory with status",
+        "Contract end dates and rate tables"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    "office_supplies_consolidation": {
+      "lever_name": "Office Supplies & Indirect Consumables Consolidation",
+      "lever_family": "supply",
+      "phasing_curve": [0.3, 0.5, 0.2],
+      "savings_type": "run_rate",
+      "cta_rate": 0.04,
+      "sustainability_score": 0.65,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Tail spend analysis completed for office supplies, print, and pantry categories",
+        "Preferred supplier e-catalog implemented in P2P",
+        "Maverick buying controls enabled for off-catalog purchases"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.8,
+      "implementation_weeks": { "p10": 4, "p50": 8, "p90": 14 },
+      "lever_id": "office_supplies_consolidation",
+      "execution_playbook": [
+        { "step": "Aggregate office supplies spend by supplier, site, and category; quantify fragmentation", "owner_role": "Category Manager", "duration_weeks": 2 },
+        { "step": "Consolidate to 1-2 preferred suppliers with volume rebates and e-catalog integration", "owner_role": "Strategic Sourcing", "duration_weeks": 4 },
+        { "step": "Deploy P2P controls and communicate catalog-first policy", "owner_role": "Procurement / IT", "duration_weeks": 3 },
+        { "step": "Track catalog adoption, supplier count, and unit price vs baseline", "owner_role": "FP&A", "duration_weeks": 4 }
+      ],
+      "diagnostic_signals": [
+        { "signal": ">15 active suppliers in office supplies with low line-item visibility", "evidence_source": "spend_profile", "confirms": "Supplier consolidation will reduce purchased cost" },
+        { "signal": "Off-catalog or maverick spend >20% of office category", "evidence_source": "p2p_logs", "confirms": "Catalog enforcement will capture savings" }
+      ],
+      "required_data_fields": [
+        "Office supplies transaction detail by supplier and site",
+        "P2P catalog coverage and maverick spend report",
+        "Supplier contract terms and rebate structures"
+      ],
+      "applicability_threshold_pct": 0.02
+    },
+    "brsr_reporting_efficiency": {
+      "lever_name": "BRSR / ESG Reporting & Assurance Efficiency",
+      "lever_family": "process",
+      "phasing_curve": [0.4, 0.4, 0.2],
+      "savings_type": "run_rate",
+      "cta_rate": 0.06,
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "low",
+      "org_change_risk": "medium",
+      "condition_precedents": [
+        "ESG data inventory mapped to BRSR Core KPI requirements",
+        "Group-level ESG data platform or shared service model evaluated",
+        "Assurance vs assessment route selected per SEBI glide path"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": { "p10": 8, "p50": 16, "p90": 28 },
+      "lever_id": "brsr_reporting_efficiency",
+      "execution_playbook": [
+        { "step": "Map BRSR Core KPI data sources across entities; identify duplication and manual collection effort", "owner_role": "Sustainability / Finance", "duration_weeks": 3 },
+        { "step": "Implement integrated ESG data platform or group reporting hub", "owner_role": "IT / ESG", "duration_weeks": 8 },
+        { "step": "Consolidate assurance providers and align to SEBI assessment standards where applicable", "owner_role": "Company Secretary / ESG", "duration_weeks": 6 },
+        { "step": "Track cost per entity for BRSR preparation and assurance vs prior year", "owner_role": "FP&A", "duration_weeks": 4 }
+      ],
+      "diagnostic_signals": [
+        { "signal": "BRSR preparation cost rising faster than entity count; duplicate data collection across BUs", "evidence_source": "esg_cost_tracker", "confirms": "Integrated reporting platform will reduce per-entity cost" },
+        { "signal": "Multiple assurance providers across group entities without coordinated scope", "evidence_source": "audit_register", "confirms": "Assurance consolidation will reduce fees" }
+      ],
+      "required_data_fields": [
+        "BRSR preparation and assurance cost by entity",
+        "ESG KPI data source inventory",
+        "SEBI applicability and glide-path status"
+      ],
+      "applicability_threshold_pct": 0.02
+    },
+    "intercompany_charge_benchmarking": {
+      "lever_name": "Intercompany & Related-Party Charge Benchmarking",
+      "lever_family": "finance",
+      "phasing_curve": [0.35, 0.45, 0.2],
+      "savings_type": "run_rate",
+      "cta_rate": 0.05,
+      "sustainability_score": 0.8,
+      "bounce_back_risk": "low",
+      "org_change_risk": "medium",
+      "condition_precedents": [
+        "Related-party transaction register reconciled to statutory disclosures",
+        "Intercompany service agreements reviewed for benefits test and arm's-length markup",
+        "Transfer pricing documentation updated for material IC charges"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.65,
+      "implementation_weeks": { "p10": 10, "p50": 20, "p90": 36 },
+      "lever_id": "intercompany_charge_benchmarking",
+      "execution_playbook": [
+        { "step": "Inventory all intercompany charges: management fees, royalties, shared services allocations", "owner_role": "Tax / Treasury", "duration_weeks": 4 },
+        { "step": "Apply OECD benefits test and benchmark markups vs arm's-length range", "owner_role": "Transfer Pricing Advisor", "duration_weeks": 6 },
+        { "step": "Renegotiate or restructure non-arm's-length charges; eliminate duplicate IC services", "owner_role": "CFO / Group Tax", "duration_weeks": 8 },
+        { "step": "Update IC agreements and SEBI RPT disclosure pack", "owner_role": "Company Secretary", "duration_weeks": 4 }
+      ],
+      "diagnostic_signals": [
+        { "signal": "Management fee or royalty charges above OECD LVAS or benchmarking median for routine services", "evidence_source": "tp_study", "confirms": "IC charge reduction is defensible at arm's length" },
+        { "signal": "Duplicate shared services billed by multiple group entities to same recipient", "evidence_source": "ic_register", "confirms": "Service duplication elimination is addressable" }
+      ],
+      "required_data_fields": [
+        "Related-party transaction schedule (SEBI Form A)",
+        "Intercompany agreements and allocation methodologies",
+        "Transfer pricing documentation for IC services"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    "energy_procurement_optimization": {
+      "lever_name": "Energy Procurement & Demand Optimisation",
+      "lever_family": "supply",
+      "phasing_curve": [0.2, 0.5, 0.3],
+      "savings_type": "run_rate",
+      "cta_rate": 0.06,
+      "sustainability_score": 0.82,
+      "bounce_back_risk": "low",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Energy consumption baseline by site and tariff category established",
+        "Open-access / captive / renewable PPA options evaluated",
+        "BEE PAT or ISO 50001 gap assessment completed for industrial sites"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": { "p10": 8, "p50": 16, "p90": 28 },
+      "lever_id": "energy_procurement_optimization",
+      "execution_playbook": [
+        { "step": "Disaggregate power spend: grid tariff, open access, captive, fuel, and demand charges", "owner_role": "Plant Finance / Energy Manager", "duration_weeks": 3 },
+        { "step": "Evaluate procurement options: group PPA, open-access, tariff reclassification, demand management", "owner_role": "Energy / Procurement", "duration_weeks": 6 },
+        { "step": "Execute quick wins (power factor, load shifting) and negotiate supply contracts", "owner_role": "Operations / Procurement", "duration_weeks": 8 },
+        { "step": "Track energy cost per unit output and % renewable mix monthly", "owner_role": "FP&A / Sustainability", "duration_weeks": 4 }
+      ],
+      "diagnostic_signals": [
+        { "signal": "Energy cost per unit output above BEE PAT sector benchmark or peer disclosure", "evidence_source": "energy_audit", "confirms": "Procurement and efficiency levers are material" },
+        { "signal": "Demand charges >25% of electricity bill without load management programme", "evidence_source": "utility_bills", "confirms": "Demand optimisation will reduce tariff leakage" }
+      ],
+      "required_data_fields": [
+        "Electricity and fuel invoices by site (24 months)",
+        "Production volume or revenue for intensity benchmarking",
+        "Open-access and captive power contract terms"
+      ],
+      "applicability_threshold_pct": 0.04
+    },
+    "rnd_portfolio_rationalization": {
+      "lever_name": "R&D Portfolio Rationalisation & Vendor Governance",
+      "lever_family": "demand",
+      "phasing_curve": [0.3, 0.45, 0.25],
+      "savings_type": "run_rate",
+      "cta_rate": 0.07,
+      "sustainability_score": 0.6,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "medium",
+      "condition_precedents": [
+        "R&D project portfolio reviewed against strategic priorities and ROI gates",
+        "CRO/vendor spend consolidated under preferred supplier framework",
+        "Stage-gate criteria updated to kill low-ROI projects early"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": { "p10": 10, "p50": 20, "p90": 32 },
+      "lever_id": "rnd_portfolio_rationalization",
+      "execution_playbook": [
+        { "step": "Inventory R&D spend by project, vendor, and stage; classify strategic vs discretionary", "owner_role": "R&D Finance / CTO office", "duration_weeks": 4 },
+        { "step": "Apply portfolio prioritisation; exit or pause tail projects below ROI threshold", "owner_role": "R&D Leadership", "duration_weeks": 6 },
+        { "step": "Consolidate CRO, lab, and tooling vendors; renegotiate framework agreements", "owner_role": "R&D Procurement", "duration_weeks": 6 },
+        { "step": "Embed stage-gate ROI reviews in annual planning cycle", "owner_role": "FP&A / R&D", "duration_weeks": 4 }
+      ],
+      "diagnostic_signals": [
+        { "signal": ">30% of R&D projects in late stage with no defined commercialisation path", "evidence_source": "project_portfolio", "confirms": "Portfolio rationalisation will release spend" },
+        { "signal": "CRO and lab vendor fragmentation with >10 suppliers for similar services", "evidence_source": "spend_profile", "confirms": "Vendor consolidation is addressable" }
+      ],
+      "required_data_fields": [
+        "R&D project register with spend and stage",
+        "Vendor spend by CRO, lab, and tooling category",
+        "Stage-gate criteria and historical project ROI"
+      ],
+      "applicability_threshold_pct": 0.04
     }
   },
   "phasing_curves": {
@@ -3416,7 +3661,14 @@
       0.2,
       0.4,
       0.4
-    ]
+    ],
+    "travel_policy_optimization": [0.35, 0.45, 0.2],
+    "telecom_expense_management": [0.25, 0.5, 0.25],
+    "office_supplies_consolidation": [0.3, 0.5, 0.2],
+    "brsr_reporting_efficiency": [0.4, 0.4, 0.2],
+    "intercompany_charge_benchmarking": [0.35, 0.45, 0.2],
+    "energy_procurement_optimization": [0.2, 0.5, 0.3],
+    "rnd_portfolio_rationalization": [0.3, 0.45, 0.25]
   },
   "savings_type_by_lever": {
     "contract_renegotiation": "run_rate",
@@ -3464,7 +3716,14 @@
     "space_utilization_optimization": "run_rate",
     "lease_restructuring": "mixed",
     "cost_governance": "run_rate",
-    "cost_avoidance": "cost_avoidance"
+    "cost_avoidance": "cost_avoidance",
+    "travel_policy_optimization": "run_rate",
+    "telecom_expense_management": "run_rate",
+    "office_supplies_consolidation": "run_rate",
+    "brsr_reporting_efficiency": "run_rate",
+    "intercompany_charge_benchmarking": "run_rate",
+    "energy_procurement_optimization": "run_rate",
+    "rnd_portfolio_rationalization": "run_rate"
   },
   "sustainability_score_by_lever": {
     "contract_renegotiation": 0.4,
@@ -3511,7 +3770,14 @@
     "bank_fee_optimization": 0.78,
     "space_utilization_optimization": 0.82,
     "lease_restructuring": 0.85,
-    "cost_governance": 0.85
+    "cost_governance": 0.85,
+    "travel_policy_optimization": 0.55,
+    "telecom_expense_management": 0.75,
+    "office_supplies_consolidation": 0.65,
+    "brsr_reporting_efficiency": 0.7,
+    "intercompany_charge_benchmarking": 0.8,
+    "energy_procurement_optimization": 0.82,
+    "rnd_portfolio_rationalization": 0.6
   },
   "implementation_cost_phasing": {
     "consulting_fees": [

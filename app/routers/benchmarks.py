@@ -3,9 +3,11 @@ from __future__ import annotations
 from typing import Any, Dict
 
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
+from fastapi.responses import Response
 
 from app.schemas import BenchmarkDatasetCreateRequest, BenchmarkSelectRequest, PeerSetCreateRequest
 from app.services.benchmarks import (
+    benchmark_csv_template,
     create_dataset,
     create_peer_set,
     dataset_coverage,
@@ -18,6 +20,16 @@ from app.services.benchmarks import (
 from app.services.compliance import append_audit_event
 
 router = APIRouter()
+
+
+@router.get("/api/v1/template/benchmark-csv")
+def download_benchmark_template() -> Response:
+    """Return downloadable benchmark CSV template (APQC-style peer percentiles)."""
+    return Response(
+        content=benchmark_csv_template(),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=benchmark_template.csv"},
+    )
 
 
 @router.get("/api/v1/benchmarks")
@@ -60,6 +72,9 @@ async def upload_benchmark_file(
     sample_size: int = Form(0),
     geography: str = Form("India"),
     specificity_score: float = Form(0.7),
+    revenue_band_min: float | None = Form(None),
+    revenue_band_max: float | None = Form(None),
+    license_expiry: str | None = Form(None),
 ) -> Dict[str, Any]:
     _bench_max = 10 * 1024 * 1024
     cl = request.headers.get("content-length")
@@ -78,6 +93,9 @@ async def upload_benchmark_file(
             sample_size=sample_size,
             geography=geography,
             specificity_score=specificity_score,
+            revenue_band_min=revenue_band_min,
+            revenue_band_max=revenue_band_max,
+            license_expiry=license_expiry,
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))

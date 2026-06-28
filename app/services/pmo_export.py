@@ -97,16 +97,26 @@ def build_pmo_data(
             "variance_cr": round(p50_cr - float(init.get("forecast_to_complete") or p50_cr), 1),
         })
 
-    # Milestone calendar — 12-week engagement milestones
+    # Milestone calendar — four gates at the quarter points of the engagement
+    # (a 12-week engagement yields the canonical weeks 3/6/9/12).
+    gate_specs = [
+        (0.25, "Gate-1: Diagnostic sign-off", "CFO brief"),
+        (0.50, "Gate-2: Initiative mandate", "Board deck"),
+        (0.75, "Gate-3: Wave-1 delivery", "Initiative mandates"),
+        (1.00, "Gate-4: Programme close", "MOR pack + tear-down"),
+    ]
     milestones = []
-    gate_weeks = [3, 6, 9, 12]
-    gate_labels = ["Gate-1: Diagnostic sign-off", "Gate-2: Initiative mandate", "Gate-3: Wave-1 delivery", "Gate-4: Programme close"]
-    for wk, label in zip(gate_weeks, gate_labels):
+    seen_weeks: set = set()
+    for fraction, label, deliverable in gate_specs:
+        wk = max(1, round(engagement_weeks * fraction))
+        if wk in seen_weeks:
+            continue
+        seen_weeks.add(wk)
         milestones.append({
             "week": wk,
             "date": (anchor + timedelta(weeks=wk)).isoformat(),
             "milestone": label,
-            "deliverable": ["CFO brief", "Board deck", "Initiative mandates", "MOR pack + tear-down"][gate_weeks.index(wk)],
+            "deliverable": deliverable,
         })
 
     # FTC variance report

@@ -1,9 +1,9 @@
 """Pydantic request/response schemas for all API routers."""
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class _FinancialParamsMixin(BaseModel):
@@ -82,6 +82,7 @@ class EngagementManifest(BaseModel):
     engagement_id: str
     company_name: str = "New engagement"
     industry: str = ""
+    industry_user_set: bool = False
     annual_revenue: float = 0.0
     currency: str = "INR"
     headcount: float | None = None
@@ -128,6 +129,7 @@ class SessionManifestPatch(BaseModel):
     annual_revenue: float | None = None
     currency: str | None = None
     audience: str | None = None
+    peer_set_name: str | None = None
 
 
 class SkillEditRequest(BaseModel):
@@ -137,6 +139,27 @@ class SkillEditRequest(BaseModel):
 class SkillCreateRequest(BaseModel):
     name: str
     content: str
+
+
+class SkillStructuredCreateRequest(BaseModel):
+    """No-code declarative skill authoring — composes SKILL.md on the server."""
+    name: str
+    description: str = ""
+    kind: str = "analysis"
+    runtime: str = "declarative"
+    discoverable: bool = True
+    weight: str = "light"
+    inputs: List[str] = Field(default_factory=list)
+    instruction_prompt: str = ""
+    output_fields: List[str] = Field(default_factory=list)
+    parallel_group: int = 8
+    depends_on: List[str] = Field(default_factory=list)
+
+
+class SkillDiscoverRequest(BaseModel):
+    query: str
+    k: int = 8
+    kind: str | None = None
 
 
 class ChatRequest(BaseModel):
@@ -212,6 +235,7 @@ class ClarificationResumeRequest(BaseModel):
 class InitiativeCreateRequest(BaseModel):
     user_id: str | None = None
     session_id: str | None = None
+    engagement_id: str | None = None
     analysis_id: str | None = None
     category: str
     lever: str
@@ -329,6 +353,7 @@ class CostToServeRequest(BaseModel):
     session_id: str
     segment_revenue: Optional[Dict[str, float]] = None
     headcount: Optional[float] = None
+    allocation_method: Literal["revenue", "equal"] = "revenue"
 
 
 class CompanyResearchRequest(BaseModel):
@@ -356,6 +381,7 @@ class DeepResearchStartResponse(BaseModel):
 
 class DeepResearchStatusResponse(BaseModel):
     status: str  # "in_progress" | "completed" | "failed"
+    error: str | None = None        # human-readable reason when status == "failed"
     summary: str | None = None      # LLM-condensed ≤400 words
     full_report: str | None = None  # raw output_text
     sources: List[Any] = []
@@ -379,3 +405,31 @@ class ConnectorIngestRequest(BaseModel):
     credentials: Dict[str, str] = {}
     fetch_kwargs: Dict[str, Any] = {}
     run_analysis: bool = False
+
+
+# ---------------------------------------------------------------------------
+# Analysis Workbench
+# ---------------------------------------------------------------------------
+
+class WorkbenchValidateRequest(BaseModel):
+    session_id: str
+    selected_skills: List[str] = []
+    overrides: Dict[str, Any] = {}
+
+
+class WorkbenchRunRequest(BaseModel):
+    session_id: str
+    name: str | None = None
+    selected_skills: List[str] = []
+    overrides: Dict[str, Any] = {}
+    seed_from_run_id: str | None = None
+    parent_run_id: str | None = None
+    engagement_id: str | None = None
+    user_id: str | None = None
+    run_id: str | None = None
+    include_quality_gates: bool = False
+    include_light_reflect: bool = False
+
+
+class WorkbenchBranchRequest(BaseModel):
+    name: str | None = None

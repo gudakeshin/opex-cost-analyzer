@@ -44,6 +44,10 @@ def test_test_skill_endpoint_smoke_runs_every_skill(client) -> None:
         resp = client.post(f"/api/v1/skills/{name}/test")
         assert resp.status_code == 200, name
         body = resp.json()
+        runtime = body.get("runtime") or meta.get("runtime") or "python"
+        if runtime == "declarative" and body.get("degraded_reason") == "provider_disabled":
+            assert body["status"] in {"pass", "skipped"}, (name, body)
+            continue
         assert body["status"] in {"pass", "skipped"}, (name, body)
         if body["status"] == "fail":
             failures.append((name, body.get("error")))

@@ -42,7 +42,11 @@
     "lease_restructuring",
     "cost_governance",
     "saas_sprawl_audit",
-    "hyperscaler_commitment_optimization"
+    "hyperscaler_commitment_optimization",
+    "travel_policy_optimization",
+    "telecom_expense_management",
+    "office_supplies_consolidation",
+    "insurance_premium_optimization"
   ],
   "sector_specific_levers": [
     {
@@ -825,6 +829,849 @@
         "Cloud and container platform capabilities and current adoption level"
       ],
       "applicability_threshold_pct": 0.05
+    },
+    {
+      "lever_id": "subcontractor_rationalisation",
+      "lever_name": "Subcontractor & Third-Party Vendor Rationalisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 24.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Subcontractor & Third-Party Vendor Rationalisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "NASSCOM Strategic Review 2025 (nasscom.in) — subcontracting 6-10% of IT services revenue; insourcing saves 30-50% per FTE equivalent",
+        "TCS FY25 Annual Report (BSE 532540) — subcontracting at 5% of revenue represents best-in-class benchmark vs sector median 8-9%",
+        "INTERNAL_CALIBRATION — savings range calibrated from 5 IT services sourcing reviews in India"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Subcontractor & Third-Party Vendor Rationalisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "pyramid_optimisation",
+      "lever_name": "Talent Pyramid Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 8.0,
+        "p90": 14.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Talent Pyramid Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 24,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "NASSCOM Strategic Review 2025 — fresher intake 50-60% of annual hiring in tier-1 IT; cost 30-40% lower than lateral equivalent",
+        "Infosys FY25 Annual Report (BSE 500209) — fresher onboarding and pyramid management cited as key margin lever",
+        "INTERNAL_CALIBRATION — pyramid rebalancing savings calibrated from 6 India IT workforce transformation engagements"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Talent Pyramid Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "attrition_reduction_it",
+      "lever_name": "Voluntary Attrition Reduction",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 3.0,
+        "p50": 7.0,
+        "p90": 12.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Voluntary Attrition Reduction"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "NASSCOM Strategic Review 2025 — cost of attrition in IT: 6-12 months salary per departure including recruitment, ramp-up, lost revenue",
+        "TCS FY25 Annual Report — attrition at 13.3% cited as best-in-class; every 1pp reduction saves ~0.5% of revenue",
+        "INTERNAL_CALIBRATION — attrition savings range from HR analytics engagements at 4 Indian IT firms"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Voluntary Attrition Reduction: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "cloud_infra_rationalisation",
+      "lever_name": "Internal Cloud & IT Infrastructure Rationalisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Internal Cloud & IT Infrastructure Rationalisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:IT present"
+      ],
+      "industry_sources": [
+        "Gartner IT Key Metrics 2024 (gartner.com) — IT services firms reducing internal infra cost 20-30% via cloud migration + FinOps",
+        "Infosys FY25 Annual Report — internal cloud transformation cited as cost driver; similar programmes at TCS, HCL",
+        "INTERNAL_CALIBRATION — cloud rationalisation savings calibrated from 5 IT services IT modernisation engagements"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Internal Cloud & IT Infrastructure Rationalisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for IT",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "real_estate_hybrid_work",
+      "lever_name": "Real Estate Rationalisation via Hybrid Work",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 12.0,
+        "p50": 22.0,
+        "p90": 35.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Real Estate Rationalisation via Hybrid Work"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:FACILITIES present"
+      ],
+      "industry_sources": [
+        "NASSCOM 2025 — post-COVID hybrid work in IT: 60-70% of employees in hybrid; seat utilisation 45-55% reducing space needs",
+        "Wipro FY25 Annual Report (BSE 507685) — facilities rationalisation contributing to margin improvement",
+        "INTERNAL_CALIBRATION — real estate savings calibrated from 4 IT sector lease restructuring mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Real Estate Rationalisation via Hybrid Work: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FACILITIES",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "travel_policy_optimisation",
+      "lever_name": "Travel & Visa Cost Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Travel & Visa Cost Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 16
+      },
+      "applicable_if": [
+        "category:TRAVEL present"
+      ],
+      "industry_sources": [
+        "Infosys FY25 Annual Report — T&E at 1.8% of revenue; best-in-class IT firms 1.5% (TCS)",
+        "Gartner 2024 — travel policy compliance programmes reduce T&E 15-25% without service delivery impact",
+        "INTERNAL_CALIBRATION — T&E optimisation savings from 5 India IT travel management engagements"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Travel & Visa Cost Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for TRAVEL",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "marketing_spend_effectiveness",
+      "lever_name": "Marketing Spend Effectiveness",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 25.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Marketing Spend Effectiveness"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:MARKETING present"
+      ],
+      "industry_sources": [
+        "NASSCOM 2025 — India IT firms allocating 1-2.5% of revenue to S&M; digital-first approaches reduce cost while maintaining pipeline",
+        "Gartner CMO Survey 2024 — digital marketing delivers 40-60% better cost-per-lead vs. events/trade shows",
+        "INTERNAL_CALIBRATION — marketing efficiency savings calibrated from 3 IT sector marketing transformation engagements"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Marketing Spend Effectiveness: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for MARKETING",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "insurance_benefit_rationalisation",
+      "lever_name": "Employee Benefits & Insurance Rationalisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 14.0,
+        "p90": 22.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Employee Benefits & Insurance Rationalisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 16
+      },
+      "applicable_if": [
+        "category:INSURANCE present"
+      ],
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 (irdai.gov.in) — group health insurance competitive market; 15-25% premium reduction achievable via RFP",
+        "NASSCOM 2025 — IT sector health insurance claims ratio 80-95%; wellness programmes reduce claims 10-15%",
+        "INTERNAL_CALIBRATION — benefits rationalisation savings from 4 IT sector HR benefits reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Employee Benefits & Insurance Rationalisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for INSURANCE",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "contingent_workforce_governance",
+      "lever_name": "Contingent Workforce Governance & Cost Control",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Contingent Workforce Governance & Cost Control"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:CONTINGENT present"
+      ],
+      "industry_sources": [
+        "NASSCOM Strategic Review 2025 — contract workforce 15-25% of IT headcount; fragmented contracting leads to 15-20% rate premium vs. structured MSA",
+        "Gartner 2024 — VMS implementation reduces contingent spend 10-20% through rate standardisation and reduced agency mark-ups",
+        "INTERNAL_CALIBRATION — contingent workforce governance savings from 3 IT sector workforce management engagements"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Contingent Workforce Governance & Cost Control: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for CONTINGENT",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "telecom_expense_management",
+      "lever_name": "Telecom Expense Management (TEM)",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 22.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.75,
+      "bounce_back_risk": "low",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Telecom inventory audit completed — circuits, mobile lines, and unused services identified",
+        "Invoice audit process established for billing error recovery",
+        "Carrier contract renewal calendar mapped"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.78,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:TELECOM present"
+      ],
+      "industry_sources": [
+        "Gartner 2024 Market Guide for Telecom Expense Management Services — 15-30% recoverable waste",
+        "Nemertes Research — enterprise telecom benchmarks; invoice audit recovers 7-12%",
+        "INTERNAL_CALIBRATION — IT sector TEM savings from 3 India IT telecom audits"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Build telecom asset inventory: voice, data, mobile, and conferencing by site and cost centre",
+          "owner_role": "IT / Telecom Manager",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Run invoice audit for billing errors, zombie circuits, and duplicate services",
+          "owner_role": "Finance / TEM vendor",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Consolidate carriers and renegotiate enterprise agreements; right-size mobile plans",
+          "owner_role": "Procurement / IT",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed ongoing TEM monitoring and MACD governance",
+          "owner_role": "IT Operations",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Telecom spend per employee above industry median or invoice error rate >3%",
+          "evidence_source": "tem_audit",
+          "confirms": "TEM programme will recover waste"
+        },
+        {
+          "signal": ">10% of lines inactive or duplicate circuits across locations",
+          "evidence_source": "inventory_report",
+          "confirms": "Inventory rationalisation is high-ROI"
+        }
+      ],
+      "required_data_fields": [
+        "Telecom invoices by carrier and service type (12 months)",
+        "Circuit and mobile line inventory with status",
+        "Contract end dates and rate tables"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "office_supplies_consolidation",
+      "lever_name": "Office Supplies & Workplace Consumables Consolidation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.04,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.65,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Tail spend analysis completed for office supplies, print, and pantry categories",
+        "Preferred supplier e-catalog implemented in P2P",
+        "Maverick buying controls enabled for off-catalog purchases"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 14
+      },
+      "applicable_if": [
+        "category:OFFICE present"
+      ],
+      "industry_sources": [
+        "Hackett Group Supplier Consolidation research — indirect purchased-cost savings scale with supplier reduction",
+        "Hackett/Ivalua P2P Study 2019 — office supplies as e-catalog category with 37% digital transaction potential",
+        "INTERNAL_CALIBRATION — office supplies consolidation savings from 2 India IT workplace mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Aggregate office supplies spend by supplier, site, and category; quantify fragmentation",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Consolidate to 1-2 preferred suppliers with volume rebates and e-catalog integration",
+          "owner_role": "Strategic Sourcing",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Deploy P2P controls and communicate catalog-first policy",
+          "owner_role": "Procurement / IT",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Track catalog adoption, supplier count, and unit price vs baseline",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": ">15 active suppliers in office supplies with low line-item visibility",
+          "evidence_source": "spend_profile",
+          "confirms": "Supplier consolidation will reduce purchased cost"
+        },
+        {
+          "signal": "Off-catalog or maverick spend >20% of office category",
+          "evidence_source": "p2p_logs",
+          "confirms": "Catalog enforcement will capture savings"
+        }
+      ],
+      "required_data_fields": [
+        "Office supplies transaction detail by supplier and site",
+        "P2P catalog coverage and maverick spend report",
+        "Supplier contract terms and rebate structures"
+      ],
+      "applicability_threshold_pct": 0.02
+    },
+    {
+      "lever_id": "consulting_spend_governance",
+      "lever_name": "Consulting & Advisory Spend Governance",
+      "lever_family": "demand",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.03,
+      "phasing_curve": [
+        0.4,
+        0.4,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.55,
+      "bounce_back_risk": "high",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Consulting spend inventory completed (all active engagements catalogued with deliverables)",
+        "CFO/CEO mandate for consulting pre-approval process established (above threshold)",
+        "ROI tracking mechanism for past engagements completed — discontinue repeat low-ROI vendors"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 14,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:PROF_SVCS present"
+      ],
+      "industry_sources": [
+        "Hackett Group G&A Benchmarks 2024 — consulting spend governance reduces advisory fees 10-20%",
+        "NASSCOM 2025 — IT services firms professional fees 0.5-1.5% of revenue",
+        "INTERNAL_CALIBRATION — consulting governance savings from 4 India IT advisory mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Loyalty Programme Cost Efficiency: validate baseline and stakeholders",
+          "owner_role": "Process Owner",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Define target operating policy and approval workflow",
+          "owner_role": "CFO / Functional Head",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Implement system controls and communicate standards",
+          "owner_role": "IT / Shared Services",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Monitor compliance and reset budgets to hold savings",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Maverick or off-catalog spend share elevated",
+          "evidence_source": "spend_profile",
+          "confirms": "Demand leakage is present"
+        },
+        {
+          "signal": "Policy exceptions rising period-on-period",
+          "evidence_source": "p2p_logs",
+          "confirms": "Governance gap is widening"
+        }
+      ],
+      "required_data_fields": [
+        "Transaction-level spend with requester/BU",
+        "Approval workflow configuration",
+        "Policy exception log"
+      ],
+      "applicability_threshold_pct": 0.03
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

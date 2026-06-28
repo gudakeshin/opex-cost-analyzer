@@ -92,6 +92,66 @@
         "DPE CPSE Survey 2022-23 — working capital management improvement as key recommendation for Miniratna CPSEs",
         "INTERNAL_CALIBRATION — receivables recovery savings from 2 India PSU commercial excellence mandates"
       ]
+    },
+    {
+      "lever_id": "brsr_reporting_efficiency",
+      "lever_name": "BRSR / ESG Reporting & Assurance Efficiency",
+      "description": "Integrate ESG data collection across CPSE subsidiaries; consolidate assurance providers; align to SEBI BRSR Core glide path for listed PSUs.",
+      "category_ids": ["BRSR_ESG"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "SEBI BRSR Core Circular Jul 2023 (sebi.gov.in) — integrated ESG platform reduces per-entity assurance cost",
+        "SEBI Expert Committee May 2024 — assessment vs assurance simplification for ease of compliance",
+        "INTERNAL_CALIBRATION — PSU ESG reporting efficiency savings from 2 India CPSE sustainability mandates"
+      ]
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "CPSE Insurance Pooling & Premium Optimisation",
+      "description": "Pool property and asset insurance across CPSE group; competitive RFP vs New India Assurance incumbent rates.",
+      "category_ids": ["INSURANCE"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 16.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — public sector insurer market; competitive tendering benchmarks",
+        "DPE CPSE Survey 2022-23 — insurance cost as component of establishment charges",
+        "INTERNAL_CALIBRATION — CPSE insurance pooling savings from 2 India PSU risk reviews"
+      ]
+    },
+    {
+      "lever_id": "township_cost_optimisation",
+      "lever_name": "Township & Establishment Cost Optimisation",
+      "description": "Rationalise captive townships, canteens, and establishment charges; outsource non-core facilities services; monetise surplus residential assets.",
+      "category_ids": ["FACILITIES"],
+      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "DPE CPSE Survey 2022-23 — township and establishment charges significant for manufacturing CPSEs",
+        "CAG Reports on CPSEs 2023-24 — excess establishment cost recurring finding",
+        "INTERNAL_CALIBRATION — township optimisation savings from 2 India PSU facilities mandates"
+      ]
+    },
+    {
+      "lever_id": "cag_audit_readiness",
+      "lever_name": "CAG Audit Readiness & Advisory Cost Control",
+      "description": "Reduce repeat CAG observations through process fixes; cap external legal and consulting spend tied to audit remediation.",
+      "category_ids": ["PROF_SVCS"],
+      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CAG Reports on CPSEs 2023-24 (cag.gov.in) — recurring audit observations drive advisory spend",
+        "DPE Guidelines on CPSE governance — audit remediation and compliance cost benchmarks",
+        "INTERNAL_CALIBRATION — CAG readiness savings from 2 India PSU governance mandates"
+      ]
     }
   ]
 }

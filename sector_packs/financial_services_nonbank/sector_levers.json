@@ -107,6 +107,36 @@
         "SEBI LODR compliance requirements — mandate on related-party transactions and procurement transparency for listed entities",
         "INTERNAL_CALIBRATION — G&A consolidation savings from 4 NBFC and AMC procurement reviews"
       ]
+    },
+    {
+      "lever_id": "payment_processing_optimisation",
+      "lever_name": "Payment Processing & Treasury Fee Optimisation",
+      "description": "Renegotiate payment gateway, NACH, and banking fees; optimise cash management and FX hedging costs.",
+      "category_ids": ["FIN_SVCS"],
+      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI payment systems report 2023-24 — digital payment cost benchmarks for NBFCs",
+        "Hackett Group Treasury Benchmarks 2024 — bank and payment fee optimisation 8-15%",
+        "INTERNAL_CALIBRATION — NBFC treasury savings from 3 India NBFC finance mandates"
+      ]
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "NBFC Corporate Insurance Premium Optimisation",
+      "description": "Competitive RFP for D&O, cyber, and property insurance; review coverage adequacy vs over-insurance.",
+      "category_ids": ["INSURANCE"],
+      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — corporate insurance competitive RFP savings 12-22%",
+        "SEBI LODR — D&O insurance disclosure requirements for listed NBFCs",
+        "INTERNAL_CALIBRATION — NBFC insurance savings from 2 India NBFC risk reviews"
+      ]
     }
   ]
 }

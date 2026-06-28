@@ -21,6 +21,7 @@ No changes to act.py are required.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List
 
@@ -117,19 +118,63 @@ def invoke_skill(name: str, ctx: SkillContext) -> tuple[Dict[str, Any], str | No
     """Dispatch *name* to its registered handler.
 
     Returns ``(output_dict, degraded_reason | None)``.
+    Falls back to the declarative LLM runtime when SKILL.md declares ``runtime: declarative``.
     Raises ``KeyError`` for unrecognised skill names.
     """
     handler = _REGISTRY.get(name)
-    if handler is None:
-        raise KeyError(
-            f"Unknown skill: '{name}'. Registered skills: {sorted(_REGISTRY)}"
-        )
-    return handler(ctx)
+    if handler is not None:
+        return handler(ctx)
+    from app.skills.registry import get_skill_meta
+
+    meta = get_skill_meta(name)
+    if meta and meta.get("runtime") == "declarative":
+        return _run_declarative_skill(name, ctx, meta)
+    raise KeyError(
+        f"Unknown skill: '{name}'. Registered skills: {sorted(_REGISTRY)}"
+    )
 
 
 def registered_skills() -> List[str]:
     """Return sorted list of all registered skill names."""
     return sorted(_REGISTRY)
+
+
+def _run_declarative_skill(
+    name: str,
+    ctx: SkillContext,
+    meta: Dict[str, Any],
+) -> tuple[Dict[str, Any], str | None]:
+    """Execute a UI-authored declarative skill via the shared LLM client."""
+    from pathlib import Path
+
+    from app.config import SKILLS_DIR
+    from app.opar.claude_client import run_declarative_skill_claude_with_meta
+
+    skill_path = Path(meta.get("path") or SKILLS_DIR / name / "SKILL.md")
+    raw = skill_path.read_text(encoding="utf-8") if skill_path.exists() else ""
+    body = re.sub(r"^---\s*\n.*?\n---\s*\n", "", raw, count=1, flags=re.DOTALL).strip()
+
+    input_names = meta.get("inputs") or []
+    upstream: Dict[str, Any] = {}
+    for inp in input_names:
+        if inp in ctx.prior_results:
+            upstream[inp] = ctx.prior_results[inp]
+    profile = _get_profile(ctx)
+    if profile:
+        upstream.setdefault("spend-profiler", profile)
+
+    try:
+        output, degraded = run_declarative_skill_claude_with_meta(
+            skill_name=name,
+            instruction_prompt=body,
+            user_message=ctx.user_message,
+            manifest=ctx.manifest,
+            upstream_outputs=upstream,
+            docs_text=ctx.docs_text,
+        )
+        return (output or {}), degraded
+    except Exception:
+        return {}, "provider_unavailable"
 
 
 # ---------------------------------------------------------------------------
@@ -155,10 +200,12 @@ def _get_bench_resolved(ctx: SkillContext) -> Dict[str, Any]:
         for c in profile.get("category_profile", [])
         if c.get("category_id")
     ]
+    peer_set = (ctx.manifest or {}).get("peer_set_name")
     return resolve_benchmark_payload(
         industry=ctx.industry,
         categories=categories,
         annual_revenue=ctx.annual_revenue,
+        peer_set_name=str(peer_set) if peer_set else None,
     )
 
 
@@ -285,11 +332,13 @@ def _savings_modeler(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     raw_rows = _engine.build_raw_rows(peer, internal, heuristic)
     root = ctx.prior("root-cause-analyzer")
     profile = _get_profile(ctx)
+    horizon = ctx.manifest.get("planning_horizon_years")
     return _engine.savings_modeler(
         {"raw_rows": raw_rows},
         root,
         discount_rate=ctx.discount_rate,
         effective_tax_rate=ctx.tax_rate,
+        planning_horizon_years=int(horizon) if horizon else None,
         industry=ctx.industry,
         spend_profile=profile,
         headcount=float(ctx.headcount or 0.0),
@@ -330,6 +379,12 @@ def _value_bridge_calculator(ctx: SkillContext) -> tuple[Dict[str, Any], str | N
 def _data_validator(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     bridge = ctx.prior("value-bridge-calculator")
     return _engine.data_validator(bridge), None
+
+
+@register("data-quality-gate")
+def _data_quality_gate(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    profile = _get_profile(ctx)
+    return _engine.data_quality_gate(ctx.lines, profile), None
 
 
 @register("evidence-gatherer")

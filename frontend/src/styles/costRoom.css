@@ -1,0 +1,205 @@
+/* Cost Room scoped design tokens — from prototype styles.css */
+.cost-room-page {
+  --cr-green: #86bc25;
+  --cr-green-dk: #5c8a0a;
+  --cr-green-soft: #eaf4d7;
+  --cr-ink: #0a0a0a;
+  --cr-gray: #53565a;
+  --cr-gray-2: #75787b;
+  --cr-gray-3: #9a9c9e;
+  --cr-line: #e4e4e1;
+  --cr-line-2: #efefec;
+  --cr-surface: #ffffff;
+  --cr-muted: #f7f7f5;
+  --cr-muted-2: #f1f1ee;
+  --cr-navy: #16324f;
+  --cr-navy-soft: #e5ecf3;
+  --cr-amber: #c97a12;
+  --cr-amber-soft: #fbefd8;
+  --cr-red: #c8472f;
+  --cr-red-soft: #f8e3dd;
+  --cr-r-sm: 7px;
+  --cr-r: 11px;
+  --cr-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+  --cr-gap: 18px;
+}
+
+.cost-room-page .cr-eyebrow {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cr-gray-2);
+}
+
+.cost-room-page .cr-card {
+  background: var(--cr-surface);
+  border: 1px solid var(--cr-line);
+  border-radius: var(--cr-r);
+  box-shadow: var(--cr-shadow);
+}
+
+.cost-room-page .cr-card-h {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--cr-line-2);
+}
+
+.cost-room-page .cr-bignum {
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.cost-room-page .cr-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.cost-room-page .cr-hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+}
+
+@media (max-width: 1180px) {
+  .cost-room-page .cr-hero-grid {
+    grid-template-columns: 1fr;
+  }
+  .cost-room-page .cr-hero-left {
+    border-right: none !important;
+    border-bottom: 1px solid var(--cr-line-2);
+  }
+  .cost-room-page .cr-work {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.cost-room-page .cr-work {
+  display: grid;
+  grid-template-columns: 1fr 372px;
+  gap: var(--cr-gap);
+  align-items: start;
+}
+
+.cost-room-page .cr-detail-sticky {
+  position: sticky;
+  top: 0;
+}
+
+.cost-room-page .cr-ptable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+.cost-room-page .cr-ptable thead th {
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cr-gray-2);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--cr-line);
+  white-space: nowrap;
+}
+
+.cost-room-page .cr-ptable tbody td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--cr-line-2);
+  vertical-align: middle;
+}
+
+.cost-room-page .cr-ptable tbody tr {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.cost-room-page .cr-ptable tbody tr:hover {
+  background: var(--cr-muted);
+}
+
+.cost-room-page .cr-ptable tbody tr.cr-sel {
+  background: var(--cr-green-soft);
+}
+
+.cost-room-page .cr-fpa-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--cr-muted);
+  border-radius: var(--cr-r-sm);
+  width: fit-content;
+  flex-wrap: wrap;
+}
+
+.cost-room-page .cr-fpa-tabs button {
+  font-size: 12.5px;
+  font-weight: 600;
+  border: none;
+  background: none;
+  color: var(--cr-gray);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cost-room-page .cr-fpa-tabs button.cr-on {
+  background: var(--cr-surface);
+  color: var(--cr-ink);
+  box-shadow: var(--cr-shadow);
+}
+
+.cost-room-page .cr-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--cr-gray-2);
+  padding-top: 16px;
+  border-top: 1px solid var(--cr-line);
+}
+
+.cost-room-page .cr-toast-wrap {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.cost-room-page .cr-toast {
+  background: var(--cr-ink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 11px 16px;
+  border-radius: var(--cr-r-sm);
+  box-shadow: 0 8px 28px -10px rgba(16, 24, 40, 0.22);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  animation: cr-rise 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes cr-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
