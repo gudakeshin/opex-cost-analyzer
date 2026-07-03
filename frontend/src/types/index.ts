@@ -1,3 +1,5 @@
+import type { components } from '../api/schema';
+
 export interface QualitySignals {
   faithfulness_score?: number;
   relevance_score?: number;
@@ -382,25 +384,14 @@ export interface ChatProgressResponse {
   error?: string | null;
 }
 
-export interface SessionManifestPatch {
-  industry?: string;
-  company_name?: string;
-  annual_revenue?: number;
-  currency?: string;
-}
+// Generated from the backend's Pydantic request model (app/schemas.py) —
+// see Phase 0/1 of the react-query migration. Kept as a re-export so the
+// frontend catches drift (e.g. new patchable fields) at compile time.
+export type SessionManifestPatch = components['schemas']['SessionManifestPatch'];
 
-export interface SessionSummary {
-  session_id: string;
-  engagement_id?: string;
-  company_name: string;
-  industry: string;
-  currency: string;
-  annual_revenue?: number;
-  created_at?: string;
-  file_count: number;
-  has_analysis: boolean;
-  top_savings_estimate?: number;
-}
+// Generated from the backend's Pydantic response model (app/schemas.py) —
+// see Phase 0/1 of the react-query migration.
+export type SessionSummary = components['schemas']['SessionSummaryResponse'];
 
 export interface EngagementMeta {
   engagement_id?: string;

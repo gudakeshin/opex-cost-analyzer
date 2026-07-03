@@ -132,6 +132,85 @@ class SessionManifestPatch(BaseModel):
     peer_set_name: str | None = None
 
 
+class SessionManifestResponse(BaseModel):
+    """Response shape for session manifest reads/writes and session creation.
+
+    `extra="allow"` is load-bearing: the on-disk manifest carries ad-hoc
+    fields (owner, wacc, headcount, etc.) beyond what's modelled here, and
+    FastAPI's response_model filtering would otherwise silently drop them.
+    """
+
+    model_config = {"extra": "allow"}
+
+    session_id: str
+    engagement_id: str | None = None
+    company_name: str | None = None
+    industry: str | None = None
+    annual_revenue: float | None = None
+    currency: str | None = None
+    audience: str | None = None
+    engagement_week: int | None = None
+    engagement_weeks_total: int | None = None
+    gate_label: str | None = None
+    created_at: str | None = None
+    files: List[Dict[str, Any]] | None = None
+    model_manifest: Dict[str, Any] | None = None
+    ingestion_report: Dict[str, Any] | None = None
+    diagnostic_urls: List[str] | None = None
+    diagnostic_result: Dict[str, Any] | None = None
+    diagnostic_completed_at: str | None = None
+    deep_research_interaction_id: str | None = None
+    deep_research_prompt: str | None = None
+    deep_research_summary: str | None = None
+    deep_research_full_report: str | None = None
+    deep_research_completed_at: str | None = None
+    engagement_sanity: Dict[str, Any] | None = None
+    probe_answers: List[Dict[str, Any]] | None = None
+
+
+class SessionStatusResponse(BaseModel):
+    model_config = {"extra": "allow"}
+
+    session_id: str
+    session_exists: bool
+    has_manifest: bool
+    has_analysis: bool
+    file_count: int
+
+
+class SessionAnalysisResponse(BaseModel):
+    """Loose response shape for the full session analysis blob.
+
+    This payload is intentionally open-ended (skill_outputs, per-skill
+    trace data, etc.); only the handful of fields consumers actually read
+    are modelled explicitly, and `extra="allow"` passes the rest through
+    unchanged.
+    """
+
+    model_config = {"extra": "allow"}
+
+    session_id: str
+    company_name: str | None = None
+    industry: str | None = None
+    annual_revenue: float | None = None
+    files: List[Any] | None = None
+    skill_outputs: Dict[str, Any] | None = None
+    last_analysis_run: Dict[str, Any] | None = None
+
+
+class SessionSummaryResponse(BaseModel):
+    session_id: str
+    engagement_id: str | None = None
+    company_name: str
+    industry: str
+    currency: str
+    annual_revenue: float | None = None
+    created_at: str | None = None
+    file_count: int
+    has_analysis: bool
+    top_savings_estimate: float | None = None
+
+
 class SkillEditRequest(BaseModel):
     content: str
 

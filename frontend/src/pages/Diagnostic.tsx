@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../components/Layout/MainLayout';
+import { useAutosave } from '../hooks/useAutosave';
+import { useGuardedNavigate } from '../hooks/useGuardedNavigate';
 import { Button } from '../components/Common/Button';
 import { Card } from '../components/Common/Card';
 import { Input } from '../components/Common/Input';
@@ -19,7 +20,9 @@ import {
 import { BenchmarkProxyDisclaimer } from '../components/PageComponents/Diagnostic/BenchmarkProxyDisclaimer';
 import { DeepResearchSection } from '../components/PageComponents/Diagnostic/DeepResearchSection';
 import { isBenchmarkProxyProfile } from '../utils/diagnosticProxyDisclaimer';
+import { useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiPatch, apiPost, getApiErrorMessage } from '../hooks/useApi';
+import { fetchSessionManifest } from '../api/hooks/useSessionQueries';
 import { friendlyErrorMessage } from '../utils/errorMessages';
 import { useSession } from '../context/SessionContext';
 import {
@@ -60,7 +63,8 @@ function sectorLabel(value: string): string {
 const FORM_SAVE_DEBOUNCE_MS = 500;
 
 export const Diagnostic: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useGuardedNavigate();
+  const queryClient = useQueryClient();
   const { sessionId, engagementId, ensureSessionForEngagement, refreshEngagement, engagement } =
     useSession();
   const [activeSid, setActiveSid] = useState<string | null>(sessionId);
@@ -76,7 +80,6 @@ export const Diagnostic: React.FC = () => {
   const [deepResearchSummary, setDeepResearchSummary] = useState<string | null>(null);
   const [handoffLoading, setHandoffLoading] = useState(false);
   const [engagementDocCount, setEngagementDocCount] = useState(0);
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipFormSaveRef = useRef(true);
   const engagementHydratedRef = useRef(false);
 
@@ -120,7 +123,7 @@ export const Diagnostic: React.FC = () => {
         if (cancelled) return;
         setActiveSid(sid);
 
-        const m = await apiGet<SessionManifest>(`/api/v1/sessions/${sid}/manifest`);
+        const m = await fetchSessionManifest(queryClient, sid);
         if (cancelled) return;
         setManifest(m);
 
@@ -163,7 +166,7 @@ export const Diagnostic: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [sessionId, engagementId, ensureSessionForEngagement, engagement]);
+  }, [sessionId, engagementId, ensureSessionForEngagement, engagement, queryClient]);
 
   // Pre-fill form from engagement metadata (once, after hydration, only if form is empty)
   useEffect(() => {
@@ -216,26 +219,13 @@ export const Diagnostic: React.FC = () => {
       .catch(() => setEngagementDocCount(0));
   }, [engagementId]);
 
-  useEffect(() => {
-    if (!activeSid || hydrating || skipFormSaveRef.current) return;
-
-    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => {
-      persistContext(activeSid).catch(() => {});
-    }, FORM_SAVE_DEBOUNCE_MS);
-
-    return () => {
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    };
-  }, [activeSid, hydrating, companyName, industry, revenueCr, urlsText, persistContext]);
-
-  useEffect(() => {
-    return () => {
-      if (!activeSid || skipFormSaveRef.current) return;
-      const patch = buildDiagnosticContextPatch(formState());
-      apiPatch(`/api/v1/sessions/${activeSid}/diagnostic-context`, patch).catch(() => {});
-    };
-  }, [activeSid, formState]);
+  useAutosave({
+    id: 'diagnostic-form',
+    data: { companyName, industry, revenueCr, urlsText },
+    enabled: Boolean(activeSid) && !hydrating && !skipFormSaveRef.current,
+    onSave: () => persistContext(activeSid as string),
+    debounceMs: FORM_SAVE_DEBOUNCE_MS,
+  });
 
   const friendlyError = error ? friendlyErrorMessage(error) : null;
 
@@ -307,7 +297,7 @@ export const Diagnostic: React.FC = () => {
         diagnosticResult: res,
         markDiagnosticComplete: true,
       });
-      const updated = await apiGet<SessionManifest>(`/api/v1/sessions/${sid}/manifest`);
+      const updated = await fetchSessionManifest(queryClient, sid);
       setManifest(updated);
       await refreshEngagement();
       skipFormSaveRef.current = false;

@@ -18,9 +18,13 @@ import { TrustRail } from '../components/Trust/TrustRail';
 import { DeloitteLogo } from '../components/Brand/DeloitteLogo';
 import { SECTOR_OPTIONS } from '../constants/sectors';
 import { useSession } from '../context/SessionContext';
+import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
+import { useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiPatch, apiPost, apiUpload, getApiErrorMessage } from '../hooks/useApi';
+import { fetchSessionManifest } from '../api/hooks/useSessionQueries';
 import { friendlyErrorMessage } from '../utils/errorMessages';
 import { loadChatMessages, saveChatMessages } from '../utils/chatStorage';
+import { latestAnalyzedSessionId } from '../utils/sessionResolve';
 import { effectiveAnalysisIndustry } from '../utils/engagementContext';
 import {
   buildAnalyzeCompleteContent,
@@ -190,6 +194,7 @@ async function pollChatProgress(
 }
 
 export const ProcurementAnalysis: React.FC = () => {
+  const queryClient = useQueryClient();
   const {
     sessionId,
     engagementId,
@@ -207,6 +212,8 @@ export const ProcurementAnalysis: React.FC = () => {
   } = useSession();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
+  // A typed-but-unsent chat message is lost on navigation.
+  useUnsavedGuard('procurement-chat-draft', input.trim().length > 0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const analysis = sessionAnalysis;
@@ -264,10 +271,10 @@ export const ProcurementAnalysis: React.FC = () => {
   const pollAbortRef = useRef<AbortController | null>(null);
 
   const refreshManifest = useCallback(async (sid: string) => {
-    const m = await apiGet<SessionManifest>(`/api/v1/sessions/${sid}/manifest`);
+    const m = await fetchSessionManifest(queryClient, sid);
     setManifest(m);
     return m;
-  }, []);
+  }, [queryClient]);
 
   useEffect(() => {
     setDismissedConflictKeys(loadDismissedConflictKeys(sessionId));
@@ -330,6 +337,19 @@ export const ProcurementAnalysis: React.FC = () => {
           session_exists?: boolean;
           has_analysis?: boolean;
         }>(`/api/v1/sessions/${sessionId}/status`);
+        // When the active session has no analysis, prefer the engagement's most
+        // recent analyzed session. An engagement can hold several sessions and
+        // the active id may point at an empty sibling — without this, returning
+        // to Analysis shows the blank welcome screen even though a completed
+        // analysis exists for this engagement.
+        if (!status.has_analysis && engagementId) {
+          const analyzedId = await latestAnalyzedSessionId(engagementId);
+          if (cancelled) return;
+          if (analyzedId && analyzedId !== sessionId) {
+            setSessionId(analyzedId);
+            return; // effect re-runs with the adopted analyzed session
+          }
+        }
         if (!status.session_exists) {
           if (!cancelled) {
             setManifest(null);
@@ -338,7 +358,7 @@ export const ProcurementAnalysis: React.FC = () => {
           return;
         }
 
-        const m = await apiGet<SessionManifest>(`/api/v1/sessions/${sessionId}/manifest`);
+        const m = await fetchSessionManifest(queryClient, sessionId);
         if (cancelled) return;
         setManifest(m);
         setRecoveryNotice(null);
@@ -396,7 +416,7 @@ export const ProcurementAnalysis: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [sessionId, refreshSessionAnalysis]);
+  }, [sessionId, engagementId, setSessionId, refreshSessionAnalysis, queryClient]);
 
   useEffect(() => {
     const onVisible = () => {

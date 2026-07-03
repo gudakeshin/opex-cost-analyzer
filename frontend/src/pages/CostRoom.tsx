@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import '../styles/costRoom.css';
+import { useGuardedNavigate } from '../hooks/useGuardedNavigate';
+import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { Card } from '../components/Common/Card';
 import { Modal } from '../components/Common/Modal';
@@ -39,29 +40,31 @@ import { PaymentTermsTab } from '../components/PageComponents/CostRoom/PaymentTe
 import { CostToServeTab } from '../components/PageComponents/CostRoom/CostToServeTab';
 import { useSession } from '../context/SessionContext';
 import { useAudience } from '../context/AudienceContext';
-import { apiGet, apiPost, apiPut, getApiErrorMessage } from '../hooks/useApi';
+import { getApiErrorMessage } from '../hooks/useApi';
+import {
+  useAddActualsMutation,
+  useAuditLogLatestQuery,
+  useConflictsQuery,
+  useConsolidateMutation,
+  useExportBusinessCaseMutation,
+  useExportExcelMutation,
+  useFpaTabQuery,
+  useInitiativeRejectMutation,
+  useInitiativeStageMutation,
+  useInitiativesQuery,
+  useMilestonesQuery,
+  usePipelineSummaryQuery,
+  useProvenanceQuery,
+  useResolveConflictMutation,
+  useSensitivityQuery,
+} from '../api/hooks/useCostRoomQueries';
 import {
   getBandSavings,
   isNeedsActionInitiative,
   scenarioFactorFromSensitivity,
 } from '../utils/initiativeHelpers';
 import { useExceptions } from '../context/ExceptionContext';
-import type {
-  ComplianceAuditResponse,
-  ConflictSpendImpact,
-  ConflictSummary,
-  DataConflict,
-  AuditLogEntry,
-  BvaResponse,
-  CostToServeResponse,
-  Initiative,
-  InitiativeProvenance,
-  PaymentTermsResponse,
-  PercentileBand,
-  PipelineSummary,
-  SensitivityResponse,
-  TrendsResponse,
-} from '../types';
+import type { AuditLogEntry, DataConflict, PercentileBand } from '../types';
 
 function triggerDownload(exportPath: string, filename?: string) {
   const url = exportPath.startsWith('/api') ? exportPath : `/api/v1/exports/${exportPath.split('/').pop()}`;
@@ -72,12 +75,6 @@ function triggerDownload(exportPath: string, filename?: string) {
   document.body.appendChild(anchor);
   anchor.click();
   document.body.removeChild(anchor);
-}
-
-function scenarioExecutionRate(scenario: ScenarioPreset): number | undefined {
-  if (scenario === 'conservative') return 0.6;
-  if (scenario === 'accelerated') return 0.9;
-  return undefined;
 }
 
 const FPA_TABS = [
@@ -112,7 +109,7 @@ export default function CostRoom() {
   const { sessionId, engagementId, engagement, ensureSession, syncEngagementFromAnalysis, refreshSessionAnalysis, sessionAnalysis } =
     useSession();
   const { isExecutive } = useAudience();
-  const navigate = useNavigate();
+  const navigate = useGuardedNavigate();
 
   const [activeTab, setActiveTab] = useState('trends');
   const [fpaOpen, setFpaOpen] = useState(!isExecutive);
@@ -123,46 +120,90 @@ export default function CostRoom() {
     ...defaultFilters,
     needsActionOnly: !isExecutive,
   }));
-  const [initiatives, setInitiatives] = useState<Initiative[]>([]);
-  const [summary, setSummary] = useState<PipelineSummary | null>(null);
-  const [sensitivity, setSensitivity] = useState<SensitivityResponse | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const [auditLog, setAuditLog] = useState<AuditLogEntry[]>([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [rejectTargetId, setRejectTargetId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
-  const [trends, setTrends] = useState<TrendsResponse | null>(null);
-  const [bva, setBva] = useState<BvaResponse | null>(null);
-  const [paymentTerms, setPaymentTerms] = useState<PaymentTermsResponse | null>(null);
-  const [costToServe, setCostToServe] = useState<CostToServeResponse | null>(null);
-  const [milestones, setMilestones] = useState<Record<string, unknown>[] | null>(null);
-  const [milestonesLoading, setMilestonesLoading] = useState(false);
-  const [provenance, setProvenance] = useState<InitiativeProvenance | null>(null);
-  const [provenanceLoading, setProvenanceLoading] = useState(false);
-  const [actualsSaving, setActualsSaving] = useState(false);
-  const [businessCaseLoading, setBusinessCaseLoading] = useState(false);
-  const [excelExportLoading, setExcelExportLoading] = useState(false);
+  useUnsavedGuard('cost-room-reject', rejectModalOpen && rejectReason.trim().length > 0);
   const [exportNotice, setExportNotice] = useState<string | null>(null);
-  const [tabLoading, setTabLoading] = useState<string | null>(null);
-  const [tabErrors, setTabErrors] = useState<Record<string, string | null>>({});
-  const [lastSync, setLastSync] = useState(() => new Date().toISOString());
   const [trustOpen, setTrustOpen] = useState(false);
-  const [serverAuditCount, setServerAuditCount] = useState(0);
-  const [chainValid, setChainValid] = useState<boolean | undefined>(undefined);
-  const [conflicts, setConflicts] = useState<ConflictSummary | null>(null);
-  const [conflictsLoading, setConflictsLoading] = useState(false);
-  const [conflictsError, setConflictsError] = useState<string | null>(null);
-  const [actingConflictId, setActingConflictId] = useState<string | null>(null);
   const [conflictNotice, setConflictNotice] = useState<string | null>(null);
   const [highlightConflicts, setHighlightConflicts] = useState(false);
   const [inboxDismissed, setInboxDismissed] = useState(false);
   const conflictsSectionRef = useRef<HTMLDivElement>(null);
   const workSectionRef = useRef<HTMLDivElement>(null);
   const { setItems: setExceptionItems, items: exceptionItems } = useExceptions();
+
+  const initiativesQuery = useInitiativesQuery(engagementId);
+  const summaryQuery = usePipelineSummaryQuery(engagementId);
+  const sensitivityQuery = useSensitivityQuery(sessionId, scenario);
+  const conflictsQuery = useConflictsQuery(sessionId, !isExecutive);
+  const trendsQuery = useFpaTabQuery('trends', sessionId, fpaOpen && !isExecutive && activeTab === 'trends');
+  const bvaQuery = useFpaTabQuery('bva', sessionId, fpaOpen && !isExecutive && activeTab === 'bva');
+  const paymentTermsQuery = useFpaTabQuery(
+    'payment-terms',
+    sessionId,
+    fpaOpen && !isExecutive && activeTab === 'payment-terms',
+  );
+  const costToServeQuery = useFpaTabQuery(
+    'cost-to-serve',
+    sessionId,
+    fpaOpen && !isExecutive && activeTab === 'cost-to-serve',
+  );
+  const fpaTabQueries: Record<string, { isFetching: boolean; refetch: () => unknown }> = {
+    trends: trendsQuery,
+    bva: bvaQuery,
+    'payment-terms': paymentTermsQuery,
+    'cost-to-serve': costToServeQuery,
+  };
+  const activeFpaQuery = fpaTabQueries[activeTab];
+  const milestonesQuery = useMilestonesQuery(selectedId);
+  const provenanceQuery = useProvenanceQuery(selectedId);
+  const auditLogQuery = useAuditLogLatestQuery(initiativesQuery.dataUpdatedAt);
+
+  const initiativeStageMutation = useInitiativeStageMutation(engagementId);
+  const initiativeRejectMutation = useInitiativeRejectMutation(engagementId);
+  const addActualsMutation = useAddActualsMutation(engagementId);
+  const consolidateMutation = useConsolidateMutation(engagementId, sessionId);
+  const resolveConflictMutation = useResolveConflictMutation(engagementId, sessionId);
+  const exportBusinessCaseMutation = useExportBusinessCaseMutation(sessionId);
+  const exportExcelMutation = useExportExcelMutation(sessionId);
+
+  const initiatives = useMemo(() => initiativesQuery.data ?? [], [initiativesQuery.data]);
+  const summary = summaryQuery.data ?? null;
+  const sensitivity = sensitivityQuery.data ?? null;
+  const loading = initiativesQuery.isFetching || summaryQuery.isFetching;
+  const milestones = milestonesQuery.data ?? null;
+  const milestonesLoading = milestonesQuery.isFetching;
+  const provenance = provenanceQuery.data ?? null;
+  const provenanceLoading = provenanceQuery.isFetching;
+  const conflicts = conflictsQuery.data ?? null;
+  const conflictsLoading = conflictsQuery.isFetching;
+  const conflictsError = conflictsQuery.error ? getApiErrorMessage(conflictsQuery.error) : null;
+  const actualsSaving = addActualsMutation.isPending;
+  const businessCaseLoading = exportBusinessCaseMutation.isPending;
+  const excelExportLoading = exportExcelMutation.isPending;
+  const tabLoading = activeFpaQuery?.isFetching ? activeTab : null;
+  const tabErrors: Record<string, string | null> = {
+    trends: trendsQuery.error ? getApiErrorMessage(trendsQuery.error) : null,
+    bva: bvaQuery.error ? getApiErrorMessage(bvaQuery.error) : null,
+    'payment-terms': paymentTermsQuery.error ? getApiErrorMessage(paymentTermsQuery.error) : null,
+    'cost-to-serve': costToServeQuery.error ? getApiErrorMessage(costToServeQuery.error) : null,
+  };
+  const serverAuditCount = auditLogQuery.data
+    ? auditLogQuery.data.integrity?.records ?? auditLogQuery.data.entries?.length ?? 0
+    : 0;
+  const chainValid = auditLogQuery.data?.integrity?.chain_valid;
+  const actingConflictId = resolveConflictMutation.isPending
+    ? resolveConflictMutation.variables?.conflictId ?? null
+    : null;
+  const lastSync = initiativesQuery.dataUpdatedAt
+    ? new Date(initiativesQuery.dataUpdatedAt).toISOString()
+    : new Date().toISOString();
 
   const factor = useMemo(
     () => scenarioFactorFromSensitivity(scenario, sensitivity),
@@ -208,90 +249,26 @@ export default function CostRoom() {
     setAuditLog((log) => [{ ts: new Date().toISOString(), message }, ...log.slice(0, 49)]);
   }, []);
 
-  const normalizeInitiative = (row: Initiative): Initiative => ({
-    ...row,
-    aqs: row.aqs ?? row.assumption_quality_score,
-    owner_name: row.owner_name ?? row.owner_role,
-  });
-
-  const loadPipeline = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams({ qualified_only: 'true' });
-      if (engagementId) params.set('engagement_id', engagementId);
-      const qs = `?${params.toString()}`;
-      const [initRes, sumRes] = await Promise.all([
-        apiGet<{ initiatives: Initiative[] }>(`/api/v1/initiatives${qs}`),
-        apiGet<PipelineSummary>(`/api/v1/pipeline/summary${qs}`),
-      ]);
-      const rows = initRes.initiatives.map(normalizeInitiative);
-      setInitiatives(rows);
-      setSummary(sumRes);
-      setLastSync(new Date().toISOString());
-      setSelectedId((prev) => prev ?? rows[0]?.initiative_id ?? null);
-    } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [engagementId]);
-
-  const loadSensitivity = useCallback(async () => {
-    if (!sessionId) return;
-    try {
-      const execRate = scenarioExecutionRate(scenario);
-      const qs = execRate != null ? `?execution_rate_pct=${execRate}` : '';
-      const data = await apiGet<SensitivityResponse>(`/api/v1/sensitivity/${sessionId}${qs}`);
-      setSensitivity(data);
-    } catch {
-      setSensitivity(null);
-    }
-  }, [sessionId, scenario]);
-
   useEffect(() => {
     ensureSession().catch(() => undefined);
-    loadPipeline();
     syncEngagementFromAnalysis().catch(() => undefined);
     refreshSessionAnalysis().catch(() => undefined);
-  }, [ensureSession, loadPipeline, syncEngagementFromAnalysis, refreshSessionAnalysis]);
+  }, [ensureSession, syncEngagementFromAnalysis, refreshSessionAnalysis]);
 
   useEffect(() => {
-    loadSensitivity();
-  }, [loadSensitivity]);
+    setSelectedId((prev) => prev ?? initiatives[0]?.initiative_id ?? null);
+  }, [initiatives]);
+
+  useEffect(() => {
+    const err = initiativesQuery.error ?? summaryQuery.error;
+    if (err) setError(getApiErrorMessage(err));
+  }, [initiativesQuery.error, summaryQuery.error]);
 
   useEffect(() => {
     if (isExecutive) {
       setFilters((f) => ({ ...f, needsActionOnly: false }));
     }
   }, [isExecutive]);
-
-  useEffect(() => {
-    apiGet<ComplianceAuditResponse>('/api/v1/compliance/audit-log?limit=1')
-      .then((res) => {
-        setServerAuditCount(res.integrity?.records ?? res.entries?.length ?? 0);
-        setChainValid(res.integrity?.chain_valid);
-      })
-      .catch(() => setServerAuditCount(0));
-  }, [lastSync]);
-
-  const loadConflicts = useCallback(async () => {
-    if (!sessionId || isExecutive) return;
-    setConflictsLoading(true);
-    setConflictsError(null);
-    try {
-      setConflicts(await apiGet<ConflictSummary>(`/api/v1/conflicts/${sessionId}`));
-    } catch (err) {
-      setConflicts(null);
-      setConflictsError(getApiErrorMessage(err));
-    } finally {
-      setConflictsLoading(false);
-    }
-  }, [sessionId, isExecutive]);
-
-  useEffect(() => {
-    loadConflicts();
-  }, [loadConflicts]);
 
   useEffect(() => {
     setExceptionItems(
@@ -302,88 +279,8 @@ export default function CostRoom() {
     );
   }, [initiatives, conflicts, setExceptionItems]);
 
-  const loadFpaTab = useCallback(
-    async (tab: string, force = false) => {
-      if (!sessionId) return;
-      const cached =
-        tab === 'trends' ? trends
-        : tab === 'bva' ? bva
-        : tab === 'payment-terms' ? paymentTerms
-        : tab === 'cost-to-serve' ? costToServe
-        : null;
-      if (cached && !force) return;
-      setTabLoading(tab);
-      setTabErrors((prev) => ({ ...prev, [tab]: null }));
-      try {
-        if (tab === 'trends') {
-          setTrends(await apiGet<TrendsResponse>(`/api/v1/trends/${sessionId}`));
-        } else if (tab === 'bva') {
-          setBva(await apiGet<BvaResponse>(`/api/v1/bva/${sessionId}`));
-        } else if (tab === 'payment-terms') {
-          setPaymentTerms(await apiGet<PaymentTermsResponse>(`/api/v1/payment-terms/${sessionId}`));
-        } else if (tab === 'cost-to-serve') {
-          setCostToServe(
-            await apiPost<CostToServeResponse>('/api/v1/cost-to-serve', { session_id: sessionId }),
-          );
-        }
-      } catch (err) {
-        setTabErrors((prev) => ({ ...prev, [tab]: getApiErrorMessage(err) }));
-      } finally {
-        setTabLoading((current) => (current === tab ? null : current));
-      }
-    },
-    [sessionId, trends, bva, paymentTerms, costToServe],
-  );
-
-  useEffect(() => {
-    if (!sessionId || !fpaOpen || isExecutive) return;
-    loadFpaTab(activeTab);
-  }, [activeTab, sessionId, fpaOpen, isExecutive, loadFpaTab]);
-
-  useEffect(() => {
-    setTrends(null);
-    setBva(null);
-    setPaymentTerms(null);
-    setCostToServe(null);
-    setTabErrors({});
-  }, [sessionId]);
-
-  const loadMilestones = useCallback(async (initiativeId: string) => {
-    setMilestonesLoading(true);
-    try {
-      const res = await apiGet<{ milestones: unknown[] }>(
-        `/api/v1/initiatives/${initiativeId}/milestones`,
-      );
-      setMilestones((res.milestones ?? []) as Record<string, unknown>[]);
-    } catch {
-      setMilestones([]);
-    } finally {
-      setMilestonesLoading(false);
-    }
-  }, []);
-
-  const loadProvenance = useCallback(async (initiativeId: string) => {
-    setProvenanceLoading(true);
-    try {
-      setProvenance(await apiGet<InitiativeProvenance>(`/api/v1/initiatives/${initiativeId}/provenance`));
-    } catch {
-      setProvenance(null);
-    } finally {
-      setProvenanceLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (selectedId) {
-      loadMilestones(selectedId);
-      loadProvenance(selectedId);
-    }
-  }, [selectedId, loadMilestones, loadProvenance]);
-
   const selectInitiative = useCallback((id: string) => {
     setSelectedId(id);
-    setMilestones(null);
-    setProvenance(null);
   }, []);
 
   const handleExceptionAction = useCallback((item: ExceptionItem) => {
@@ -400,11 +297,10 @@ export default function CostRoom() {
 
   const acceptInit = async (initiativeId: string) => {
     try {
-      await apiPut(`/api/v1/initiatives/${initiativeId}/stage`, { stage: 'committed' });
+      await initiativeStageMutation.mutateAsync({ initiativeId, stage: 'committed' });
       const init = initiatives.find((x) => x.initiative_id === initiativeId);
       toast(`Committed · ${init?.lever ?? initiativeId}`);
       appendAudit(`acceptInit: ${initiativeId} → committed`);
-      await loadPipeline();
     } catch (err) {
       setError(getApiErrorMessage(err));
     }
@@ -412,11 +308,10 @@ export default function CostRoom() {
 
   const deferInit = async (initiativeId: string) => {
     try {
-      await apiPut(`/api/v1/initiatives/${initiativeId}/stage`, { stage: 'deferred' });
+      await initiativeStageMutation.mutateAsync({ initiativeId, stage: 'deferred' });
       const init = initiatives.find((x) => x.initiative_id === initiativeId);
       toast(`Deferred · ${init?.lever ?? initiativeId}`);
       appendAudit(`deferInit: ${initiativeId} → deferred`);
-      await loadPipeline();
     } catch (err) {
       setError(getApiErrorMessage(err));
     }
@@ -431,12 +326,14 @@ export default function CostRoom() {
   const confirmReject = async () => {
     if (!rejectTargetId || !rejectReason.trim()) return;
     try {
-      await apiPut(`/api/v1/initiatives/${rejectTargetId}/reject`, { reason: rejectReason.trim() });
+      await initiativeRejectMutation.mutateAsync({
+        initiativeId: rejectTargetId,
+        reason: rejectReason.trim(),
+      });
       const init = initiatives.find((x) => x.initiative_id === rejectTargetId);
       toast(`Rejected · ${init?.lever ?? rejectTargetId}`);
       appendAudit(`rejectInit: ${rejectTargetId}`);
       setRejectModalOpen(false);
-      await loadPipeline();
     } catch (err) {
       setError(getApiErrorMessage(err));
     }
@@ -450,78 +347,48 @@ export default function CostRoom() {
 
   const addActuals = useCallback(
     async (initiativeId: string, amount: number) => {
-      setActualsSaving(true);
       try {
-        await apiPost(`/api/v1/initiatives/${initiativeId}/actuals`, { amount_cr: amount });
+        await addActualsMutation.mutateAsync({ initiativeId, amount });
         const init = initiatives.find((x) => x.initiative_id === initiativeId);
         toast(`Actuals updated · ${init?.lever ?? initiativeId}`);
         appendAudit(`actuals_recorded: ${initiativeId}`);
-        await loadPipeline();
       } catch (err) {
         setError(getApiErrorMessage(err));
-      } finally {
-        setActualsSaving(false);
       }
     },
-    [appendAudit, initiatives, loadPipeline, toast],
+    [appendAudit, initiatives, addActualsMutation, toast],
   );
 
   const actOnConflict = async (conflict: DataConflict, strategy: string, auditLabel: string) => {
     if (!sessionId || !conflict.conflict_id) return;
-    setActingConflictId(conflict.conflict_id);
     setConflictNotice(null);
     try {
-      const result = await apiPost<{
-        resolved_count?: number;
-        escalated_count?: number;
-        spend_impact?: ConflictSpendImpact | null;
-      }>(`/api/v1/conflicts/resolve?session_id=${sessionId}`, {
-        conflict_ids: [conflict.conflict_id],
-        strategy,
-      });
+      await resolveConflictMutation.mutateAsync({ conflictId: conflict.conflict_id, strategy });
       toast(`Conflict resolved · ${conflict.title ?? conflict.conflict_id}`);
       appendAudit(`${auditLabel}: ${conflict.conflict_id}`);
-      if (result.spend_impact && (result.spend_impact.spend_delta ?? 0) !== 0) {
-        await loadPipeline();
-        await syncEngagementFromAnalysis();
-        await refreshSessionAnalysis();
-      }
-      await loadConflicts();
     } catch (err) {
       setError(getApiErrorMessage(err));
-    } finally {
-      setActingConflictId(null);
     }
   };
 
   const exportBusinessCase = useCallback(async () => {
     if (!sessionId) return;
-    setBusinessCaseLoading(true);
     try {
-      const res = await apiPost<{ export_url?: string; filename?: string }>(
-        `/api/v1/board-deck/${sessionId}`,
-        {},
-      );
-      appendAudit('board_deck_export_requested');
-      if (res.export_url) {
-        triggerDownload(res.export_url, res.filename);
-        setExportNotice('Board deck downloaded.');
+      const res = await exportBusinessCaseMutation.mutateAsync();
+      appendAudit('business_case_export_requested');
+      if (res.exports?.docx) {
+        triggerDownload(res.exports.docx, `${sessionId}_business_case.docx`);
+        setExportNotice('Business case downloaded.');
       }
     } catch (err) {
       setError(getApiErrorMessage(err));
-    } finally {
-      setBusinessCaseLoading(false);
     }
-  }, [sessionId, appendAudit]);
+  }, [sessionId, appendAudit, exportBusinessCaseMutation]);
 
   const exportExcel = useCallback(async () => {
     if (!sessionId) return;
-    setExcelExportLoading(true);
     try {
-      const res = await apiPost<{ export_url?: string; filename?: string }>(
-        `/api/v1/pmo-export/${sessionId}`,
-        {},
-      );
+      const res = await exportExcelMutation.mutateAsync();
       appendAudit('export_excel_requested');
       if (res.export_url) {
         triggerDownload(res.export_url, res.filename);
@@ -529,22 +396,19 @@ export default function CostRoom() {
       }
     } catch (err) {
       setError(getApiErrorMessage(err));
-    } finally {
-      setExcelExportLoading(false);
     }
-  }, [sessionId, appendAudit]);
+  }, [sessionId, appendAudit, exportExcelMutation]);
 
   const handleConsolidate = useCallback(async () => {
     if (!sessionId) return;
     try {
-      await apiPost(`/api/v1/consolidate/${sessionId}`, {});
+      await consolidateMutation.mutateAsync();
       toast('Entities consolidated');
       appendAudit('consolidation_run');
-      await loadPipeline();
     } catch (err) {
       setError(getApiErrorMessage(err));
     }
-  }, [sessionId, appendAudit, loadPipeline, toast]);
+  }, [sessionId, appendAudit, consolidateMutation, toast]);
 
   const auditCountTotal = serverAuditCount + auditLog.length;
   const friendlyError = error ? friendlyErrorMessage(error) : null;
@@ -764,23 +628,23 @@ export default function CostRoom() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => loadFpaTab(activeTab, true)}
+                  onClick={() => activeFpaQuery?.refetch()}
                   disabled={tabLoading === activeTab}
                   className="mb-4 text-xs border border-[var(--cr-line)] rounded-[var(--cr-r-sm)] px-3 py-1.5 bg-white disabled:opacity-50"
                 >
                   {tabLoading === activeTab ? 'Refreshing…' : 'Refresh'}
                 </button>
                 {activeTab === 'trends' && (
-                  <TrendsTab data={trends} loading={tabLoading === 'trends'} error={tabErrors.trends ?? null} currency={engagement.currency} />
+                  <TrendsTab data={trendsQuery.data ?? null} loading={tabLoading === 'trends'} error={tabErrors.trends ?? null} currency={engagement.currency} />
                 )}
                 {activeTab === 'bva' && (
-                  <BvaTab data={bva} loading={tabLoading === 'bva'} error={tabErrors.bva ?? null} currency={engagement.currency} />
+                  <BvaTab data={bvaQuery.data ?? null} loading={tabLoading === 'bva'} error={tabErrors.bva ?? null} currency={engagement.currency} />
                 )}
                 {activeTab === 'payment-terms' && (
-                  <PaymentTermsTab data={paymentTerms} loading={tabLoading === 'payment-terms'} error={tabErrors['payment-terms'] ?? null} currency={engagement.currency} />
+                  <PaymentTermsTab data={paymentTermsQuery.data ?? null} loading={tabLoading === 'payment-terms'} error={tabErrors['payment-terms'] ?? null} currency={engagement.currency} />
                 )}
                 {activeTab === 'cost-to-serve' && (
-                  <CostToServeTab data={costToServe} loading={tabLoading === 'cost-to-serve'} error={tabErrors['cost-to-serve'] ?? null} currency={engagement.currency} />
+                  <CostToServeTab data={costToServeQuery.data ?? null} loading={tabLoading === 'cost-to-serve'} error={tabErrors['cost-to-serve'] ?? null} currency={engagement.currency} />
                 )}
               </div>
             )}

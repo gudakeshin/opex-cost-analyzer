@@ -12,9 +12,16 @@ import {
   SectorPackDetailDrawer,
   type SectorPackRow,
 } from '../components/PageComponents/Benchmarks/SectorPackDetailDrawer';
+import { useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiPatch, getApiErrorMessage } from '../hooks/useApi';
+import {
+  fetchSessionManifest,
+  setSessionManifestData,
+  type SessionManifestResult,
+} from '../api/hooks/useSessionQueries';
 
 export const Benchmarks: React.FC = () => {
+  const queryClient = useQueryClient();
   const { sessionId, ensureSession } = useSession();
   const [sectorPacks, setSectorPacks] = useState<SectorPackRow[]>([]);
   const [peerSets, setPeerSets] = useState<PeerSet[]>([]);
@@ -64,19 +71,22 @@ export const Benchmarks: React.FC = () => {
       const sid = sessionId || (await ensureSession());
       if (!sid) return;
       try {
-        const manifest = await apiGet<{ peer_set_name?: string }>(`/api/v1/sessions/${sid}/manifest`);
+        const manifest = await fetchSessionManifest(queryClient, sid);
         if (manifest.peer_set_name) setActivePeerSet(manifest.peer_set_name);
       } catch {
         /* optional */
       }
     })();
-  }, [sessionId, ensureSession]);
+  }, [sessionId, ensureSession, queryClient]);
 
   const setEngagementPeerSet = async (name: string | null) => {
     const sid = sessionId || (await ensureSession());
     if (!sid) return;
     try {
-      await apiPatch(`/api/v1/sessions/${sid}/manifest`, { peer_set_name: name });
+      const updated = await apiPatch<SessionManifestResult>(`/api/v1/sessions/${sid}/manifest`, {
+        peer_set_name: name,
+      });
+      setSessionManifestData(queryClient, sid, updated);
       setActivePeerSet(name);
       setNotice(name ? `Peer set “${name}” set as session default.` : 'Peer set default cleared.');
     } catch (err) {

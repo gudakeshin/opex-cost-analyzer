@@ -24,7 +24,16 @@ from app.routers._shared import (
     validate_session_id,
     write_manifest,
 )
-from app.schemas import AnalyzeRequest, DiagnosticContextPatch, SessionCreateRequest, SessionManifestPatch
+from app.schemas import (
+    AnalyzeRequest,
+    DiagnosticContextPatch,
+    SessionAnalysisResponse,
+    SessionCreateRequest,
+    SessionManifestPatch,
+    SessionManifestResponse,
+    SessionStatusResponse,
+    SessionSummaryResponse,
+)
 from app.security.auth import current_principal, visible_to_principal
 from app.services.analysis import load_taxonomy, run_core_pipeline
 from app.services.compliance import append_audit_event
@@ -265,8 +274,8 @@ def download_spend_template() -> Response:
     )
 
 
-@router.post("/api/sessions")
-@router.post("/api/v1/sessions")
+@router.post("/api/sessions", response_model=SessionManifestResponse)
+@router.post("/api/v1/sessions", response_model=SessionManifestResponse)
 def create_session(request: Request, payload: SessionCreateRequest) -> Dict[str, Any]:
     session_id = str(uuid.uuid4())
     session_dir(session_id).mkdir(parents=True, exist_ok=True)
@@ -499,8 +508,8 @@ async def analyze_session(request: Request, session_id: str, payload: AnalyzeReq
     return analysis
 
 
-@router.get("/api/sessions/{session_id}/status")
-@router.get("/api/v1/sessions/{session_id}/status")
+@router.get("/api/sessions/{session_id}/status", response_model=SessionStatusResponse)
+@router.get("/api/v1/sessions/{session_id}/status", response_model=SessionStatusResponse)
 def get_session_status(session_id: str) -> Dict[str, Any]:
     """Lightweight session probe — always 200; avoids 404 noise when analysis is not ready."""
     validate_session_id(session_id)
@@ -521,8 +530,8 @@ def get_session_status(session_id: str) -> Dict[str, Any]:
     }
 
 
-@router.get("/api/sessions/{session_id}")
-@router.get("/api/v1/sessions/{session_id}")
+@router.get("/api/sessions/{session_id}", response_model=SessionAnalysisResponse)
+@router.get("/api/v1/sessions/{session_id}", response_model=SessionAnalysisResponse)
 def get_session_analysis(session_id: str) -> Dict[str, Any]:
     validate_session_id(session_id)
     result = _memory.get("session", session_id)
@@ -531,8 +540,8 @@ def get_session_analysis(session_id: str) -> Dict[str, Any]:
     return result
 
 
-@router.patch("/api/sessions/{session_id}/manifest")
-@router.patch("/api/v1/sessions/{session_id}/manifest")
+@router.patch("/api/sessions/{session_id}/manifest", response_model=SessionManifestResponse)
+@router.patch("/api/v1/sessions/{session_id}/manifest", response_model=SessionManifestResponse)
 async def patch_session_manifest(session_id: str, payload: SessionManifestPatch) -> Dict[str, Any]:
     validate_session_id(session_id)
     if not session_dir(session_id).exists():
@@ -553,8 +562,8 @@ async def patch_session_manifest(session_id: str, payload: SessionManifestPatch)
     return manifest
 
 
-@router.get("/api/sessions/{session_id}/manifest")
-@router.get("/api/v1/sessions/{session_id}/manifest")
+@router.get("/api/sessions/{session_id}/manifest", response_model=SessionManifestResponse)
+@router.get("/api/v1/sessions/{session_id}/manifest", response_model=SessionManifestResponse)
 def get_session_manifest(session_id: str) -> Dict[str, Any]:
     validate_session_id(session_id)
     sdir = session_dir(session_id)
@@ -594,7 +603,7 @@ def get_session_schema(session_id: str) -> Dict[str, Any]:
     return {"session_id": session_id, "schemas": schemas}
 
 
-@router.get("/api/v1/sessions")
+@router.get("/api/v1/sessions", response_model=List[SessionSummaryResponse])
 def list_sessions(request: Request) -> List[Dict[str, Any]]:
     """Return a summary of all sessions, newest first. Used by the History page."""
     from app.storage import read_json as _read_json
@@ -631,7 +640,11 @@ def list_sessions(request: Request) -> List[Dict[str, Any]]:
                 "annual_revenue": manifest.get("annual_revenue"),
                 "created_at": manifest.get("created_at"),
                 "file_count": len(manifest.get("files", [])),
-                "has_analysis": analysis is not None,
+                # _memory.get() returns {} (not None) for sessions without a
+                # persisted analysis, so test truthiness — otherwise every empty
+                # session falsely reports has_analysis=true. Matches the
+                # /sessions/{id}/status probe (bool(analysis)).
+                "has_analysis": bool(analysis),
                 "top_savings_estimate": top_savings,
             })
         except Exception:
