@@ -1,6 +1,6 @@
 # OpEx Intelligence Platform
 
-Reference implementation aligned to `OpEx_Intelligence_Platform_PRD.md` with:
+Reference implementation aligned to `OpEx_Intelligence_Platform_PRD_v2.0.md` with:
 - FastAPI backend
 - React + Vite + TypeScript + Tailwind frontend (`frontend/`)
 - Skill discovery/runtime from `skills/*/SKILL.md`

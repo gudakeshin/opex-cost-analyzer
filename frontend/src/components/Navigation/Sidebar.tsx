@@ -6,6 +6,7 @@ import { useAudience } from '../../context/AudienceContext';
 import { useSession } from '../../context/SessionContext';
 import { ChartIcon, SearchIcon, CostRoomIcon, GuidebookIcon, DocumentsIcon } from './NavIcons';
 import { useExceptions } from '../../context/ExceptionContext';
+import { useUnsavedChanges } from '../../context/UnsavedChangesContext';
 import { DeloitteLogo } from '../Brand/DeloitteLogo';
 import { isClientEngagementReady } from '../../utils/engagement';
 import { isNavActive } from '../../utils/navPath';
@@ -29,6 +30,7 @@ export const Sidebar: React.FC = () => {
   const { isExecutive, audience, setAudience } = useAudience();
   const { count: exceptionCount } = useExceptions();
   const { engagement, hasAnalysis } = useSession();
+  const { confirmNavigation } = useUnsavedChanges();
   const showLabels = !collapsed || isMobile;
   const executiveReady = isClientEngagementReady(hasAnalysis, engagement.company_name);
 
@@ -38,6 +40,9 @@ export const Sidebar: React.FC = () => {
 
   const handleExecutiveToggle = () => {
     if (!executiveReady) return;
+    // Confirm before switching audience so a cancelled navigation doesn't
+    // leave the app toggled to executive mode on the current page.
+    if (!confirmNavigation()) return;
     setAudience('executive');
     navigate('/cost-room');
   };

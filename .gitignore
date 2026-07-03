@@ -13,6 +13,8 @@ build/
 venv/
 .pytest_cache/
 .coverage
+.mypy_cache/
+.ruff_cache/
 
 # Data — session uploads and outputs contain client data
 data/uploads/
@@ -33,6 +35,10 @@ data/provenance/
 frontend/node_modules/
 frontend/dist/
 node_modules/
+
+# Playwright E2E run output
+frontend/playwright-report/
+frontend/test-results/
 
 # OS / IDE
 .DS_Store

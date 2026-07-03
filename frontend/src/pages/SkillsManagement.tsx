@@ -8,6 +8,7 @@ import { Alert } from '../components/Common/Alert';
 import { PageHeader } from '../components/Common/PageHeader';
 import { RunTracePanel } from '../components/PageComponents/Skills/RunTracePanel';
 import { apiGet, apiPost, apiPut, getApiErrorMessage } from '../hooks/useApi';
+import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
 import { friendlyErrorMessage } from '../utils/errorMessages';
 import type { SkillMeta } from '../types';
 
@@ -70,6 +71,7 @@ export const SkillsManagement: React.FC = () => {
 
   const friendlyError = error ? friendlyErrorMessage(error) : null;
   const hasDiff = content !== savedContent;
+  useUnsavedGuard('skills-editor', hasDiff);
 
   const filteredSkills = useMemo(
     () => skills.filter((s) => !kindFilter || s.kind === kindFilter),

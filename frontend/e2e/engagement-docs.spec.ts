@@ -48,7 +48,8 @@ test.describe("Engagement documents", () => {
     );
     expect([200, 201, 202]).toContain(uploadRes.status());
     const body = await uploadRes.json();
-    expect(body).toHaveProperty("document_id");
+    expect(body).toHaveProperty("document");
+    expect(body.document).toHaveProperty("document_id");
   });
 
   test("lists documents for an engagement", async ({ page }) => {
@@ -67,10 +68,12 @@ test.describe("Engagement documents", () => {
   test("deletes an engagement", async ({ page }) => {
     const engagementId = await createEngagement(page);
 
+    // Teardown lives under the singular /api/v1/engagement/{id} route (compliance.py),
+    // distinct from the plural /api/v1/engagements/{id} CRUD routes.
     const deleteRes = await page.request.delete(
-      `${API}/api/v1/engagements/${engagementId}`
+      `${API}/api/v1/engagement/${engagementId}`
     );
-    expect([200, 204]).toContain(deleteRes.status());
+    expect(deleteRes.status()).toBe(200);
 
     // Verify it no longer appears in the list
     const listRes = await page.request.get(`${API}/api/v1/engagements`);

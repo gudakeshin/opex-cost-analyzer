@@ -11,6 +11,7 @@ import { ResultsBoard } from '../components/PageComponents/Workbench/ResultsBoar
 import { RunCompareView } from '../components/PageComponents/Workbench/RunCompareView';
 import { RunDetail } from '../components/PageComponents/Workbench/RunDetail';
 import { apiGet, apiPost, apiDelete, getApiErrorMessage } from '../hooks/useApi';
+import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
 import { useSession } from '../context/SessionContext';
 import type {
   WorkbenchCatalog,
@@ -70,6 +71,9 @@ export const Workbench: React.FC = () => {
   const [runName, setRunName] = useState('');
   const [validation, setValidation] = useState<WorkbenchValidation | null>(null);
   const [running, setRunning] = useState(false);
+  // Guard an in-flight run and a named-but-unstarted draft; selected skills and
+  // overrides deliberately persist across runs, so they don't count as dirty.
+  useUnsavedGuard('workbench-draft', running || runName.trim().length > 0);
   const [parentRunId, setParentRunId] = useState<string | null>(null);
   const [seedFromRunId, setSeedFromRunId] = useState<string | null>(null);
   const [seedName, setSeedName] = useState<string | null>(null);

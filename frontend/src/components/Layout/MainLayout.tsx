@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Sidebar } from '../Navigation/Sidebar';
 import { ThemeToggle } from '../Navigation/ThemeToggle';
+import { UnsavedChangesIndicator } from '../Common/UnsavedChangesIndicator';
 import { useSidebar } from '../../context/SidebarContext';
 import { useAudience } from '../../context/AudienceContext';
 
@@ -30,6 +31,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   if (executive) {
     return (
       <div className="min-h-screen executive-shell bg-brand-surface">
+        <div className="fixed top-3 right-4 z-40">
+          <UnsavedChangesIndicator />
+        </div>
         <div className="p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto">{children}</div>
       </div>
     );
@@ -63,11 +67,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
                 )}
               </div>
               <div className="flex items-center gap-3 shrink-0">
+                <UnsavedChangesIndicator />
                 {headerExtra}
                 <ThemeToggle />
               </div>
             </div>
           </header>
+        )}
+        {hideHeader && (
+          <div className="fixed top-3 right-4 z-40">
+            <UnsavedChangesIndicator />
+          </div>
         )}
         <div className="p-4 md:p-6">{children}</div>
       </main>

@@ -67,6 +67,72 @@ jobs:
         run: PYTHONPATH=. pytest tests/ -m "not llm_judge" -q --tb=short --cov=app --cov-fail-under=70 --cov-report=term-missing
 
   # -----------------------------------------------------------------------
+  # E2E (Playwright) — backend + frontend dev server, deterministic specs only.
+  # chat/analyze fall back to rule-based responses without ANTHROPIC_API_KEY,
+  # so these specs assert on status/shape rather than LLM content and don't
+  # need the nightly-only secret.
+  # -----------------------------------------------------------------------
+  test-e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install backend dependencies
+        run: pip install -r requirements.txt
+
+      - name: Start backend
+        env:
+          AUTH_ENABLED: "false"
+        run: |
+          PYTHONPATH=. nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 > backend.log 2>&1 &
+          npx --yes wait-on@7 http://localhost:8000/health --timeout 60000
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Start frontend dev server
+        working-directory: frontend
+        run: |
+          nohup npm run dev -- --port 5173 > frontend.log 2>&1 &
+          npx --yes wait-on@7 http://localhost:5173 --timeout 60000
+
+      - name: Run Playwright E2E tests
+        working-directory: frontend
+        run: npx playwright test
+
+      - name: Show backend log on failure
+        if: failure()
+        run: cat backend.log
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7
+
+  # -----------------------------------------------------------------------
   # Secret scan — fail the build if API keys/credentials are committed
   # -----------------------------------------------------------------------
   secret-scan:

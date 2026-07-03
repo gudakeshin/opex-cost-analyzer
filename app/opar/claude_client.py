@@ -8,7 +8,7 @@ import re
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from typing import Any, Dict, List, Tuple
 
-from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED
+from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED, logger
 from app.metrics import record_llm_usage
 from app.services.llm_selection import (
     get_resolved_llm_model,
@@ -433,7 +433,10 @@ def classify_intent_claude_with_meta(msg: str) -> Dict[str, Any] | None:
             max_tokens=220,
         )
         data = _extract_json(raw)
-    except Exception:
+    except Exception as exc:
+        # Caller falls back to the rule-based classifier; keep the reason so
+        # degraded routing quality is diagnosable.
+        logger.warning('"llm_intent_classification_failed error=%s — falling back to rule-based classifier"', exc)
         return None
     if not isinstance(data, dict):
         return None

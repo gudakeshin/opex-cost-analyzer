@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useGuardedNavigate } from '../hooks/useGuardedNavigate';
+import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { PageHeader } from '../components/Common/PageHeader';
 import { Card } from '../components/Common/Card';
@@ -37,7 +39,7 @@ function truncateId(id: string): string {
 }
 
 export const EngagementDocuments: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useGuardedNavigate();
   const {
     engagementId,
     setEngagementId,
@@ -71,6 +73,8 @@ export const EngagementDocuments: React.FC = () => {
   const [newCurrency, setNewCurrency] = useState('INR');
   const [creating, setCreating] = useState(false);
   const [justCreatedId, setJustCreatedId] = useState<string | null>(null);
+  // Uploads in flight and half-filled create forms are lost on navigation.
+  useUnsavedGuard('engagement-documents', uploading || (showCreateModal && newName.trim().length > 0));
 
   const loadEngagements = useCallback(async () => {
     const list = await listEngagements();

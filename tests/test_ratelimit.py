@@ -64,3 +64,31 @@ def test_multiworker_without_redis_fails_fast(monkeypatch) -> None:
     monkeypatch.delenv("REDIS_URL", raising=False)
     monkeypatch.setenv("UVICORN_WORKERS", "1")
     _guard_multiworker_without_redis()  # single worker is always fine
+
+
+def test_multiworker_cli_args_without_redis_fails_fast(monkeypatch) -> None:
+    import sys
+
+    import pytest
+
+    from app.main import _guard_multiworker_without_redis
+
+    monkeypatch.delenv("REDIS_URL", raising=False)
+    monkeypatch.delenv("UVICORN_WORKERS", raising=False)
+    monkeypatch.delenv("WEB_CONCURRENCY", raising=False)
+
+    for argv in (
+        ["uvicorn", "app.main:app", "--workers", "4"],
+        ["uvicorn", "app.main:app", "--workers=4"],
+        ["gunicorn", "app.main:app", "-w", "4"],
+    ):
+        monkeypatch.setattr(sys, "argv", argv)
+        with pytest.raises(RuntimeError, match="REDIS_URL"):
+            _guard_multiworker_without_redis()
+
+    monkeypatch.setattr(sys, "argv", ["uvicorn", "app.main:app", "--workers", "1"])
+    _guard_multiworker_without_redis()  # single worker is always fine
+
+    monkeypatch.setattr(sys, "argv", ["uvicorn", "app.main:app", "--workers", "4"])
+    monkeypatch.setenv("REDIS_URL", "redis://localhost:6379/0")
+    _guard_multiworker_without_redis()  # no raise when Redis configured

@@ -93,7 +93,10 @@ def _synthesize_via_llm(
                 thinking_callback(thinking)
             if text:
                 return text, thinking
-        except Exception:
+        except Exception as exc:
+            # Falling through to the next provider is by design, but keep the
+            # reason — when every provider misses, this is the only evidence.
+            logger.warning('"chat_synthesis_provider_failed synth=%s error=%s"', getattr(synth, "__name__", synth), exc)
             continue
     return None, None
 

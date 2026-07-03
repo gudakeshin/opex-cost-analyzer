@@ -13,6 +13,7 @@ from __future__ import annotations
 import asyncio
 import os
 import re
+import sys
 import time
 import uuid
 from typing import Any
@@ -49,13 +50,27 @@ from app.memory import MemoryStore as _MemoryStore
 ensure_dirs()
 
 
+def _cli_worker_count(argv: list[str]) -> int | None:
+    """Extract N from `--workers N`, `--workers=N`, or `-w N` in a CLI invocation."""
+    for i, arg in enumerate(argv):
+        if arg in ("--workers", "-w"):
+            if i + 1 < len(argv) and argv[i + 1].isdigit():
+                return int(argv[i + 1])
+        elif arg.startswith("--workers="):
+            value = arg.partition("=")[2]
+            if value.isdigit():
+                return int(value)
+    return None
+
+
 def _guard_multiworker_without_redis() -> None:
     """Fail fast on a known-corrupting config: >1 worker without Redis.
 
     Session/manifest locks fall back to in-process locks when REDIS_URL is
     unset; two workers then interleave read-modify-write cycles on the same
     JSON manifests. UVICORN_WORKERS (our Dockerfile) and WEB_CONCURRENCY
-    (gunicorn convention) are the explicit signals we can check.
+    (gunicorn convention) are the explicit signals we can check, plus
+    `--workers N` on a manual uvicorn/gunicorn command line.
     """
     if os.getenv("REDIS_URL", "").strip():
         return
@@ -67,6 +82,13 @@ def _guard_multiworker_without_redis() -> None:
                 "locks are per-process and concurrent workers corrupt JSON state. "
                 "Set REDIS_URL or run a single worker."
             )
+    cli_workers = _cli_worker_count(sys.argv)
+    if cli_workers is not None and cli_workers > 1:
+        raise RuntimeError(
+            f"--workers {cli_workers} requires REDIS_URL: without Redis, session/manifest "
+            "locks are per-process and concurrent workers corrupt JSON state. "
+            "Set REDIS_URL or run a single worker."
+        )
 
 
 _guard_multiworker_without_redis()

@@ -1,6 +1,7 @@
 """Reflect persistence — session cache merge, analysis trace, memory writes."""
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
 from typing import Any, Dict, List
 
@@ -12,6 +13,8 @@ from app.opar.provenance import record_llm_narrative
 from app.storage import read_json, write_json
 
 _memory = MemoryStore()
+
+logger = logging.getLogger(__name__)
 
 _CONFLICT_TYPE_LABELS: Dict[str, str] = {
     "tds_mismatch": "TDS mismatch",
@@ -44,6 +47,12 @@ def _merge_with_session_cache(
 
         return apply_probe_answers_to_skill_outputs(merged, session_id)
     except Exception:
+        # Degraded, not fatal: the analysis proceeds without the consultant's
+        # probe answers, so make the omission visible instead of silent.
+        logger.exception(
+            '"probe_answer_merge_failed session_id=%s — proceeding without probe answers"',
+            session_id,
+        )
         return merged
 
 
@@ -161,6 +170,47 @@ def persist_session_analysis(
 
         analysis_snapshot = repair_spend_base_if_needed(ctx.session_id, analysis_snapshot)
     _memory.put("session", ctx.session_id, analysis_snapshot)
+    _maybe_seed_pipeline(ctx, manifest, analysis_snapshot, merged_outputs, validated, advisory_sections)
+
+
+def _maybe_seed_pipeline(
+    ctx: ObserveContext,
+    manifest: Dict[str, Any],
+    analysis_snapshot: Dict[str, Any],
+    merged_outputs: Dict[str, Any],
+    validated: Dict[str, Dict[str, Any]],
+    advisory: AdvisorySections | None,
+) -> None:
+    """Seed Cost Room pipeline initiatives from chat-driven analysis.
+
+    The batch ``/api/analyze`` path seeds in its router; conversational turns
+    funnel through here instead, so without this the Cost Room never populates
+    from chat analysis. Reuse the advisory already computed this turn to avoid a
+    second LLM call. Seed only when savings were (re)modeled this turn, or when
+    the pipeline has nothing yet for this session. Seeding dedupes by
+    (category, lever), so re-running is safe.
+    """
+    savings_model = merged_outputs.get("savings-modeler", {}) or {}
+    if not (isinstance(savings_model, dict) and savings_model.get("initiatives")):
+        return
+    try:
+        from app.services.compliance import append_audit_event
+        from app.services.pipeline import list_initiatives
+        from app.services.pipeline_seed import seed_initiatives_from_analysis
+
+        ran_this_turn = "savings-modeler" in validated
+        if not ran_this_turn and list_initiatives(session_id=ctx.session_id):
+            return  # already seeded for this session; nothing new to model
+        uid = (manifest.get("company_name") or "default").lower().replace(" ", "_").replace(".", "_")
+        created = seed_initiatives_from_analysis(
+            analysis_snapshot, ctx.session_id, user_id=uid, advisory=advisory
+        )
+        if created:
+            append_audit_event(
+                f"pipeline_seeded session_id={ctx.session_id} initiatives={created}"
+            )
+    except Exception:
+        logger.warning("pipeline_seed_failed session_id=%s", ctx.session_id, exc_info=True)
 
 
 def persist_conflict_manifest(session_id: str, validated: Dict[str, Dict[str, Any]]) -> None:
@@ -201,6 +251,9 @@ def record_advisory_provenance(
             metadata={"prompt_versions": prompt_version_map()},
         )
     except Exception:
+        # Provenance is the audit trail for LLM narratives; losing a record
+        # silently would make the trail look complete when it isn't.
+        logger.exception('"llm_narrative_provenance_write_failed session_id=%s turn_id=%s"', ctx.session_id, ctx.turn_id)
         return None
 
 

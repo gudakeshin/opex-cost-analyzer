@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { isNavActive } from '../../utils/navPath';
+import { useUnsavedChanges } from '../../context/UnsavedChangesContext';
 
 interface NavLinkProps {
   to: string;
@@ -21,11 +22,20 @@ export const NavLink: React.FC<NavLinkProps> = ({
 }) => {
   const location = useLocation();
   const active = isNavActive(location.pathname, to);
+  const { confirmNavigation } = useUnsavedChanges();
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (!confirmNavigation()) {
+      e.preventDefault();
+      return;
+    }
+    onNavigate?.();
+  };
 
   return (
     <Link
       to={to}
-      onClick={onNavigate}
+      onClick={handleClick}
       aria-current={active ? 'page' : undefined}
       title={collapsed ? label : undefined}
       className={`

@@ -40,8 +40,8 @@ def _session_currency(session_id: str) -> str:
         manifest = read_json(UPLOAD_DIR / session_id / "manifest.json", {})
         if manifest.get("currency"):
             return str(manifest["currency"])
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning('"session_currency_fallback session_id=%s error=%s — defaulting to INR"', session_id, exc)
     return "INR"
 
 
@@ -592,7 +592,9 @@ async def _run_opar_loop_inner(
 
                     validated = apply_probe_answers_to_skill_outputs(validated, session_id)
                 except Exception:
-                    pass
+                    # Degraded, not fatal: the response proceeds without the
+                    # consultant's probe answers — record it, don't hide it.
+                    logger.exception('"probe_answer_merge_failed session_id=%s — proceeding without probe answers"', session_id)
                 manifest = _session_manifest(session_id)
                 currency = str(existing_analysis.get("reporting_currency") or _session_currency(session_id))
                 synthesis = synthesize_chat_response(
