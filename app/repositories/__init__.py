@@ -8,9 +8,10 @@ Usage::
     session_repo().save("session-uuid", manifest)
 
 The default implementation is JSON-on-disk (``JsonSessionRepository`` /
-``JsonEngagementRepository``).  Future implementations (SQLite, PostgreSQL)
-can be swapped in by setting the ``REPOSITORY_BACKEND`` env var and providing
-the corresponding class in this package.
+``JsonEngagementRepository``).  Set ``REPOSITORY_BACKEND=sqlite`` to switch to
+``SqliteSessionRepository`` / ``SqliteEngagementRepository`` (see
+app/repositories/sqlite_store.py and docs/architecture/persistence-migration-plan.md).
+A future PostgreSQL implementation can be added the same way.
 """
 from __future__ import annotations
 
@@ -25,13 +26,21 @@ _BACKEND = os.getenv("REPOSITORY_BACKEND", "json").lower()
 def _make_session_repo() -> SessionRepository:
     if _BACKEND == "json":
         return JsonSessionRepository()
-    raise ValueError(f"Unknown REPOSITORY_BACKEND={_BACKEND!r}; supported: json")
+    if _BACKEND == "sqlite":
+        from app.repositories.sqlite_store import SqliteSessionRepository
+
+        return SqliteSessionRepository()
+    raise ValueError(f"Unknown REPOSITORY_BACKEND={_BACKEND!r}; supported: json, sqlite")
 
 
 def _make_engagement_repo() -> EngagementRepository:
     if _BACKEND == "json":
         return JsonEngagementRepository()
-    raise ValueError(f"Unknown REPOSITORY_BACKEND={_BACKEND!r}; supported: json")
+    if _BACKEND == "sqlite":
+        from app.repositories.sqlite_store import SqliteEngagementRepository
+
+        return SqliteEngagementRepository()
+    raise ValueError(f"Unknown REPOSITORY_BACKEND={_BACKEND!r}; supported: json, sqlite")
 
 
 # Module-level singletons — lazily initialised, cheap to construct.
