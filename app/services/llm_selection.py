@@ -51,16 +51,28 @@ class LlmModelOption:
 
 MODEL_CATALOG: tuple[LlmModelOption, ...] = (
     LlmModelOption(
+        "claude-sonnet-5",
+        "Claude Sonnet 5",
+        "anthropic",
+        "Latest Sonnet — balanced speed and depth",
+    ),
+    LlmModelOption(
         "claude-sonnet-4-6",
         "Claude Sonnet 4.6",
         "anthropic",
-        "Balanced speed and depth",
+        "Previous generation Sonnet",
+    ),
+    LlmModelOption(
+        "claude-haiku-4-5-20251001",
+        "Claude Haiku 4.5",
+        "anthropic",
+        "Fast routing and classification",
     ),
     LlmModelOption(
         "claude-sonnet-4-5-20250929",
         "Claude Sonnet 4.5",
         "anthropic",
-        "Previous generation Sonnet",
+        "Legacy Sonnet",
     ),
     LlmModelOption(
         "gemini-2.5-flash",

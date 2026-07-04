@@ -6,10 +6,9 @@ import json
 import os
 import re
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
-from typing import Any, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
 from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED, logger
-from app.metrics import record_llm_usage
 from app.services.llm_selection import (
     get_resolved_llm_model,
     get_resolved_llm_provider,
@@ -17,6 +16,22 @@ from app.services.llm_selection import (
 )
 from app.opar.gemini_client import CHAT_RESPONSE_SYSTEM_PROMPT
 from app.opar.models import IntentClass
+from app.opar.anthropic_api import (
+    anthropic_max_tokens_for_thinking,
+    anthropic_output_config,
+    anthropic_thinking_kwargs,
+    apply_tool_cache_breakpoint,
+    call_anthropic_structured_json,
+    cached_system_blocks,
+    record_anthropic_usage,
+)
+from app.opar.llm_schemas import (
+    CHART_SELECTION_SCHEMA,
+    INTENT_CLASSIFY_SCHEMA,
+)
+
+# Fast model for intent routing (220-token structured call).
+INTENT_CLASSIFY_MODEL = "claude-haiku-4-5-20251001"
 
 # Canonical intent set — derived from the typed enum so the prompt menu below and
 # the validator stay in sync as intents are added.
@@ -43,7 +58,7 @@ INTENT_CLASSIFY_PROMPT = """You are the intent router for an enterprise OpEx (op
 
 User message: "{message}"
 
-Respond with ONLY a JSON object (no markdown, no prose):
+Respond with a JSON object matching the schema:
 {{"intent": "<one intent id>", "explicit_category": "<spend category name or null>", "confidence": 0.0, "category_confidence": 0.0, "capabilities": ["<capability id>", ...]}}
 
 Intent ids (choose exactly one):
@@ -198,6 +213,8 @@ def _call_anthropic_native(
     model: str | None = None,
     *,
     http_timeout_s: float | None = None,
+    cache_system: bool = False,
+    user_content_blocks: list[dict[str, Any]] | None = None,
 ) -> str:
     """Call Anthropic directly — never routed through Gemini."""
     active_model = model or get_resolved_llm_model(provider="anthropic")
@@ -212,19 +229,19 @@ def _call_anthropic_native(
 
     timeout = http_timeout_s if http_timeout_s is not None else _anthropic_http_timeout_seconds()
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY, timeout=timeout)
+    system_param: str | list[dict[str, Any]] = (
+        cached_system_blocks(system) if cache_system else system
+    )
+    user_param: str | list[dict[str, Any]] = (
+        user_content_blocks if user_content_blocks is not None else user_content
+    )
     response = client.messages.create(
         model=active_model,
         max_tokens=max_tokens,
-        system=system,
-        messages=[{"role": "user", "content": user_content}],
+        system=system_param,
+        messages=[{"role": "user", "content": user_param}],
     )
-    usage = getattr(response, "usage", None)
-    if usage is not None:
-        record_llm_usage(
-            "anthropic", active_model,
-            getattr(usage, "input_tokens", 0),
-            getattr(usage, "output_tokens", 0),
-        )
+    record_anthropic_usage(getattr(response, "usage", None), active_model)
     if getattr(response, "stop_reason", None) == "max_tokens":
         from app.config import logger as _log
 
@@ -235,6 +252,63 @@ def _call_anthropic_native(
         )
     text = getattr(response.content[0], "text", "") if response.content else ""
     return text.strip()
+
+
+def _stream_anthropic_native(
+    system: str,
+    user_content: str,
+    max_tokens: int = 512,
+    model: str | None = None,
+    *,
+    http_timeout_s: float | None = None,
+    cache_system: bool = False,
+    user_content_blocks: list[dict[str, Any]] | None = None,
+    on_token: Callable[[str], None] | None = None,
+) -> str:
+    """Stream Anthropic text deltas via ``on_token``; returns the full assembled text."""
+    active_model = model or get_resolved_llm_model(provider="anthropic")
+    if os.getenv("PYTEST_CURRENT_TEST"):
+        raise RuntimeError("Claude calls disabled during pytest runs")
+    if not ANTHROPIC_ENABLED or not ANTHROPIC_API_KEY:
+        raise RuntimeError("Anthropic not configured")
+    try:
+        import anthropic
+    except ImportError:
+        raise RuntimeError("anthropic package not installed")
+
+    timeout = http_timeout_s if http_timeout_s is not None else _anthropic_http_timeout_seconds()
+    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY, timeout=timeout)
+    system_param: str | list[dict[str, Any]] = (
+        cached_system_blocks(system) if cache_system else system
+    )
+    user_param: str | list[dict[str, Any]] = (
+        user_content_blocks if user_content_blocks is not None else user_content
+    )
+    parts: list[str] = []
+    with client.messages.stream(
+        model=active_model,
+        max_tokens=max_tokens,
+        system=system_param,
+        messages=[{"role": "user", "content": user_param}],
+    ) as stream:
+        for event in stream:
+            if getattr(event, "type", None) != "content_block_delta":
+                continue
+            delta = getattr(getattr(event, "delta", None), "text", None)
+            if not delta:
+                continue
+            parts.append(delta)
+            if on_token:
+                on_token(delta)
+        final = stream.get_final_message()
+    record_anthropic_usage(getattr(final, "usage", None), active_model)
+    if getattr(final, "stop_reason", None) == "max_tokens":
+        logger.warning(
+            '"anthropic stream truncated at max_tokens=%d model=%s"',
+            max_tokens,
+            active_model,
+        )
+    return "".join(parts).strip()
 
 
 def _call_claude(
@@ -278,6 +352,8 @@ async def call_claude_async(
     model: str | None = None,
     *,
     http_timeout_s: float | None = None,
+    cache_system: bool = False,
+    user_content_blocks: list[dict[str, Any]] | None = None,
 ) -> str:
     """Async Claude call using AsyncAnthropic — does not occupy a thread-pool slot.
 
@@ -299,19 +375,19 @@ async def call_claude_async(
 
         timeout = http_timeout_s if http_timeout_s is not None else _anthropic_http_timeout_seconds()
         client = _anthropic.AsyncAnthropic(api_key=ANTHROPIC_API_KEY, timeout=timeout)
+        system_param: str | list[dict[str, Any]] = (
+            cached_system_blocks(system) if cache_system else system
+        )
+        user_param: str | list[dict[str, Any]] = (
+            user_content_blocks if user_content_blocks is not None else user_content
+        )
         response = await client.messages.create(
             model=active_model,
             max_tokens=max_tokens,
-            system=system,
-            messages=[{"role": "user", "content": user_content}],
+            system=system_param,
+            messages=[{"role": "user", "content": user_param}],
         )
-        usage = getattr(response, "usage", None)
-        if usage is not None:
-            record_llm_usage(
-                "anthropic", active_model,
-                getattr(usage, "input_tokens", 0),
-                getattr(usage, "output_tokens", 0),
-            )
+        record_anthropic_usage(getattr(response, "usage", None), active_model)
         text = getattr(response.content[0], "text", "") if response.content else ""
         return text.strip()
 
@@ -330,8 +406,16 @@ def _call_claude_with_thinking(
     max_tokens: int = 1800,
     model: str | None = None,
     budget_tokens: int = 8000,
+    *,
+    cache_system: bool = False,
+    user_content_blocks: list[dict[str, Any]] | None = None,
 ) -> Tuple[str, str | None]:
     """Call LLM with extended thinking. Preferred provider first, cross-provider fallback."""
+    effective_user = user_content
+    if user_content_blocks is not None:
+        effective_user = "\n\n".join(
+            str(b.get("text") or "") for b in user_content_blocks if b.get("type") == "text"
+        )
     active_model = model or get_resolved_llm_model(thinking=True, provider="anthropic")
     prefer_gemini = get_resolved_llm_provider() == "gemini"
     if prefer_gemini and GEMINI_ENABLED:
@@ -340,7 +424,7 @@ def _call_claude_with_thinking(
 
             return call_gemini_with_thinking(
                 system=system,
-                user_content=user_content,
+                user_content=effective_user,
                 max_tokens=max_tokens,
                 model=model,
             )
@@ -361,27 +445,34 @@ def _call_claude_with_thinking(
 
     http_timeout = float(llm_thinking_timeout_seconds()) + 20.0
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY, timeout=http_timeout)
+    thinking_kwargs = anthropic_thinking_kwargs(model=active_model, budget_tokens=budget_tokens)
+    output_kwargs = anthropic_output_config(model=active_model, budget_tokens=budget_tokens)
+    system_param: str | list[dict[str, Any]] = (
+        cached_system_blocks(system) if cache_system else system
+    )
+    user_param: str | list[dict[str, Any]] = (
+        user_content_blocks if user_content_blocks is not None else user_content
+    )
     response = client.messages.create(
         model=active_model,
-        max_tokens=max_tokens + budget_tokens,
-        system=system,
-        messages=[{"role": "user", "content": user_content}],
-        thinking={"type": "enabled", "budget_tokens": budget_tokens},
+        max_tokens=anthropic_max_tokens_for_thinking(
+            max_tokens, model=active_model, budget_tokens=budget_tokens, thinking=True
+        ),
+        system=system_param,
+        messages=[{"role": "user", "content": user_param}],
+        **thinking_kwargs,
+        **output_kwargs,
     )
-    usage = getattr(response, "usage", None)
-    if usage is not None:
-        record_llm_usage(
-            "anthropic", active_model,
-            getattr(usage, "input_tokens", 0),
-            getattr(usage, "output_tokens", 0),
-        )
+    record_anthropic_usage(getattr(response, "usage", None), active_model)
     if getattr(response, "stop_reason", None) == "max_tokens":
         from app.config import logger as _log
 
         _log.warning(
-            '"anthropic thinking response truncated at max_tokens=%d (budget=%d) model=%s"',
-            max_tokens + budget_tokens,
-            budget_tokens,
+            '"anthropic thinking response truncated at max_tokens=%d (effort=%s) model=%s"',
+            anthropic_max_tokens_for_thinking(
+                max_tokens, model=active_model, budget_tokens=budget_tokens, thinking=True
+            ),
+            (output_kwargs.get("output_config") or {}).get("effort", "default"),
             active_model,
         )
     text = ""
@@ -427,16 +518,18 @@ def classify_intent_claude_with_meta(msg: str) -> Dict[str, Any] | None:
     """
     prompt = INTENT_CLASSIFY_PROMPT.format(message=msg)
     try:
-        raw = _call_claude(
-            system="You are an intent classifier. Output only valid JSON.",
-            user_content=prompt,
+        data = call_anthropic_structured_json(
+            "You are an intent classifier for an OpEx cost-analysis platform.",
+            prompt,
+            INTENT_CLASSIFY_SCHEMA,
             max_tokens=220,
+            model=INTENT_CLASSIFY_MODEL,
         )
-        data = _extract_json(raw)
     except Exception as exc:
-        # Caller falls back to the rule-based classifier; keep the reason so
-        # degraded routing quality is diagnosable.
-        logger.warning('"llm_intent_classification_failed error=%s — falling back to rule-based classifier"', exc)
+        logger.warning(
+            '"llm_intent_classification_failed error=%s — falling back to rule-based classifier"',
+            exc,
+        )
         return None
     if not isinstance(data, dict):
         return None
@@ -478,8 +571,7 @@ def classify_intent_claude_with_meta(msg: str) -> Dict[str, Any] | None:
 _CHART_SELECTION_SYSTEM_PROMPT = (
     "You are a data-visualization advisor for an OpEx cost analysis platform. "
     "Given the user's question and a spend profile summary, choose 1–3 chart types "
-    "that best answer the question. "
-    "Respond with JSON only — no prose, no markdown fence."
+    "that best answer the question."
 )
 
 _AVAILABLE_CHARTS = (
@@ -518,14 +610,19 @@ def select_charts_claude(
         f"  has_trend_data: {profile_summary.get('has_trend', False)}\n"
         f"  top categories:\n{cat_lines}\n\n"
         f"{_AVAILABLE_CHARTS}\n"
-        "Output JSON with keys 'selected_charts' (array of {{chart, reason}}) "
-        "and 'commentary_points' (array of 3–5 strings that directly address the user's question "
-        "using the profile numbers above)."
+        "Select charts that directly address the user's question using the profile numbers above."
     )
     executor = ThreadPoolExecutor(max_workers=1)
-    future = submit_with_context(executor, _call_claude, _CHART_SELECTION_SYSTEM_PROMPT, user_prompt, 512)
+    future = submit_with_context(
+        executor,
+        call_anthropic_structured_json,
+        _CHART_SELECTION_SYSTEM_PROMPT,
+        user_prompt,
+        CHART_SELECTION_SCHEMA,
+        max_tokens=512,
+    )
     try:
-        raw = future.result(timeout=10)
+        data = future.result(timeout=10)
     except (FuturesTimeoutError, Exception):
         future.cancel()
         executor.shutdown(wait=False, cancel_futures=True)
@@ -533,10 +630,6 @@ def select_charts_claude(
     finally:
         if not future.cancelled():
             executor.shutdown(wait=True, cancel_futures=True)
-    try:
-        data = _extract_json(raw)
-    except Exception:
-        return None
     if not isinstance(data, dict):
         return None
     charts = data.get("selected_charts")
@@ -804,6 +897,7 @@ def synthesize_chat_response_claude(
     context: Dict[str, Any],
     *,
     thinking_enabled: bool = False,
+    token_callback: Callable[[str], None] | None = None,
 ) -> Tuple[str | None, str | None]:
     """Conversational QA answer from structured context via Claude.
 
@@ -814,13 +908,12 @@ def synthesize_chat_response_claude(
     """
     if not ANTHROPIC_ENABLED:
         return None, None
-    user_prompt = (
-        "Answer the user's question from this context. Return markdown only.\n"
-        f"{json.dumps(context, ensure_ascii=False)}"
-    )
+    from app.opar.chat_synthesis import build_chat_user_content_blocks
+
+    user_blocks = build_chat_user_content_blocks(context)
+    payload_bytes = len(json.dumps(context, ensure_ascii=False))
     from app.config import llm_synthesis_timeout_seconds, llm_thinking_timeout_seconds
 
-    payload_bytes = len(user_prompt)
     timeout_s = (
         llm_thinking_timeout_seconds()
         if thinking_enabled
@@ -828,21 +921,38 @@ def synthesize_chat_response_claude(
     )
     max_tokens = 2048 if thinking_enabled else 1024
     executor = ThreadPoolExecutor(max_workers=1)
+    cache_kwargs = {"cache_system": True, "user_content_blocks": user_blocks}
     if thinking_enabled:
         future: Future[Any] = submit_with_context(
             executor,
             _call_claude_with_thinking,
             CHAT_RESPONSE_SYSTEM_PROMPT,
-            user_prompt,
+            "",
             max_tokens,
+            None,
+            8000,
+            **cache_kwargs,
+        )
+    elif token_callback:
+        future = submit_with_context(
+            executor,
+            _stream_anthropic_native,
+            CHAT_RESPONSE_SYSTEM_PROMPT,
+            "",
+            max_tokens,
+            cache_system=True,
+            user_content_blocks=user_blocks,
+            on_token=token_callback,
         )
     else:
         future = submit_with_context(
             executor,
             _call_anthropic_native,
             CHAT_RESPONSE_SYSTEM_PROMPT,
-            user_prompt,
+            "",
             max_tokens,
+            cache_system=True,
+            user_content_blocks=user_blocks,
         )
     try:
         result = future.result(timeout=timeout_s)
@@ -887,20 +997,21 @@ async def synthesize_chat_response_claude_async(
         return None, None
     if os.getenv("PYTEST_CURRENT_TEST"):
         return None, None
-    user_prompt = (
-        "Answer the user's question from this context. Return markdown only.\n"
-        f"{json.dumps(context, ensure_ascii=False)}"
-    )
+    from app.opar.chat_synthesis import build_chat_user_content_blocks
+
+    user_blocks = build_chat_user_content_blocks(context)
     from app.config import llm_synthesis_timeout_seconds
 
     import asyncio as _asyncio
-    timeout_s = llm_synthesis_timeout_seconds(len(user_prompt))
+    timeout_s = llm_synthesis_timeout_seconds(len(json.dumps(context, ensure_ascii=False)))
     try:
         text = await _asyncio.wait_for(
             call_claude_async(
                 CHAT_RESPONSE_SYSTEM_PROMPT,
-                user_prompt,
+                "",
                 max_tokens=1024,
+                cache_system=True,
+                user_content_blocks=user_blocks,
             ),
             timeout=timeout_s,
         )
@@ -1418,8 +1529,7 @@ class ClaudeToolTransport:
     ) -> None:
         self.thinking_budget = thinking_budget
         self.model = model or get_resolved_llm_model(provider="anthropic")
-        # Anthropic requires max_tokens > thinking.budget_tokens.
-        self.max_tokens = max(max_tokens, thinking_budget + 2048)
+        self.max_tokens = max_tokens
 
     def generate(
         self,
@@ -1438,28 +1548,33 @@ class ClaudeToolTransport:
         import anthropic
 
         client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-        anthropic_tools = [t.to_anthropic() if isinstance(t, ToolDefinition) else t for t in tools]
+        anthropic_tools = [
+            t.to_anthropic() if isinstance(t, ToolDefinition) else t for t in tools
+        ]
+        anthropic_tools = apply_tool_cache_breakpoint(anthropic_tools)
         api_messages = _to_anthropic_messages(messages)
 
         kwargs: dict[str, Any] = {
             "model": self.model,
-            "max_tokens": self.max_tokens,
-            "system": system,
+            "max_tokens": anthropic_max_tokens_for_thinking(
+                self.max_tokens,
+                model=self.model,
+                budget_tokens=self.thinking_budget,
+                thinking=thinking,
+            ),
+            "system": cached_system_blocks(system),
             "messages": api_messages,
             "tools": anthropic_tools,
+            **anthropic_output_config(model=self.model, budget_tokens=self.thinking_budget),
         }
         if thinking:
-            kwargs["thinking"] = {"type": "enabled", "budget_tokens": self.thinking_budget}
+            kwargs.update(
+                anthropic_thinking_kwargs(model=self.model, budget_tokens=self.thinking_budget)
+            )
 
         response = client.messages.create(**kwargs)
 
-        usage = getattr(response, "usage", None)
-        if usage is not None:
-            record_llm_usage(
-                "anthropic", self.model,
-                getattr(usage, "input_tokens", 0),
-                getattr(usage, "output_tokens", 0),
-            )
+        record_anthropic_usage(getattr(response, "usage", None), self.model)
 
         text_parts: list[str] = []
         thinking_parts: list[str] = []

@@ -2,12 +2,14 @@
 # wrapper cannot resolve postponed annotations (List[UploadFile] etc.) because
 # FastAPI evaluates them against the wrapper's __globals__, not this module's.
 import asyncio
+import json
 import os
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, AsyncIterator, Dict, List
 
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
+from fastapi.responses import StreamingResponse
 
 from app.config import MAX_UPLOAD_MB
 from app.ratelimit import RATE_LIMIT_LLM, limiter
@@ -54,6 +56,136 @@ def _progress_callbacks(run_id: str) -> tuple:
     return (
         lambda phase, msg: progress_append(run_id, phase, msg),
         lambda chunk: progress_append_thinking(run_id, chunk),
+    )
+
+
+def _format_sse(event: str, data: Dict[str, Any]) -> str:
+    return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+
+
+def _stream_callbacks(
+    run_id: str,
+    queue: asyncio.Queue[tuple[str, Dict[str, Any]]],
+    loop: asyncio.AbstractEventLoop,
+) -> tuple:
+    def emit(event: str, data: Dict[str, Any]) -> None:
+        loop.call_soon_threadsafe(queue.put_nowait, (event, data))
+
+    def on_progress(phase: str, msg: str) -> None:
+        progress_append(run_id, phase, msg)
+        emit("progress", {"phase": phase, "message": msg})
+
+    def on_thinking(chunk: str) -> None:
+        progress_append_thinking(run_id, chunk)
+        emit("thinking", {"chunk": chunk})
+
+    def on_token(delta: str) -> None:
+        emit("token", {"delta": delta})
+
+    return on_progress, on_thinking, on_token
+
+
+async def _chat_stream_events(
+    payload: V1ChatRequest,
+    request: Request,
+) -> AsyncIterator[str]:
+    validate_session_id(payload.session_id)
+    check_session_owner(request, payload.session_id)
+    if not session_dir(payload.session_id).exists():
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    run_id = payload.run_id or str(uuid.uuid4())
+    progress_init(run_id, payload.session_id)
+    manifest = read_manifest(payload.session_id)
+    if merge_context_into_manifest(
+        manifest,
+        company_name=payload.company_name,
+        industry=payload.industry,
+        annual_revenue=payload.annual_revenue,
+        currency=payload.currency,
+        audience=payload.audience,
+        headcount=payload.headcount,
+    ):
+        write_manifest(payload.session_id, manifest)
+
+    user_id = payload.user_id
+    if not user_id:
+        company = manifest.get("company_name") or "default"
+        user_id = company.lower().replace(" ", "_").replace(".", "_")
+
+    thinking_enabled = payload.thinking_mode == "extended"
+    queue: asyncio.Queue[tuple[str, Dict[str, Any]]] = asyncio.Queue()
+    loop = asyncio.get_running_loop()
+    progress_cb, thinking_cb, token_cb = _stream_callbacks(run_id, queue, loop)
+
+    async def run_opar() -> None:
+        try:
+            with llm_selection_context(payload.llm_model):
+                result = await asyncio.wait_for(
+                    run_opar_loop(
+                        payload.message,
+                        payload.session_id,
+                        user_id,
+                        None,
+                        progress_cb,
+                        thinking_cb,
+                        token_callback=token_cb,
+                        thinking_enabled=thinking_enabled,
+                        chat_history=_serialize_chat_history(payload.chat_history),
+                    ),
+                    timeout=float(_OPAR_TIMEOUT_S),
+                )
+            progress_complete(run_id)
+            append_audit_event(f"opar_chat_stream session_id={payload.session_id}")
+            loop.call_soon_threadsafe(
+                queue.put_nowait,
+                ("done", _opar_response(result, run_id, session_id=payload.session_id)),
+            )
+        except asyncio.TimeoutError:
+            progress_complete(run_id, failed=True, error="timeout")
+            loop.call_soon_threadsafe(
+                queue.put_nowait,
+                (
+                    "error",
+                    {
+                        "error": "analysis_timeout",
+                        "message": f"Timed out after {_OPAR_TIMEOUT_S}s",
+                    },
+                ),
+            )
+        except Exception as exc:
+            progress_complete(run_id, failed=True, error=str(exc))
+            loop.call_soon_threadsafe(
+                queue.put_nowait,
+                ("error", {"error": "opar_failed", "message": str(exc)}),
+            )
+        finally:
+            loop.call_soon_threadsafe(queue.put_nowait, ("_end", {}))
+
+    task = asyncio.create_task(run_opar())
+    yield _format_sse("run_id", {"run_id": run_id})
+    try:
+        while True:
+            event, data = await queue.get()
+            if event == "_end":
+                break
+            yield _format_sse(event, data)
+    finally:
+        await task
+
+
+@router.post("/api/v1/chat/stream")
+@limiter.limit(RATE_LIMIT_LLM)
+async def chat_v1_stream(request: Request, payload: V1ChatRequest) -> StreamingResponse:
+    """SSE stream of OPAR progress, thinking chunks, synthesis tokens, and final payload."""
+    return StreamingResponse(
+        _chat_stream_events(payload, request),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
     )
 
 

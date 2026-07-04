@@ -20,7 +20,7 @@ import { SECTOR_OPTIONS } from '../constants/sectors';
 import { useSession } from '../context/SessionContext';
 import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
 import { useQueryClient, type QueryClient } from '@tanstack/react-query';
-import { apiGet, apiPatch, apiPost, apiUpload, getApiErrorMessage } from '../hooks/useApi';
+import { apiGet, apiPatch, apiPost, apiUpload, getApiErrorMessage, streamChatPost } from '../hooks/useApi';
 import { fetchSessionManifest, fetchSessionStatus } from '../api/hooks/useSessionQueries';
 import { useEngagementDocuments, useLlmModels } from '../api/hooks/useProcurementQueries';
 import { procurementKeys } from '../api/queryKeys';
@@ -544,9 +544,119 @@ export const ProcurementAnalysis: React.FC = () => {
     setInsightsOpen(true);
     setPipelineLabel(undefined);
     setAgentSteps([{ phase: 'observe', message: 'Starting OPAR agent…' }]);
-    startPolling(runId);
+    let streamedText = '';
+    setMessages((m) => [...m, { role: 'assistant', content: '', run_id: runId }]);
 
     try {
+      const res = await streamChatPost(
+        '/api/v1/chat/stream',
+        {
+          message: text,
+          session_id: sid,
+          run_id: runId,
+          thinking_mode: thinkingMode ? 'extended' : 'standard',
+          llm_model: selectedLlmModel || undefined,
+          chat_history: chatHistoryPayload(messages),
+          ...contextPayload(engagement, manifest),
+        },
+        (ev) => {
+          if (ev.event === 'progress') {
+            setAgentSteps((prev) => [
+              ...(prev ?? []),
+              { phase: ev.data.phase, message: ev.data.message },
+            ]);
+          }
+          if (ev.event === 'thinking' && ev.data.chunk) {
+            setMessages((m) =>
+              m.map((msg) =>
+                msg.run_id === runId && msg.role === 'assistant'
+                  ? { ...msg, thinking: `${msg.thinking ?? ''}${ev.data.chunk}` }
+                  : msg,
+              ),
+            );
+          }
+          if (ev.event === 'token' && ev.data.delta) {
+            streamedText += ev.data.delta;
+            setMessages((m) =>
+              m.map((msg) =>
+                msg.run_id === runId && msg.role === 'assistant'
+                  ? { ...msg, content: streamedText }
+                  : msg,
+              ),
+            );
+          }
+        },
+      );
+      if (!res) return;
+      const chat = res as V1ChatResponse;
+      if (chat.hitl_required && chat.clarification && chat.checkpoint_id) {
+        setMessages((m) => m.filter((msg) => msg.run_id !== runId));
+        openClarificationProbe({
+          clarification: chat.clarification,
+          checkpoint_id: chat.checkpoint_id,
+        });
+        return;
+      }
+      setLastSignals(chat.quality_signals);
+      setLastSteps(chat.progress_steps);
+      setAgentSteps(chat.progress_steps);
+      setAgentDegraded(!!chat.degraded_mode);
+      setAgentFallbackReasons(chat.fallback_reasons);
+      let session: SessionResponse | null = null;
+      let latestManifest = manifest;
+      try {
+        session = await refreshSessionAnalysis();
+        await refreshAnalysisStatus();
+      } catch {
+        /* analysis not run yet */
+      }
+      try {
+        latestManifest = await refreshManifest(sid);
+      } catch {
+        /* manifest optional */
+      }
+      const snapshot = extractInsightSnapshot(session, latestManifest);
+      const showPeer = wantsPeerSavingsInsight(text);
+      const suppressCategoryInsight = chat.response_metadata?.insight_dimension === 'supplier';
+      const nextOptions = buildAssistantNextOptions(
+        snapshot,
+        latestManifest,
+        chat.next_options,
+        showPeer,
+        currentAnsweredProbeFamilies(),
+      );
+      const insightSnap =
+        !suppressCategoryInsight && snapshot && (snapshot.total_spend > 0 || showPeer)
+          ? snapshot
+          : undefined;
+      setMessages((m) =>
+        m.map((msg) =>
+          msg.run_id === runId && msg.role === 'assistant'
+            ? {
+                role: 'assistant',
+                content: chat.response_text || streamedText || 'No response',
+                thinking: chat.thinking,
+                advisory_sections: chat.advisory_sections,
+                presentation: chat.presentation,
+                quality_signals: chat.quality_signals,
+                next_options: nextOptions,
+                run_id: chat.run_id,
+                progress_steps: chat.progress_steps,
+                degraded_mode: chat.degraded_mode,
+                used_llm_synthesis: chat.used_llm_synthesis,
+                fallback_reasons: chat.fallback_reasons,
+                artefacts: chat.artefacts,
+                insight_snapshot: insightSnap,
+                show_peer_savings: showPeer,
+                charts: chat.charts,
+                suggested_outputs: chat.suggested_outputs,
+              }
+            : msg,
+        ),
+      );
+      maybeAutoOpenProbeModal(insightSnap, currentAnsweredProbeFamilies(), chat.run_id);
+    } catch (streamErr) {
+      setMessages((m) => m.filter((msg) => msg.run_id !== runId));
       const res = await apiPost<V1ChatResponse>('/api/v1/chat', {
         message: text,
         session_id: sid,
@@ -618,8 +728,9 @@ export const ProcurementAnalysis: React.FC = () => {
         },
       ]);
       maybeAutoOpenProbeModal(insightSnap, currentAnsweredProbeFamilies(), res.run_id);
-    } finally {
-      stopPolling();
+      if (streamErr instanceof Error && !res.response_text) {
+        throw streamErr;
+      }
     }
   };
 

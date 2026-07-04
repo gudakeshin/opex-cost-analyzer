@@ -536,6 +536,10 @@ class CustomScenarioSpec(BaseModel):
     savings_pct_delta: float = 0.0
     timeline_factor: float = 1.0
     execution_rate: float | None = None
+    addressable_spend_delta_pct: float = 0.0
+    spend_pool_delta_pct: float = 0.0
+    bounce_back_override: str | None = None  # high | medium | low
+    cost_driver_deltas: Dict[str, float] = Field(default_factory=dict)
 
 
 class CustomSensitivityRequest(BaseModel):

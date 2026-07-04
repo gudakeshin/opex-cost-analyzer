@@ -82,12 +82,22 @@ def _synthesize_via_llm(
     *,
     thinking_enabled: bool = False,
     thinking_callback: Callable[[str], None] | None = None,
+    token_callback: Callable[[str], None] | None = None,
 ) -> Tuple[str | None, str | None]:
     """Run chat synthesis across providers; ``(None, None)`` when all miss."""
     if not LLM_CHAT_SYNTHESIS_ENABLED:
         return None, None
     for synth in _iter_chat_synthesizers():
         try:
+            kwargs: dict[str, Any] = {"thinking_enabled": thinking_enabled}
+            if token_callback and synth.__name__ == "synthesize_chat_response_claude":
+                kwargs["token_callback"] = token_callback
+            text, thinking = synth(context, **kwargs)
+            if thinking and thinking_callback:
+                thinking_callback(thinking)
+            if text:
+                return text, thinking
+        except TypeError:
             text, thinking = synth(context, thinking_enabled=thinking_enabled)
             if thinking and thinking_callback:
                 thinking_callback(thinking)
@@ -325,6 +335,50 @@ def _trim_chat_context_to_budget(context: Dict[str, Any]) -> Dict[str, Any]:
     return trimmed
 
 
+# Stable within a session — safe to cache across follow-up chat turns.
+_CACHED_CHAT_CONTEXT_KEYS: tuple[str, ...] = (
+    "session_context",
+    "data_readiness",
+    "spend_data",
+    "portfolio_summary",
+    "deep_research_summary",
+    "business_override_note",
+    "probe_context",
+    "document_context",
+    "modeled_initiatives",
+    "value_matrix_rows",
+    "confidence_bands",
+    "root_cause_findings",
+    "contract_renewals",
+)
+
+# Changes every turn — appended after the cached prefix.
+_TURN_CHAT_CONTEXT_KEYS: tuple[str, ...] = (
+    "user_message",
+    "query_analysis",
+    "recent_turns",
+    "document_excerpts",
+)
+
+
+def split_chat_context_for_caching(context: Dict[str, Any]) -> tuple[Dict[str, Any], Dict[str, Any]]:
+    """Split chat context into a cacheable session prefix and per-turn suffix."""
+    cached = {k: context[k] for k in _CACHED_CHAT_CONTEXT_KEYS if k in context}
+    turn = {k: context[k] for k in _TURN_CHAT_CONTEXT_KEYS if k in context}
+    return cached, turn
+
+
+def build_chat_user_content_blocks(context: Dict[str, Any]) -> list[dict[str, Any]]:
+    """Build Anthropic user content blocks with prompt caching for the stable prefix."""
+    from app.opar.anthropic_api import build_chat_user_content_blocks as _blocks
+
+    cached, turn = split_chat_context_for_caching(context)
+    return _blocks(
+        json.dumps(cached, ensure_ascii=False),
+        json.dumps(turn, ensure_ascii=False),
+    )
+
+
 def _fetch_document_excerpts(engagement_id: str, query: str, limit: int = 2) -> List[str]:
     if not engagement_id:
         return []
@@ -528,6 +582,7 @@ def synthesize_chat_response(
     currency: str = "INR",
     thinking_enabled: bool = False,
     thinking_callback: Callable[[str], None] | None = None,
+    token_callback: Callable[[str], None] | None = None,
 ) -> ChatSynthesisResult:
     """Build context, run the resolved LLM, fall back to deterministic QA on failure."""
     context = build_chat_context(
@@ -542,6 +597,7 @@ def synthesize_chat_response(
         context,
         thinking_enabled=thinking_enabled,
         thinking_callback=thinking_callback,
+        token_callback=token_callback,
     )
     pres_out = pres if pres.blocks else None
     if text:

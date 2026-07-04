@@ -9,12 +9,15 @@ from app.config import logger
 from app.opar.tools.context import ToolSessionContext
 from app.services.compliance import append_audit_event
 from app.services.spend_schema import load_spend_schema
-from app.services.spend_store import SpendQueryError
+from app.services.spend_store import SpendQueryError, SpendStore
 
 from app.opar.tools.catalog import _open_agent_store
 
 Tier = Literal["skill", "aggregate", "sql"]
 Prefer = Literal["auto", "skill", "aggregate", "sql"]
+
+MAX_SQL_ATTEMPTS = 3
+NL_SQL_MAX_TOKENS = 1200
 
 _SKILL_PATTERNS: List[Tuple[re.Pattern[str], str, str]] = [
     (re.compile(r"\b(peer|benchmark|sector|p25|p50|p75|gap)\b", re.I), "get_benchmarks", "benchmark comparison"),
@@ -92,7 +95,6 @@ def _rule_based_aggregate_spec(question: str, valid_cols: set[str]) -> Dict[str,
         if col and col not in group_by:
             group_by.append(col)
 
-    # explicit "by X" / "by X and Y"
     by_match = re.search(r"\bby\s+([\w\s,/&]+)", q)
     if by_match:
         for part in re.split(r"[,/&]|\band\b", by_match.group(1)):
@@ -122,48 +124,128 @@ def _rule_based_aggregate_spec(question: str, valid_cols: set[str]) -> Dict[str,
     }
 
 
+def _schema_for_llm(schema: Dict[str, Any]) -> str:
+    """Full schema payload for LLM SQL/aggregate generation (not truncated)."""
+    return json.dumps(
+        {
+            "columns": schema.get("columns") or [],
+            "sample_values": schema.get("sample_values") or {},
+            "line_count": schema.get("line_count"),
+            "total_spend": schema.get("total_spend"),
+        },
+        ensure_ascii=False,
+    )
+
+
 def _llm_aggregate_or_sql(
     question: str,
     schema: Dict[str, Any],
     *,
     tier: Literal["aggregate", "sql"],
+    max_tokens: int | None = None,
 ) -> Dict[str, Any] | str | None:
-    from app.opar.llm_provider import call_llm
+    from app.opar.llm_provider import call_llm_structured
+    from app.opar.llm_schemas import NL_AGGREGATE_SPEC_SCHEMA, NL_SQL_SCHEMA
 
-    col_names = [c["name"] for c in schema.get("columns", [])]
-    samples = json.dumps(schema.get("sample_values") or {}, ensure_ascii=False)[:2000]
+    schema_blob = _schema_for_llm(schema)
     if tier == "aggregate":
         system = (
             "You translate natural-language spend questions into a JSON aggregate spec. "
-            "Return ONLY valid JSON with keys: group_by (list of column names), "
-            "metrics (dict name->SQL expr like SUM(amount)), filters (dict or null), "
-            "limit (int), order_by (string or null). "
             "Use only columns from the schema. Use fiscal_period not period."
         )
-        user = f"Question: {question}\nColumns: {col_names}\nSamples: {samples}"
-    else:
-        system = (
-            "You write a single DuckDB SELECT or WITH…SELECT against view `spend`. "
-            "Return ONLY the SQL text, no markdown. Use fiscal_period not period. "
-            "Read-only; no DDL/DML."
+        user = f"Question: {question}\nSchema:\n{schema_blob}"
+        data = call_llm_structured(
+            system,
+            user,
+            NL_AGGREGATE_SPEC_SCHEMA,
+            max_tokens=max_tokens or 800,
+            skill_name="natural_language_query",
         )
-        user = f"Question: {question}\nColumns: {col_names}\nSamples: {samples}"
+        return data if isinstance(data, dict) else None
 
-    raw = call_llm(system, user, max_tokens=800, skill_name="natural_language_query")
-    if not raw:
-        return None
-    text = raw.strip()
-    if tier == "sql":
-        text = re.sub(r"^```(?:sql)?\s*", "", text)
-        text = re.sub(r"\s*```$", "", text)
-        return text.strip()
-    try:
-        from app.opar.claude_client import _extract_json
+    system = (
+        "You write a single DuckDB SELECT or WITH…SELECT against view `spend`. "
+        "Use fiscal_period not period. Read-only; no DDL/DML."
+    )
+    user = f"Question: {question}\nSchema:\n{schema_blob}"
+    data = call_llm_structured(
+        system,
+        user,
+        NL_SQL_SCHEMA,
+        max_tokens=max_tokens or NL_SQL_MAX_TOKENS,
+        skill_name="natural_language_query",
+    )
+    if isinstance(data, dict):
+        sql = str(data.get("sql") or "").strip()
+        return sql or None
+    return None
 
-        return _extract_json(text)  # type: ignore[return-value]
-    except Exception:
-        logger.warning("nl_query: failed to parse LLM aggregate spec")
-        return None
+
+def _aggregate_spec_to_sql(spec: Dict[str, Any]) -> str:
+    gb = ", ".join(spec["group_by"])
+    metrics = spec.get("metrics") or {"spend": "SUM(amount)"}
+    select = ", ".join([gb] + [f"{expr} AS {n}" for n, expr in metrics.items()])
+    return (
+        f"SELECT {select} FROM spend GROUP BY {gb} "
+        f"ORDER BY {spec.get('order_by') or 'spend DESC'} LIMIT {int(spec.get('limit') or 50)}"
+    )
+
+
+def _execute_sql_with_repair_loop(
+    store: SpendStore,
+    question: str,
+    schema: Dict[str, Any],
+    *,
+    initial_sql: str | None = None,
+) -> Dict[str, Any]:
+    """Generate SQL, execute, inspect errors, and revise up to MAX_SQL_ATTEMPTS times."""
+    sql_text = (initial_sql or "").strip()
+    last_err: Exception | None = None
+    attempts: List[Dict[str, str]] = []
+
+    for attempt in range(MAX_SQL_ATTEMPTS):
+        if not sql_text:
+            generated = _llm_aggregate_or_sql(question, schema, tier="sql")
+            sql_text = str(generated or "").strip()
+        if not sql_text:
+            break
+        try:
+            result = store.run_sql(sql_text, limit=500)
+            return {
+                "tier": "sql",
+                "question": question,
+                "sql": sql_text,
+                "result": result.to_dict(),
+                "sql_attempts": attempt + 1,
+                "repair_trace": attempts,
+            }
+        except SpendQueryError as exc:
+            last_err = exc
+            attempts.append({"sql": sql_text, "error": str(exc)})
+            if attempt >= MAX_SQL_ATTEMPTS - 1:
+                break
+            repair_prompt = (
+                f"{question}\n\nPrevious SQL failed:\n{sql_text}\n\nError: {exc}\n"
+                f"Fix the SQL. Attempt {attempt + 2}/{MAX_SQL_ATTEMPTS}."
+            )
+            repaired = _llm_aggregate_or_sql(repair_prompt, schema, tier="sql")
+            next_sql = str(repaired or "").strip()
+            sql_text = next_sql if next_sql and next_sql != sql_text else ""
+
+    fallback_sql = (
+        "SELECT category_name, SUM(amount) AS spend, COUNT(*) AS lines "
+        "FROM spend GROUP BY category_name ORDER BY spend DESC LIMIT 25"
+    )
+    if not sql_text:
+        sql_text = fallback_sql
+    return {
+        "tier": "sql",
+        "question": question,
+        "sql": sql_text,
+        "error": str(last_err) if last_err else "sql_generation_failed",
+        "sql_attempts": len(attempts) + (1 if sql_text else 0),
+        "repair_trace": attempts,
+    }
 
 
 def _execute_skill_tier(session: ToolSessionContext, question: str) -> Dict[str, Any]:
@@ -177,7 +259,6 @@ def _execute_skill_tier(session: ToolSessionContext, question: str) -> Dict[str,
             else:
                 result = session.invoke_skill(skill_or_tool)
             return {"skill": skill_or_tool, "reason": reason, "result": result}
-    # default skill path
     out = session.invoke_skill("spend-profiler")
     return {"skill": "spend-profiler", "reason": "default spend summary", "result": out}
 
@@ -249,50 +330,14 @@ def run_natural_language_query(
                     "retry_hint": "Try natural_language_query with prefer=sql",
                 }
 
-    # Tier 3 — SQL with one repair attempt
-    sql = _rule_based_aggregate_spec(question, valid_cols)
-    if isinstance(sql, dict):
-        # Build SQL from aggregate spec as fallback
-        gb = ", ".join(sql["group_by"])
-        metrics = sql.get("metrics") or {"spend": "SUM(amount)"}
-        select = ", ".join([gb] + [f"{expr} AS {n}" for n, expr in metrics.items()])
-        sql_text = f"SELECT {select} FROM spend GROUP BY {gb} ORDER BY spend DESC LIMIT {sql.get('limit', 50)}"
-    else:
-        sql_text = ""
+    rule_spec = _rule_based_aggregate_spec(question, valid_cols)
+    initial_sql = _aggregate_spec_to_sql(rule_spec) if isinstance(rule_spec, dict) else None
+    if not initial_sql:
+        initial_sql = str(_llm_aggregate_or_sql(question, schema, tier="sql") or "").strip() or None
 
-    if not sql_text:
-        llm_sql = _llm_aggregate_or_sql(question, schema, tier="sql")
-        sql_text = str(llm_sql or "").strip()
-
-    if not sql_text:
-        sql_text = (
-            "SELECT category_name, SUM(amount) AS spend, COUNT(*) AS lines "
-            "FROM spend GROUP BY category_name ORDER BY spend DESC LIMIT 25"
-        )
-
-    try:
-        result = store.run_sql(sql_text, limit=500)
-    except SpendQueryError as first_err:
-        repaired = _llm_aggregate_or_sql(
-            f"{question}\n\nPrevious SQL failed: {first_err}\nFix the SQL.",
-            schema,
-            tier="sql",
-        )
-        if repaired and str(repaired).strip() != sql_text:
-            try:
-                result = store.run_sql(str(repaired).strip(), limit=500)
-                sql_text = str(repaired).strip()
-            except SpendQueryError as exc:
-                return {"tier": "sql", "question": question, "sql": sql_text, "error": str(exc)}
-        else:
-            return {"tier": "sql", "question": question, "sql": sql_text, "error": str(first_err)}
-
+    out = _execute_sql_with_repair_loop(store, question, schema, initial_sql=initial_sql)
     append_audit_event(
-        f"nl_query session={session.session_id} tier=sql rows={result.row_count}"
+        f"nl_query session={session.session_id} tier=sql rows="
+        f"{out.get('result', {}).get('row_count', 0) if isinstance(out.get('result'), dict) else 0}"
     )
-    return {
-        "tier": "sql",
-        "question": question,
-        "sql": sql_text,
-        "result": result.to_dict(),
-    }
+    return out

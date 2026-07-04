@@ -345,24 +345,47 @@ def compute_sensitivity(
     for custom in custom_scenarios or []:
         name = str(custom.get("name") or "custom")
         delta = float(custom.get("savings_pct_delta", 0.0))
+        pool_delta = float(custom.get("spend_pool_delta_pct", 0.0))
+        addr_delta = float(custom.get("addressable_spend_delta_pct", 0.0))
+        combined_delta = delta + pool_delta + addr_delta
         tl = float(custom.get("timeline_factor", timeline_factor))
         exec_r = float(custom.get("execution_rate", base_exec))
         target = str(custom.get("target") or "portfolio")
         target_id = str(custom.get("id") or "")
-        adjusted_mid = mid * (1.0 + delta)
+        cost_drivers = custom.get("cost_driver_deltas") or {}
+        bounce_override = str(custom.get("bounce_back_override") or "").lower() or None
+
+        adjusted_mid = mid * (1.0 + combined_delta)
         if target == "category" and target_id and savings_model and savings_model.get("initiatives"):
             cat_savings = sum(
                 float(i.get("net_savings", {}).get("total_3yr", 0.0))
                 for i in savings_model["initiatives"]
                 if str(i.get("category_id") or i.get("category")) == target_id
             )
-            adjusted_mid = mid - cat_savings + cat_savings * (1.0 + delta)
+            adjusted_mid = mid - cat_savings + cat_savings * (1.0 + combined_delta)
+
+        if bounce_override in BOUNCE_BACK_RATES:
+            exec_r = exec_r * (1.0 - BOUNCE_BACK_RATES[bounce_override] * 0.12)
+
+        assumption_parts = [
+            f"Custom what-if: {target}={target_id or 'all'}",
+            f"savings Δ {combined_delta:+.0%}",
+            f"execution {exec_r:.0%}",
+            f"timeline ×{tl:.2f}",
+        ]
+        if pool_delta:
+            assumption_parts.append(f"spend pool Δ {pool_delta:+.0%}")
+        if addr_delta:
+            assumption_parts.append(f"addressable Δ {addr_delta:+.0%}")
+        if bounce_override:
+            assumption_parts.append(f"bounce-back override={bounce_override}")
+        if cost_drivers:
+            driver_txt = ", ".join(f"{k} {v:+.0%}" for k, v in cost_drivers.items())
+            assumption_parts.append(f"cost drivers: {driver_txt}")
+
         scenarios.append({
             "name": name,
-            "key_assumption": (
-                f"Custom what-if: {target}={target_id or 'all'}, "
-                f"savings Δ {delta:+.0%}, execution {exec_r:.0%}, timeline ×{tl:.2f}"
-            ),
+            "key_assumption": ", ".join(assumption_parts),
             "savings_3yr": round(adjusted_mid * exec_r, 2),
             "timeline_months": int(36 * tl),
             "npv_pretax": round(_simple_npv(adjusted_mid * exec_r, 3.0 * tl, 0.0), 2),
@@ -374,6 +397,10 @@ def compute_sensitivity(
             "custom": True,
             "target": target,
             "target_id": target_id,
+            "spend_pool_delta_pct": pool_delta,
+            "addressable_spend_delta_pct": addr_delta,
+            "bounce_back_override": bounce_override,
+            "cost_driver_deltas": cost_drivers,
         })
 
     return {

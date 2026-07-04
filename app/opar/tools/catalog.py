@@ -181,7 +181,11 @@ RUN_SENSITIVITY_TOOL = ToolDefinition(
             },
             "scenarios": {
                 "type": "array",
-                "description": "Structured custom scenarios (CustomScenarioSpec fields).",
+                "description": (
+                    "CustomScenarioSpec: savings_pct_delta, timeline_factor, execution_rate, "
+                    "addressable_spend_delta_pct, spend_pool_delta_pct, bounce_back_override, "
+                    "cost_driver_deltas."
+                ),
                 "items": {"type": "object"},
             },
             "drivers": {

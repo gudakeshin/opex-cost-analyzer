@@ -74,6 +74,7 @@ def reflect(
     thinking_budget_tokens: int = 8000,
     chat_history: list[dict[str, str]] | None = None,
     thinking_callback: Callable[[str], None] | None = None,
+    token_callback: Callable[[str], None] | None = None,
 ) -> ReflectOutput:
     """Validate outputs (3-layer), compose response, persist memory, return ReflectOutput."""
     validated: Dict[str, Dict[str, Any]] = {}
@@ -162,6 +163,7 @@ def reflect(
             currency=reporting_currency,
             thinking_enabled=thinking_enabled,
             thinking_callback=thinking_callback,
+            token_callback=token_callback,
         )
         response = synthesis.response_text
         response_metadata = synthesis.response_metadata
@@ -232,6 +234,7 @@ def reflect(
                 currency=reporting_currency,
                 thinking_enabled=thinking_enabled,
                 thinking_callback=thinking_callback,
+                token_callback=token_callback,
             )
             response = synthesis.response_text
             response_metadata = synthesis.response_metadata

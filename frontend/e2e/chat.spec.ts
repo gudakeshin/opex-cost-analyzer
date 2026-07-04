@@ -37,19 +37,18 @@ test.describe("Chat journey", () => {
   test("chat with streaming endpoint opens and streams", async ({ page }) => {
     const sessionId = await createSession(page);
 
-    // There is no dedicated SSE endpoint today: this request lands on the
-    // catch-all POST /api/v1/chat/{session_id} route with session_id="stream",
-    // which 400s (not a valid session). Accept the range of "not implemented
-    // as a distinct route" outcomes so this doesn't silently start passing
-    // for the wrong reason if a real streaming endpoint is added later.
     const res = await page.request.post(`${API}/api/v1/chat/stream`, {
       data: {
         session_id: sessionId,
-        message: "hello",
+        message: "What can you help me with?",
         user_id: "e2e-test",
       },
     });
-    expect([200, 400, 404, 405, 422]).toContain(res.status());
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-type"]).toContain("text/event-stream");
+    const body = await res.text();
+    expect(body).toContain("event: run_id");
+    expect(body).toMatch(/event: (done|error)/);
   });
 
   test("UI renders chat panel on session page", async ({ page }) => {

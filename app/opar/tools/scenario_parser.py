@@ -81,7 +81,7 @@ def _match_category(question: str, categories: List[Dict[str, str]]) -> str | No
 
 
 def parse_drivers_from_nl(question: str) -> Dict[str, float]:
-    """Rule-based extraction of portfolio driver overrides."""
+    """Rule-based extraction of portfolio driver overrides (fast path)."""
     q = question.lower()
     drivers: Dict[str, float] = {}
 
@@ -103,8 +103,12 @@ def parse_drivers_from_nl(question: str) -> Dict[str, float]:
     m = re.search(r"timeline\s+(?:slip|delay|extends?)\s+(\d+(?:\.\d+)?)\s*x", q)
     if m:
         drivers["timeline_compression_factor"] = float(m.group(1))
-    elif re.search(r"\b(slip|delay|delayed)\b", q):
+    elif re.search(r"\b(slip|slips|delay|delayed)\b", q):
         drivers["timeline_compression_factor"] = 1.25
+
+    m = re.search(r"supplier\s+prices?\s+(?:rise|increase|up)\s+(\d+(?:\.\d+)?)\s*%", q)
+    if m:
+        drivers["supplier_price_inflation_pct"] = float(m.group(1)) / 100.0
 
     return drivers
 
@@ -125,8 +129,13 @@ def _rule_based_scenarios(
     if m:
         savings_delta = -float(m.group(1)) / 100.0
 
+    spend_pool_delta = 0.0
+    m = re.search(r"supplier\s+prices?\s+(?:rise|increase|up)\s+(\d+(?:\.\d+)?)\s*%", q)
+    if m:
+        spend_pool_delta = float(m.group(1)) / 100.0
+
     timeline_factor = 1.0
-    if re.search(r"\b(slip|delay|delayed|months late)\b", q):
+    if re.search(r"\b(slip|slips|delay|delayed|months late)\b", q):
         timeline_factor = 1.5
     m = re.search(r"timeline\s+(?:factor|×|x)\s*(\d+(?:\.\d+)?)", q)
     if m:
@@ -138,49 +147,64 @@ def _rule_based_scenarios(
         val = float(m.group(1))
         exec_rate = val / 100.0 if val > 1 else val
 
-    if cat_id or savings_delta or timeline_factor != 1.0 or exec_rate is not None:
+    bounce_back: str | None = None
+    if "high bounce" in q or "high bounce-back" in q:
+        bounce_back = "high"
+    elif "low bounce" in q:
+        bounce_back = "low"
+
+    if (
+        cat_id
+        or savings_delta
+        or spend_pool_delta
+        or timeline_factor != 1.0
+        or exec_rate is not None
+        or bounce_back
+    ):
         scenarios.append({
             "name": "custom_nl",
             "target": "category" if cat_id else "portfolio",
             "id": cat_id,
             "savings_pct_delta": savings_delta,
+            "spend_pool_delta_pct": spend_pool_delta,
             "timeline_factor": timeline_factor,
             "execution_rate": exec_rate,
+            "bounce_back_override": bounce_back,
         })
     return scenarios
 
 
-def _llm_parse_scenarios(
+def _llm_parse_what_if(
     question: str,
     categories: List[Dict[str, str]],
-) -> List[Dict[str, Any]]:
-    from app.opar.llm_provider import call_llm
+) -> Dict[str, Any]:
+    from app.opar.llm_provider import call_llm_structured
+    from app.opar.llm_schemas import SCENARIO_PARSE_SCHEMA
 
     system = (
-        "Parse a what-if question into JSON: "
-        '{"scenarios": [{"name": str, "target": "portfolio"|"category", '
-        '"id": str|null, "savings_pct_delta": float, "timeline_factor": float, '
-        '"execution_rate": float|null}], "drivers": {}}. '
-        "savings_pct_delta is fractional (-0.1 = -10%). "
-        "Only use category ids/names from the provided list. "
-        "Return ONLY JSON."
+        "Parse a what-if question into structured scenario specs and portfolio driver overrides. "
+        "savings_pct_delta, addressable_spend_delta_pct, and spend_pool_delta_pct are fractional "
+        "(-0.1 = -10%). cost_driver_deltas maps named drivers (e.g. supplier_price_inflation_pct) "
+        "to fractional deltas. bounce_back_override is high|medium|low when specified. "
+        "Only use category ids/names from the provided list."
     )
     user = json.dumps(
         {"question": question, "categories": categories[:30]},
         ensure_ascii=False,
     )
-    raw = call_llm(system, user, max_tokens=600, skill_name="scenario_parser")
-    if not raw:
-        return []
-    try:
-        from app.opar.claude_client import _extract_json
-
-        data = _extract_json(raw)
-        if isinstance(data, dict):
-            return list(data.get("scenarios") or [])
-    except Exception:
-        logger.warning("scenario_parser: LLM JSON parse failed")
-    return []
+    data = call_llm_structured(
+        system,
+        user,
+        SCENARIO_PARSE_SCHEMA,
+        max_tokens=800,
+        skill_name="scenario_parser",
+    )
+    if isinstance(data, dict):
+        return {
+            "scenarios": list(data.get("scenarios") or []),
+            "drivers": dict(data.get("drivers") or {}),
+        }
+    return {"scenarios": [], "drivers": {}}
 
 
 def validate_custom_scenarios(
@@ -207,6 +231,10 @@ def validate_custom_scenarios(
             ):
                 errors.append(f"Unknown category '{target_id}' — not in session data")
                 continue
+        bounce = raw.get("bounce_back_override")
+        if bounce is not None and str(bounce).lower() not in ("high", "medium", "low"):
+            errors.append(f"Invalid bounce_back_override '{bounce}' — use high, medium, or low")
+            bounce = None
         try:
             validated.append(
                 CustomScenarioSpec(
@@ -216,6 +244,14 @@ def validate_custom_scenarios(
                     savings_pct_delta=float(raw.get("savings_pct_delta") or 0.0),
                     timeline_factor=float(raw.get("timeline_factor") or 1.0),
                     execution_rate=float(raw["execution_rate"]) if raw.get("execution_rate") is not None else None,
+                    addressable_spend_delta_pct=float(raw.get("addressable_spend_delta_pct") or 0.0),
+                    spend_pool_delta_pct=float(raw.get("spend_pool_delta_pct") or 0.0),
+                    bounce_back_override=str(bounce).lower() if bounce else None,
+                    cost_driver_deltas={
+                        str(k): float(v)
+                        for k, v in (raw.get("cost_driver_deltas") or {}).items()
+                        if isinstance(v, (int, float))
+                    },
                 )
             )
         except Exception as exc:
@@ -227,13 +263,24 @@ def parse_what_if_request(
     session: ToolSessionContext,
     question: str,
 ) -> Dict[str, Any]:
-    """NL → drivers + custom scenarios with validation."""
+    """NL → drivers + custom scenarios with validation (LLM primary, regex fast-path)."""
     question = (question or "").strip()
     categories = _session_categories(session)
-    drivers = parse_drivers_from_nl(question)
-    scenarios = _rule_based_scenarios(question, categories)
+
+    llm_parsed = _llm_parse_what_if(question, categories)
+    drivers = dict(llm_parsed.get("drivers") or {})
+    scenarios = list(llm_parsed.get("scenarios") or [])
+
+    for key, val in parse_drivers_from_nl(question).items():
+        drivers.setdefault(key, val)
+
     if not scenarios:
-        scenarios = _llm_parse_scenarios(question, categories)
+        scenarios = _rule_based_scenarios(question, categories)
+
+    for spec in scenarios:
+        for key, val in (spec.get("cost_driver_deltas") or {}).items():
+            drivers.setdefault(str(key), float(val))
+
     validated, errors = validate_custom_scenarios(scenarios, categories)
     return {
         "question": question,
@@ -241,6 +288,7 @@ def parse_what_if_request(
         "scenarios": [s.model_dump() for s in validated],
         "validation_errors": errors,
         "known_categories": categories[:20],
+        "parse_source": "llm" if llm_parsed.get("scenarios") else "regex",
     }
 
 

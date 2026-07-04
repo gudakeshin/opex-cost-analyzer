@@ -52,6 +52,7 @@ llm_cost_usd_total = Counter(
 
 # Pricing per 1M tokens (input, output) — for cost estimation only.
 _LLM_PRICE_PER_1M: dict[str, tuple[float, float]] = {
+    "claude-sonnet-5": (3.0, 15.0),
     "claude-sonnet-4-6": (3.0, 15.0),
     "claude-opus-4-8": (15.0, 75.0),
     "claude-haiku-4-5-20251001": (0.80, 4.0),
@@ -61,10 +62,31 @@ _LLM_PRICE_PER_1M: dict[str, tuple[float, float]] = {
 _DEFAULT_PRICE = (3.0, 15.0)
 
 
-def record_llm_usage(provider: str, model: str, input_tokens: int, output_tokens: int) -> None:
+def record_llm_usage(
+    provider: str,
+    model: str,
+    input_tokens: int,
+    output_tokens: int,
+    *,
+    cache_read_input_tokens: int = 0,
+    cache_creation_input_tokens: int = 0,
+) -> None:
     """Record token counts and estimated cost to Prometheus metrics."""
     p_in, p_out = _LLM_PRICE_PER_1M.get(model, _DEFAULT_PRICE)
-    cost = (input_tokens * p_in + output_tokens * p_out) / 1_000_000
+    cost = (
+        input_tokens * p_in
+        + cache_creation_input_tokens * p_in * 1.25
+        + cache_read_input_tokens * p_in * 0.1
+        + output_tokens * p_out
+    ) / 1_000_000
     llm_tokens_total.labels(provider=provider, model=model, token_type="input").inc(input_tokens)
     llm_tokens_total.labels(provider=provider, model=model, token_type="output").inc(output_tokens)
+    if cache_read_input_tokens:
+        llm_tokens_total.labels(provider=provider, model=model, token_type="cache_read").inc(
+            cache_read_input_tokens
+        )
+    if cache_creation_input_tokens:
+        llm_tokens_total.labels(provider=provider, model=model, token_type="cache_creation").inc(
+            cache_creation_input_tokens
+        )
     llm_cost_usd_total.labels(provider=provider, model=model).inc(cost)

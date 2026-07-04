@@ -26,6 +26,7 @@ interface SensitivityResult {
   scenarios: SensitivityScenario[];
   baseline_mid_savings: number;
   confidence_bands: { low: number; mid: number; high: number };
+  narrative?: string;
 }
 
 interface SensitivityPanelProps {
@@ -209,6 +210,12 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({ sessionId })
           </div>
           {loading && <Loader label="Computing scenarios…" />}
           {result && (
+            <>
+              {result.narrative && (
+                <div className="text-xs text-brand-ink border border-brand-border rounded p-2 whitespace-pre-wrap prose prose-sm max-w-none">
+                  {result.narrative}
+                </div>
+              )}
             <div className="overflow-auto max-h-80 border border-brand-border rounded">
               <table className="w-full text-xs">
                 <thead>
@@ -233,6 +240,7 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({ sessionId })
                 </tbody>
               </table>
             </div>
+            </>
           )}
         </div>
       )}

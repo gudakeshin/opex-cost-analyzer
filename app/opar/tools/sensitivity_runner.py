@@ -49,6 +49,13 @@ def run_sensitivity_for_session(
     custom_scenarios = list(scenarios or [])
     driver_inputs = dict(drivers or {})
 
+    for raw in custom_scenarios:
+        for key, val in (raw.get("cost_driver_deltas") or {}).items():
+            try:
+                driver_inputs.setdefault(str(key), float(val))
+            except (TypeError, ValueError):
+                pass
+
     if natural_language:
         parsed_nl = parse_what_if_request(session, natural_language)
         custom_scenarios.extend(parsed_nl.get("scenarios") or [])

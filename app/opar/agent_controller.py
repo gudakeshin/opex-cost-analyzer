@@ -230,6 +230,87 @@ def run_agent_controller(
     )
 
 
+def run_agent_chat_controller(
+    ctx: ObserveContext,
+    *,
+    seed_skill_outputs: Dict[str, Any] | None = None,
+    progress_callback: Callable[[str, str], None] | None = None,
+    thinking_callback: Callable[[str], None] | None = None,
+    transport: Any | None = None,
+) -> AgentRunResult:
+    """Lightweight agent loop for general_qa chat — accepts tool-only outcomes."""
+    if not agent_loop_available():
+        return AgentRunResult(success=False, fallback_reason="agent_loop_unavailable")
+
+    transports = [transport] if transport is not None else _iter_transports()
+    if not transports:
+        return AgentRunResult(success=False, fallback_reason="no_llm_transport")
+
+    session = ToolSessionContext(ctx=ctx)
+    if seed_skill_outputs:
+        session.skill_outputs.update(seed_skill_outputs)
+    agent_system = _build_agent_system(session)
+
+    def dispatch(call: ToolCall) -> Any:
+        if progress_callback:
+            progress_callback("act", f"Agent tool: {call.name}")
+        return dispatch_tool_call(session, call)
+
+    last_exc: Exception | None = None
+    loop_result = None
+    for active_transport in transports:
+        try:
+            loop_result = run_tool_loop(
+                system=agent_system,
+                messages=[{"role": "user", "content": _build_user_message(ctx)}],
+                tools=get_tool_catalog(),
+                dispatch=dispatch,
+                transport=active_transport,
+                thinking=True,
+                thinking_callback=thinking_callback,
+            )
+            break
+        except Exception as exc:
+            last_exc = exc
+            logger.warning(
+                '"agent_chat_controller failed session=%s transport=%s err=%s"',
+                ctx.session_id,
+                type(active_transport).__name__,
+                exc,
+            )
+            loop_result = None
+    else:
+        return AgentRunResult(
+            success=False,
+            fallback_reason=str(last_exc)[:200] if last_exc else "all_transports_failed",
+        )
+
+    if loop_result is None:
+        return AgentRunResult(success=False, fallback_reason="agent_loop_returned_no_result")
+
+    final_text = (loop_result.final_text or "").strip()
+    has_outputs = bool(session.skill_outputs or session.opportunity_assessment)
+    if not has_outputs and not final_text:
+        return AgentRunResult(
+            success=False,
+            fallback_reason="agent_produced_no_outputs",
+            agent_summary=loop_result.final_text,
+            agent_trace=session.agent_trace,
+        )
+
+    act_result = session.to_act_result() if session.skill_outputs else None
+    exec_plan = session.to_execution_plan() if session.skills_run else None
+
+    return AgentRunResult(
+        success=True,
+        act_result=act_result,
+        exec_plan=exec_plan,
+        agent_summary=loop_result.final_text,
+        thinking_text=loop_result.thinking_text,
+        agent_trace=session.agent_trace,
+    )
+
+
 def try_agent_run(
     ctx: ObserveContext,
     *,
@@ -248,6 +329,30 @@ def try_agent_run(
         return result
     logger.info(
         '"agent_fallback session=%s reason=%s"',
+        ctx.session_id,
+        result.fallback_reason,
+    )
+    return result
+
+
+def try_agent_chat_run(
+    ctx: ObserveContext,
+    *,
+    seed_skill_outputs: Dict[str, Any] | None = None,
+    progress_callback: Callable[[str, str], None] | None = None,
+    thinking_callback: Callable[[str], None] | None = None,
+) -> Optional[AgentRunResult]:
+    """Agent tool loop for bespoke chat turns; falls back to one-shot synthesis on failure."""
+    result = run_agent_chat_controller(
+        ctx,
+        seed_skill_outputs=seed_skill_outputs,
+        progress_callback=progress_callback,
+        thinking_callback=thinking_callback,
+    )
+    if result.success:
+        return result
+    logger.info(
+        '"agent_chat_fallback session=%s reason=%s"',
         ctx.session_id,
         result.fallback_reason,
     )

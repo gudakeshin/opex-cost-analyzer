@@ -101,46 +101,9 @@ def _is_schema_request(msg: str) -> bool:
     )
 
 
-_INTERACTIVE_QA_CAPABILITIES = frozenset({
-    "value_modeling",
-    "benchmarking",
-    "root_cause",
-    "executive_narrative",
-    "document_context",
-})
-
-_INTERACTIVE_QA_TOKENS = (
-    "savings",
-    "save money",
-    "optimize",
-    "optimise",
-    "priorit",
-    "opportunity",
-    "opportunities",
-    "value bridge",
-    "value-at-the-table",
-    "addressable",
-    "business case",
-    "npv",
-    "payback",
-    "benchmark",
-    "peer",
-    "compare",
-    "root cause",
-    "why ",
-    "driver",
-    "executive",
-    "cfo",
-    "board",
-    "reduce cost",
-    "cost reduction",
-    "cost optimization",
-    "cost optimisation",
-    "renegotiat",
-    "re-negotiat",
-    "renewal",
-    "initiative",
-    "lever",
+from app.opar.chat_routing import (
+    should_use_cached_qa_fastpath as _should_use_cached_qa_fastpath,
+    should_use_agent_chat_path as _should_use_agent_chat_path,
 )
 
 
@@ -153,20 +116,6 @@ def _should_use_agent_path(ctx: Any) -> bool:
     if ctx.intent_class == "export_business_case":
         return False
     if not (ctx.has_tabular_spend or ctx.spend_profile_ready or ctx.has_document_files):
-        return False
-    return True
-
-
-def _should_use_cached_qa_fastpath(ctx: Any, msg: str) -> bool:
-    """Return True only for simple spend lookups that can be answered from cache.
-
-    Savings, optimization, benchmark, and executive questions must fall through
-    to plan → act → reflect so the response is query-conditioned."""
-    caps = set(getattr(ctx, "query_capabilities", None) or [])
-    if caps & _INTERACTIVE_QA_CAPABILITIES:
-        return False
-    lowered = (msg or "").lower()
-    if any(token in lowered for token in _INTERACTIVE_QA_TOKENS):
         return False
     return True
 
@@ -213,6 +162,79 @@ def _add_progress_step(progress: list[Dict[str, str]], phase: str, message: str)
             "message": message,
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
+    )
+
+
+def _try_agent_chat_response(
+    ctx: ObserveContext,
+    msg: str,
+    *,
+    session_id: str,
+    validated: Dict[str, Any],
+    manifest: Dict[str, Any],
+    currency: str,
+    chat_history: list[dict[str, str]] | None,
+    thinking_enabled: bool,
+    thinking_callback: Callable[[str], None] | None,
+    token_callback: Callable[[str], None] | None,
+    progress: list[Dict[str, str]],
+    progress_callback: Callable[[str, str], None] | None,
+) -> ReflectOutput | None:
+    """Run the agent tool loop for bespoke chat; None when caller should fall back."""
+    from app.opar.agent_controller import try_agent_chat_run
+
+    _add_progress_step(progress, "plan", "Agent investigating your question with tools...")
+    if progress_callback:
+        progress_callback("plan", "Agent investigating your question with tools...")
+    agent_result = try_agent_chat_run(
+        ctx,
+        seed_skill_outputs=validated,
+        progress_callback=progress_callback,
+        thinking_callback=thinking_callback,
+    )
+    if not agent_result or not agent_result.success:
+        return None
+
+    merged = dict(validated)
+    if agent_result.act_result and agent_result.act_result.skill_outputs:
+        merged.update(agent_result.act_result.skill_outputs)
+
+    synthesis = synthesize_chat_response(
+        ctx,
+        manifest,
+        merged,
+        chat_history=chat_history,
+        currency=currency,
+        thinking_enabled=thinking_enabled,
+        thinking_callback=thinking_callback,
+        token_callback=token_callback,
+    )
+    response_text = synthesis.response_text
+    if not synthesis.used_llm and agent_result.agent_summary:
+        response_text = agent_result.agent_summary
+
+    meta = dict(synthesis.response_metadata or {})
+    meta["agent_path"] = True
+    meta["agent_chat"] = True
+    if agent_result.agent_trace:
+        meta["agent_trace"] = agent_result.agent_trace
+    if agent_result.agent_summary:
+        meta["agent_summary"] = agent_result.agent_summary
+
+    next_opts = []
+    if merged.get("spend-profiler"):
+        next_opts = [
+            {"label": "Benchmark my spend", "message": "Benchmark my spend against industry peers"},
+            {"label": "Value-at-the-table", "message": "Calculate the value-at-the-table matrix"},
+        ]
+    return ReflectOutput(
+        response_text=response_text,
+        loop_complete=True,
+        progress_steps=progress,
+        next_options=next_opts,
+        used_llm_synthesis=synthesis.used_llm or bool(agent_result.agent_summary),
+        thinking_text=synthesis.thinking_text or agent_result.thinking_text,
+        response_metadata=meta,
     )
 
 
@@ -434,6 +456,7 @@ async def run_opar_loop(
     file_ids: list[str] | None = None,
     progress_callback: Callable[[str, str], None] | None = None,
     thinking_callback: Callable[[str], None] | None = None,
+    token_callback: Callable[[str], None] | None = None,
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
     chat_history: list[dict[str, str]] | None = None,
@@ -446,6 +469,7 @@ async def run_opar_loop(
         return await _run_opar_loop_inner(
             msg, session_id, user_id, file_ids, progress_callback, progress,
             thinking_callback=thinking_callback,
+            token_callback=token_callback,
             thinking_enabled=thinking_enabled,
             thinking_budget_tokens=thinking_budget_tokens,
             chat_history=chat_history,
@@ -459,6 +483,7 @@ async def resume_opar_loop(
     answer: ClarificationAnswer,
     progress_callback: Callable[[str, str], None] | None = None,
     thinking_callback: Callable[[str], None] | None = None,
+    token_callback: Callable[[str], None] | None = None,
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
     chat_history: list[dict[str, str]] | None = None,
@@ -488,6 +513,7 @@ async def resume_opar_loop(
         progress_callback,
         progress,
         thinking_callback=thinking_callback,
+        token_callback=token_callback,
         thinking_enabled=thinking_enabled,
         thinking_budget_tokens=thinking_budget_tokens,
         clarification_answer=clarification_answer,
@@ -508,6 +534,7 @@ async def _run_opar_loop_inner(
     progress_callback: Callable[[str, str], None] | None,
     progress: list[Dict[str, str]],
     thinking_callback: Callable[[str], None] | None = None,
+    token_callback: Callable[[str], None] | None = None,
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
     clarification_answer: ClarificationAnswer | None = None,
@@ -587,7 +614,7 @@ async def _run_opar_loop_inner(
                         progress_steps=progress,
                         next_options=[{"label": "File format guide", "message": "What columns does my spend file need?"}],
                     )
-            if not chart_request and _should_use_cached_qa_fastpath(ctx, msg):
+            if not chart_request and existing_analysis:
                 validated = existing_analysis.get("skill_outputs", {})
                 if not validated:
                     validated = {"spend-profiler": existing_analysis} if existing_analysis.get("category_profile") else {}
@@ -596,34 +623,54 @@ async def _run_opar_loop_inner(
 
                     validated = apply_probe_answers_to_skill_outputs(validated, session_id)
                 except Exception:
-                    # Degraded, not fatal: the response proceeds without the
-                    # consultant's probe answers — record it, don't hide it.
                     logger.exception('"probe_answer_merge_failed session_id=%s — proceeding without probe answers"', session_id)
                 manifest = _session_manifest(session_id)
                 currency = str(existing_analysis.get("reporting_currency") or _session_currency(session_id))
-                synthesis = synthesize_chat_response(
-                    ctx,
-                    manifest,
-                    validated,
-                    chat_history=chat_history,
-                    currency=currency,
-                    thinking_enabled=thinking_enabled,
-                )
-                next_opts = []
-                if validated.get("spend-profiler"):
-                    next_opts = [
-                        {"label": "Benchmark my spend", "message": "Benchmark my spend against industry peers"},
-                        {"label": "Value-at-the-table", "message": "Calculate the value-at-the-table matrix"},
-                    ]
-                return ReflectOutput(
-                    response_text=synthesis.response_text,
-                    loop_complete=True,
-                    progress_steps=progress,
-                    next_options=next_opts,
-                    used_llm_synthesis=synthesis.used_llm,
-                    thinking_text=synthesis.thinking_text,
-                    response_metadata=synthesis.response_metadata,
-                )
+
+                if _should_use_agent_chat_path(ctx, msg):
+                    agent_chat = _try_agent_chat_response(
+                        ctx,
+                        msg,
+                        session_id=session_id,
+                        validated=validated,
+                        manifest=manifest,
+                        currency=currency,
+                        chat_history=chat_history,
+                        thinking_enabled=thinking_enabled,
+                        thinking_callback=thinking_callback,
+                        token_callback=token_callback,
+                        progress=progress,
+                        progress_callback=progress_callback,
+                    )
+                    if agent_chat is not None:
+                        return agent_chat
+
+                if _should_use_cached_qa_fastpath(ctx, msg):
+                    synthesis = synthesize_chat_response(
+                        ctx,
+                        manifest,
+                        validated,
+                        chat_history=chat_history,
+                        currency=currency,
+                        thinking_enabled=thinking_enabled,
+                        thinking_callback=thinking_callback,
+                        token_callback=token_callback,
+                    )
+                    next_opts = []
+                    if validated.get("spend-profiler"):
+                        next_opts = [
+                            {"label": "Benchmark my spend", "message": "Benchmark my spend against industry peers"},
+                            {"label": "Value-at-the-table", "message": "Calculate the value-at-the-table matrix"},
+                        ]
+                    return ReflectOutput(
+                        response_text=synthesis.response_text,
+                        loop_complete=True,
+                        progress_steps=progress,
+                        next_options=next_opts,
+                        used_llm_synthesis=synthesis.used_llm,
+                        thinking_text=synthesis.thinking_text,
+                        response_metadata=synthesis.response_metadata,
+                    )
 
         # No stored analysis — check if files are uploaded
         if ctx.uploaded_file_ids or ctx.has_tabular_spend:
@@ -697,6 +744,7 @@ async def _run_opar_loop_inner(
                 thinking_budget_tokens=thinking_budget_tokens,
                 chat_history=chat_history,
                 thinking_callback=thinking_callback,
+                token_callback=token_callback,
             )
             meta = dict(result.response_metadata or {})
             meta["agent_trace"] = agent_result.agent_trace or []
@@ -794,6 +842,7 @@ async def _run_opar_loop_inner(
             thinking_budget_tokens=thinking_budget_tokens,
             chat_history=chat_history,
             thinking_callback=thinking_callback,
+            token_callback=token_callback,
         )
 
         # Close the agentic loop: if the reflect-gate replanner produced a

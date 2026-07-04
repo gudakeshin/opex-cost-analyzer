@@ -152,7 +152,7 @@ def run_custom_sensitivity(request: Request, payload: CustomSensitivityRequest) 
     savings_model = analysis.get("skill_outputs", {}).get("savings-modeler")
     manifest = analysis.get("manifest") or {}
     custom = [s.model_dump() for s in payload.scenarios]
-    return compute_sensitivity(
+    result = compute_sensitivity(
         bridge,
         savings_model=savings_model,
         discount_rate=float(payload.discount_rate or manifest.get("wacc") or 0.10),
@@ -161,6 +161,15 @@ def run_custom_sensitivity(request: Request, payload: CustomSensitivityRequest) 
         ),
         custom_scenarios=custom,
     )
+    from app.opar.sensitivity_narrative import synthesize_sensitivity_narrative
+
+    currency = str(manifest.get("currency") or analysis.get("reporting_currency") or "INR")
+    result["narrative"] = synthesize_sensitivity_narrative(
+        result,
+        currency=currency,
+        scenario_labels=[s.name for s in payload.scenarios],
+    )
+    return result
 
 
 @router.get("/api/v1/engagements/{engagement_id}/export")
