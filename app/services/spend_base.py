@@ -52,6 +52,73 @@ def assert_spend_base_consistent(session: Dict[str, Any]) -> None:
         )
 
 
+def _session_engagement_id(session_id: str) -> str | None:
+    from app.routers._shared import read_manifest
+
+    manifest = read_manifest(session_id, {})
+    return str(manifest.get("engagement_id") or "") or None
+
+
+def open_spend_query(session_id: str):
+    """Return the session engagement's SpendStore when it has indexed data.
+
+    Returns None when duckdb/pyarrow are unavailable, the session has no
+    engagement, or nothing has been Parquet-indexed yet (legacy engagements
+    are backfilled lazily via ensure_spend_store_synced, not here — this is
+    called on the hot analysis path and must stay cheap).
+    """
+    from app.services import spend_store as ss
+
+    if not ss.is_available():
+        return None
+    engagement_id = _session_engagement_id(session_id)
+    if not engagement_id:
+        return None
+    store = ss.SpendStore(engagement_id)
+    return store if store.has_data() else None
+
+
+def ensure_spend_store_synced(session_id: str):
+    """Open the store, backfilling legacy sessions on first use.
+
+    When the engagement has no Parquet yet but the corpus has spend lines,
+    write them once (as a synthetic 'legacy-backfill' document) together with
+    the session's persisted adjustments. Called from the explicit query
+    surfaces (ad-hoc SQL endpoint, agent tool) — not the analysis hot path.
+    """
+    from app.services import spend_store as ss
+
+    store = open_spend_query(session_id)
+    if store is not None:
+        return store
+    if not ss.is_available():
+        return None
+    engagement_id = _session_engagement_id(session_id)
+    if not engagement_id:
+        return None
+    lines, _docs, _manifest = load_authoritative_spend_lines(session_id)
+    if not lines:
+        return None
+    store = ss.SpendStore(engagement_id)
+    store.write_document_lines("legacy-backfill", lines)
+    store.write_adjustments(store.adjustments_from_lines(lines))
+    return store
+
+
+def sync_spend_store_adjustments(session_id: str, lines: List[NormalizedSpendLine]) -> None:
+    """Mirror session line adjustments into the analytical store (best-effort)."""
+    try:
+        store = open_spend_query(session_id)
+        if store is not None:
+            store.write_adjustments(store.adjustments_from_lines(lines))
+    except Exception:
+        from app.config import logger
+
+        logger.warning(
+            '"spend_store_adjustment_sync_failed session_id=%s"', session_id, exc_info=True
+        )
+
+
 def load_authoritative_spend_lines(
     session_id: str,
 ) -> Tuple[List[NormalizedSpendLine], List[str], Dict[str, Any]]:
@@ -137,6 +204,9 @@ def refresh_spend_base(
 
     assert_spend_base_consistent(updated_state)
     _memory.put("session", session_id, updated_state)
+    # Keep the analytical store's effective `spend` view aligned with the
+    # freshly persisted adjustments (conflict resolutions, eliminations).
+    sync_spend_store_adjustments(session_id, lines)
 
     profile = inc_outputs["spend-profiler"]
     new_total = float(profile.get("total_spend", 0.0) or 0.0)

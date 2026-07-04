@@ -50,6 +50,11 @@ class SkillContext:
     entity_tree: Dict[str, Any] | None = None
     segment_revenue: Dict[str, float] | None = None
     sector_weights: Dict[str, float] | None = None
+    # Analytical spend store (app/services/spend_store.SpendStore) when the
+    # session's engagement has Parquet-indexed spend. Skills that can push
+    # aggregations down to DuckDB should prefer it over scanning `lines`;
+    # None when duckdb/pyarrow are absent or nothing is indexed yet.
+    spend_store: Any | None = None
 
     # ── Convenience accessors ───────────────────────────────────────────────
 
