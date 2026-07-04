@@ -27,6 +27,7 @@ from app.schemas import CustomSensitivityRequest, SavedQueryRequest, SpendQueryR
 from app.security.auth import check_session_owner
 from app.services.compliance import append_audit_event
 from app.services.sensitivity import compute_sensitivity
+from app.services.spend_schema import load_spend_schema
 from app.services.spend_store import SpendQueryError, SpendStoreUnavailable, is_available
 
 router = APIRouter()
@@ -76,34 +77,8 @@ def get_spend_schema(request: Request, session_id: str) -> Dict[str, Any]:
     validate_session_id(session_id)
     check_session_owner(request, session_id)
     store = _open_store(session_id)
-    with store.connect_readonly() as con:
-        columns = [
-            {"name": r[0], "type": r[1]}
-            for r in con.execute(
-                "SELECT column_name, data_type FROM information_schema.columns "
-                "WHERE table_name = 'spend_raw' ORDER BY ordinal_position"
-            ).fetchall()
-        ]
-        samples: Dict[str, list] = {}
-        for dim in ("category_name", "supplier", "business_unit", "gl_code", "cost_center_id"):
-            rows = con.execute(
-                f"SELECT {dim}, COUNT(*) AS n FROM spend WHERE {dim} IS NOT NULL "
-                f"GROUP BY {dim} ORDER BY n DESC LIMIT 15"
-            ).fetchall()
-            samples[dim] = [r[0] for r in rows]
-        total = con.execute("SELECT COUNT(*), SUM(amount) FROM spend").fetchone()
-    return {
-        "session_id": session_id,
-        "views": {
-            "spend": "Effective spend lines (reconciled amounts applied, eliminated lines excluded)",
-            "spend_raw": "As-ingested lines, including eliminated ones",
-            "adjustments": "Line-level conflict/consolidation adjustments",
-        },
-        "columns": columns,
-        "sample_values": samples,
-        "line_count": int(total[0] or 0),
-        "total_spend": float(total[1] or 0.0),
-    }
+    payload = load_spend_schema(store)
+    return {"session_id": session_id, **payload}
 
 
 # ---------------------------------------------------------------------------

@@ -277,6 +277,16 @@ skills:
   weight: light
   runtime: python
   status: active
+- name: sensitivity-analyzer
+  tier: Strategic
+  parallel_group: 5
+  depends_on:
+  - value-bridge-calculator
+  estimated_tokens: 400
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
 - name: value-bridge-calculator
   tier: Savings & Value
   parallel_group: 4

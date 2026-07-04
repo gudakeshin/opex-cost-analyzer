@@ -11,8 +11,9 @@ from app.opar.agent_runtime import ToolCall, agent_loop_available, run_tool_loop
 from app.opar.models import ActResult, ExecutionPlan, ObserveContext
 from app.opar.tools.catalog import dispatch_tool_call, get_tool_catalog
 from app.opar.tools.context import ToolSessionContext
+from app.services.spend_schema import NL_QUERY_ROUTING_EXAMPLES, compact_schema_for_agent, load_spend_schema
 
-_AGENT_SYSTEM = """You are a senior FP&A analyst embedded in an OpEx cost intelligence platform.
+_AGENT_SYSTEM_BASE = """You are a senior FP&A analyst embedded in an OpEx cost intelligence platform.
 
 Your mandate: investigate before concluding. Never surface savings opportunities from thresholds alone.
 
@@ -20,16 +21,35 @@ Workflow:
 1. Understand the user's question and what evidence is needed.
 2. Use find_skills when unsure which analysis capabilities apply.
 3. search_documents for contract/policy/supporting evidence from uploads.
-4. run_skill (or query_spend / get_benchmarks / model_savings) for deterministic numbers.
-5. get_evidence before claiming initiative readiness.
-6. assess_opportunities to pressure-test which gaps are real vs noise.
+4. natural_language_query for ad-hoc spend questions in plain English (preferred over raw SQL).
+5. run_skill (or get_benchmarks / model_savings) for deterministic analysis.
+6. run_sensitivity for what-if / NPV scenario analysis (execution rate, delays, macro shocks).
+7. get_evidence before claiming initiative readiness.
+8. assess_opportunities to pressure-test which gaps are real vs noise.
 
 Rules:
 - Deterministic skill outputs are the numeric anchor; if you adjust figures, explain why.
 - Prefer specific suppliers, categories, and mechanisms over generic advice.
 - When data is missing, say so and suggest what upload would help.
 - Finish with a concise analyst summary once you have sufficient evidence.
+
+{routing_examples}
 """
+
+
+def _build_agent_system(session: ToolSessionContext) -> str:
+    """Inject spend schema context when a store is available."""
+    parts = [_AGENT_SYSTEM_BASE.format(routing_examples=NL_QUERY_ROUTING_EXAMPLES)]
+    try:
+        from app.services.spend_base import open_spend_query
+
+        store = open_spend_query(session.session_id)
+        if store is not None:
+            schema = load_spend_schema(store)
+            parts.append(compact_schema_for_agent(schema))
+    except Exception:
+        pass
+    return "\n\n".join(parts)
 
 
 @dataclass
@@ -124,6 +144,7 @@ def run_agent_controller(
         return AgentRunResult(success=False, fallback_reason="no_llm_transport")
 
     session = ToolSessionContext(ctx=ctx)
+    agent_system = _build_agent_system(session)
 
     def dispatch(call: ToolCall) -> Any:
         if progress_callback:
@@ -134,7 +155,7 @@ def run_agent_controller(
     for active_transport in transports:
         try:
             loop_result = run_tool_loop(
-                system=_AGENT_SYSTEM,
+                system=agent_system,
                 messages=[{"role": "user", "content": _build_user_message(ctx)}],
                 tools=get_tool_catalog(),
                 dispatch=dispatch,

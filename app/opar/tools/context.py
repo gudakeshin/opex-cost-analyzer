@@ -134,6 +134,14 @@ class ToolSessionContext:
                 "maturity_score": output.get("maturity_score"),
                 "initiatives": (output.get("initiatives") or [])[:6],
             }
+        if skill_name == "sensitivity-analyzer":
+            scenarios = output.get("scenarios") or []
+            return {
+                "skill": skill_name,
+                "baseline_mid_savings": output.get("baseline_mid_savings"),
+                "scenario_count": len(scenarios),
+                "scenarios": scenarios[:12],
+            }
         # Generic truncation
         text = str(output)
         if len(text) > 6000:

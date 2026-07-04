@@ -614,6 +614,22 @@ def _scenario_modeler(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     ), None
 
 
+@register("sensitivity-analyzer")
+def _sensitivity_analyzer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    from app.services.sensitivity import compute_sensitivity
+
+    bridge = ctx.prior("value-bridge-calculator")
+    if not bridge:
+        return {"error": "value-bridge-calculator required"}, None
+    savings = ctx.prior("savings-modeler")
+    return compute_sensitivity(
+        bridge,
+        savings_model=savings,
+        discount_rate=ctx.wacc,
+        effective_tax_rate=ctx.effective_tax_rate,
+    ), None
+
+
 @register("value-to-shareholder-bridge")
 def _value_to_shareholder_bridge(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     initiatives, wacc, _tax_rate, _base = _portfolio_inputs(ctx)

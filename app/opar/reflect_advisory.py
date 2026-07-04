@@ -22,7 +22,7 @@ _CAPABILITY_SKILL_MAP: Dict[str, frozenset[str]] = {
     }),
     "value_modeling": frozenset({
         "savings-modeler", "value-bridge-calculator", "heuristic-analyzer",
-        "scenario-modeler", "cost-to-serve-analyzer",
+        "scenario-modeler", "sensitivity-analyzer", "cost-to-serve-analyzer",
     }),
     "variance_analysis": frozenset({"bva-analyzer"}),
     "temporal_trend": frozenset({"temporal-analyzer"}),

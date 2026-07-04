@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 
 from app.opar.agent_runtime import ToolCall, ToolDefinition
 from app.opar.tools.context import ToolSessionContext
+from app.services.spend_schema import spend_schema_description
 
 SEARCH_DOCUMENTS_TOOL = ToolDefinition(
     name="search_documents",
@@ -57,15 +58,36 @@ RUN_SKILL_TOOL = ToolDefinition(
     },
 )
 
+NATURAL_LANGUAGE_QUERY_TOOL = ToolDefinition(
+    name="natural_language_query",
+    description=(
+        "Preferred entry for ad-hoc spend questions in plain English. Routes to "
+        "deterministic skills (benchmarks, profiler, cohort), structured rollups, "
+        "or SQL as needed. " + spend_schema_description()
+    ),
+    input_schema={
+        "type": "object",
+        "properties": {
+            "question": {
+                "type": "string",
+                "description": "Natural-language spend question.",
+            },
+            "prefer": {
+                "type": "string",
+                "enum": ["auto", "skill", "aggregate", "sql"],
+                "description": "Force a routing tier (default auto).",
+            },
+        },
+        "required": ["question"],
+    },
+)
+
 QUERY_SPEND_TOOL = ToolDefinition(
     name="query_spend",
     description=(
-        "Run a read-only SQL SELECT against the session's spend store (DuckDB view `spend`). "
-        "Columns include: supplier, category_id, category_name, amount, period, business_unit, "
-        "gl_code, cost_center_id, currency, description. "
-        "Views: spend (effective lines), spend_raw (as-ingested), adjustments. "
-        "Use for bespoke cuts — top vendors by category, QoQ trends, BU rollups. "
-        "Provide a full SELECT; omit sql only for a default top-categories summary."
+        "Run a read-only SQL SELECT when you already have SQL. "
+        + spend_schema_description()
+        + " Provide a full SELECT; omit sql only for a default top-categories summary."
     ),
     input_schema={
         "type": "object",
@@ -136,6 +158,43 @@ MODEL_SAVINGS_TOOL = ToolDefinition(
     },
 )
 
+RUN_SENSITIVITY_TOOL = ToolDefinition(
+    name="run_sensitivity",
+    description=(
+        "Run deterministic NPV/savings what-if scenarios. Supports built-in presets "
+        "(conservative, accelerated, bounce_back, …), macro shocks (fx_stress, "
+        "wage_inflation, commodity_spike), custom scenario specs, or natural_language "
+        "what-if questions. Auto-runs value-bridge prerequisites."
+    ),
+    input_schema={
+        "type": "object",
+        "properties": {
+            "preset": {
+                "type": "string",
+                "description": (
+                    "Built-in or macro preset id, e.g. conservative, accelerated, fx_stress."
+                ),
+            },
+            "natural_language": {
+                "type": "string",
+                "description": "Plain-English what-if to parse into scenarios/drivers.",
+            },
+            "scenarios": {
+                "type": "array",
+                "description": "Structured custom scenarios (CustomScenarioSpec fields).",
+                "items": {"type": "object"},
+            },
+            "drivers": {
+                "type": "object",
+                "description": (
+                    "Portfolio drivers: execution_rate_pct, headcount_growth_pct, "
+                    "revenue_growth_pct, timeline_compression_factor."
+                ),
+            },
+        },
+    },
+)
+
 ASSESS_OPPORTUNITIES_TOOL = ToolDefinition(
     name="assess_opportunities",
     description=(
@@ -155,11 +214,13 @@ ALL_TOOLS: List[ToolDefinition] = [
     SEARCH_DOCUMENTS_TOOL,
     FIND_SKILLS_TOOL,
     RUN_SKILL_TOOL,
+    NATURAL_LANGUAGE_QUERY_TOOL,
     QUERY_SPEND_TOOL,
     SAVE_QUERY_RESULT_TOOL,
     GET_BENCHMARKS_TOOL,
     GET_EVIDENCE_TOOL,
     MODEL_SAVINGS_TOOL,
+    RUN_SENSITIVITY_TOOL,
     ASSESS_OPPORTUNITIES_TOOL,
 ]
 
@@ -176,11 +237,13 @@ def dispatch_tool_call(session: ToolSessionContext, call: ToolCall) -> Any:
         "search_documents": _search_documents,
         "find_skills": _find_skills,
         "run_skill": _run_skill,
+        "natural_language_query": _natural_language_query,
         "query_spend": _query_spend,
         "save_query_result": _save_query_result,
         "get_benchmarks": _get_benchmarks,
         "get_evidence": _get_evidence,
         "model_savings": _model_savings,
+        "run_sensitivity": _run_sensitivity,
         "assess_opportunities": _assess_opportunities,
     }
     handler = handlers.get(call.name)
@@ -223,6 +286,16 @@ def _open_agent_store(session: ToolSessionContext):
     return ensure_spend_store_synced(session.session_id)
 
 
+def _natural_language_query(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str, Any]:
+    from app.opar.tools.nl_query import run_natural_language_query
+
+    question = str(args.get("question") or session.user_message).strip()
+    prefer = str(args.get("prefer") or "auto")
+    if prefer not in ("auto", "skill", "aggregate", "sql"):
+        prefer = "auto"
+    return run_natural_language_query(session, question=question, prefer=prefer)  # type: ignore[arg-type]
+
+
 def _query_spend(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str, Any]:
     sql = (args.get("sql") or "").strip()
     limit = int(args.get("limit") or 500)
@@ -240,7 +313,6 @@ def _query_spend(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str,
             return {"sql": sql, **result.to_dict()}
         except SpendQueryError as exc:
             return {"sql": sql, "error": str(exc), "rows": []}
-    # Fallback: spend-profiler path when store unavailable
     out = session.invoke_skill("spend-profiler")
     category = (args.get("category") or "").strip()
     if category and isinstance(out.get("top_categories"), list):
@@ -298,11 +370,31 @@ def _model_savings(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[st
     return session.invoke_skill("savings-modeler")
 
 
+def _run_sensitivity(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str, Any]:
+    from app.opar.tools.sensitivity_runner import run_sensitivity_for_session
+
+    scenarios = args.get("scenarios")
+    if scenarios is not None and not isinstance(scenarios, list):
+        scenarios = None
+    drivers = args.get("drivers")
+    if drivers is not None and not isinstance(drivers, dict):
+        drivers = None
+    return run_sensitivity_for_session(
+        session,
+        scenarios=scenarios,
+        drivers=drivers,
+        preset=args.get("preset"),
+        natural_language=args.get("natural_language"),
+    )
+
+
 def _assess_opportunities(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str, Any]:
     from app.opar.tools.opportunity_reasoning import assess_opportunities_with_llm
 
     _model_savings(session, args)
     session.invoke_skill("evidence-gatherer")
-    assessment = assess_opportunities_with_llm(session, focus_category=args.get("focus_category"), notes=args.get("notes"))
+    assessment = assess_opportunities_with_llm(
+        session, focus_category=args.get("focus_category"), notes=args.get("notes")
+    )
     session.opportunity_assessment = assessment
     return assessment

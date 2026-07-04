@@ -310,6 +310,7 @@ _DEP_MAP: Dict[str, tuple[int, List[str], int]] = {
     "value-bridge-calculator":   (4, ["peer-benchmarker", "internal-benchmarker", "savings-modeler", "heuristic-analyzer"], 700),
     "evidence-gatherer":         (4, ["savings-modeler", "spend-profiler", "root-cause-analyzer", "peer-benchmarker"], 400),
     "scenario-modeler":          (4, ["savings-modeler"], 600),
+    "sensitivity-analyzer":      (5, ["value-bridge-calculator"], 400),
     # Group 5 — depend on group 4
     "data-validator":            (5, ["value-bridge-calculator"], 200),
     "business-case-builder":     (5, ["value-bridge-calculator"], 1500),
@@ -669,10 +670,15 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
         selected = ["spend-profiler", "peer-benchmarker", "internal-benchmarker"]
         if ctx.has_annual_revenue:
             selected.append("heuristic-analyzer")
-        selected += ["savings-modeler", "value-bridge-calculator"]
+        selected += [
+            "savings-modeler",
+            "value-bridge-calculator",
+            "scenario-modeler",
+            "sensitivity-analyzer",
+        ]
         return _finalize_plan(
             _expand(selected),
-            "I'll model NPV sensitivity across discount rate, tax rate, execution rate, headcount growth, and revenue growth scenarios.",
+            "I'll model NPV sensitivity across discount rate, tax rate, execution rate, headcount growth, revenue growth, and built-in what-if scenarios.",
             "~50 seconds",
             False,
             ctx,
