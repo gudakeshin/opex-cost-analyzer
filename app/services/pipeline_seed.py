@@ -56,12 +56,18 @@ def seed_initiatives_from_analysis(
     *,
     user_id: str | None = None,
     template: str = "detailed_proposal",
+    advisory: Any | None = None,
 ) -> int:
     """Create pipeline initiatives from business-case rows when not already present.
 
+    ``advisory`` lets callers pass an already-computed ``AdvisorySections`` so the
+    business case is not regenerated via a fresh LLM call (the chat path reuses
+    the advisory built for the turn). When omitted, ``build_business_case`` runs
+    its own LLM advisory synthesis as before.
+
     Returns the number of newly created initiatives.
     """
-    bc = build_business_case(analysis, template=template)
+    bc = build_business_case(analysis, template=template, advisory=advisory)
     uid = user_id or _user_id_from_manifest(analysis)
     engagement_id = _resolve_engagement_id(session_id, analysis)
     existing = list_initiatives(session_id=session_id)

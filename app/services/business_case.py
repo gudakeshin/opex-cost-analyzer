@@ -321,7 +321,11 @@ def _priority_actions(advisory: Any | None, details: list[Dict[str, Any]], curre
     return out
 
 
-def build_business_case(analysis: Dict[str, Any], template: str = "detailed_proposal") -> Dict[str, Any]:
+def build_business_case(
+    analysis: Dict[str, Any],
+    template: str = "detailed_proposal",
+    advisory: Any | None = None,
+) -> Dict[str, Any]:
     outputs = analysis.get("skill_outputs", {})
     bridge = outputs.get("value-bridge-calculator", {})
     conf = bridge.get("confidence_bands", {})
@@ -330,7 +334,10 @@ def build_business_case(analysis: Dict[str, Any], template: str = "detailed_prop
     top_categories = _top_categories_from_profile(outputs)
     top_text = ", ".join(top_categories) if top_categories else "top identified categories"
 
-    advisory = _llm_advisory_sections(analysis)
+    # Callers may pass an already-computed AdvisorySections to avoid a redundant
+    # LLM synthesis; otherwise generate it here (best-effort, degrades to None).
+    if advisory is None:
+        advisory = _llm_advisory_sections(analysis)
     details = build_initiative_details(outputs, advisory)
 
     # Executive summary: LLM takeaway when available, else the deterministic band line.
