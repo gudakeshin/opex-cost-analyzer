@@ -12,6 +12,7 @@ TIER_MAP: Dict[str, str] = {
     "spend-profiler": "Diagnostics",
     "bva-analyzer": "Diagnostics",
     "temporal-analyzer": "Diagnostics",
+    "cohort-segmenter": "Diagnostics",
     "internal-benchmarker": "Diagnostics",
     "peer-benchmarker": "Benchmarking",
     "heuristic-analyzer": "Benchmarking",

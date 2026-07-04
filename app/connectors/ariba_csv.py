@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any, List
 
 from app.connectors.base import ConnectorInterface, FetchResult
+from app.connectors._since import filter_lines_since
 from app.models import NormalizedSpendLine
 
 logger = logging.getLogger("opex.connector.ariba_csv")
@@ -56,6 +57,12 @@ class AribaCSVConnector(ConnectorInterface):
                         lines.append(self._map_row(row, idx))
                     except Exception as exc:
                         errors.append(f"row {idx}: {exc}")
+            since = kwargs.get("since")
+            if since:
+                before = len(lines)
+                lines = filter_lines_since(lines, str(since))
+                if len(lines) < before:
+                    logger.info('"ariba_csv_since_filter before=%d after=%d"', before, len(lines))
             logger.info('"ariba_csv_fetch rows=%d errors=%d"', len(lines), len(errors))
             return FetchResult(lines=lines, errors=errors, row_count=len(lines), source_system_id=self.source_system_id)
         except Exception as exc:

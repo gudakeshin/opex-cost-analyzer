@@ -61,6 +61,10 @@ class SAPODataConnector(ConnectorInterface):
                 filters.append(f"FiscalYear eq '{kwargs['fiscal_year']}'")
             if kwargs.get("company_code"):
                 filters.append(f"CompanyCode eq '{kwargs['company_code']}'")
+            since = kwargs.get("since")
+            if since:
+                date_part = str(since)[:10]
+                filters.append(f"PostingDate ge datetime'{date_part}T00:00:00'")
             if filters:
                 params["$filter"] = " and ".join(filters)
 

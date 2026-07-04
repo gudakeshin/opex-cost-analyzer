@@ -288,6 +288,7 @@ _DEP_MAP: Dict[str, tuple[int, List[str], int]] = {
     "payment-terms-optimizer":   (1, ["spend-profiler"], 450),
     "bva-analyzer":              (1, ["spend-profiler"], 500),
     "temporal-analyzer":         (1, ["spend-profiler"], 500),
+    "cohort-segmenter":          (1, ["spend-profiler"], 450),
     "chart-builder":             (1, ["spend-profiler"], 300),
     "contract-lifecycle-manager":(1, ["spend-profiler"], 500),
     "dashboard-builder":         (1, ["spend-profiler"], 300),

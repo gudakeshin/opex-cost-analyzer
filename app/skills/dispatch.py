@@ -227,16 +227,26 @@ def _build_transaction_examples(
 
 
 # ---------------------------------------------------------------------------
-# Skill handlers — one per skill, decorated with @register
-# ---------------------------------------------------------------------------
+from app.services.cache import MID_CAP_LIMIT
+
+
+def _should_use_pushdown(ctx: SkillContext) -> bool:
+    if ctx.spend_store is None:
+        return False
+    n = len(ctx.lines) if ctx.lines else ctx.spend_store.line_count()
+    return n > MID_CAP_LIMIT
+
 
 from app.skills import engine as _engine  # noqa: E402  (after primitives)
+from app.skills.engine import cohort as _cohort  # noqa: E402
 
 
 # ── Tier 0: raw data ingestion ───────────────────────────────────────────────
 
 @register("spend-profiler")
 def _spend_profiler(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    if _should_use_pushdown(ctx):
+        return _engine.spend_profiler_pushdown(ctx.spend_store), None
     return _engine.spend_profiler(ctx.lines), None
 
 
@@ -264,6 +274,16 @@ def _temporal_analyzer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     return _engine.temporal_analyzer(ctx.lines), None
 
 
+@register("cohort-segmenter")
+def _cohort_segmenter(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    if ctx.spend_store is None:
+        return {"cohort_available": False, "reason": "No analytical spend store indexed"}, None
+    group_by = ctx.manifest.get("cohort_group_by")
+    if isinstance(group_by, str):
+        group_by = [group_by]
+    return _cohort.cohort_segmenter(ctx.spend_store, group_by=group_by), None
+
+
 @register("payment-terms-optimizer")
 def _payment_terms_optimizer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     return _engine.payment_terms_optimizer(
@@ -286,6 +306,8 @@ def _heuristic_analyzer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
 
 @register("internal-benchmarker")
 def _internal_benchmarker(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    if _should_use_pushdown(ctx):
+        return _engine.internal_benchmarker_pushdown(ctx.spend_store), None
     return _engine.internal_benchmarker(ctx.lines), None
 
 

@@ -86,6 +86,7 @@ def compute_sensitivity(
     discount_rate: float = 0.10,
     effective_tax_rate: float = 0.0,
     drivers: Dict[str, float] | None = None,
+    custom_scenarios: List[Dict[str, Any]] | None = None,
 ) -> Dict[str, Any]:
     """Compute sensitivity scenarios for the savings portfolio.
 
@@ -340,6 +341,40 @@ def compute_sensitivity(
         "driver_adjusted": False,
         "regulatory_warning": True,
     })
+
+    for custom in custom_scenarios or []:
+        name = str(custom.get("name") or "custom")
+        delta = float(custom.get("savings_pct_delta", 0.0))
+        tl = float(custom.get("timeline_factor", timeline_factor))
+        exec_r = float(custom.get("execution_rate", base_exec))
+        target = str(custom.get("target") or "portfolio")
+        target_id = str(custom.get("id") or "")
+        adjusted_mid = mid * (1.0 + delta)
+        if target == "category" and target_id and savings_model and savings_model.get("initiatives"):
+            cat_savings = sum(
+                float(i.get("net_savings", {}).get("total_3yr", 0.0))
+                for i in savings_model["initiatives"]
+                if str(i.get("category_id") or i.get("category")) == target_id
+            )
+            adjusted_mid = mid - cat_savings + cat_savings * (1.0 + delta)
+        scenarios.append({
+            "name": name,
+            "key_assumption": (
+                f"Custom what-if: {target}={target_id or 'all'}, "
+                f"savings Δ {delta:+.0%}, execution {exec_r:.0%}, timeline ×{tl:.2f}"
+            ),
+            "savings_3yr": round(adjusted_mid * exec_r, 2),
+            "timeline_months": int(36 * tl),
+            "npv_pretax": round(_simple_npv(adjusted_mid * exec_r, 3.0 * tl, 0.0), 2),
+            "npv_aftertax": round(
+                _simple_npv(adjusted_mid * exec_r, 3.0 * tl, effective_tax_rate), 2
+            ),
+            "execution_rate": exec_r,
+            "driver_adjusted": True,
+            "custom": True,
+            "target": target,
+            "target_id": target_id,
+        })
 
     return {
         "discount_rate": discount_rate,

@@ -166,6 +166,15 @@ skills:
   kind: analysis
   weight: light
   runtime: python
+- name: cohort-segmenter
+  tier: Diagnostics
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 450
+  kind: analysis
+  weight: light
+  runtime: python
   status: active
 - name: vendor-master-builder
   tier: Enterprise Data

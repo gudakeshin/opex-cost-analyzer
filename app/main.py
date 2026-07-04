@@ -39,7 +39,7 @@ from app.config import (
 )
 from app.opar.memory_adapter import get_memory_adapter_status
 from app.services.document_index import get_document_index_status
-from app.routers import benchmarks, chat, compliance, connectors, engagements, enterprise, llm, outputs, pipeline, sessions, skills, workbench
+from app.routers import benchmarks, chat, compliance, connectors, engagements, enterprise, jobs, llm, outputs, pipeline, query, sessions, skills, workbench
 from app.security.auth import auth_enabled, enforce_resource_owner, require_auth
 from app.storage import ensure_dirs
 from app.memory import MemoryStore as _MemoryStore
@@ -98,6 +98,7 @@ _CLEANUP_INTERVAL_H = int(os.getenv("CLEANUP_INTERVAL_HOURS", "24"))
 
 # Shared memory store for health/usage stats (MemoryStore is stateless wrapper).
 _memory_store = _MemoryStore()
+_job_stop = asyncio.Event()
 
 
 async def _periodic_cleanup() -> None:
@@ -131,7 +132,23 @@ async def _on_startup() -> None:
     # One-time legacy JSON → SQLite import (no-op on the json backend or once
     # the database is populated). Runs in a thread: it's sqlite/file I/O.
     await asyncio.to_thread(import_json_if_needed)
+    try:
+        from app.services.jobs import requeue_stale_jobs, run_job_worker
+        from app.services.job_handlers import register_all_job_handlers
+
+        register_all_job_handlers()
+        n = await asyncio.to_thread(requeue_stale_jobs)
+        if n:
+            logger.info('"jobs_requeued count=%s"', n)
+        asyncio.create_task(run_job_worker(_job_stop))
+    except Exception as exc:
+        logger.warning('"job_worker_start_skipped error=%s"', exc)
     asyncio.create_task(_periodic_cleanup())
+
+
+@app.on_event("shutdown")
+async def _on_shutdown() -> None:
+    _job_stop.set()
 
 
 # CORS
@@ -320,12 +337,14 @@ _auth = [Depends(require_auth), Depends(enforce_resource_owner)]
 app.include_router(engagements.router, dependencies=_auth)
 app.include_router(sessions.router, dependencies=_auth)
 app.include_router(connectors.router, dependencies=_auth)
+app.include_router(jobs.router, dependencies=_auth)
 app.include_router(chat.router, dependencies=_auth)
 app.include_router(llm.router, dependencies=_auth)
 app.include_router(pipeline.router, dependencies=_auth)
 app.include_router(benchmarks.router, dependencies=_auth)
 app.include_router(skills.router, dependencies=_auth)
 app.include_router(workbench.router, dependencies=_auth)
+app.include_router(query.router, dependencies=_auth)
 app.include_router(outputs.router, dependencies=_auth)
 app.include_router(compliance.router, dependencies=_auth)
 app.include_router(enterprise.router, dependencies=_auth)

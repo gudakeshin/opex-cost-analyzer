@@ -675,6 +675,67 @@ def spend_profiler(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
     return result
 
 
+def spend_profiler_pushdown(store: Any) -> Dict[str, Any]:
+    """DuckDB pushdown for large-cap engagements — core profile fields only.
+
+    Produces the same top-level keys as spend_profiler so downstream skills and
+    assert_spend_base_consistent stay compatible. Rich per-category fields
+    (HHI, Kraljic, addressability) are omitted; use the in-memory path for
+    mid-cap corpora where those matter.
+    """
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from app.services.spend_store import SpendStore
+
+    agg = store.aggregate(
+        group_by=["category_id", "category_name"],
+        metrics={"spend": "SUM(amount)", "line_count": "COUNT(*)"},
+        order_by="spend DESC",
+        limit=500,
+    )
+    total_row = store.run_sql("SELECT SUM(amount) AS total FROM spend", limit=1)
+    total = float(total_row.rows[0][0] or 0.0) if total_row.rows else 0.0
+
+    category_profile: List[Dict[str, Any]] = []
+    col_idx = {name: i for i, name in enumerate(agg.columns)}
+    for row in agg.rows:
+        spend = float(row[col_idx["spend"]] or 0.0)
+        category_profile.append(
+            {
+                "category_id": row[col_idx["category_id"]],
+                "category_name": row[col_idx["category_name"]],
+                "spend": spend,
+                "line_count": int(row[col_idx["line_count"]] or 0),
+                "share_of_total": round(spend / total, 6) if total else 0.0,
+                "addressable_spend": spend,
+            }
+        )
+
+    div = store.run_sql(
+        "SELECT COUNT(DISTINCT business_unit) AS bus, "
+        "COUNT(DISTINCT cost_center_id) AS ccs FROM spend",
+        limit=1,
+    )
+    bus, ccs = (0, 0)
+    if div.rows:
+        bus = int(div.rows[0][0] or 0)
+        ccs = int(div.rows[0][1] or 0)
+
+    return {
+        "total_spend": total,
+        "category_profile": category_profile,
+        "multi_currency": False,
+        "currency_breakdown": {},
+        "quadrant_breakdown": {},
+        "organizational_diversity": {
+            "distinct_business_units": bus,
+            "distinct_cost_centers": ccs,
+        },
+        "pushdown": True,
+    }
+
+
 # ---------------------------------------------------------------------------
 # Chart builder
 # ---------------------------------------------------------------------------

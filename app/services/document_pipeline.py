@@ -101,6 +101,12 @@ def _cache_spend_lines(
     from app.services.spend_store import write_document_spend_lines
 
     parquet_ok = write_document_spend_lines(engagement_id, document_id, lines)
+    try:
+        from app.services.cache import CostRoomCache
+
+        CostRoomCache().invalidate(engagement_id)
+    except Exception:
+        pass
     if len(lines) <= _JSON_CACHE_MAX_LINES or not parquet_ok:
         (parsed_dir / "spend_lines.json").write_text(
             json.dumps(_serialize_lines(lines), indent=2),

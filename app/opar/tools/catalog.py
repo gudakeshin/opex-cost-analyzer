@@ -59,12 +59,49 @@ RUN_SKILL_TOOL = ToolDefinition(
 
 QUERY_SPEND_TOOL = ToolDefinition(
     name="query_spend",
-    description="Read spend-profiler output: totals, categories, suppliers. Runs profiler if needed.",
+    description=(
+        "Run a read-only SQL SELECT against the session's spend store (DuckDB view `spend`). "
+        "Columns include: supplier, category_id, category_name, amount, period, business_unit, "
+        "gl_code, cost_center_id, currency, description. "
+        "Views: spend (effective lines), spend_raw (as-ingested), adjustments. "
+        "Use for bespoke cuts — top vendors by category, QoQ trends, BU rollups. "
+        "Provide a full SELECT; omit sql only for a default top-categories summary."
+    ),
     input_schema={
         "type": "object",
         "properties": {
-            "category": {"type": "string", "description": "Optional category filter."},
+            "sql": {
+                "type": "string",
+                "description": "Single SELECT or WITH…SELECT against view `spend`.",
+            },
+            "limit": {
+                "type": "integer",
+                "description": "Max rows to return (default 500, cap 10000).",
+            },
+            "category": {
+                "type": "string",
+                "description": "Legacy filter — used only when SQL is omitted and store unavailable.",
+            },
         },
+    },
+)
+
+SAVE_QUERY_RESULT_TOOL = ToolDefinition(
+    name="save_query_result",
+    description=(
+        "Execute a SELECT and save results as a downloadable CSV under /api/v1/exports/. "
+        "Use after query_spend when the user wants an export artifact."
+    ),
+    input_schema={
+        "type": "object",
+        "properties": {
+            "sql": {"type": "string", "description": "SELECT to export."},
+            "filename": {
+                "type": "string",
+                "description": "Base filename without extension (default: query_export).",
+            },
+        },
+        "required": ["sql"],
     },
 )
 
@@ -119,6 +156,7 @@ ALL_TOOLS: List[ToolDefinition] = [
     FIND_SKILLS_TOOL,
     RUN_SKILL_TOOL,
     QUERY_SPEND_TOOL,
+    SAVE_QUERY_RESULT_TOOL,
     GET_BENCHMARKS_TOOL,
     GET_EVIDENCE_TOOL,
     MODEL_SAVINGS_TOOL,
@@ -139,6 +177,7 @@ def dispatch_tool_call(session: ToolSessionContext, call: ToolCall) -> Any:
         "find_skills": _find_skills,
         "run_skill": _run_skill,
         "query_spend": _query_spend,
+        "save_query_result": _save_query_result,
         "get_benchmarks": _get_benchmarks,
         "get_evidence": _get_evidence,
         "model_savings": _model_savings,
@@ -178,7 +217,30 @@ def _run_skill(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str, A
     return session.invoke_skill(name)
 
 
+def _open_agent_store(session: ToolSessionContext):
+    from app.services.spend_base import ensure_spend_store_synced
+
+    return ensure_spend_store_synced(session.session_id)
+
+
 def _query_spend(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str, Any]:
+    sql = (args.get("sql") or "").strip()
+    limit = int(args.get("limit") or 500)
+    store = _open_agent_store(session)
+    if store is not None:
+        if not sql:
+            sql = (
+                "SELECT category_name, SUM(amount) AS spend, COUNT(*) AS lines "
+                "FROM spend GROUP BY category_name ORDER BY spend DESC"
+            )
+        from app.services.spend_store import SpendQueryError
+
+        try:
+            result = store.run_sql(sql, limit=limit)
+            return {"sql": sql, **result.to_dict()}
+        except SpendQueryError as exc:
+            return {"sql": sql, "error": str(exc), "rows": []}
+    # Fallback: spend-profiler path when store unavailable
     out = session.invoke_skill("spend-profiler")
     category = (args.get("category") or "").strip()
     if category and isinstance(out.get("top_categories"), list):
@@ -189,7 +251,33 @@ def _query_spend(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str,
             or category.lower() in str(c.get("category_id", "")).lower()
         ]
         out["filtered_categories"] = filtered
+    out["fallback"] = "spend-profiler"
     return out
+
+
+def _save_query_result(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str, Any]:
+    import re
+    import uuid
+
+    from app.config import OUTPUT_DIR
+
+    sql = (args.get("sql") or "").strip()
+    if not sql:
+        raise ValueError("save_query_result requires sql")
+    store = _open_agent_store(session)
+    if store is None:
+        raise RuntimeError("No spend store available for export")
+    base = re.sub(r"[^\w\-]+", "_", (args.get("filename") or "query_export").strip())[:80]
+    filename = f"{base}_{uuid.uuid4().hex[:8]}.csv"
+    path = OUTPUT_DIR / filename
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    row_count = store.export_sql(sql, path, fmt="csv")
+    return {
+        "filename": filename,
+        "download_url": f"/api/v1/exports/{filename}",
+        "row_count": row_count,
+        "format": "csv",
+    }
 
 
 def _get_benchmarks(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str, Any]:

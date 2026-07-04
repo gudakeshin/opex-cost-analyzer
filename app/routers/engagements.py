@@ -22,9 +22,11 @@ from app.security.auth import current_principal, visible_to_principal
 from app.services.analysis import load_taxonomy
 from app.services.compliance import append_audit_event
 from app.services.document_pipeline import (
+    _should_stream_csv,
     process_engagement_document,
     validate_upload_suffix,
 )
+from app.services.jobs import enqueue_job
 from app.services.engagements_store import (
     SUPPORTED_EXTENSIONS,
     add_document_record,
@@ -248,6 +250,19 @@ async def upload_document(
         engagement_id=engagement_id,
         data={"document_id": document_id, "file": safe_filename},
     )
+    use_job = (
+        suffix.lower() == ".csv" and _should_stream_csv(raw_path)
+    ) or size_bytes > 100 * 1024 * 1024
+    if use_job:
+        job_id = enqueue_job(
+            "document_parse",
+            {
+                "engagement_id": engagement_id,
+                "document_id": document_id,
+                "currency": currency,
+            },
+        )
+        return {"document": record, "status": "pending", "job_id": job_id}
     background_tasks.add_task(_run_document_pipeline, engagement_id, document_id, currency)
     return {"document": record, "status": "pending"}
 

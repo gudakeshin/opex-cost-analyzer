@@ -250,3 +250,26 @@ def test_json_fallback_when_parquet_missing(tmp_path, monkeypatch):
     SpendStore(eid).write_document_lines(did, [_line(i) for i in range(1, 6)])
     loaded = document_pipeline.load_cached_spend_lines(eid, did)
     assert len(loaded) == 5
+
+
+def test_pushdown_profiler_matches_in_memory_on_sample(store):
+    """Pushdown totals must match in-memory profiler for mid-size corpora."""
+    from app.skills.engine.profiler import spend_profiler, spend_profiler_pushdown
+
+    lines = [_line(i) for i in range(1, 501)]
+    store.write_document_lines("doc-1", lines)
+    mem = spend_profiler(lines)
+    push = spend_profiler_pushdown(store)
+    assert abs(mem["total_spend"] - push["total_spend"]) < 0.01
+    mem_by_cat = {c["category_id"]: c["spend"] for c in mem["category_profile"]}
+    push_by_cat = {c["category_id"]: c["spend"] for c in push["category_profile"]}
+    assert mem_by_cat == push_by_cat
+
+
+def test_export_sql_csv(store, tmp_path):
+    store.write_document_lines("doc-1", [_line(i) for i in range(1, 11)])
+    out = tmp_path / "export.csv"
+    n = store.export_sql("SELECT supplier, amount FROM spend", out)
+    assert n == 10
+    assert out.exists()
+    assert "supplier" in out.read_text(encoding="utf-8")

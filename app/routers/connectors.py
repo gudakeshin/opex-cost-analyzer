@@ -6,10 +6,13 @@ from typing import Any, Dict
 
 from fastapi import APIRouter, HTTPException, Request
 
+from app.routers._shared import validate_engagement_id
 from app.schemas import ConnectorIngestRequest
 from app.services.compliance import append_audit_event
 from app.services.connector_ingest import ingest_via_connector
 from app.services.connector_registry import list_connectors
+from app.services.connector_sync import list_watermarks
+from app.services.jobs import enqueue_job
 
 router = APIRouter()
 
@@ -20,6 +23,12 @@ def get_connectors() -> Dict[str, Any]:
     return {"connectors": list_connectors()}
 
 
+@router.get("/api/v1/engagements/{engagement_id}/connector-watermarks")
+def get_connector_watermarks(engagement_id: str) -> Dict[str, Any]:
+    validate_engagement_id(engagement_id)
+    return {"engagement_id": engagement_id, "watermarks": list_watermarks(engagement_id)}
+
+
 @router.post("/api/connectors/{connector_type}/ingest")
 @router.post("/api/v1/connectors/{connector_type}/ingest")
 async def ingest_connector(
@@ -27,7 +36,33 @@ async def ingest_connector(
     payload: ConnectorIngestRequest,
     request: Request,
 ) -> Dict[str, Any]:
-    _ = request  # reserved for rate-limit / auth hooks
+    _ = request
+    job_payload = {
+        "session_id": payload.session_id,
+        "connector_type": connector_type,
+        "source_file": payload.source_file,
+        "source_system_id": payload.source_system_id,
+        "credentials": payload.credentials,
+        "fetch_kwargs": payload.fetch_kwargs,
+        "run_analysis": payload.run_analysis,
+        "delta_sync": payload.delta_sync,
+    }
+
+    if payload.async_mode or payload.delta_sync:
+        job_id = enqueue_job("connector_ingest", job_payload)
+        append_audit_event(
+            "connector_ingest_queued",
+            session_id=payload.session_id,
+            data={"connector_type": connector_type, "job_id": job_id, "delta_sync": payload.delta_sync},
+        )
+        return {
+            "status": "queued",
+            "job_id": job_id,
+            "connector_type": connector_type,
+            "session_id": payload.session_id,
+            "delta_sync": payload.delta_sync,
+        }
+
     try:
         result = await asyncio.to_thread(
             ingest_via_connector,
@@ -38,6 +73,7 @@ async def ingest_connector(
             credentials=payload.credentials,
             fetch_kwargs=payload.fetch_kwargs,
             run_analysis=payload.run_analysis,
+            delta_sync=payload.delta_sync,
         )
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc

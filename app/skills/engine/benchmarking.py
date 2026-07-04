@@ -149,6 +149,41 @@ def internal_benchmarker(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
     return {"internal_variance": variances}
 
 
+def internal_benchmarker_pushdown(store: Any) -> Dict[str, Any]:
+    """DuckDB pushdown for BU × category internal spread analysis."""
+    agg = store.aggregate(
+        group_by=["business_unit", "category_id"],
+        metrics={"spend": "SUM(amount)"},
+        limit=50_000,
+    )
+    col_idx = {name: i for i, name in enumerate(agg.columns)}
+    categories: Dict[str, List[Tuple[str, float]]] = defaultdict(list)
+    for row in agg.rows:
+        bu = str(row[col_idx["business_unit"]] or "Unknown BU")
+        cat = str(row[col_idx["category_id"]])
+        categories[cat].append((bu, float(row[col_idx["spend"]] or 0.0)))
+
+    variances = []
+    for cat, pairs in categories.items():
+        values = [x[1] for x in pairs]
+        if len(values) < 2:
+            continue
+        max_v, min_v = max(values), min(values)
+        spread = ((max_v - min_v) / max_v) if max_v else 0.0
+        variances.append(
+            {
+                "category_id": cat,
+                "max_spend": max_v,
+                "min_spend": min_v,
+                "median_spend": median(values),
+                "internal_spread": spread,
+                "flagged_gt_20pct": spread > 0.2,
+                "segments": [{"segment": bu, "spend": amount} for bu, amount in pairs],
+            }
+        )
+    return {"internal_variance": variances, "pushdown": True}
+
+
 def heuristic_analyzer(
     profile: Dict[str, Any],
     revenue: float,

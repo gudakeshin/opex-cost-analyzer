@@ -484,6 +484,8 @@ class ConnectorIngestRequest(BaseModel):
     credentials: Dict[str, str] = {}
     fetch_kwargs: Dict[str, Any] = {}
     run_analysis: bool = False
+    delta_sync: bool = False
+    async_mode: bool = False
 
 
 # ---------------------------------------------------------------------------
@@ -512,3 +514,32 @@ class WorkbenchRunRequest(BaseModel):
 
 class WorkbenchBranchRequest(BaseModel):
     name: str | None = None
+
+
+class SpendQueryRequest(BaseModel):
+    """Ad-hoc SQL over the session's analytical spend store."""
+
+    sql: str
+    limit: int | None = None
+
+
+class SavedQueryRequest(BaseModel):
+    name: str
+    sql: str
+    description: str | None = None
+
+
+class CustomScenarioSpec(BaseModel):
+    name: str
+    target: str = "portfolio"  # portfolio | lever | vendor | category
+    id: str | None = None
+    savings_pct_delta: float = 0.0
+    timeline_factor: float = 1.0
+    execution_rate: float | None = None
+
+
+class CustomSensitivityRequest(BaseModel):
+    session_id: str
+    scenarios: List[CustomScenarioSpec]
+    discount_rate: float | None = None
+    effective_tax_rate: float | None = None

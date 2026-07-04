@@ -520,6 +520,36 @@ class SpendStore:
         finally:
             con.close()
 
+    def export_sql(
+        self,
+        sql: str,
+        path: Path,
+        *,
+        fmt: str = "csv",
+        limit: int = 1_000_000,
+    ) -> int:
+        """Materialize a validated SELECT to disk (csv or parquet). Returns row count."""
+        import csv
+
+        limit = max(1, min(int(limit), 1_000_000))
+        result = self.run_sql(sql, limit=limit)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if fmt == "parquet":
+            import pyarrow as pa
+            import pyarrow.parquet as pq
+
+            columns = {name: [] for name in result.columns}
+            for row in result.rows:
+                for i, name in enumerate(result.columns):
+                    columns[name].append(row[i])
+            pq.write_table(pa.table(columns), path)
+        else:
+            with path.open("w", newline="", encoding="utf-8") as fh:
+                writer = csv.writer(fh)
+                writer.writerow(result.columns)
+                writer.writerows(result.rows)
+        return result.row_count
+
     def destroy(self) -> None:
         """Remove all analytical data for this engagement."""
         if self.spend_dir.exists():
