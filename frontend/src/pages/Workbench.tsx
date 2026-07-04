@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { Card } from '../components/Common/Card';
 import { Loader } from '../components/Common/Loader';
@@ -10,11 +11,16 @@ import { DraftRunCanvas } from '../components/PageComponents/Workbench/DraftRunC
 import { ResultsBoard } from '../components/PageComponents/Workbench/ResultsBoard';
 import { RunCompareView } from '../components/PageComponents/Workbench/RunCompareView';
 import { RunDetail } from '../components/PageComponents/Workbench/RunDetail';
-import { apiGet, apiPost, apiDelete, getApiErrorMessage } from '../hooks/useApi';
+import { apiPost, apiDelete, getApiErrorMessage } from '../hooks/useApi';
 import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
 import { useSession } from '../context/SessionContext';
+import {
+  useWorkbenchCatalog,
+  useWorkbenchProgress,
+  useWorkbenchRuns,
+} from '../api/hooks/useWorkbenchQueries';
+import { workbenchKeys } from '../api/queryKeys';
 import type {
-  WorkbenchCatalog,
   WorkbenchRun,
   WorkbenchValidation,
   WorkbenchAssumptionField,
@@ -60,10 +66,13 @@ function overridesToFormValues(
 }
 
 export const Workbench: React.FC = () => {
+  const queryClient = useQueryClient();
   const { sessionId, engagementId, ensureSession } = useSession();
   const [activeSid, setActiveSid] = useState<string | null>(sessionId);
-  const [catalog, setCatalog] = useState<WorkbenchCatalog | null>(null);
-  const [hydrating, setHydrating] = useState(true);
+  const [sessionResolving, setSessionResolving] = useState(true);
+  const catalogQuery = useWorkbenchCatalog();
+  const catalog = catalogQuery.data ?? null;
+  const hydrating = sessionResolving || catalogQuery.isLoading;
   const [error, setError] = useState<string | null>(null);
 
   const [selected, setSelected] = useState<string[]>([]);
@@ -78,18 +87,26 @@ export const Workbench: React.FC = () => {
   const [seedFromRunId, setSeedFromRunId] = useState<string | null>(null);
   const [seedName, setSeedName] = useState<string | null>(null);
 
-  const [runs, setRuns] = useState<WorkbenchRun[]>([]);
+  const runsQuery = useWorkbenchRuns(engagementId, activeSid);
+  const runs = runsQuery.data?.runs ?? [];
   const [openRun, setOpenRun] = useState<WorkbenchRun | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [includeQualityGates, setIncludeQualityGates] = useState(false);
   const [includeLightReflect, setIncludeLightReflect] = useState(false);
-  const [progressMessage, setProgressMessage] = useState('');
+  const [runningRunId, setRunningRunId] = useState<string | null>(null);
   const [promoting, setPromoting] = useState(false);
 
   const validateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const progressQuery = useWorkbenchProgress(runningRunId, running);
+  const progressMessage = running
+    ? (() => {
+        const steps = progressQuery.data?.steps;
+        const last = steps?.[steps.length - 1];
+        return last?.message || progressQuery.data?.phase || 'Starting run…';
+      })()
+    : '';
 
-  // ---- Hydration: ensure a session, load catalog + board ------------------
+  // ---- Hydration: ensure a session ------------------------------------------
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -97,13 +114,10 @@ export const Workbench: React.FC = () => {
         const sid = sessionId || (await ensureSession());
         if (cancelled) return;
         setActiveSid(sid);
-        const cat = await apiGet<WorkbenchCatalog>('/api/v1/workbench/catalog');
-        if (cancelled) return;
-        setCatalog(cat);
       } catch (e) {
         if (!cancelled) setError(getApiErrorMessage(e));
       } finally {
-        if (!cancelled) setHydrating(false);
+        if (!cancelled) setSessionResolving(false);
       }
     })();
     return () => {
@@ -112,24 +126,13 @@ export const Workbench: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const loadRuns = useCallback(async () => {
-    const params = engagementId
-      ? `engagement_id=${engagementId}`
-      : activeSid
-        ? `session_id=${activeSid}`
-        : '';
-    if (!params) return;
-    try {
-      const res = await apiGet<{ runs: WorkbenchRun[] }>(`/api/v1/workbench/runs?${params}`);
-      setRuns(res.runs);
-    } catch (e) {
-      setError(getApiErrorMessage(e));
-    }
-  }, [engagementId, activeSid]);
+  useEffect(() => {
+    if (catalogQuery.isError) setError(getApiErrorMessage(catalogQuery.error));
+  }, [catalogQuery.isError, catalogQuery.error]);
 
   useEffect(() => {
-    if (!hydrating) loadRuns();
-  }, [hydrating, loadRuns]);
+    if (runsQuery.isError) setError(getApiErrorMessage(runsQuery.error));
+  }, [runsQuery.isError, runsQuery.error]);
 
   // ---- Live validation (debounced) ----------------------------------------
   useEffect(() => {
@@ -181,21 +184,9 @@ export const Workbench: React.FC = () => {
   const handleRun = async () => {
     if (!activeSid || !catalog || selected.length === 0) return;
     const runId = crypto.randomUUID();
+    setRunningRunId(runId);
     setRunning(true);
     setError(null);
-    setProgressMessage('Starting run…');
-
-    progressTimer.current = setInterval(async () => {
-      try {
-        const prog = await apiGet<{ steps?: { message?: string }[]; phase?: string }>(
-          `/api/v1/workbench/progress/${runId}`,
-        );
-        const last = prog.steps?.[prog.steps.length - 1];
-        setProgressMessage(last?.message || prog.phase || 'Running…');
-      } catch {
-        /* progress not ready yet */
-      }
-    }, 800);
 
     try {
       const run = await apiPost<WorkbenchRun>('/api/v1/workbench/runs', {
@@ -210,18 +201,21 @@ export const Workbench: React.FC = () => {
         include_quality_gates: includeQualityGates,
         include_light_reflect: includeLightReflect,
       });
-      setRuns((prev) => [run, ...prev]);
+      queryClient.setQueryData(
+        workbenchKeys.runs(engagementId, activeSid),
+        (prev: { runs: WorkbenchRun[] } | undefined) => ({
+          runs: [run, ...(prev?.runs ?? [])],
+        }),
+      );
       setRunName('');
       setParentRunId(null);
       setSeedFromRunId(null);
       setSeedName(null);
-      setProgressMessage('');
     } catch (e) {
       setError(getApiErrorMessage(e));
     } finally {
-      if (progressTimer.current) clearInterval(progressTimer.current);
       setRunning(false);
-      setProgressMessage('');
+      setRunningRunId(null);
     }
   };
 
@@ -233,16 +227,18 @@ export const Workbench: React.FC = () => {
         `/api/v1/workbench/runs/${run.run_id}/promote`,
         {},
       );
-      setRuns((prev) =>
-        prev.map((r) =>
-          r.run_id === run.run_id
-            ? { ...r, promoted_initiative_ids: res.promoted.map((p) => p.initiative_id) }
-            : r,
-        ),
+      const promotedIds = res.promoted.map((p) => p.initiative_id);
+      queryClient.setQueryData(
+        workbenchKeys.runs(engagementId, activeSid),
+        (prev: { runs: WorkbenchRun[] } | undefined) => ({
+          runs: (prev?.runs ?? []).map((r) =>
+            r.run_id === run.run_id ? { ...r, promoted_initiative_ids: promotedIds } : r,
+          ),
+        }),
       );
       setOpenRun((prev) =>
         prev?.run_id === run.run_id
-          ? { ...prev, promoted_initiative_ids: res.promoted.map((p) => p.initiative_id) }
+          ? { ...prev, promoted_initiative_ids: promotedIds }
           : prev,
       );
     } catch (e) {
@@ -276,7 +272,12 @@ export const Workbench: React.FC = () => {
   const handleDelete = async (run: WorkbenchRun) => {
     try {
       await apiDelete(`/api/v1/workbench/runs/${run.run_id}`);
-      setRuns((prev) => prev.filter((r) => r.run_id !== run.run_id));
+      queryClient.setQueryData(
+        workbenchKeys.runs(engagementId, activeSid),
+        (prev: { runs: WorkbenchRun[] } | undefined) => ({
+          runs: (prev?.runs ?? []).filter((r) => r.run_id !== run.run_id),
+        }),
+      );
       setCompareIds((prev) => prev.filter((id) => id !== run.run_id));
     } catch (e) {
       setError(getApiErrorMessage(e));

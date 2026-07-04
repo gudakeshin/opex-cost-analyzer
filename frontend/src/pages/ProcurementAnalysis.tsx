@@ -19,9 +19,11 @@ import { DeloitteLogo } from '../components/Brand/DeloitteLogo';
 import { SECTOR_OPTIONS } from '../constants/sectors';
 import { useSession } from '../context/SessionContext';
 import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { apiGet, apiPatch, apiPost, apiUpload, getApiErrorMessage } from '../hooks/useApi';
-import { fetchSessionManifest } from '../api/hooks/useSessionQueries';
+import { fetchSessionManifest, fetchSessionStatus } from '../api/hooks/useSessionQueries';
+import { useEngagementDocuments, useLlmModels } from '../api/hooks/useProcurementQueries';
+import { procurementKeys } from '../api/queryKeys';
 import { friendlyErrorMessage } from '../utils/errorMessages';
 import { loadChatMessages, saveChatMessages } from '../utils/chatStorage';
 import { latestAnalyzedSessionId } from '../utils/sessionResolve';
@@ -72,7 +74,6 @@ import type {
   AnalysisInsightSnapshot,
   BusinessClarification,
   ProbeAnswerResponse,
-  LlmModelsResponse,
 } from '../types';
 
 const LLM_MODEL_STORAGE_KEY = 'opex_llm_model';
@@ -172,10 +173,15 @@ async function pollChatProgress(
   onSteps: (steps: ProgressStep[]) => void,
   onThinking: (thinking: string) => void,
   signal: AbortSignal,
+  queryClient: QueryClient,
 ): Promise<void> {
   while (!signal.aborted) {
     try {
-      const entry = await apiGet<ChatProgressResponse>(`/api/v1/chat/progress/${runId}`);
+      const entry = await queryClient.fetchQuery({
+        queryKey: procurementKeys.chatProgress(runId),
+        queryFn: () => apiGet<ChatProgressResponse>(`/api/v1/chat/progress/${runId}`),
+        staleTime: 0,
+      });
       if (entry.steps?.length) onSteps(progressStepsFromPoll(entry));
       const thinking = String(entry.thinking_text ?? '').trim();
       if (thinking) onThinking(thinking);
@@ -218,7 +224,6 @@ export const ProcurementAnalysis: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const analysis = sessionAnalysis;
   const [manifest, setManifest] = useState<SessionManifest | null>(null);
-  const [engagementDocCount, setEngagementDocCount] = useState<number | null>(null);
   const [insightsOpen, setInsightsOpen] = useState(true);
   const {
     width: insightsPanelWidth,
@@ -260,7 +265,6 @@ export const ProcurementAnalysis: React.FC = () => {
   const [thinkingMode, setThinkingMode] = useState(false);
   const [liveThinking, setLiveThinking] = useState('');
   const [recoveryNotice, setRecoveryNotice] = useState<string | null>(null);
-  const [llmModels, setLlmModels] = useState<LlmModelsResponse['models']>([]);
   const [selectedLlmModel, setSelectedLlmModel] = useState('');
   const [conflictResolving, setConflictResolving] = useState(false);
   const [dismissedConflictKeys, setDismissedConflictKeys] = useState<Set<string>>(
@@ -280,24 +284,16 @@ export const ProcurementAnalysis: React.FC = () => {
     setDismissedConflictKeys(loadDismissedConflictKeys(sessionId));
   }, [sessionId]);
 
+  const llmModelsQuery = useLlmModels();
+  const llmModels = useMemo(() => llmModelsQuery.data?.models ?? [], [llmModelsQuery.data]);
+
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await apiGet<LlmModelsResponse>('/api/v1/llm/models');
-        if (cancelled) return;
-        setLlmModels(res.models ?? []);
-        const stored = localStorage.getItem(LLM_MODEL_STORAGE_KEY);
-        const validStored = res.models?.some((m) => m.id === stored) ? stored : null;
-        setSelectedLlmModel(validStored || res.default_model_id || res.models?.[0]?.id || '');
-      } catch {
-        if (!cancelled) setLlmModels([]);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    const res = llmModelsQuery.data;
+    if (!res) return;
+    const stored = localStorage.getItem(LLM_MODEL_STORAGE_KEY);
+    const validStored = res.models?.some((m) => m.id === stored) ? stored : null;
+    setSelectedLlmModel(validStored || res.default_model_id || res.models?.[0]?.id || '');
+  }, [llmModelsQuery.data]);
 
   const handleLlmModelChange = (modelId: string) => {
     setSelectedLlmModel(modelId);
@@ -308,15 +304,12 @@ export const ProcurementAnalysis: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    if (!engagementId) { setEngagementDocCount(null); return; }
-    apiGet<{ documents: { status: string }[] }>(`/api/v1/engagements/${engagementId}/documents`)
-      .then((res) => {
-        const ready = (res.documents ?? []).filter((d) => d.status === 'ready').length;
-        setEngagementDocCount(ready);
-      })
-      .catch(() => setEngagementDocCount(null));
-  }, [engagementId]);
+  const engagementDocumentsQuery = useEngagementDocuments(engagementId);
+  const engagementDocCount = engagementId
+    ? engagementDocumentsQuery.data
+      ? engagementDocumentsQuery.data.documents.filter((d) => d.status === 'ready').length
+      : null
+    : null;
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -333,10 +326,7 @@ export const ProcurementAnalysis: React.FC = () => {
 
     (async () => {
       try {
-        const status = await apiGet<{
-          session_exists?: boolean;
-          has_analysis?: boolean;
-        }>(`/api/v1/sessions/${sessionId}/status`);
+        const status = await fetchSessionStatus(queryClient, sessionId);
         // When the active session has no analysis, prefer the engagement's most
         // recent analyzed session. An engagement can hold several sessions and
         // the active id may point at an empty sibling — without this, returning
@@ -485,7 +475,7 @@ export const ProcurementAnalysis: React.FC = () => {
     setLiveThinking('');
     const ac = new AbortController();
     pollAbortRef.current = ac;
-    void pollChatProgress(runId, setAgentSteps, setLiveThinking, ac.signal);
+    void pollChatProgress(runId, setAgentSteps, setLiveThinking, ac.signal, queryClient);
   };
 
   const resetSmeProbeState = () => {
@@ -1057,7 +1047,13 @@ export const ProcurementAnalysis: React.FC = () => {
         : `run-${Date.now()}`;
     setLastRunId(runId);
     const controller = new AbortController();
-    const pollPromise = pollChatProgress(runId, setAgentSteps, setLiveThinking, controller.signal);
+    const pollPromise = pollChatProgress(
+      runId,
+      setAgentSteps,
+      setLiveThinking,
+      controller.signal,
+      queryClient,
+    );
     try {
       const sid = await ensureSession();
       const analysisResult = await apiPost<SessionResponse>(`/api/v1/analyze/${sid}`, {

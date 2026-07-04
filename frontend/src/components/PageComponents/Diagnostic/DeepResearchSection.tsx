@@ -1,19 +1,14 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Alert } from '../../Common/Alert';
 import { Button } from '../../Common/Button';
 import { Card } from '../../Common/Card';
 import { Loader } from '../../Common/Loader';
-import { apiGet, apiPost, getApiErrorMessage } from '../../../hooks/useApi';
+import { apiPost, getApiErrorMessage } from '../../../hooks/useApi';
+import { useDeepResearchStatus } from '../../../api/hooks/useDiagnosticQueries';
 import { buildDefaultDeepResearchPrompt } from '../../../utils/deepResearchPrompt';
-import type {
-  DeepResearchSource,
-  DeepResearchStartResponse,
-  DeepResearchStatusResponse,
-} from '../../../types';
+import type { DeepResearchSource, DeepResearchStartResponse } from '../../../types';
 
 type Phase = 'idle' | 'starting' | 'polling' | 'done' | 'failed';
-
-const POLL_INTERVAL_MS = 30_000;
 
 interface Props {
   companyName: string;
@@ -56,17 +51,9 @@ export const DeepResearchSection: React.FC<Props> = ({
   const [sourcesExpanded, setSourcesExpanded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedToSession, setSavedToSession] = useState(false);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const restoredRef = useRef(false);
 
-  const stopPolling = useCallback(() => {
-    if (pollRef.current !== null) {
-      clearInterval(pollRef.current);
-      pollRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => () => stopPolling(), [stopPolling]);
+  const statusQuery = useDeepResearchStatus(interactionId, sessionId, phase === 'polling');
 
   useEffect(() => {
     if (promptCustomized) return;
@@ -83,63 +70,39 @@ export const DeepResearchSection: React.FC<Props> = ({
     setPromptCustomized(false);
   };
 
-  const handlePollResult = useCallback(
-    (data: DeepResearchStatusResponse) => {
-      if (data.status === 'completed') {
-        stopPolling();
-        setSummary(data.summary ?? null);
-        setFullReport(data.full_report ?? null);
-        setSources(data.sources ?? []);
-        setPhase('done');
-        if (data.summary) {
-          onSummaryReady(data.summary);
-          setSavedToSession(!!sessionId);
-        }
-      } else if (data.status === 'failed') {
-        stopPolling();
-        setError(data.error ?? 'Deep research job failed. Please try again.');
-        setPhase('failed');
-      } else if (data.status === 'in_progress') {
-        setPhase('polling');
-      } else {
-        // Defensive: any unrecognized status must stop the poll loop so the UI
-        // can never hang indefinitely in "in progress".
-        stopPolling();
-        setError(data.error ?? 'Deep research ended in an unexpected state.');
-        setPhase('failed');
+  useEffect(() => {
+    const data = statusQuery.data;
+    if (!data || phase !== 'polling') return;
+    if (data.status === 'completed') {
+      setSummary(data.summary ?? null);
+      setFullReport(data.full_report ?? null);
+      setSources(data.sources ?? []);
+      setPhase('done');
+      if (data.summary) {
+        onSummaryReady(data.summary);
+        setSavedToSession(!!sessionId);
       }
-    },
-    [stopPolling, onSummaryReady, sessionId],
-  );
+    } else if (data.status === 'failed') {
+      setError(data.error ?? 'Deep research job failed. Please try again.');
+      setPhase('failed');
+    } else if (data.status === 'in_progress') {
+      // already polling — nothing to change
+    } else {
+      // Defensive: any unrecognized status must stop the poll loop so the UI
+      // can never hang indefinitely in "in progress".
+      setError(data.error ?? 'Deep research ended in an unexpected state.');
+      setPhase('failed');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusQuery.data]);
 
-  const pollOnce = useCallback(
-    async (id: string) => {
-      try {
-        const sessionParam = sessionId ? `?session_id=${encodeURIComponent(sessionId)}` : '';
-        const data = await apiGet<DeepResearchStatusResponse>(
-          `/api/v1/diagnostic/deep-research/${id}${sessionParam}`,
-        );
-        handlePollResult(data);
-        return data;
-      } catch (err) {
-        stopPolling();
-        setError(getApiErrorMessage(err));
-        setPhase('failed');
-        return null;
-      }
-    },
-    [sessionId, handlePollResult, stopPolling],
-  );
-
-  const startPolling = useCallback(
-    (id: string) => {
-      setInteractionId(id);
-      setPhase('polling');
-      setTimeout(() => pollOnce(id), 5_000);
-      pollRef.current = setInterval(() => pollOnce(id), POLL_INTERVAL_MS);
-    },
-    [pollOnce],
-  );
+  useEffect(() => {
+    if (statusQuery.isError && phase === 'polling') {
+      setError(getApiErrorMessage(statusQuery.error));
+      setPhase('failed');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusQuery.isError, statusQuery.error]);
 
   useEffect(() => {
     if (!hydrateReady || restoredRef.current) return;
@@ -157,27 +120,13 @@ export const DeepResearchSection: React.FC<Props> = ({
     if (initialInteractionId && sessionId) {
       restoredRef.current = true;
       setInteractionId(initialInteractionId);
-      (async () => {
-        const data = await pollOnce(initialInteractionId);
-        if (data?.status === 'in_progress') {
-          startPolling(initialInteractionId);
-        }
-      })();
+      setPhase('polling');
     }
-  }, [
-    hydrateReady,
-    initialSummary,
-    initialFullReport,
-    initialInteractionId,
-    sessionId,
-    onSummaryReady,
-    pollOnce,
-    startPolling,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrateReady, initialSummary, initialFullReport, initialInteractionId, sessionId, onSummaryReady]);
 
   const handleStart = async () => {
     if (!companyName.trim()) return;
-    stopPolling();
     restoredRef.current = true;
     setError(null);
     setPhase('starting');
@@ -192,7 +141,8 @@ export const DeepResearchSection: React.FC<Props> = ({
           research_prompt: researchPrompt.trim(),
         },
       );
-      startPolling(res.interaction_id);
+      setInteractionId(res.interaction_id);
+      setPhase('polling');
     } catch (err) {
       setError(getApiErrorMessage(err));
       setPhase('failed');
@@ -200,7 +150,6 @@ export const DeepResearchSection: React.FC<Props> = ({
   };
 
   const handleRetry = () => {
-    stopPolling();
     restoredRef.current = false;
     setPhase('idle');
     setError(null);

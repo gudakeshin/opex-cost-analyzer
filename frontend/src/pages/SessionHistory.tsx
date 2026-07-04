@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { PageHeader } from '../components/Common/PageHeader';
 import { Loader } from '../components/Common/Loader';
 import { Alert } from '../components/Common/Alert';
 import { useSession } from '../context/SessionContext';
-import { apiGet, getApiErrorMessage } from '../hooks/useApi';
-import type { SessionSummary } from '../types';
+import { getApiErrorMessage } from '../hooks/useApi';
+import { useSessionsList } from '../api/hooks/useSessionQueries';
 
-function formatDate(iso?: string): string {
+function formatDate(iso?: string | null): string {
   if (!iso) return '—';
   return new Date(iso).toLocaleDateString('en-IN', {
     day: 'numeric',
@@ -17,7 +17,7 @@ function formatDate(iso?: string): string {
   });
 }
 
-function formatRevenue(amount?: number, currency?: string): string {
+function formatRevenue(amount?: number | null, currency?: string | null): string {
   if (!amount) return '—';
   const sym = currency === 'INR' ? '₹' : currency === 'USD' ? '$' : (currency ?? '') + ' ';
   if (amount >= 10_000_000) return `${sym}${(amount / 10_000_000).toFixed(1)} Cr`;
@@ -28,18 +28,14 @@ function formatRevenue(amount?: number, currency?: string): string {
 export const SessionHistory: React.FC = () => {
   const { resumeSession, sessionId } = useSession();
   const navigate = useNavigate();
-  const [sessions, setSessions] = useState<SessionSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const sessionsQuery = useSessionsList();
+  const sessions = sessionsQuery.data ?? [];
+  const loading = sessionsQuery.isLoading;
+  const [errorDismissed, setErrorDismissed] = useState(false);
+  const error =
+    sessionsQuery.isError && !errorDismissed ? getApiErrorMessage(sessionsQuery.error) : null;
 
-  useEffect(() => {
-    apiGet<SessionSummary[]>('/api/v1/sessions')
-      .then(setSessions)
-      .catch((err) => setError(getApiErrorMessage(err)))
-      .finally(() => setLoading(false));
-  }, []);
-
-  const handleResumeSession = (sid: string, eid?: string) => {
+  const handleResumeSession = (sid: string, eid?: string | null) => {
     resumeSession(sid, eid ?? null);
     navigate('/');
   };
@@ -52,7 +48,7 @@ export const SessionHistory: React.FC = () => {
       />
 
       {error && (
-        <Alert variant="error" title="Could not load sessions" onDismiss={() => setError(null)}>
+        <Alert variant="error" title="Could not load sessions" onDismiss={() => setErrorDismissed(true)}>
           {error}
         </Alert>
       )}

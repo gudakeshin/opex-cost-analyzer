@@ -1,70 +1,51 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { Alert } from '../components/Common/Alert';
 import { PageHeader } from '../components/Common/PageHeader';
 import { useSession } from '../context/SessionContext';
 import { SectorPackGrid } from '../components/PageComponents/Benchmarks/SectorPackGrid';
-import {
-  BenchmarkToolsPanel,
-  type PeerSet,
-} from '../components/PageComponents/Benchmarks/BenchmarkToolsPanel';
+import { BenchmarkToolsPanel } from '../components/PageComponents/Benchmarks/BenchmarkToolsPanel';
 import {
   SectorPackDetailDrawer,
   type SectorPackRow,
 } from '../components/PageComponents/Benchmarks/SectorPackDetailDrawer';
 import { useQueryClient } from '@tanstack/react-query';
-import { apiGet, apiPatch, getApiErrorMessage } from '../hooks/useApi';
+import { apiPatch, getApiErrorMessage } from '../hooks/useApi';
 import {
   fetchSessionManifest,
   setSessionManifestData,
   type SessionManifestResult,
 } from '../api/hooks/useSessionQueries';
+import {
+  useInvalidateBenchmarkReferenceData,
+  usePeerSets,
+  useSectorPacks,
+} from '../api/hooks/useBenchmarksQueries';
 
 export const Benchmarks: React.FC = () => {
   const queryClient = useQueryClient();
   const { sessionId, ensureSession } = useSession();
-  const [sectorPacks, setSectorPacks] = useState<SectorPackRow[]>([]);
-  const [peerSets, setPeerSets] = useState<PeerSet[]>([]);
-  const [loading, setLoading] = useState(false);
+  const sectorPacksQuery = useSectorPacks();
+  const peerSetsQuery = usePeerSets();
+  const invalidateReferenceData = useInvalidateBenchmarkReferenceData();
+  const sectorPacks = sectorPacksQuery.data?.packs ?? [];
+  const peerSets = peerSetsQuery.data?.peer_sets ?? [];
+  const loading = sectorPacksQuery.isLoading || peerSetsQuery.isLoading;
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [detailPack, setDetailPack] = useState<SectorPackRow | null>(null);
   const [activePeerSet, setActivePeerSet] = useState<string | null>(null);
 
-  const loadPacksAndPeerSets = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    const errors: string[] = [];
-    try {
-      const [spRes, psRes] = await Promise.allSettled([
-        apiGet<{ packs: SectorPackRow[] }>('/api/v1/sector-packs'),
-        apiGet<{ peer_sets: PeerSet[] }>('/api/v1/benchmarks/peer-sets'),
-      ]);
-      if (spRes.status === 'fulfilled') {
-        setSectorPacks(spRes.value.packs ?? []);
-      } else {
-        errors.push(getApiErrorMessage(spRes.reason));
-      }
-      if (psRes.status === 'fulfilled') {
-        setPeerSets(psRes.value.peer_sets ?? []);
-      } else {
-        errors.push(getApiErrorMessage(psRes.reason));
-      }
-      if (errors.length === 2) {
-        setError(errors[0]);
-      } else if (errors.length > 0) {
-        setNotice(`Some reference data could not be loaded: ${errors.join('; ')}`);
-      }
-    } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    loadPacksAndPeerSets();
-  }, [loadPacksAndPeerSets]);
+    const spFailed = sectorPacksQuery.isError;
+    const psFailed = peerSetsQuery.isError;
+    if (spFailed && psFailed) {
+      setError(getApiErrorMessage(sectorPacksQuery.error));
+    } else if (spFailed || psFailed) {
+      const message = getApiErrorMessage(spFailed ? sectorPacksQuery.error : peerSetsQuery.error);
+      setNotice(`Some reference data could not be loaded: ${message}`);
+    }
+  }, [sectorPacksQuery.isError, sectorPacksQuery.error, peerSetsQuery.isError, peerSetsQuery.error]);
 
   useEffect(() => {
     (async () => {
@@ -125,8 +106,8 @@ export const Benchmarks: React.FC = () => {
         sectorPacks={sectorPacks}
         onError={setError}
         onNotice={setNotice}
-        onPeerSetsChanged={loadPacksAndPeerSets}
-        onDatasetsChanged={loadPacksAndPeerSets}
+        onPeerSetsChanged={invalidateReferenceData}
+        onDatasetsChanged={invalidateReferenceData}
         onOpenSectorPack={setDetailPack}
         onSetEngagementPeerSet={(name) => setEngagementPeerSet(name)}
       />

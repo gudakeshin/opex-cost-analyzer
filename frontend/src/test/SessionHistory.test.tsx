@@ -1,7 +1,9 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { vi } from 'vitest';
+import { createTestQueryClient } from './queryClient';
 
 const navigateMock = vi.fn();
 const resumeSessionMock = vi.fn();
@@ -45,9 +47,11 @@ import { SessionHistory } from '../pages/SessionHistory';
 
 test('resuming a session keeps engagement in sync', async () => {
   render(
-    <MemoryRouter>
-      <SessionHistory />
-    </MemoryRouter>,
+    <QueryClientProvider client={createTestQueryClient()}>
+      <MemoryRouter>
+        <SessionHistory />
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 
   const resumeButton = await screen.findByRole('button', { name: /resume/i });

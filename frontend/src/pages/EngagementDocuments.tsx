@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useGuardedNavigate } from '../hooks/useGuardedNavigate';
 import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
 import { MainLayout } from '../components/Layout/MainLayout';
@@ -12,10 +13,16 @@ import { Button } from '../components/Common/Button';
 import { Input } from '../components/Common/Input';
 import { Select } from '../components/Common/Select';
 import { useSession } from '../context/SessionContext';
-import { apiDelete, apiGet, apiPost, apiUpload, getApiErrorMessage } from '../hooks/useApi';
+import { apiDelete, apiPost, apiUpload, getApiErrorMessage } from '../hooks/useApi';
+import {
+  fetchEngagementsList,
+  useEngagementDocumentsFull,
+  useEngagementsList,
+} from '../api/hooks/useEngagementQueries';
+import { engagementKeys, procurementKeys } from '../api/queryKeys';
 import { formatFileSize } from '../utils/sessionFiles';
 import { SECTOR_OPTIONS } from '../constants/sectors';
-import type { EngagementDocument, EngagementSummary } from '../types';
+import type { EngagementSummary } from '../types';
 
 const ACCEPT =
   '.csv,.xlsx,.xls,.json,.pdf,.docx,.txt,.md,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json';
@@ -40,30 +47,31 @@ function truncateId(id: string): string {
 
 export const EngagementDocuments: React.FC = () => {
   const navigate = useGuardedNavigate();
+  const queryClient = useQueryClient();
   const {
     engagementId,
     setEngagementId,
     setSessionId,
     ensureEngagement,
-    listEngagements,
     deleteEngagement,
     createEngagement,
     engagement,
   } = useSession();
-  const [engagements, setEngagements] = useState<EngagementSummary[]>([]);
+  const engagementsQuery = useEngagementsList();
+  const engagements = engagementsQuery.data ?? [];
   const [engagementSearch, setEngagementSearch] = useState('');
   const [noDocsOnly, setNoDocsOnly] = useState(false);
   const [selectedEngagementIds, setSelectedEngagementIds] = useState<Set<string>>(new Set());
   const [pendingDelete, setPendingDelete] = useState<EngagementSummary[]>([]);
   const [deletingEngagement, setDeletingEngagement] = useState(false);
-  const [documents, setDocuments] = useState<EngagementDocument[]>([]);
-  const [llamaparseConfigured, setLlamaparseConfigured] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const documentsQuery = useEngagementDocumentsFull(engagementId);
+  const documents = documentsQuery.data?.documents ?? [];
+  const llamaparseConfigured = !!documentsQuery.data?.llamaparse_configured;
+  const [resolvingEngagement, setResolvingEngagement] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const uploadSectionRef = useRef<HTMLDivElement>(null);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // New engagement modal state
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -76,72 +84,49 @@ export const EngagementDocuments: React.FC = () => {
   // Uploads in flight and half-filled create forms are lost on navigation.
   useUnsavedGuard('engagement-documents', uploading || (showCreateModal && newName.trim().length > 0));
 
-  const loadEngagements = useCallback(async () => {
-    const list = await listEngagements();
-    setEngagements(list);
-    return list;
-  }, [listEngagements]);
-
-  const loadDocuments = useCallback(async (eid: string) => {
-    const res = await apiGet<{
-      documents: EngagementDocument[];
-      llamaparse_configured?: boolean;
-    }>(`/api/v1/engagements/${eid}/documents`);
-    setDocuments(res.documents ?? []);
-    setLlamaparseConfigured(!!res.llamaparse_configured);
-  }, []);
-
-  const refresh = useCallback(async () => {
-    setError(null);
-    try {
-      const list = await loadEngagements();
-      let eid = engagementId;
-      if (!eid && list.length > 0) {
-        eid = list[0].engagement_id;
-        setEngagementId(eid);
-      }
-      if (!eid) {
-        eid = await ensureEngagement();
-      }
-      if (eid) await loadDocuments(eid);
-    } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [engagementId, ensureEngagement, loadDocuments, loadEngagements, setEngagementId]);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  const hasPending = documents.some(
-    (d) => d.status === 'pending' || d.status === 'processing',
+  const invalidateDocuments = useCallback(
+    (eid: string) => queryClient.invalidateQueries({ queryKey: procurementKeys.engagementDocuments(eid) }),
+    [queryClient],
   );
 
-  useEffect(() => {
-    if (pollRef.current) clearInterval(pollRef.current);
-    if (!engagementId || !hasPending) return;
-    pollRef.current = setInterval(() => {
-      loadDocuments(engagementId).catch(() => undefined);
-    }, 2500);
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
-  }, [hasPending, engagementId, loadDocuments]);
+  const invalidateEngagements = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: engagementKeys.list() }),
+    [queryClient],
+  );
 
-  const handleSelectEngagement = async (eid: string) => {
+  const loading = resolvingEngagement || (!!engagementId && documentsQuery.isLoading);
+
+  // Resolve which engagement is active once the engagement list has loaded:
+  // reuse the first one if none is selected yet, otherwise create one.
+  useEffect(() => {
+    if (!engagementsQuery.isSuccess || engagementId) {
+      if (engagementId) setResolvingEngagement(false);
+      return;
+    }
+    (async () => {
+      setError(null);
+      try {
+        if (engagementsQuery.data.length > 0) {
+          setEngagementId(engagementsQuery.data[0].engagement_id);
+        } else {
+          await ensureEngagement();
+        }
+      } catch (err) {
+        setError(getApiErrorMessage(err));
+      } finally {
+        setResolvingEngagement(false);
+      }
+    })();
+  }, [engagementsQuery.isSuccess, engagementsQuery.data, engagementId, ensureEngagement, setEngagementId]);
+
+  useEffect(() => {
+    if (documentsQuery.isError) setError(getApiErrorMessage(documentsQuery.error));
+  }, [documentsQuery.isError, documentsQuery.error]);
+
+  const handleSelectEngagement = (eid: string) => {
     setSessionId(null);
     setEngagementId(eid);
     setJustCreatedId(null);
-    setLoading(true);
-    try {
-      await loadDocuments(eid);
-    } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
   };
 
   const openCreateModal = () => {
@@ -163,8 +148,7 @@ export const EngagementDocuments: React.FC = () => {
         annual_revenue: parseFloat(newRevenueCr) * 1e7,
         currency: newCurrency,
       });
-      await loadEngagements();
-      await loadDocuments(eid);
+      await invalidateEngagements();
       setJustCreatedId(eid);
       setShowCreateModal(false);
     } catch (err) {
@@ -185,7 +169,7 @@ export const EngagementDocuments: React.FC = () => {
         fd.append('file', file);
         await apiUpload(`/api/v1/engagements/${engagementId}/documents`, fd);
       }
-      await loadDocuments(engagementId);
+      await invalidateDocuments(engagementId);
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {
@@ -198,7 +182,7 @@ export const EngagementDocuments: React.FC = () => {
     if (!engagementId) return;
     try {
       await apiDelete(`/api/v1/engagements/${engagementId}/documents/${docId}`);
-      await loadDocuments(engagementId);
+      await invalidateDocuments(engagementId);
     } catch (err) {
       setError(getApiErrorMessage(err));
     }
@@ -233,12 +217,10 @@ export const EngagementDocuments: React.FC = () => {
         targetIds.forEach((id) => next.delete(id));
         return next;
       });
-      const list = await loadEngagements();
+      const list = await fetchEngagementsList(queryClient);
+      invalidateEngagements();
       if (wasActiveDeleted) {
-        const next = list[0]?.engagement_id ?? null;
-        setEngagementId(next);
-        if (next) await loadDocuments(next);
-        else setDocuments([]);
+        setEngagementId(list[0]?.engagement_id ?? null);
       }
       if (failures.length > 0) {
         setError(`Some engagements could not be deleted — ${failures.join('; ')}`);
@@ -252,7 +234,7 @@ export const EngagementDocuments: React.FC = () => {
     if (!engagementId) return;
     try {
       await apiPost(`/api/v1/engagements/${engagementId}/documents/${docId}/reprocess`, {});
-      await loadDocuments(engagementId);
+      await invalidateDocuments(engagementId);
     } catch (err) {
       setError(getApiErrorMessage(err));
     }

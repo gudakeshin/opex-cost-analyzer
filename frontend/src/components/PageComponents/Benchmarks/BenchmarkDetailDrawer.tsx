@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Loader } from '../../Common/Loader';
-import { apiGet, getApiErrorMessage } from '../../../hooks/useApi';
+import { getApiErrorMessage } from '../../../hooks/useApi';
+import { useBenchmarkCoverage } from '../../../api/hooks/useBenchmarksQueries';
 
 export interface BenchmarkDatasetRow {
   dataset_id: string;
@@ -25,7 +26,7 @@ interface LeverDetailRow {
   savings_type?: string;
 }
 
-interface CoverageResponse {
+export interface CoverageResponse {
   dataset_id: string;
   source?: string;
   industry_name?: string;
@@ -73,29 +74,10 @@ export const BenchmarkDetailDrawer: React.FC<BenchmarkDetailDrawerProps> = ({
   onClose,
   onOpenSectorPack,
 }) => {
-  const [coverage, setCoverage] = useState<CoverageResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!dataset) return;
-    let cancelled = false;
-    (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await apiGet<CoverageResponse>(`/api/v1/benchmarks/${dataset.dataset_id}/coverage`);
-        if (!cancelled) setCoverage(res);
-      } catch (err) {
-        if (!cancelled) setError(getApiErrorMessage(err));
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [dataset]);
+  const coverageQuery = useBenchmarkCoverage(dataset?.dataset_id);
+  const coverage = coverageQuery.data ?? null;
+  const loading = coverageQuery.isLoading;
+  const error = coverageQuery.isError ? getApiErrorMessage(coverageQuery.error) : null;
 
   if (!dataset) return null;
 

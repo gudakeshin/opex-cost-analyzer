@@ -1,17 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Drawer } from '../Common/Drawer';
 import { Tabs } from '../Common/Tabs';
 import { AuditLogPanel } from '../PageComponents/CostRoom/AuditLogPanel';
 import { LogicTrace } from './LogicTrace';
 import { ProvenanceList } from './ProvenanceList';
 import { ConfidenceBadge } from './ConfidenceBadge';
-import { apiGet } from '../../hooks/useApi';
-import type {
-  AuditLogEntry,
-  ComplianceAuditResponse,
-  ProgressStep,
-  QualitySignals,
-} from '../../types';
+import { useAuditLogQuery } from '../../api/hooks/useCostRoomQueries';
+import type { AuditLogEntry, ProgressStep, QualitySignals } from '../../types';
 
 const TRUST_TABS = [
   { id: 'audit', label: 'Audit' },
@@ -44,24 +39,13 @@ export const TrustRail: React.FC<TrustRailProps> = ({
   narrativeTag,
 }) => {
   const [tab, setTab] = useState('audit');
-  const [serverAudit, setServerAudit] = useState<AuditLogEntry[]>([]);
-  const [integrity, setIntegrity] = useState<ComplianceAuditResponse['integrity'] | null>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    apiGet<ComplianceAuditResponse>('/api/v1/compliance/audit-log?limit=40')
-      .then((res) => {
-        setIntegrity(res.integrity);
-        setServerAudit(
-          res.entries.map((e) => ({
-            ts: String(e.ts ?? ''),
-            message: String(e.event ?? e.message ?? JSON.stringify(e)),
-            source: 'server' as const,
-          })),
-        );
-      })
-      .catch(() => setServerAudit([]));
-  }, [open]);
+  const auditQuery = useAuditLogQuery(40, open);
+  const integrity = auditQuery.data?.integrity ?? null;
+  const serverAudit: AuditLogEntry[] = (auditQuery.data?.entries ?? []).map((e) => ({
+    ts: String(e.ts ?? ''),
+    message: String(e.event ?? e.message ?? JSON.stringify(e)),
+    source: 'server' as const,
+  }));
 
   const merged: AuditLogEntry[] = [
     ...localAudit.map((e) => ({ ...e, source: 'local' as const })),

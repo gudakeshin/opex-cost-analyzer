@@ -9,8 +9,12 @@ import { PageHeader } from '../components/Common/PageHeader';
 import { RunTracePanel } from '../components/PageComponents/Skills/RunTracePanel';
 import { apiGet, apiPost, apiPut, getApiErrorMessage } from '../hooks/useApi';
 import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
+import {
+  useInvalidateSkillsCatalog,
+  useSkillDependencies,
+  useSkillsCatalog,
+} from '../api/hooks/useSkillsQueries';
 import { friendlyErrorMessage } from '../utils/errorMessages';
-import type { SkillMeta } from '../types';
 
 const KIND_OPTIONS = [
   { value: '', label: 'All kinds' },
@@ -29,11 +33,6 @@ const KIND_BADGE: Record<string, string> = {
   ingestion: 'bg-violet-100 text-violet-800',
 };
 
-interface DepSkill {
-  name: string;
-  depends_on: string[];
-}
-
 function KindBadge({ kind }: { kind?: string }) {
   const k = kind || 'analysis';
   return (
@@ -44,8 +43,14 @@ function KindBadge({ kind }: { kind?: string }) {
 }
 
 export const SkillsManagement: React.FC = () => {
-  const [skills, setSkills] = useState<SkillMeta[]>([]);
-  const [depSkills, setDepSkills] = useState<DepSkill[]>([]);
+  const skillsQuery = useSkillsCatalog();
+  const dependenciesQuery = useSkillDependencies();
+  const invalidateCatalog = useInvalidateSkillsCatalog();
+  const skills = useMemo(() => skillsQuery.data ?? [], [skillsQuery.data]);
+  const depSkills = useMemo(
+    () => dependenciesQuery.data?.skills ?? [],
+    [dependenciesQuery.data],
+  );
   const [selectedSkill, setSelectedSkill] = useState('');
   const [kindFilter, setKindFilter] = useState('');
   const [content, setContent] = useState('');
@@ -80,19 +85,14 @@ export const SkillsManagement: React.FC = () => {
 
   const selectedMeta = skills.find((s) => s.name === selectedSkill);
 
-  const refreshCatalog = useCallback(async () => {
-    const [list, deps] = await Promise.all([
-      apiGet<SkillMeta[]>('/api/v1/skills'),
-      apiGet<{ skills: DepSkill[] }>('/api/v1/skills/catalog/dependencies'),
-    ]);
-    setSkills(list);
-    setDepSkills(deps.skills || []);
-    if (list.length && !selectedSkill) setSelectedSkill(list[0].name);
-  }, [selectedSkill]);
+  useEffect(() => {
+    if (skills.length && !selectedSkill) setSelectedSkill(skills[0].name);
+  }, [skills, selectedSkill]);
 
   useEffect(() => {
-    refreshCatalog().catch((err) => setError(getApiErrorMessage(err)));
-  }, [refreshCatalog]);
+    if (skillsQuery.isError) setError(getApiErrorMessage(skillsQuery.error));
+    else if (dependenciesQuery.isError) setError(getApiErrorMessage(dependenciesQuery.error));
+  }, [skillsQuery.isError, skillsQuery.error, dependenciesQuery.isError, dependenciesQuery.error]);
 
   useEffect(() => {
     if (!selectedSkill) return;
@@ -204,7 +204,7 @@ export const SkillsManagement: React.FC = () => {
       await apiPut(`/api/v1/skills/${selectedSkill}`, { content });
       setSavedContent(content);
       setOutput(`Saved ${selectedSkill} at ${new Date().toLocaleTimeString()}`);
-      await refreshCatalog();
+      await invalidateCatalog();
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {
@@ -257,7 +257,7 @@ export const SkillsManagement: React.FC = () => {
         instruction_prompt: newPrompt,
         output_fields: newOutputs.split('\n').map((s) => s.trim()).filter(Boolean),
       });
-      await refreshCatalog();
+      await invalidateCatalog();
       setSelectedSkill(name);
       setShowCreate(false);
       setOutput(`Created declarative skill: ${name}`);

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Loader } from '../../Common/Loader';
-import { apiGet, getApiErrorMessage } from '../../../hooks/useApi';
+import { getApiErrorMessage } from '../../../hooks/useApi';
 import { specificityBadge } from './BenchmarkDetailDrawer';
+import { useSectorPackDetail } from '../../../api/hooks/useBenchmarksQueries';
 
 export interface SectorPackRow {
   pack_id: string;
@@ -50,7 +51,7 @@ interface KpiRow {
   p50_benchmark_inr?: number;
 }
 
-interface SectorPackDetailResponse {
+export interface SectorPackDetailResponse {
   pack_id: string;
   sector?: string;
   version?: string;
@@ -105,31 +106,16 @@ interface SectorPackDetailDrawerProps {
 }
 
 export const SectorPackDetailDrawer: React.FC<SectorPackDetailDrawerProps> = ({ pack, onClose }) => {
-  const [detail, setDetail] = useState<SectorPackDetailResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<TabId>('overview');
 
   useEffect(() => {
-    if (!pack) return;
-    let cancelled = false;
-    setTab('overview');
-    (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await apiGet<SectorPackDetailResponse>(`/api/v1/sector-packs/${pack.pack_id}/detail`);
-        if (!cancelled) setDetail(res);
-      } catch (err) {
-        if (!cancelled) setError(getApiErrorMessage(err));
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
+    if (pack) setTab('overview');
   }, [pack]);
+
+  const detailQuery = useSectorPackDetail(pack?.pack_id);
+  const detail = detailQuery.data ?? null;
+  const loading = detailQuery.isLoading;
+  const error = detailQuery.isError ? getApiErrorMessage(detailQuery.error) : null;
 
   if (!pack) return null;
 

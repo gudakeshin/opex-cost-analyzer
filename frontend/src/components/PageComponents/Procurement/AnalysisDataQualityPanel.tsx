@@ -1,8 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { FactVsInferenceLabel } from '../../Common/FactVsInferenceLabel';
 import { Loader } from '../../Common/Loader';
-import { apiGet, getApiErrorMessage } from '../../../hooks/useApi';
+import { getApiErrorMessage } from '../../../hooks/useApi';
+import { useConflictsQuery } from '../../../api/hooks/useCostRoomQueries';
+import { costRoomKeys } from '../../../api/queryKeys';
 import {
   anomalyRecommendation,
   extractAnomalyFlags,
@@ -15,7 +18,7 @@ import {
   fallbackConflictTitle,
   fallbackRecommendation,
 } from '../../../utils/conflictGuidance';
-import type { ConflictSummary, DataConflict, SessionResponse } from '../../../types';
+import type { DataConflict, SessionResponse } from '../../../types';
 
 interface AnalysisDataQualityPanelProps {
   analysis: SessionResponse | null;
@@ -26,31 +29,25 @@ export const AnalysisDataQualityPanel: React.FC<AnalysisDataQualityPanelProps> =
   analysis,
   currency = 'INR',
 }) => {
+  const queryClient = useQueryClient();
   const sessionId = analysis?.session_id ?? null;
-  const [conflicts, setConflicts] = useState<ConflictSummary | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const conflictsQuery = useConflictsQuery(sessionId, true);
+  const conflicts = conflictsQuery.data ?? null;
+  const loading = conflictsQuery.isLoading;
+  const error = conflictsQuery.isError ? getApiErrorMessage(conflictsQuery.error) : null;
 
   const anomalies = useMemo(
     () => extractAnomalyFlags(analysis?.skill_outputs as Record<string, unknown> | undefined, 50),
     [analysis?.skill_outputs],
   );
 
+  // A fresh analysis run can create/resolve conflicts, so refetch when the
+  // analysis payload changes (the old effect re-fetched on skill_outputs too).
   useEffect(() => {
-    if (!sessionId) {
-      setConflicts(null);
-      return;
+    if (sessionId && analysis?.skill_outputs) {
+      queryClient.invalidateQueries({ queryKey: costRoomKeys.conflicts(sessionId) });
     }
-    setLoading(true);
-    setError(null);
-    apiGet<ConflictSummary>(`/api/v1/conflicts/${sessionId}`)
-      .then(setConflicts)
-      .catch((err) => {
-        setConflicts(null);
-        setError(getApiErrorMessage(err));
-      })
-      .finally(() => setLoading(false));
-  }, [sessionId, analysis?.skill_outputs]);
+  }, [sessionId, analysis?.skill_outputs, queryClient]);
 
   const openConflicts = (conflicts?.conflicts ?? []).filter((c) => !c.resolved);
   const totalItems = openConflicts.length + anomalies.length;

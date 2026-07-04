@@ -122,6 +122,17 @@ export function useAuditLogLatestQuery(trigger: number) {
   });
 }
 
+export function useAuditLogQuery(limit: number, enabled: boolean) {
+  return useQuery({
+    queryKey: costRoomKeys.auditLog(limit),
+    queryFn: () => apiGet<ComplianceAuditResponse>(`/api/v1/compliance/audit-log?limit=${limit}`),
+    enabled,
+    // staleTime 0 so re-opening the drawer refetches, matching the previous
+    // fetch-on-open behavior.
+    staleTime: 0,
+  });
+}
+
 function invalidatePipeline(queryClient: ReturnType<typeof useQueryClient>, engagementId: string | null) {
   queryClient.invalidateQueries({ queryKey: costRoomKeys.initiatives(engagementId) });
   queryClient.invalidateQueries({ queryKey: costRoomKeys.summary(engagementId) });

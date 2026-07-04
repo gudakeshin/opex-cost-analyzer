@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Card } from '../../Common/Card';
 import { Button } from '../../Common/Button';
 import { Input } from '../../Common/Input';
@@ -9,7 +10,9 @@ import {
   type BenchmarkDatasetRow,
 } from './BenchmarkDetailDrawer';
 import type { SectorPackRow } from './SectorPackDetailDrawer';
-import { apiGet, apiPost, apiUpload, getApiErrorMessage } from '../../../hooks/useApi';
+import { apiPost, apiUpload, getApiErrorMessage } from '../../../hooks/useApi';
+import { useBenchmarkDatasets } from '../../../api/hooks/useBenchmarksQueries';
+import { benchmarkKeys } from '../../../api/queryKeys';
 
 const BENCHMARK_TEMPLATE_URL = '/api/v1/template/benchmark-csv';
 
@@ -66,10 +69,12 @@ export const BenchmarkToolsPanel: React.FC<BenchmarkToolsPanelProps> = ({
   onOpenSectorPack,
   onSetEngagementPeerSet,
 }) => {
+  const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState(false);
-  const [datasets, setDatasets] = useState<BenchmarkDatasetRow[]>([]);
-  const [datasetsLoading, setDatasetsLoading] = useState(false);
-  const [datasetsLoaded, setDatasetsLoaded] = useState(false);
+  const datasetsQuery = useBenchmarkDatasets(expanded);
+  const datasets = datasetsQuery.data?.datasets ?? [];
+  const datasetsLoading = datasetsQuery.isLoading;
+  const datasetsLoaded = datasetsQuery.isSuccess;
   const [detailDataset, setDetailDataset] = useState<BenchmarkDatasetRow | null>(null);
 
   const [uploading, setUploading] = useState(false);
@@ -95,24 +100,9 @@ export const BenchmarkToolsPanel: React.FC<BenchmarkToolsPanelProps> = ({
   const [psDatasetIds, setPsDatasetIds] = useState('');
   const [psDescription, setPsDescription] = useState('');
 
-  const loadDatasets = useCallback(async () => {
-    setDatasetsLoading(true);
-    try {
-      const res = await apiGet<{ datasets: BenchmarkDatasetRow[] }>('/api/v1/benchmarks');
-      setDatasets(res.datasets ?? []);
-      setDatasetsLoaded(true);
-    } catch (err) {
-      onError(getApiErrorMessage(err));
-    } finally {
-      setDatasetsLoading(false);
-    }
-  }, [onError]);
-
   useEffect(() => {
-    if (expanded && !datasetsLoaded && !datasetsLoading) {
-      loadDatasets();
-    }
-  }, [expanded, datasetsLoaded, datasetsLoading, loadDatasets]);
+    if (datasetsQuery.isError) onError(getApiErrorMessage(datasetsQuery.error));
+  }, [datasetsQuery.isError, datasetsQuery.error, onError]);
 
   const customDatasets = datasets.filter(isCustomDataset);
 
@@ -143,7 +133,7 @@ export const BenchmarkToolsPanel: React.FC<BenchmarkToolsPanelProps> = ({
       const res = await apiUpload<BenchmarkDatasetRow>('/api/v1/benchmarks/upload', form);
       onNotice(`Uploaded “${datasetTitle(res)}”.`);
       if (fileRef.current) fileRef.current.value = '';
-      await loadDatasets();
+      await queryClient.invalidateQueries({ queryKey: benchmarkKeys.datasets() });
       onDatasetsChanged();
     } catch (err) {
       onError(getApiErrorMessage(err));

@@ -21,8 +21,9 @@ import { BenchmarkProxyDisclaimer } from '../components/PageComponents/Diagnosti
 import { DeepResearchSection } from '../components/PageComponents/Diagnostic/DeepResearchSection';
 import { isBenchmarkProxyProfile } from '../utils/diagnosticProxyDisclaimer';
 import { useQueryClient } from '@tanstack/react-query';
-import { apiGet, apiPatch, apiPost, getApiErrorMessage } from '../hooks/useApi';
+import { apiPatch, apiPost, getApiErrorMessage } from '../hooks/useApi';
 import { fetchSessionManifest } from '../api/hooks/useSessionQueries';
+import { useEngagementDocuments } from '../api/hooks/useProcurementQueries';
 import { friendlyErrorMessage } from '../utils/errorMessages';
 import { useSession } from '../context/SessionContext';
 import {
@@ -79,7 +80,10 @@ export const Diagnostic: React.FC = () => {
   const [result, setResult] = useState<DiagnosticResponse | null>(null);
   const [deepResearchSummary, setDeepResearchSummary] = useState<string | null>(null);
   const [handoffLoading, setHandoffLoading] = useState(false);
-  const [engagementDocCount, setEngagementDocCount] = useState(0);
+  const engagementDocumentsQuery = useEngagementDocuments(engagementId);
+  const engagementDocCount = engagementDocumentsQuery.data
+    ? engagementDocumentsQuery.data.documents.filter((d) => d.status === 'ready').length
+    : 0;
   const skipFormSaveRef = useRef(true);
   const engagementHydratedRef = useRef(false);
 
@@ -207,17 +211,6 @@ export const Diagnostic: React.FC = () => {
     industry,
     revenueCr,
   ]);
-
-  // Fetch engagement document count for the context banner
-  useEffect(() => {
-    if (!engagementId) return;
-    apiGet<{ documents: { status: string }[] }>(`/api/v1/engagements/${engagementId}/documents`)
-      .then((res) => {
-        const ready = (res.documents ?? []).filter((d) => d.status === 'ready').length;
-        setEngagementDocCount(ready);
-      })
-      .catch(() => setEngagementDocCount(0));
-  }, [engagementId]);
 
   useAutosave({
     id: 'diagnostic-form',

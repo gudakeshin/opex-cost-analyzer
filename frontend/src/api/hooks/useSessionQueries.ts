@@ -1,7 +1,12 @@
 import { useQuery, type QueryClient } from '@tanstack/react-query';
 import { apiGet } from '../../hooks/useApi';
 import { sessionKeys, engagementKeys } from '../queryKeys';
-import type { EngagementSummary, SessionManifest, SessionResponse } from '../../types';
+import type {
+  EngagementSummary,
+  SessionManifest,
+  SessionResponse,
+  SessionSummary,
+} from '../../types';
 
 // Short grace window for passive page-level reads (Diagnostic, Benchmarks,
 // ProcurementAnalysis) so navigating between pages shortly after
@@ -94,4 +99,11 @@ export function setSessionManifestData(
 
 export async function listEngagements(): Promise<EngagementSummary[]> {
   return apiGet<EngagementSummary[]>('/api/v1/engagements');
+}
+
+export function useSessionsList() {
+  return useQuery({
+    queryKey: sessionKeys.list(),
+    queryFn: () => apiGet<SessionSummary[]>('/api/v1/sessions'),
+  });
 }
