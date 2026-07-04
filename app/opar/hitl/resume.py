@@ -67,8 +67,9 @@ def apply_clarification_answer(
     answer: ClarificationAnswer,
 ) -> dict[str, Any]:
     """Persist user answer to manifest and session memory; return observe overrides."""
-    manifest_path = UPLOAD_DIR / session_id / "manifest.json"
-    manifest = read_json(manifest_path, {"files": [], "industry": "", "annual_revenue": 0.0})
+    from app.routers._shared import read_manifest, write_manifest
+
+    manifest = read_manifest(session_id, {"files": [], "industry": "", "annual_revenue": 0.0})
 
     waive = should_waive_spend_requirement(answer)
     override_note = (answer.free_text or "").strip()
@@ -83,7 +84,7 @@ def apply_clarification_answer(
         manifest["business_override_note"] = override_note
 
     try:
-        manifest_path.write_text(json.dumps(manifest, indent=2))
+        write_manifest(session_id, manifest)
     except Exception:
         pass
 

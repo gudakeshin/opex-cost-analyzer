@@ -214,20 +214,21 @@ def _maybe_seed_pipeline(
 
 
 def persist_conflict_manifest(session_id: str, validated: Dict[str, Dict[str, Any]]) -> None:
-    manifest_path = UPLOAD_DIR / session_id / "manifest.json"
-    if "conflict-detector" not in validated or not manifest_path.parent.exists():
+    from app.routers._shared import read_manifest, session_dir, write_manifest
+
+    if "conflict-detector" not in validated or not session_dir(session_id).exists():
         return
     cd = validated["conflict-detector"]
     if not isinstance(cd, dict):
         return
-    manifest = read_json(manifest_path, {})
+    manifest = read_manifest(session_id, {})
     manifest["conflict_state"] = {
         "total": int(cd.get("conflict_count") or cd.get("total") or 0),
         "unresolved": int(cd.get("unresolved") or 0),
         "by_type": cd.get("by_type") or {},
         "has_intercompany": bool((cd.get("by_type") or {}).get("intercompany_inflation")),
     }
-    write_json(manifest_path, manifest)
+    write_manifest(session_id, manifest)
 
 
 def record_advisory_provenance(

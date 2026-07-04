@@ -69,12 +69,65 @@ def manifest_path(session_id: str) -> Path:
     return session_dir(session_id) / "manifest.json"
 
 
-def read_manifest(session_id: str) -> Dict[str, Any]:
-    return read_json(manifest_path(session_id), {"files": []})
+def _use_repo() -> bool:
+    """True when session manifests live in a repository backend (e.g. SQLite)
+    rather than in manifest.json files. The JSON file logic below IS the json
+    backend (JsonSessionRepository delegates here), so only dispatch out for
+    non-json backends.
+    """
+    from app.repositories import active_backend
+
+    return active_backend() != "json"
+
+
+def read_manifest(session_id: str, default: Dict[str, Any] | None = None) -> Dict[str, Any]:
+    fallback: Dict[str, Any] = {"files": []} if default is None else default
+    if _use_repo():
+        from app.repositories import session_repo
+
+        try:
+            return session_repo().get(session_id)
+        except (KeyError, HTTPException):
+            # Missing session, or an id the repo's UUID validation rejects —
+            # same outcome as the json backend's missing-file read: fallback.
+            return fallback
+    return read_json(manifest_path(session_id), fallback)
 
 
 def write_manifest(session_id: str, payload: Dict[str, Any]) -> None:
+    if _use_repo():
+        from app.repositories import session_repo
+
+        session_repo().save(session_id, payload)
+        # Uploads and derived artifacts still live under session_dir; keep
+        # creating it so "does this session exist" directory checks and the
+        # upload path behave identically across backends.
+        session_dir(session_id).mkdir(parents=True, exist_ok=True)
+        return
     write_json(manifest_path(session_id), payload)
+
+
+def session_manifest_exists(session_id: str) -> bool:
+    if _use_repo():
+        from app.repositories import session_repo
+
+        return session_repo().exists(session_id)
+    return manifest_path(session_id).exists()
+
+
+def list_session_ids() -> list[str]:
+    """All session ids known to the active backend, unordered."""
+    if _use_repo():
+        from app.repositories import session_repo
+
+        return session_repo().list_ids()
+    if not UPLOAD_DIR.exists():
+        return []
+    return [
+        p.name
+        for p in UPLOAD_DIR.iterdir()
+        if p.is_dir() and (p / "manifest.json").exists()
+    ]
 
 
 # ---------------------------------------------------------------------------

@@ -478,8 +478,9 @@ def observe(
     user_mem = adapter.get_user_memory(user_id)
     session_mem = adapter.get_session_memory(session_id, query=msg, limit=10)
     if manifest is None:
-        manifest_path = UPLOAD_DIR / session_id / "manifest.json"
-        manifest = read_json(manifest_path, {"files": [], "industry": "", "annual_revenue": 0.0})
+        from app.routers._shared import read_manifest
+
+        manifest = read_manifest(session_id, {"files": [], "industry": "", "annual_revenue": 0.0})
 
     engagement_id = str(manifest.get("engagement_id") or session_id)
     files = manifest.get("files", [])
@@ -634,9 +635,10 @@ def observe(
                     continue
             # Persist newly computed manifest for downstream turns.
             if model_manifest:
-                manifest_path = UPLOAD_DIR / session_id / "manifest.json"
                 try:
-                    manifest_path.write_text(json.dumps(manifest, indent=2))
+                    from app.routers._shared import write_manifest
+
+                    write_manifest(session_id, manifest)
                 except Exception:
                     pass
                 adapter.add_session(

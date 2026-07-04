@@ -67,7 +67,8 @@ def test_session_links_engagement(client, monkeypatch, tmp_path):
     assert sess.status_code == 200
     body = sess.json()
     assert body["engagement_id"] == eid
-    manifest_path = eng_dir / eid / "manifest.json"
-    assert manifest_path.exists()
-    manifest = json.loads(manifest_path.read_text())
+    # Backend-agnostic: read through the store (json files or sqlite rows).
+    from app.services.engagements_store import read_engagement_manifest
+
+    manifest = read_engagement_manifest(eid)
     assert body["session_id"] in manifest.get("session_ids", [])

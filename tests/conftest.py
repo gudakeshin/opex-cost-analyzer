@@ -19,6 +19,9 @@ from fastapi.testclient import TestClient
 # TestClient sends every request from one IP, so per-IP limits would trip
 # across the suite. Must be set before app.main (→ app.ratelimit) is imported.
 os.environ.setdefault("RATE_LIMIT_ENABLED", "false")
+# Keep tests hermetic: never import the developer's real data/engagements
+# JSON into the per-test SQLite database at app startup.
+os.environ.setdefault("SQLITE_BOOTSTRAP_ENABLED", "false")
 
 from app.main import app  # noqa: E402
 from app.models import NormalizedSpendLine, SessionAnalysisState
@@ -37,6 +40,16 @@ def clean_data_dirs() -> None:
         target = data_dir / name
         if target.exists():
             shutil.rmtree(target)
+    # Same reset for the sqlite backend: session/engagement rows live in the
+    # DB file, not under data/uploads.
+    from app.config import SQLITE_DB_PATH
+    from app.db.connection import reset_schema_cache
+
+    for suffix in ("", "-wal", "-shm"):
+        db_file = Path(f"{SQLITE_DB_PATH}{suffix}")
+        if db_file.exists():
+            db_file.unlink()
+    reset_schema_cache()
     ensure_dirs()
 
 

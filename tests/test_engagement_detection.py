@@ -406,11 +406,14 @@ def test_revenue_detected_from_annual_report_context(monkeypatch, tmp_path) -> N
         ),
     ],
 )
-def test_real_engagement_regression_fixtures(engagement_id, expected_company, expected_revenue) -> None:
+def test_real_engagement_regression_fixtures(engagement_id, expected_company, expected_revenue, monkeypatch) -> None:
     from pathlib import Path
 
     if not Path(f"data/engagements/{engagement_id}/manifest.json").exists():
         pytest.skip("fixture engagement not present")
+    # Fixture engagements are JSON manifests on disk; read them via the json
+    # backend regardless of the default.
+    monkeypatch.setenv("REPOSITORY_BACKEND", "json")
     result = detect_engagement_profile(engagement_id)
     assert result["detected_company_name"] == expected_company
     assert result.get("detected_annual_revenue_cr") == expected_revenue

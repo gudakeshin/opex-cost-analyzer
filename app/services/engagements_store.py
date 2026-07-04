@@ -262,8 +262,37 @@ def _skeleton_manifest(engagement_id: str) -> Dict[str, Any]:
     }
 
 
-def _parse_manifest_file(engagement_id: str) -> Tuple[Dict[str, Any], bool, Optional[str]]:
-    """Return manifest dict, needs_rewrite flag, and optional parse error."""
+def _use_repo() -> bool:
+    """True when engagement manifests live in a repository backend (SQLite)
+    rather than manifest.json files. The file logic in this module IS the
+    json backend (JsonEngagementRepository delegates here), so only dispatch
+    out for non-json backends.
+    """
+    from app.repositories import active_backend
+
+    return active_backend() != "json"
+
+
+def _parse_manifest_file(
+    engagement_id: str, *, force_json: bool = False
+) -> Tuple[Dict[str, Any], bool, Optional[str]]:
+    """Return manifest dict, needs_rewrite flag, and optional parse error.
+
+    ``force_json=True`` always reads the on-disk manifest.json regardless of
+    the active backend — used by the JSON→SQLite bootstrap import, which must
+    read legacy JSON while REPOSITORY_BACKEND=sqlite is already in effect.
+    """
+    if not force_json and _use_repo():
+        from fastapi import HTTPException
+
+        from app.repositories import engagement_repo
+
+        try:
+            return engagement_repo().get(engagement_id), False, None
+        except (KeyError, HTTPException):
+            # Missing engagement, or an id the repo's UUID validation rejects —
+            # same outcome as a missing manifest.json on the json backend.
+            return {}, False, None
     path = engagement_manifest_path(engagement_id)
     if not path.exists():
         return {}, False, None
@@ -305,8 +334,13 @@ def _backup_manifest(path: Path) -> None:
 
 def _write_manifest_payload(engagement_id: str, payload: Dict[str, Any]) -> None:
     """Validate, backup, and atomically persist a manifest (caller must hold lock)."""
-    path = engagement_manifest_path(engagement_id)
     normalized = _validate_and_normalize(payload)
+    if _use_repo():
+        from app.repositories import engagement_repo
+
+        engagement_repo().save(engagement_id, normalized)
+        return
+    path = engagement_manifest_path(engagement_id)
     _backup_manifest(path)
     write_json(path, normalized)
 
@@ -338,6 +372,24 @@ def read_engagement_manifest(engagement_id: str, *, auto_repair: bool = True) ->
     normalized = _normalize_document_records(manifest)
     if auto_repair and (needs_rewrite or repaired_orphans or deduped or normalized):
         write_engagement_manifest(engagement_id, manifest)
+    return manifest
+
+
+def read_engagement_manifest_from_json(engagement_id: str) -> Dict[str, Any]:
+    """Read the legacy on-disk manifest.json regardless of the active backend,
+    applying the same salvage/normalization as read_engagement_manifest but
+    WITHOUT writing anything back. Used by the JSON→SQLite bootstrap import.
+
+    Raises ManifestReadError when the file exists but cannot be salvaged.
+    """
+    manifest, _, parse_error = _parse_manifest_file(engagement_id, force_json=True)
+    if parse_error:
+        raise ManifestReadError(engagement_id, parse_error)
+    if not manifest.get("engagement_id"):
+        return manifest if isinstance(manifest, dict) else {}
+    _repair_manifest_documents(engagement_id, manifest)
+    _dedupe_manifest_documents(manifest)
+    _normalize_document_records(manifest)
     return manifest
 
 
@@ -517,6 +569,10 @@ def _corrupt_engagement_summary(engagement_id: str, reason: str) -> Dict[str, An
 
 
 def list_engagements() -> List[Dict[str, Any]]:
+    if _use_repo():
+        from app.repositories import engagement_repo
+
+        return engagement_repo().list_all()
     if not ENGAGEMENTS_DIR.exists():
         return []
     summaries: List[Dict[str, Any]] = []
@@ -671,6 +727,12 @@ def delete_document(engagement_id: str, document_id: str) -> None:
 
 def delete_engagement(engagement_id: str) -> None:
     """Remove the engagement's manifest, documents, and on-disk directory."""
+    if _use_repo():
+        from app.repositories import engagement_repo
+
+        # Deletes the DB rows and the on-disk directory (raw blobs).
+        engagement_repo().delete(engagement_id)
+        return
     edir = engagement_dir(engagement_id)
     if edir.exists():
         shutil.rmtree(edir, ignore_errors=True)

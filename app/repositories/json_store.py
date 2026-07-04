@@ -12,7 +12,7 @@ from app.repositories.base import EngagementRepository, SessionRepository
 
 
 class JsonSessionRepository(SessionRepository):
-    """Session manifests stored as JSON files under DATA_DIR/sessions/<id>/manifest.json."""
+    """Session manifests stored as JSON files under UPLOAD_DIR/<id>/manifest.json."""
 
     def get(self, session_id: str) -> Dict[str, Any]:
         from app.routers._shared import manifest_path, read_manifest, validate_session_id
@@ -37,14 +37,13 @@ class JsonSessionRepository(SessionRepository):
             return False
 
     def list_ids(self) -> List[str]:
-        from app.config import DATA_DIR
+        from app.config import UPLOAD_DIR
 
-        sessions_dir = DATA_DIR / "sessions"
-        if not sessions_dir.exists():
+        if not UPLOAD_DIR.exists():
             return []
         return [
             p.name
-            for p in sessions_dir.iterdir()
+            for p in UPLOAD_DIR.iterdir()
             if p.is_dir() and (p / "manifest.json").exists()
         ]
 

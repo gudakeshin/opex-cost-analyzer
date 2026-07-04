@@ -58,8 +58,7 @@ def get_conflicts(session_id: str) -> Dict[str, Any]:
         conflicts,
     )
     summary = resolver.summary(conflicts, user_actions=user_actions)
-    manifest_path = UPLOAD_DIR / session_id / "manifest.json"
-    manifest = read_json(manifest_path, {})
+    manifest = read_manifest(session_id, {})
     manifest["conflict_state"] = {
         "total": summary["total"],
         "unresolved": summary["unresolved"],
@@ -68,7 +67,7 @@ def get_conflicts(session_id: str) -> Dict[str, Any]:
         "has_intercompany": bool(summary["by_type"].get("intercompany_inflation", 0) > 0),
     }
     try:
-        write_json(manifest_path, manifest)
+        write_manifest(session_id, manifest)
     except Exception:
         pass
     append_audit_event(f"conflict_detection session={session_id} total={summary['total']}")

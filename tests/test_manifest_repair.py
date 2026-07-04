@@ -22,6 +22,13 @@ from app.services.engagements_store import (
 )
 
 
+@pytest.fixture(autouse=True)
+def _json_backend(monkeypatch):
+    """These tests exercise JSON-file corruption salvage/repair semantics,
+    which only exist on the json backend."""
+    monkeypatch.setenv("REPOSITORY_BACKEND", "json")
+
+
 @pytest.fixture
 def client():
     return TestClient(app)

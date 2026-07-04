@@ -58,7 +58,10 @@ CREATE INDEX IF NOT EXISTS idx_documents_status ON documents(status);
 
 CREATE TABLE IF NOT EXISTS sessions (
     session_id      TEXT PRIMARY KEY,
-    engagement_id   TEXT REFERENCES engagements(engagement_id) ON DELETE SET NULL,
+    -- Deliberately NOT a foreign key: session manifests can reference an
+    -- engagement before its row exists (upload flow creates the session
+    -- first), matching the JSON backend which never enforced this.
+    engagement_id   TEXT,
     owner           TEXT,
     company_name    TEXT NOT NULL DEFAULT 'New engagement',
     industry        TEXT NOT NULL DEFAULT '',

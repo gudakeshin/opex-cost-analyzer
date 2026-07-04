@@ -134,8 +134,9 @@ def reflect(
         except Exception:
             replanner_log = []
 
-    manifest_path = UPLOAD_DIR / ctx.session_id / "manifest.json"
-    manifest = read_json(manifest_path, {}) if manifest_path.exists() else {}
+    from app.routers._shared import read_manifest
+
+    manifest = read_manifest(ctx.session_id, {})
 
     early_analysis = _memory.get("session", ctx.session_id)
     reporting_currency = str(

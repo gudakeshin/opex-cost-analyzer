@@ -14,6 +14,7 @@ from app.config import DATA_DIR, MAX_UPLOAD_MB, UPLOAD_DIR, logger
 from app.ratelimit import RATE_LIMIT_LLM, limiter
 from app.routers._shared import (
     _memory,
+    list_session_ids,
     merge_context_into_manifest,
     progress_append,
     progress_complete,
@@ -21,6 +22,7 @@ from app.routers._shared import (
     read_manifest,
     session_dir,
     session_lock,
+    session_manifest_exists,
     validate_session_id,
     write_manifest,
 )
@@ -513,9 +515,7 @@ async def analyze_session(request: Request, session_id: str, payload: AnalyzeReq
 def get_session_status(session_id: str) -> Dict[str, Any]:
     """Lightweight session probe — always 200; avoids 404 noise when analysis is not ready."""
     validate_session_id(session_id)
-    sdir = session_dir(session_id)
-    manifest_path = sdir / "manifest.json"
-    has_manifest = manifest_path.is_file()
+    has_manifest = session_manifest_exists(session_id)
     meta = _memory.get("session_meta", session_id) or _memory.get("session", session_id)
     session_exists = has_manifest or bool(meta)
     analysis = _memory.get("session", session_id)
@@ -606,33 +606,27 @@ def get_session_schema(session_id: str) -> Dict[str, Any]:
 @router.get("/api/v1/sessions", response_model=List[SessionSummaryResponse])
 def list_sessions(request: Request) -> List[Dict[str, Any]]:
     """Return a summary of all sessions, newest first. Used by the History page."""
-    from app.storage import read_json as _read_json
     summaries: List[Dict[str, Any]] = []
-    if not UPLOAD_DIR.exists():
-        return summaries
-    for session_path in UPLOAD_DIR.iterdir():
-        if not session_path.is_dir():
-            continue
+    for session_id in list_session_ids():
         try:
-            uuid.UUID(session_path.name, version=4)
+            uuid.UUID(session_id, version=4)
         except ValueError:
             continue
-        manifest_file = session_path / "manifest.json"
-        if not manifest_file.exists():
-            continue
         try:
-            manifest = _read_json(manifest_file, {})
+            manifest = read_manifest(session_id, {})
+            if not manifest:
+                continue
             if not visible_to_principal(request, manifest.get("owner")):
                 continue
-            analysis = _memory.get("session", session_path.name)
+            analysis = _memory.get("session", session_id)
             top_savings = None
             if analysis and isinstance(analysis, dict):
                 top_savings = analysis.get("total_savings_opportunity")
             from app.services.engagements_store import backfill_engagement_for_session
 
-            engagement_id = backfill_engagement_for_session(session_path.name, manifest)
+            engagement_id = backfill_engagement_for_session(session_id, manifest)
             summaries.append({
-                "session_id": session_path.name,
+                "session_id": session_id,
                 "engagement_id": engagement_id,
                 "company_name": manifest.get("company_name") or "Unknown",
                 "industry": manifest.get("industry") or "",

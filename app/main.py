@@ -126,6 +126,11 @@ if not RATE_LIMIT_ENABLED:
 @app.on_event("startup")
 async def _on_startup() -> None:
     logger.info('"app_startup version=%s"', APP_VERSION)
+    from app.db.bootstrap import import_json_if_needed
+
+    # One-time legacy JSON → SQLite import (no-op on the json backend or once
+    # the database is populated). Runs in a thread: it's sqlite/file I/O.
+    await asyncio.to_thread(import_json_if_needed)
     asyncio.create_task(_periodic_cleanup())
 
 

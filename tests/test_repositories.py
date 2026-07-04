@@ -153,11 +153,9 @@ def test_unknown_backend_raises():
     import os
     from unittest.mock import patch
 
+    from app.repositories import session_repo
+
+    # active_backend() reads the env dynamically — no module reload needed.
     with patch.dict(os.environ, {"REPOSITORY_BACKEND": "postgres"}):
-        import importlib
-        import app.repositories as repo_module
-        importlib.reload(repo_module)
         with pytest.raises(ValueError, match="Unknown REPOSITORY_BACKEND"):
-            repo_module._make_session_repo()
-    # Restore
-    importlib.reload(repo_module)
+            session_repo()

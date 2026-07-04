@@ -37,7 +37,9 @@ def _session_currency(session_id: str) -> str:
     if isinstance(meta, dict) and meta.get("reporting_currency"):
         return str(meta["reporting_currency"])
     try:
-        manifest = read_json(UPLOAD_DIR / session_id / "manifest.json", {})
+        from app.routers._shared import read_manifest
+
+        manifest = read_manifest(session_id, {})
         if manifest.get("currency"):
             return str(manifest["currency"])
     except Exception as exc:
@@ -246,7 +248,9 @@ class ClarificationDeferralError(Exception):
 
 
 def _session_manifest(session_id: str) -> Dict[str, Any]:
-    return read_json(UPLOAD_DIR / session_id / "manifest.json", {"files": [], "industry": "", "annual_revenue": 0.0})
+    from app.routers._shared import read_manifest
+
+    return read_manifest(session_id, {"files": [], "industry": "", "annual_revenue": 0.0})
 
 
 def _create_hitl_checkpoint(
