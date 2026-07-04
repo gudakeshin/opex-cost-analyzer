@@ -39,6 +39,77 @@ def _deserialize_lines(payload: List[Dict[str, Any]]) -> List[NormalizedSpendLin
     return [NormalizedSpendLine.model_validate(item) for item in payload]
 
 
+# Above this, the per-document JSON cache is skipped: the Parquet store is the
+# only cache, and load_cached_spend_lines reads it back. Below it, both are
+# written so environments without duckdb/pyarrow keep working unchanged.
+_JSON_CACHE_MAX_LINES = 100_000
+
+
+def _should_stream_csv(raw_path: Path) -> bool:
+    """Stream CSVs too big for the in-memory parser, when the store can take them."""
+    from app.services.ingestion import _ROW_MAX, estimate_csv_rows
+    from app.services.spend_store import is_available
+
+    if not is_available():
+        return False
+    try:
+        return estimate_csv_rows(raw_path) > _ROW_MAX
+    except OSError:
+        return False
+
+
+def _stream_csv_document(
+    engagement_id: str,
+    document_id: str,
+    raw_path: Path,
+    *,
+    taxonomy: Dict[str, Any],
+    reporting_currency: str,
+) -> tuple[int, Dict[str, Any]]:
+    """Chunk a large CSV straight into the Parquet spend store.
+
+    Peak memory is one chunk (100k lines); no spend_lines.json is written —
+    load_cached_spend_lines reads the Parquet store instead.
+    """
+    from app.services.ingestion import iter_spend_csv_chunks
+    from app.services.spend_store import SpendStore
+
+    total = SpendStore(engagement_id).write_document_batches(
+        document_id,
+        iter_spend_csv_chunks(
+            raw_path, taxonomy, reporting_currency=reporting_currency
+        ),
+    )
+    report = {
+        "source_file": raw_path.name,
+        "sheets_ingested": [
+            {"sheet": raw_path.stem, "rows": total, "strategy": "csv_streamed"}
+        ],
+        "sheets_skipped": [],
+        "rows_ingested": total,
+        "streamed": True,
+    }
+    return total, report
+
+
+def _cache_spend_lines(
+    engagement_id: str,
+    document_id: str,
+    parsed_dir: Path,
+    lines: List[NormalizedSpendLine],
+) -> None:
+    from app.services.spend_store import write_document_spend_lines
+
+    parquet_ok = write_document_spend_lines(engagement_id, document_id, lines)
+    if len(lines) <= _JSON_CACHE_MAX_LINES or not parquet_ok:
+        (parsed_dir / "spend_lines.json").write_text(
+            json.dumps(_serialize_lines(lines), indent=2),
+            encoding="utf-8",
+        )
+    else:
+        (parsed_dir / "spend_lines.json").unlink(missing_ok=True)
+
+
 def index_document_nodes(
     engagement_id: str,
     document_id: str,
@@ -154,17 +225,27 @@ def process_engagement_document(
     parsed_markdown = ""
 
     try:
-        if suffix in (".csv", ".xlsx", ".xls"):
+        if suffix == ".csv" and _should_stream_csv(raw_path):
+            line_count, report = _stream_csv_document(
+                engagement_id, document_id, raw_path,
+                taxonomy=taxonomy, reporting_currency=reporting_currency,
+            )
+            role = "spend_tabular"
+            parse_backend = "native_streamed"
+            (parsed_dir / "ingestion_report.json").write_text(
+                json.dumps(report, indent=2),
+                encoding="utf-8",
+            )
+            text_preview = f"Parsed {line_count} spend lines from {raw_path.name} (streamed)"
+
+        elif suffix in (".csv", ".xlsx", ".xls"):
             lines, report = parse_spend_file_with_report(
                 raw_path, taxonomy, reporting_currency=reporting_currency
             )
             role = "spend_tabular"
             parse_backend = "native"
             line_count = len(lines)
-            (parsed_dir / "spend_lines.json").write_text(
-                json.dumps(_serialize_lines(lines), indent=2),
-                encoding="utf-8",
-            )
+            _cache_spend_lines(engagement_id, document_id, parsed_dir, lines)
             (parsed_dir / "ingestion_report.json").write_text(
                 json.dumps(report, indent=2),
                 encoding="utf-8",
@@ -178,10 +259,7 @@ def process_engagement_document(
             role = "spend_tabular"
             parse_backend = "native"
             line_count = len(lines)
-            (parsed_dir / "spend_lines.json").write_text(
-                json.dumps(_serialize_lines(lines), indent=2),
-                encoding="utf-8",
-            )
+            _cache_spend_lines(engagement_id, document_id, parsed_dir, lines)
             (parsed_dir / "ingestion_report.json").write_text(
                 json.dumps(report, indent=2),
                 encoding="utf-8",
@@ -304,6 +382,17 @@ def process_engagement_document(
 def load_cached_spend_lines(engagement_id: str, document_id: str) -> List[NormalizedSpendLine]:
     path = document_parsed_dir(engagement_id, document_id) / "spend_lines.json"
     if not path.exists():
+        # Large documents are cached in Parquet only (see _cache_spend_lines).
+        from app.services.spend_store import SpendStore, is_available
+
+        if is_available():
+            try:
+                return SpendStore(engagement_id).document_lines(document_id)
+            except Exception:
+                logger.warning(
+                    '"spend_store_read_failed engagement_id=%s document_id=%s"',
+                    engagement_id, document_id, exc_info=True,
+                )
         return []
     data = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(data, list):

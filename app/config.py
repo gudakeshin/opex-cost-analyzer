@@ -105,7 +105,9 @@ def _clean_env(key: str, default: str = "") -> str:
 SQLITE_DB_PATH = Path(_clean_env("SQLITE_DB_PATH", str(DATA_DIR / "opex.db")))
 SQLITE_BUSY_TIMEOUT_MS = int(_clean_env("SQLITE_BUSY_TIMEOUT_MS", "10000") or "10000")
 
-MAX_UPLOAD_MB = int(_clean_env("MAX_UPLOAD_MB", "50") or "50")
+# Uploads are spooled to disk in chunks (never buffered whole in memory) and
+# large CSVs stream into the Parquet spend store, so this can be generous.
+MAX_UPLOAD_MB = int(_clean_env("MAX_UPLOAD_MB", "512") or "512")
 # Full OPAR loop (agent tool-use + reflect synthesis). Must exceed agent + LLM synthesis budgets.
 OPAR_TIMEOUT_SECONDS = int(_clean_env("OPAR_TIMEOUT_SECONDS", "240") or "240")
 # Wall-clock budgets for reflect/chat LLM synthesis (thread-pool futures).

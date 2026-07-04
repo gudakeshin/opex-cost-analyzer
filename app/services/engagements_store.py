@@ -714,6 +714,9 @@ def delete_document(engagement_id: str, document_id: str) -> None:
     ddir = document_dir(engagement_id, document_id)
     if ddir.exists():
         shutil.rmtree(ddir, ignore_errors=True)
+    from app.services.spend_store import delete_document_spend_lines
+
+    delete_document_spend_lines(engagement_id, document_id)
     with manifest_lock.acquire(engagement_id):
         manifest, _, parse_error = _parse_manifest_file(engagement_id)
         if parse_error or not manifest.get("engagement_id"):

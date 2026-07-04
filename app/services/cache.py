@@ -243,8 +243,12 @@ class CostRoomCache:
 
     @staticmethod
     def _cache_key(engagement_id: str, filters: Dict[str, Any]) -> str:
-        payload = json.dumps({"e": engagement_id, "f": filters}, sort_keys=True)
-        return "cr:" + hashlib.sha256(payload.encode()).hexdigest()[:16]
+        # Engagement id stays in the key so invalidate() can target one
+        # engagement's entries; only the filters are hashed.
+        digest = hashlib.sha256(
+            json.dumps(filters, sort_keys=True).encode()
+        ).hexdigest()[:16]
+        return f"cr:{engagement_id}:{digest}"
 
     def get(self, engagement_id: str, filters: Dict[str, Any]) -> Optional[Dict]:
         self._connect()
@@ -271,7 +275,7 @@ class CostRoomCache:
     def invalidate(self, engagement_id: str) -> int:
         """Remove all cached entries for an engagement (called at tear-down)."""
         self._connect()
-        prefix = "cr:"
+        prefix = f"cr:{engagement_id}:"
         removed = 0
         try:
             if self._using_redis:
@@ -282,7 +286,7 @@ class CostRoomCache:
                 before = len(self._local)
                 self._local = {
                     k: v for k, v in self._local.items()
-                    if engagement_id not in k
+                    if not k.startswith(prefix)
                 }
                 removed = before - len(self._local)
         except Exception as exc:

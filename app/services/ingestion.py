@@ -17,9 +17,14 @@ from app.config import logger
 from app.models import NormalizedSpendLine
 
 # Row-count guardrails — enforced in parse_spend_file before any processing.
+# _ROW_MAX bounds the fully-in-memory path only: CSVs above it are ingested by
+# iter_spend_csv_chunks (streamed straight into the Parquet spend store, hard
+# wall at _ROW_ABSOLUTE_MAX). XLSX has no streaming path — convert to CSV.
 _ROW_WARN = 100_000
 _ROW_CHUNK = 200_000
 _ROW_MAX = 500_000
+_ROW_ABSOLUTE_MAX = 20_000_000  # conglomerate tier ceiling (app/services/cache.py)
+_STREAM_CHUNK_ROWS = 100_000
 
 # ---------------------------------------------------------------------------
 # Optional: regional language OCR (pytesseract + Tesseract system binary)
@@ -700,13 +705,30 @@ def _parse_msme_flag(value: Any) -> Optional[bool]:
     return None
 
 
+# Keyed by (path, mtime_ns, size): chunked ingestion calls
+# _dataframe_to_spend_lines once per chunk, and re-hashing a multi-hundred-MB
+# file per 100k-row chunk would turn ingestion O(N²) in file size.
+_file_hash_cache: Dict[Tuple[str, int, int], str] = {}
+
+
 def _compute_file_hash(file_path: Path) -> str:
     """SHA-256 of the file bytes — used for source dedup."""
+    try:
+        stat = file_path.stat()
+        cache_key = (str(file_path), stat.st_mtime_ns, stat.st_size)
+    except OSError:
+        cache_key = None
+    if cache_key is not None and cache_key in _file_hash_cache:
+        return _file_hash_cache[cache_key]
     h = hashlib.sha256()
     with open(file_path, "rb") as fh:
         for chunk in iter(lambda: fh.read(65_536), b""):
             h.update(chunk)
-    return h.hexdigest()
+    digest = h.hexdigest()
+    if cache_key is not None:
+        _file_hash_cache.clear()  # keep at most one entry — same file repeats per chunk
+        _file_hash_cache[cache_key] = digest
+    return digest
 
 
 # ---------------------------------------------------------------------------
@@ -1339,7 +1361,9 @@ def parse_spend_file_with_report(
         n_rows = len(frame)
         if n_rows > _ROW_MAX:
             raise ValueError(
-                f"{file_path.name} sheet '{sheet_name}' has {n_rows:,} rows (limit: {_ROW_MAX:,})."
+                f"{file_path.name} sheet '{sheet_name}' has {n_rows:,} rows "
+                f"(in-memory limit: {_ROW_MAX:,}). Export the sheet to CSV — "
+                f"CSVs up to {_ROW_ABSOLUTE_MAX:,} rows are ingested via streaming."
             )
         sid = source_system_id or sheet_name
         lines, mapping_note = _dataframe_to_spend_lines(
@@ -1394,8 +1418,10 @@ def parse_spend_file_with_report(
         n_rows = len(frame)
         if n_rows > _ROW_MAX:
             raise ValueError(
-                f"{file_path.name} has {n_rows:,} rows (limit: {_ROW_MAX:,}). "
-                "Split by entity or fiscal year and upload each part separately."
+                f"{file_path.name} has {n_rows:,} rows (in-memory limit: {_ROW_MAX:,}). "
+                "Large CSVs are normally streamed automatically — this fallback "
+                "requires the duckdb/pyarrow spend store. Install those, or split "
+                "the file by entity or fiscal year."
             )
         lines, mapping_note = _dataframe_to_spend_lines(
             frame,
@@ -1441,6 +1467,53 @@ def parse_spend_file(
         source_system_id=source_system_id,
     )
     return lines
+
+
+def estimate_csv_rows(file_path: Path) -> int:
+    """Fast newline count (minus header) — decides in-memory vs streamed path."""
+    count = 0
+    with open(file_path, "rb") as fh:
+        for block in iter(lambda: fh.read(1 << 20), b""):
+            count += block.count(b"\n")
+    return max(count - 1, 0)
+
+
+def iter_spend_csv_chunks(
+    file_path: Path,
+    taxonomy: Dict,
+    *,
+    default_amount_type: str = "actual",
+    reporting_currency: str = "INR",
+    source_system_id: Optional[str] = None,
+    chunk_rows: Optional[int] = None,
+):
+    """Yield List[NormalizedSpendLine] per CSV chunk without materializing the file.
+
+    The column-mapping heuristics run per chunk over an identical column set,
+    so the mapping is stable for homogeneous files; row_ids stay contiguous
+    across chunks. Cumulative rows are capped at _ROW_ABSOLUTE_MAX.
+    """
+    chunk_rows = chunk_rows or _STREAM_CHUNK_ROWS  # resolved at call time
+    total_rows = 0
+    row_start = 1
+    for frame in pd.read_csv(file_path, chunksize=chunk_rows):
+        total_rows += len(frame)
+        if total_rows > _ROW_ABSOLUTE_MAX:
+            raise ValueError(
+                f"{file_path.name} exceeds {_ROW_ABSOLUTE_MAX:,} rows. "
+                "Split by entity or fiscal year and upload each part separately."
+            )
+        lines, _note = _dataframe_to_spend_lines(
+            frame,
+            file_path,
+            taxonomy,
+            default_amount_type=default_amount_type,
+            reporting_currency=reporting_currency,
+            source_system_id=source_system_id,
+            row_id_start=row_start,
+        )
+        row_start += len(lines)
+        yield lines
 
 
 def _load_json_records(file_path: Path) -> List[Dict[str, Any]]:

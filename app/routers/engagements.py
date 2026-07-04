@@ -207,27 +207,41 @@ async def upload_document(
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    content = await file.read()
-    if len(content) > _max_bytes:
-        raise HTTPException(status_code=413, detail=f"File exceeds {MAX_UPLOAD_MB} MB limit")
-
     document_id = str(uuid.uuid4())
     ddir = document_dir(engagement_id, document_id)
     raw_path = ddir / f"raw{suffix}"
 
-    # Register manifest + sidecar meta before writing raw bytes so orphan-folder
-    # repair cannot synthesize a duplicate upload.* row for the same document_id.
-    async with engagement_lock(engagement_id):
-        record = add_document_record(
-            engagement_id,
-            document_id=document_id,
-            filename=safe_filename,
-            content_type=file.content_type or "application/octet-stream",
-            size_bytes=len(content),
-            raw_path=str(raw_path),
-            _already_locked=True,
-        )
-        raw_path.write_bytes(content)
+    # Spool the body to disk in chunks — a 500MB CSV must never be buffered
+    # whole in memory. Size is enforced as bytes arrive.
+    tmp_path = ddir.parent / f".upload-{document_id}{suffix}"
+    tmp_path.parent.mkdir(parents=True, exist_ok=True)
+    size_bytes = 0
+    try:
+        with tmp_path.open("wb") as spool:
+            while chunk := await file.read(1 << 20):
+                size_bytes += len(chunk)
+                if size_bytes > _max_bytes:
+                    raise HTTPException(
+                        status_code=413, detail=f"File exceeds {MAX_UPLOAD_MB} MB limit"
+                    )
+                spool.write(chunk)
+
+        # Register manifest + sidecar meta before writing raw bytes so orphan-folder
+        # repair cannot synthesize a duplicate upload.* row for the same document_id.
+        async with engagement_lock(engagement_id):
+            record = add_document_record(
+                engagement_id,
+                document_id=document_id,
+                filename=safe_filename,
+                content_type=file.content_type or "application/octet-stream",
+                size_bytes=size_bytes,
+                raw_path=str(raw_path),
+                _already_locked=True,
+            )
+            ddir.mkdir(parents=True, exist_ok=True)
+            tmp_path.replace(raw_path)
+    finally:
+        tmp_path.unlink(missing_ok=True)
 
     append_audit_event(
         "document_uploaded",
