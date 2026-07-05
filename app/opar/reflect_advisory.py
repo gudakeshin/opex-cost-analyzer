@@ -242,6 +242,7 @@ def normalize_advisory_sections(raw: Dict[str, Any]) -> AdvisorySections | None:
         "priority_actions_30_60_90": raw.get("priority_actions_30_60_90", []),
         "sme_qualification_narrative": raw.get("sme_qualification_narrative", ""),
         "recommendations": raw.get("recommendations", []),
+        "citations": raw.get("citations", []),
     }
     try:
         return AdvisorySections.model_validate(payload)
@@ -285,8 +286,8 @@ def _estimate_tokens(payload: Any) -> int:
 
 _ADVISORY_HINT = (
     "\nOUTPUT BUDGET (overrides schema constraints above):\n"
-    '- Return "recommendations", "assumptions" and "citations" as empty arrays [] — '
-    "this consumer does not read them; put all insight into the other fields.\n"
+    '- Return "recommendations" and "assumptions" as empty arrays [] when not requested.\n'
+    "- Citations may reference source_skill keys from skill_outputs only — never invent metrics.\n"
     "- Cap category_focus_section at 400 words. Keep every other string under 60 words.\n"
     "- The complete JSON must close properly well within the output limit.\n"
 )
@@ -513,6 +514,7 @@ def generate_llm_advisory_sections(
         "available_analyses": available_analyses,
     }
     had_any_raw = False
+    permanent_skip: str | None = None
     for synthesize in synthesizers:
         for strict_mode in mode_order:
             try:
@@ -522,6 +524,16 @@ def generate_llm_advisory_sections(
                     strict_mode=strict_mode,
                 )
             except Exception as exc:
+                from app.opar.llm_errors import ProviderPermanentError
+
+                if isinstance(exc, ProviderPermanentError):
+                    permanent_skip = exc.skip_reason
+                    logger.warning(
+                        "llm_advisory_permanent_error skip=%s error=%s",
+                        permanent_skip,
+                        exc,
+                    )
+                    return None, captured_thinking, permanent_skip
                 logger.warning("llm_advisory_synthesizer_error error=%s", exc)
                 raw, thinking_text = None, None
             if raw is not None:
@@ -557,6 +569,10 @@ def generate_llm_advisory_sections(
                         strict_mode=strict_mode,
                     )
                 except Exception as exc:
+                    from app.opar.llm_errors import ProviderPermanentError
+
+                    if isinstance(exc, ProviderPermanentError):
+                        return None, captured_thinking, exc.skip_reason
                     logger.warning("llm_advisory_synthesizer_error error=%s", exc)
                     raw, thinking_text = None, None
                 if raw is not None:

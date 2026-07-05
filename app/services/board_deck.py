@@ -25,6 +25,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from app.config import OUTPUT_DIR
+from app.services.narrative_composer import (
+    compose_deterministic_advisory,
+    provenance_banner_text,
+)
 
 try:
     from pptx import Presentation
@@ -59,12 +63,24 @@ def build_board_deck(
     company_name: str = "Client",
     engagement_week: int = 1,
     pack_id: Optional[str] = None,
+    advisory: Any | None = None,
+    narrative_provenance: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Build a 15-slide board deck data structure from OPAR analysis outputs.
     Returns a JSON-serialisable dict; call export_board_deck_pptx() for PPTX.
     """
     outputs = analysis.get("skill_outputs", {})
+    currency = str(analysis.get("reporting_currency") or "INR")
+    if advisory is None:
+        advisory = compose_deterministic_advisory(
+            outputs,
+            company_name=company_name,
+            currency=currency,
+            category_focused=True,
+        )
+    provenance = narrative_provenance or {"mode": "deterministic", "llm_skip_reason": "export_no_llm"}
+    banner = provenance_banner_text(provenance)
     bridge_conf = outputs.get("value-bridge-calculator", {}).get("confidence_bands", {})
     shareholder = outputs.get("value-to-shareholder-bridge", {}).get("metrics", {})
     initiatives = outputs.get("savings-modeler", {}).get("initiatives", [])
@@ -94,6 +110,7 @@ def build_board_deck(
     })
 
     # Slide 2 — Executive Summary
+    exec_takeaway = (getattr(advisory, "executive_takeaway", "") or "").strip()
     slides.append({
         "slide_number": 2,
         "title": _SLIDE_TITLES[1],
@@ -104,6 +121,8 @@ def build_board_deck(
             "top_lever": initiatives[0].get("category_name", "—") if initiatives else "—",
             "ebitda_bps": shareholder.get("delta_ebitda_bps"),
             "aqs": f"{aqs:.2f}" if aqs else "N/A",
+            "executive_takeaway": exec_takeaway[:500] if exec_takeaway else None,
+            "narrative_provenance_banner": banner,
         },
     })
 
@@ -278,6 +297,7 @@ def build_board_deck(
         "type": "board_deck",
         "slide_count": len(slides),
         "generated_on": str(date.today()),
+        "narrative_provenance": provenance,
         "slides": slides,
     }
 

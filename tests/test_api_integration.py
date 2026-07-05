@@ -134,8 +134,18 @@ def test_opar_v1_chat_endpoint(client) -> None:
     assert "degraded_mode" in data
     assert "fallback_reasons" in data
     assert "loop_complete" in data
-    assert "Spend profile" in data["response_text"] or "value bridge" in data["response_text"].lower()
-    assert "Benchmarked using" in data["response_text"]
+    text = data["response_text"]
+    assert (
+        "Spend profile" in text
+        or "value bridge" in text.lower()
+        or "modeled opex savings" in text.lower()
+        or "benchmark gaps" in text.lower()
+    )
+    assert (
+        "Benchmarked using" in text
+        or "benchmark gaps" in text.lower()
+        or "peer median" in text.lower()
+    )
     plan_steps = [s.get("message", "") for s in data.get("progress_steps", []) if s.get("phase") == "plan"]
     selected_line = next((m for m in plan_steps if m.startswith("Selected skills: ")), "")
     assert "Selected skills:" in selected_line
@@ -182,7 +192,12 @@ def test_opar_v1_chat_with_files_endpoint(client) -> None:
     data = resp.json()
     assert "response_text" in data
     assert isinstance(data.get("uploaded_files", []), list)
-    assert "Spend profile" in data["response_text"]
+    text = data["response_text"]
+    assert (
+        "Spend profile" in text
+        or "modeled OpEx savings" in text
+        or "benchmark gaps" in text.lower()
+    )
 
 
 def test_opar_v1_chat_with_txt_file_captures_document_semantics(client) -> None:

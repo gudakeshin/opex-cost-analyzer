@@ -107,7 +107,7 @@ def _advisory():
 # --- LLM path (mocked advisory) ------------------------------------------------
 
 def test_business_case_includes_llm_sections():
-    with patch.object(bc_mod, "_llm_advisory_sections", return_value=_advisory()):
+    with patch.object(bc_mod, "_llm_advisory_sections", return_value=(_advisory(), None)):
         bc = build_business_case(_analysis())
     secs = bc["sections"]
     assert secs["business_levers"][0]["lever_name"] == "License Rightsizing"
@@ -119,7 +119,7 @@ def test_business_case_includes_llm_sections():
 
 
 def test_llm_business_lever_sharpens_initiative_rationale():
-    with patch.object(bc_mod, "_llm_advisory_sections", return_value=_advisory()):
+    with patch.object(bc_mod, "_llm_advisory_sections", return_value=(_advisory(), None)):
         bc = build_business_case(_analysis())
     detail = bc["sections"]["initiative_details"][0]
     assert "renegotiate the Oracle enterprise agreement" in detail["business_rationale"]
@@ -129,24 +129,25 @@ def test_llm_business_lever_sharpens_initiative_rationale():
 # --- Offline / deterministic fallback -----------------------------------------
 
 def test_business_case_offline_keeps_depth():
-    with patch.object(bc_mod, "_llm_advisory_sections", return_value=None):
+    with patch.object(bc_mod, "_llm_advisory_sections", return_value=(None, "provider_billing")):
         bc = build_business_case(_analysis())
     secs = bc["sections"]
-    # No LLM levers, but deterministic detail + a 30/60/90 fallback are present.
-    assert secs["business_levers"] == []
+    assert bc["narrative_provenance"]["mode"] == "deterministic"
+    assert len(secs["business_levers"]) >= 1, "deterministic composer should populate levers"
     assert secs["priority_actions_30_60_90"], "deterministic 30/60/90 fallback expected"
     assert secs["strategic_context"], "deterministic strategic context expected"
+    assert secs["quick_wins"], "deterministic quick wins expected"
     detail = secs["initiative_details"][0]
     assert detail["owner_role"]
     assert detail["affected_vendors"]
     assert detail["risks"]
     assert detail["kpis"]
-    # Deterministic rationale survives.
-    assert "License Rightsizing addresses" in detail["business_rationale"]
+    # Deterministic rationale may be sharpened by composer levers when LLM is offline.
+    assert "Shelfware" in detail["business_rationale"] or "License Rightsizing" in detail["business_rationale"]
 
 
 def test_business_case_uses_reporting_currency_inr():
-    with patch.object(bc_mod, "_llm_advisory_sections", return_value=None):
+    with patch.object(bc_mod, "_llm_advisory_sections", return_value=(None, "provider_failed")):
         bc = build_business_case(_analysis())
     secs = bc["sections"]
     assert bc["reporting_currency"] == "INR"
@@ -203,7 +204,7 @@ def test_business_case_persists_business_detail(client):
 # --- Document rendering --------------------------------------------------------
 
 def test_docx_and_text_render_business_detail(tmp_path):
-    with patch.object(bc_mod, "_llm_advisory_sections", return_value=_advisory()):
+    with patch.object(bc_mod, "_llm_advisory_sections", return_value=(_advisory(), None)):
         bc = build_business_case(_analysis())
     with patch.object(bc_mod, "OUTPUT_DIR", tmp_path):
         docx_path = export_docx(bc, "bc.docx")

@@ -15,6 +15,7 @@ from docx import Document
 from docx.shared import Pt
 
 from app.config import OUTPUT_DIR
+from app.services.narrative_composer import compose_deterministic_advisory, provenance_banner_text
 from app.utils.inr_format import fmt_inr_cr
 
 
@@ -54,12 +55,25 @@ def build_cfo_brief(
     engagement_week: int = 1,
     pack_id: Optional[str] = None,
     company_name: str = "Client",
+    advisory: Any | None = None,
+    narrative_provenance: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Build a structured CFO brief dict from OPAR analysis outputs.
     Returns a dict with sections suitable for DOCX export or JSON.
     """
     outputs = analysis.get("skill_outputs", {})
+    currency = str(analysis.get("reporting_currency") or "INR")
+    if advisory is None:
+        advisory = compose_deterministic_advisory(
+            outputs,
+            company_name=company_name,
+            currency=currency,
+            category_focused=True,
+        )
+    provenance = narrative_provenance or {"mode": "deterministic", "llm_skip_reason": "export_no_llm"}
+    banner = provenance_banner_text(provenance)
+    exec_takeaway = (getattr(advisory, "executive_takeaway", "") or "").strip()
     bridge = outputs.get("value-bridge-calculator", {})
     conf = bridge.get("confidence_bands", {})
 
@@ -119,12 +133,15 @@ def build_cfo_brief(
         "brsr_cobenefits": {"delta_scope2_tco2e": scope2, "delta_scope3_tco2e": scope3},
         "regulatory_alerts": [r.get("title", r.get("event_id", "?")) for r in reg_flags[:3]],
         "next_decision_gate": f"Gate-{min(4, (engagement_week // 3) + 1)} (Week {min(12, engagement_week + 3 - (engagement_week % 3) or 3)})",
+        "executive_takeaway": exec_takeaway[:600] if exec_takeaway else None,
+        "narrative_provenance_banner": banner,
     }
 
     return {
         "type": "cfo_brief",
         "template": "one_page",
         "generated_on": str(date.today()),
+        "narrative_provenance": provenance,
         "sections": sections,
     }
 
@@ -136,6 +153,12 @@ def export_cfo_brief_docx(brief: Dict[str, Any], filename: str) -> Path:
 
     headline = brief["sections"]["headline"]
     doc.add_heading(f"OpEx CFO Brief — {headline['company']}", level=0)
+    banner = brief["sections"].get("narrative_provenance_banner") or provenance_banner_text(
+        brief.get("narrative_provenance")
+    )
+    if banner:
+        p = doc.add_paragraph(banner)
+        p.italic = True
     doc.add_paragraph(
         f"As of {headline['as_of']}  |  Engagement Week {headline['engagement_week']}  |  Pack: {headline['pack']}"
     )

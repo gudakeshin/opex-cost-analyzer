@@ -213,6 +213,16 @@ class AdvisoryRecommendation(BaseModel):
     decisions_required: List[str] = Field(default_factory=list)
 
 
+class AdvisoryCitation(BaseModel):
+    source_skill: str
+    metric: str
+    value: str
+    row_count: int = 0
+    dataset: str = ""
+    vintage: str = ""
+    sample_n: int = 0
+
+
 class AdvisorySections(BaseModel):
     executive_takeaway: str = ""
     category_focus_section: str = ""
@@ -222,6 +232,7 @@ class AdvisorySections(BaseModel):
     priority_actions_30_60_90: List[AdvisoryActionItem] = Field(default_factory=list)
     sme_qualification_narrative: str = ""
     recommendations: List[AdvisoryRecommendation] = Field(default_factory=list)
+    citations: List[AdvisoryCitation] = Field(default_factory=list)
 
 
 class ReflectOutput(BaseModel):

@@ -7,6 +7,12 @@ from typing import Any, Dict
 from docx import Document
 
 from app.config import OUTPUT_DIR
+from app.services.narrative_composer import (
+    attach_citations,
+    compose_deterministic_advisory,
+    narrative_provenance_payload,
+    provenance_banner_text,
+)
 from app.utils.inr_format import format_money
 
 
@@ -145,17 +151,17 @@ def _build_rag_section(outputs: Dict[str, Any]) -> Dict[str, Any]:
 # Layer B — LLM advisory narrative (reuses the reflect-phase synthesis)
 # ---------------------------------------------------------------------------
 
-def _llm_advisory_sections(analysis: Dict[str, Any]) -> Any | None:
-    """Run the existing LLM advisory synthesis for the business case.
+def _llm_advisory_sections(analysis: Dict[str, Any]) -> tuple[Any | None, str | None]:
+    """Run LLM advisory synthesis for the business case.
 
-    Returns an ``AdvisorySections`` (or None when the LLM is disabled / low
-    quality). Best-effort: any failure degrades to the deterministic sections.
+    Returns ``(AdvisorySections | None, skip_reason)``. On failure callers should
+    use the deterministic narrative composer.
     """
     try:
         from app.opar.models import ObserveContext
         from app.opar.reflect_advisory import generate_llm_advisory_sections
     except Exception:
-        return None
+        return None, "provider_unavailable"
     outputs = analysis.get("skill_outputs", {})
     manifest = {
         "company_name": analysis.get("company_name"),
@@ -176,12 +182,39 @@ def _llm_advisory_sections(analysis: Dict[str, Any]) -> Any | None:
             engagement_id=str(analysis.get("engagement_id", "") or ""),
             deep_research_summary=analysis.get("deep_research_summary"),
         )
-        advisory, _thinking, _skip = generate_llm_advisory_sections(
+        advisory, _thinking, skip = generate_llm_advisory_sections(
             ctx, manifest, outputs, category_focused=True
         )
-        return advisory
+        return advisory, skip
     except Exception:
-        return None
+        return None, "provider_failed"
+
+
+def _resolve_advisory(
+    analysis: Dict[str, Any],
+    advisory: Any | None,
+) -> tuple[Any | None, Dict[str, Any]]:
+    """LLM advisory when available; otherwise deterministic composer."""
+    outputs = analysis.get("skill_outputs", {})
+    currency = _resolve_reporting_currency(analysis)
+    skip_reason: str | None = None
+    mode = "llm"
+
+    if advisory is None:
+        advisory, skip_reason = _llm_advisory_sections(analysis)
+
+    if advisory is None:
+        advisory = compose_deterministic_advisory(
+            outputs,
+            company_name=str(analysis.get("company_name") or "Client"),
+            currency=currency,
+            category_focused=True,
+        )
+        mode = "deterministic"
+
+    advisory = attach_citations(advisory, outputs, currency=currency)
+    provenance = narrative_provenance_payload(mode, skip_reason)
+    return advisory, provenance
 
 
 def _match_advisory_lever(advisory_levers: list, initiative: Dict[str, Any]) -> Any | None:
@@ -335,9 +368,8 @@ def build_business_case(
     top_text = ", ".join(top_categories) if top_categories else "top identified categories"
 
     # Callers may pass an already-computed AdvisorySections to avoid a redundant
-    # LLM synthesis; otherwise generate it here (best-effort, degrades to None).
-    if advisory is None:
-        advisory = _llm_advisory_sections(analysis)
+    # LLM synthesis; otherwise generate it here (best-effort, degrades to composer).
+    advisory, narrative_provenance = _resolve_advisory(analysis, advisory)
     details = build_initiative_details(outputs, advisory)
 
     # Executive summary: LLM takeaway when available, else the deterministic band line.
@@ -378,11 +410,23 @@ def build_business_case(
         "risk_assessment": _dynamic_risks(outputs),
         "assumption_register": _build_assumption_register_section(outputs),
         "rag_factors": _build_rag_section(outputs),
+        "evidence_and_sources": [
+            {
+                "source_skill": c.source_skill,
+                "metric": c.metric,
+                "value": c.value,
+                "dataset": c.dataset,
+                "vintage": c.vintage,
+                "sample_n": c.sample_n,
+            }
+            for c in getattr(advisory, "citations", []) or []
+        ],
     }
     return {
         "template": template,
         "generated_on": str(date.today()),
         "reporting_currency": currency,
+        "narrative_provenance": narrative_provenance,
         "sections": sections,
     }
 
@@ -490,11 +534,29 @@ def _render_priority_actions_docx(doc: Document, actions: list) -> None:
             doc.add_paragraph(str(a), style="List Bullet")
 
 
+def _render_citations_docx(doc: Document, citations: list) -> None:
+    for c in citations:
+        if not isinstance(c, dict):
+            continue
+        line = f"{c.get('source_skill')}: {c.get('metric')} — {c.get('value')}"
+        meta = []
+        if c.get("dataset"):
+            meta.append(str(c["dataset"]))
+        if c.get("vintage"):
+            meta.append(str(c["vintage"]))
+        if c.get("sample_n"):
+            meta.append(f"n={c['sample_n']}")
+        if meta:
+            line += f" ({', '.join(meta)})"
+        doc.add_paragraph(line, style="List Bullet")
+
+
 # Keys whose value is a list-of-dicts needing a structured renderer.
 _STRUCTURED_DOCX: Dict[str, Any] = {
     "initiative_details": _render_initiative_details_docx,
     "business_levers": _render_business_levers_docx,
     "priority_actions_30_60_90": _render_priority_actions_docx,
+    "evidence_and_sources": _render_citations_docx,
 }
 
 
@@ -505,6 +567,10 @@ def export_docx(business_case: Dict[str, Any], filename: str) -> Path:
     doc = Document()
     doc.add_heading("OpEx Business Case", level=0)
     doc.add_paragraph(f"Generated: {business_case.get('generated_on')}")
+    banner = provenance_banner_text(business_case.get("narrative_provenance"))
+    if banner:
+        p = doc.add_paragraph(banner)
+        p.italic = True
     for key, value in business_case.get("sections", {}).items():
         doc.add_heading(key.replace("_", " ").title(), level=1)
         renderer = _STRUCTURED_DOCX.get(key)

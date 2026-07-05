@@ -1,5 +1,6 @@
 import React from 'react';
 import { ConfidenceBadge } from '../../Trust/ConfidenceBadge';
+import { NarrativeProvenanceBanner, narrativeModeFromMetadata } from '../../Trust/NarrativeProvenanceBanner';
 import { AnalysisTraceBlock } from './AnalysisTraceBlock';
 import { ChatInsightBlock } from './ChatInsightBlock';
 import { DynamicCharts } from './DynamicCharts';
@@ -49,10 +50,14 @@ function llmFallbackDetail(reasons?: Record<string, unknown>): string {
   }
   if (advisory === 'provider_unavailable' || advisory === 'provider_failed') {
     return (
-      'Live LLM narrative synthesis did not complete (often extended-thinking timeout on large ' +
-      'engagements). A deterministic summary was used instead. Try Claude Sonnet 4.6 in the model ' +
-      'dropdown, turn Thinking off for faster synthesis, or retry after confirming API keys in .env.'
+      'Live LLM narrative synthesis did not complete. A deterministic, data-backed narrative was used instead.'
     );
+  }
+  if (advisory === 'provider_billing') {
+    return 'LLM narrative skipped — API credits exhausted. Deterministic narrative composed from skill outputs.';
+  }
+  if (advisory === 'provider_auth') {
+    return 'LLM narrative skipped — API authentication failed. Deterministic narrative composed from skill outputs.';
   }
   const chat = String(reasons?.chat_synthesis ?? '').trim();
   if (chat === 'provider_failed') {
@@ -243,6 +248,12 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
         )}
         {!isUser && message.used_llm_synthesis === false && hasSynthesisSkipReason(message.fallback_reasons) && (
           <LlmOfflineBanner reasons={message.fallback_reasons} />
+        )}
+        {!isUser && (
+          <NarrativeProvenanceBanner
+            provenance={narrativeModeFromMetadata(message.response_metadata, message.fallback_reasons)}
+            className="mb-3"
+          />
         )}
         {isUser ? (
           <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>

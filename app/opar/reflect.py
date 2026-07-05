@@ -7,6 +7,7 @@ from app.memory import MemoryStore
 from app.opar.chat_synthesis import synthesize_chat_response
 from app.opar.presentation import assemble_assistant_payload
 from app.opar.visualization import build_chart_specs
+from app.services.narrative_composer import attach_citations, compose_from_context
 from app.opar.models import (
     ActResult,
     AdvisorySections,
@@ -192,6 +193,12 @@ def reflect(
                     "llm_advisory": advisory_skip_reason,
                 }
         if advisory_sections is not None:
+            advisory_sections = attach_citations(
+                advisory_sections,
+                composition_validated,
+                currency=reporting_currency,
+            )
+            response_metadata = {**response_metadata, "narrative_mode": "llm"}
             presentation = assemble_assistant_payload(
                 advisory_sections, composition_validated, ctx
             )
@@ -214,33 +221,26 @@ def reflect(
                 )
                 if bands_only and bands_only != response:
                     response = f"{response}\n\n{bands_only}".strip()
-        elif advisory_was_needed and category_focused:
-            # The question targets a specific category (e.g. "what drives spend
-            # in HR & Recruitment?") and warranted an LLM narrative, but synthesis
-            # failed or produced low-quality output. build_response_text composes
-            # from whatever portfolio-wide skill outputs happen to be cached
-            # (conflicts/spend-profile/benchmark/BvA) regardless of the category
-            # asked about — answer the user's actual question via the query-aware
-            # chat synthesis path instead. (Portfolio-wide asks like "calculate
-            # value bridge" still get build_response_text's value-bridge summary,
-            # which is the right composer for that broader request.)
-            synthesis = synthesize_chat_response(
-                ctx,
-                manifest,
+        elif advisory_was_needed:
+            advisory_sections = compose_from_context(ctx, composition_validated, manifest)
+            advisory_sections = attach_citations(
+                advisory_sections,
                 composition_validated,
-                chat_history=chat_history,
                 currency=reporting_currency,
-                thinking_enabled=thinking_enabled,
-                thinking_callback=thinking_callback,
-                token_callback=token_callback,
             )
-            response = synthesis.response_text
-            response_metadata = synthesis.response_metadata
-            qa_used_llm = synthesis.used_llm
-            if not qa_used_llm:
-                degradation_reasons = {**degradation_reasons, "chat_synthesis": "provider_failed"}
-            if synthesis.thinking_text:
-                thinking_text = synthesis.thinking_text
+            response_metadata = {**response_metadata, "narrative_mode": "deterministic"}
+            presentation = assemble_assistant_payload(
+                advisory_sections, composition_validated, ctx
+            )
+            response = presentation.narrative_markdown
+            if not response.strip():
+                response = compose_response_from_advisory(
+                    advisory_sections,
+                    composition_validated,
+                    include_executive_takeaway=bool(ctx.wants_executive_narrative),
+                    include_business_case_metrics=bool(ctx.intent_class == "business_case"),
+                    category_focused=category_focused,
+                )
         else:
             response = build_response_text(composition_validated, failed, plan, ctx)
 

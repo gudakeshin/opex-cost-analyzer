@@ -170,5 +170,10 @@ async def test_value_bridge_chat_reflect_path(tmp_path, monkeypatch) -> None:
         )
         result = await run_opar_loop("Calculate value bridge", session_id, "smoke-user")
 
-    assert "Value bridge" in result.response_text or "Top Recommendations" in result.response_text
+    assert (
+        "Value bridge" in result.response_text
+        or "Top Recommendations" in result.response_text
+        or "modeled OpEx savings" in result.response_text
+        or "Evidence anchors" in result.response_text
+    )
     assert result.response_metadata.get("agent_path") is not True

@@ -235,15 +235,23 @@ def _call_anthropic_native(
     user_param: str | list[dict[str, Any]] = (
         user_content_blocks if user_content_blocks is not None else user_content
     )
-    response = client.messages.create(
-        model=active_model,
-        max_tokens=max_tokens,
-        # cached_system_blocks()/user_content_blocks already match the SDK's
-        # TextBlockParam shape at runtime; cast because mypy can't line up a
-        # generic list[dict[str, Any]] against the SDK's precise TypedDicts.
-        system=cast(Any, system_param),
-        messages=[{"role": "user", "content": cast(Any, user_param)}],
-    )
+    try:
+        response = client.messages.create(
+            model=active_model,
+            max_tokens=max_tokens,
+            # cached_system_blocks()/user_content_blocks already match the SDK's
+            # TextBlockParam shape at runtime; cast because mypy can't line up a
+            # generic list[dict[str, Any]] against the SDK's precise TypedDicts.
+            system=cast(Any, system_param),
+            messages=[{"role": "user", "content": cast(Any, user_param)}],
+        )
+    except Exception as exc:
+        from app.opar.llm_errors import classify_anthropic_exception
+
+        classified = classify_anthropic_exception(exc)
+        if classified:
+            raise classified from exc
+        raise
     record_anthropic_usage(getattr(response, "usage", None), active_model)
     if getattr(response, "stop_reason", None) == "max_tokens":
         from app.config import logger as _log
@@ -336,9 +344,25 @@ def _call_claude(
                 )
             raise
     if ANTHROPIC_ENABLED:
-        return _call_anthropic_native(
-            system, user_content, max_tokens=max_tokens, model=model
-        )
+        try:
+            return _call_anthropic_native(
+                system, user_content, max_tokens=max_tokens, model=model
+            )
+        except Exception as exc:
+            from app.opar.llm_errors import ProviderPermanentError
+
+            if isinstance(exc, ProviderPermanentError):
+                raise
+            if GEMINI_ENABLED:
+                from app.config import logger as _log
+
+                _log.warning("anthropic_call_failed_falling_back_to_gemini error=%s", exc)
+                from app.opar.gemini_client import call_gemini
+
+                return call_gemini(
+                    system=system, user_content=user_content, max_tokens=max_tokens, model=model
+                )
+            raise
     if GEMINI_ENABLED:
         from app.opar.gemini_client import call_gemini
 
@@ -1139,8 +1163,8 @@ def synthesize_analysis_claude(
     # fits the output cap instead of truncating mid-JSON on data-rich engagements.
     advisory_hint = (
         "\nOUTPUT BUDGET (overrides schema constraints above):\n"
-        '- Return "recommendations", "assumptions" and "citations" as empty arrays [] — '
-        "this consumer does not read them; put all insight into the other fields.\n"
+        '- Return "recommendations" and "assumptions" as empty arrays [] when not requested.\n'
+        "- Citations may reference source_skill keys from skill_outputs only — never invent metrics.\n"
         "- Cap category_focus_section at 400 words. Keep every other string under 60 words.\n"
         "- The complete JSON must close properly well within the output limit.\n"
     )
@@ -1205,6 +1229,15 @@ def synthesize_analysis_claude(
                 deep_research_summary=deep_research_summary,
                 retrieved_context=retrieved_context,
             )
+        return None, None
+    except Exception as exc:
+        from app.opar.llm_errors import ProviderPermanentError
+
+        future.cancel()
+        executor.shutdown(wait=False, cancel_futures=True)
+        if isinstance(exc, ProviderPermanentError):
+            raise
+        _log.warning('"synthesize_analysis_claude provider error" error=%s', exc)
         return None, None
     finally:
         if not future.cancelled():

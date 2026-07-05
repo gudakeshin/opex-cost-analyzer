@@ -221,6 +221,7 @@ export interface ChatMessage {
   show_peer_savings?: boolean;
   charts?: ChartSpec[];
   suggested_outputs?: SuggestedOutput[];
+  response_metadata?: ChatResponseMetadata;
 }
 
 export interface SessionCreatePayload {
@@ -416,9 +417,16 @@ export interface ChatHistoryTurn {
   content: string;
 }
 
+export interface NarrativeProvenance {
+  mode?: 'llm' | 'deterministic' | string;
+  llm_skip_reason?: string | null;
+}
+
 export interface ChatResponseMetadata {
   insight_dimension?: string;
   focus_category?: string;
+  narrative_mode?: 'llm' | 'deterministic' | string;
+  narrative_provenance?: NarrativeProvenance;
 }
 
 export interface V1ChatPayload {
