@@ -398,6 +398,26 @@
           "confidence": "illustrative",
           "source_type": "internal_calibration",
           "rationale": "Compliance, audit and regulatory-reporting opex as % of revenue for BFSI."
+        },
+        "TECH_INFRA": {
+          "P25": 4.0,
+          "P50": 6.5,
+          "P75": 9.0,
+          "P90": 12.0,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Core banking, payments and data-centre infrastructure opex as % of revenue."
+        },
+        "TREASURY_OPS": {
+          "P25": 0.8,
+          "P50": 1.4,
+          "P75": 2.2,
+          "P90": 3.5,
+          "unit": "% of revenue",
+          "confidence": "illustrative",
+          "source_type": "internal_calibration",
+          "rationale": "Treasury, liquidity and market-operations cost as % of revenue."
         }
       }
     },

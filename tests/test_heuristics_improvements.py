@@ -273,6 +273,27 @@ def test_p3b_fallback_note_for_borrowed_mapping() -> None:
     assert note and "financial_services" in note
 
 
+def test_p3_industries_have_sector_specific_categories() -> None:
+    import json
+    from pathlib import Path
+
+    seed = json.loads(
+        Path("skills/peer-benchmarker/references/industry_benchmarks.json").read_text(encoding="utf-8")
+    )
+    benchmarks = seed["benchmarks"]
+    tech_cats = set(benchmarks["technology"]["categories"])
+    assert {"NETWORK_OPEX", "SPECTRUM_LICENSING", "TOWER_INFRA"}.issubset(
+        set(benchmarks["telecom_infra"]["categories"])
+    )
+    assert {"CLINICAL_SUPPLIES", "MEDICAL_DEVICES", "CLINICAL_STAFFING"}.issubset(
+        set(benchmarks["healthcare"]["categories"])
+    )
+    assert {"TECH_INFRA", "TREASURY_OPS", "REGULATORY_COMPLIANCE"}.issubset(
+        set(benchmarks["financial_services"]["categories"])
+    )
+    assert tech_cats != set(benchmarks["telecom_infra"]["categories"])
+
+
 # ---------------------------------------------------------------------------
 # Tier 2 — effort_weeks normalization + dedup overlap matrix
 # ---------------------------------------------------------------------------

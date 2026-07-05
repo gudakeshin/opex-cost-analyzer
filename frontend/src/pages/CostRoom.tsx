@@ -594,6 +594,7 @@ export default function CostRoom() {
               summary={conflicts}
               loading={conflictsLoading}
               error={conflictsError}
+              onRetry={() => void conflictsQuery.refetch()}
               onApplyRecommendation={(c) =>
                 c.resolution_strategy &&
                 c.resolution_strategy !== 'escalate' &&

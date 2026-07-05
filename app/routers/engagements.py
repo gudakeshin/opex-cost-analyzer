@@ -18,7 +18,7 @@ from app.routers._shared import (
     validate_engagement_id,
 )
 from app.schemas import EngagementCreateRequest, EngagementPatchRequest
-from app.security.auth import current_principal, visible_to_principal
+from app.security.auth import check_owner, current_principal, visible_to_principal
 from app.services.analysis import load_taxonomy
 from app.services.compliance import append_audit_event
 from app.services.document_pipeline import (
@@ -32,12 +32,14 @@ from app.services.engagements_store import (
     add_document_record,
     create_engagement_manifest,
     delete_document,
+    delete_engagement,
     document_dir,
     engagement_dir,
     ensure_engagement_exists,
     get_document_record,
     list_engagements,
     repair_engagement_manifest,
+    search_engagements,
     update_document_record,
     write_engagement_manifest,
 )
@@ -89,8 +91,14 @@ def create_engagement(request: Request, payload: EngagementCreateRequest) -> Dic
 
 
 @router.get("/api/v1/engagements")
-def get_engagements(request: Request) -> List[Dict[str, Any]]:
-    return [m for m in list_engagements() if visible_to_principal(request, m.get("owner"))]
+def get_engagements(request: Request, q: str | None = None) -> List[Dict[str, Any]]:
+    rows = search_engagements(q) if q else list_engagements()
+    return [m for m in rows if visible_to_principal(request, m.get("owner"))]
+
+
+@router.get("/api/engagements")
+def get_engagements_legacy(request: Request, q: str | None = None) -> List[Dict[str, Any]]:
+    return get_engagements(request, q=q)
 
 
 @router.get("/api/v1/engagements/{engagement_id}")
@@ -123,6 +131,21 @@ def patch_engagement(engagement_id: str, payload: EngagementPatchRequest) -> Dic
     manifest["updated_at"] = utc_now_iso()
     write_engagement_manifest(engagement_id, manifest)
     return manifest
+
+
+@router.delete("/api/v1/engagements/{engagement_id}")
+def remove_engagement(request: Request, engagement_id: str) -> Dict[str, Any]:
+    validate_engagement_id(engagement_id)
+    manifest = ensure_engagement_exists(engagement_id)
+    check_owner(request, manifest.get("owner"))
+    delete_engagement(engagement_id)
+    append_audit_event("engagement_deleted", engagement_id=engagement_id)
+    return {"deleted": engagement_id, "status": "removed"}
+
+
+@router.delete("/api/engagements/{engagement_id}")
+def remove_engagement_legacy(request: Request, engagement_id: str) -> Dict[str, Any]:
+    return remove_engagement(request, engagement_id)
 
 
 @router.post("/api/v1/engagements/{engagement_id}/repair-manifest")

@@ -46,6 +46,23 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         className="flex-1 min-h-screen bg-brand-surface transition-[margin] duration-300"
         style={{ marginLeft: sidebarWidth }}
       >
+        {hideHeader && isMobile && (
+          <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-brand-border bg-white px-4 py-3 shadow-sm">
+            <button
+              type="button"
+              onClick={toggleCollapsed}
+              className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0"
+              aria-label="Open menu"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            {title && (
+              <h1 className="min-w-0 truncate text-lg font-bold font-sans text-brand-ink tracking-tight">{title}</h1>
+            )}
+          </div>
+        )}
         {!hideHeader && (
           <header className="sticky top-0 z-30 bg-white border-b border-brand-border shadow-sm">
             <div className="flex items-center justify-between px-4 md:px-6 py-4 gap-4">

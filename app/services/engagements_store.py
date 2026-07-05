@@ -620,6 +620,30 @@ def list_engagements() -> List[Dict[str, Any]]:
     return summaries
 
 
+def search_engagements(query: str | None = None) -> List[Dict[str, Any]]:
+    """Filter engagement summaries by company, industry, or engagement id."""
+    rows = list_engagements()
+    q = (query or "").strip().lower()
+    if not q:
+        return rows
+
+    def _matches(row: Dict[str, Any]) -> bool:
+        haystack = " ".join(
+            str(row.get(field) or "")
+            for field in (
+                "engagement_id",
+                "company_name",
+                "industry",
+                "detected_company_name",
+                "detected_industry",
+                "detected_industry_label",
+            )
+        ).lower()
+        return q in haystack
+
+    return [row for row in rows if _matches(row)]
+
+
 def add_document_record(
     engagement_id: str,
     *,

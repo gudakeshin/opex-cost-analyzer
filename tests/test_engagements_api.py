@@ -72,3 +72,39 @@ def test_session_links_engagement(client, monkeypatch, tmp_path):
 
     manifest = read_engagement_manifest(eid)
     assert body["session_id"] in manifest.get("session_ids", [])
+
+
+def test_search_engagements_by_company_name(client, tmp_path, monkeypatch):
+    _patch_engagements_dir(monkeypatch, tmp_path)
+    client.post("/api/v1/engagements", json={"company_name": "Alpha Retail"})
+    client.post("/api/v1/engagements", json={"company_name": "Beta Telecom", "industry": "telecom_infra"})
+
+    all_rows = client.get("/api/v1/engagements")
+    assert all_rows.status_code == 200
+    assert len(all_rows.json()) == 2
+
+    filtered = client.get("/api/v1/engagements", params={"q": "telecom"})
+    assert filtered.status_code == 200
+    names = {row["company_name"] for row in filtered.json()}
+    assert names == {"Beta Telecom"}
+
+    legacy = client.get("/api/engagements", params={"q": "alpha"})
+    assert legacy.status_code == 200
+    assert len(legacy.json()) == 1
+    assert legacy.json()[0]["company_name"] == "Alpha Retail"
+
+
+def test_delete_engagement(client, tmp_path, monkeypatch):
+    _patch_engagements_dir(monkeypatch, tmp_path)
+    res = client.post("/api/v1/engagements", json={"company_name": "Delete Me Co"})
+    eid = res.json()["engagement_id"]
+
+    deleted = client.delete(f"/api/v1/engagements/{eid}")
+    assert deleted.status_code == 200
+    assert deleted.json()["deleted"] == eid
+
+    listing = client.get("/api/v1/engagements")
+    assert all(row["engagement_id"] != eid for row in listing.json())
+
+    gone = client.get(f"/api/v1/engagements/{eid}")
+    assert gone.status_code == 404

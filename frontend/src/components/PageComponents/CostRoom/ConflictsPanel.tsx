@@ -14,7 +14,18 @@ interface ConflictsPanelProps {
   error: string | null;
   onApplyRecommendation: (conflict: DataConflict) => void;
   onFlagForReview: (conflict: DataConflict) => void;
+  onRetry?: () => void;
   actingConflictId?: string | null;
+}
+
+function friendlyConflictLoadError(raw: string | null): string {
+  const msg = String(raw ?? '').trim();
+  if (!msg) return 'The conflicts service is temporarily unavailable.';
+  if (/404|not found/i.test(msg)) return 'No conflict data exists for this session yet.';
+  if (/401|403|forbidden|unauthorized/i.test(msg)) return 'You do not have access to load conflict data for this session.';
+  if (/500|502|503|504|network|fetch/i.test(msg)) return 'The server could not load conflicts. Try again in a moment.';
+  if (msg.length > 120) return 'Could not load cross-source conflicts for this session.';
+  return msg;
 }
 
 function severityRail(severity: string): string {
@@ -88,11 +99,26 @@ export const ConflictsPanel: React.FC<ConflictsPanelProps> = ({
   error,
   onApplyRecommendation,
   onFlagForReview,
+  onRetry,
   actingConflictId,
 }) => {
   if (loading) return <Loader label="Loading conflicts…" />;
   if (error) {
-    return <p className="text-sm text-[var(--cr-gray)]">{error}</p>;
+    return (
+      <div className="cr-card p-5 border border-amber-200 bg-amber-50/60">
+        <p className="text-sm font-semibold text-[var(--cr-ink)]">Could not load data conflicts</p>
+        <p className="text-xs text-[var(--cr-gray)] mt-1">{friendlyConflictLoadError(error)}</p>
+        {onRetry && (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="mt-3 text-xs px-3 py-1.5 rounded-[var(--cr-r-sm)] border border-[var(--cr-line)] bg-white font-semibold hover:bg-gray-50"
+          >
+            Try again
+          </button>
+        )}
+      </div>
+    );
   }
   if (!summary || !summary.total) {
     return (
