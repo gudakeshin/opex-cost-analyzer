@@ -62,5 +62,23 @@
     "p50_benchmark_pct": 42.0,
     "p75_benchmark_pct": 52.0,
     "source": "Sun Pharma FY25: ~35% (branded generics premium), Cipla FY25: ~40%, Dr. Reddy's FY25: ~42%. Domestic generics-only: 45-55%."
+  },
+  {
+    "kpi_id": "field_force_cost_pct",
+    "kpi_name": "Field Force Cost % of Revenue",
+    "unit": "pct",
+    "formula": "field_force_cost / net_revenue * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 9.0,
+    "source": "AIOCD-AWACS + annual report selling expense disclosures; India branded generics field-heavy model"
+  },
+  {
+    "kpi_id": "regulatory_cost_pct",
+    "kpi_name": "Regulatory & Compliance Cost % of Revenue",
+    "unit": "pct",
+    "formula": "regulatory_cost / net_revenue * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 1.0,
+    "source": "USFDA/CDSCO filing fees + GMP compliance cost estimates for multi-market filers"
   }
 ]

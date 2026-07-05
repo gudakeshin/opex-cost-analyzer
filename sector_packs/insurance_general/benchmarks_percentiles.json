@@ -1,7 +1,7 @@
 {
   "sector": "insurance_general",
   "version": "1.0",
-  "vintage_date": "2025-04-01",
+  "vintage_date": "2026-05-01",
   "confidence_overall": "public_disclosure",
   "source_metadata": {
     "primary_sources": [
@@ -49,52 +49,166 @@
       "label": "General Insurance (India)",
       "categories": {
         "HR": {
-          "P25": 8.0, "P50": 12.0, "P75": 17.0, "P90": 22.0,
+          "P25": 8.0,
+          "P50": 12.0,
+          "P75": 17.0,
+          "P90": 22.0,
           "unit": "% of GWP",
           "confidence": "public_disclosure",
           "source_note": "Staff costs as % of gross written premium. IRDAI mandates expense-of-management disclosure. ICICI Lombard FY25: employee cost ~9% of GWP, New India ~15%, PSU players 18-22%."
         },
         "MARKETING": {
-          "P25": 10.0, "P50": 14.0, "P75": 19.0, "P90": 25.0,
+          "P25": 10.0,
+          "P50": 14.0,
+          "P75": 19.0,
+          "P90": 25.0,
           "unit": "% of GWP",
           "confidence": "public_disclosure",
           "source_note": "Commission + marketing as % of GWP. IRDAI FY24 aggregate: average commission ratio 11-15%. Retail health (Star Health): ~20% commission. Commercial lines: 8-12%."
         },
         "IT": {
-          "P25": 2.5, "P50": 4.0, "P75": 6.0, "P90": 9.0,
+          "P25": 2.5,
+          "P50": 4.0,
+          "P75": 6.0,
+          "P90": 9.0,
           "unit": "% of GWP",
           "confidence": "published_research",
           "source_note": "Technology spend. Gartner FS Benchmark 2024: insurance IT spend 3-5% of premium. Insurtech-adjacent players 5-8%. Legacy PSU players 7-9% (inefficient, on-premise)."
         },
         "OUTSOURCED": {
-          "P25": 2.0, "P50": 4.0, "P75": 6.5, "P90": 10.0,
+          "P25": 2.0,
+          "P50": 4.0,
+          "P75": 6.5,
+          "P90": 10.0,
           "unit": "% of GWP",
           "confidence": "public_disclosure",
           "source_note": "Outsourced claims processing, surveyor fees, KYC. ICICI Lombard: third-party administrator and surveyor costs ~3% of GWP."
         },
         "FACILITIES": {
-          "P25": 1.0, "P50": 1.8, "P75": 2.8, "P90": 4.0,
+          "P25": 1.0,
+          "P50": 1.8,
+          "P75": 2.8,
+          "P90": 4.0,
           "unit": "% of GWP",
           "confidence": "public_disclosure",
           "source_note": "Branch network and office costs. IRDAI: general insurers shifting to direct digital channel; branch cost share declining. PSU players with legacy branch networks higher."
         },
         "PROF_SVCS": {
-          "P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.0,
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.0,
+          "P90": 3.0,
           "unit": "% of GWP",
           "confidence": "public_disclosure",
           "source_note": "Actuarial, legal, reinsurance advisory, audit. IRDAI: mandatory appointed actuary fees + external audit included in expense-of-management ratio."
         },
         "INSURANCE": {
-          "P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5,
+          "P25": 0.3,
+          "P50": 0.8,
+          "P75": 1.5,
+          "P90": 2.5,
           "unit": "% of GWP",
           "confidence": "internal_calibration",
           "source_note": "Reinsurance admin costs net of premium (operational cost of reinsurance contracts, not claims). INTERNAL_CALIBRATION."
         },
         "TRAVEL": {
-          "P25": 0.3, "P50": 0.6, "P75": 1.0, "P90": 1.5,
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.0,
+          "P90": 1.5,
           "unit": "% of GWP",
           "confidence": "internal_calibration",
           "source_note": "Sales staff travel and agent support. INTERNAL_CALIBRATION — estimated from IRDAI expense-of-management sub-heads."
+        },
+        "claims_processing": {
+          "P25": 1.5,
+          "P50": 2.5,
+          "P75": 4.0,
+          "P90": 6.0,
+          "unit": "% of GWP",
+          "confidence": "internal_calibration",
+          "source_note": "Claims handling opex (people + systems + surveyors), excluding claim payouts."
+        },
+        "actuarial_services": {
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.0,
+          "P90": 1.6,
+          "unit": "% of GWP",
+          "confidence": "internal_calibration",
+          "source_note": "Actuarial team, external actuary reviews, IFRS-17/Ind AS 117 model build and run."
+        },
+        "distribution_agency": {
+          "P25": 8.0,
+          "P50": 12.0,
+          "P75": 17.0,
+          "P90": 22.0,
+          "unit": "% of GWP",
+          "confidence": "public_disclosure",
+          "source_note": "Commission & brokerage per IRDAI EoM disclosures; motor/health retail at upper band."
+        },
+        "reinsurance_costs": {
+          "P25": 5.0,
+          "P50": 12.0,
+          "P75": 25.0,
+          "P90": 40.0,
+          "unit": "% of GWP",
+          "confidence": "public_disclosure",
+          "source_note": "Ceded premium share; property/cat-exposed books cede more (GIC Re treaty market data)."
+        },
+        "irdai_compliance": {
+          "P25": 0.2,
+          "P50": 0.4,
+          "P75": 0.8,
+          "P90": 1.3,
+          "unit": "% of GWP",
+          "confidence": "internal_calibration",
+          "source_note": "IRDAI filings, product approvals, market conduct, and policyholder-protection compliance."
+        },
+        "tpa_network_costs": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.5,
+          "P90": 5.5,
+          "unit": "% of GWP",
+          "confidence": "internal_calibration",
+          "source_note": "TPA fees for health books and hospital network management/empanelment costs."
+        },
+        "policy_acquisition_costs": {
+          "P25": 10.0,
+          "P50": 15.0,
+          "P75": 22.0,
+          "P90": 30.0,
+          "unit": "% of GWP",
+          "confidence": "public_disclosure",
+          "source_note": "Total acquisition cost incl. commissions, onboarding, medicals, and issuance under EoM caps."
+        },
+        "fraud_investigation": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 1.8,
+          "unit": "% of GWP",
+          "confidence": "internal_calibration",
+          "source_note": "SIU operations, external investigators, and fraud analytics platforms."
+        },
+        "customer_service_ops": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.0,
+          "P90": 4.5,
+          "unit": "% of GWP",
+          "confidence": "internal_calibration",
+          "source_note": "Contact centres, branch service desks, grievance handling, and policyholder communications."
+        },
+        "technology_core_systems": {
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.5,
+          "P90": 8.0,
+          "unit": "% of GWP",
+          "confidence": "internal_calibration",
+          "source_note": "Core PAS/claims platforms, digital journeys, and infrastructure run cost."
         }
       }
     }

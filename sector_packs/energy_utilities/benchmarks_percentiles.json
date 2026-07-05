@@ -1,7 +1,7 @@
 {
   "sector": "energy_utilities",
   "version": "1.0",
-  "vintage_date": "2025-04-01",
+  "vintage_date": "2026-05-01",
   "confidence_overall": "public_disclosure",
   "source_metadata": {
     "primary_sources": [
@@ -146,6 +146,96 @@
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Aggregate technical & commercial (AT&C) loss cost as % of revenue; internal calibration."
+        },
+        "fuel_cost": {
+          "P25": 35.0,
+          "P50": 50.0,
+          "P75": 62.0,
+          "P90": 72.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Fuel cost share for thermal gencos (NTPC FY25 ~58%, IPP range wider); linkage vs e-auction mix drives spread."
+        },
+        "grid_wheeling_charges": {
+          "P25": 2.0,
+          "P50": 4.0,
+          "P75": 7.0,
+          "P90": 10.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Transmission/wheeling and open-access charges paid; PoC rates per CERC orders."
+        },
+        "o_and_m_plant": {
+          "P25": 3.0,
+          "P50": 5.0,
+          "P75": 8.0,
+          "P90": 12.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Plant O&M cost; CERC normative O&M per MW escalated, hydro at upper band."
+        },
+        "carbon_compliance": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 1.8,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "CCTS carbon credit obligations, monitoring/verification, and ESG assurance."
+        },
+        "at_and_c_losses": {
+          "P25": 8.0,
+          "P50": 15.0,
+          "P75": 22.0,
+          "P90": 30.0,
+          "unit": "% of input energy value",
+          "confidence": "public_disclosure",
+          "source_note": "Discom AT&C losses per PFC Report on Utility Performance FY23-24; national avg ~15.4%."
+        },
+        "renewable_ppa_costs": {
+          "P25": 3.0,
+          "P50": 8.0,
+          "P75": 15.0,
+          "P90": 25.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "RE PPA purchase obligations and RPO compliance cost share; rises with RPO trajectory."
+        },
+        "smart_metering_ops": {
+          "P25": 0.3,
+          "P50": 0.8,
+          "P75": 1.5,
+          "P90": 2.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "AMI rollout opex under RDSS — meter reading, MDM platform, DBFOOT service fees."
+        },
+        "regulatory_tariff_filings": {
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.6,
+          "P90": 1.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "ARR/tariff petition preparation, regulatory counsel, and hearing costs before CERC/SERCs."
+        },
+        "ash_water_environment": {
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 2.0,
+          "P90": 3.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Ash handling & utilisation, water charges, FGD O&M, and environmental compliance."
+        },
+        "safety_hse_ops": {
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.1,
+          "P90": 1.8,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Safety programmes, PPE, HSE audits, and statutory inspections across plants and networks."
         }
       }
     }

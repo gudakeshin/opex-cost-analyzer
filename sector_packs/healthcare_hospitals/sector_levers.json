@@ -8,7 +8,9 @@
       "lever_name": "Medical Consumables & Implants Group Procurement",
       "description": "Aggregate multi-hospital purchasing into a group purchasing organisation (GPO); standardise implant preferences across surgeons; renegotiate device and consumable contracts.",
       "category_ids": [
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "medical_consumables",
+        "diagnostics_reagents"
       ],
       "p10_pct": 8.0,
       "p50_pct": 16.0,
@@ -66,7 +68,9 @@
       "lever_name": "Clinical Workforce Staffing Optimisation",
       "description": "Right-size nursing staff ratios using patient acuity-based staffing models; cross-train paramedics; optimise resident doctor scheduling; reduce agency/contract nursing dependency.",
       "category_ids": [
-        "HR"
+        "HR",
+        "clinical_staff",
+        "housekeeping_support_services"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -85,7 +89,8 @@
       "lever_name": "Hospital Information System (HIS) & EMR Modernisation",
       "description": "Replace legacy HIS with integrated cloud-native EMR + billing + pharmacy + lab. Enable order entry at bedside; eliminate paper-based processes.",
       "category_ids": [
-        "IT"
+        "IT",
+        "digital_health_platforms"
       ],
       "p10_pct": 10.0,
       "p50_pct": 18.0,
@@ -104,7 +109,8 @@
       "lever_name": "Pharmacy Formulary Optimisation & Generic Substitution",
       "description": "Establish and enforce hospital formulary with approved generic equivalents for branded drugs; implement therapeutic substitution protocols; centralise inpatient dispensing.",
       "category_ids": [
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "pharmacy_inventory"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -124,7 +130,8 @@
       "description": "Reduce insurance claim denials via front-end eligibility checks; implement DRG-based coding; automate pre-authorisation workflows; reduce DSO on insurance receivables.",
       "category_ids": [
         "HR",
-        "IT"
+        "IT",
+        "insurance_tpa_costs"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -143,7 +150,8 @@
       "lever_name": "Hospital Facilities & Lease Optimisation",
       "description": "Rationalise non-clinical space; renegotiate leases; consolidate support services facilities across hospital network.",
       "category_ids": [
-        "FACILITIES"
+        "FACILITIES",
+        "patient_food_services"
       ],
       "p10_pct": 4.0,
       "p50_pct": 8.0,
@@ -162,7 +170,8 @@
       "lever_name": "Biomedical Equipment AMC & Maintenance Optimisation",
       "description": "Consolidate AMC contracts for imaging and critical care equipment; shift to predictive maintenance; standardise spare parts catalogue.",
       "category_ids": [
-        "PLANT_MAINTENANCE"
+        "PLANT_MAINTENANCE",
+        "biomedical_maintenance"
       ],
       "p10_pct": 6.0,
       "p50_pct": 12.0,
@@ -200,7 +209,8 @@
       "lever_name": "Healthcare Compliance & Advisory Spend Governance",
       "description": "Panel-firm governance for legal, NABH accreditation advisory, and regulatory consulting; cap duplicate compliance spend.",
       "category_ids": [
-        "PROF_SVCS"
+        "PROF_SVCS",
+        "regulatory_compliance"
       ],
       "p10_pct": 4.0,
       "p50_pct": 8.0,
@@ -219,7 +229,8 @@
       "lever_name": "Clinical Workforce Mix Optimisation (FTE vs. Agency Nursing & Locum Doctors)",
       "description": "Rebalance nurse-to-bed ratios, cross-train clinical support staff, and reduce agency/locum dependence through structured float pools.",
       "category_ids": [
-        "HR"
+        "HR",
+        "clinical_staff"
       ],
       "p10_pct": 8.0,
       "p50_pct": 16.0,
@@ -238,7 +249,8 @@
       "lever_name": "Medical Supplies & Implant Cost Optimisation (GPO vs. Direct Sourcing)",
       "description": "Consolidate medical-surgical consumables onto formulary contracts with compliance tracking and clinical-variation reduction programmes.",
       "category_ids": [
-        "OFFICE"
+        "OFFICE",
+        "medical_consumables"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -257,7 +269,8 @@
       "lever_name": "Pharmacy Cost Optimisation (Formulary Management & Generic Substitution)",
       "description": "Tighten hospital pharmacy economics — generic substitution protocols, consignment stock, and pilferage controls at dispensing points.",
       "category_ids": [
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "pharmacy_inventory"
       ],
       "p10_pct": 12.0,
       "p50_pct": 20.0,
@@ -276,7 +289,8 @@
       "lever_name": "Revenue Cycle Management Automation (Denial Management & Pre-Auth)",
       "description": "Automate charge capture, coding assistance, and payer-claims scrubbing to cut billing cost and revenue leakage.",
       "category_ids": [
-        "IT"
+        "IT",
+        "insurance_tpa_costs"
       ],
       "p10_pct": 15.0,
       "p50_pct": 25.0,
@@ -313,7 +327,8 @@
       "lever_name": "Medical Equipment Asset Optimisation (Lease vs. Buy & Maintenance Cost)",
       "description": "Rationalise medical equipment fleet — utilisation-based redeployment, standardised vendors, and outcome-based maintenance contracts.",
       "category_ids": [
-        "FACILITIES"
+        "FACILITIES",
+        "biomedical_maintenance"
       ],
       "p10_pct": 10.0,
       "p50_pct": 18.0,

@@ -62,5 +62,23 @@
     "p50_benchmark_pct": 12.0,
     "p75_benchmark_pct": 17.0,
     "source": "IRDAI expense-of-management disclosures. ICICI Lombard FY25: ~9%. New India Assurance FY25: ~15% (higher due to large PSU workforce). Private insurers: 8-13%."
+  },
+  {
+    "kpi_id": "it_spend_per_gwp",
+    "kpi_name": "IT Spend % of GWP",
+    "unit": "pct",
+    "formula": "it_spend / gross_written_premium * 100",
+    "target_direction": "context_dependent",
+    "p50_benchmark_pct": 3.5,
+    "source": "IRDAI Annual Report FY24 + insurer P&L technology expense disclosures"
+  },
+  {
+    "kpi_id": "acquisition_cost_ratio",
+    "kpi_name": "Policy Acquisition Cost Ratio",
+    "unit": "pct",
+    "formula": "acquisition_costs / gross_written_premium * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 15.0,
+    "source": "IRDAI expenses of management (EoM) disclosures post-2023 EoM regulations"
   }
 ]

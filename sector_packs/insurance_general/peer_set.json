@@ -2,16 +2,88 @@
   "sector": "insurance_general",
   "currency": "INR",
   "peers": [
-    {"name": "LIC of India", "ticker": "LICI.NS", "exchange": "NSE", "entity_type": "life_insurer", "gwp_cr": 440000},
-    {"name": "New India Assurance", "ticker": "NIACL.NS", "exchange": "NSE", "entity_type": "general_insurer", "gwp_cr": 35000},
-    {"name": "HDFC Life Insurance", "ticker": "HDFCLIFE.NS", "exchange": "NSE", "entity_type": "life_insurer", "gwp_cr": 65000},
-    {"name": "SBI Life Insurance", "ticker": "SBILIFE.NS", "exchange": "NSE", "entity_type": "life_insurer", "gwp_cr": 72000},
-    {"name": "ICICI Lombard GIC", "ticker": "ICICIGI.NS", "exchange": "NSE", "entity_type": "general_insurer", "gwp_cr": 23000},
-    {"name": "Star Health Insurance", "ticker": "STARHEALTH.NS", "exchange": "NSE", "entity_type": "health_insurer", "gwp_cr": 14000}
+    {
+      "name": "LIC of India",
+      "ticker": "LICI.NS",
+      "exchange": "NSE",
+      "entity_type": "life_insurer",
+      "gwp_cr": 440000
+    },
+    {
+      "name": "New India Assurance",
+      "ticker": "NIACL.NS",
+      "exchange": "NSE",
+      "entity_type": "general_insurer",
+      "gwp_cr": 35000
+    },
+    {
+      "name": "HDFC Life Insurance",
+      "ticker": "HDFCLIFE.NS",
+      "exchange": "NSE",
+      "entity_type": "life_insurer",
+      "gwp_cr": 65000
+    },
+    {
+      "name": "SBI Life Insurance",
+      "ticker": "SBILIFE.NS",
+      "exchange": "NSE",
+      "entity_type": "life_insurer",
+      "gwp_cr": 72000
+    },
+    {
+      "name": "ICICI Lombard GIC",
+      "ticker": "ICICIGI.NS",
+      "exchange": "NSE",
+      "entity_type": "general_insurer",
+      "gwp_cr": 23000
+    },
+    {
+      "name": "Star Health Insurance",
+      "ticker": "STARHEALTH.NS",
+      "exchange": "NSE",
+      "entity_type": "health_insurer",
+      "gwp_cr": 14000
+    },
+    {
+      "name": "GIC Re",
+      "ticker": "GICRE.NS",
+      "exchange": "NSE",
+      "entity_type": "reinsurer",
+      "gwp_cr": 44000
+    },
+    {
+      "name": "Niva Bupa Health Insurance",
+      "ticker": "NIVABUPA.NS",
+      "exchange": "NSE",
+      "entity_type": "health_insurer",
+      "gwp_cr": 6000
+    },
+    {
+      "name": "Go Digit General Insurance",
+      "ticker": "GODIGIT.NS",
+      "exchange": "NSE",
+      "entity_type": "general_insurer",
+      "gwp_cr": 9000
+    },
+    {
+      "name": "Max Financial Services",
+      "ticker": "MFSL.NS",
+      "exchange": "NSE",
+      "entity_type": "life_insurer",
+      "gwp_cr": 30000
+    }
   ],
   "benchmark_metrics": {
-    "combined_ratio_pct": {"p25": 98.0, "p50": 103.0, "p75": 110.0},
-    "opex_to_gwp_pct": {"p25": 12.0, "p50": 17.0, "p75": 24.0}
+    "combined_ratio_pct": {
+      "p25": 98.0,
+      "p50": 103.0,
+      "p75": 110.0
+    },
+    "opex_to_gwp_pct": {
+      "p25": 12.0,
+      "p50": 17.0,
+      "p75": 24.0
+    }
   },
   "data_source": "BSE/NSE annual reports FY25",
   "refresh_date": "2026-04-01"

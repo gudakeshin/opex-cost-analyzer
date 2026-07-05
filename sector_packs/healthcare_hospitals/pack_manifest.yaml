@@ -1,10 +1,13 @@
 pack_id: healthcare_hospitals
 sector: Healthcare & Hospitals
-version: '0.1'
+version: '1.0'
 schema_version: '1.0'
-status: scaffold
-description: Multi-speciality hospitals, diagnostic chains, single-speciality chains,
-  pharma distribution.
+status: full
+description: >
+  Full sector pack for Indian hospital chains, diagnostic networks, and
+  healthcare platforms. Covers consumables and pharmacy economics, clinical
+  workforce cost, biomedical maintenance, payer/TPA administration, NABH
+  compliance, and digital health platform costs.
 applicable_entity_types:
 - Hospital_Chain
 - Diagnostic_Chain

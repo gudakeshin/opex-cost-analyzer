@@ -1,7 +1,7 @@
 {
   "sector": "pharma_lifesciences",
   "version": "1.0",
-  "vintage_date": "2025-04-01",
+  "vintage_date": "2026-05-01",
   "confidence_overall": "public_disclosure",
   "source_metadata": {
     "primary_sources": [
@@ -49,58 +49,175 @@
       "label": "Pharma & Life Sciences (India)",
       "categories": {
         "HR": {
-          "P25": 13.0, "P50": 16.0, "P75": 20.0, "P90": 26.0,
+          "P25": 13.0,
+          "P50": 16.0,
+          "P75": 20.0,
+          "P90": 26.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Employee cost % of revenue. Sun Pharma FY25: ~14%, Cipla FY25: ~16%, Dr. Reddy's FY25: ~18%. OPPI: 12-20% range. Best-in-class: scale manufacturers with high automation."
         },
         "MARKETING": {
-          "P25": 12.0, "P50": 16.0, "P75": 21.0, "P90": 28.0,
+          "P25": 12.0,
+          "P50": 16.0,
+          "P75": 21.0,
+          "P90": 28.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Selling, medical representative, and distribution costs. Sun Pharma FY25: ~17%, Cipla FY25: ~14%, Dr. Reddy's FY25: ~12%. OPPI: domestic-focused companies 18-24%."
         },
         "RND": {
-          "P25": 5.0, "P50": 6.5, "P75": 9.0, "P90": 13.0,
+          "P25": 5.0,
+          "P50": 6.5,
+          "P75": 9.0,
+          "P90": 13.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "R&D expenditure % of revenue. Sun Pharma FY25: 7%, Cipla FY25: 5.5%, Dr. Reddy's FY25: 6%. OPPI: India pharma R&D 5-10% for innovator-oriented companies; generics-only: 2-4%."
         },
         "OUTSOURCED": {
-          "P25": 8.0, "P50": 14.0, "P75": 20.0, "P90": 28.0,
+          "P25": 8.0,
+          "P50": 14.0,
+          "P75": 20.0,
+          "P90": 28.0,
           "unit": "% of revenue",
           "confidence": "published_research",
           "source_note": "Contract manufacturing and CMO costs. IQVIA India 2024: contract manufacturing growing; generics-only domestic players use CMOs 20-30% of production."
         },
         "IT": {
-          "P25": 1.0, "P50": 2.0, "P75": 3.2, "P90": 5.0,
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.2,
+          "P90": 5.0,
           "unit": "% of revenue",
           "confidence": "published_research",
           "source_note": "IT including regulatory systems (eTMF, PV systems), ERP, track-and-trace. Gartner Pharma IT 2024: pharma 2-4% of revenue on technology. FDA 21 CFR Part 11 compliance drives IT spend."
         },
         "FACILITIES": {
-          "P25": 1.5, "P50": 2.5, "P75": 4.0, "P90": 6.0,
+          "P25": 1.5,
+          "P50": 2.5,
+          "P75": 4.0,
+          "P90": 6.0,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Office, lab, and non-manufacturing facilities. Manufacturing plant costs excluded. INTERNAL_CALIBRATION — estimated from Indian pharma overhead structure."
         },
         "PROF_SVCS": {
-          "P25": 1.0, "P50": 2.0, "P75": 3.5, "P90": 5.5,
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.5,
+          "P90": 5.5,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Regulatory filing fees, legal (USFDA responses, patent litigation), audit. Sun Pharma FY25: significant regulatory compliance spend disclosed. USFDA-approved companies higher."
         },
         "LOGISTICS_INDIA": {
-          "P25": 2.5, "P50": 4.0, "P75": 6.0, "P90": 9.0,
+          "P25": 2.5,
+          "P50": 4.0,
+          "P75": 6.0,
+          "P90": 9.0,
           "unit": "% of revenue",
           "confidence": "published_research",
           "source_note": "Cold-chain and distribution logistics. CII Pharma Logistics 2024: India pharma logistics 3-6% of revenue; cold chain adds 30-50% premium."
         },
         "INSURANCE": {
-          "P25": 0.3, "P50": 0.6, "P75": 1.0, "P90": 1.6,
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.0,
+          "P90": 1.6,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Product liability, D&O, clinical trial insurance. INTERNAL_CALIBRATION — higher for US-market pharma companies due to product liability."
+        },
+        "regulatory_filing_costs": {
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 1.8,
+          "P90": 3.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "ANDA/dossier filing fees, DMF maintenance, GDUFA fees for US-facing portfolios."
+        },
+        "gmp_validation_costs": {
+          "P25": 0.4,
+          "P50": 0.8,
+          "P75": 1.4,
+          "P90": 2.2,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "GMP validation, qualification, and remediation programme costs; rises post-483/warning letter."
+        },
+        "clinical_trials": {
+          "P25": 1.0,
+          "P50": 3.0,
+          "P75": 6.0,
+          "P90": 10.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Clinical/bioequivalence study spend; complex generics and NCE pipelines at upper band (annual report R&D notes)."
+        },
+        "cold_chain_logistics": {
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 2.0,
+          "P90": 3.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Temperature-controlled storage & distribution for biologics/vaccines portfolios."
+        },
+        "pharmacovigilance": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 0.9,
+          "P90": 1.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "PV case processing, literature monitoring, PSUR/PADER filings; volume-driven."
+        },
+        "api_km_sourcing": {
+          "P25": 20.0,
+          "P50": 28.0,
+          "P75": 36.0,
+          "P90": 45.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "API + key starting material cost for formulations players; China dependency and PLI-linked localisation shift economics."
+        },
+        "field_force_operations": {
+          "P25": 6.0,
+          "P50": 9.0,
+          "P75": 13.0,
+          "P90": 18.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "MR salaries, incentives, travel, and HCP engagement; India branded generics selling model."
+        },
+        "market_access_tenders": {
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.5,
+          "P90": 4.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Tender management, institutional discounts administration, and market access teams."
+        },
+        "quality_control_labs": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.0,
+          "P90": 4.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "QC lab operations, stability chambers, reagents, and analyst costs across sites."
+        },
+        "rnd_analytical_dev": {
+          "P25": 4.0,
+          "P50": 6.5,
+          "P75": 9.0,
+          "P90": 12.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "R&D intensity: Sun ~6.5%, DRL ~8.5%, Cipla ~6%, Lupin ~7.5% (FY25 disclosures)."
         }
       }
     }

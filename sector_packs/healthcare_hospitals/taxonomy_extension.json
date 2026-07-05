@@ -1,14 +1,70 @@
 {
   "base_taxonomy_version": "1.0",
   "additional_categories": [
-    {"category_id": "medical_consumables", "category_name": "Medical Consumables & Pharmacy", "gl_prefix": "MED"},
-    {"category_id": "diagnostics_reagents", "category_name": "Diagnostics Reagents & Lab Consumables", "gl_prefix": "LAB"},
-    {"category_id": "biomedical_maintenance", "category_name": "Biomedical Equipment Maintenance", "gl_prefix": "BME"},
-    {"category_id": "clinical_staff", "category_name": "Clinical & Nursing Staff Costs", "gl_prefix": "CLN"},
-    {"category_id": "regulatory_compliance", "category_name": "NABH / Regulatory Compliance", "gl_prefix": "REG"}
+    {
+      "category_id": "medical_consumables",
+      "category_name": "Medical Consumables & Pharmacy",
+      "gl_prefix": "MED"
+    },
+    {
+      "category_id": "diagnostics_reagents",
+      "category_name": "Diagnostics Reagents & Lab Consumables",
+      "gl_prefix": "LAB"
+    },
+    {
+      "category_id": "biomedical_maintenance",
+      "category_name": "Biomedical Equipment Maintenance",
+      "gl_prefix": "BME"
+    },
+    {
+      "category_id": "clinical_staff",
+      "category_name": "Clinical & Nursing Staff Costs",
+      "gl_prefix": "CLN"
+    },
+    {
+      "category_id": "regulatory_compliance",
+      "category_name": "NABH / Regulatory Compliance",
+      "gl_prefix": "REG"
+    },
+    {
+      "category_id": "pharmacy_inventory",
+      "category_name": "Hospital Pharmacy & Drug Inventory",
+      "gl_prefix": "PHI",
+      "cost_nature": "materials"
+    },
+    {
+      "category_id": "housekeeping_support_services",
+      "category_name": "Housekeeping, Security & Support Services",
+      "gl_prefix": "HSS",
+      "cost_nature": "operations"
+    },
+    {
+      "category_id": "insurance_tpa_costs",
+      "category_name": "Payer, TPA & Empanelment Costs",
+      "gl_prefix": "TPA",
+      "cost_nature": "commercial"
+    },
+    {
+      "category_id": "digital_health_platforms",
+      "category_name": "Digital Health Platforms & Telemedicine",
+      "gl_prefix": "DHP",
+      "cost_nature": "technology"
+    },
+    {
+      "category_id": "patient_food_services",
+      "category_name": "Patient F&B and Dietary Services",
+      "gl_prefix": "PFS",
+      "cost_nature": "operations"
+    }
   ],
   "overrides": [
-    {"category_id": "facilities", "category_name": "Hospital Facilities, Utilities & Housekeeping"},
-    {"category_id": "it", "category_name": "HIS, EMR & Clinical IT Systems"}
+    {
+      "category_id": "facilities",
+      "category_name": "Hospital Facilities, Utilities & Housekeeping"
+    },
+    {
+      "category_id": "it",
+      "category_name": "HIS, EMR & Clinical IT Systems"
+    }
   ]
 }

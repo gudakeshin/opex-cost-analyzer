@@ -9,7 +9,8 @@
       "description": "Right-size field force by optimising territory coverage, call frequency, and doctor targeting using prescription data analytics. Shift from mass coverage to high-potential prescriber focus.",
       "category_ids": [
         "MARKETING",
-        "HR"
+        "HR",
+        "field_force_operations"
       ],
       "p10_pct": 6.0,
       "p50_pct": 14.0,
@@ -28,7 +29,8 @@
       "lever_name": "API & Raw Material Procurement Consolidation",
       "description": "Consolidate API and excipient supplier base; renegotiate volume-based contracts; co-develop API with preferred suppliers to reduce cost-of-goods.",
       "category_ids": [
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "api_km_sourcing"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -48,7 +50,8 @@
       "description": "Improve Overall Equipment Effectiveness through reduced changeovers, preventive maintenance, and lean manufacturing (SMED, Kaizen). Increase batch sizes for high-volume products.",
       "category_ids": [
         "HR",
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "gmp_validation_costs"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -68,7 +71,9 @@
       "description": "Streamline global regulatory filing processes; use eCTD submission automation; rationalise number of ANDA/dossier filings to focus on highest-ROI markets.",
       "category_ids": [
         "PROF_SVCS",
-        "HR"
+        "HR",
+        "regulatory_filing_costs",
+        "gmp_validation_costs"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -87,7 +92,8 @@
       "lever_name": "Cold Chain & Distribution Logistics Optimisation",
       "description": "Implement hub-and-spoke cold chain with temperature monitoring; consolidate stockists; implement direct-to-retail in key markets to reduce distribution layers.",
       "category_ids": [
-        "LOGISTICS_INDIA"
+        "LOGISTICS_INDIA",
+        "cold_chain_logistics"
       ],
       "p10_pct": 8.0,
       "p50_pct": 16.0,
@@ -145,7 +151,9 @@
       "lever_name": "R&D Portfolio Rationalisation & CRO Governance",
       "description": "Prioritise R&D projects by ROI; consolidate CRO and clinical trial vendors; exit low-ROI development programmes.",
       "category_ids": [
-        "RND"
+        "RND",
+        "rnd_analytical_dev",
+        "clinical_trials"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -183,7 +191,9 @@
       "lever_name": "QC Lab & GMP Facilities Cost Optimisation",
       "description": "Consolidate QC lab operations; energy-efficient HVAC for clean rooms; shared facilities across sites.",
       "category_ids": [
-        "FACILITIES"
+        "FACILITIES",
+        "quality_control_labs",
+        "gmp_validation_costs"
       ],
       "p10_pct": 4.0,
       "p50_pct": 8.0,
@@ -202,7 +212,8 @@
       "lever_name": "Clinical Trial Efficiency & CRO Optimisation",
       "description": "Optimise trial site mix, adopt decentralised/hybrid trial elements, and renegotiate CRO rate cards to lower per-patient trial cost.",
       "category_ids": [
-        "RND"
+        "RND",
+        "clinical_trials"
       ],
       "p10_pct": 12.0,
       "p50_pct": 20.0,
@@ -240,7 +251,8 @@
       "lever_name": "Sales Force Sizing & Territory Optimisation",
       "description": "Right-size field-force territories using prescriber-value analytics; redeploy or reduce coverage of low-yield segments.",
       "category_ids": [
-        "HR"
+        "HR",
+        "field_force_operations"
       ],
       "p10_pct": 8.0,
       "p50_pct": 13.0,
@@ -277,7 +289,8 @@
       "description": "Tighten rebate and discount governance across channels with contract compliance analytics and claw-back of off-contract concessions.",
       "category_ids": [
         "MARKETING",
-        "PROF_SERVICES"
+        "PROF_SERVICES",
+        "market_access_tenders"
       ],
       "p10_pct": 4.0,
       "p50_pct": 8.0,
@@ -331,7 +344,8 @@
       "lever_name": "Regulatory Affairs Efficiency",
       "description": "Standardise dossier authoring with structured content management and automate submission publishing across markets.",
       "category_ids": [
-        "PROF_SVCS"
+        "PROF_SVCS",
+        "regulatory_filing_costs"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -349,7 +363,8 @@
       "lever_name": "Pharmacovigilance (PV) Process Automation",
       "description": "Automate adverse-event case intake and processing with AI-assisted triage, cutting per-case PV cost while maintaining compliance.",
       "category_ids": [
-        "PROF_SVCS"
+        "PROF_SVCS",
+        "pharmacovigilance"
       ],
       "p10_pct": 15.0,
       "p50_pct": 24.0,

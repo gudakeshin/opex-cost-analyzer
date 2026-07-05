@@ -1,9 +1,13 @@
 pack_id: energy_utilities
 sector: Energy & Utilities (India)
-version: "0.1"
+version: "1.0"
 schema_version: "1"
-status: scaffold
-description: Scaffold for Indian power generators, transmission, distribution, and oil & gas companies. Full content deferred.
+status: full
+description: >
+  Full sector pack for Indian power generation, transmission, distribution,
+  and oil & gas companies. Covers fuel economics, O&M, AT&C losses, RPO/PPA
+  obligations, smart metering, tariff regulation, and environmental
+  compliance cost structures.
 applicable_entity_types: [power_generator, transmission_company, distribution_company, oil_gas_e_and_p, refinery]
 regulatory_bodies: [CERC, SERC, MoPNG, PNGRB, SEBI, MoP]
 fiscal_year_end: "March 31"

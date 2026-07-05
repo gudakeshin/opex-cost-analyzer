@@ -64,5 +64,23 @@
     "p50_benchmark_inr": 18000,
     "p75_benchmark_inr": 10000,
     "source": "Apollo FY25: ~₹28,000/bed/day (tertiary, metro). Narayana: ~₹15,000 (value model). NHA PM-JAY rates: ₹5,000-₹15,000 for empanelled procedures."
+  },
+  {
+    "kpi_id": "energy_cost_pct",
+    "kpi_name": "Energy Cost % of Revenue",
+    "unit": "pct",
+    "formula": "power_fuel_cost / net_revenue * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 3.0,
+    "source": "Apollo/Max FY25 power & fuel disclosures; 24x7 HVAC and medical gas load"
+  },
+  {
+    "kpi_id": "support_services_cost_pct",
+    "kpi_name": "Support Services Cost % of Revenue",
+    "unit": "pct",
+    "formula": "support_services_cost / net_revenue * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 3.5,
+    "source": "Outsourced housekeeping/security/F&B contracts across listed hospital chains"
   }
 ]

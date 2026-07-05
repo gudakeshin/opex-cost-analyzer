@@ -9,7 +9,8 @@
       "description": "Accelerate shift from thermal to renewable generation (solar, wind, hydro); reduce variable fuel cost exposure; lock in long-term PPA rates.",
       "category_ids": [
         "POWER_ENERGY",
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "renewable_ppa_costs"
       ],
       "p10_pct": 5.0,
       "p50_pct": 12.0,
@@ -29,7 +30,8 @@
       "description": "Improve plant load factor through better O&M practices, predictive maintenance, and startup/shutdown optimisation. Reduce heat rate (fuel consumption per kWh).",
       "category_ids": [
         "PLANT_MAINTENANCE",
-        "HR"
+        "HR",
+        "o_and_m_plant"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -48,7 +50,8 @@
       "lever_name": "Fuel Procurement & Supply Chain Optimisation",
       "description": "Diversify coal/fuel sources; optimise blending (imported + domestic); renegotiate long-term fuel supply agreements; reduce fuel inventory carrying cost.",
       "category_ids": [
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "fuel_cost"
       ],
       "p10_pct": 3.0,
       "p50_pct": 6.0,
@@ -68,7 +71,8 @@
       "description": "Deploy smart metering (RDSS scheme), aerial bundled cables in high-loss feeders, GIS mapping of network, consumer indexing, and feeder separation to reduce technical and commercial losses.",
       "category_ids": [
         "OUTSOURCED",
-        "IT"
+        "IT",
+        "at_and_c_losses"
       ],
       "p10_pct": 10.0,
       "p50_pct": 20.0,
@@ -108,7 +112,8 @@
       "description": "Deploy SCADA upgrades, IoT sensors for equipment health monitoring, AI-based predictive maintenance, and digital control rooms to reduce unplanned outages.",
       "category_ids": [
         "IT",
-        "PLANT_MAINTENANCE"
+        "PLANT_MAINTENANCE",
+        "smart_metering_ops"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -127,7 +132,9 @@
       "lever_name": "BRSR / ESG Reporting & Assurance Efficiency",
       "description": "Integrate ESG data platform for generation and distribution utilities; consolidate assurance for BRSR Core KPIs.",
       "category_ids": [
-        "BRSR_ESG"
+        "BRSR_ESG",
+        "carbon_compliance",
+        "ash_water_environment"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -165,7 +172,8 @@
       "lever_name": "Regulatory, Legal & Advisory Spend Governance",
       "description": "Cap external legal and regulatory advisory; panel-firm governance for CERC/SEBI compliance consulting.",
       "category_ids": [
-        "PROF_SVCS"
+        "PROF_SVCS",
+        "regulatory_tariff_filings"
       ],
       "p10_pct": 4.0,
       "p50_pct": 8.0,
@@ -184,7 +192,8 @@
       "lever_name": "Fuel Mix & Generation Cost Optimisation",
       "description": "Optimise coal/gas blending, inventory levels, and fuel supply contracts to reduce variable generation cost per kWh.",
       "category_ids": [
-        "FUEL_GENERATION"
+        "FUEL_GENERATION",
+        "fuel_cost"
       ],
       "p10_pct": 3.0,
       "p50_pct": 6.0,
@@ -241,7 +250,8 @@
       "lever_name": "AT&C / T&D Loss Reduction Programme",
       "description": "Deploy smart metering, feeder separation, and theft detection to reduce technical and commercial T&D losses.",
       "category_ids": [
-        "T&D_LOSSES"
+        "T&D_LOSSES",
+        "at_and_c_losses"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -260,7 +270,8 @@
       "lever_name": "Predictive / Condition-Based Maintenance",
       "description": "Deploy condition-based monitoring on critical rotating equipment to convert breakdown and time-based maintenance into predictive interventions.",
       "category_ids": [
-        "PLANT_MAINTENANCE"
+        "PLANT_MAINTENANCE",
+        "o_and_m_plant"
       ],
       "p10_pct": 18.0,
       "p50_pct": 26.0,
@@ -279,7 +290,9 @@
       "lever_name": "AT&C / Technical Distribution Loss Reduction",
       "description": "Reduce AT&C losses through feeder metering, theft analytics, and targeted network refurbishment in high-loss zones.",
       "category_ids": [
-        "POWER_ENERGY"
+        "POWER_ENERGY",
+        "at_and_c_losses",
+        "grid_wheeling_charges"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -298,7 +311,8 @@
       "lever_name": "Fuel / Energy Procurement Optimisation",
       "description": "Optimise coal/gas linkage mix, e-auction participation, and blending strategies; renegotiate transport contracts to lower landed fuel cost.",
       "category_ids": [
-        "POWER_ENERGY"
+        "POWER_ENERGY",
+        "fuel_cost"
       ],
       "p10_pct": 4.0,
       "p50_pct": 7.0,
@@ -317,7 +331,8 @@
       "lever_name": "Field Workforce Scheduling & Route Optimisation",
       "description": "Optimise field crew scheduling and dispatch with demand-based rostering and mobile workforce management tools.",
       "category_ids": [
-        "HR"
+        "HR",
+        "safety_hse_ops"
       ],
       "p10_pct": 10.0,
       "p50_pct": 16.0,
@@ -336,7 +351,8 @@
       "lever_name": "Grid / Network Modernisation (OPEX Reduction Component)",
       "description": "Deploy smart meters, SCADA/ADMS upgrades, and self-healing feeder automation to cut outage response and manual operations cost.",
       "category_ids": [
-        "POWER_ENERGY"
+        "POWER_ENERGY",
+        "smart_metering_ops"
       ],
       "p10_pct": 8.0,
       "p50_pct": 18.0,
@@ -355,7 +371,8 @@
       "lever_name": "Renewable Energy Procurement / Captive Solar",
       "description": "Contract round-the-clock renewable PPAs and group captive solar/wind to displace costlier grid and fossil generation.",
       "category_ids": [
-        "POWER_ENERGY"
+        "POWER_ENERGY",
+        "renewable_ppa_costs"
       ],
       "p10_pct": 12.0,
       "p50_pct": 22.0,
@@ -374,7 +391,8 @@
       "lever_name": "O&M Contract Outsourcing (Distribution / Generation)",
       "description": "Rebid O&M and outsourced field operations with output-based SLAs and benchmarked unit rates; insource where scale justifies.",
       "category_ids": [
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "o_and_m_plant"
       ],
       "p10_pct": 15.0,
       "p50_pct": 25.0,

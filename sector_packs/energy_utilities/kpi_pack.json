@@ -62,5 +62,23 @@
     "target_direction": "higher",
     "p50_benchmark_pct": 30.0,
     "source": "CEA Annual Report 2023-24: India total installed RE capacity ~44% of total as of March 2024. Government target: 500 GW RE by 2030. NTPC RE capacity: growing to 60 GW by 2032."
+  },
+  {
+    "kpi_id": "fuel_cost_pct",
+    "kpi_name": "Fuel Cost % of Revenue",
+    "unit": "pct",
+    "formula": "fuel_cost / total_revenue * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 50.0,
+    "source": "NTPC/Adani Power FY25 annual reports; thermal genco fuel share of revenue"
+  },
+  {
+    "kpi_id": "aux_consumption_pct",
+    "kpi_name": "Auxiliary Power Consumption",
+    "unit": "pct",
+    "formula": "aux_power_units / gross_generation_units * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 7.0,
+    "source": "CEA performance review of thermal stations 2023-24; 6.5-8.5% band by unit size"
   }
 ]

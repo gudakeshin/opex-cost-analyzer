@@ -9,7 +9,8 @@
       "description": "Deploy straight-through processing (STP) for low-value claims; AI models for fraud scoring; automated surveyor assignment for motor OD claims.",
       "category_ids": [
         "HR",
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "claims_processing"
       ],
       "p10_pct": 10.0,
       "p50_pct": 20.0,
@@ -29,7 +30,8 @@
       "description": "Grow policyholder acquisition through direct web/app channels to reduce agent commission ratio. Partnered with aggregators (Policybazaar, Coverfox) for lead generation at lower cost than traditional agency.",
       "category_ids": [
         "MARKETING",
-        "HR"
+        "HR",
+        "policy_acquisition_costs"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -49,7 +51,8 @@
       "description": "Re-structure catastrophe and proportional reinsurance treaties; increase retention for low-volatility lines; renegotiate terms with RI partners.",
       "category_ids": [
         "FIN_SVCS",
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "reinsurance_costs"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -69,7 +72,8 @@
       "description": "Exit sub-threshold branches; convert to digital service hubs. Rationalise POSP (Point of Sales Person) network to productive agents; digitise policy issuance.",
       "category_ids": [
         "HR",
-        "FACILITIES"
+        "FACILITIES",
+        "distribution_agency"
       ],
       "p10_pct": 8.0,
       "p50_pct": 16.0,
@@ -88,7 +92,8 @@
       "lever_name": "Policy Administration System (PAS) Modernisation",
       "description": "Replace legacy PAS with cloud-native platforms to reduce IT maintenance cost, improve STP rates, and support new product launch speed.",
       "category_ids": [
-        "IT"
+        "IT",
+        "technology_core_systems"
       ],
       "p10_pct": 12.0,
       "p50_pct": 20.0,
@@ -129,7 +134,9 @@
       "category_ids": [
         "HR",
         "FACILITIES",
-        "PROF_SVCS"
+        "PROF_SVCS",
+        "irdai_compliance",
+        "customer_service_ops"
       ],
       "p10_pct": 6.0,
       "p50_pct": 12.0,
@@ -186,7 +193,9 @@
       "lever_name": "Claims Processing Automation (AI Triage & Settlement)",
       "description": "Automate FNOL intake, triage, and straight-through settlement for low-value claims; deploy AI-assisted estimation to compress loss-adjustment expense.",
       "category_ids": [
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "claims_processing",
+        "tpa_network_costs"
       ],
       "p10_pct": 18.0,
       "p50_pct": 26.0,
@@ -224,7 +233,8 @@
       "lever_name": "Policy Administration Digitisation (Paperless Ops)",
       "description": "Digitise policy administration — issuance, endorsements, renewals — with straight-through processing to cut per-policy servicing cost.",
       "category_ids": [
-        "IT_SOFTWARE"
+        "IT_SOFTWARE",
+        "customer_service_ops"
       ],
       "p10_pct": 15.0,
       "p50_pct": 26.0,
@@ -244,7 +254,8 @@
       "description": "Deploy ML fraud scoring across claims intake to reduce leakage from staged, inflated, and duplicate claims while protecting genuine settlement TAT.",
       "category_ids": [
         "IT_SOFTWARE",
-        "PROF_SERVICES"
+        "PROF_SERVICES",
+        "fraud_investigation"
       ],
       "p10_pct": 4.0,
       "p50_pct": 9.0,
@@ -263,7 +274,9 @@
       "lever_name": "Distribution Channel Mix Optimisation",
       "description": "Shift acquisition mix toward lower-cost digital and bancassurance channels; rationalise agency incentives against persistency-adjusted economics.",
       "category_ids": [
-        "PROF_SVCS"
+        "PROF_SVCS",
+        "distribution_agency",
+        "policy_acquisition_costs"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -283,7 +296,8 @@
       "description": "Restructure reinsurance programmes — retention levels, treaty vs facultative mix, and panel competition — to cut ceded cost per unit of cover.",
       "category_ids": [
         "INSURANCE",
-        "FIN_SVCS"
+        "FIN_SVCS",
+        "reinsurance_costs"
       ],
       "p10_pct": 3.0,
       "p50_pct": 6.0,
@@ -320,7 +334,8 @@
       "lever_name": "Actuarial Reserving & Pricing Automation",
       "description": "Automate actuarial data preparation, reserving runs, and IFRS-17/Ind AS 117 reporting pipelines to cut actuarial support cost and cycle time.",
       "category_ids": [
-        "PROF_SVCS"
+        "PROF_SVCS",
+        "actuarial_services"
       ],
       "p10_pct": 12.0,
       "p50_pct": 20.0,
