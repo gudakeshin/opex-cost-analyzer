@@ -22,7 +22,12 @@
         "DoT National Telecom Policy 2012 / 2023 update — network sharing guidelines for active and passive sharing in India",
         "Indus Towers FY25 Annual Report (BSE 534816) — tower sharing economics: >3 tenancies per tower reduces per-operator cost by 40-60%",
         "INTERNAL_CALIBRATION — network sharing savings calibrated from 2 India telecom network strategy mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "energy_cost_reduction_towers",
@@ -42,7 +47,12 @@
         "Indus Towers FY25 Annual Report — energy cost 35.7% of tower revenue; solar deployment reducing diesel dependency",
         "TRAI Annual Report 2023-24 — energy is single largest cost for tower companies; DoT mandate for 50% green energy for towers by 2025",
         "INTERNAL_CALIBRATION — tower energy savings from 3 India telecom infrastructure energy mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "network_modernisation_5g",
@@ -62,7 +72,12 @@
         "GSMA Mobile Economy India 2024 (gsma.com) — 5G Open RAN reduces per-site network opex 20-30% vs. traditional RAN",
         "Airtel FY25 Annual Report — 5G rollout on existing 4G spectrum; network efficiency investment cited",
         "INTERNAL_CALIBRATION — network modernisation savings from 2 India telecom network transformation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 39,
+        "p50": 52,
+        "p90": 65
+      }
     },
     {
       "lever_id": "churn_reduction_arpu_uplift",
@@ -83,7 +98,12 @@
         "TRAI Annual Report 2023-24 — subscriber churn dynamics; customer acquisition cost ₹200-500; retention 60-80% cheaper",
         "Airtel FY25 Annual Report — ARPU improvement strategy: prepaid to postpaid migration, home broadband bundling",
         "INTERNAL_CALIBRATION — churn reduction and ARPU uplift savings from 3 India telecom commercial excellence mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "oss_bss_modernisation",
@@ -103,7 +123,12 @@
         "GSMA India 2024 — OSS/BSS modernisation: 15-25% reduction in IT maintenance + 30% faster service launch",
         "Gartner Telecom IT 2024 — cloud-native BSS reduces IT opex 20-30% vs. legacy on-premise systems",
         "INTERNAL_CALIBRATION — OSS/BSS modernisation savings from 1 India telecom IT transformation mandate"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 30,
+        "p50": 40,
+        "p90": 50
+      }
     },
     {
       "lever_id": "field_operations_workforce",
@@ -123,7 +148,12 @@
         "Gartner Telecom Operations 2024 — AI-driven field service management reduces truck rolls 20-30% and MTTR 15-25%",
         "Indus Towers FY25 Annual Report — field force optimisation as operational efficiency lever for tower operations",
         "INTERNAL_CALIBRATION — field operations savings from 2 India telecom network operations mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "network_opex_optimization",
@@ -144,7 +174,12 @@
         "TRAI Annual Report 2023-24 — network opex benchmarks and EBITDA margins for Indian operators",
         "GSMA Mobile Economy India 2024 — network cost optimisation levers for 5G rollout",
         "INTERNAL_CALIBRATION — network OPEX savings from 2 India telecom network finance mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "spectrum_utilisation_audit",
@@ -164,7 +199,12 @@
         "DoT National Digital Communications Policy 2018 — spectrum utilisation and trading framework",
         "TRAI recommendations on spectrum usage charge and liberalisation",
         "INTERNAL_CALIBRATION — spectrum utilisation savings from 1 India telecom regulatory mandate"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "tower_opex_sharing",
@@ -183,7 +223,12 @@
         "Indus Towers FY25 Annual Report — tenancy economics: >3 tenancies reduces per-operator cost 40-60%",
         "DoT tower sharing guidelines — passive infrastructure sharing benchmarks",
         "INTERNAL_CALIBRATION — tower OPEX savings from 2 India telecom infrastructure mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "bank_fee_optimization",
@@ -202,7 +247,12 @@
         "RBI — bank charges disclosure framework for corporate customers",
         "Hackett Group Treasury Benchmarks 2024 — bank fee optimisation 8-15% savings",
         "INTERNAL_CALIBRATION — telecom treasury savings from 2 India telecom finance mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
     },
     {
       "lever_id": "telecom_facilities_right_size",
@@ -222,7 +272,12 @@
         "Airtel FY25 Annual Report — facilities rationalisation as opex lever",
         "Hackett Group G&A Benchmarks 2024 — facilities right-sizing 10-20% savings",
         "INTERNAL_CALIBRATION — telecom facilities savings from 2 India telecom real estate mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 10,
+        "p50": 14,
+        "p90": 17
+      }
     },
     {
       "lever_id": "tower_sharing",
@@ -241,7 +296,12 @@
         "TRAI — Infrastructure Sharing in Telecom (trai.gov.in/release-publication/reports) — tower sharing benefits and benchmarks India",
         "GSMA — Tower Sharing Economics (gsma.com) — passive infrastructure sharing cost savings 15-35%",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 33,
+        "p50": 44,
+        "p90": 55
+      }
     },
     {
       "lever_id": "spectrum_efficiency",
@@ -261,7 +321,12 @@
         "TRAI — Spectrum Pricing and Efficiency Report 2024 (trai.gov.in) — spectrum utilisation benchmarks India",
         "DoT — National Spectrum Policy (dot.gov.in) — spectrum allocation and efficiency guidelines",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 33,
+        "p50": 44,
+        "p90": 55
+      }
     },
     {
       "lever_id": "customer_service_automation",
@@ -281,7 +346,12 @@
         "TRAI — Quality of Service Reports 2024 (trai.gov.in/release-publication/reports) — call centre performance benchmarks India telcos",
         "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/) — process automation benchmarks applicable to customer ops",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "churn_reduction",
@@ -301,7 +371,12 @@
       "industry_sources": [
         "TRAI — Telecom Subscription Data Q4 FY2024 (trai.gov.in/release-publication/reports/telecom-subscription-data) — churn rates by operator India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 16,
+        "p50": 22,
+        "p90": 27
+      }
     },
     {
       "lever_id": "roaming_cost_optimization",
@@ -321,7 +396,12 @@
         "TRAI — International Roaming Charges Report 2024 (trai.gov.in) — international roaming cost benchmarks India",
         "GSMA — Roaming Services Report 2024 (gsma.com) — wholesale roaming pricing trends",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 13,
+        "p50": 18,
+        "p90": 22
+      }
     },
     {
       "lever_id": "it_bss_oss_modernization",
@@ -341,7 +421,12 @@
         "GSMA — BSS/OSS Modernisation Trends 2024 (gsma.com/solutions-and-impact/technology) — cloud-native BSS/OSS migration savings 18-38%",
         "Gartner — Market Guide for Telecom BSS 2024 (gartner.com) — BSS modernisation ROI benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 54,
+        "p50": 72,
+        "p90": 90
+      }
     },
     {
       "lever_id": "energy_management",
@@ -361,7 +446,12 @@
         "TRAI — Annual Report 2023-24 (trai.gov.in/release-publication/reports) — energy consumption benchmarks for Indian telecom networks",
         "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/) — energy cost benchmarks for telecom infrastructure",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "workforce_productivity",
@@ -379,7 +469,12 @@
       "industry_sources": [
         "TRAI — Quality of Service Reports 2024 (trai.gov.in/release-publication/reports) — field workforce productivity KPIs for Indian telcos",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 16,
+        "p50": 22,
+        "p90": 27
+      }
     }
   ]
 }

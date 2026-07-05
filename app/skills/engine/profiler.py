@@ -291,6 +291,42 @@ def _evaluate_lever_signals(
     )
 
 
+_COMPLEXITY_EFFORT_P50: Dict[str, int] = {
+    "quick_win": 10,
+    "low": 10,
+    "medium": 24,
+    "high": 40,
+    "complex": 40,
+}
+
+
+def _normalize_effort_weeks(meta: Dict[str, Any]) -> Dict[str, int]:
+    """Return p10/p50/p90 effort weeks from pack JSON or derive from complexity tier."""
+    ew = meta.get("effort_weeks")
+    iw = meta.get("implementation_weeks")
+    if isinstance(ew, dict) and ew.get("p50"):
+        p50 = int(ew["p50"])
+        return {
+            "p10": int(ew.get("p10") or max(4, round(p50 * 0.75))),
+            "p50": p50,
+            "p90": int(ew.get("p90") or round(p50 * 1.25)),
+        }
+    if isinstance(iw, dict) and iw.get("p50"):
+        p50 = int(iw["p50"])
+        return {
+            "p10": int(iw.get("p10") or max(4, round(p50 * 0.75))),
+            "p50": p50,
+            "p90": int(iw.get("p90") or round(p50 * 1.25)),
+        }
+    scalar = iw if isinstance(iw, (int, float)) else ew if isinstance(ew, (int, float)) else None
+    if scalar and scalar > 0:
+        p50 = int(scalar)
+        return {"p10": max(4, int(p50 * 0.75)), "p50": p50, "p90": int(p50 * 1.25)}
+    tier = str(meta.get("complexity_tier", "medium")).lower()
+    p50 = _COMPLEXITY_EFFORT_P50.get(tier, 24)
+    return {"p10": max(4, int(p50 * 0.75)), "p50": p50, "p90": int(p50 * 1.25)}
+
+
 def _build_lever_entry(
     lever_id: str,
     meta: Dict[str, Any],
@@ -324,10 +360,8 @@ def _build_lever_entry(
         "complexity_tier": meta.get("complexity_tier", "medium"),
         "base_execution_probability": meta.get("base_execution_probability", 0.70),
         "savings_range_pct": savings_range_pct or {},
-        # effort_weeks is an alias over the long-standing implementation_weeks block
-        # (p10/p50/p90) so the effort-vs-impact matrix and horizon classifier have a
-        # single field to read regardless of which JSON source the lever came from.
-        "effort_weeks": meta.get("effort_weeks") or meta.get("implementation_weeks") or {},
+        # effort_weeks is normalized to p10/p50/p90 from pack JSON or complexity tier.
+        "effort_weeks": _normalize_effort_weeks(meta),
         "applicability_threshold_pct": meta.get("applicability_threshold_pct"),
     }
 

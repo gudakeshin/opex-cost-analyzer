@@ -22,7 +22,12 @@
         "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/) — industrial energy consumption benchmarks and efficiency improvement data",
         "Bureau of Energy Efficiency (BEE) — Perform Achieve Trade (PAT) Scheme results (beeindia.gov.in/content/pat-cycle) — energy savings achieved by designated consumers",
         "McKinsey & Company — Reducing Energy Consumption in Manufacturing (mckinsey.com/capabilities/operations/our-insights) — 10-25% energy savings potential in industrial settings"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "logistics_network_redesign",
@@ -43,7 +48,12 @@
         "CRISIL — India Logistics Report 2024 (crisil.com) — logistics cost as % of GDP and network optimisation benchmarks",
         "DPIIT — Trade Facilitation and Logistics Performance Data 2024 (dpiit.gov.in) — logistics efficiency benchmarks",
         "INTERNAL_CALIBRATION — specific network redesign savings range is an internal consulting estimate for Indian manufacturing"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "gst_itc_recovery",
@@ -63,7 +73,12 @@
         "GST Act 2017 Section 17(5) — blocked credit categories (statutory source, not a benchmark)",
         "GSTN — Annual Statistics on ITC claims and reconciliation gaps (gstn.org.in) — ITC leakage rates across industries",
         "INTERNAL_CALIBRATION — 2-8% recovery range is an internal consulting estimate based on ITC reconciliation engagements"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
     },
     {
       "lever_id": "rm_should_cost_bom",
@@ -83,7 +98,12 @@
         "Hackett Group — World-Class Performance Study: Procurement Benchmarks 2024 (thehackettgroup.com/research/) — should-cost driven negotiation savings 3-8% on addressable spend",
         "McKinsey & Company — Manufacturing Sourcing Excellence (mckinsey.com/capabilities/operations/our-insights) — clean-sheet costing for direct materials",
         "INTERNAL_CALIBRATION — savings range calibrated from 4 India manufacturing BOM should-cost mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "rm_supplier_consolidation",
@@ -103,7 +123,12 @@
         "Hackett Group — Supplier Base Rationalisation Benchmarks 2024 (thehackettgroup.com/research/) — 5-15% savings from strategic supplier consolidation",
         "ACMA — Automotive Component Manufacturers Association Cost Reduction Programmes (acma.in) — vendor consolidation case studies in auto ancillary sector",
         "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing procurement consolidation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "rm_alternate_vendor_dual_sourcing",
@@ -123,7 +148,12 @@
         "CAPS Research — Dual Sourcing and Supply Risk Benchmarking (capsresearch.org/benchmarking/) — dual-source programmes deliver 4-12% price improvement",
         "DPIIT — Production Linked Incentive (PLI) scheme domestic sourcing norms (dpiit.gov.in) — import substitution and alternate vendor qualification incentives",
         "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing dual-sourcing mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "vave_design_to_cost",
@@ -143,7 +173,12 @@
         "SAVE International — Value Methodology Standard (value-eng.org) — VAVE programme savings norms 5-15% on targeted components",
         "ACMA — Cost Reduction and VAVE Case Studies (acma.in) — auto ancillary VAVE programmes in India",
         "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing VAVE workshops"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 21,
+        "p50": 28,
+        "p90": 35
+      }
     },
     {
       "lever_id": "mro_vendor_consolidation",
@@ -164,7 +199,12 @@
         "Hackett Group — World-Class Performance Study: Procurement Benchmarks 2024 (thehackettgroup.com/research/) — MRO supplier consolidation savings benchmarks",
         "CAPS Research — MRO Procurement Benchmarking (capsresearch.org/benchmarking/) — maintenance spend under management benchmarks",
         "INTERNAL_CALIBRATION — specific MRO consolidation savings range is an internal consulting estimate"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
     },
     {
       "lever_id": "contract_manufacturing_optimise",
@@ -183,7 +223,12 @@
       "industry_sources": [
         "McKinsey & Company — Make vs Buy in Manufacturing Operations (mckinsey.com/capabilities/operations/our-insights) — insourcing decision framework and savings potential",
         "INTERNAL_CALIBRATION — contract manufacturing optimisation savings range is an internal consulting estimate for Indian diversified manufacturers"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "ind_as116_lease_reclassify",
@@ -203,7 +248,12 @@
         "ICAI — Ind AS 116 Leases — Implementation Guidance (icai.org) — statutory accounting standard with practical expedients for short-term and low-value leases",
         "MCA — Indian Accounting Standards Notification 2015, updated 2019 (mca.gov.in) — Ind AS 116 regulatory basis",
         "INTERNAL_CALIBRATION — 1-6% cash flow recovery range is an internal consulting estimate based on Ind AS 116 transition reviews"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 4,
+        "p50": 6,
+        "p90": 7
+      }
     },
     {
       "lever_id": "mes_erp_rationalisation",
@@ -222,7 +272,12 @@
         "Gartner IT Key Metrics 2024 (gartner.com) — manufacturing IT spend 1-2.5% of revenue; licence rationalisation saves 15-25%",
         "McKinsey — Digital Manufacturing Operations (mckinsey.com/capabilities/operations) — MES consolidation reduces IT maintenance 20-30%",
         "INTERNAL_CALIBRATION — plant software rationalisation savings from 3 India manufacturing IT mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "prof_services_governance",
@@ -241,7 +296,12 @@
         "Hackett Group G&A Benchmarks 2024 (thehackettgroup.com) — world-class advisory spend governance reduces professional fees 10-20%",
         "MCA — Statutory audit rotation requirements (mca.gov.in) — competitive audit tendering benchmarks",
         "INTERNAL_CALIBRATION — professional services governance savings from 4 India manufacturing G&A mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
     },
     {
       "lever_id": "kaizen_smed_programme",
@@ -260,7 +320,12 @@
         "CII — Manufacturing Excellence Awards & Lean Case Studies (cii.in) — Kaizen and SMED programmes reduce conversion cost 6-14%",
         "Toyota Production System — SMED methodology benchmarks (lean.org) — changeover time reduction 50-90% on pilot lines",
         "INTERNAL_CALIBRATION — savings range calibrated from 4 India manufacturing lean transformation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "plant_oee_bottleneck_removal",
@@ -279,7 +344,12 @@
         "McKinsey & Company — Asset Productivity in Manufacturing (mckinsey.com/capabilities/operations/our-insights) — OEE improvement 6-14% of conversion cost",
         "CII — National Manufacturing Competitiveness Council OEE benchmarks (cii.in) — world-class OEE 85% vs India median ~72%",
         "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing OEE improvement mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "factory_automation",
@@ -298,7 +368,12 @@
         "McKinsey & Company — Automation in Manufacturing Operations (mckinsey.com/capabilities/operations/our-insights) — 12-30% direct labour reduction on automated lines",
         "IFR — World Robotics Report India chapter (ifr.org) — industrial robot density and payback benchmarks",
         "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing automation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 45,
+        "p50": 60,
+        "p90": 75
+      }
     },
     {
       "lever_id": "industry_4_physical_ai",
@@ -317,7 +392,12 @@
         "McKinsey & Company — Digital Manufacturing and Industry 4.0 (mckinsey.com/capabilities/operations/our-insights) — 10-20% productivity improvement from digital shop-floor",
         "NASSCOM — Industry 4.0 India Adoption Report (nasscom.in) — IoT, edge analytics, and computer vision use cases in Indian manufacturing",
         "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing Industry 4.0 pilot programmes"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 27,
+        "p50": 36,
+        "p90": 45
+      }
     },
     {
       "lever_id": "conversion_scrap_copq_reduction",
@@ -337,7 +417,12 @@
         "ASQ — Cost of Poor Quality benchmarks (asq.org) — scrap and rework typically 2-8% of conversion cost in batch manufacturing",
         "CII — Quality Excellence Awards case studies (cii.in) — Six Sigma COPQ reduction programmes",
         "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing quality improvement mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "predictive_maintenance",
@@ -358,7 +443,12 @@
         "Bureau of Energy Efficiency (BEE) — PAT Scheme maintenance excellence results (beeindia.gov.in) — predictive maintenance reduces downtime 12-25%",
         "CII — Maintenance Excellence case studies (cii.in) — condition-based maintenance vs time-based benchmarks",
         "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing predictive maintenance mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "mro_consolidation",
@@ -378,7 +468,12 @@
         "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 16,
+        "p50": 22,
+        "p90": 27
+      }
     },
     {
       "lever_id": "energy_audit_compliance",
@@ -399,7 +494,12 @@
         "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
         "DPE — Survey of CPSEs 2023-24 (dpe.gov.in/reports/annual-report)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "packaging_optimisation",
@@ -417,7 +517,12 @@
       "industry_sources": [
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 19,
+        "p50": 26,
+        "p90": 32
+      }
     }
   ]
 }

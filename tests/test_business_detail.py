@@ -35,7 +35,7 @@ def _outputs(**overrides):
                     "org_change_risk": "medium",
                     "confidence": "low",
                     "root_cause": "Shelfware above peer norm",
-                    "horizon": "tactical",
+                    "horizon": "quick_win",
                     "payback_months": 6,
                     "annualized_run_rate_savings": 250000.0,
                     "ebitda_impact": {"ebitda_bps": 12.5},
@@ -101,7 +101,7 @@ def test_enrich_phasing_and_rationale():
     so = _outputs()
     enrich_initiatives_business_detail(so)
     init = so["savings-modeler"]["initiatives"][0]
-    assert "Tactical initiative phased" in init["phasing_narrative"]
+    assert "Quick win initiative phased" in init["phasing_narrative"]
     assert "Payback ~6 months" in init["phasing_narrative"]
     assert "License Rightsizing addresses" in init["business_rationale"]
     assert "annualized run-rate savings" in init["business_rationale"]

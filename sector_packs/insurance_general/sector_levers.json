@@ -22,7 +22,12 @@
         "IRDAI Annual Report 2023-24 (irdai.gov.in) — claims settlement efficiency targets; STP claims reducing servicing cost",
         "ICICI Lombard FY25 Annual Report (BSE 540716) — AI-driven claims: 90%+ motor claims settled within 3 hours via automated surveyor",
         "INTERNAL_CALIBRATION — claims automation savings calibrated from 3 general insurance transformation engagements"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "direct_digital_channel_growth",
@@ -43,7 +48,12 @@
         "IRDAI Annual Report 2023-24 — digital channel GWP share growing; web aggregator regulation enabling transparent pricing",
         "Policybazaar (PB Fintech) FY25 Annual Report (BSE 543390) — aggregator commission 8-12% vs. agency 15-20% for comparable business",
         "INTERNAL_CALIBRATION — channel shift savings from 2 general insurance distribution strategy mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "reinsurance_optimisation",
@@ -64,7 +74,12 @@
         "GIC Re FY25 Annual Report (BSE 540755) — domestic reinsurance market; cession rates and treaty terms for Indian insurers",
         "IRDAI Reinsurance Regulations 2018 amended 2022 (irdai.gov.in) — Indian First rule mandating GIC Re as preferred reinsurer",
         "INTERNAL_CALIBRATION — reinsurance optimisation savings from 2 general insurance actuarial reviews"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "branch_agent_network_rationalisation",
@@ -85,7 +100,12 @@
         "IRDAI Agent Regulation — POSP digital licensing enabling direct policy issuance without branch infrastructure",
         "New India Assurance FY25 Annual Report (BSE 540769) — branch rationalisation cited as structural cost reduction initiative",
         "INTERNAL_CALIBRATION — agency network rationalisation savings from 3 general insurance distribution mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "technology_legacy_modernisation",
@@ -105,7 +125,12 @@
         "Gartner — Insurance Core System Modernisation 2024 (gartner.com) — cloud PAS reduces IT maintenance 25-35% vs. on-premise legacy",
         "ICICI Lombard FY25 Annual Report — technology investments in digital-first model cited as structural advantage in combined ratio management",
         "INTERNAL_CALIBRATION — PAS modernisation savings from 1 general insurance IT transformation mandate"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 39,
+        "p50": 52,
+        "p90": 65
+      }
     },
     {
       "lever_id": "telematics_risk_based_pricing",
@@ -125,7 +150,12 @@
         "IRDAI Sandbox Regulations 2019 amended 2023 (irdai.gov.in) — UBI (usage-based insurance) regulatory sandbox enabling telematics",
         "ICICI Lombard InstaSpect and telematics programme — improved loss ratio on telematics-priced motor book",
         "INTERNAL_CALIBRATION — telematics loss ratio improvement calibrated from 2 Indian motor insurer programmes"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 19,
+        "p50": 26,
+        "p90": 32
+      }
     },
     {
       "lever_id": "shared_services_insurance",
@@ -148,7 +178,12 @@
         "Hackett Group G&A Benchmarks 2024 (thehackettgroup.com) — world-class G&A at 1.1% of revenue; shared services reduces G&A 20-30%",
         "IRDAI Annual Report 2023-24 — expense-of-management ratio as regulatory metric; group-level efficiency initiatives",
         "INTERNAL_CALIBRATION — shared services savings calibrated from 2 insurance group G&A transformation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "travel_policy_optimization",
@@ -167,7 +202,12 @@
         "GBTA 2025 Business Travel Index Outlook (gbta.org) — managed travel programmes save 10-25% via policy compliance",
         "IRDAI Annual Report 2023-24 — insurer T&E as component of expense-of-management ratio",
         "INTERNAL_CALIBRATION — insurance T&E savings from 2 India general insurance travel mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
     },
     {
       "lever_id": "insurance_premium_optimization",
@@ -186,7 +226,12 @@
         "GIC Re FY25 Annual Report — reinsurance market benchmarks for Indian insurers",
         "Marsh Global Risk Report 2024 — corporate insurance RFP savings 10-20%",
         "INTERNAL_CALIBRATION — insurer corporate insurance savings from 2 India insurance group risk reviews"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
     },
     {
       "lever_id": "claims_automation",
@@ -207,7 +252,12 @@
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 30,
+        "p50": 40,
+        "p90": 50
+      }
     },
     {
       "lever_id": "underwriting_automation",
@@ -226,7 +276,12 @@
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 33,
+        "p50": 44,
+        "p90": 55
+      }
     },
     {
       "lever_id": "policy_admin_digitization",
@@ -246,7 +301,12 @@
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 21,
+        "p50": 28,
+        "p90": 35
+      }
     },
     {
       "lever_id": "fraud_detection_ai_insurance",
@@ -267,7 +327,12 @@
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 27,
+        "p50": 36,
+        "p90": 45
+      }
     },
     {
       "lever_id": "channel_mix_optimization",
@@ -288,7 +353,12 @@
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 27,
+        "p50": 36,
+        "p90": 45
+      }
     },
     {
       "lever_id": "reinsurance_optimization",
@@ -308,7 +378,12 @@
       "industry_sources": [
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 21,
+        "p50": 28,
+        "p90": 35
+      }
     },
     {
       "lever_id": "investment_ops_efficiency",
@@ -327,7 +402,12 @@
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 19,
+        "p50": 26,
+        "p90": 32
+      }
     },
     {
       "lever_id": "actuarial_automation",
@@ -347,7 +427,12 @@
         "IRDAI — Annual Report 2023-24 (irdai.gov.in)",
         "Gartner — IT Budget Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget)",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 28,
+        "p50": 38,
+        "p90": 47
+      }
     }
   ]
 }

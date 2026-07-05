@@ -4188,7 +4188,30 @@
     "value_bridge": {
       "dedup_mid_factor": 0.75,
       "low_factor": 0.8,
-      "high_factor": 1.2
+      "high_factor": 1.2,
+      "dedup_overlap_matrix": {
+        "supply:supply": 0.85,
+        "process:process": 0.80,
+        "demand:demand": 0.75,
+        "technology:technology": 0.82,
+        "finance:finance": 0.78,
+        "structure:structure": 0.70,
+        "supply:process": 0.55,
+        "supply:demand": 0.50,
+        "supply:technology": 0.58,
+        "supply:finance": 0.52,
+        "supply:structure": 0.45,
+        "process:demand": 0.65,
+        "process:technology": 0.60,
+        "process:finance": 0.58,
+        "process:structure": 0.50,
+        "demand:technology": 0.55,
+        "demand:finance": 0.48,
+        "demand:structure": 0.42,
+        "technology:finance": 0.55,
+        "technology:structure": 0.48,
+        "finance:structure": 0.52
+      }
     },
     "bounce_back_rates_by_risk": {
       "high": 0.8,

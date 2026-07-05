@@ -43,7 +43,7 @@ def _analysis():
                     "org_change_risk": "medium",
                     "confidence": "medium",
                     "root_cause": "Shelfware above peer norm",
-                    "horizon": "tactical",
+                    "horizon": "quick_win",
                     "payback_months": 6,
                     "annualized_run_rate_savings": 250000.0,
                     "ebitda_impact": {"ebitda_bps": 12.5},

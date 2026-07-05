@@ -22,7 +22,12 @@
         "NHA (National Health Authority) PM-JAY hospital cost data 2023-24 (nha.gov.in) — consumables 22-28% of hospital revenue; GPO saves 12-18% on implant costs",
         "Apollo Hospitals FY25 Annual Report (BSE 508869) — group procurement as key cost management lever across network hospitals",
         "INTERNAL_CALIBRATION — consumables GPO savings calibrated from 3 India hospital chain procurement mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "clinical_pathway_standardisation",
@@ -42,7 +47,12 @@
         "NABH Clinical Standards 2024 (nabh.co) — clinical pathways as NABH accreditation requirement; ALOS reduction 15-25% achievable",
         "Narayana Health FY25 Annual Report (BSE 539551) — clinical excellence and cost efficiency model: ALOS 3.2-3.5 days vs. sector median 4.5 days",
         "INTERNAL_CALIBRATION — clinical pathway savings calibrated from 3 India hospital operations mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "energy_hospital_efficiency",
@@ -61,7 +71,12 @@
         "Apollo Hospitals FY25 Annual Report — Apollo Green Hospital programme: energy intensity reduction target, solar installed at 12 hospitals",
         "NHA PM-JAY hospital benchmarks — energy 4-7% of revenue for tertiary hospitals; BMS reduces 15-25%",
         "INTERNAL_CALIBRATION — hospital energy savings calibrated from 4 India hospital energy efficiency mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "workforce_staffing_optimisation",
@@ -82,7 +97,12 @@
         "NABH Patient Safety Standards 2024 (nabh.co) — nurse-patient ratio guidelines: 1:6 general ward, 1:2 ICU; acuity-based staffing reduces over-staffing 10-15%",
         "Fortis Healthcare FY25 Annual Report (BSE 532843) — workforce productivity cited as operational efficiency lever",
         "INTERNAL_CALIBRATION — staffing optimisation savings from 3 India hospital workforce management mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "hospital_information_system",
@@ -102,7 +122,12 @@
         "NHA (nha.gov.in) — Ayushman Bharat Digital Mission (ABDM) mandating digital health records for all hospitals",
         "Gartner Healthcare IT 2024 — integrated HIS reduces administrative cost 15-25% via automation of billing, coding, and claim submission",
         "INTERNAL_CALIBRATION — HIS modernisation savings from 2 India hospital IT transformation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 22,
+        "p50": 30,
+        "p90": 37
+      }
     },
     {
       "lever_id": "pharmacy_formulary_management",
@@ -122,7 +147,12 @@
         "NPPA drug price ceiling notifications (nppa.gov.in) — scheduled formulations capped; generic substitution reduces pharmacy cost 20-40%",
         "NHA PM-JAY essential medicine list — generic formulary basis for empanelled hospitals saves 15-30% on drug cost",
         "INTERNAL_CALIBRATION — formulary management savings from 3 India hospital pharmacy optimisation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
     },
     {
       "lever_id": "revenue_cycle_management",
@@ -143,7 +173,12 @@
         "NHA PM-JAY claims processing data (nha.gov.in) — claim denial rate 8-15% for poorly structured billing; best-in-class <3%",
         "Apollo Hospitals FY25 Annual Report — revenue cycle management as operational priority; insurance receivables management cited",
         "INTERNAL_CALIBRATION — revenue cycle savings calibrated from 3 India hospital billing optimisation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
     },
     {
       "lever_id": "hospital_facilities_optimisation",
@@ -163,7 +198,12 @@
         "NABH Hospital Infrastructure Standards 2024 — facilities cost benchmarks for accredited hospitals",
         "Apollo Hospitals FY25 Annual Report — network facilities management as opex lever",
         "INTERNAL_CALIBRATION — hospital facilities savings from 2 India hospital real estate mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 10,
+        "p50": 14,
+        "p90": 17
+      }
     },
     {
       "lever_id": "biomedical_maintenance_amc",
@@ -183,7 +223,12 @@
         "NABH Medical Equipment Management Standards 2024 — AMC governance requirements",
         "Gartner Healthcare IT 2024 — predictive maintenance reduces biomedical downtime cost 20-30%",
         "INTERNAL_CALIBRATION — biomedical AMC savings from 2 India hospital engineering mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
     },
     {
       "lever_id": "patient_acquisition_roi",
@@ -202,7 +247,12 @@
         "NHA PM-JAY empanelment data — hospital marketing cost benchmarks for insurance-driven volumes",
         "Gartner CMO Survey 2024 — healthcare digital marketing 40-60% better cost-per-lead",
         "INTERNAL_CALIBRATION — hospital marketing ROI savings from 2 India hospital commercial mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
     },
     {
       "lever_id": "healthcare_compliance_advisory",
@@ -222,7 +272,12 @@
         "NABH Accreditation Standards 2024 — compliance advisory cost benchmarks",
         "Hackett Group G&A Benchmarks 2024 — advisory spend governance 10-18% savings",
         "INTERNAL_CALIBRATION — healthcare advisory savings from 2 India hospital governance mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
     },
     {
       "lever_id": "clinical_workforce_optimization",
@@ -242,7 +297,12 @@
         "McKinsey & Company — The Future of Healthcare Workforce (mckinsey.com/industries/healthcare) — clinical staffing mix optimisation 8-18%",
         "MoHFW — National Health Workforce Account 2023-24 (mohfw.gov.in/) — nurse-to-doctor ratio and staffing benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 24,
+        "p50": 32,
+        "p90": 40
+      }
     },
     {
       "lever_id": "medical_supplies_procurement",
@@ -262,7 +322,12 @@
         "NABH — Accreditation Standards for Hospitals 5th Edition (nabh.co/) — supply chain and materials management standards",
         "McKinsey & Company — Procurement in Healthcare (mckinsey.com/industries/healthcare) — GPO vs. direct sourcing savings 10-20%",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 27,
+        "p50": 36,
+        "p90": 45
+      }
     },
     {
       "lever_id": "pharmacy_cost_optimization",
@@ -282,7 +347,12 @@
         "NPPA — National List of Essential Medicines (NLEM) 2022 (pharmaceuticals.gov.in) — drug price control and generic substitution framework",
         "MoHFW — Jan Aushadhi Scheme Data 2024 (mohfw.gov.in/) — generic drug penetration benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "revenue_cycle_automation",
@@ -302,7 +372,12 @@
         "NABH — Clinical Establishment Standards 2023 (nabh.co/) — revenue cycle and billing standards",
         "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/) — process automation benchmarks applicable to revenue cycle",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 27,
+        "p50": 36,
+        "p90": 45
+      }
     },
     {
       "lever_id": "clinical_space_utilization",
@@ -320,7 +395,12 @@
       "industry_sources": [
         "MoHFW — Health Facility Statistics 2023-24 (mohfw.gov.in/) — bed occupancy rates and OT utilisation benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "medical_equipment_rationalization",
@@ -339,7 +419,12 @@
       "industry_sources": [
         "NABH — Medical Equipment Management Standards (nabh.co/) — medical equipment lifecycle and maintenance benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     }
   ]
 }

@@ -22,7 +22,12 @@
         "RAI India Retail 2024 (rai.net.in) — occupancy 6-12% of revenue; lease renegotiation at renewal saves 15-25%",
         "Shoppers Stop FY25 Annual Report (BSE 532638) — store portfolio rationalisation cited as margin lever; closed underperforming stores",
         "INTERNAL_CALIBRATION — real estate optimisation savings from 3 India organised retail mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "shrinkage_reduction",
@@ -43,7 +48,12 @@
         "RAI Retail Shrinkage Survey 2024 (rai.net.in) — India retail shrinkage 1.2-2.5% of revenue; top quartile achieves 0.5-0.8% via technology",
         "Gartner Retail IT 2024 — RFID reduces shrinkage 30-50%; AI vision cameras improve loss prevention ROI",
         "INTERNAL_CALIBRATION — shrinkage reduction savings from 2 India organised retail loss prevention mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
     },
     {
       "lever_id": "private_label_expansion",
@@ -64,7 +74,12 @@
         "RAI India Retail 2024 — private label penetration 8-20% of modern trade revenue; 15-20pp higher margin than branded",
         "Trent FY25 Annual Report (BSE 500251) — Zudio private label strategy as key gross margin driver (>38% gross margin)",
         "INTERNAL_CALIBRATION — private label margin uplift savings from 3 India organised retail mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "supply_chain_direct_sourcing",
@@ -84,7 +99,12 @@
         "DMart FY25 Annual Report (BSE 540376) — direct sourcing from manufacturers as key EDLC structural advantage; logistics cost 1-2% of revenue",
         "CII Logistics India 2024 — direct sourcing reduces landed cost 8-15% by eliminating distributor margin",
         "INTERNAL_CALIBRATION — supply chain compression savings from 3 India grocery retail mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "workforce_scheduling_optimisation",
@@ -103,7 +123,12 @@
         "RAI India Retail 2024 — workforce productivity: revenue per employee ₹35,000-₹55,000/month; scheduling tools improve by 15-20%",
         "Gartner Retail Workforce 2024 — AI scheduling reduces excess staffing 12-18% without service level impact",
         "INTERNAL_CALIBRATION — workforce scheduling savings from 2 India retail operations mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
     },
     {
       "lever_id": "omnichannel_digital_integration",
@@ -123,7 +148,12 @@
         "Gartner Retail IT 2024 — omnichannel IT stack consolidation reduces technology spend 15-20% vs. siloed systems",
         "Shoppers Stop FY25 Annual Report — omnichannel investments as growth and efficiency enabler",
         "INTERNAL_CALIBRATION — omnichannel IT savings from 2 India organised retail technology mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "insurance_premium_optimization",
@@ -142,7 +172,12 @@
         "IRDAI Annual Report 2023-24 — property and inventory insurance competitive RFP savings 12-22%",
         "RAI India Retail 2024 — shrinkage and inventory insurance as material cost for organised retail",
         "INTERNAL_CALIBRATION — retail insurance optimisation savings from 2 India retail risk reviews"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
     },
     {
       "lever_id": "retail_compliance_audit_efficiency",
@@ -161,7 +196,12 @@
         "SEBI LODR — listed retailer audit rotation and compliance cost disclosure",
         "Hackett Group G&A Benchmarks 2024 — advisory spend governance 10-18% savings",
         "INTERNAL_CALIBRATION — retail compliance advisory savings from 2 India organised retail mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
     },
     {
       "lever_id": "store_labor_optimization",
@@ -180,7 +220,12 @@
         "RAI — India Retail Report 2024 (rai.net.in/) — store labour productivity benchmarks (sales per FTE)",
         "McKinsey & Company — Reimagining the Store (mckinsey.com/industries/retail) — labour scheduling optimisation 8-18%",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 13,
+        "p50": 18,
+        "p90": 22
+      }
     },
     {
       "lever_id": "category_management",
@@ -200,7 +245,12 @@
         "RAI — India Retail Report 2024 (rai.net.in/) — vendor funding and category management benchmarks India",
         "Nielsen — Retail Execution Excellence 2024 (nielsen.com/insights/) — category management ROI",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 16,
+        "p50": 22,
+        "p90": 27
+      }
     },
     {
       "lever_id": "private_label",
@@ -220,7 +270,12 @@
       "industry_sources": [
         "RAI — India Retail Report 2024 (rai.net.in/) — private label penetration and margin premium benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 30,
+        "p50": 40,
+        "p90": 50
+      }
     },
     {
       "lever_id": "omnichannel_fulfillment",
@@ -241,7 +296,12 @@
       "industry_sources": [
         "CRISIL — India E-Commerce and Logistics Report 2024 (crisil.com) — last-mile delivery cost benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 27,
+        "p50": 36,
+        "p90": 45
+      }
     },
     {
       "lever_id": "markdown_optimization",
@@ -259,7 +319,12 @@
       "industry_sources": [
         "Nielsen — Retail Inventory Management 2024 (nielsen.com/insights/) — markdown optimisation and clearance benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 16,
+        "p50": 22,
+        "p90": 27
+      }
     },
     {
       "lever_id": "loyalty_program_efficiency",
@@ -278,7 +343,12 @@
       "industry_sources": [
         "RAI — India Retail Report 2024 (rai.net.in/) — loyalty programme cost as % of sales and redemption benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 16,
+        "p50": 22,
+        "p90": 27
+      }
     },
     {
       "lever_id": "store_network_optimization",
@@ -298,7 +368,12 @@
         "RAI — India Retail Report 2024 (rai.net.in/) — retail store productivity and breakeven benchmarks India",
         "JLL India — India Retail Real Estate Report 2024 (jll.com/en-in/research) — rental benchmarks and store network optimisation",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 22,
+        "p50": 30,
+        "p90": 37
+      }
     }
   ]
 }

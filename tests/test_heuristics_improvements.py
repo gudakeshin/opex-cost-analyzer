@@ -16,7 +16,8 @@ from __future__ import annotations
 
 from app.models import NormalizedSpendLine
 from app.skills import engine
-from app.skills.engine.savings import _band_factors, _classify_horizon
+from app.skills.engine.savings import _band_factors, _classify_horizon, _category_deduped_mid
+from app.skills.engine.profiler import _normalize_effort_weeks
 from app.services.benchmarks import benchmark_industry_for, resolve_benchmark_payload
 from app.services.sector_packs import run_regression_test
 from app.services.sensitivity import compute_sensitivity
@@ -221,7 +222,7 @@ def test_p2d_ebitda_bps_250_for_2000cr_and_50cr() -> None:
 # ---------------------------------------------------------------------------
 
 def test_p2e_classify_horizon_by_effort_weeks() -> None:
-    assert _classify_horizon([1.0, 0.0, 0.0], 6, 10) == "tactical"            # payment_terms
+    assert _classify_horizon([1.0, 0.0, 0.0], 6, 10) == "quick_win"            # payment_terms
     assert _classify_horizon([0.15, 0.55, 0.30], 3, 16) == "structural"       # contract_reneg
     assert _classify_horizon([0.10, 0.40, 0.50], 36, 48) == "transformational"  # SSC
 
@@ -233,7 +234,7 @@ def test_p2e_initiatives_and_summary_carry_horizon() -> None:
     ]}
     raw = engine.build_raw_rows(peer, {"internal_variance": []}, {"heuristic_findings": []})
     model = engine.savings_modeler({"raw_rows": raw}, {"root_cause_findings": []}, annual_revenue=1e9)
-    valid = {"tactical", "structural", "transformational"}
+    valid = {"quick_win", "structural", "transformational"}
     assert all(i["horizon"] in valid for i in model["initiatives"])
     assert set(model["summary"]["horizon_summary"]).issubset(valid)
 
@@ -270,3 +271,53 @@ def test_p3b_fallback_note_for_borrowed_mapping() -> None:
     resolved = resolve_benchmark_payload("bfsi_banks", ["IT", "PROF_SVCS"])
     note = resolved["selection_rationale"].get("benchmark_confidence_note")
     assert note and "financial_services" in note
+
+
+# ---------------------------------------------------------------------------
+# Tier 2 — effort_weeks normalization + dedup overlap matrix
+# ---------------------------------------------------------------------------
+
+def test_normalize_effort_weeks_from_scalar_implementation_weeks() -> None:
+    ew = _normalize_effort_weeks({"implementation_weeks": 20, "complexity_tier": "medium"})
+    assert ew == {"p10": 15, "p50": 20, "p90": 25}
+
+
+def test_normalize_effort_weeks_fallback_from_complexity_tier() -> None:
+    ew = _normalize_effort_weeks({"complexity_tier": "high"})
+    assert ew["p50"] == 40
+
+
+def test_dedup_overlap_matrix_below_flat_sum() -> None:
+    overlap = {
+        "supply:process": 0.55,
+        "supply:demand": 0.50,
+        "process:demand": 0.65,
+    }
+    lever_by_source = {"peer": "contract_renegotiation", "internal": "process_standardization", "heuristic": "demand_management"}
+    levers_meta = {
+        "contract_renegotiation": {"lever_family": "supply"},
+        "process_standardization": {"lever_family": "process"},
+        "demand_management": {"lever_family": "demand"},
+    }
+    values = {"peer": 100.0, "internal": 80.0, "heuristic": 60.0}
+    flat = sum(values.values()) * 0.75
+    deduped = _category_deduped_mid(
+        values,
+        lever_by_source=lever_by_source,
+        levers_meta=levers_meta,
+        overlap_matrix=overlap,
+        fallback=0.75,
+    )
+    assert deduped < flat
+    assert deduped > values["peer"]
+
+
+def test_value_bridge_uses_overlap_matrix_when_present() -> None:
+    peer = {"comparisons": [{"category_id": "IT", "estimated_saving_amount": 100.0}]}
+    internal = {"internal_variance": [{"category_id": "IT", "estimated_saving_amount": 80.0}]}
+    heuristic = {"heuristic_findings": [{"category_id": "IT", "estimated_saving_amount": 60.0}]}
+    out = engine.value_bridge_calculator(peer, internal, heuristic, 1000.0)
+    row = out["value_matrix"][0]
+    flat = (100 + 80 + 60) * 0.75
+    assert row["deduped_mid_savings"] < flat
+    assert row["deduped_mid_savings"] > 100.0

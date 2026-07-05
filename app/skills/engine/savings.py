@@ -56,11 +56,11 @@ def _classify_horizon(
     payback_months: int,
     effort_weeks_p50: int | None = None,
 ) -> str:
-    """Classify an initiative as tactical / structural / transformational.
+    """Classify an initiative as quick_win / structural / transformational.
 
     Effort (implementation weeks, P50) is the primary signal when available — it is
     the most reliable delivery-speed measure and what the effort-vs-impact matrix
-    consumes. Thresholds: ≤12 weeks tactical, ≤30 weeks structural, else
+    consumes. Thresholds: ≤12 weeks quick_win, ≤30 weeks structural, else
     transformational. (A phasing/payback-only rule cannot reproduce the expected
     quick-win→transformation spread on real lever data — e.g. contract renegotiation
     front-loads only 15% in Y1 yet pays back in ~3 months — so effort_weeks leads and
@@ -68,16 +68,60 @@ def _classify_horizon(
     """
     if effort_weeks_p50:
         if effort_weeks_p50 <= 12:
-            return "tactical"
+            return "quick_win"
         if effort_weeks_p50 <= 30:
             return "structural"
         return "transformational"
     y1_pct = phasing_curve[0] if phasing_curve else 0.25
     if y1_pct >= 0.60 or payback_months < 6:
-        return "tactical"
+        return "quick_win"
     if y1_pct >= 0.20 and payback_months <= 18:
         return "structural"
     return "transformational"
+
+
+def _overlap_factor(
+    family_a: str,
+    family_b: str,
+    overlap_matrix: Dict[str, float],
+    fallback: float,
+) -> float:
+    if family_a == family_b:
+        key = f"{family_a}:{family_b}"
+        return float(overlap_matrix.get(key, fallback))
+    key_ab = f"{family_a}:{family_b}"
+    key_ba = f"{family_b}:{family_a}"
+    return float(overlap_matrix.get(key_ab) or overlap_matrix.get(key_ba) or fallback)
+
+
+def _category_deduped_mid(
+    values: Dict[str, float],
+    *,
+    lever_by_source: Dict[str, str],
+    levers_meta: Dict[str, Any],
+    overlap_matrix: Dict[str, float],
+    fallback: float,
+) -> float:
+    """Combine peer/internal/heuristic savings using lever-family overlap factors."""
+    source_keys = ("peer", "internal", "heuristic")
+    parts: List[Tuple[str, float, str]] = []
+    for src in source_keys:
+        amt = float(values.get(src, 0.0) or 0.0)
+        if amt <= 0:
+            continue
+        lever_id = lever_by_source.get(src, "")
+        family = str(levers_meta.get(lever_id, {}).get("lever_family", "supply"))
+        parts.append((src, amt, family))
+    if not parts:
+        return 0.0
+    if len(parts) == 1:
+        return parts[0][1]
+    parts.sort(key=lambda x: x[1], reverse=True)
+    total = parts[0][1]
+    primary_family = parts[0][2]
+    for _, amt, family in parts[1:]:
+        total += amt * _overlap_factor(primary_family, family, overlap_matrix, fallback)
+    return total
 
 
 def savings_modeler(
@@ -454,6 +498,9 @@ def value_bridge_calculator(
 ) -> Dict[str, Any]:
     vb_cfg = _get_model_params().get("defaults", {}).get("value_bridge", {})
     dedup_mid_factor = float(vb_cfg.get("dedup_mid_factor", 0.75))
+    overlap_matrix = vb_cfg.get("dedup_overlap_matrix") or {}
+    lever_by_source = _get_model_params().get("lever_by_source", {})
+    levers_meta = _get_model_params().get("levers", {})
 
     if savings_model and savings_model.get("initiatives"):
         committed = committed_initiatives or []
@@ -537,8 +584,17 @@ def value_bridge_calculator(
     # category-average band using the default sustainability and the run specificity.
     low_factor, high_factor = _band_factors(0.65, benchmark_specificity, data_quality_score)
     for cat, values in merged.items():
-        combined = values["peer"] + values["internal"] + values["heuristic"]
-        deduped_mid = combined * dedup_mid_factor
+        if overlap_matrix:
+            deduped_mid = _category_deduped_mid(
+                values,
+                lever_by_source=lever_by_source,
+                levers_meta=levers_meta,
+                overlap_matrix=overlap_matrix,
+                fallback=dedup_mid_factor,
+            )
+        else:
+            combined = values["peer"] + values["internal"] + values["heuristic"]
+            deduped_mid = combined * dedup_mid_factor
         deduped_low = deduped_mid * low_factor
         deduped_high = deduped_mid * high_factor
         low += deduped_low

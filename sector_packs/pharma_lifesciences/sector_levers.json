@@ -22,7 +22,12 @@
         "IQVIA India Pharma Market 2024 (iqvia.com) — prescription data analytics improving MR targeting: 20-30% reduction in cost per call while maintaining market share",
         "OPPI India Pharma Review 2024 (oppi.in) — field force productivity: visits per MR per day 8-12 for best-in-class vs. 5-7 for average",
         "INTERNAL_CALIBRATION — salesforce effectiveness savings calibrated from 4 India pharma go-to-market mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "procurement_api_rm_consolidation",
@@ -42,7 +47,12 @@
         "NPPA (National Pharmaceutical Pricing Authority) drug pricing data (nppa.gov.in) — API cost as % of drug price published for scheduled formulations",
         "Cipla FY25 Annual Report (BSE 500087) — API backward integration and supplier rationalisation as strategic priority",
         "INTERNAL_CALIBRATION — API procurement savings calibrated from 3 India pharma raw material sourcing mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "manufacturing_efficiency_oee",
@@ -63,7 +73,12 @@
         "Dr. Reddy's FY25 Annual Report (BSE 500124) — manufacturing excellence programme: OEE improvement at Hyderabad plants",
         "CII Manufacturing Excellence Awards 2024 (cii.in) — pharma lean transformation case studies",
         "INTERNAL_CALIBRATION — OEE improvement savings calibrated from 3 India pharma plant efficiency mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "regulatory_compliance_cost_reduction",
@@ -85,7 +100,12 @@
         "USFDA Generic Drug User Fee Amendments (GDUFA) rate schedule 2024 — ANDA filing fees $231,440 per application; prioritisation saves significant cost",
         "Sun Pharma FY25 Annual Report — regulatory excellence investment cited; USFDA warning letter remediation costs disclosed",
         "INTERNAL_CALIBRATION — regulatory compliance savings from 3 India pharma regulatory affairs mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "cold_chain_logistics_optimisation",
@@ -105,7 +125,12 @@
         "CII Pharma Logistics India 2024 (cii.in) — cold chain logistics 3-6% of pharma revenue; hub-and-spoke reduces cost 15-25% vs. direct shipment",
         "Cipla FY25 Annual Report — distribution efficiency and trade receivables management as working capital priority",
         "INTERNAL_CALIBRATION — logistics optimisation savings from 3 India pharma distribution mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "digital_marketing_hcp",
@@ -124,7 +149,12 @@
         "IQVIA India HCP Engagement 2024 — digital detailing cost per contact 70-80% lower than in-person MR visit; HCP digital receptivity growing post-COVID",
         "OPPI India Pharma 2024 (oppi.in) — omnichannel HCP engagement adoption by top 10 India pharma companies",
         "INTERNAL_CALIBRATION — digital HCP engagement savings from 4 India pharma commercial transformation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
     },
     {
       "lever_id": "tech_regulatory_it_modernisation",
@@ -144,7 +174,12 @@
         "Gartner Life Sciences IT 2024 (gartner.com) — pharma quality systems modernisation: 20-30% reduction in compliance IT cost + audit preparation time",
         "USFDA 21 CFR Part 11 / EU Annex 11 requirements — electronic records and audit trail mandates driving IT consolidation",
         "INTERNAL_CALIBRATION — QMS IT modernisation savings from 2 India pharma GxP technology mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "rnd_portfolio_rationalization",
@@ -165,7 +200,12 @@
         "Gartner Life Sciences R&D Portfolio Management 2024 — tail project rationalisation saves 10-18% of R&D spend",
         "Dr. Reddy's FY25 Annual Report — R&D productivity and portfolio focus cited as strategic priority",
         "INTERNAL_CALIBRATION — pharma R&D portfolio savings from 3 India pharma R&D mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "insurance_premium_optimization",
@@ -184,7 +224,12 @@
         "Marsh Life Sciences Risk Report 2024 — pharma insurance RFP savings 8-15%",
         "IRDAI Annual Report 2023-24 — commercial insurance market benchmarks",
         "INTERNAL_CALIBRATION — pharma insurance savings from 2 India pharma risk reviews"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
     },
     {
       "lever_id": "qc_lab_facilities_optimisation",
@@ -205,7 +250,12 @@
         "BEE PAT Scheme — pharma designated consumers energy efficiency benchmarks",
         "CII Pharma Manufacturing Excellence 2024 — GMP facility cost optimisation case studies",
         "INTERNAL_CALIBRATION — pharma facilities savings from 2 India pharma plant mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "clinical_trial_efficiency",
@@ -225,7 +275,12 @@
         "DSIR — R&D Statistics and Indicators 2023-24 (dsir.gov.in/reports.htm) — India clinical trial landscape and CRO adoption",
         "OPPI — Indian Pharmaceutical Industry Report 2024 (oppiin.org) — clinical trial cost benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 39,
+        "p50": 52,
+        "p90": 65
+      }
     },
     {
       "lever_id": "manufacturing_cogs",
@@ -244,7 +299,12 @@
         "DPCO — Drug Price Control Order and NLEM (pharmaceuticals.gov.in/national-pharmaceutical-pricing-authority) — manufacturing cost benchmarks for regulated pricing",
         "McKinsey & Company — Productivity in Pharma Manufacturing (mckinsey.com/industries/life-sciences) — COGS reduction levers 8-18%",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 33,
+        "p50": 44,
+        "p90": 55
+      }
     },
     {
       "lever_id": "sales_force_sizing",
@@ -263,7 +323,12 @@
       "industry_sources": [
         "OPPI — Indian Pharmaceutical Industry Report 2024 (oppiin.org) — field force productivity benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 24,
+        "p50": 32,
+        "p90": 40
+      }
     },
     {
       "lever_id": "digital_rep_model",
@@ -281,7 +346,12 @@
       "industry_sources": [
         "OPPI — Digital Health and Pharma Marketing Report 2024 (oppiin.org) — e-detailing adoption benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 27,
+        "p50": 36,
+        "p90": 45
+      }
     },
     {
       "lever_id": "market_access_rebate_mgmt",
@@ -301,7 +371,12 @@
       "industry_sources": [
         "NPPA — Price Monitoring and Resource Unit Data 2024 (pharmaceuticals.gov.in) — gross-to-net deduction benchmarks India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 27,
+        "p50": 36,
+        "p90": 45
+      }
     },
     {
       "lever_id": "tech_platform_consolidation",
@@ -319,7 +394,12 @@
       "industry_sources": [
         "Gartner — Life Sciences IT Spending Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget) — pharma IT platform consolidation savings",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 39,
+        "p50": 52,
+        "p90": 65
+      }
     },
     {
       "lever_id": "expiry_risk_reduction",
@@ -337,7 +417,12 @@
       "industry_sources": [
         "CRISIL — Pharma Supply Chain Report 2024 (crisil.com) — inventory write-off rates for Indian pharma companies",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 16,
+        "p50": 22,
+        "p90": 27
+      }
     },
     {
       "lever_id": "regulatory_submission_efficiency",
@@ -356,7 +441,12 @@
       "industry_sources": [
         "CDSCO — Central Drugs Standard Control Organisation Annual Report 2023-24 (cdsco.gov.in) — regulatory submission timelines India",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 21,
+        "p50": 28,
+        "p90": 35
+      }
     },
     {
       "lever_id": "pharmacovigilance_automation",
@@ -375,7 +465,12 @@
       "industry_sources": [
         "CDSCO — Pharmacovigilance Programme of India (pvpi.gov.in) — PV reporting requirements and automation opportunities",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 31,
+        "p50": 42,
+        "p90": 52
+      }
     }
   ]
 }

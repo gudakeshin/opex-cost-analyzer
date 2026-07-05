@@ -23,7 +23,12 @@
         "Hackett Group G&A Benchmarks 2024 (thehackettgroup.com) — world-class shared services: 25-35% G&A reduction vs. decentralised model",
         "SEBI LODR — group entity governance and related-party frameworks enabling shared service arrangements",
         "INTERNAL_CALIBRATION — group shared services savings calibrated from 3 India conglomerate G&A transformation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 22,
+        "p50": 30,
+        "p90": 37
+      }
     },
     {
       "lever_id": "group_procurement_consolidation",
@@ -45,7 +50,12 @@
         "M&M FY25 Annual Report (BSE 500520) — group procurement synergies cited for auto and farm equipment sourcing",
         "Aditya Birla Group — group-level procurement arm consolidating spend across Hindalco, UltraTech, Grasim, Fashion & Lifestyle",
         "INTERNAL_CALIBRATION — group procurement savings calibrated from 4 India conglomerate sourcing mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "portfolio_rationalisation",
@@ -65,7 +75,12 @@
         "SEBI LODR — board-level portfolio review governance requirements for listed conglomerates",
         "Tata Sons portfolio rationalization: Tata Steel Europe restructuring, Tata AIG stake management — published investor communications",
         "INTERNAL_CALIBRATION — portfolio rationalisation savings from 2 India conglomerate strategic review mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 30,
+        "p50": 40,
+        "p90": 50
+      }
     },
     {
       "lever_id": "treasury_working_capital",
@@ -85,7 +100,12 @@
         "SEBI RPT Regulations 2021 — inter-company loan frameworks and arm's-length pricing requirements",
         "M&M FY25 Annual Report — treasury operations and inter-company financing structure detailed in RPT disclosures",
         "INTERNAL_CALIBRATION — group treasury savings from 3 India conglomerate treasury transformation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
     },
     {
       "lever_id": "real_estate_group_portfolio",
@@ -104,7 +124,12 @@
         "SEBI LODR — disclosure of significant real estate transactions and related-party property arrangements",
         "Aditya Birla Group — surplus land monetisation from legacy manufacturing sites disclosed in annual reports",
         "INTERNAL_CALIBRATION — group real estate monetisation from 2 India conglomerate property review mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "digital_group_platform",
@@ -124,7 +149,12 @@
         "Gartner G2000 IT Benchmark 2024 — group-level IT consolidation: 20-30% reduction in per-entity IT spend",
         "Tata Consultancy Services (group IT arm) — Tata group companies' shared IT services model cited in TCS investor materials",
         "INTERNAL_CALIBRATION — group IT rationalisation from 2 India conglomerate technology transformation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 27,
+        "p50": 36,
+        "p90": 45
+      }
     },
     {
       "lever_id": "brsr_esg_programme",
@@ -144,7 +174,12 @@
         "SEBI BRSR Core Circular 2023 (sebi.gov.in) — mandatory assured BRSR for top-1000 listed entities; integrated platform reduces per-entity assurance cost",
         "M&M FY25 Annual Report — integrated sustainability reporting and CSR spend of ₹1,800 Cr disclosed with outcome metrics",
         "INTERNAL_CALIBRATION — ESG programme efficiency savings from 2 India conglomerate sustainability mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "group_energy_procurement",
@@ -163,7 +198,12 @@
         "BEE PAT Scheme results (beeindia.gov.in) — designated consumers achieve 10-20% energy cost reduction",
         "CEA Annual Report 2023-24 — industrial tariff and open-access benchmarks",
         "INTERNAL_CALIBRATION — group energy procurement savings from 2 India conglomerate energy mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "shared_services_center",
@@ -184,7 +224,12 @@
         "Deloitte — Global Shared Services & Outsourcing Survey 2024 (deloitte.com/content/dam/Deloitte/global/Documents/Tax/dttl-tax-global-shared-services-survey.pdf) — 25-50% cost reduction benchmarks for SSC migration",
         "McKinsey & Company — Transforming the Back Office (mckinsey.com/capabilities/operations/our-insights) — shared services ROI studies across large conglomerates",
         "Hackett Group — World-Class Shared Services Performance 2024 (thehackettgroup.com/research/) — G&A cost reduction through SSC"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 45,
+        "p50": 60,
+        "p90": 75
+      }
     },
     {
       "lever_id": "group_procurement",
@@ -205,7 +250,12 @@
         "Hackett Group — World-Class Procurement Performance Study 2024 (thehackettgroup.com/research/) — group procurement aggregation savings 8-20%",
         "CAPS Research — Group Purchasing & Consortium Benchmarks (capsresearch.org/benchmarking/) — spend aggregation leverage benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 19,
+        "p50": 26,
+        "p90": 32
+      }
     },
     {
       "lever_id": "corporate_overhead_right_size",
@@ -226,7 +276,12 @@
         "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again) — 10-25% corporate overhead reduction",
         "CII — India Inc. Cost Competitiveness Report 2024 (cii.in) — corporate overhead benchmarks for Indian conglomerates",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 24,
+        "p50": 32,
+        "p90": 40
+      }
     },
     {
       "lever_id": "portfolio_rationalization",
@@ -245,7 +300,12 @@
       "industry_sources": [
         "McKinsey & Company — The Five Traps of Portfolio Rationalisation (mckinsey.com/capabilities/strategy-and-corporate-finance) — divestiture impact on EBITDA margins",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 45,
+        "p50": 60,
+        "p90": 75
+      }
     },
     {
       "lever_id": "group_insurance_pooling",
@@ -264,7 +324,12 @@
       "industry_sources": [
         "Aon — Global Insurance Market Conditions Report 2024 (aon.com/risk-services/risk-consulting/insurance-market-update.jsp) — group pooling discount benchmarks 10-25%",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 16,
+        "p50": 22,
+        "p90": 27
+      }
     },
     {
       "lever_id": "intercompany_pricing_optimization",
@@ -287,7 +352,12 @@
         "OECD — Transfer Pricing Guidelines for Multinational Enterprises 2022 (oecd.org/tax/transfer-pricing/) — arm's length principle for intercompany pricing",
         "PwC — International Transfer Pricing 2024 (pwc.com/gx/en/services/tax/international-tax/transfer-pricing.html) — transfer pricing optimisation frameworks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 16,
+        "p50": 22,
+        "p90": 27
+      }
     },
     {
       "lever_id": "real_estate_portfolio_mgmt",
@@ -306,7 +376,12 @@
         "JLL India — India Office Market Report 2024 (jll.com/en-in/research/india-office-market-report) — office space rationalisation benchmarks",
         "CBRE — India Real Estate Market Outlook 2024 (cbre.com/insights/reports/india-real-estate-market-outlook) — real estate portfolio optimisation",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 24,
+        "p50": 32,
+        "p90": 40
+      }
     },
     {
       "lever_id": "group_treasury_netting",
@@ -326,7 +401,12 @@
         "Atradius — Payment Practices Barometer Asia-Pacific 2024 (atradius.us/knowledge-and-research/reports/payment-practices-barometer-asia-pacific.html) — working capital benchmarks",
         "Hackett Group — Working Capital Management 2024 (thehackettgroup.com/working-capital-management-hackett/) — cash pooling and netting benefits",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     }
   ]
 }

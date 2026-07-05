@@ -97,19 +97,29 @@ def _build_risks(
     return risks
 
 
+def _horizon_label(horizon: str) -> str:
+    labels = {
+        "quick_win": "Quick win",
+        "structural": "Structural",
+        "transformational": "Transformational",
+    }
+    return labels.get(horizon, horizon.replace("_", " ").title())
+
+
 def _build_phasing_narrative(initiative: Dict[str, Any]) -> str:
     gross = initiative.get("gross_savings") or {}
     total = float(gross.get("total_3yr") or 0.0)
     horizon = str(initiative.get("horizon") or "structural")
+    label = _horizon_label(horizon)
     payback = initiative.get("payback_months")
     pb = f" Payback ~{payback} months." if payback else ""
     if total <= 0:
-        return f"{horizon.title()} initiative phased across three years.{pb}"
+        return f"{label} initiative phased across three years.{pb}"
     p1 = round(float(gross.get("y1") or 0.0) / total * 100)
     p2 = round(float(gross.get("y2") or 0.0) / total * 100)
     p3 = round(float(gross.get("y3") or 0.0) / total * 100)
     return (
-        f"{horizon.title()} initiative phased {p1}% / {p2}% / {p3}% of gross savings "
+        f"{label} initiative phased {p1}% / {p2}% / {p3}% of gross savings "
         f"across Years 1–3.{pb}"
     )
 

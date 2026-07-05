@@ -21,7 +21,12 @@
         "DPE Annual Survey 2022-23 (dpe.gov.in) — VRS cited as key manpower cost reduction tool for loss-making CPSEs; BHEL VRS 2019-20 reduced headcount 10,000",
         "Ministry of Heavy Industries — BHEL revival plan 2022: workforce rationalisation as strategic pillar",
         "INTERNAL_CALIBRATION — manpower rationalisation savings from 2 India PSU turnaround mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 19,
+        "p50": 26,
+        "p90": 32
+      }
     },
     {
       "lever_id": "procurement_gem_portal",
@@ -41,7 +46,12 @@
         "GeM Annual Report 2023-24 (gem.gov.in) — ₹2.5 Lakh Cr in transactions; CPSEs mandated to procure via GeM; competitive pricing 8-15% below traditional procurement",
         "CVC (Central Vigilance Commission) Procurement Guidelines — GeM adoption saves procurement time and reduces corruption risk",
         "INTERNAL_CALIBRATION — GeM-based procurement savings from 3 India CPSE procurement transformation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
     },
     {
       "lever_id": "inventory_rationalisation",
@@ -60,7 +70,12 @@
         "CAG Reports on CPSEs 2023-24 (cag.gov.in) — excess inventory is recurring finding; BHEL stores blocking ₹3,000+ Cr in excess inventory cited",
         "DPE Survey 2022-23 — inventory days 90-180 for manufacturing CPSEs vs. private sector median 45-60 days",
         "INTERNAL_CALIBRATION — inventory rationalisation savings from 3 India PSU supply chain mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "technology_erp_modernisation",
@@ -79,7 +94,12 @@
         "MeitY Digital India programme — ERP adoption in CPSEs mandated for transparency; CIL SAP implementation cited as modernisation benchmark",
         "Gartner ERP 2024 — S/4HANA migration reduces IT maintenance 20-30% vs. legacy ERP + process efficiency gains 10-15%",
         "INTERNAL_CALIBRATION — ERP modernisation savings from 2 India PSU digital transformation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 39,
+        "p50": 52,
+        "p90": 65
+      }
     },
     {
       "lever_id": "energy_efficiency_plants",
@@ -99,7 +119,12 @@
         "BEE (Bureau of Energy Efficiency) PAT Scheme Cycle VI 2023-24 (beeindia.gov.in) — designated consumers (DCs) including CPSEs must achieve specific energy reduction targets",
         "BHEL FY25 Annual Report — energy efficiency investments under PAT scheme at manufacturing plants",
         "INTERNAL_CALIBRATION — energy efficiency savings from 3 India manufacturing PSU energy mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "commercial_recovery_ndues",
@@ -121,7 +146,12 @@
         "CAG Reports on CPSEs 2023-24 — excess receivables: BHEL outstanding dues from government utilities cited; debtors >180 days flagged",
         "DPE CPSE Survey 2022-23 — working capital management improvement as key recommendation for Miniratna CPSEs",
         "INTERNAL_CALIBRATION — receivables recovery savings from 2 India PSU commercial excellence mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "brsr_reporting_efficiency",
@@ -140,7 +170,12 @@
         "SEBI BRSR Core Circular Jul 2023 (sebi.gov.in) — integrated ESG platform reduces per-entity assurance cost",
         "SEBI Expert Committee May 2024 — assessment vs assurance simplification for ease of compliance",
         "INTERNAL_CALIBRATION — PSU ESG reporting efficiency savings from 2 India CPSE sustainability mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "insurance_premium_optimization",
@@ -159,7 +194,12 @@
         "IRDAI Annual Report 2023-24 — public sector insurer market; competitive tendering benchmarks",
         "DPE CPSE Survey 2022-23 — insurance cost as component of establishment charges",
         "INTERNAL_CALIBRATION — CPSE insurance pooling savings from 2 India PSU risk reviews"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
     },
     {
       "lever_id": "township_cost_optimisation",
@@ -180,7 +220,12 @@
         "DPE CPSE Survey 2022-23 — township and establishment charges significant for manufacturing CPSEs",
         "CAG Reports on CPSEs 2023-24 — excess establishment cost recurring finding",
         "INTERNAL_CALIBRATION — township optimisation savings from 2 India PSU facilities mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "cag_audit_readiness",
@@ -201,7 +246,12 @@
         "CAG Reports on CPSEs 2023-24 (cag.gov.in) — recurring audit observations drive advisory spend",
         "DPE Guidelines on CPSE governance — audit remediation and compliance cost benchmarks",
         "INTERNAL_CALIBRATION — CAG readiness savings from 2 India PSU governance mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
     },
     {
       "lever_id": "gst_itc_recovery",
@@ -220,7 +270,12 @@
         "GST Act 2017 Section 17(5) — blocked credit categories (statutory)",
         "DPE — Survey of CPSEs 2022-23 (dpe.gov.in/reports/annual-report) — GST compliance benchmarks for CPSEs",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
     },
     {
       "lever_id": "ind_as_116_lease",
@@ -239,7 +294,12 @@
         "MCA — Indian Accounting Standard Ind AS 116 Leases (mca.gov.in) — statutory accounting standard",
         "ICAI — Ind AS 116 Implementation Guidance (icai.org) — practical expedients for short-term and low-value leases",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
     },
     {
       "lever_id": "csr_efficiency",
@@ -259,7 +319,12 @@
         "MCA — CSR Annual Reports & Impact Data (mca.gov.in/content/mca/global/en/acts-rules/ebooks/circulars.html) — Companies Act 2013 Section 135 CSR spending data",
         "DPE — Survey of CPSEs CSR Expenditure 2022-23 (dpe.gov.in/reports/annual-report) — CPSE CSR spend impact benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 10,
+        "p50": 14,
+        "p90": 17
+      }
     },
     {
       "lever_id": "public_procurement_reform",
@@ -278,7 +343,12 @@
         "GeM — Government e-Marketplace Annual Report 2023-24 (gem.gov.in/resources/files/Annual_Report_GEM.pdf) — GeM procurement savings benchmarks for CPSEs",
         "CVC — Procurement Reform Guidelines (cvc.gov.in) — public procurement best practices",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 13,
+        "p50": 18,
+        "p90": 22
+      }
     },
     {
       "lever_id": "mro_consolidation",
@@ -297,7 +367,12 @@
         "DPE — Survey of CPSEs 2022-23 (dpe.gov.in/reports/annual-report) — MRO and maintenance spend benchmarks for CPSEs",
         "Hackett Group — World-Class Procurement Benchmarks 2024 (thehackettgroup.com/research/) — MRO consolidation savings 8-20%",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 16,
+        "p50": 22,
+        "p90": 27
+      }
     },
     {
       "lever_id": "energy_audit_compliance",
@@ -316,7 +391,12 @@
         "BEE — Perform Achieve Trade (PAT) Scheme Cycle Results (beeindia.gov.in/content/pat-cycle) — energy savings achieved by designated consumers including CPSEs",
         "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/) — industrial energy efficiency benchmarks",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "manpower_rationalisation",
@@ -337,7 +417,12 @@
         "DPE — Survey of CPSEs 2022-23 (dpe.gov.in/reports/annual-report) — employee cost as % of revenue benchmarks for CPSEs",
         "CAG — Audit Reports on CPSEs (cag.gov.in/en/report) — manpower productivity findings",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 39,
+        "p50": 52,
+        "p90": 65
+      }
     },
     {
       "lever_id": "project_cost_overrun_control",
@@ -357,7 +442,12 @@
         "CAG — Audit Reports on Infrastructure Projects (cag.gov.in/en/report) — project cost overrun patterns in Indian CPSEs",
         "DPE — MoU Performance Evaluation of CPSEs 2023 (dpe.gov.in) — project delivery KPIs",
         "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 19,
+        "p50": 26,
+        "p90": 32
+      }
     }
   ]
 }
