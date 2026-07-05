@@ -1683,6 +1683,97 @@
         "Benefits tracking for past engagements where available"
       ],
       "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "sez_stpi_tax_optimisation",
+      "lever_name": "SEZ / STPI Tax Benefit Optimisation (Section 10AA / 10B)",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 14.0,
+        "p90": 25.0
+      },
+      "savings_base": "effective_tax_liability",
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
+      "savings_type": "mixed",
+      "sustainability_score": 0.78,
+      "bounce_back_risk": "medium",
+      "condition_precedents": [
+        "Big 4 tax counsel engaged for SEZ/STPI eligibility assessment",
+        "GCC operating from an SEZ notified zone or STPI registered unit",
+        "Transfer pricing structure aligned with SEZ deduction requirements",
+        "MAT credit entitlement and utilisation schedule reviewed"
+      ],
+      "complexity_tier": "high",
+      "base_execution_probability": 0.55,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 32,
+        "p90": 56
+      },
+      "applicable_if": [
+        "category:stpi_see_compliance present",
+        "stpi_keywords detected",
+        "sez_keywords detected"
+      ],
+      "industry_sources": [
+        "EY — Driving Transfer Pricing Certainty in Uncertain Times: 2024 International Tax and Transfer Pricing Survey (ey.com/en_in/insights/tax/international-tax-and-transfer-pricing-survey)",
+        "KPMG — Global Transfer Pricing Review (kpmg.com/us/en/articles/2023/global-transfer-pricing-review.html)",
+        "Deloitte — Transfer Pricing Controversy Trends: 2024 Global Survey (internationaltaxreview.com)"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit current SEZ/STPI status and compliance: unit approval, Softex declaration volume and coverage, and bond utilisation",
+          "owner_role": "Finance / Tax / Compliance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Calculate IT/ITeS income tax exemption foregone due to non-filing or incomplete Softex declarations; quantify IEC and bond optimisation opportunity",
+          "owner_role": "Tax / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "File backdated Softex declarations (where permissible); correct STPI/SEZ compliance gaps and implement automated Softex filing workflow",
+          "owner_role": "Finance / Tax",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Integrate Softex filing into monthly invoice generation workflow; track exemption utilisation and compliance calendar",
+          "owner_role": "Finance / IT",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Softex declaration coverage <80% of eligible software export invoices",
+          "evidence_source": "stpi_compliance_audit",
+          "confirms": "Filing gap recovery will immediately improve tax exemption position"
+        },
+        {
+          "signal": "IT income tax exemption utilised <90% of eligible income under STPI/SEZ scheme",
+          "evidence_source": "tax_return_data",
+          "confirms": "Compliance improvement will reduce effective tax rate"
+        },
+        {
+          "signal": "STPI/SEZ bond amount not optimised (excess bond increasing opportunity cost)",
+          "evidence_source": "stpi_bond_register",
+          "confirms": "Bond rightsizing will release working capital"
+        }
+      ],
+      "required_data_fields": [
+        "Softex declaration log vs total software export invoice value",
+        "IT exemption claimed vs eligible income in tax returns",
+        "STPI/SEZ unit approval documents and scope",
+        "Bond register and utilisation rate",
+        "Monthly software export invoice data by client and currency"
+      ],
+      "applicability_threshold_pct": 0.02,
+      "shared_lever": true
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

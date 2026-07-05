@@ -8,7 +8,9 @@
       "lever_name": "Trade Marketing & Promotions ROI Optimisation",
       "description": "Deploy promotion effectiveness analytics to redirect spend from low-ROI trade schemes to high-ROI channels and formats. Shift from blanket discounts to targeted incentives.",
       "category_ids": [
-        "MARKETING"
+        "MARKETING",
+        "advertising_promotion",
+        "trade_spend_terms"
       ],
       "p10_pct": 6.0,
       "p50_pct": 12.0,
@@ -27,7 +29,10 @@
       "lever_name": "Distribution Network & Logistics Optimisation",
       "description": "Consolidate C&F agents, optimise hub-and-spoke delivery routes, implement demand-driven replenishment with distributors to reduce freight and handling cost.",
       "category_ids": [
-        "LOGISTICS_INDIA"
+        "LOGISTICS_INDIA",
+        "distribution_gt_mt",
+        "warehousing_cfa_costs",
+        "cold_chain_fmcg"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -46,7 +51,8 @@
       "lever_name": "Packaging Material Cost Reduction",
       "description": "Right-weight primary packaging; renegotiate volume-based contracts with packaging suppliers; switch to mono-material for sustainability + cost saving.",
       "category_ids": [
-        "PACKAGING"
+        "PACKAGING",
+        "packaging_material"
       ],
       "p10_pct": 4.0,
       "p50_pct": 8.0,
@@ -85,7 +91,8 @@
       "description": "Implement dynamic pricing, SKU rationalisation, and mix management to grow gross margin without volume loss. Exit low-margin SKUs, grow high-margin portfolio.",
       "category_ids": [
         "MARKETING",
-        "HR"
+        "HR",
+        "ecommerce_qcommerce_costs"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -104,7 +111,8 @@
       "lever_name": "Salesforce Effectiveness & Route-to-Market Optimisation",
       "description": "Restructure field sales force coverage model; use data analytics for territory design; deploy digital van sales (DMS) to improve calls per day and revenue per salesperson.",
       "category_ids": [
-        "HR"
+        "HR",
+        "field_sales_operations"
       ],
       "p10_pct": 6.0,
       "p50_pct": 12.0,
@@ -124,7 +132,8 @@
       "description": "Implement demand sensing, S&OP maturity, and vendor-managed inventory to reduce distributor and trade inventory days without service level deterioration.",
       "category_ids": [
         "LOGISTICS_INDIA",
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "cold_chain_fmcg"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -181,7 +190,8 @@
       "lever_name": "Audit, Legal & Regulatory Advisory Governance",
       "description": "Implement panel-firm governance for legal and audit; competitive RFP at rotation; cap litigation and compliance advisory spend.",
       "category_ids": [
-        "PROF_SVCS"
+        "PROF_SVCS",
+        "fssai_regulatory"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -238,7 +248,8 @@
       "lever_name": "SKU Rationalisation",
       "description": "Prune tail SKUs below contribution thresholds and harmonise formulations/packs to cut complexity cost across the value chain.",
       "category_ids": [
-        "PACKAGING"
+        "PACKAGING",
+        "rnd_product_development"
       ],
       "p10_pct": 4.0,
       "p50_pct": 9.0,
@@ -275,7 +286,9 @@
       "lever_name": "Trade Terms & Route-to-Market Optimisation",
       "description": "Restructure trade spend from unconditional margins to performance-linked terms with claims automation and audit recovery.",
       "category_ids": [
-        "LOGISTICS"
+        "LOGISTICS",
+        "trade_spend_terms",
+        "ecommerce_qcommerce_costs"
       ],
       "p10_pct": 2.0,
       "p50_pct": 4.0,
@@ -293,7 +306,8 @@
       "lever_name": "Warehouse & Distribution Centre Automation",
       "description": "Automate high-throughput DC operations (sortation, put-to-light, WMS optimisation) to cut cost per case shipped.",
       "category_ids": [
-        "LOGISTICS"
+        "LOGISTICS",
+        "warehousing_cfa_costs"
       ],
       "p10_pct": 12.0,
       "p50_pct": 20.0,

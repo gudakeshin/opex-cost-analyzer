@@ -1,7 +1,7 @@
 {
   "sector": "it_ites",
   "version": "1.0",
-  "vintage_date": "2025-04-01",
+  "vintage_date": "2026-05-01",
   "confidence_overall": "public_disclosure",
   "source_metadata": {
     "primary_sources": [
@@ -56,70 +56,193 @@
       "label": "IT & IT-Enabled Services (India)",
       "categories": {
         "HR": {
-          "P25": 52.0, "P50": 59.0, "P75": 65.0, "P90": 72.0,
+          "P25": 52.0,
+          "P50": 59.0,
+          "P75": 65.0,
+          "P90": 72.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Employee benefit expense % of revenue. TCS FY25: 52.4%, Infosys: 58.2%, HCL: 59.1%, LTIMindtree: 60.8%, Wipro: 62.0%, Mphasis: 67.1%. Sorted: 52.4→58.2→59.1→60.8→62.0→67.1 giving P25≈52, P50≈59, P75≈63, P90≈70 (adjusted for industry distribution)."
         },
         "OUTSOURCED": {
-          "P25": 5.0, "P50": 8.0, "P75": 11.0, "P90": 15.0,
+          "P25": 5.0,
+          "P50": 8.0,
+          "P75": 11.0,
+          "P90": 15.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Third-party subcontracting / external delivery. TCS FY25: 5.0%, Wipro: 7.7%, HCL: 9.0%, Infosys: 9.1%. NASSCOM notes 10-15% subcon at high-growth ITES firms."
         },
         "IT": {
-          "P25": 1.5, "P50": 2.5, "P75": 3.8, "P90": 5.5,
+          "P25": 1.5,
+          "P50": 2.5,
+          "P75": 3.8,
+          "P90": 5.5,
           "unit": "% of revenue",
           "confidence": "published_research",
           "source_note": "Internal IT infrastructure, software licences. Gartner IT Key Metrics 2024: IT services firms spend 2-4% of revenue on internal IT. Best-in-class near 1.5% (shared infra, high cloud discipline)."
         },
         "TRAVEL": {
-          "P25": 1.5, "P50": 2.0, "P75": 2.8, "P90": 3.8,
+          "P25": 1.5,
+          "P50": 2.0,
+          "P75": 2.8,
+          "P90": 3.8,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Travel & entertainment. Infosys FY25: 1.8%, Wipro FY25: ~2.2%. Industry averaged 1.5-2.5%. NASSCOM: post-COVID T&E stabilising at ~2% of revenue."
         },
         "FACILITIES": {
-          "P25": 1.2, "P50": 2.0, "P75": 2.8, "P90": 3.8,
+          "P25": 1.2,
+          "P50": 2.0,
+          "P75": 2.8,
+          "P90": 3.8,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Rent & facilities. Infosys campus model shows lower rent (Ind AS 116 lease-adjusted). HCL SEZ footprint ~1.8%. NASSCOM: Tier-1 city campus firms 1.5-2%, leased office firms 2.5-3.5%."
         },
         "PROF_SVCS": {
-          "P25": 0.5, "P50": 1.0, "P75": 1.8, "P90": 2.8,
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 1.8,
+          "P90": 2.8,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Legal, audit, external consulting. INTERNAL_CALIBRATION — calibrated from Indian IT sector compliance and M&A advisory spend patterns."
         },
         "MARKETING": {
-          "P25": 0.8, "P50": 1.5, "P75": 2.2, "P90": 3.2,
+          "P25": 0.8,
+          "P50": 1.5,
+          "P75": 2.2,
+          "P90": 3.2,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Sales & marketing. TCS: ~1.0%, Infosys: ~1.4% (includes analyst relations, brand). Wipro higher due to cloud go-to-market push ~2.0%. Mid-tier ITES ~2.5-3.0%."
         },
         "TELECOM": {
-          "P25": 0.3, "P50": 0.6, "P75": 1.0, "P90": 1.5,
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.0,
+          "P90": 1.5,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Communications and network costs. INTERNAL_CALIBRATION — estimated from India IT firm connectivity spend (MPLS, internet, collaboration tools)."
         },
         "INSURANCE": {
-          "P25": 0.3, "P50": 0.6, "P75": 0.9, "P90": 1.3,
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 0.9,
+          "P90": 1.3,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Group health insurance, D&O, professional indemnity. INTERNAL_CALIBRATION — calibrated from Indian IT sector statutory benefit structures and E&O policy benchmarks."
         },
         "OFFICE": {
-          "P25": 0.2, "P50": 0.4, "P75": 0.7, "P90": 1.0,
+          "P25": 0.2,
+          "P50": 0.4,
+          "P75": 0.7,
+          "P90": 1.0,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Office supplies, printing, sundry admin. INTERNAL_CALIBRATION."
         },
         "CONTINGENT": {
-          "P25": 1.5, "P50": 3.0, "P75": 5.0, "P90": 8.0,
+          "P25": 1.5,
+          "P50": 3.0,
+          "P75": 5.0,
+          "P90": 8.0,
           "unit": "% of revenue",
           "confidence": "published_research",
           "source_note": "Contract/gig workforce. NASSCOM 2025: contract headcount 15-25% of workforce in ITES; estimated cost at market billing rates."
+        },
+        "offshore_delivery_infra": {
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.0,
+          "P90": 7.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Offshore development centre facilities + connectivity share of revenue; campus vs leased mix drives spread."
+        },
+        "subcontracting_associates": {
+          "P25": 5.0,
+          "P50": 8.0,
+          "P75": 12.0,
+          "P90": 16.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Subcontracting expense % of revenue. TCS FY25 ~7.5%, Infosys ~10.5%, Wipro ~12%; spikes with demand volatility."
+        },
+        "visa_immigration": {
+          "P25": 0.3,
+          "P50": 0.7,
+          "P75": 1.2,
+          "P90": 2.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Visa filing, immigration legal, and compliance costs; H-1B/L-1 dependency raises spend (annual report visa cost disclosures)."
+        },
+        "stpi_see_compliance": {
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.6,
+          "P90": 1.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "STPI/SEZ unit compliance, softex filings, NFE reporting administration."
+        },
+        "cloud_saas_infra": {
+          "P25": 1.5,
+          "P50": 3.0,
+          "P75": 5.0,
+          "P90": 7.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Hyperscaler + SaaS tooling for internal delivery platforms; Flexera State of the Cloud 2025 waste estimates 27-32%."
+        },
+        "bench_capacity_cost": {
+          "P25": 1.0,
+          "P50": 2.5,
+          "P75": 4.5,
+          "P90": 7.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Cost of unallocated delivery capacity; utilisation (excl. trainees) 80-85% peer band implies 2-5% revenue drag."
+        },
+        "genai_tooling_platforms": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 2.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "GenAI copilot licences and platform run cost; early-adopter spend with productivity offset expectations."
+        },
+        "client_site_onsite_costs": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.5,
+          "P90": 5.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Onsite deployment premium — allowances, housing, local payroll gross-ups beyond billed rates."
+        },
+        "talent_acquisition_costs": {
+          "P25": 0.8,
+          "P50": 1.5,
+          "P75": 2.5,
+          "P90": 4.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Recruitment agencies, referral payouts, employer branding; rises with attrition and lateral mix."
+        },
+        "delivery_excellence_quality": {
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.0,
+          "P90": 1.6,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "QA/process certification (CMMI, ISO), delivery audits, and quality tooling."
         }
       }
     }

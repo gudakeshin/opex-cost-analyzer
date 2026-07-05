@@ -1,7 +1,7 @@
 {
   "sector": "gcc_capability_centers",
   "version": "1.0",
-  "vintage_date": "2025-04-01",
+  "vintage_date": "2026-05-01",
   "confidence_overall": "public_disclosure",
   "source_metadata": {
     "primary_sources": [
@@ -49,64 +49,184 @@
       "label": "Global Capability Centres (India)",
       "categories": {
         "HR": {
-          "P25": 58.0, "P50": 64.0, "P75": 70.0, "P90": 76.0,
+          "P25": 58.0,
+          "P50": 64.0,
+          "P75": 70.0,
+          "P90": 76.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Talent cost % of total GCC operating cost. WNS FY25: 61%, Genpact FY25: 60%, Firstsource FY25: 64%. Everest Group GCC survey: 60-70% range. P25 reflects best-in-class offshore talent mix with automation offsets."
         },
         "FACILITIES": {
-          "P25": 4.0, "P50": 6.5, "P75": 9.0, "P90": 12.0,
+          "P25": 4.0,
+          "P50": 6.5,
+          "P75": 9.0,
+          "P90": 12.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Rent + property costs. NASSCOM GCC 2024: India office costs ₹60-100/sqft/month. Tier-1 cities higher. WNS FY25 property costs ~5.2%, Firstsource ~7.1%."
         },
         "IT": {
-          "P25": 5.0, "P50": 7.5, "P75": 10.0, "P90": 14.0,
+          "P25": 5.0,
+          "P50": 7.5,
+          "P75": 10.0,
+          "P90": 14.0,
           "unit": "% of revenue",
           "confidence": "published_research",
           "source_note": "IT infra, software, cloud costs. Everest Group GCC 2024: Technology infrastructure 10-15% of GCC cost base. Best-in-class GCCs with shared cloud infra at 5-7%."
         },
         "TELECOM": {
-          "P25": 0.8, "P50": 1.5, "P75": 2.2, "P90": 3.0,
+          "P25": 0.8,
+          "P50": 1.5,
+          "P75": 2.2,
+          "P90": 3.0,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Connectivity and telecom costs for offshore delivery. INTERNAL_CALIBRATION — estimated from 6 India GCC engagements."
         },
         "TRAVEL": {
-          "P25": 1.0, "P50": 2.0, "P75": 3.0, "P90": 4.5,
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.0,
+          "P90": 4.5,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Travel & visa costs for GCC staff. Higher than pure IT services due to client-site travel. Genpact FY25 T&E ~2.2%, WNS ~1.8%."
         },
         "PROF_SVCS": {
-          "P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.2,
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.0,
+          "P90": 3.2,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Legal, audit, consulting. INTERNAL_CALIBRATION — estimated from GCC setup and ongoing compliance costs."
         },
         "MARKETING": {
-          "P25": 0.2, "P50": 0.5, "P75": 1.0, "P90": 1.8,
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 1.8,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Talent branding and recruitment marketing. GCCs spend less on external marketing vs product companies. INTERNAL_CALIBRATION."
         },
         "INSURANCE": {
-          "P25": 0.5, "P50": 0.9, "P75": 1.3, "P90": 1.8,
+          "P25": 0.5,
+          "P50": 0.9,
+          "P75": 1.3,
+          "P90": 1.8,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Group health, professional indemnity, D&O. INTERNAL_CALIBRATION — calibrated from India GCC benefit structures."
         },
         "CONTINGENT": {
-          "P25": 2.0, "P50": 4.0, "P75": 7.0, "P90": 11.0,
+          "P25": 2.0,
+          "P50": 4.0,
+          "P75": 7.0,
+          "P90": 11.0,
           "unit": "% of revenue",
           "confidence": "published_research",
           "source_note": "Contract/contingent workforce. NASSCOM GCC 2024: gig and contract labour rising in GCCs; 10-20% of headcount mix."
         },
         "OUTSOURCED": {
-          "P25": 3.0, "P50": 6.0, "P75": 9.0, "P90": 13.0,
+          "P25": 3.0,
+          "P50": 6.0,
+          "P75": 9.0,
+          "P90": 13.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Third-party subcontracting (overflow, niche skills). Genpact FY25 subcontractor costs ~6.1%, WNS ~5.4%."
+        },
+        "seat_based_infra": {
+          "P25": 8.0,
+          "P50": 11.0,
+          "P75": 14.0,
+          "P90": 18.0,
+          "unit": "% of total opex",
+          "confidence": "public_disclosure",
+          "source_note": "Real estate + facilities cost share of GCC opex; JLL/Zinnov seat cost benchmarks (₹1.6-2.4 lakh/seat/yr metro)."
+        },
+        "captive_talent_development": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.0,
+          "P90": 4.5,
+          "unit": "% of total opex",
+          "confidence": "internal_calibration",
+          "source_note": "L&D, certification, and global mobility development spend; NASSCOM GCC talent report 2024."
+        },
+        "parent_recharge_costs": {
+          "P25": 3.0,
+          "P50": 6.0,
+          "P75": 10.0,
+          "P90": 15.0,
+          "unit": "% of total opex",
+          "confidence": "internal_calibration",
+          "source_note": "Parent brand/IT/management recharges into the India entity; transfer-pricing documentation ranges."
+        },
+        "gcc_governance_compliance": {
+          "P25": 0.8,
+          "P50": 1.5,
+          "P75": 2.5,
+          "P90": 4.0,
+          "unit": "% of total opex",
+          "confidence": "internal_calibration",
+          "source_note": "Entity governance, statutory audit, TP documentation, STPI/SEZ compliance administration."
+        },
+        "digital_automation_ops": {
+          "P25": 1.5,
+          "P50": 3.0,
+          "P75": 5.0,
+          "P90": 7.0,
+          "unit": "% of total opex",
+          "confidence": "internal_calibration",
+          "source_note": "RPA/IDP platform licences, automation CoE run cost; Everest Group intelligent automation adoption studies."
+        },
+        "expat_global_mobility": {
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.5,
+          "P90": 4.0,
+          "unit": "% of total opex",
+          "confidence": "internal_calibration",
+          "source_note": "Expat assignment, housing, and mobility costs for parent-company secondees."
+        },
+        "quality_certifications": {
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.0,
+          "P90": 1.5,
+          "unit": "% of total opex",
+          "confidence": "internal_calibration",
+          "source_note": "SOC2, ISO 27001/9001, CMMI surveillance and recertification cycle costs."
+        },
+        "bench_management": {
+          "P25": 1.5,
+          "P50": 3.0,
+          "P75": 5.0,
+          "P90": 8.0,
+          "unit": "% of total opex",
+          "confidence": "internal_calibration",
+          "source_note": "Unallocated/bench capacity cost share; utilisation deltas vs 80-85% target."
+        },
+        "data_privacy_security": {
+          "P25": 0.8,
+          "P50": 1.5,
+          "P75": 2.5,
+          "P90": 3.5,
+          "unit": "% of total opex",
+          "confidence": "internal_calibration",
+          "source_note": "DPDP/GDPR programme, security tooling, SOC monitoring for client-data operations."
+        },
+        "parent_entity_it_license": {
+          "P25": 2.0,
+          "P50": 4.0,
+          "P75": 6.0,
+          "P90": 9.0,
+          "unit": "% of total opex",
+          "confidence": "internal_calibration",
+          "source_note": "Parent-negotiated enterprise IT licences allocated to the GCC; benchmark vs India-sourced equivalents."
         }
       }
     }

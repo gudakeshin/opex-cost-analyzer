@@ -62,5 +62,23 @@
     "target_direction": "lower",
     "p50_benchmark_days": 18,
     "source": "HUL FY25: working capital negative (strong trade credit). Dabur FY25: ~25 days. FMCG best-in-class: negative working capital due to retailer credit management."
+  },
+  {
+    "kpi_id": "trade_spend_pct",
+    "kpi_name": "Trade Spend % of Revenue",
+    "unit": "pct",
+    "formula": "trade_spend / net_revenue * 100",
+    "target_direction": "context_dependent",
+    "p50_benchmark_pct": 12.0,
+    "source": "Nielsen IQ India trade promotion studies 2024; HUL/Dabur investor disclosures on trade scheme intensity"
+  },
+  {
+    "kpi_id": "packaging_cost_pct",
+    "kpi_name": "Packaging Material Cost % of Revenue",
+    "unit": "pct",
+    "formula": "packaging_material_cost / net_revenue * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 12.0,
+    "source": "MCA21 Schedule III packing material disclosures for listed FMCG; category mix drives spread"
   }
 ]

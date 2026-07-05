@@ -1,7 +1,7 @@
 {
   "sector": "fmcg_consumer",
   "version": "1.0",
-  "vintage_date": "2025-04-01",
+  "vintage_date": "2026-05-01",
   "confidence_overall": "public_disclosure",
   "source_metadata": {
     "primary_sources": [
@@ -49,58 +49,175 @@
       "label": "FMCG & Consumer Goods (India)",
       "categories": {
         "HR": {
-          "P25": 5.0, "P50": 7.5, "P75": 10.0, "P90": 14.0,
+          "P25": 5.0,
+          "P50": 7.5,
+          "P75": 10.0,
+          "P90": 14.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Employee cost % of revenue. HUL FY25: 5.3%, Marico FY25: ~8%, Dabur FY25: 7.7%, ITC-FMCG: ~8%. Best-in-class reflects scale leverage and fixed cost absorption."
         },
         "MARKETING": {
-          "P25": 11.0, "P50": 14.5, "P75": 18.0, "P90": 24.0,
+          "P25": 11.0,
+          "P50": 14.5,
+          "P75": 18.0,
+          "P90": 24.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Advertising, promotion, trade marketing as % of revenue. HUL FY25: 14.0%, Dabur FY25: 14.0%, Marico FY25: 15.0%, ITC-FMCG: 14-16%. FICCI FMCG Survey 2024: 12-16% industry range."
         },
         "LOGISTICS_INDIA": {
-          "P25": 6.0, "P50": 9.0, "P75": 12.0, "P90": 16.0,
+          "P25": 6.0,
+          "P50": 9.0,
+          "P75": 12.0,
+          "P90": 16.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Distribution, freight, C&FA costs. HUL FY25: ~10%, Dabur FY25: ~9%, Marico FY25: ~8%. CII Logistics Report 2024: India FMCG logistics 8-12% of revenue."
         },
         "IT": {
-          "P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.0,
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.0,
+          "P90": 3.0,
           "unit": "% of revenue",
           "confidence": "published_research",
           "source_note": "Internal IT including ERP, DMS, trade analytics. Gartner Retail/CPG IT Benchmark 2024: CPG companies 1-2% of revenue on IT."
         },
         "FACILITIES": {
-          "P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5,
+          "P25": 0.3,
+          "P50": 0.8,
+          "P75": 1.5,
+          "P90": 2.5,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Corporate offices and sales offices (manufacturing facilities excluded). FMCG companies are primarily asset-light in offices. INTERNAL_CALIBRATION."
         },
         "PROF_SVCS": {
-          "P25": 0.3, "P50": 0.7, "P75": 1.2, "P90": 2.0,
+          "P25": 0.3,
+          "P50": 0.7,
+          "P75": 1.2,
+          "P90": 2.0,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Legal, audit, regulatory consulting. SEBI LODR compliance costs for listed FMCG. INTERNAL_CALIBRATION."
         },
         "PACKAGING": {
-          "P25": 8.0, "P50": 11.0, "P75": 14.0, "P90": 18.0,
+          "P25": 8.0,
+          "P50": 11.0,
+          "P75": 14.0,
+          "P90": 18.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Primary and secondary packaging material. HUL: packaging included in material costs; typically 9-12% of revenue. Dabur FY25 disclosures."
         },
         "OUTSOURCED": {
-          "P25": 2.0, "P50": 4.5, "P75": 7.0, "P90": 11.0,
+          "P25": 2.0,
+          "P50": 4.5,
+          "P75": 7.0,
+          "P90": 11.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Contract manufacturing and third-party processing. Dabur FY25: contract manufacturing disclosed. HUL: ~30% of production outsourced. Smaller FMCG companies: higher outsourcing."
         },
         "INSURANCE": {
-          "P25": 0.1, "P50": 0.3, "P75": 0.5, "P90": 0.8,
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.5,
+          "P90": 0.8,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Group health, D&O, property insurance (operations). INTERNAL_CALIBRATION."
+        },
+        "advertising_promotion": {
+          "P25": 4.0,
+          "P50": 8.0,
+          "P75": 12.0,
+          "P90": 16.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "A&P spend % of revenue. HUL FY25 ~10%, Nestlé India ~7%, Colgate ~13%, Dabur ~7%; media + consumer promotions."
+        },
+        "distribution_gt_mt": {
+          "P25": 3.0,
+          "P50": 4.5,
+          "P75": 6.0,
+          "P90": 8.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "GT/MT distribution cost incl. distributor margins support, secondary freight, and merchandising."
+        },
+        "packaging_material": {
+          "P25": 8.0,
+          "P50": 12.0,
+          "P75": 16.0,
+          "P90": 20.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Packing material consumed per Schedule III; laminates/rigid mix and premiumisation drive spread."
+        },
+        "fssai_regulatory": {
+          "P25": 0.1,
+          "P50": 0.25,
+          "P75": 0.5,
+          "P90": 0.9,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "FSSAI licensing, lab testing, labelling compliance, and recall readiness costs."
+        },
+        "cold_chain_fmcg": {
+          "P25": 0.5,
+          "P50": 1.5,
+          "P75": 3.0,
+          "P90": 5.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Cold chain storage & reefer transport for dairy/frozen/beverages portfolios where applicable."
+        },
+        "trade_spend_terms": {
+          "P25": 8.0,
+          "P50": 12.0,
+          "P75": 17.0,
+          "P90": 22.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Trade schemes, channel margins over base, display/listing fees; GT vs MT vs e-comm mix dependent."
+        },
+        "field_sales_operations": {
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.0,
+          "P90": 7.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Field force salaries, incentives, beat travel, and SFA tooling; DSR density per lakh outlets."
+        },
+        "ecommerce_qcommerce_costs": {
+          "P25": 1.0,
+          "P50": 2.5,
+          "P75": 5.0,
+          "P90": 8.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Marketplace commissions, quick-commerce listing/ads, and dedicated fulfilment for digital channels."
+        },
+        "rnd_product_development": {
+          "P25": 0.3,
+          "P50": 0.7,
+          "P75": 1.2,
+          "P90": 2.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "R&D revenue expenditure per annual report disclosures; renovation-heavy portfolios at upper band."
+        },
+        "warehousing_cfa_costs": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.0,
+          "P90": 4.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "C&F agent commissions and warehousing; consolidation post-GST reduced depot count 30-40%."
         }
       }
     }

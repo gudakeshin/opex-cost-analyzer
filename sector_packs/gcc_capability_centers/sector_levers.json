@@ -300,7 +300,8 @@
       "lever_name": "Multi-Process Shared Services Consolidation",
       "description": "Consolidate fragmented support functions into the GCC's shared-services towers with standardised processes and unit-rate charging.",
       "category_ids": [
-        "gcc_governance_compliance"
+        "gcc_governance_compliance",
+        "quality_certifications"
       ],
       "p10_pct": 12.0,
       "p50_pct": 20.0,
@@ -436,7 +437,8 @@
       "lever_name": "Employee Perks & Benefits Rationalisation",
       "description": "Rationalise benefits portfolio against utilisation data — transport, cafeteria, insurance top-ups — while protecting high-value retention perks.",
       "category_ids": [
-        "hr"
+        "hr",
+        "expat_global_mobility"
       ],
       "p10_pct": 5.0,
       "p50_pct": 12.0,
@@ -554,7 +556,8 @@
       "description": "Discover and eliminate shadow SaaS via SSO/CASB telemetry; consolidate duplicative tools into the sanctioned stack.",
       "category_ids": [
         "digital_automation_ops",
-        "parent_entity_it_license"
+        "parent_entity_it_license",
+        "data_privacy_security"
       ],
       "p10_pct": 10.0,
       "p50_pct": 18.0,

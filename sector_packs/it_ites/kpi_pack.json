@@ -75,5 +75,23 @@
     "p50_benchmark_pct": 6.5,
     "p75_benchmark_pct": 9.0,
     "source": "Derived from annual reports: TCS SG&A ~4.5%, Infosys ~6.0%, HCL ~6.8%, Wipro ~8.2%. NASSCOM: mid-tier firms 8-12%."
+  },
+  {
+    "kpi_id": "offshore_leverage_pct",
+    "kpi_name": "Offshore Effort Leverage",
+    "unit": "pct",
+    "formula": "offshore_effort_hours / total_effort_hours * 100",
+    "target_direction": "higher",
+    "p50_benchmark_pct": 75.0,
+    "source": "TCS/Infosys/HCL FY25 factsheets — offshore effort mix 74-78% for tier-1 Indian IT"
+  },
+  {
+    "kpi_id": "fresher_mix_pct",
+    "kpi_name": "Fresher / Trainee Mix in Delivery Pyramid",
+    "unit": "pct",
+    "formula": "fresher_headcount / delivery_headcount * 100",
+    "target_direction": "context_dependent",
+    "p50_benchmark_pct": 28.0,
+    "source": "NASSCOM Strategic Review 2024 — entry-level hiring share of delivery workforce"
   }
 ]

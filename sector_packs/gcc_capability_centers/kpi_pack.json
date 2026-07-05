@@ -69,5 +69,27 @@
     "target_direction": "lower",
     "p50_benchmark_lakh": 1.8,
     "source": "Everest Group GCC 2024: Technology infrastructure 10-15% of GCC cost base divided by FTE count. Best-in-class: ₹1.2-1.5L/FTE with shared cloud platform."
+  },
+  {
+    "kpi_id": "total_cost_per_fte",
+    "kpi_name": "Total Operating Cost per FTE",
+    "unit": "inr_lakh",
+    "formula": "total_opex / fte_count",
+    "target_direction": "lower",
+    "p25_benchmark_pct": 22.0,
+    "p50_benchmark_pct": 28.0,
+    "p75_benchmark_pct": 35.0,
+    "source": "NASSCOM GCC India Landscape 2024 + Zinnov GCC cost benchmarks; blended tech/ops GCC cost per FTE"
+  },
+  {
+    "kpi_id": "seat_sharing_ratio",
+    "kpi_name": "Seat Sharing Ratio (FTE per Seat)",
+    "unit": "ratio",
+    "formula": "fte_count / physical_seats",
+    "target_direction": "higher",
+    "p25_benchmark_pct": 1.1,
+    "p50_benchmark_pct": 1.4,
+    "p75_benchmark_pct": 1.7,
+    "source": "JLL India flex-workspace benchmarks 2024; hybrid-era GCC seat utilisation studies"
   }
 ]
