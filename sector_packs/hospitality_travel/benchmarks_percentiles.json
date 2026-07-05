@@ -1,7 +1,7 @@
 {
   "sector": "hospitality_travel",
   "version": "1.0",
-  "vintage_date": "2025-04-01",
+  "vintage_date": "2026-05-01",
   "confidence_overall": "public_disclosure",
   "source_metadata": {
     "primary_sources": [
@@ -49,52 +49,166 @@
       "label": "Hospitality & Travel (Hotels, QSR — India)",
       "categories": {
         "HR": {
-          "P25": 24.0, "P50": 28.0, "P75": 33.0, "P90": 40.0,
+          "P25": 24.0,
+          "P50": 28.0,
+          "P75": 33.0,
+          "P90": 40.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Employee costs % of revenue. IHCL FY25: 26.4%, Lemon Tree FY25: ~28%, EIH FY25: ~28%. FHRAI Survey 2024: luxury 24-28%, economy 30-40%."
         },
         "POWER_ENERGY": {
-          "P25": 8.0, "P50": 11.5, "P75": 15.0, "P90": 19.0,
+          "P25": 8.0,
+          "P50": 11.5,
+          "P75": 15.0,
+          "P90": 19.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Energy and utilities (electricity, gas, water). IHCL FY25: ~12%, Lemon Tree: ~12%, EIH: ~10%. FHRAI: 10-14% industry range. Energy is second-largest variable cost after labour."
         },
         "OUTSOURCED": {
-          "P25": 10.0, "P50": 16.0, "P75": 22.0, "P90": 28.0,
+          "P25": 10.0,
+          "P50": 16.0,
+          "P75": 22.0,
+          "P90": 28.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Food & beverage and housekeeping supplies (F&B is major variable cost). IHCL FY25 F&B costs: ~18%, Lemon Tree: ~15%. Note: F&B cost is distinct from F&B revenue."
         },
         "FACILITIES": {
-          "P25": 5.0, "P50": 8.0, "P75": 12.0, "P90": 18.0,
+          "P25": 5.0,
+          "P50": 8.0,
+          "P75": 12.0,
+          "P90": 18.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Rent, lease, occupancy (Ind AS 116 adjusted). IHCL FY25 rent: ~7%, Lemon Tree: ~10% (sale-leaseback properties). Owned properties: 4-6%, leased: 10-18%."
         },
         "MARKETING": {
-          "P25": 3.0, "P50": 5.0, "P75": 7.5, "P90": 11.0,
+          "P25": 3.0,
+          "P50": 5.0,
+          "P75": 7.5,
+          "P90": 11.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Sales, marketing, OTA commissions, loyalty programme. IHCL: ~5% (includes OTA fees). FHRAI: OTA commissions 12-18% of OTA-sourced revenue; blended 4-8%."
         },
         "PLANT_MAINTENANCE": {
-          "P25": 1.5, "P50": 2.5, "P75": 3.8, "P90": 5.5,
+          "P25": 1.5,
+          "P50": 2.5,
+          "P75": 3.8,
+          "P90": 5.5,
           "unit": "% of revenue",
           "confidence": "published_research",
           "source_note": "Repairs, maintenance, refurbishment. FHRAI: hotels spend 2-4% of revenue on maintenance to maintain brand standards. Ageing properties higher."
         },
         "IT": {
-          "P25": 0.8, "P50": 1.5, "P75": 2.5, "P90": 4.0,
+          "P25": 0.8,
+          "P50": 1.5,
+          "P75": 2.5,
+          "P90": 4.0,
           "unit": "% of revenue",
           "confidence": "published_research",
           "source_note": "PMS, CRS, revenue management systems. Gartner Hospitality IT 2024: luxury hotels 1.5-2.5% of revenue, economy 0.5-1%."
         },
         "INSURANCE": {
-          "P25": 0.3, "P50": 0.6, "P75": 1.0, "P90": 1.5,
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.0,
+          "P90": 1.5,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Property, liability, event cancellation insurance. INTERNAL_CALIBRATION."
+        },
+        "fb_cost_of_sales": {
+          "P25": 28.0,
+          "P50": 33.0,
+          "P75": 38.0,
+          "P90": 44.0,
+          "unit": "% of F&B revenue",
+          "confidence": "public_disclosure",
+          "source_note": "F&B cost of sales; HVS/FHRAI norms — banquets-heavy properties at lower band."
+        },
+        "utilities_energy": {
+          "P25": 4.0,
+          "P50": 6.0,
+          "P75": 8.0,
+          "P90": 11.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Hotel energy & utilities; HVS India 5-8% of revenue, higher for older assets."
+        },
+        "property_occupancy": {
+          "P25": 3.0,
+          "P50": 6.0,
+          "P75": 10.0,
+          "P90": 15.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Lease/license fees for leased assets or ground rent; owned assets at lower band."
+        },
+        "guest_amenities": {
+          "P25": 0.8,
+          "P50": 1.5,
+          "P75": 2.5,
+          "P90": 3.8,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Guest supplies, amenities, and loyalty programme redemption costs."
+        },
+        "ota_commission": {
+          "P25": 3.0,
+          "P50": 6.0,
+          "P75": 10.0,
+          "P90": 15.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "OTA commissions on room revenue at 15-25% take rate scaled by OTA channel mix."
+        },
+        "housekeeping_laundry": {
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.0,
+          "P90": 7.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Housekeeping manpower and laundry (in-house or outsourced per-kg contracts)."
+        },
+        "franchise_management_fees": {
+          "P25": 2.0,
+          "P50": 4.0,
+          "P75": 6.5,
+          "P90": 9.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Brand/management fees (base + incentive) for franchised and managed properties."
+        },
+        "banquets_events_ops": {
+          "P25": 1.5,
+          "P50": 3.0,
+          "P75": 5.0,
+          "P90": 7.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Banquet operations, event staging, and outsourced event services."
+        },
+        "guest_technology": {
+          "P25": 0.8,
+          "P50": 1.5,
+          "P75": 2.5,
+          "P90": 4.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "PMS, POS, guest Wi-Fi, keyless entry, and CRS/channel manager platforms."
+        },
+        "travel_distribution_gds": {
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.5,
+          "P90": 4.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "GDS fees, channel manager costs, and TMC distribution for corporate bookings."
         }
       }
     }

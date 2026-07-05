@@ -8,7 +8,8 @@
       "lever_name": "Energy Management & Renewable Transition",
       "description": "Deploy Building Management System (BMS) for HVAC, lighting, chilling optimisation. Install rooftop solar; switch to LED throughout property.",
       "category_ids": [
-        "POWER_ENERGY"
+        "POWER_ENERGY",
+        "utilities_energy"
       ],
       "p10_pct": 12.0,
       "p50_pct": 20.0,
@@ -47,7 +48,8 @@
       "lever_name": "F&B Cost Control & Menu Engineering",
       "description": "Rationalise menu to highest-margin items; implement recipe control and wastage tracking; renegotiate F&B supplier contracts; reduce food wastage via predictive ordering.",
       "category_ids": [
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "fb_cost_of_sales"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -66,7 +68,8 @@
       "lever_name": "Workforce Optimisation & Cross-Training",
       "description": "Multi-skill housekeeping and F&B staff to enable flexible deployment across functions. Reduce casual labour dependency; implement productivity-linked incentives.",
       "category_ids": [
-        "HR"
+        "HR",
+        "banquets_events_ops"
       ],
       "p10_pct": 6.0,
       "p50_pct": 12.0,
@@ -104,7 +107,8 @@
       "lever_name": "Property Management System (PMS) & Tech Stack Modernisation",
       "description": "Replace legacy PMS with cloud-native system integrating front desk, POS, channel manager, revenue management, and loyalty in a single platform.",
       "category_ids": [
-        "IT"
+        "IT",
+        "guest_technology"
       ],
       "p10_pct": 10.0,
       "p50_pct": 18.0,
@@ -124,7 +128,8 @@
       "description": "Centralise hotel procurement across properties for F&B, housekeeping, linen, amenities. Standardise specifications to achieve volume discounts.",
       "category_ids": [
         "OUTSOURCED",
-        "PLANT_MAINTENANCE"
+        "PLANT_MAINTENANCE",
+        "guest_amenities"
       ],
       "p10_pct": 6.0,
       "p50_pct": 12.0,
@@ -143,7 +148,9 @@
       "lever_name": "Hotel Lease & Occupancy Cost Optimisation",
       "description": "Renegotiate lease terms at renewal; optimise sale-leaseback structures; consolidate co-located back-office facilities.",
       "category_ids": [
-        "FACILITIES"
+        "FACILITIES",
+        "property_occupancy",
+        "franchise_management_fees"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -181,7 +188,9 @@
       "lever_name": "OTA Commission Reduction (Direct Booking Channel Mix Shift)",
       "description": "Shift booking mix toward direct channels via rate parity discipline, loyalty-exclusive pricing, and metasearch investment to cut OTA commissions.",
       "category_ids": [
-        "MARKETING"
+        "MARKETING",
+        "ota_commission",
+        "travel_distribution_gds"
       ],
       "p10_pct": 12.0,
       "p50_pct": 22.0,
@@ -200,7 +209,8 @@
       "lever_name": "Food & Beverage Procurement Optimisation (Menu Engineering & Waste Reduction)",
       "description": "Consolidate F&B vendors, implement seasonal menu engineering, and enforce yield/portioning standards to cut food cost percentage.",
       "category_ids": [
-        "LOGISTICS"
+        "LOGISTICS",
+        "fb_cost_of_sales"
       ],
       "p10_pct": 8.0,
       "p50_pct": 14.0,
@@ -219,7 +229,8 @@
       "lever_name": "Energy Cost per Key Reduction (Smart Room Energy Management & HVAC Optimisation)",
       "description": "Cut energy cost per occupied room via BMS-driven HVAC scheduling, heat-pump retrofits, and kitchen/laundry equipment upgrades.",
       "category_ids": [
-        "POWER_ENERGY"
+        "POWER_ENERGY",
+        "utilities_energy"
       ],
       "p10_pct": 12.0,
       "p50_pct": 20.0,
@@ -238,7 +249,8 @@
       "lever_name": "Housekeeping Labour & Chemical Cost Optimisation",
       "description": "Re-engineer housekeeping standards with workload-based staffing, task bundling, and outsourced deep-clean cycles to cut cost per occupied room.",
       "category_ids": [
-        "HR"
+        "HR",
+        "housekeeping_laundry"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -256,7 +268,8 @@
       "lever_name": "Revenue Management & Dynamic Pricing Optimisation",
       "description": "Deploy dynamic pricing and channel-mix revenue management to lift RevPAR while trimming distribution and manual pricing effort.",
       "category_ids": [
-        "IT"
+        "IT",
+        "ota_commission"
       ],
       "p10_pct": 4.0,
       "p50_pct": 9.0,

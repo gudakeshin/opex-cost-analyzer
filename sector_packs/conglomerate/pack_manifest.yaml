@@ -1,9 +1,13 @@
 pack_id: conglomerate
 sector: Indian Business Conglomerate (Multi-Sector)
-version: "0.1"
+version: "1.0"
 schema_version: "1"
-status: scaffold
-description: Scaffold for multi-sector Indian conglomerates. Handles intercompany elimination and group shared-services allocation. Full content deferred.
+status: full
+description: >
+  Full sector pack for multi-sector Indian conglomerates and holding
+  companies. Covers group shared services, intercompany pricing and brand
+  royalties, holding-company overhead, group treasury and insurance
+  programmes, and portfolio rationalisation levers.
 applicable_entity_types: [diversified_conglomerate, family_owned_group, holding_company]
 regulatory_bodies: [SEBI, MCA21, CCI, RBI_if_nbfc, sectoral_regulators]
 fiscal_year_end: "March 31"

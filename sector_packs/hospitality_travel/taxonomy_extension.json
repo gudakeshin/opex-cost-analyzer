@@ -1,14 +1,70 @@
 {
   "base_taxonomy_version": "1.0",
   "additional_categories": [
-    {"category_id": "fb_cost_of_sales", "category_name": "Food & Beverage Cost of Sales", "gl_prefix": "FBC"},
-    {"category_id": "utilities_energy", "category_name": "Utilities, Energy & Water", "gl_prefix": "UTL"},
-    {"category_id": "property_occupancy", "category_name": "Property Rent, CAM & Lease Costs", "gl_prefix": "OCC"},
-    {"category_id": "guest_amenities", "category_name": "Guest Amenities & Housekeeping Supplies", "gl_prefix": "AMN"},
-    {"category_id": "ota_commission", "category_name": "OTA & Distribution Commission", "gl_prefix": "OTA"}
+    {
+      "category_id": "fb_cost_of_sales",
+      "category_name": "Food & Beverage Cost of Sales",
+      "gl_prefix": "FBC"
+    },
+    {
+      "category_id": "utilities_energy",
+      "category_name": "Utilities, Energy & Water",
+      "gl_prefix": "UTL"
+    },
+    {
+      "category_id": "property_occupancy",
+      "category_name": "Property Rent, CAM & Lease Costs",
+      "gl_prefix": "OCC"
+    },
+    {
+      "category_id": "guest_amenities",
+      "category_name": "Guest Amenities & Housekeeping Supplies",
+      "gl_prefix": "AMN"
+    },
+    {
+      "category_id": "ota_commission",
+      "category_name": "OTA & Distribution Commission",
+      "gl_prefix": "OTA"
+    },
+    {
+      "category_id": "housekeeping_laundry",
+      "category_name": "Housekeeping & Laundry Operations",
+      "gl_prefix": "HKL",
+      "cost_nature": "operations"
+    },
+    {
+      "category_id": "franchise_management_fees",
+      "category_name": "Franchise, Management & Brand Fees",
+      "gl_prefix": "FMF",
+      "cost_nature": "commercial"
+    },
+    {
+      "category_id": "banquets_events_ops",
+      "category_name": "Banquets & Events Operations",
+      "gl_prefix": "BEO",
+      "cost_nature": "operations"
+    },
+    {
+      "category_id": "guest_technology",
+      "category_name": "Guest Technology & PMS Platforms",
+      "gl_prefix": "GTP",
+      "cost_nature": "technology"
+    },
+    {
+      "category_id": "travel_distribution_gds",
+      "category_name": "Travel Distribution & GDS Costs",
+      "gl_prefix": "GDS",
+      "cost_nature": "commercial"
+    }
   ],
   "overrides": [
-    {"category_id": "hr", "category_name": "Employee Costs (front office, F&B, housekeeping)"},
-    {"category_id": "travel", "category_name": "Corporate Travel & Sales Visits"}
+    {
+      "category_id": "hr",
+      "category_name": "Employee Costs (front office, F&B, housekeeping)"
+    },
+    {
+      "category_id": "travel",
+      "category_name": "Corporate Travel & Sales Visits"
+    }
   ]
 }

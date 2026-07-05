@@ -1,10 +1,13 @@
 pack_id: hospitality_travel
 sector: Hospitality & Travel
-version: '0.1'
+version: '1.0'
 schema_version: '1.0'
-status: scaffold
-description: Hotel chains, OTAs, airline catering, travel management companies, QSR
-  chains.
+status: full
+description: >
+  Full sector pack for Indian hotel chains, OTAs, QSR chains, and travel
+  management companies. Covers F&B cost of sales, energy per key, OTA and
+  GDS distribution costs, housekeeping and staffing ratios, franchise and
+  brand fees, and revenue-management levers.
 applicable_entity_types:
 - Hotel_Chain
 - OTA

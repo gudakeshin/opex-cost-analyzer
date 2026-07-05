@@ -62,5 +62,23 @@
     "target_direction": "lower",
     "p50_benchmark_pct": 28.0,
     "source": "FHRAI Survey 2024: F&B cost ratio 25-32% of F&B revenue for Indian hotels. Luxury: 28-32%, midscale: 25-28%."
+  },
+  {
+    "kpi_id": "ota_commission_pct",
+    "kpi_name": "OTA Commission % of Room Revenue",
+    "unit": "pct",
+    "formula": "ota_commissions / room_revenue * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 12.0,
+    "source": "FHRAI distribution cost studies; OTA take rates 15-25% moderated by direct mix"
+  },
+  {
+    "kpi_id": "staff_to_room_ratio",
+    "kpi_name": "Staff per Occupied Room",
+    "unit": "ratio",
+    "formula": "total_staff / occupied_rooms",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 1.6,
+    "source": "HVS India hotel operations benchmarks 2024; luxury 2.0+, midscale 1.2-1.5"
   }
 ]

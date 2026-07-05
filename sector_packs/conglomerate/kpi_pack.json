@@ -54,5 +54,23 @@
     "target_direction": "context_dependent",
     "p50_benchmark_pct": 2.0,
     "source": "Companies Act Section 135: mandatory 2% of average net profit. M&M FY25: ₹1,800 Cr CSR. SEBI BRSR Core: mandatory assurance of CSR disclosures for top-1000 listed entities."
+  },
+  {
+    "kpi_id": "shared_services_penetration_pct",
+    "kpi_name": "Shared Services Penetration",
+    "unit": "pct",
+    "formula": "transactions_via_ssc / total_transactions * 100",
+    "target_direction": "higher",
+    "p50_benchmark_pct": 55.0,
+    "source": "SSON India shared services benchmarks 2024; F&A/HR transactional coverage"
+  },
+  {
+    "kpi_id": "brand_royalty_pct",
+    "kpi_name": "Brand Royalty % of Revenue",
+    "unit": "pct",
+    "formula": "brand_royalty_paid / revenue * 100",
+    "target_direction": "context_dependent",
+    "p50_benchmark_pct": 0.25,
+    "source": "Tata Sons/Godrej brand fee disclosures in related-party transaction notes (0.1-0.5%)"
   }
 ]

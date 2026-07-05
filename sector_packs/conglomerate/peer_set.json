@@ -2,15 +2,88 @@
   "sector": "conglomerate",
   "currency": "INR",
   "peers": [
-    {"name": "Tata Group (consolidated, proxy: TCS revenue)", "ticker": "TCS.NS", "exchange": "NSE", "group_revenue_cr": 1400000},
-    {"name": "Reliance Industries", "ticker": "RELIANCE.NS", "exchange": "NSE", "group_revenue_cr": 900000},
-    {"name": "Adani Group (proxy: Adani Enterprises)", "ticker": "ADANIENT.NS", "exchange": "NSE", "group_revenue_cr": 300000},
-    {"name": "Mahindra Group (proxy: M&M)", "ticker": "M&M.NS", "exchange": "NSE", "group_revenue_cr": 200000},
-    {"name": "Aditya Birla Group (proxy: Hindalco)", "ticker": "HINDALCO.NS", "exchange": "NSE", "group_revenue_cr": 250000}
+    {
+      "name": "Tata Group (consolidated, proxy: TCS revenue)",
+      "ticker": "TCS.NS",
+      "exchange": "NSE",
+      "group_revenue_cr": 1400000,
+      "entity_type": "diversified_conglomerate"
+    },
+    {
+      "name": "Reliance Industries",
+      "ticker": "RELIANCE.NS",
+      "exchange": "NSE",
+      "group_revenue_cr": 900000,
+      "entity_type": "diversified_conglomerate"
+    },
+    {
+      "name": "Adani Group (proxy: Adani Enterprises)",
+      "ticker": "ADANIENT.NS",
+      "exchange": "NSE",
+      "group_revenue_cr": 300000,
+      "entity_type": "diversified_conglomerate"
+    },
+    {
+      "name": "Mahindra Group (proxy: M&M)",
+      "ticker": "M&M.NS",
+      "exchange": "NSE",
+      "group_revenue_cr": 200000,
+      "entity_type": "diversified_conglomerate"
+    },
+    {
+      "name": "Aditya Birla Group (proxy: Hindalco)",
+      "ticker": "HINDALCO.NS",
+      "exchange": "NSE",
+      "group_revenue_cr": 250000,
+      "entity_type": "diversified_conglomerate"
+    },
+    {
+      "name": "Larsen & Toubro",
+      "ticker": "LT.NS",
+      "exchange": "NSE",
+      "entity_type": "diversified_conglomerate",
+      "group_revenue_cr": 221000
+    },
+    {
+      "name": "ITC Ltd",
+      "ticker": "ITC.NS",
+      "exchange": "NSE",
+      "entity_type": "diversified_conglomerate",
+      "group_revenue_cr": 70000
+    },
+    {
+      "name": "Godrej Industries",
+      "ticker": "GODREJIND.NS",
+      "exchange": "NSE",
+      "entity_type": "family_owned_group",
+      "group_revenue_cr": 16000
+    },
+    {
+      "name": "Vedanta",
+      "ticker": "VEDL.NS",
+      "exchange": "NSE",
+      "entity_type": "holding_company",
+      "group_revenue_cr": 141000
+    },
+    {
+      "name": "Grasim Industries (AB Group holding)",
+      "ticker": "GRASIM.NS",
+      "exchange": "NSE",
+      "entity_type": "holding_company",
+      "group_revenue_cr": 130000
+    }
   ],
   "benchmark_metrics": {
-    "shared_services_to_group_opex_pct": {"p25": 3.0, "p50": 5.5, "p75": 9.0},
-    "holding_overhead_to_group_revenue_pct": {"p25": 0.3, "p50": 0.6, "p75": 1.2}
+    "shared_services_to_group_opex_pct": {
+      "p25": 3.0,
+      "p50": 5.5,
+      "p75": 9.0
+    },
+    "holding_overhead_to_group_revenue_pct": {
+      "p25": 0.3,
+      "p50": 0.6,
+      "p75": 1.2
+    }
   },
   "data_source": "BSE annual reports FY25 (group consolidated)",
   "refresh_date": "2026-04-01"

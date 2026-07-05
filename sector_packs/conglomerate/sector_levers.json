@@ -10,7 +10,8 @@
       "category_ids": [
         "HR",
         "IT",
-        "PROF_SVCS"
+        "PROF_SVCS",
+        "group_shared_services"
       ],
       "p10_pct": 12.0,
       "p50_pct": 22.0,
@@ -110,7 +111,8 @@
       "lever_name": "Group-Wide Digital Platform & IT Rationalisation",
       "description": "Consolidate ERP, HR, finance, and supply chain IT systems on group-wide platforms. Eliminate redundant SaaS subscriptions across entities. Migrate to group cloud agreement.",
       "category_ids": [
-        "IT"
+        "IT",
+        "group_digital_platforms"
       ],
       "p10_pct": 10.0,
       "p50_pct": 18.0,
@@ -169,7 +171,8 @@
       "description": "Consolidate finance, HR, and procurement transactional work from group companies into a shared services centre with unit-cost SLAs.",
       "category_ids": [
         "PROF_SERVICES",
-        "HR"
+        "HR",
+        "group_shared_services"
       ],
       "p10_pct": 25.0,
       "p50_pct": 38.0,
@@ -189,7 +192,8 @@
       "description": "Aggregate common indirect categories across group companies into master agreements with group-level pricing and compliance tracking.",
       "category_ids": [
         "PROF_SERVICES",
-        "OFFICE"
+        "OFFICE",
+        "corporate_aviation_travel"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -209,7 +213,8 @@
       "description": "Right-size corporate centre spans, delayer management, and rebase central function budgets against benchmarked cost-to-revenue ratios.",
       "category_ids": [
         "PROF_SERVICES",
-        "HR"
+        "HR",
+        "holding_co_overhead"
       ],
       "p10_pct": 12.0,
       "p50_pct": 22.0,
@@ -228,7 +233,8 @@
       "lever_name": "Portfolio Rationalisation (Non-Core Divestiture)",
       "description": "Exit or divest sub-scale business lines and merge overlapping legal entities to eliminate stranded overhead and compliance cost.",
       "category_ids": [
-        "PROF_SERVICES"
+        "PROF_SERVICES",
+        "listed_entity_compliance"
       ],
       "p10_pct": 10.0,
       "p50_pct": 22.0,
@@ -246,7 +252,8 @@
       "lever_name": "Group Insurance Pooling & Captive Programme",
       "description": "Pool group companies' insurance programmes into master policies with captive/retention analysis to cut total premium spend.",
       "category_ids": [
-        "INSURANCE"
+        "INSURANCE",
+        "group_insurance_programs"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -265,7 +272,10 @@
       "description": "Rebase intercompany service charges and royalties on benchmarked arm's-length rates with documented cost-allocation keys.",
       "category_ids": [
         "FIN_SVCS",
-        "PROF_SERVICES"
+        "PROF_SERVICES",
+        "intercompany_eliminations",
+        "related_party_transactions",
+        "group_brand_royalty"
       ],
       "p10_pct": 1.0,
       "p50_pct": 3.0,
@@ -303,7 +313,8 @@
       "lever_name": "Group Treasury Cash Pooling & Netting",
       "description": "Centralise treasury with intercompany netting, cash pooling, and consolidated banking mandates to cut financing and bank fees.",
       "category_ids": [
-        "FIN_SVCS"
+        "FIN_SVCS",
+        "group_treasury_funding"
       ],
       "p10_pct": 0.8,
       "p50_pct": 2.0,

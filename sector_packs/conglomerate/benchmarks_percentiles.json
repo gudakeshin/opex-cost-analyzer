@@ -1,7 +1,7 @@
 {
   "sector": "conglomerate",
   "version": "1.0",
-  "vintage_date": "2025-04-01",
+  "vintage_date": "2026-05-01",
   "confidence_overall": "public_disclosure",
   "source_metadata": {
     "primary_sources": [
@@ -42,52 +42,166 @@
       "label": "Conglomerates (India — Diversified)",
       "categories": {
         "HR": {
-          "P25": 8.0, "P50": 13.0, "P75": 20.0, "P90": 30.0,
+          "P25": 8.0,
+          "P50": 13.0,
+          "P75": 20.0,
+          "P90": 30.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Consolidated employee cost % of revenue. M&M FY25: 11.6%, Reliance FY25: ~3-4% (O2C-heavy lowers ratio), Aditya Birla Group: 8-15% depending on segment mix. Range reflects business mix: O2C/commodities lowers ratio, services/tech raises it."
         },
         "OUTSOURCED": {
-          "P25": 30.0, "P50": 45.0, "P75": 60.0, "P90": 72.0,
+          "P25": 30.0,
+          "P50": 45.0,
+          "P75": 60.0,
+          "P90": 72.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Material, manufacturing, and outsourced services combined. M&M FY25: material + manufacturing ~65%. Commodity-heavy conglomerates (Hindalco): material 50-70%. Services-heavy: lower."
         },
         "IT": {
-          "P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.5,
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.0,
+          "P90": 3.5,
           "unit": "% of revenue",
           "confidence": "published_research",
           "source_note": "Consolidated IT. Conglomerates with IT subsidiaries (Mahindra with Tech Mahindra) show higher ratios. Commodity-heavy: 0.5-1%. Diversified-services: 1.5-3%. Gartner CPG/Industrial IT 2024."
         },
         "MARKETING": {
-          "P25": 2.0, "P50": 4.0, "P75": 7.0, "P90": 12.0,
+          "P25": 2.0,
+          "P50": 4.0,
+          "P75": 7.0,
+          "P90": 12.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "S&M across segments (weighted average). Consumer-facing segments (Reliance Retail, Aditya Birla Fashion): 5-10%. B2B/commodity segments: 0.5-2%."
         },
         "FACILITIES": {
-          "P25": 0.5, "P50": 1.2, "P75": 2.5, "P90": 4.5,
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.5,
+          "P90": 4.5,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Group corporate HQ and business services overhead. INTERNAL_CALIBRATION — conglomerate HQ overhead typically 0.5-1.5% of group revenue."
         },
         "POWER_ENERGY": {
-          "P25": 2.0, "P50": 4.5, "P75": 8.0, "P90": 14.0,
+          "P25": 2.0,
+          "P50": 4.5,
+          "P75": 8.0,
+          "P90": 14.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Energy costs across manufacturing operations. Energy-intensive conglomerates (Hindalco aluminium, UltraTech cement): 10-15%. Diversified: 3-6%. M&M FY25: ~3%."
         },
         "PROF_SVCS": {
-          "P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5,
+          "P25": 0.3,
+          "P50": 0.8,
+          "P75": 1.5,
+          "P90": 2.5,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Group-level legal, audit, governance. SEBI LODR + BRSR Core compliance costs for top-1000 listed entities. INTERNAL_CALIBRATION."
         },
         "BRSR_ESG": {
-          "P25": 0.1, "P50": 0.3, "P75": 0.6, "P90": 1.2,
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.6,
+          "P90": 1.2,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "CSR (2% of PAT mandatory) + ESG assurance costs. M&M FY25: CSR spend ₹1,800 Cr. SEBI BRSR Core mandates third-party assurance for top-1000. Conglomerate scale means significant absolute CSR."
+        },
+        "group_shared_services": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.5,
+          "P90": 5.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Group SSC operating cost for F&A, HR, procurement transactional services."
+        },
+        "intercompany_eliminations": {
+          "P25": 2.0,
+          "P50": 5.0,
+          "P75": 10.0,
+          "P90": 18.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Gross intercompany trading eliminated on consolidation; governance of transfer terms."
+        },
+        "holding_co_overhead": {
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 2.0,
+          "P90": 3.5,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Holding company corporate centre cost; ~0.5-1.5% for benchmark conglomerates."
+        },
+        "related_party_transactions": {
+          "P25": 1.0,
+          "P50": 3.0,
+          "P75": 7.0,
+          "P90": 12.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "RPT volume per SEBI LODR disclosures; arm's-length pricing audit scope."
+        },
+        "group_treasury_funding": {
+          "P25": 0.3,
+          "P50": 0.7,
+          "P75": 1.3,
+          "P90": 2.2,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Treasury operations, guarantee fees, and inter-corporate deposit administration."
+        },
+        "group_brand_royalty": {
+          "P25": 0.1,
+          "P50": 0.25,
+          "P75": 0.5,
+          "P90": 0.8,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Brand royalty paid to group holding entity per RPT notes (Tata ~0.25%, Godrej ~0.5%)."
+        },
+        "group_digital_platforms": {
+          "P25": 0.8,
+          "P50": 1.5,
+          "P75": 2.8,
+          "P90": 4.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Group-wide ERP, cybersecurity, and digital platform investments allocated to entities."
+        },
+        "listed_entity_compliance": {
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.6,
+          "P90": 1.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Multiple listed entity secretarial, LODR compliance, and board governance costs."
+        },
+        "group_insurance_programs": {
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.1,
+          "P90": 1.8,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Group master policies — property, liability, D&O, marine — across entities."
+        },
+        "corporate_aviation_travel": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 1.8,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Corporate aircraft operations and group senior-management travel programmes."
         }
       }
     }
