@@ -37,7 +37,7 @@ import time
 import typing
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Sequence
 
 from app.config import ENGAGEMENTS_DIR, logger
 from app.models import NormalizedSpendLine
@@ -538,7 +538,7 @@ class SpendStore:
             import pyarrow as pa
             import pyarrow.parquet as pq
 
-            columns = {name: [] for name in result.columns}
+            columns: Dict[str, List[Any]] = {name: [] for name in result.columns}
             for row in result.rows:
                 for i, name in enumerate(result.columns):
                     columns[name].append(row[i])

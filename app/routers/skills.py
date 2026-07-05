@@ -6,7 +6,6 @@ from typing import Any, Dict, List
 
 from fastapi import APIRouter, HTTPException
 
-from app.config import ROOT_DIR
 from app.opar.plan import get_skill_dep_map
 from app.schemas import SkillCreateRequest, SkillDiscoverRequest, SkillEditRequest, SkillStructuredCreateRequest
 from app.services.compliance import append_audit_event

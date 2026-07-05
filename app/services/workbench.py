@@ -358,7 +358,7 @@ def promote_run_initiatives(run_id: str) -> Dict[str, Any]:
 
         if not _positive_savings(candidate):
             continue
-        session_id = run.get("session_id")
+        session_id = run["session_id"]
         engagement_id = _resolve_engagement_id(session_id, run.get("engagement_id"))
         payload = {
             "session_id": session_id,

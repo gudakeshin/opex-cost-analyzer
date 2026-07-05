@@ -25,6 +25,7 @@ import re
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List
 
+from app.services.cache import MID_CAP_LIMIT
 from app.skills.engine.evidence import evidence_gatherer
 from app.models import NormalizedSpendLine
 from app.opar.transaction_examples import build_transaction_examples_from_lines
@@ -235,7 +236,6 @@ def _build_transaction_examples(
 
 
 # ---------------------------------------------------------------------------
-from app.services.cache import MID_CAP_LIMIT
 
 
 def _should_use_pushdown(ctx: SkillContext) -> bool:

@@ -683,11 +683,6 @@ def spend_profiler_pushdown(store: Any) -> Dict[str, Any]:
     (HHI, Kraljic, addressability) are omitted; use the in-memory path for
     mid-cap corpora where those matter.
     """
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:
-        from app.services.spend_store import SpendStore
-
     agg = store.aggregate(
         group_by=["category_id", "category_name"],
         metrics={"spend": "SUM(amount)", "line_count": "COUNT(*)"},

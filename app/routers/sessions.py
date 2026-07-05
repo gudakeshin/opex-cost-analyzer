@@ -10,7 +10,7 @@ from typing import Any, Dict, List
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 from fastapi.responses import Response
 
-from app.config import DATA_DIR, MAX_UPLOAD_MB, UPLOAD_DIR, logger
+from app.config import DATA_DIR, MAX_UPLOAD_MB, logger
 from app.ratelimit import RATE_LIMIT_LLM, limiter
 from app.routers._shared import (
     _memory,

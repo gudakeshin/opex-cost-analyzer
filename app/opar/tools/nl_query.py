@@ -5,7 +5,6 @@ import json
 import re
 from typing import Any, Dict, List, Literal, Tuple
 
-from app.config import logger
 from app.opar.tools.context import ToolSessionContext
 from app.services.compliance import append_audit_event
 from app.services.spend_schema import load_spend_schema
@@ -109,7 +108,7 @@ def _rule_based_aggregate_spec(question: str, valid_cols: set[str]) -> Dict[str,
     for dim in ("category_name", "supplier", "business_unit"):
         if dim not in valid_cols:
             continue
-        m = re.search(rf"\b(in|for)\s+([A-Za-z0-9][\w\s&.-]{{2,40}})", question, re.I)
+        m = re.search(r"\b(in|for)\s+([A-Za-z0-9][\w\s&.-]{2,40})", question, re.I)
         if m and dim == "category_name":
             filters[dim] = m.group(2).strip()
             break
@@ -299,7 +298,10 @@ def run_natural_language_query(
     if tier == "aggregate":
         spec = _rule_based_aggregate_spec(question, valid_cols)
         if spec is None:
-            spec = _llm_aggregate_or_sql(question, schema, tier="aggregate")
+            # tier="aggregate" always returns dict | None (the str branch is
+            # sql-tier only) — narrow explicitly since the signature is shared.
+            llm_spec = _llm_aggregate_or_sql(question, schema, tier="aggregate")
+            spec = llm_spec if isinstance(llm_spec, dict) else None
         if not isinstance(spec, dict):
             tier = "sql"
         else:

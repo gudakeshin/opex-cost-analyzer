@@ -47,6 +47,7 @@ from .profiler import (
     _build_lever_entry,
     resolve_eligible_levers,
     spend_profiler,
+    spend_profiler_pushdown,
     chart_builder,
     document_contextualizer,
 )
@@ -56,6 +57,7 @@ from .benchmarking import (
     _category_pct_of_revenue,
     peer_benchmarker,
     internal_benchmarker,
+    internal_benchmarker_pushdown,
     heuristic_analyzer,
     root_cause_analyzer,
 )
@@ -161,12 +163,14 @@ __all__ = [
     "resolve_eligible_levers",
     # profiler skills
     "spend_profiler",
+    "spend_profiler_pushdown",
     "chart_builder",
     "document_contextualizer",
     # benchmarking
     "_category_pct_of_revenue",
     "peer_benchmarker",
     "internal_benchmarker",
+    "internal_benchmarker_pushdown",
     "heuristic_analyzer",
     "root_cause_analyzer",
     # savings

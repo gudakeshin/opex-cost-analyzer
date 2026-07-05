@@ -22,7 +22,6 @@ from app.opar.orchestrator import (
     run_opar_plan_preview,
 )
 from app.storage import ensure_dirs, write_json
-from app.config import UPLOAD_DIR
 
 
 def test_business_clarification_payload_rejects_too_few_options() -> None:
@@ -97,7 +96,7 @@ def test_should_waive_spend_requirement() -> None:
 
 
 def test_apply_clarification_answer_persists_waiver(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("app.opar.hitl.resume.UPLOAD_DIR", tmp_path)
+    monkeypatch.setattr("app.routers._shared.UPLOAD_DIR", tmp_path)
     session_id = "hitl-session"
     (tmp_path / session_id).mkdir(parents=True)
     write_json(
@@ -113,7 +112,7 @@ def test_apply_clarification_answer_persists_waiver(tmp_path, monkeypatch) -> No
 
 
 def test_plan_preview_returns_hitl_when_data_missing(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("app.opar.orchestrator.UPLOAD_DIR", tmp_path)
+    monkeypatch.setattr("app.routers._shared.UPLOAD_DIR", tmp_path)
     session_id = str(uuid.uuid4())
     (tmp_path / session_id).mkdir(parents=True)
     write_json(
@@ -142,8 +141,7 @@ async def test_resume_opar_loop_checkpoint_not_found() -> None:
 
 @pytest.mark.asyncio
 async def test_resume_opar_loop_with_waiver(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("app.opar.orchestrator.UPLOAD_DIR", tmp_path)
-    monkeypatch.setattr("app.opar.hitl.resume.UPLOAD_DIR", tmp_path)
+    monkeypatch.setattr("app.routers._shared.UPLOAD_DIR", tmp_path)
     session_id = str(uuid.uuid4())
     (tmp_path / session_id).mkdir(parents=True)
     write_json(

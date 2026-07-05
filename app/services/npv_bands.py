@@ -75,16 +75,16 @@ def initiative_band_npv(initiative: dict, band: str, discount_rate: float = DEFA
     p50 = band_savings_amount(
         band="p50",
         p50_savings=initiative.get("p50_savings"),
-        gross_savings_y1=initiative.get("gross_savings_y1"),
-        net_npv=initiative.get("net_npv"),
+        gross_savings_y1=initiative.get("gross_savings_y1") or 0.0,
+        net_npv=initiative.get("net_npv") or 0.0,
     )
     band_amt = band_savings_amount(
         band=band,
         p10_savings=initiative.get("p10_savings"),
         p50_savings=initiative.get("p50_savings"),
         p90_savings=initiative.get("p90_savings"),
-        gross_savings_y1=initiative.get("gross_savings_y1"),
-        net_npv=initiative.get("net_npv"),
+        gross_savings_y1=initiative.get("gross_savings_y1") or 0.0,
+        net_npv=initiative.get("net_npv") or 0.0,
     )
     return compute_band_npv(
         gross_y1=float(initiative.get("gross_savings_y1") or 0.0),

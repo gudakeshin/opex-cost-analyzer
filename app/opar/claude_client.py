@@ -6,7 +6,7 @@ import json
 import os
 import re
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Tuple, cast
 
 from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED, logger
 from app.services.llm_selection import (
@@ -238,8 +238,11 @@ def _call_anthropic_native(
     response = client.messages.create(
         model=active_model,
         max_tokens=max_tokens,
-        system=system_param,
-        messages=[{"role": "user", "content": user_param}],
+        # cached_system_blocks()/user_content_blocks already match the SDK's
+        # TextBlockParam shape at runtime; cast because mypy can't line up a
+        # generic list[dict[str, Any]] against the SDK's precise TypedDicts.
+        system=cast(Any, system_param),
+        messages=[{"role": "user", "content": cast(Any, user_param)}],
     )
     record_anthropic_usage(getattr(response, "usage", None), active_model)
     if getattr(response, "stop_reason", None) == "max_tokens":
@@ -288,8 +291,8 @@ def _stream_anthropic_native(
     with client.messages.stream(
         model=active_model,
         max_tokens=max_tokens,
-        system=system_param,
-        messages=[{"role": "user", "content": user_param}],
+        system=cast(Any, system_param),
+        messages=[{"role": "user", "content": cast(Any, user_param)}],
     ) as stream:
         for event in stream:
             if getattr(event, "type", None) != "content_block_delta":
@@ -384,8 +387,8 @@ async def call_claude_async(
         response = await client.messages.create(
             model=active_model,
             max_tokens=max_tokens,
-            system=system_param,
-            messages=[{"role": "user", "content": user_param}],
+            system=cast(Any, system_param),
+            messages=[{"role": "user", "content": cast(Any, user_param)}],
         )
         record_anthropic_usage(getattr(response, "usage", None), active_model)
         text = getattr(response.content[0], "text", "") if response.content else ""
@@ -458,8 +461,8 @@ def _call_claude_with_thinking(
         max_tokens=anthropic_max_tokens_for_thinking(
             max_tokens, model=active_model, budget_tokens=budget_tokens, thinking=True
         ),
-        system=system_param,
-        messages=[{"role": "user", "content": user_param}],
+        system=cast(Any, system_param),
+        messages=[{"role": "user", "content": cast(Any, user_param)}],
         **thinking_kwargs,
         **output_kwargs,
     )
@@ -921,7 +924,6 @@ def synthesize_chat_response_claude(
     )
     max_tokens = 2048 if thinking_enabled else 1024
     executor = ThreadPoolExecutor(max_workers=1)
-    cache_kwargs = {"cache_system": True, "user_content_blocks": user_blocks}
     if thinking_enabled:
         future: Future[Any] = submit_with_context(
             executor,
@@ -931,7 +933,8 @@ def synthesize_chat_response_claude(
             max_tokens,
             None,
             8000,
-            **cache_kwargs,
+            cache_system=True,
+            user_content_blocks=user_blocks,
         )
     elif token_callback:
         future = submit_with_context(

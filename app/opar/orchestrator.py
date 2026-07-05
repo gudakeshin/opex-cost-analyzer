@@ -4,11 +4,10 @@ from datetime import datetime, timezone
 import time
 from typing import Any, Callable, Dict
 
-from app.config import UPLOAD_DIR, logger
+from app.config import logger
 from app.metrics import opar_cycle_duration_seconds
 from app.memory import MemoryStore
 from app.opar.category_resolver import tokenize
-from app.storage import read_json
 from app.utils.inr_format import format_money
 from app.opar.act import act
 from app.opar.hitl.checkpoint_store import checkpoint_store
@@ -19,6 +18,10 @@ from app.opar.models import ExecutionPlan, ObserveContext, ReflectOutput, SkillT
 from app.opar.observe import observe
 from app.opar.plan import plan
 from app.opar.chat_synthesis import synthesize_chat_response
+from app.opar.chat_routing import (
+    should_use_cached_qa_fastpath as _should_use_cached_qa_fastpath,
+    should_use_agent_chat_path as _should_use_agent_chat_path,
+)
 from app.opar.qa_lookup import _FILE_FORMAT_MSG, _CAPABILITIES_MSG
 from app.opar.reflect import reflect
 from app.services.business_case import build_business_case, export_docx
@@ -99,12 +102,6 @@ def _is_schema_request(msg: str) -> bool:
             "file structure",
         ]
     )
-
-
-from app.opar.chat_routing import (
-    should_use_cached_qa_fastpath as _should_use_cached_qa_fastpath,
-    should_use_agent_chat_path as _should_use_agent_chat_path,
-)
 
 
 def _should_use_agent_path(ctx: Any) -> bool:

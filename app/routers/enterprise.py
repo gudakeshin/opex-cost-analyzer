@@ -32,7 +32,6 @@ from app.services.sector_packs import (
 )
 from app.skills import engine as _engine
 from app.skills.registry import discover_skills
-from app.storage import read_json, write_json
 
 router = APIRouter()
 
@@ -215,7 +214,7 @@ def consolidate_session(session_id: str, req: ConsolidateRequest) -> Dict[str, A
 
 @router.get("/api/metrics")
 def get_metrics() -> Dict[str, Any]:
-    from app.config import OUTPUT_DIR, UPLOAD_DIR
+    from app.config import OUTPUT_DIR
     sessions = [p for p in UPLOAD_DIR.glob("*") if p.is_dir()]
     outputs = list(OUTPUT_DIR.glob("*"))
     return {

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from typing import Any, Callable, Dict, List
 
-from app.config import UPLOAD_DIR
 from app.memory import MemoryStore
 from app.opar.chat_synthesis import synthesize_chat_response
 from app.opar.presentation import assemble_assistant_payload
@@ -49,7 +48,6 @@ from app.opar.reflect_validation import (
     _run_gate2_check,
     _run_reg_watcher,
 )
-from app.storage import read_json
 
 _memory = MemoryStore()
 

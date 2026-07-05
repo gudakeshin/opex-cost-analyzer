@@ -1,7 +1,6 @@
 """Load and validate the canonical skills manifest (skills/manifest.yaml)."""
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any, Dict, List
 
 import yaml

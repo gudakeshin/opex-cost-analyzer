@@ -247,7 +247,8 @@ def _attach_discovered_outputs(
     msg = (ctx.user_message or "").lower()
     for cta in _HEAVY_EXPORT_CTAS:
         skill = str(cta["skill"])
-        if any(kw in msg for kw in cta["keywords"]):  # type: ignore[union-attr]
+        keywords = cta["keywords"]
+        if isinstance(keywords, tuple) and any(kw in msg for kw in keywords):
             if not any(s.skill == skill for s in suggestions):
                 suggestions.append(
                     SuggestedOutput(

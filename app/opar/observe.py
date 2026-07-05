@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import os
 from pathlib import Path
 import re
@@ -13,7 +12,6 @@ from app.config import (
     GEMINI_ENABLED,
     LLM_INTENT_CLASSIFICATION_ENABLED,
     MEMORY_DIR,
-    UPLOAD_DIR,
 )
 from app.opar.memory_adapter import get_memory_adapter
 from app.opar.hitl.clarification_tool import ClarificationAnswer

@@ -588,7 +588,7 @@ export const ProcurementAnalysis: React.FC = () => {
         },
       );
       if (!res) return;
-      const chat = res as V1ChatResponse;
+      const chat = res as unknown as V1ChatResponse;
       if (chat.hitl_required && chat.clarification && chat.checkpoint_id) {
         setMessages((m) => m.filter((msg) => msg.run_id !== runId));
         openClarificationProbe({

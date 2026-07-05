@@ -5,7 +5,6 @@ import json
 import re
 from typing import Any, Dict, List, Tuple
 
-from app.config import logger
 from app.opar.tools.context import ToolSessionContext
 from app.schemas import CustomScenarioSpec
 

@@ -5,12 +5,10 @@ import logging
 from datetime import datetime, timezone
 from typing import Any, Dict, List
 
-from app.config import UPLOAD_DIR
 from app.memory import MemoryStore
 from app.opar.memory_adapter import get_memory_adapter
 from app.opar.models import ActResult, AdvisorySections, MemoryUpdate, ObserveContext
 from app.opar.provenance import record_llm_narrative
-from app.storage import read_json, write_json
 
 _memory = MemoryStore()
 

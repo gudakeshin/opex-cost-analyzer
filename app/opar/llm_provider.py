@@ -22,7 +22,6 @@ import os
 from typing import Any, Dict, Optional
 
 from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED, LLM_PROVIDER, ROOT_DIR, logger
-from app.metrics import record_llm_usage
 from app.services.llm_selection import get_resolved_llm_model
 
 # ---------------------------------------------------------------------------
