@@ -66,6 +66,12 @@ jobs:
       - name: Run unit tests with coverage
         run: PYTHONPATH=. pytest tests/ -m "not llm_judge" -q --tb=short --cov=app --cov-fail-under=70 --cov-report=term-missing
 
+      - name: Skill catalog lint
+        run: PYTHONPATH=. python scripts/lint_skills.py
+
+      - name: Skill catalog eval (deterministic, no live LLM)
+        run: PYTHONPATH=. python eval/run_skill_catalog_eval.py
+
   # -----------------------------------------------------------------------
   # E2E (Playwright) — backend + frontend dev server, deterministic specs only.
   # chat/analyze fall back to rule-based responses without ANTHROPIC_API_KEY,

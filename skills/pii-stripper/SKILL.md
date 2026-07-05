@@ -1,6 +1,7 @@
 ---
 name: pii-stripper
 description: "Scan spend-line records for PII (email, phone, PAN, Aadhaar, named individuals) and redact before any downstream skill or LLM receives the data. Classify quarantine-worthy rows as B4. Run as Group 0 skill before any analysis."
+discoverable: false
 version: "1.0"
 status: active
 llm_required: false

@@ -1,0 +1,99 @@
+{
+  "discovery": {
+    "mrr_at_3": 1.0,
+    "cases": [
+      {
+        "query": "compare my spend to industry peers and benchmark gaps",
+        "expected_any": [
+          "internal-benchmarker",
+          "peer-benchmarker"
+        ],
+        "top5": [
+          "peer-benchmarker",
+          "internal-benchmarker",
+          "root-cause-analyzer",
+          "indian-tax-optimizer",
+          "heuristic-analyzer"
+        ],
+        "hit": true
+      },
+      {
+        "query": "model savings NPV phased initiatives cost to achieve",
+        "expected_any": [
+          "savings-modeler",
+          "value-bridge-calculator"
+        ],
+        "top5": [
+          "savings-modeler",
+          "sensitivity-analyzer",
+          "root-cause-analyzer",
+          "value-bridge-calculator",
+          "evidence-gatherer"
+        ],
+        "hit": true
+      },
+      {
+        "query": "diagnose why spend is above peers root cause",
+        "expected_any": [
+          "root-cause-analyzer"
+        ],
+        "top5": [
+          "root-cause-analyzer",
+          "peer-benchmarker",
+          "chart-builder",
+          "internal-benchmarker",
+          "indian-tax-optimizer"
+        ],
+        "hit": true
+      },
+      {
+        "query": "categorize and profile uploaded spend data",
+        "expected_any": [
+          "spend-profiler"
+        ],
+        "top5": [
+          "spend-profiler",
+          "chart-builder",
+          "peer-benchmarker",
+          "indian-tax-optimizer",
+          "internal-benchmarker"
+        ],
+        "hit": true
+      }
+    ]
+  },
+  "rubric": {
+    "avg_score": 2.62,
+    "below_threshold": [
+      "analysis-synthesizer",
+      "assumption-register",
+      "brsr-cobenefit-calculator",
+      "business-case-builder",
+      "cohort-segmenter",
+      "dashboard-builder",
+      "data-classifier",
+      "data-validator",
+      "document-contextualizer",
+      "executive-communication",
+      "export-formatter",
+      "heuristic-analyzer",
+      "indian-tax-optimizer",
+      "internal-benchmarker",
+      "llm-context-builder",
+      "peer-benchmarker",
+      "peer-disclosure-miner",
+      "pii-stripper",
+      "scenario-modeler",
+      "sensitivity-analyzer",
+      "spend-profiler",
+      "value-bridge-calculator",
+      "value-to-shareholder-bridge"
+    ]
+  },
+  "declarative_schema": {
+    "passes": true
+  },
+  "manifest_drift_errors": [],
+  "manifest_skill_count": 40,
+  "overall_pass": true
+}

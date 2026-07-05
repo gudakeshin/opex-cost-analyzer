@@ -17,6 +17,10 @@ Dashboards for spend analysis need to balance three things:
 
 Achieve this with progressive disclosure: summary cards at the top, interactive charts in the middle, detailed tables at the bottom.
 
+## Runtime Methodology (Python)
+
+The handler builds a self-contained HTML dashboard from upstream skill outputs in `prior_results` (value bridge, peer benchmarks, spend profile). It embeds Chart.js via CDN and serializes data as inline JSON — no user interaction or file upload step at runtime.
+
 ## Technology Stack
 
 All dashboards are built as single HTML files containing:

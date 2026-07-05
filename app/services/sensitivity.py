@@ -107,6 +107,8 @@ def compute_sensitivity(
         - "execution_rate_pct"    : override execution probability (0.0–1.0)
         - "timeline_compression_factor": e.g. 0.75 to compress 36 months to 27 months
     """
+    discount_rate = float(discount_rate if discount_rate is not None else 0.10)
+    effective_tax_rate = float(effective_tax_rate if effective_tax_rate is not None else 0.0)
     conf = value_bridge.get("confidence_bands", {})
     mid = float(conf.get("mid", 0.0))
     low_band = float(conf.get("low", mid * 0.8))
@@ -277,10 +279,10 @@ def compute_sensitivity(
             bbr = BOUNCE_BACK_RATES.get(
                 str(init.get("bounce_back_risk", "medium")), BOUNCE_BACK_RATES["medium"]
             )
-            gs = init.get("gross_savings", {})
-            y1 = float(gs.get("y1", 0.0))
-            y2 = float(gs.get("y2", 0.0))
-            y3_kept = float(gs.get("y3", 0.0)) * (1.0 - bbr)
+            gs = init.get("gross_savings") or {}
+            y1 = float(gs.get("y1") or 0.0)
+            y2 = float(gs.get("y2") or 0.0)
+            y3_kept = float(gs.get("y3") or 0.0) * (1.0 - bbr)
             # Y1+Y2 realised in full; only the retained slice of Y3 survives reversion.
             bounce_back_3yr += y1 + y2 + y3_kept
             y3_retained += y3_kept

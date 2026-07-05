@@ -8,6 +8,15 @@ skills:
   weight: light
   runtime: python
   status: active
+- name: pii-stripper
+  tier: Enterprise Data
+  parallel_group: 0
+  depends_on: []
+  estimated_tokens: 200
+  kind: ingestion
+  weight: light
+  runtime: python
+  status: active
 - name: spend-profiler
   tier: Diagnostics
   parallel_group: 0
@@ -34,6 +43,16 @@ skills:
   - spend-profiler
   estimated_tokens: 300
   kind: output
+  weight: light
+  runtime: python
+  status: active
+- name: cohort-segmenter
+  tier: Diagnostics
+  parallel_group: 1
+  depends_on:
+  - spend-profiler
+  estimated_tokens: 450
+  kind: analysis
   weight: light
   runtime: python
   status: active
@@ -74,6 +93,16 @@ skills:
   - spend-profiler
   estimated_tokens: 300
   kind: output
+  weight: light
+  runtime: python
+  status: active
+- name: data-classifier
+  tier: Enterprise Data
+  parallel_group: 1
+  depends_on:
+  - pii-stripper
+  estimated_tokens: 200
+  kind: ingestion
   weight: light
   runtime: python
   status: active
@@ -166,15 +195,6 @@ skills:
   kind: analysis
   weight: light
   runtime: python
-- name: cohort-segmenter
-  tier: Diagnostics
-  parallel_group: 1
-  depends_on:
-  - spend-profiler
-  estimated_tokens: 450
-  kind: analysis
-  weight: light
-  runtime: python
   status: active
 - name: vendor-master-builder
   tier: Enterprise Data
@@ -205,6 +225,16 @@ skills:
   - peer-benchmarker
   estimated_tokens: 500
   kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: llm-context-builder
+  tier: Enterprise Data
+  parallel_group: 2
+  depends_on:
+  - data-classifier
+  estimated_tokens: 150
+  kind: ingestion
   weight: light
   runtime: python
   status: active
@@ -277,16 +307,6 @@ skills:
   weight: light
   runtime: python
   status: active
-- name: sensitivity-analyzer
-  tier: Strategic
-  parallel_group: 5
-  depends_on:
-  - value-bridge-calculator
-  estimated_tokens: 400
-  kind: analysis
-  weight: light
-  runtime: python
-  status: active
 - name: value-bridge-calculator
   tier: Savings & Value
   parallel_group: 4
@@ -326,6 +346,16 @@ skills:
   depends_on:
   - value-bridge-calculator
   estimated_tokens: 200
+  kind: analysis
+  weight: light
+  runtime: python
+  status: active
+- name: sensitivity-analyzer
+  tier: Strategic
+  parallel_group: 5
+  depends_on:
+  - value-bridge-calculator
+  estimated_tokens: 400
   kind: analysis
   weight: light
   runtime: python

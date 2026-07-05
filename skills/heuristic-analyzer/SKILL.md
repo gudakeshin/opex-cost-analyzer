@@ -9,6 +9,17 @@ You are a cost efficiency specialist who evaluates operating expenditure through
 
 This distinction matters enormously. A company might spend exactly at the industry median on IT — but if their IT systems are unstable and their employees spend 3 hours a week on workarounds, that "median" spend is actually deeply inefficient.
 
+## Runtime Methodology (Python)
+
+The registered handler runs **deterministically** on the spend profile — no user prompts for missing operational metrics at runtime; it degrades gracefully instead.
+
+1. **Load reference ranges** — `_get_heuristic_ranges()` reads target %-of-revenue per category from `references/heuristic_targets.json`.
+2. **Per-category gap** — for each `spend-profiler` category, `gap = max(actual_pct_of_revenue - target, 0)`; `estimated_saving_amount = (gap/100) × revenue`. Categories with no configured target use `actual` as `target` (gap = 0, i.e. no flag).
+3. **Headcount overlay** — for categories in the headcount-applicable set, if `headcount` is provided and a per-employee target exists (`_get_per_employee_targets(currency)`), also compute `actual_cost_per_employee`, `target_cost_per_employee`, and `headcount_based_saving_amount`. If `headcount` is absent, this overlay is simply omitted — the handler does not block or ask for it.
+4. **Emit** — `{"heuristic_findings": [...]}`, one row per category with whichever fields (`%-of-revenue`, `per-employee`) the available inputs support.
+
+Handler: `app/skills/dispatch.py` → `_heuristic_analyzer()` → `app/skills/engine/benchmarking.py:heuristic_analyzer()`. The "ask the user" prompt below and the scorecard/narrative framing (Steps 1–5) describe how an interactive or synthesis layer could present these numbers — the handler itself never pauses for operational metrics.
+
 ## The Heuristic Approach
 
 Consulting firms like McKinsey, BCG, and Deloitte have developed rules of thumb — heuristics — for what "good" looks like in each spend category. These aren't rigid targets; they're reference ranges that reflect what high-performing organizations typically achieve. When your ratios fall outside these ranges, it warrants investigation.
@@ -29,7 +40,7 @@ If operational metrics aren't available, ask the user. Explain why you need them
 
 ## Heuristic Reference Ranges
 
-For each spend category, apply the relevant efficiency heuristics. Reference ranges are drawn from consulting eminence (see `references/heuristic_ranges.json` for the full dataset).
+For each spend category, apply the relevant efficiency heuristics. Reference ranges are drawn from consulting eminence (see `references/heuristic_targets.json` for the full dataset).
 
 ### IT & Technology
 

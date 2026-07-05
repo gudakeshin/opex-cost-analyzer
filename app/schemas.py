@@ -219,6 +219,13 @@ class SkillCreateRequest(BaseModel):
     name: str
     content: str
 
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str) -> str:
+        from app.skills.validation import validate_skill_slug
+
+        return validate_skill_slug(v)
+
 
 class SkillStructuredCreateRequest(BaseModel):
     """No-code declarative skill authoring — composes SKILL.md on the server."""
@@ -233,6 +240,13 @@ class SkillStructuredCreateRequest(BaseModel):
     output_fields: List[str] = Field(default_factory=list)
     parallel_group: int = 8
     depends_on: List[str] = Field(default_factory=list)
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str) -> str:
+        from app.skills.validation import validate_skill_slug
+
+        return validate_skill_slug(v)
 
 
 class SkillDiscoverRequest(BaseModel):

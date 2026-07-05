@@ -176,8 +176,16 @@ def _run_declarative_skill(
             manifest=ctx.manifest,
             upstream_outputs=upstream,
             docs_text=ctx.docs_text,
+            output_fields=list(meta.get("output_fields") or []),
         )
-        return (output or {}), degraded
+        if degraded:
+            return (output or {}), degraded
+        from app.skills.registry import validate_declarative_output
+
+        schema_err = validate_declarative_output(output, list(meta.get("output_fields") or []))
+        if schema_err:
+            return (output or {}), schema_err
+        return (output or {}), None
     except Exception:
         return {}, "provider_unavailable"
 
@@ -625,8 +633,8 @@ def _sensitivity_analyzer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None
     return compute_sensitivity(
         bridge,
         savings_model=savings,
-        discount_rate=ctx.wacc,
-        effective_tax_rate=ctx.effective_tax_rate,
+        discount_rate=ctx.discount_rate,
+        effective_tax_rate=ctx.tax_rate,
     ), None
 
 

@@ -1,6 +1,7 @@
 ---
 name: llm-context-builder
 description: "Assemble the LLM context payload for analysis-synthesizer and executive-communication, enforcing band rules: B2 data included in full, B3 data tokenised (supplier names replaced with coded IDs), B4 data rejected. Emits a context-assembly audit event."
+discoverable: false
 version: "1.0"
 status: active
 llm_required: false

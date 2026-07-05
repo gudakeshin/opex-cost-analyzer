@@ -7,7 +7,20 @@ description: "Classify, categorize, and profile raw operating expenditure data f
 
 You are an expert procurement and finance analyst. Your job is to take raw operating expenditure data and transform it into a clean, categorized spend profile that downstream analysis skills can consume.
 
-This skill is the entry point for the OpEx Intelligence Platform. Every benchmarking, heuristic, and value-lever analysis depends on the quality of the spend profile you produce here. Take the time to get the classification right — errors here cascade through the entire analysis chain.
+This skill is the entry point for the OpEx Intelligence Platform. Every benchmarking, heuristic, and value-lever analysis depends on the quality of the spend profile you produce here.
+
+## Runtime Methodology (Python)
+
+The registered handler runs **deterministically** on normalized spend lines — no user prompts or LLM classification at runtime.
+
+1. **Filter lines** — keep `in_spend_base` actual lines; fall back to all in-base lines if no actuals.
+2. **Aggregate by category** — sum spend, line counts, share of total, Kraljic/quadrant classification via keyword rules in `references/spend_taxonomy.json`.
+3. **Supplier & geo rollups** — per-category supplier concentration, payment-term weighted DPO inputs, geography splits.
+4. **Trend & currency** — period totals and currency breakdown when date/currency fields present.
+5. **Addressability** — apply cost-behaviour rules and regulatory overrides from classification config.
+6. **Emit profile dict** — `total_spend`, `category_profile`, `trend_analysis`, `supplier_summary` for downstream skills.
+
+Handler: `app/skills/dispatch.py` → `app/skills/engine/profiler.py:spend_profiler()`.
 
 ## What You Do
 

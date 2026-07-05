@@ -49,6 +49,26 @@ def append_manifest_entry(entry: Dict[str, Any]) -> Dict[str, Any]:
     return entry
 
 
+def update_manifest_skill(name: str, **fields: Any) -> Dict[str, Any] | None:
+    """Patch fields on an existing manifest row."""
+    data = load_manifest()
+    skills: List[Dict[str, Any]] = list(data.get("skills") or [])
+    updated: Dict[str, Any] | None = None
+    for row in skills:
+        if str(row.get("name") or "") == name:
+            row.update(fields)
+            updated = row
+            break
+    if updated is None:
+        return None
+    data["skills"] = skills
+    MANIFEST_PATH.write_text(
+        yaml.dump(data, default_flow_style=False, sort_keys=False),
+        encoding="utf-8",
+    )
+    return updated
+
+
 def validate_manifest_drift() -> List[str]:
     """Return human-readable drift messages (empty list = OK)."""
     from app.opar.plan import get_skill_dep_map
@@ -86,5 +106,14 @@ def validate_manifest_drift() -> List[str]:
                 errors.append(f"{name}: parallel_group drift (manifest {row.get('parallel_group')} vs _DEP_MAP {pg})")
             if list(row.get("depends_on") or []) != list(deps):
                 errors.append(f"{name}: depends_on drift")
+
+    from app.config import SKILLS_DIR
+    from app.skills.registry import parse_skill_md
+
+    for path in sorted(SKILLS_DIR.glob("*/SKILL.md")):
+        skill_name = path.parent.name
+        meta = parse_skill_md(path)
+        if meta.get("discoverable", True) and skill_name not in manifest_names:
+            errors.append(f"discoverable skill not in manifest: {skill_name}")
 
     return errors

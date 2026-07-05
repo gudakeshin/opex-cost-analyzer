@@ -1437,10 +1437,14 @@ def run_declarative_skill_claude_with_meta(
     manifest: Dict[str, Any],
     upstream_outputs: Dict[str, Any],
     docs_text: List[str] | None = None,
+    output_fields: List[str] | None = None,
 ) -> Tuple[Dict[str, Any] | None, str | None]:
     """Generic declarative skill runtime — shared client, retry, and degradation semantics."""
     if not ANTHROPIC_ENABLED:
         return None, "provider_disabled"
+    required = list(output_fields or [])
+    max_tokens = 2400 if len(required) > 5 else 1200
+    timeout_s = 30 if len(required) > 5 else 12
     payload = {
         "skill_name": skill_name,
         "user_message": user_message,
@@ -1462,10 +1466,10 @@ def run_declarative_skill_claude_with_meta(
             f"Skill instruction:\n{instruction_prompt}\n\n"
             f"Context JSON:\n{json.dumps(payload, ensure_ascii=False)}"
         ),
-        1200,
+        max_tokens,
     )
     try:
-        raw = future.result(timeout=12)
+        raw = future.result(timeout=timeout_s)
     except FuturesTimeoutError:
         future.cancel()
         executor.shutdown(wait=False, cancel_futures=True)
