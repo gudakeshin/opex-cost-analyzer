@@ -7,8 +7,13 @@
       "lever_id": "salesforce_effectiveness_pharma",
       "lever_name": "Medical Representative Salesforce Effectiveness",
       "description": "Right-size field force by optimising territory coverage, call frequency, and doctor targeting using prescription data analytics. Shift from mass coverage to high-potential prescriber focus.",
-      "category_ids": ["MARKETING", "HR"],
-      "p10_pct": 6.0, "p50_pct": 14.0, "p90_pct": 22.0,
+      "category_ids": [
+        "MARKETING",
+        "HR"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 14.0,
+      "p90_pct": 22.0,
       "implementation_weeks": 16,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -22,8 +27,12 @@
       "lever_id": "procurement_api_rm_consolidation",
       "lever_name": "API & Raw Material Procurement Consolidation",
       "description": "Consolidate API and excipient supplier base; renegotiate volume-based contracts; co-develop API with preferred suppliers to reduce cost-of-goods.",
-      "category_ids": ["OUTSOURCED"],
-      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 16.0,
+      "category_ids": [
+        "OUTSOURCED"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 16.0,
       "implementation_weeks": 16,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -37,8 +46,13 @@
       "lever_id": "manufacturing_efficiency_oee",
       "lever_name": "Manufacturing OEE & Lean Transformation",
       "description": "Improve Overall Equipment Effectiveness through reduced changeovers, preventive maintenance, and lean manufacturing (SMED, Kaizen). Increase batch sizes for high-volume products.",
-      "category_ids": ["HR", "OUTSOURCED"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "category_ids": [
+        "HR",
+        "OUTSOURCED"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 25.0,
       "implementation_weeks": 24,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -52,8 +66,13 @@
       "lever_id": "regulatory_compliance_cost_reduction",
       "lever_name": "Regulatory Compliance Cost Optimisation",
       "description": "Streamline global regulatory filing processes; use eCTD submission automation; rationalise number of ANDA/dossier filings to focus on highest-ROI markets.",
-      "category_ids": ["PROF_SVCS", "HR"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "category_ids": [
+        "PROF_SVCS",
+        "HR"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 24.0,
       "implementation_weeks": 20,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -67,8 +86,12 @@
       "lever_id": "cold_chain_logistics_optimisation",
       "lever_name": "Cold Chain & Distribution Logistics Optimisation",
       "description": "Implement hub-and-spoke cold chain with temperature monitoring; consolidate stockists; implement direct-to-retail in key markets to reduce distribution layers.",
-      "category_ids": ["LOGISTICS_INDIA"],
-      "p10_pct": 8.0, "p50_pct": 16.0, "p90_pct": 26.0,
+      "category_ids": [
+        "LOGISTICS_INDIA"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 16.0,
+      "p90_pct": 26.0,
       "implementation_weeks": 16,
       "brsr_principle": "P4",
       "savings_type": "run_rate",
@@ -82,8 +105,12 @@
       "lever_id": "digital_marketing_hcp",
       "lever_name": "Digital & Omnichannel HCP Engagement",
       "description": "Shift from MR-only engagement to digital-first HCP (healthcare professional) communications: medical e-detailing, KOL webinars, CME online platforms.",
-      "category_ids": ["MARKETING"],
-      "p10_pct": 8.0, "p50_pct": 14.0, "p90_pct": 22.0,
+      "category_ids": [
+        "MARKETING"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 14.0,
+      "p90_pct": 22.0,
       "implementation_weeks": 12,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -97,8 +124,13 @@
       "lever_id": "tech_regulatory_it_modernisation",
       "lever_name": "Quality & Regulatory IT Systems Modernisation",
       "description": "Consolidate QMS, pharmacovigilance, and document management systems onto a single cloud platform. Automate batch record review and CAPA management.",
-      "category_ids": ["IT", "PROF_SVCS"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "category_ids": [
+        "IT",
+        "PROF_SVCS"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 24.0,
       "implementation_weeks": 24,
       "brsr_principle": "P6",
       "savings_type": "mixed",
@@ -112,8 +144,12 @@
       "lever_id": "rnd_portfolio_rationalization",
       "lever_name": "R&D Portfolio Rationalisation & CRO Governance",
       "description": "Prioritise R&D projects by ROI; consolidate CRO and clinical trial vendors; exit low-ROI development programmes.",
-      "category_ids": ["RND"],
-      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "category_ids": [
+        "RND"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
       "implementation_weeks": 20,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -127,8 +163,12 @@
       "lever_id": "insurance_premium_optimization",
       "lever_name": "Pharma Corporate & Product Liability Insurance Optimisation",
       "description": "Competitive RFP for product liability, clinical trial, and property insurance; optimise deductibles.",
-      "category_ids": ["INSURANCE"],
-      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 16.0,
+      "category_ids": [
+        "INSURANCE"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 16.0,
       "implementation_weeks": 10,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -142,8 +182,12 @@
       "lever_id": "qc_lab_facilities_optimisation",
       "lever_name": "QC Lab & GMP Facilities Cost Optimisation",
       "description": "Consolidate QC lab operations; energy-efficient HVAC for clean rooms; shared facilities across sites.",
-      "category_ids": ["FACILITIES"],
-      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "category_ids": [
+        "FACILITIES"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 8.0,
+      "p90_pct": 14.0,
       "implementation_weeks": 16,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -151,6 +195,171 @@
         "BEE PAT Scheme — pharma designated consumers energy efficiency benchmarks",
         "CII Pharma Manufacturing Excellence 2024 — GMP facility cost optimisation case studies",
         "INTERNAL_CALIBRATION — pharma facilities savings from 2 India pharma plant mandates"
+      ]
+    },
+    {
+      "lever_id": "clinical_trial_efficiency",
+      "lever_name": "Clinical Trial Efficiency & CRO Optimisation",
+      "description": "Optimise trial site mix, adopt decentralised/hybrid trial elements, and renegotiate CRO rate cards to lower per-patient trial cost.",
+      "category_ids": [
+        "RND"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 20.0,
+      "p90_pct": 28.0,
+      "implementation_weeks": 52,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "DSIR — R&D Statistics and Indicators 2023-24 (dsir.gov.in/reports.htm) — India clinical trial landscape and CRO adoption",
+        "OPPI — Indian Pharmaceutical Industry Report 2024 (oppiin.org) — clinical trial cost benchmarks India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "manufacturing_cogs",
+      "lever_name": "Pharma Manufacturing COGS Reduction",
+      "description": "Drive conversion-cost productivity via OEE improvement, yield optimisation, and energy intensity reduction across API and formulation plants.",
+      "category_ids": [
+        "PLANT_MAINTENANCE"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 22.0,
+      "implementation_weeks": 44,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "DPCO — Drug Price Control Order and NLEM (pharmaceuticals.gov.in/national-pharmaceutical-pricing-authority) — manufacturing cost benchmarks for regulated pricing",
+        "McKinsey & Company — Productivity in Pharma Manufacturing (mckinsey.com/industries/life-sciences) — COGS reduction levers 8-18%",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "sales_force_sizing",
+      "lever_name": "Sales Force Sizing & Territory Optimisation",
+      "description": "Right-size field-force territories using prescriber-value analytics; redeploy or reduce coverage of low-yield segments.",
+      "category_ids": [
+        "HR"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 13.0,
+      "p90_pct": 18.0,
+      "implementation_weeks": 32,
+      "brsr_principle": "P3",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "OPPI — Indian Pharmaceutical Industry Report 2024 (oppiin.org) — field force productivity benchmarks India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "digital_rep_model",
+      "lever_name": "Digital Medical Rep / e-Detailing Model",
+      "description": "Shift field-force coverage of long-tail prescribers to digital/hybrid engagement, resizing territories around high-value accounts.",
+      "category_ids": [
+        "MARKETING"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 20.0,
+      "p90_pct": 28.0,
+      "implementation_weeks": 36,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "OPPI — Digital Health and Pharma Marketing Report 2024 (oppiin.org) — e-detailing adoption benchmarks India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "market_access_rebate_mgmt",
+      "lever_name": "Market Access & Gross-to-Net Optimisation",
+      "description": "Tighten rebate and discount governance across channels with contract compliance analytics and claw-back of off-contract concessions.",
+      "category_ids": [
+        "MARKETING",
+        "PROF_SERVICES"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 8.0,
+      "p90_pct": 14.0,
+      "implementation_weeks": 36,
+      "brsr_principle": "P9",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NPPA — Price Monitoring and Resource Unit Data 2024 (pharmaceuticals.gov.in) — gross-to-net deduction benchmarks India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "tech_platform_consolidation",
+      "lever_name": "IT Platform Consolidation (ERP / CRM / CTMS)",
+      "description": "Consolidate commercial and R&D technology platforms post-acquisition; decommission overlapping systems and renegotiate enterprise agreements.",
+      "category_ids": [
+        "IT"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 20.0,
+      "p90_pct": 28.0,
+      "implementation_weeks": 52,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Gartner — Life Sciences IT Spending Benchmarks 2024 (gartner.com/en/information-technology/insights/it-budget) — pharma IT platform consolidation savings",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "expiry_risk_reduction",
+      "lever_name": "Inventory Expiry & Write-Off Reduction",
+      "description": "Reduce expiry write-offs with shelf-life-aware inventory deployment, FEFO discipline, and demand-linked production slotting.",
+      "category_ids": [
+        "PACKAGING"
+      ],
+      "p10_pct": 3.0,
+      "p50_pct": 6.0,
+      "p90_pct": 10.0,
+      "implementation_weeks": 22,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CRISIL — Pharma Supply Chain Report 2024 (crisil.com) — inventory write-off rates for Indian pharma companies",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "regulatory_submission_efficiency",
+      "lever_name": "Regulatory Affairs Efficiency",
+      "description": "Standardise dossier authoring with structured content management and automate submission publishing across markets.",
+      "category_ids": [
+        "PROF_SVCS"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 22.0,
+      "implementation_weeks": 28,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CDSCO — Central Drugs Standard Control Organisation Annual Report 2023-24 (cdsco.gov.in) — regulatory submission timelines India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "pharmacovigilance_automation",
+      "lever_name": "Pharmacovigilance (PV) Process Automation",
+      "description": "Automate adverse-event case intake and processing with AI-assisted triage, cutting per-case PV cost while maintaining compliance.",
+      "category_ids": [
+        "PROF_SVCS"
+      ],
+      "p10_pct": 15.0,
+      "p50_pct": 24.0,
+      "p90_pct": 32.0,
+      "implementation_weeks": 42,
+      "brsr_principle": "P9",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CDSCO — Pharmacovigilance Programme of India (pvpi.gov.in) — PV reporting requirements and automation opportunities",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     }
   ]

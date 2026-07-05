@@ -7,8 +7,12 @@
       "lever_id": "energy_management_system",
       "lever_name": "Energy Management & Renewable Transition",
       "description": "Deploy Building Management System (BMS) for HVAC, lighting, chilling optimisation. Install rooftop solar; switch to LED throughout property.",
-      "category_ids": ["POWER_ENERGY"],
-      "p10_pct": 12.0, "p50_pct": 20.0, "p90_pct": 30.0,
+      "category_ids": [
+        "POWER_ENERGY"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 20.0,
+      "p90_pct": 30.0,
       "implementation_weeks": 16,
       "brsr_principle": "P2",
       "savings_type": "run_rate",
@@ -22,8 +26,13 @@
       "lever_id": "revenue_management_occ",
       "lever_name": "Revenue Management & OTA Channel Optimisation",
       "description": "Implement AI-based revenue management system for dynamic pricing. Shift mix from OTA (12-18% commission) to direct bookings (0-3% cost). Optimise length-of-stay restrictions.",
-      "category_ids": ["MARKETING", "IT"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "category_ids": [
+        "MARKETING",
+        "IT"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 25.0,
       "implementation_weeks": 12,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -37,8 +46,12 @@
       "lever_id": "food_beverage_cost_control",
       "lever_name": "F&B Cost Control & Menu Engineering",
       "description": "Rationalise menu to highest-margin items; implement recipe control and wastage tracking; renegotiate F&B supplier contracts; reduce food wastage via predictive ordering.",
-      "category_ids": ["OUTSOURCED"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "category_ids": [
+        "OUTSOURCED"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 24.0,
       "implementation_weeks": 8,
       "brsr_principle": "P2",
       "savings_type": "run_rate",
@@ -52,8 +65,12 @@
       "lever_id": "workforce_cross_training",
       "lever_name": "Workforce Optimisation & Cross-Training",
       "description": "Multi-skill housekeeping and F&B staff to enable flexible deployment across functions. Reduce casual labour dependency; implement productivity-linked incentives.",
-      "category_ids": ["HR"],
-      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "category_ids": [
+        "HR"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
       "implementation_weeks": 12,
       "brsr_principle": "P5",
       "savings_type": "run_rate",
@@ -67,8 +84,12 @@
       "lever_id": "property_maintenance_preventive",
       "lever_name": "Preventive Maintenance Programme",
       "description": "Shift from reactive to preventive/predictive maintenance using IoT sensors. Reduce emergency repair costs and asset downtime. Extend asset life to defer capital expenditure.",
-      "category_ids": ["PLANT_MAINTENANCE"],
-      "p10_pct": 10.0, "p50_pct": 20.0, "p90_pct": 30.0,
+      "category_ids": [
+        "PLANT_MAINTENANCE"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 20.0,
+      "p90_pct": 30.0,
       "implementation_weeks": 16,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -82,8 +103,12 @@
       "lever_id": "technology_pms_modernisation",
       "lever_name": "Property Management System (PMS) & Tech Stack Modernisation",
       "description": "Replace legacy PMS with cloud-native system integrating front desk, POS, channel manager, revenue management, and loyalty in a single platform.",
-      "category_ids": ["IT"],
-      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "category_ids": [
+        "IT"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 18.0,
+      "p90_pct": 28.0,
       "implementation_weeks": 20,
       "brsr_principle": "P6",
       "savings_type": "mixed",
@@ -97,8 +122,13 @@
       "lever_id": "procurement_consolidation_hotel",
       "lever_name": "Procurement Consolidation & Supplier Renegotiation",
       "description": "Centralise hotel procurement across properties for F&B, housekeeping, linen, amenities. Standardise specifications to achieve volume discounts.",
-      "category_ids": ["OUTSOURCED", "PLANT_MAINTENANCE"],
-      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "category_ids": [
+        "OUTSOURCED",
+        "PLANT_MAINTENANCE"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
       "implementation_weeks": 12,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -112,8 +142,12 @@
       "lever_id": "hotel_lease_optimisation",
       "lever_name": "Hotel Lease & Occupancy Cost Optimisation",
       "description": "Renegotiate lease terms at renewal; optimise sale-leaseback structures; consolidate co-located back-office facilities.",
-      "category_ids": ["FACILITIES"],
-      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "category_ids": [
+        "FACILITIES"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
       "implementation_weeks": 16,
       "brsr_principle": "P4",
       "savings_type": "run_rate",
@@ -127,8 +161,12 @@
       "lever_id": "insurance_premium_optimization",
       "lever_name": "Hospitality Property & Liability Insurance Optimisation",
       "description": "Pool property, liability, and event cancellation insurance across hotel portfolio; competitive RFP.",
-      "category_ids": ["INSURANCE"],
-      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 16.0,
+      "category_ids": [
+        "INSURANCE"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 16.0,
       "implementation_weeks": 10,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -136,6 +174,100 @@
         "IRDAI Annual Report 2023-24 — commercial property insurance market benchmarks",
         "Marsh Hospitality Risk Report 2024 — portfolio insurance RFP savings 8-15%",
         "INTERNAL_CALIBRATION — hospitality insurance savings from 2 India hotel risk reviews"
+      ]
+    },
+    {
+      "lever_id": "ota_commission_reduction",
+      "lever_name": "OTA Commission Reduction (Direct Booking Channel Mix Shift)",
+      "description": "Shift booking mix toward direct channels via rate parity discipline, loyalty-exclusive pricing, and metasearch investment to cut OTA commissions.",
+      "category_ids": [
+        "MARKETING"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 22.0,
+      "p90_pct": 35.0,
+      "implementation_weeks": 22,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Ministry of Tourism India — India Tourism Statistics 2024 (tourism.gov.in/india-tourism-statistics) — OTA distribution channel mix benchmarks",
+        "FHRAI — Hotel Industry Survey 2024 (fhrai.com/) — OTA commission rates and direct booking benchmarks India 12-25%",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "fnb_procurement_optimization",
+      "lever_name": "Food & Beverage Procurement Optimisation (Menu Engineering & Waste Reduction)",
+      "description": "Consolidate F&B vendors, implement seasonal menu engineering, and enforce yield/portioning standards to cut food cost percentage.",
+      "category_ids": [
+        "LOGISTICS"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 14.0,
+      "p90_pct": 22.0,
+      "implementation_weeks": 18,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "FHRAI — Hotel Industry Survey 2024 (fhrai.com/) — F&B cost as % of revenue benchmarks India",
+        "Ministry of Tourism — India Tourism Statistics 2024 (tourism.gov.in/india-tourism-statistics) — hospitality sector cost structure data",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "energy_per_key_reduction",
+      "lever_name": "Energy Cost per Key Reduction (Smart Room Energy Management & HVAC Optimisation)",
+      "description": "Cut energy cost per occupied room via BMS-driven HVAC scheduling, heat-pump retrofits, and kitchen/laundry equipment upgrades.",
+      "category_ids": [
+        "POWER_ENERGY"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 20.0,
+      "p90_pct": 30.0,
+      "implementation_weeks": 22,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Ministry of Tourism — Green Hotel Guidelines (tourism.gov.in) — energy efficiency standards for Indian hotels",
+        "BEE — Hotel Energy Efficiency Programme (beeindia.gov.in) — energy intensity benchmarks for hospitality sector",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "housekeeping_optimization",
+      "lever_name": "Housekeeping Labour & Chemical Cost Optimisation",
+      "description": "Re-engineer housekeeping standards with workload-based staffing, task bundling, and outsourced deep-clean cycles to cut cost per occupied room.",
+      "category_ids": [
+        "HR"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 22.0,
+      "implementation_weeks": 18,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "FHRAI — Hotel Industry Survey 2024 (fhrai.com/) — housekeeping cost per occupied room benchmarks India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "revenue_management_optimization",
+      "lever_name": "Revenue Management & Dynamic Pricing Optimisation",
+      "description": "Deploy dynamic pricing and channel-mix revenue management to lift RevPAR while trimming distribution and manual pricing effort.",
+      "category_ids": [
+        "IT"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 9.0,
+      "p90_pct": 15.0,
+      "implementation_weeks": 18,
+      "brsr_principle": "P9",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "STR — India Hotel Benchmark 2024 (str.com/solutions/benchmarking) — RevPAR, ADR, occupancy benchmarks by hotel category and city",
+        "Ministry of Tourism — India Tourism Statistics 2024 (tourism.gov.in/india-tourism-statistics) — hotel performance data India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     }
   ]

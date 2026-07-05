@@ -7,8 +7,14 @@
       "lever_id": "shared_services_group",
       "lever_name": "Group-Level Shared Services Centre",
       "description": "Centralise back-office functions (HR ops, finance ops, IT, procurement, legal) across group companies into a single shared service centre. Eliminate entity-level duplication.",
-      "category_ids": ["HR", "IT", "PROF_SVCS"],
-      "p10_pct": 12.0, "p50_pct": 22.0, "p90_pct": 35.0,
+      "category_ids": [
+        "HR",
+        "IT",
+        "PROF_SVCS"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 22.0,
+      "p90_pct": 35.0,
       "implementation_weeks": 30,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -22,8 +28,15 @@
       "lever_id": "group_procurement_consolidation",
       "lever_name": "Group Procurement Consolidation & Category Management",
       "description": "Aggregate common spend categories (IT, travel, professional services, utilities, packaging, marketing) across group companies. Negotiate enterprise-level agreements.",
-      "category_ids": ["OUTSOURCED", "IT", "MARKETING", "PROF_SVCS"],
-      "p10_pct": 8.0, "p50_pct": 16.0, "p90_pct": 25.0,
+      "category_ids": [
+        "OUTSOURCED",
+        "IT",
+        "MARKETING",
+        "PROF_SVCS"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 16.0,
+      "p90_pct": 25.0,
       "implementation_weeks": 16,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -37,8 +50,13 @@
       "lever_id": "portfolio_rationalisation",
       "lever_name": "Portfolio Rationalisation & Sub-Optimal Business Exit",
       "description": "Identify and divest underperforming or non-core businesses; redeploy capital to high-ROCE businesses. Eliminate holding company overhead for exited entities.",
-      "category_ids": ["PROF_SVCS", "HR"],
-      "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 22.0,
+      "category_ids": [
+        "PROF_SVCS",
+        "HR"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 12.0,
+      "p90_pct": 22.0,
       "implementation_weeks": 40,
       "brsr_principle": "P1",
       "savings_type": "one_time",
@@ -52,8 +70,13 @@
       "lever_id": "treasury_working_capital",
       "lever_name": "Group Treasury & Working Capital Optimisation",
       "description": "Implement cash pooling across group entities; optimise inter-company loans at arm's length; reduce gross debt through better working capital management.",
-      "category_ids": ["FIN_SVCS", "HR"],
-      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "category_ids": [
+        "FIN_SVCS",
+        "HR"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
       "implementation_weeks": 12,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -67,8 +90,12 @@
       "lever_id": "real_estate_group_portfolio",
       "lever_name": "Group Real Estate Portfolio Optimisation",
       "description": "Audit group real estate holdings; exit non-strategic properties; monetise surplus land (listed or unlisted assets); consolidate offices of co-located group companies.",
-      "category_ids": ["FACILITIES"],
-      "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 22.0,
+      "category_ids": [
+        "FACILITIES"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 12.0,
+      "p90_pct": 22.0,
       "implementation_weeks": 24,
       "brsr_principle": "P4",
       "savings_type": "one_time",
@@ -82,8 +109,12 @@
       "lever_id": "digital_group_platform",
       "lever_name": "Group-Wide Digital Platform & IT Rationalisation",
       "description": "Consolidate ERP, HR, finance, and supply chain IT systems on group-wide platforms. Eliminate redundant SaaS subscriptions across entities. Migrate to group cloud agreement.",
-      "category_ids": ["IT"],
-      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "category_ids": [
+        "IT"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 18.0,
+      "p90_pct": 28.0,
       "implementation_weeks": 36,
       "brsr_principle": "P6",
       "savings_type": "mixed",
@@ -97,8 +128,13 @@
       "lever_id": "brsr_esg_programme",
       "lever_name": "Integrated ESG Programme & BRSR Compliance Efficiency",
       "description": "Build group-level ESG data management system to reduce BRSR compliance cost; identify carbon credit monetisation opportunities; align CSR spend to business-linked programmes.",
-      "category_ids": ["BRSR_ESG", "PROF_SVCS"],
-      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "category_ids": [
+        "BRSR_ESG",
+        "PROF_SVCS"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
       "implementation_weeks": 16,
       "brsr_principle": "P2",
       "savings_type": "run_rate",
@@ -112,8 +148,12 @@
       "lever_id": "group_energy_procurement",
       "lever_name": "Group Energy Procurement & Industrial Utilities Optimisation",
       "description": "Aggregate industrial power and fuel buying across group manufacturing entities; negotiate group PPAs and open-access contracts.",
-      "category_ids": ["POWER_ENERGY"],
-      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "category_ids": [
+        "POWER_ENERGY"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
       "implementation_weeks": 20,
       "brsr_principle": "P2",
       "savings_type": "run_rate",
@@ -121,6 +161,160 @@
         "BEE PAT Scheme results (beeindia.gov.in) — designated consumers achieve 10-20% energy cost reduction",
         "CEA Annual Report 2023-24 — industrial tariff and open-access benchmarks",
         "INTERNAL_CALIBRATION — group energy procurement savings from 2 India conglomerate energy mandates"
+      ]
+    },
+    {
+      "lever_id": "shared_services_center",
+      "lever_name": "Group Shared Services Centre (Finance / HR / IT / Procurement)",
+      "description": "Consolidate finance, HR, and procurement transactional work from group companies into a shared services centre with unit-cost SLAs.",
+      "category_ids": [
+        "PROF_SERVICES",
+        "HR"
+      ],
+      "p10_pct": 25.0,
+      "p50_pct": 38.0,
+      "p90_pct": 52.0,
+      "implementation_weeks": 60,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Deloitte — Global Shared Services & Outsourcing Survey 2024 (deloitte.com/content/dam/Deloitte/global/Documents/Tax/dttl-tax-global-shared-services-survey.pdf) — 25-50% cost reduction benchmarks for SSC migration",
+        "McKinsey & Company — Transforming the Back Office (mckinsey.com/capabilities/operations/our-insights) — shared services ROI studies across large conglomerates",
+        "Hackett Group — World-Class Shared Services Performance 2024 (thehackettgroup.com/research/) — G&A cost reduction through SSC"
+      ]
+    },
+    {
+      "lever_id": "group_procurement",
+      "lever_name": "Group Procurement Aggregation & Preferred Supplier Panels",
+      "description": "Aggregate common indirect categories across group companies into master agreements with group-level pricing and compliance tracking.",
+      "category_ids": [
+        "PROF_SERVICES",
+        "OFFICE"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 17.0,
+      "implementation_weeks": 26,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Hackett Group — World-Class Procurement Performance Study 2024 (thehackettgroup.com/research/) — group procurement aggregation savings 8-20%",
+        "CAPS Research — Group Purchasing & Consortium Benchmarks (capsresearch.org/benchmarking/) — spend aggregation leverage benchmarks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "corporate_overhead_right_size",
+      "lever_name": "Corporate Centre Right-Sizing (Lean HQ Model)",
+      "description": "Right-size corporate centre spans, delayer management, and rebase central function budgets against benchmarked cost-to-revenue ratios.",
+      "category_ids": [
+        "PROF_SERVICES",
+        "HR"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 22.0,
+      "p90_pct": 32.0,
+      "implementation_weeks": 32,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again) — 10-25% corporate overhead reduction",
+        "CII — India Inc. Cost Competitiveness Report 2024 (cii.in) — corporate overhead benchmarks for Indian conglomerates",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "portfolio_rationalization",
+      "lever_name": "Portfolio Rationalisation (Non-Core Divestiture)",
+      "description": "Exit or divest sub-scale business lines and merge overlapping legal entities to eliminate stranded overhead and compliance cost.",
+      "category_ids": [
+        "PROF_SERVICES"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 22.0,
+      "p90_pct": 34.0,
+      "implementation_weeks": 60,
+      "brsr_principle": "P2",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "McKinsey & Company — The Five Traps of Portfolio Rationalisation (mckinsey.com/capabilities/strategy-and-corporate-finance) — divestiture impact on EBITDA margins",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "group_insurance_pooling",
+      "lever_name": "Group Insurance Pooling & Captive Programme",
+      "description": "Pool group companies' insurance programmes into master policies with captive/retention analysis to cut total premium spend.",
+      "category_ids": [
+        "INSURANCE"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 22.0,
+      "implementation_weeks": 22,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Aon — Global Insurance Market Conditions Report 2024 (aon.com/risk-services/risk-consulting/insurance-market-update.jsp) — group pooling discount benchmarks 10-25%",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "intercompany_pricing_optimization",
+      "lever_name": "Intercompany Transfer Pricing & Shared Cost Optimisation",
+      "description": "Rebase intercompany service charges and royalties on benchmarked arm's-length rates with documented cost-allocation keys.",
+      "category_ids": [
+        "FIN_SVCS",
+        "PROF_SERVICES"
+      ],
+      "p10_pct": 1.0,
+      "p50_pct": 3.0,
+      "p90_pct": 6.0,
+      "implementation_weeks": 22,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "OECD — Transfer Pricing Guidelines for Multinational Enterprises 2022 (oecd.org/tax/transfer-pricing/) — arm's length principle for intercompany pricing",
+        "PwC — International Transfer Pricing 2024 (pwc.com/gx/en/services/tax/international-tax/transfer-pricing.html) — transfer pricing optimisation frameworks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "real_estate_portfolio_mgmt",
+      "lever_name": "Group Real Estate Portfolio Rationalisation",
+      "description": "Consolidate group office footprint, sublet surplus space, and renegotiate leases at renewal against market benchmarks.",
+      "category_ids": [
+        "FACILITIES"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 22.0,
+      "p90_pct": 32.0,
+      "implementation_weeks": 32,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "JLL India — India Office Market Report 2024 (jll.com/en-in/research/india-office-market-report) — office space rationalisation benchmarks",
+        "CBRE — India Real Estate Market Outlook 2024 (cbre.com/insights/reports/india-real-estate-market-outlook) — real estate portfolio optimisation",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "group_treasury_netting",
+      "lever_name": "Group Treasury Cash Pooling & Netting",
+      "description": "Centralise treasury with intercompany netting, cash pooling, and consolidated banking mandates to cut financing and bank fees.",
+      "category_ids": [
+        "FIN_SVCS"
+      ],
+      "p10_pct": 0.8,
+      "p50_pct": 2.0,
+      "p90_pct": 4.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Atradius — Payment Practices Barometer Asia-Pacific 2024 (atradius.us/knowledge-and-research/reports/payment-practices-barometer-asia-pacific.html) — working capital benchmarks",
+        "Hackett Group — Working Capital Management 2024 (thehackettgroup.com/working-capital-management-hackett/) — cash pooling and netting benefits",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     }
   ]

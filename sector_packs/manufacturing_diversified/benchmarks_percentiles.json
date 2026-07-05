@@ -1,7 +1,7 @@
 {
   "sector": "manufacturing_diversified",
   "version": "1.0",
-  "vintage_date": "2025-04-01",
+  "vintage_date": "2026-05-01",
   "confidence_overall": "public_disclosure",
   "source_metadata": {
     "primary_sources": [
@@ -34,46 +34,184 @@
     "manufacturing_diversified": {
       "categories": {
         "RAW_MATERIALS": {
-          "P25": 45.0, "P50": 55.0, "P75": 65.0, "P90": 72.0,
+          "P25": 45.0,
+          "P50": 55.0,
+          "P75": 65.0,
+          "P90": 72.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Material cost as % of revenue for diversified manufacturing (MCA21 Schedule III)."
         },
         "CONVERSION_COST": {
-          "P25": 12.0, "P50": 18.0, "P75": 24.0, "P90": 30.0,
+          "P25": 12.0,
+          "P50": 18.0,
+          "P75": 24.0,
+          "P90": 30.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Direct labour + manufacturing overhead + plant depreciation (ex-raw materials and energy). Decomposed from MCA21 Schedule III: Employee Benefit Expense (~9%), Depreciation (~4%), manufacturing overhead subset of Other Expenses (~5%). Cross-checked against CII Manufacturing Excellence cost-structure disclosures and BSE FY24 filings (Tata Motors, UltraTech, Pidilite)."
         },
         "LOGISTICS": {
-          "P25": 3.0, "P50": 5.0, "P75": 7.5, "P90": 10.0,
+          "P25": 3.0,
+          "P50": 5.0,
+          "P75": 7.5,
+          "P90": 10.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Freight, warehousing, distribution."
         },
         "FACILITIES": {
-          "P25": 2.0, "P50": 3.5, "P75": 5.0, "P90": 7.0,
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.0,
+          "P90": 7.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Plant rent, utilities (ex-energy pass-through)."
         },
         "IT_SOFTWARE": {
-          "P25": 0.8, "P50": 1.5, "P75": 2.5, "P90": 4.0,
+          "P25": 0.8,
+          "P50": 1.5,
+          "P75": 2.5,
+          "P90": 4.0,
           "unit": "% of revenue",
           "confidence": "published_research",
           "source_note": "ERP, MES, plant automation software."
         },
         "PROF_SERVICES": {
-          "P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.0,
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.0,
+          "P90": 3.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Consulting, audit, legal."
         },
         "OUTSOURCED": {
-          "P25": 4.0, "P50": 7.0, "P75": 10.0, "P90": 14.0,
+          "P25": 4.0,
+          "P50": 7.0,
+          "P75": 10.0,
+          "P90": 14.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Contract manufacturing, maintenance outsourcing."
+        },
+        "PLANT_MAINTENANCE": {
+          "P25": 1.5,
+          "P50": 2.5,
+          "P75": 4.0,
+          "P90": 5.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Maintenance & repairs 2-4% of revenue for asset-heavy plants (CII plant engineering benchmarks; MCA21 repairs-to-machinery disclosures)."
+        },
+        "POWER_ENERGY": {
+          "P25": 2.0,
+          "P50": 4.0,
+          "P75": 7.0,
+          "P90": 10.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Power & fuel as % of revenue from MCA21 Schedule III; CEA industrial tariff statistics FY24. Varies with segment energy intensity."
+        },
+        "PACKAGING": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.5,
+          "P90": 5.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Packing material consumption for discrete/process mix (Schedule III packing materials line)."
+        },
+        "raw_material_procurement": {
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.0,
+          "P90": 1.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Procurement function operating cost (people + systems) as % of revenue; ISM/CIPS procurement cost benchmarks."
+        },
+        "energy_utilities_plant": {
+          "P25": 1.5,
+          "P50": 3.0,
+          "P75": 5.0,
+          "P90": 8.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Plant utilities (power, steam, compressed air, water) share of conversion cost; CEA + PAT-cycle disclosures."
+        },
+        "maintenance_spares": {
+          "P25": 0.8,
+          "P50": 1.5,
+          "P75": 2.5,
+          "P90": 3.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Spares & consumables inventory consumption; MRO spend studies (Ardent Partners 2024)."
+        },
+        "quality_testing": {
+          "P25": 0.4,
+          "P50": 0.8,
+          "P75": 1.5,
+          "P90": 2.2,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "QA/QC labs, testing, certification and cost of poor quality remediation; ASQ COPQ studies."
+        },
+        "pli_scheme_costs": {
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.6,
+          "P90": 1.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "PLI scheme compliance, certification and claim administration for participating manufacturers (MeitY/DPIIT scheme guidelines)."
+        },
+        "ehs_environment": {
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.0,
+          "P90": 1.6,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "EHS compliance, effluent treatment, CPCB/SPCB consent costs and BRSR environmental reporting."
+        },
+        "inbound_logistics": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.5,
+          "P90": 5.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Inbound freight & handling; India logistics cost studies (NCAER 2023 logistics cost ~7.8-8.9% of GDP)."
+        },
+        "outbound_logistics": {
+          "P25": 1.5,
+          "P50": 2.8,
+          "P75": 4.5,
+          "P90": 6.5,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Outbound/secondary freight incl. warehousing; MCA21 freight & forwarding disclosures."
+        },
+        "contract_manufacturing": {
+          "P25": 2.0,
+          "P50": 5.0,
+          "P75": 9.0,
+          "P90": 14.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Third-party conversion/job-work charges where outsourced manufacturing is used (Schedule III job work expenses)."
+        },
+        "r_and_d_expense": {
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.5,
+          "P90": 4.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "R&D revenue expenditure per DSIR-recognised unit disclosures; diversified industrials median ~1%."
         }
       }
     }

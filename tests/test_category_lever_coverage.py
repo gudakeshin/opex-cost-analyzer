@@ -56,9 +56,21 @@ def _norm_cat_id(cat: str) -> str:
     return (cat or "").strip().lower().replace(" ", "_")
 
 
-def test_bfsi_taxonomy_categories_have_linked_lever() -> None:
-    """Every additional_categories entry in bfsi_banks taxonomy must have at least one linked lever."""
-    pack_id = "bfsi_banks"
+def _pack_status(pack_id: str) -> str:
+    manifest = (ROOT_DIR / "sector_packs" / pack_id / "pack_manifest.yaml").read_text(encoding="utf-8")
+    for line in manifest.splitlines():
+        if line.startswith("status:"):
+            return line.split(":", 1)[1].strip()
+    return "scaffold"
+
+
+def _full_pack_ids() -> list[str]:
+    return [p for p in _pack_ids() if _pack_status(p) == "full"]
+
+
+@pytest.mark.parametrize("pack_id", _full_pack_ids())
+def test_full_pack_taxonomy_categories_have_linked_lever(pack_id: str) -> None:
+    """Every additional_categories entry in a full pack's taxonomy must have a linked lever."""
     tax_path = ROOT_DIR / "sector_packs" / pack_id / "taxonomy_extension.json"
     tax = json.loads(tax_path.read_text(encoding="utf-8"))
     taxonomy_ids = [c["category_id"] for c in tax.get("additional_categories") or []]
@@ -76,9 +88,9 @@ def test_bfsi_taxonomy_categories_have_linked_lever() -> None:
     )
 
 
-def test_bfsi_stub_runtime_lever_parity() -> None:
-    """Stub lever IDs must exist in runtime sector_specific_levers (no orphan stubs)."""
-    pack_id = "bfsi_banks"
+@pytest.mark.parametrize("pack_id", _pack_ids())
+def test_stub_runtime_lever_parity(pack_id: str) -> None:
+    """Stub and runtime lever catalogs must carry the same lever_id set (both directions)."""
     stub_path = ROOT_DIR / "sector_packs" / pack_id / "sector_levers.json"
     runtime_path = ROOT_DIR / "skills" / "sector-packs" / pack_id / "sector_levers.json"
     stub = json.loads(stub_path.read_text(encoding="utf-8"))
@@ -88,20 +100,25 @@ def test_bfsi_stub_runtime_lever_parity() -> None:
     runtime_ids = {lev["lever_id"] for lev in runtime.get("sector_specific_levers") or []}
 
     orphan_stubs = stub_ids - runtime_ids
+    missing_stubs = runtime_ids - stub_ids
     assert not orphan_stubs, (
         f"{pack_id}: stub levers missing from runtime: {sorted(orphan_stubs)}. "
         f"Run scripts/sync_category_levers_runtime.py"
     )
+    assert not missing_stubs, (
+        f"{pack_id}: runtime levers missing stub entries: {sorted(missing_stubs)}. "
+        f"Run scripts/backfill_stub_levers.py"
+    )
 
 
-def test_bfsi_benchmark_category_ids_on_levers() -> None:
-    """BFSI lever category_ids for benchmarked keys must be subset of benchmark keys."""
-    pack_id = "bfsi_banks"
+@pytest.mark.parametrize("pack_id", _full_pack_ids())
+def test_full_pack_benchmark_category_ids_on_levers(pack_id: str) -> None:
+    """Full-pack benchmark categories must each appear on at least one stub lever."""
     stub_path = ROOT_DIR / "sector_packs" / pack_id / "sector_levers.json"
     bench_path = ROOT_DIR / "sector_packs" / pack_id / "benchmarks_percentiles.json"
     stub = json.loads(stub_path.read_text(encoding="utf-8"))
     bench = json.loads(bench_path.read_text(encoding="utf-8"))
-    bench_cats = set(bench["benchmarks"]["bfsi_banks"]["categories"].keys())
+    bench_cats = set(bench["benchmarks"][pack_id]["categories"].keys())
     bench_norm = {_norm_cat_id(c): c for c in bench_cats}
 
     linked: set[str] = set()
@@ -110,5 +127,4 @@ def test_bfsi_benchmark_category_ids_on_levers() -> None:
             norm = _norm_cat_id(str(cat))
             if norm in bench_norm:
                 linked.add(bench_norm[norm])
-    # All benchmark categories must appear on at least one lever (covered by parametrized test)
     assert linked == bench_cats, f"benchmark categories not linked: {bench_cats - linked}"

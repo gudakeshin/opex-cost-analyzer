@@ -7,8 +7,14 @@
       "lever_id": "energy_efficiency_program",
       "lever_name": "Plant Energy Efficiency Programme",
       "description": "ISO 50001 audit + variable speed drives + waste heat recovery. Typical 12–22% energy bill reduction.",
-      "category_ids": ["FACILITIES"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 22.0,
+      "category_ids": [
+        "FACILITIES",
+        "energy_utilities_plant",
+        "POWER_ENERGY"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 22.0,
       "implementation_weeks": 20,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -22,8 +28,14 @@
       "lever_id": "logistics_network_redesign",
       "lever_name": "Outbound Logistics Network Redesign",
       "description": "Hub-and-spoke model; milk-run consolidation; 3PL contract renegotiation.",
-      "category_ids": ["LOGISTICS"],
-      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "category_ids": [
+        "LOGISTICS",
+        "inbound_logistics",
+        "outbound_logistics"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 18.0,
+      "p90_pct": 28.0,
       "implementation_weeks": 16,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -37,8 +49,13 @@
       "lever_id": "gst_itc_recovery",
       "lever_name": "GST ITC Leakage Recovery",
       "description": "Reconcile GSTR-2B vs purchase register; recover blocked credits under Sec 17(5) exclusions.",
-      "category_ids": ["RAW_MATERIALS"],
-      "p10_pct": 2.0, "p50_pct": 4.0, "p90_pct": 8.0,
+      "category_ids": [
+        "RAW_MATERIALS",
+        "pli_scheme_costs"
+      ],
+      "p10_pct": 2.0,
+      "p50_pct": 4.0,
+      "p90_pct": 8.0,
       "implementation_weeks": 8,
       "brsr_principle": "P1",
       "savings_type": "one_time",
@@ -52,8 +69,13 @@
       "lever_id": "rm_should_cost_bom",
       "lever_name": "Should-Cost / Clean-Sheet BOM Modelling",
       "description": "Build first-principles should-cost models for top BOM categories using commodity indices, process yields, and benchmark specs; use models to drive RFx and renegotiation.",
-      "category_ids": ["RAW_MATERIALS"],
-      "p10_pct": 3.0, "p50_pct": 6.0, "p90_pct": 10.0,
+      "category_ids": [
+        "RAW_MATERIALS",
+        "raw_material_procurement"
+      ],
+      "p10_pct": 3.0,
+      "p50_pct": 6.0,
+      "p90_pct": 10.0,
       "implementation_weeks": 20,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -67,8 +89,13 @@
       "lever_id": "rm_supplier_consolidation",
       "lever_name": "Raw Material Supplier Consolidation & Rate Contracts",
       "description": "Rationalise raw material vendor base; implement framework rate contracts, volume rebates, and quarterly business reviews with top-tier suppliers.",
-      "category_ids": ["RAW_MATERIALS"],
-      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "category_ids": [
+        "RAW_MATERIALS",
+        "raw_material_procurement"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 8.0,
+      "p90_pct": 14.0,
       "implementation_weeks": 16,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -82,8 +109,13 @@
       "lever_id": "rm_alternate_vendor_dual_sourcing",
       "lever_name": "Alternate Vendor Qualification & Dual Sourcing",
       "description": "Qualify domestic or import-substitute alternate vendors per key material; run competitive RFQ to restore pricing tension and reduce single-source dependency.",
-      "category_ids": ["RAW_MATERIALS"],
-      "p10_pct": 3.0, "p50_pct": 7.0, "p90_pct": 12.0,
+      "category_ids": [
+        "RAW_MATERIALS",
+        "raw_material_procurement"
+      ],
+      "p10_pct": 3.0,
+      "p50_pct": 7.0,
+      "p90_pct": 12.0,
       "implementation_weeks": 24,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -97,8 +129,13 @@
       "lever_id": "vave_design_to_cost",
       "lever_name": "VAVE / Design-to-Cost Engineering",
       "description": "Cross-functional Value Analysis / Value Engineering workshops on top cost drivers: material substitution, gauge reduction, process simplification, and spec right-sizing.",
-      "category_ids": ["RAW_MATERIALS"],
-      "p10_pct": 4.0, "p50_pct": 9.0, "p90_pct": 16.0,
+      "category_ids": [
+        "RAW_MATERIALS",
+        "r_and_d_expense"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 9.0,
+      "p90_pct": 16.0,
       "implementation_weeks": 28,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -112,8 +149,14 @@
       "lever_id": "mro_vendor_consolidation",
       "lever_name": "MRO Vendor Consolidation",
       "description": "Reduce MRO vendors 40%; framework contracts with quarterly rebates; VMI for top-20 SKUs.",
-      "category_ids": ["OUTSOURCED"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "category_ids": [
+        "OUTSOURCED",
+        "maintenance_spares",
+        "PLANT_MAINTENANCE"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 25.0,
       "implementation_weeks": 12,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -127,8 +170,13 @@
       "lever_id": "contract_manufacturing_optimise",
       "lever_name": "Job Work & Contract Mfg Optimisation",
       "description": "Insource sub-optimal job-work where BEP positive; renegotiate utilisation-based contracts.",
-      "category_ids": ["OUTSOURCED"],
-      "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "category_ids": [
+        "OUTSOURCED",
+        "contract_manufacturing"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
       "implementation_weeks": 24,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -141,8 +189,13 @@
       "lever_id": "ind_as116_lease_reclassify",
       "lever_name": "Ind AS 116 Lease Reclassification",
       "description": "Identify short-term/low-value leases mis-classified as ROU; correct to P&L; recover cash flow.",
-      "category_ids": ["FACILITIES", "LOGISTICS"],
-      "p10_pct": 1.0, "p50_pct": 3.0, "p90_pct": 6.0,
+      "category_ids": [
+        "FACILITIES",
+        "LOGISTICS"
+      ],
+      "p10_pct": 1.0,
+      "p50_pct": 3.0,
+      "p90_pct": 6.0,
       "implementation_weeks": 6,
       "brsr_principle": "P1",
       "savings_type": "one_time",
@@ -156,8 +209,12 @@
       "lever_id": "mes_erp_rationalisation",
       "lever_name": "MES / ERP & Plant Software Rationalisation",
       "description": "Consolidate plant MES, ERP modules, and automation software licences; eliminate redundant vendor contracts across sites.",
-      "category_ids": ["IT_SOFTWARE"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "category_ids": [
+        "IT_SOFTWARE"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 24.0,
       "implementation_weeks": 20,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -171,8 +228,12 @@
       "lever_id": "prof_services_governance",
       "lever_name": "Consulting, Audit & Legal Spend Governance",
       "description": "Implement panel-firm governance, competitive RFP for audit rotation, and consulting engagement ROI gates for plant and corporate advisory spend.",
-      "category_ids": ["PROF_SERVICES"],
-      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "category_ids": [
+        "PROF_SERVICES"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
       "implementation_weeks": 10,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -186,8 +247,12 @@
       "lever_id": "kaizen_smed_programme",
       "lever_name": "Kaizen, SMED & Shop-Floor Continuous Improvement",
       "description": "Establish loss-bucket analysis by line; run SMED on top changeover SKUs and Kaizen blitzes on highest-loss workstations; standardise visual management and tiered problem-solving.",
-      "category_ids": ["CONVERSION_COST"],
-      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "category_ids": [
+        "CONVERSION_COST"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 8.0,
+      "p90_pct": 14.0,
       "implementation_weeks": 20,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -201,8 +266,12 @@
       "lever_id": "plant_oee_bottleneck_removal",
       "lever_name": "OEE & Bottleneck Removal Programme",
       "description": "Map availability, performance, and quality losses by line; remove bottleneck constraints via capacity balancing, minor stoppage elimination, and throughput optimisation.",
-      "category_ids": ["CONVERSION_COST"],
-      "p10_pct": 6.0, "p50_pct": 11.0, "p90_pct": 18.0,
+      "category_ids": [
+        "CONVERSION_COST"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 11.0,
+      "p90_pct": 18.0,
       "implementation_weeks": 24,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -216,8 +285,12 @@
       "lever_id": "factory_automation",
       "lever_name": "Factory Automation & Robotics",
       "description": "Phased deployment of robotics, vision systems, AGVs, and PLC automation on stable, high-volume processes to reduce direct labour and defect rates.",
-      "category_ids": ["CONVERSION_COST"],
-      "p10_pct": 12.0, "p50_pct": 20.0, "p90_pct": 30.0,
+      "category_ids": [
+        "CONVERSION_COST"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 20.0,
+      "p90_pct": 30.0,
       "implementation_weeks": 60,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -231,8 +304,12 @@
       "lever_id": "industry_4_physical_ai",
       "lever_name": "Industry 4.0 / Physical AI Shop-Floor Intelligence",
       "description": "Instrument bottleneck lines with IoT sensors, MES integration, edge analytics, and computer-vision quality inspection to improve OEE, reduce COPQ, and enable predictive control.",
-      "category_ids": ["CONVERSION_COST"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "category_ids": [
+        "CONVERSION_COST"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 24.0,
       "implementation_weeks": 36,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -246,8 +323,13 @@
       "lever_id": "conversion_scrap_copq_reduction",
       "lever_name": "Scrap, Rework & COPQ Reduction",
       "description": "Establish Cost of Poor Quality baseline; deploy Six Sigma / SPC on critical parameters; reduce scrap, rework, and warranty costs through root-cause elimination.",
-      "category_ids": ["CONVERSION_COST"],
-      "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 22.0,
+      "category_ids": [
+        "CONVERSION_COST",
+        "quality_testing"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 12.0,
+      "p90_pct": 22.0,
       "implementation_weeks": 24,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -261,8 +343,14 @@
       "lever_id": "predictive_maintenance",
       "lever_name": "Predictive / Condition-Based Maintenance",
       "description": "Shift from time-based to sensor-led predictive maintenance; model remaining useful life on critical assets to reduce unplanned downtime and OEE losses.",
-      "category_ids": ["CONVERSION_COST"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "category_ids": [
+        "CONVERSION_COST",
+        "PLANT_MAINTENANCE",
+        "maintenance_spares"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 25.0,
       "implementation_weeks": 24,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -270,6 +358,65 @@
         "Bureau of Energy Efficiency (BEE) — PAT Scheme maintenance excellence results (beeindia.gov.in) — predictive maintenance reduces downtime 12-25%",
         "CII — Maintenance Excellence case studies (cii.in) — condition-based maintenance vs time-based benchmarks",
         "INTERNAL_CALIBRATION — savings range calibrated from 3 India manufacturing predictive maintenance mandates"
+      ]
+    },
+    {
+      "lever_id": "mro_consolidation",
+      "lever_name": "MRO Vendor Consolidation & Rate Contracts",
+      "description": "Consolidate MRO vendors under annual rate contracts with ABC-criticality stocking norms and consumption-based replenishment.",
+      "category_ids": [
+        "PLANT_MAINTENANCE",
+        "maintenance_spares"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 18.0,
+      "p90_pct": 27.0,
+      "implementation_weeks": 22,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "energy_audit_compliance",
+      "lever_name": "Plant Energy Audit & Consumption Reduction",
+      "description": "Execute PAT-cycle energy audits and implement identified conservation measures (VFDs, waste-heat recovery, compressed-air fixes) across plants.",
+      "category_ids": [
+        "POWER_ENERGY",
+        "energy_utilities_plant",
+        "ehs_environment"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 16.0,
+      "p90_pct": 26.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "DPE — Survey of CPSEs 2023-24 (dpe.gov.in/reports/annual-report)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "packaging_optimisation",
+      "lever_name": "Primary / Secondary Packaging Specification Optimisation",
+      "description": "Lightweight and right-size packaging specifications, increase recycled content, and consolidate packaging vendors across plants.",
+      "category_ids": [
+        "PACKAGING"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
+      "implementation_weeks": 26,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     }
   ]

@@ -7,8 +7,12 @@
       "lever_id": "manpower_rationalisation_vrs",
       "lever_name": "Manpower Rationalisation & VRS",
       "description": "Implement Voluntary Retirement Scheme (VRS) to reduce headcount in overstaffed functions; redeploy staff to growth areas; contract-out non-core services.",
-      "category_ids": ["HR"],
-      "p10_pct": 6.0, "p50_pct": 14.0, "p90_pct": 24.0,
+      "category_ids": [
+        "HR"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 14.0,
+      "p90_pct": 24.0,
       "implementation_weeks": 26,
       "brsr_principle": "P5",
       "savings_type": "run_rate",
@@ -22,8 +26,13 @@
       "lever_id": "procurement_gem_portal",
       "lever_name": "GeM Portal & Centralised Procurement",
       "description": "Mandate Government e-Marketplace (GeM) for all eligible purchases; implement centralised procurement for common items across CPSE group; standardise technical specifications.",
-      "category_ids": ["OUTSOURCED", "PLANT_MAINTENANCE"],
-      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "category_ids": [
+        "OUTSOURCED",
+        "PLANT_MAINTENANCE"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
       "implementation_weeks": 8,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -37,8 +46,12 @@
       "lever_id": "inventory_rationalisation",
       "lever_name": "Inventory Rationalisation & Stores Management",
       "description": "Implement inventory analytics to identify slow-moving stores & spares; reduce dead stock; implement VMI with key suppliers; standardise spare parts catalogue.",
-      "category_ids": ["OUTSOURCED"],
-      "p10_pct": 8.0, "p50_pct": 16.0, "p90_pct": 26.0,
+      "category_ids": [
+        "OUTSOURCED"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 16.0,
+      "p90_pct": 26.0,
       "implementation_weeks": 16,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -52,8 +65,12 @@
       "lever_id": "technology_erp_modernisation",
       "lever_name": "ERP & Digital Transformation",
       "description": "Migrate from legacy systems to modern ERP (SAP S/4HANA); implement e-tendering and digital payments; deploy analytics for production planning and cost monitoring.",
-      "category_ids": ["IT"],
-      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "category_ids": [
+        "IT"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
       "implementation_weeks": 52,
       "brsr_principle": "P6",
       "savings_type": "mixed",
@@ -67,8 +84,13 @@
       "lever_id": "energy_efficiency_plants",
       "lever_name": "Energy Efficiency in Manufacturing Plants",
       "description": "PAT (Perform Achieve and Trade) scheme compliance; implement waste heat recovery, motor efficiency upgrades, compressed air leak reduction, lighting LED retrofit.",
-      "category_ids": ["POWER_ENERGY", "PLANT_MAINTENANCE"],
-      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "category_ids": [
+        "POWER_ENERGY",
+        "PLANT_MAINTENANCE"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
       "implementation_weeks": 20,
       "brsr_principle": "P2",
       "savings_type": "run_rate",
@@ -82,8 +104,13 @@
       "lever_id": "commercial_recovery_ndues",
       "lever_name": "Commercial Recovery & Dues Realisation",
       "description": "Improve debtor days through active collection of government dues, advance payment clauses in new contracts, and legal proceedings for aged receivables.",
-      "category_ids": ["HR", "PROF_SVCS"],
-      "p10_pct": 3.0, "p50_pct": 8.0, "p90_pct": 15.0,
+      "category_ids": [
+        "HR",
+        "PROF_SVCS"
+      ],
+      "p10_pct": 3.0,
+      "p50_pct": 8.0,
+      "p90_pct": 15.0,
       "implementation_weeks": 16,
       "brsr_principle": "P1",
       "savings_type": "one_time",
@@ -97,8 +124,12 @@
       "lever_id": "brsr_reporting_efficiency",
       "lever_name": "BRSR / ESG Reporting & Assurance Efficiency",
       "description": "Integrate ESG data collection across CPSE subsidiaries; consolidate assurance providers; align to SEBI BRSR Core glide path for listed PSUs.",
-      "category_ids": ["BRSR_ESG"],
-      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "category_ids": [
+        "BRSR_ESG"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
       "implementation_weeks": 16,
       "brsr_principle": "P2",
       "savings_type": "run_rate",
@@ -112,8 +143,12 @@
       "lever_id": "insurance_premium_optimization",
       "lever_name": "CPSE Insurance Pooling & Premium Optimisation",
       "description": "Pool property and asset insurance across CPSE group; competitive RFP vs New India Assurance incumbent rates.",
-      "category_ids": ["INSURANCE"],
-      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 16.0,
+      "category_ids": [
+        "INSURANCE"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 16.0,
       "implementation_weeks": 10,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -127,8 +162,12 @@
       "lever_id": "township_cost_optimisation",
       "lever_name": "Township & Establishment Cost Optimisation",
       "description": "Rationalise captive townships, canteens, and establishment charges; outsource non-core facilities services; monetise surplus residential assets.",
-      "category_ids": ["FACILITIES"],
-      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "category_ids": [
+        "FACILITIES"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 8.0,
+      "p90_pct": 14.0,
       "implementation_weeks": 20,
       "brsr_principle": "P4",
       "savings_type": "run_rate",
@@ -142,8 +181,12 @@
       "lever_id": "cag_audit_readiness",
       "lever_name": "CAG Audit Readiness & Advisory Cost Control",
       "description": "Reduce repeat CAG observations through process fixes; cap external legal and consulting spend tied to audit remediation.",
-      "category_ids": ["PROF_SVCS"],
-      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "category_ids": [
+        "PROF_SVCS"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 8.0,
+      "p90_pct": 14.0,
       "implementation_weeks": 12,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -151,6 +194,158 @@
         "CAG Reports on CPSEs 2023-24 (cag.gov.in) — recurring audit observations drive advisory spend",
         "DPE Guidelines on CPSE governance — audit remediation and compliance cost benchmarks",
         "INTERNAL_CALIBRATION — CAG readiness savings from 2 India PSU governance mandates"
+      ]
+    },
+    {
+      "lever_id": "gst_itc_recovery",
+      "lever_name": "GST Input Tax Credit Optimisation & Recovery",
+      "description": "Recover blocked input tax credit through vendor compliance remediation, GSTR-2B reconciliation, and refund claim acceleration.",
+      "category_ids": [
+        "FIN_SVCS"
+      ],
+      "p10_pct": 2.0,
+      "p50_pct": 5.0,
+      "p90_pct": 9.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "GST Act 2017 Section 17(5) — blocked credit categories (statutory)",
+        "DPE — Survey of CPSEs 2022-23 (dpe.gov.in/reports/annual-report) — GST compliance benchmarks for CPSEs",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "ind_as_116_lease",
+      "lever_name": "Ind AS 116 Lease Reclassification (Operating vs. Finance)",
+      "description": "Restructure lease portfolios post-Ind AS 116 — renegotiate embedded escalations, exercise break clauses, and rationalise underutilised leased assets.",
+      "category_ids": [
+        "FACILITIES"
+      ],
+      "p10_pct": 1.0,
+      "p50_pct": 3.0,
+      "p90_pct": 7.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P2",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "MCA — Indian Accounting Standard Ind AS 116 Leases (mca.gov.in) — statutory accounting standard",
+        "ICAI — Ind AS 116 Implementation Guidance (icai.org) — practical expedients for short-term and low-value leases",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "csr_efficiency",
+      "lever_name": "CSR Spend Efficiency & Impact Optimisation",
+      "description": "Consolidate CSR programme administration, co-fund with government schemes, and shift to outcome-based partner contracts to raise impact per rupee.",
+      "category_ids": [
+        "CSR"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 22.0,
+      "implementation_weeks": 14,
+      "brsr_principle": "P8",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "MCA — CSR Annual Reports & Impact Data (mca.gov.in/content/mca/global/en/acts-rules/ebooks/circulars.html) — Companies Act 2013 Section 135 CSR spending data",
+        "DPE — Survey of CPSEs CSR Expenditure 2022-23 (dpe.gov.in/reports/annual-report) — CPSE CSR spend impact benchmarks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "public_procurement_reform",
+      "lever_name": "Public Procurement Reform (GeM / DGS&D Rate Contracts)",
+      "description": "Adopt GeM marketplace pricing, e-reverse auctions, and framework agreements to compress procurement rates within CVC guidelines.",
+      "category_ids": [
+        "PROF_SERVICES"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
+      "implementation_weeks": 18,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "GeM — Government e-Marketplace Annual Report 2023-24 (gem.gov.in/resources/files/Annual_Report_GEM.pdf) — GeM procurement savings benchmarks for CPSEs",
+        "CVC — Procurement Reform Guidelines (cvc.gov.in) — public procurement best practices",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "mro_consolidation",
+      "lever_name": "MRO Vendor Consolidation & Rate Contracts",
+      "description": "Consolidate MRO vendors under annual rate contracts with ABC-criticality stocking norms and consumption-based replenishment.",
+      "category_ids": [
+        "PLANT_MAINTENANCE"
+      ],
+      "p10_pct": 7.0,
+      "p50_pct": 15.0,
+      "p90_pct": 26.0,
+      "implementation_weeks": 22,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "DPE — Survey of CPSEs 2022-23 (dpe.gov.in/reports/annual-report) — MRO and maintenance spend benchmarks for CPSEs",
+        "Hackett Group — World-Class Procurement Benchmarks 2024 (thehackettgroup.com/research/) — MRO consolidation savings 8-20%",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "energy_audit_compliance",
+      "lever_name": "BEE Energy Audit & PAT Cycle Compliance",
+      "description": "Execute PAT-cycle energy audits and implement identified conservation measures (VFDs, waste-heat recovery, compressed-air fixes) across plants.",
+      "category_ids": [
+        "POWER_ENERGY"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 16.0,
+      "p90_pct": 24.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "BEE — Perform Achieve Trade (PAT) Scheme Cycle Results (beeindia.gov.in/content/pat-cycle) — energy savings achieved by designated consumers including CPSEs",
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/) — industrial energy efficiency benchmarks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "manpower_rationalisation",
+      "lever_name": "Manpower Rationalisation (VRS / Role Automation)",
+      "description": "Rebalance workforce through VRS design, redeployment to growth units, and freeze-and-attrite plans aligned with DPE guidelines.",
+      "category_ids": [
+        "HR"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 18.0,
+      "p90_pct": 28.0,
+      "implementation_weeks": 52,
+      "brsr_principle": "P3",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "DPE — Survey of CPSEs 2022-23 (dpe.gov.in/reports/annual-report) — employee cost as % of revenue benchmarks for CPSEs",
+        "CAG — Audit Reports on CPSEs (cag.gov.in/en/report) — manpower productivity findings",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "project_cost_overrun_control",
+      "lever_name": "Capital Project Cost & Overrun Control",
+      "description": "Institute stage-gate reviews, EPC contract discipline, and independent cost audits to arrest project time and cost overruns.",
+      "category_ids": [
+        "PROF_SVCS"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 10.0,
+      "p90_pct": 16.0,
+      "implementation_weeks": 26,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CAG — Audit Reports on Infrastructure Projects (cag.gov.in/en/report) — project cost overrun patterns in Indian CPSEs",
+        "DPE — MoU Performance Evaluation of CPSEs 2023 (dpe.gov.in) — project delivery KPIs",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     }
   ]

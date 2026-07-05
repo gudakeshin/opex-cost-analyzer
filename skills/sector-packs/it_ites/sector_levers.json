@@ -1634,42 +1634,53 @@
       ],
       "execution_playbook": [
         {
-          "step": "Confirm scope for Loyalty Programme Cost Efficiency: validate baseline and stakeholders",
-          "owner_role": "Process Owner",
+          "step": "Aggregate consulting and advisory spend by firm, project, and sponsoring executive (36 months)",
+          "owner_role": "Procurement Analytics",
           "duration_weeks": 2
         },
         {
-          "step": "Define target operating policy and approval workflow",
-          "owner_role": "CFO / Functional Head",
+          "step": "Institute a demand gate: business case, internal-capability check, and ROI hypothesis before engagement",
+          "owner_role": "CFO / Transformation Office",
           "duration_weeks": 3
         },
         {
-          "step": "Implement system controls and communicate standards",
-          "owner_role": "IT / Shared Services",
-          "duration_weeks": 4
+          "step": "Negotiate preferred-firm panel with rate cards, value-based fees, and volume commitments",
+          "owner_role": "Strategic Sourcing",
+          "duration_weeks": 5
         },
         {
-          "step": "Monitor compliance and reset budgets to hold savings",
+          "step": "Shift repeatable work to internal teams or lower-cost providers; cap partner-heavy staffing ratios",
+          "owner_role": "Functional Heads",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track benefits realisation per engagement against the approved business case",
           "owner_role": "FP&A",
           "duration_weeks": 4
         }
       ],
       "diagnostic_signals": [
         {
-          "signal": "Maverick or off-catalog spend share elevated",
+          "signal": "Consulting spend growing faster than revenue with fragmented firm panel",
           "evidence_source": "spend_profile",
-          "confirms": "Demand leakage is present"
+          "confirms": "Governance and consolidation savings exist"
         },
         {
-          "signal": "Policy exceptions rising period-on-period",
+          "signal": "Engagements extended repeatedly without re-approval or measured outcomes",
           "evidence_source": "p2p_logs",
-          "confirms": "Governance gap is widening"
+          "confirms": "Demand-side controls are absent"
+        },
+        {
+          "signal": "Rates per grade vary widely across firms for comparable work",
+          "evidence_source": "vendor_master",
+          "confirms": "Rate-card negotiation headroom exists"
         }
       ],
       "required_data_fields": [
-        "Transaction-level spend with requester/BU",
-        "Approval workflow configuration",
-        "Policy exception log"
+        "Consulting/advisory spend by firm, project, and sponsor (36 months)",
+        "Engagement contracts with rates, staffing mix, and deliverables",
+        "Internal capability inventory for overlapping skills",
+        "Benefits tracking for past engagements where available"
       ],
       "applicability_threshold_pct": 0.03
     }

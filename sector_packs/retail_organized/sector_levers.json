@@ -7,8 +7,12 @@
       "lever_id": "real_estate_portfolio_optimisation",
       "lever_name": "Store Network & Real Estate Portfolio Optimisation",
       "description": "Exit sub-performing stores (below threshold revenue/sqft); renegotiate leases at renewal; shift from revenue-share to fixed-rent structures where profitable.",
-      "category_ids": ["FACILITIES"],
-      "p10_pct": 8.0, "p50_pct": 16.0, "p90_pct": 28.0,
+      "category_ids": [
+        "FACILITIES"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 16.0,
+      "p90_pct": 28.0,
       "implementation_weeks": 20,
       "brsr_principle": "P4",
       "savings_type": "run_rate",
@@ -22,8 +26,13 @@
       "lever_id": "shrinkage_reduction",
       "lever_name": "Shrinkage & Pilferage Reduction",
       "description": "Deploy RFID, AI-vision cameras, electronic article surveillance; improve inventory reconciliation frequency; staff awareness training.",
-      "category_ids": ["OUTSOURCED", "IT"],
-      "p10_pct": 15.0, "p50_pct": 25.0, "p90_pct": 40.0,
+      "category_ids": [
+        "OUTSOURCED",
+        "IT"
+      ],
+      "p10_pct": 15.0,
+      "p50_pct": 25.0,
+      "p90_pct": 40.0,
       "implementation_weeks": 12,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -37,8 +46,13 @@
       "lever_id": "private_label_expansion",
       "lever_name": "Private Label Programme Expansion",
       "description": "Grow private label share of assortment in high-volume categories to capture 15-25pp margin premium vs. branded products.",
-      "category_ids": ["MARKETING", "OUTSOURCED"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "category_ids": [
+        "MARKETING",
+        "OUTSOURCED"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 25.0,
       "implementation_weeks": 24,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -52,8 +66,12 @@
       "lever_id": "supply_chain_direct_sourcing",
       "lever_name": "Direct Farm/Factory Sourcing & Supply Chain Compression",
       "description": "Eliminate distributors and C&F agents; source directly from manufacturers and farms; deploy cross-docking to reduce handling touches.",
-      "category_ids": ["LOGISTICS_INDIA"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "category_ids": [
+        "LOGISTICS_INDIA"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 24.0,
       "implementation_weeks": 20,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -67,8 +85,12 @@
       "lever_id": "workforce_scheduling_optimisation",
       "lever_name": "Workforce Scheduling & Productivity Optimisation",
       "description": "Implement AI-based workforce scheduling aligned to footfall patterns; reduce overtime; use part-time/contractual staffing for peak hours.",
-      "category_ids": ["HR"],
-      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "category_ids": [
+        "HR"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
       "implementation_weeks": 10,
       "brsr_principle": "P5",
       "savings_type": "run_rate",
@@ -82,8 +104,12 @@
       "lever_id": "omnichannel_digital_integration",
       "lever_name": "Omnichannel & Digital Integration",
       "description": "Consolidate online and offline technology stacks (OMS, WMS, loyalty). Reduce duplicate IT maintenance costs; enable ship-from-store to reduce fulfilment cost.",
-      "category_ids": ["IT"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "category_ids": [
+        "IT"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 24.0,
       "implementation_weeks": 24,
       "brsr_principle": "P6",
       "savings_type": "mixed",
@@ -97,8 +123,12 @@
       "lever_id": "insurance_premium_optimization",
       "lever_name": "Retail Property & Inventory Insurance Optimisation",
       "description": "Competitive RFP for property, inventory, and liability insurance; optimise deductibles and coverage limits across store network.",
-      "category_ids": ["INSURANCE"],
-      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "category_ids": [
+        "INSURANCE"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
       "implementation_weeks": 8,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -112,8 +142,12 @@
       "lever_id": "retail_compliance_audit_efficiency",
       "lever_name": "Audit, Legal & Compliance Advisory Efficiency",
       "description": "Consolidate legal and audit panel firms; standardise store compliance advisory; reduce duplicate statutory filings across entities.",
-      "category_ids": ["PROF_SVCS"],
-      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 16.0,
+      "category_ids": [
+        "PROF_SVCS"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 16.0,
       "implementation_weeks": 10,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -121,6 +155,136 @@
         "SEBI LODR — listed retailer audit rotation and compliance cost disclosure",
         "Hackett Group G&A Benchmarks 2024 — advisory spend governance 10-18% savings",
         "INTERNAL_CALIBRATION — retail compliance advisory savings from 2 India organised retail mandates"
+      ]
+    },
+    {
+      "lever_id": "store_labor_optimization",
+      "lever_name": "Store Labour & Scheduling Optimisation",
+      "description": "Deploy traffic-driven labour scheduling, task-time standards, and multi-skilling to cut store labour cost per transaction.",
+      "category_ids": [
+        "HR"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 14.0,
+      "p90_pct": 22.0,
+      "implementation_weeks": 18,
+      "brsr_principle": "P3",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RAI — India Retail Report 2024 (rai.net.in/) — store labour productivity benchmarks (sales per FTE)",
+        "McKinsey & Company — Reimagining the Store (mckinsey.com/industries/retail) — labour scheduling optimisation 8-18%",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "category_management",
+      "lever_name": "Category Management & Vendor Funding Optimisation",
+      "description": "Deploy category captaincy with joint business plans, planogram discipline, and margin-mix targets across grocery and general merchandise categories.",
+      "category_ids": [
+        "MARKETING"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 9.0,
+      "p90_pct": 16.0,
+      "implementation_weeks": 22,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RAI — India Retail Report 2024 (rai.net.in/) — vendor funding and category management benchmarks India",
+        "Nielsen — Retail Execution Excellence 2024 (nielsen.com/insights/) — category management ROI",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "private_label",
+      "lever_name": "Private Label / Own-Brand Development",
+      "description": "Expand private-label penetration in high-margin categories with dedicated sourcing and quality programmes to improve blended margin.",
+      "category_ids": [
+        "MARKETING",
+        "RAW_MATERIALS"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 14.0,
+      "p90_pct": 22.0,
+      "implementation_weeks": 40,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RAI — India Retail Report 2024 (rai.net.in/) — private label penetration and margin premium benchmarks India",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "omnichannel_fulfillment",
+      "lever_name": "Omnichannel Fulfilment Cost Optimisation",
+      "description": "Optimise split between store-fulfilled, dark-store, and DC e-commerce fulfilment to cut cost per order without degrading promise times.",
+      "category_ids": [
+        "LOGISTICS"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 16.0,
+      "p90_pct": 26.0,
+      "implementation_weeks": 36,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CRISIL — India E-Commerce and Logistics Report 2024 (crisil.com) — last-mile delivery cost benchmarks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "markdown_optimization",
+      "lever_name": "Markdown & Clearance Optimisation",
+      "description": "Apply ML-driven markdown timing and depth optimisation by store/SKU to recover margin from clearance activity.",
+      "category_ids": [
+        "MARKETING"
+      ],
+      "p10_pct": 2.0,
+      "p50_pct": 5.0,
+      "p90_pct": 9.0,
+      "implementation_weeks": 22,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Nielsen — Retail Inventory Management 2024 (nielsen.com/insights/) — markdown optimisation and clearance benchmarks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "loyalty_program_efficiency",
+      "lever_name": "Loyalty Programme Cost Efficiency",
+      "description": "Re-engineer loyalty economics — tier thresholds, breakage assumptions, and partner-funded rewards — to cut programme cost per active member.",
+      "category_ids": [
+        "MARKETING"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 22.0,
+      "p90_pct": 32.0,
+      "implementation_weeks": 22,
+      "brsr_principle": "P9",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RAI — India Retail Report 2024 (rai.net.in/) — loyalty programme cost as % of sales and redemption benchmarks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ]
+    },
+    {
+      "lever_id": "store_network_optimization",
+      "lever_name": "Store Network Rationalisation",
+      "description": "Exit persistently sub-threshold stores, renegotiate renewal leases, and rebalance formats toward higher-productivity footprints.",
+      "category_ids": [
+        "FACILITIES"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 22.0,
+      "p90_pct": 32.0,
+      "implementation_weeks": 30,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RAI — India Retail Report 2024 (rai.net.in/) — retail store productivity and breakeven benchmarks India",
+        "JLL India — India Retail Real Estate Report 2024 (jll.com/en-in/research) — rental benchmarks and store network optimisation",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
       ]
     }
   ]

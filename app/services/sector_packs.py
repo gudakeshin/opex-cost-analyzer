@@ -286,6 +286,87 @@ def merge_taxonomy(base_categories: List[Dict], pack_id: str) -> List[Dict]:
     return merged
 
 
+# Minimum content depth a pack must carry before it may declare status=full.
+# Derived from the bfsi_banks / manufacturing_diversified gold standard.
+FULL_PACK_MIN_TAXONOMY = 10
+FULL_PACK_MIN_PEERS = 8
+FULL_PACK_MIN_BENCHMARK_CATEGORIES = 15
+FULL_PACK_MIN_KPIS = 8
+FULL_PACK_MIN_TRIGGERS = 5
+_BENCHMARK_REQUIRED_FIELDS = ("P25", "P50", "P75", "P90", "unit", "confidence", "source_note")
+
+
+def _full_pack_depth_checks(
+    pack_id: str, pack: Dict[str, Any], runtime_levers: List[Dict[str, Any]]
+) -> tuple[Dict[str, bool], List[str]]:
+    """Content-depth gate for status=full packs; scaffolds/drafts are exempt."""
+    checks: Dict[str, bool] = {}
+    errors: List[str] = []
+
+    tax_cats = pack["taxonomy_extension"].get("additional_categories", [])
+    checks["full_taxonomy_depth"] = len(tax_cats) >= FULL_PACK_MIN_TAXONOMY
+    if not checks["full_taxonomy_depth"]:
+        errors.append(
+            f"status=full requires >= {FULL_PACK_MIN_TAXONOMY} taxonomy categories, found {len(tax_cats)}"
+        )
+
+    peers = pack["peer_set"].get("peers", [])
+    checks["full_peer_depth"] = len(peers) >= FULL_PACK_MIN_PEERS
+    if not checks["full_peer_depth"]:
+        errors.append(f"status=full requires >= {FULL_PACK_MIN_PEERS} peers, found {len(peers)}")
+
+    bench_path = pack_dir(pack_id) / "benchmarks_percentiles.json"
+    bench_cats: Dict[str, Any] = {}
+    if bench_path.exists():
+        bench_cats = (
+            _load_json(bench_path).get("benchmarks", {}).get(pack_id, {}).get("categories") or {}
+        )
+    checks["full_benchmark_depth"] = len(bench_cats) >= FULL_PACK_MIN_BENCHMARK_CATEGORIES
+    if not checks["full_benchmark_depth"]:
+        errors.append(
+            f"status=full requires >= {FULL_PACK_MIN_BENCHMARK_CATEGORIES} benchmark categories, "
+            f"found {len(bench_cats)}"
+        )
+    bad_bench = [
+        cat_id
+        for cat_id, row in bench_cats.items()
+        if not all(field in row for field in _BENCHMARK_REQUIRED_FIELDS)
+    ]
+    checks["full_benchmark_fields"] = len(bad_bench) == 0
+    if bad_bench:
+        errors.append(f"Benchmark categories missing P25/P50/P75/P90/unit/confidence/source_note: {bad_bench[:10]}")
+
+    kpis = pack.get("kpi_pack") or []
+    n_kpis = len(kpis) if isinstance(kpis, list) else 0
+    checks["full_kpi_depth"] = n_kpis >= FULL_PACK_MIN_KPIS
+    if not checks["full_kpi_depth"]:
+        errors.append(f"status=full requires >= {FULL_PACK_MIN_KPIS} KPIs, found {n_kpis}")
+
+    triggers = parse_regulatory_triggers(pack.get("regulatory_layer") or "")
+    checks["full_regulatory_triggers"] = len(triggers) >= FULL_PACK_MIN_TRIGGERS
+    if not checks["full_regulatory_triggers"]:
+        errors.append(
+            f"status=full requires >= {FULL_PACK_MIN_TRIGGERS} parsed regulatory triggers, found {len(triggers)}"
+        )
+
+    major = str(pack["version"]).split(".")[0]
+    checks["full_version_ge_1"] = major.isdigit() and int(major) >= 1
+    if not checks["full_version_ge_1"]:
+        errors.append(f"status=full requires version >= 1.0, found {pack['version']}")
+
+    stub_ids = {lv.get("lever_id") for lv in pack_levers_list(pack.get("sector_levers"))}
+    runtime_ids = {lv.get("lever_id") for lv in runtime_levers}
+    missing_stub = sorted(runtime_ids - stub_ids)
+    orphan_stub = sorted(stub_ids - runtime_ids)
+    checks["full_lever_parity"] = not missing_stub and not orphan_stub
+    if missing_stub:
+        errors.append(f"Runtime levers missing stub entries in sector_packs/{pack_id}: {missing_stub[:10]}")
+    if orphan_stub:
+        errors.append(f"Stub levers absent from runtime skills pack for {pack_id}: {orphan_stub[:10]}")
+
+    return checks, errors
+
+
 def run_regression_test(pack_id: str) -> Dict[str, Any]:
     """
     Validate pack integrity before a version bump can be released.
@@ -373,6 +454,12 @@ def run_regression_test(pack_id: str) -> Dict[str, Any]:
     checks["regulatory_layer_present"] = has_regulatory
     if status == "full" and not has_regulatory:
         errors.append("regulatory_layer.md is required for status=full packs")
+
+    # 6. Depth checks — only gate packs that claim status=full
+    if status == "full":
+        depth_checks, depth_errors = _full_pack_depth_checks(pack_id, pack, sector_levers)
+        checks.update(depth_checks)
+        errors.extend(depth_errors)
 
     passed = all(checks.values())
     return {"passed": passed, "pack_id": pack_id, "version": pack["version"], "checks": checks, "errors": errors}

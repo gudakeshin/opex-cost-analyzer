@@ -175,42 +175,53 @@
       "lever_id": "demand_management",
       "execution_playbook": [
         {
-          "step": "Confirm scope for Loyalty Programme Cost Efficiency: validate baseline and stakeholders",
-          "owner_role": "Process Owner",
+          "step": "Baseline consumption by category, BU, and requester; separate price from volume drivers over 24 months",
+          "owner_role": "FP&A / Procurement Analytics",
           "duration_weeks": 2
         },
         {
-          "step": "Define target operating policy and approval workflow",
+          "step": "Set demand policies per category (eligibility, frequency, standards) and quantify the volume reduction target",
           "owner_role": "CFO / Functional Head",
           "duration_weeks": 3
         },
         {
-          "step": "Implement system controls and communicate standards",
+          "step": "Configure catalog restrictions, approval thresholds, and budget gates in the P2P system",
           "owner_role": "IT / Shared Services",
           "duration_weeks": 4
         },
         {
-          "step": "Monitor compliance and reset budgets to hold savings",
-          "owner_role": "FP&A",
+          "step": "Run BU-level demand review boards for top categories with monthly consumption scorecards",
+          "owner_role": "Category Manager",
           "duration_weeks": 4
+        },
+        {
+          "step": "Reset budgets to the new consumption baseline so savings cannot be respent",
+          "owner_role": "FP&A",
+          "duration_weeks": 3
         }
       ],
       "diagnostic_signals": [
         {
-          "signal": "Maverick or off-catalog spend share elevated",
+          "signal": "Consumption volume growing faster than the business driver (headcount, revenue, output)",
           "evidence_source": "spend_profile",
-          "confirms": "Demand leakage is present"
+          "confirms": "Volume-driven leakage, not price, is the savings pool"
         },
         {
-          "signal": "Policy exceptions rising period-on-period",
+          "signal": "Wide per-employee or per-unit consumption variance across comparable BUs",
+          "evidence_source": "spend_profile",
+          "confirms": "Policy and demand discipline gaps exist"
+        },
+        {
+          "signal": "Approval exceptions and off-catalog requests rising period-on-period",
           "evidence_source": "p2p_logs",
-          "confirms": "Governance gap is widening"
+          "confirms": "Current controls are not containing demand"
         }
       ],
       "required_data_fields": [
-        "Transaction-level spend with requester/BU",
-        "Approval workflow configuration",
-        "Policy exception log"
+        "Transaction-level spend with requester, BU, and cost centre (24 months)",
+        "Business driver series (headcount, revenue, production volume) by BU",
+        "P2P approval workflow configuration and exception log",
+        "Category consumption policies currently in force"
       ],
       "applicability_threshold_pct": 0.03
     },
@@ -445,42 +456,53 @@
       "lever_id": "maverick_compliance",
       "execution_playbook": [
         {
-          "step": "Confirm scope for Loyalty Programme Cost Efficiency: validate baseline and stakeholders",
-          "owner_role": "Process Owner",
+          "step": "Quantify off-contract spend by category and vendor; identify top maverick requesters and root causes",
+          "owner_role": "Procurement Analytics",
           "duration_weeks": 2
         },
         {
-          "step": "Define target operating policy and approval workflow",
-          "owner_role": "CFO / Functional Head",
+          "step": "Close catalog gaps: onboard missing items/vendors under contract and fix punch-out usability issues",
+          "owner_role": "Category Manager",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Enforce no-PO-no-pay and channel blocking for categories with contracted alternatives",
+          "owner_role": "P2P Process Owner",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Publish BU-level compliance scorecards with escalation to functional heads for repeat leakage",
+          "owner_role": "FP&A",
           "duration_weeks": 3
         },
         {
-          "step": "Implement system controls and communicate standards",
-          "owner_role": "IT / Shared Services",
-          "duration_weeks": 4
-        },
-        {
-          "step": "Monitor compliance and reset budgets to hold savings",
-          "owner_role": "FP&A",
-          "duration_weeks": 4
+          "step": "Recover retro rebates and reprice trailing maverick purchases onto contract terms",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 3
         }
       ],
       "diagnostic_signals": [
         {
-          "signal": "Maverick or off-catalog spend share elevated",
+          "signal": "Off-contract share above 15% in categories with valid framework agreements",
           "evidence_source": "spend_profile",
-          "confirms": "Demand leakage is present"
+          "confirms": "Contract leakage is material and addressable"
         },
         {
-          "signal": "Policy exceptions rising period-on-period",
+          "signal": "Invoices without POs or POs raised after invoice date",
           "evidence_source": "p2p_logs",
-          "confirms": "Governance gap is widening"
+          "confirms": "Purchasing controls are bypassed routinely"
+        },
+        {
+          "signal": "Price paid for identical items varies across BUs beyond contract tiers",
+          "evidence_source": "vendor_master",
+          "confirms": "Negotiated rates are not being applied"
         }
       ],
       "required_data_fields": [
-        "Transaction-level spend with requester/BU",
-        "Approval workflow configuration",
-        "Policy exception log"
+        "PO/non-PO invoice split by category and BU (24 months)",
+        "Contract coverage map: categories with active framework agreements and rates",
+        "Item-level price variance for top repeat purchases",
+        "P2P channel configuration (catalog, punch-out, free-text)"
       ],
       "applicability_threshold_pct": 0.03
     },
@@ -870,42 +892,53 @@
       "lever_id": "zero_based_rebaseline",
       "execution_playbook": [
         {
-          "step": "Confirm scope for Loyalty Programme Cost Efficiency: validate baseline and stakeholders",
-          "owner_role": "Process Owner",
-          "duration_weeks": 2
-        },
-        {
-          "step": "Define target operating policy and approval workflow",
-          "owner_role": "CFO / Functional Head",
+          "step": "Select ZBB pilot cost packages and build activity-level cost visibility (driver x rate) for each",
+          "owner_role": "FP&A",
           "duration_weeks": 3
         },
         {
-          "step": "Implement system controls and communicate standards",
-          "owner_role": "IT / Shared Services",
+          "step": "Challenge every activity against business need: eliminate, reduce, standardise, or automate",
+          "owner_role": "CFO / BU Heads",
           "duration_weeks": 4
         },
         {
-          "step": "Monitor compliance and reset budgets to hold savings",
+          "step": "Rebuild budgets bottom-up from approved activities at target unit rates",
           "owner_role": "FP&A",
           "duration_weeks": 4
+        },
+        {
+          "step": "Lock governance: monthly variance review against the zero-based budget with reinvestment gates",
+          "owner_role": "FP&A",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Roll out to remaining cost packages in waves using pilot playbook",
+          "owner_role": "Transformation Office",
+          "duration_weeks": 8
         }
       ],
       "diagnostic_signals": [
         {
-          "signal": "Maverick or off-catalog spend share elevated",
-          "evidence_source": "spend_profile",
-          "confirms": "Demand leakage is present"
+          "signal": "Budgets set incrementally (prior year + x%) with no activity-level justification",
+          "evidence_source": "process_benchmarking",
+          "confirms": "Structural over-budgeting is likely embedded"
         },
         {
-          "signal": "Policy exceptions rising period-on-period",
-          "evidence_source": "p2p_logs",
-          "confirms": "Governance gap is widening"
+          "signal": "Cost packages growing despite flat or falling business volumes",
+          "evidence_source": "spend_profile",
+          "confirms": "Spend is decoupled from need"
+        },
+        {
+          "signal": "Large favourable variances repeatedly rebadged as new spend late in the year",
+          "evidence_source": "operating_metrics",
+          "confirms": "Budget padding exists and can be harvested"
         }
       ],
       "required_data_fields": [
-        "Transaction-level spend with requester/BU",
-        "Approval workflow configuration",
-        "Policy exception log"
+        "Cost-centre level budgets vs actuals (36 months)",
+        "Activity/driver decomposition for target cost packages",
+        "Headcount and vendor spend mapped to each activity",
+        "Prior-year budget build methodology and assumptions"
       ],
       "applicability_threshold_pct": 0.03
     },
@@ -1149,42 +1182,53 @@
       "lever_id": "specification_optimization",
       "execution_playbook": [
         {
-          "step": "Confirm scope for Loyalty Programme Cost Efficiency: validate baseline and stakeholders",
-          "owner_role": "Process Owner",
-          "duration_weeks": 2
-        },
-        {
-          "step": "Define target operating policy and approval workflow",
-          "owner_role": "CFO / Functional Head",
+          "step": "Rank top spend items by value and margin impact; shortlist over-specified candidates with engineering",
+          "owner_role": "Category Manager / Engineering",
           "duration_weeks": 3
         },
         {
-          "step": "Implement system controls and communicate standards",
-          "owner_role": "IT / Shared Services",
+          "step": "Run tear-down/should-cost and functional analysis to separate must-have from over-engineered attributes",
+          "owner_role": "Value Engineering Team",
           "duration_weeks": 4
         },
         {
-          "step": "Monitor compliance and reset budgets to hold savings",
-          "owner_role": "FP&A",
-          "duration_weeks": 4
+          "step": "Validate de-specified alternatives with quality, regulatory, and key customers where relevant",
+          "owner_role": "Quality / R&D",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Negotiate re-specified items with incumbents and challengers; capture price delta",
+          "owner_role": "Strategic Sourcing",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Embed spec review gates into new product and repeat-buy approval workflows",
+          "owner_role": "Engineering Change Board",
+          "duration_weeks": 3
         }
       ],
       "diagnostic_signals": [
         {
-          "signal": "Maverick or off-catalog spend share elevated",
-          "evidence_source": "spend_profile",
-          "confirms": "Demand leakage is present"
+          "signal": "Specifications exceed functional requirements or industry norms for the use case",
+          "evidence_source": "benchmark",
+          "confirms": "De-speccing headroom exists without performance loss"
         },
         {
-          "signal": "Policy exceptions rising period-on-period",
-          "evidence_source": "p2p_logs",
-          "confirms": "Governance gap is widening"
+          "signal": "Single-source items whose spec locks out competition",
+          "evidence_source": "vendor_master",
+          "confirms": "Spec change unlocks competitive pricing"
+        },
+        {
+          "signal": "Material or grade cost per unit above should-cost model output",
+          "evidence_source": "spend_profile",
+          "confirms": "Value-engineering gap is quantifiable"
         }
       ],
       "required_data_fields": [
-        "Transaction-level spend with requester/BU",
-        "Approval workflow configuration",
-        "Policy exception log"
+        "Bill of materials / item master with specifications for top items",
+        "Should-cost or benchmark cost models for shortlisted items",
+        "Quality and regulatory constraints per item",
+        "Supplier quotes for alternative specifications"
       ],
       "applicability_threshold_pct": 0.03
     },
@@ -2188,42 +2232,53 @@
       "lever_id": "benefits_cost_optimization",
       "execution_playbook": [
         {
-          "step": "Confirm scope for Loyalty Programme Cost Efficiency: validate baseline and stakeholders",
-          "owner_role": "Process Owner",
-          "duration_weeks": 2
-        },
-        {
-          "step": "Define target operating policy and approval workflow",
-          "owner_role": "CFO / Functional Head",
+          "step": "Baseline total benefits cost per employee by plan, grade, and geography against market benchmarks",
+          "owner_role": "Total Rewards / HR",
           "duration_weeks": 3
         },
         {
-          "step": "Implement system controls and communicate standards",
-          "owner_role": "IT / Shared Services",
-          "duration_weeks": 4
+          "step": "Analyse utilisation and perceived value per benefit; identify low-use high-cost items",
+          "owner_role": "HR Analytics",
+          "duration_weeks": 3
         },
         {
-          "step": "Monitor compliance and reset budgets to hold savings",
-          "owner_role": "FP&A",
-          "duration_weeks": 4
+          "step": "Redesign the benefits portfolio: flex-benefit wallets, plan tier changes, and voluntary top-ups",
+          "owner_role": "CHRO / CFO",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Re-broke insurance programmes (GMC/GPA/GTL) with claims-experience data and wellness credits",
+          "owner_role": "Benefits Broker / Total Rewards",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Communicate changes with employee value framing and track uptake vs cost per employee",
+          "owner_role": "HR Communications",
+          "duration_weeks": 3
         }
       ],
       "diagnostic_signals": [
         {
-          "signal": "Maverick or off-catalog spend share elevated",
-          "evidence_source": "spend_profile",
-          "confirms": "Demand leakage is present"
+          "signal": "Benefits cost per employee above 75th percentile of market for the talent segment",
+          "evidence_source": "hr_analytics",
+          "confirms": "Portfolio is over-market and can be rebalanced"
         },
         {
-          "signal": "Policy exceptions rising period-on-period",
-          "evidence_source": "p2p_logs",
-          "confirms": "Governance gap is widening"
+          "signal": "GMC claims loss ratio driving premium escalation above medical inflation",
+          "evidence_source": "operating_metrics",
+          "confirms": "Plan design and wellness levers can cut premium"
+        },
+        {
+          "signal": "Benefits with <20% utilisation absorbing material spend",
+          "evidence_source": "hr_analytics",
+          "confirms": "Low-value benefits can be swapped or dropped"
         }
       ],
       "required_data_fields": [
-        "Transaction-level spend with requester/BU",
-        "Approval workflow configuration",
-        "Policy exception log"
+        "Benefits cost per employee by plan, grade, location (24 months)",
+        "Insurance claims experience and loss ratios by policy year",
+        "Benefit utilisation / enrolment statistics",
+        "Market benchmark for benefits spend in comparable employers"
       ],
       "applicability_threshold_pct": 0.03
     },
@@ -2255,42 +2310,53 @@
       "lever_id": "contingent_workforce_optimization",
       "execution_playbook": [
         {
-          "step": "Confirm scope for Loyalty Programme Cost Efficiency: validate baseline and stakeholders",
-          "owner_role": "Process Owner",
-          "duration_weeks": 2
-        },
-        {
-          "step": "Define target operating policy and approval workflow",
-          "owner_role": "CFO / Functional Head",
+          "step": "Census the contingent workforce: headcount, tenure, rates, and engagement mode by function and vendor",
+          "owner_role": "Procurement / HR",
           "duration_weeks": 3
         },
         {
-          "step": "Implement system controls and communicate standards",
-          "owner_role": "IT / Shared Services",
-          "duration_weeks": 4
+          "step": "Define role-level sourcing rules: SOW for outcomes, T&M for defined capacity, augmentation only for true flex",
+          "owner_role": "CHRO / CFO / Functional Heads",
+          "duration_weeks": 3
         },
         {
-          "step": "Monitor compliance and reset budgets to hold savings",
-          "owner_role": "FP&A",
+          "step": "Rationalise rates: benchmark rate cards, tenure caps, and volume discounts across staffing vendors",
+          "owner_role": "Strategic Sourcing",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Convert long-tenure augmentation roles to employees or outcome-based SOWs where cheaper",
+          "owner_role": "HR / Vendor Management",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Stand up a VMS/contingent tower with monthly mix and rate compliance reporting",
+          "owner_role": "Vendor Management Office",
           "duration_weeks": 4
         }
       ],
       "diagnostic_signals": [
         {
-          "signal": "Maverick or off-catalog spend share elevated",
-          "evidence_source": "spend_profile",
-          "confirms": "Demand leakage is present"
+          "signal": "Contingent workers with tenure >18 months on time-and-material terms",
+          "evidence_source": "hr_analytics",
+          "confirms": "Conversion or SOW restructuring saves margin"
         },
         {
-          "signal": "Policy exceptions rising period-on-period",
-          "evidence_source": "p2p_logs",
-          "confirms": "Governance gap is widening"
+          "signal": "Rate variance for identical roles across staffing vendors above 15%",
+          "evidence_source": "vendor_master",
+          "confirms": "Rate card discipline is missing"
+        },
+        {
+          "signal": "Contingent share of workforce above sector norm without seasonal justification",
+          "evidence_source": "hr_analytics",
+          "confirms": "Mix is structurally expensive"
         }
       ],
       "required_data_fields": [
-        "Transaction-level spend with requester/BU",
-        "Approval workflow configuration",
-        "Policy exception log"
+        "Contingent workforce census with rates, tenure, vendor, and engagement mode",
+        "Staffing vendor contracts and rate cards",
+        "Comparable internal fully-loaded cost per role",
+        "Demand forecast by function for the next 12-24 months"
       ],
       "applicability_threshold_pct": 0.03
     },
@@ -2322,42 +2388,53 @@
       "lever_id": "consulting_spend_governance",
       "execution_playbook": [
         {
-          "step": "Confirm scope for Loyalty Programme Cost Efficiency: validate baseline and stakeholders",
-          "owner_role": "Process Owner",
+          "step": "Aggregate consulting and advisory spend by firm, project, and sponsoring executive (36 months)",
+          "owner_role": "Procurement Analytics",
           "duration_weeks": 2
         },
         {
-          "step": "Define target operating policy and approval workflow",
-          "owner_role": "CFO / Functional Head",
+          "step": "Institute a demand gate: business case, internal-capability check, and ROI hypothesis before engagement",
+          "owner_role": "CFO / Transformation Office",
           "duration_weeks": 3
         },
         {
-          "step": "Implement system controls and communicate standards",
-          "owner_role": "IT / Shared Services",
-          "duration_weeks": 4
+          "step": "Negotiate preferred-firm panel with rate cards, value-based fees, and volume commitments",
+          "owner_role": "Strategic Sourcing",
+          "duration_weeks": 5
         },
         {
-          "step": "Monitor compliance and reset budgets to hold savings",
+          "step": "Shift repeatable work to internal teams or lower-cost providers; cap partner-heavy staffing ratios",
+          "owner_role": "Functional Heads",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track benefits realisation per engagement against the approved business case",
           "owner_role": "FP&A",
           "duration_weeks": 4
         }
       ],
       "diagnostic_signals": [
         {
-          "signal": "Maverick or off-catalog spend share elevated",
+          "signal": "Consulting spend growing faster than revenue with fragmented firm panel",
           "evidence_source": "spend_profile",
-          "confirms": "Demand leakage is present"
+          "confirms": "Governance and consolidation savings exist"
         },
         {
-          "signal": "Policy exceptions rising period-on-period",
+          "signal": "Engagements extended repeatedly without re-approval or measured outcomes",
           "evidence_source": "p2p_logs",
-          "confirms": "Governance gap is widening"
+          "confirms": "Demand-side controls are absent"
+        },
+        {
+          "signal": "Rates per grade vary widely across firms for comparable work",
+          "evidence_source": "vendor_master",
+          "confirms": "Rate-card negotiation headroom exists"
         }
       ],
       "required_data_fields": [
-        "Transaction-level spend with requester/BU",
-        "Approval workflow configuration",
-        "Policy exception log"
+        "Consulting/advisory spend by firm, project, and sponsor (36 months)",
+        "Engagement contracts with rates, staffing mix, and deliverables",
+        "Internal capability inventory for overlapping skills",
+        "Benefits tracking for past engagements where available"
       ],
       "applicability_threshold_pct": 0.03
     },
@@ -2389,42 +2466,53 @@
       "lever_id": "legal_spend_optimization",
       "execution_playbook": [
         {
-          "step": "Confirm scope for Loyalty Programme Cost Efficiency: validate baseline and stakeholders",
-          "owner_role": "Process Owner",
-          "duration_weeks": 2
-        },
-        {
-          "step": "Define target operating policy and approval workflow",
-          "owner_role": "CFO / Functional Head",
+          "step": "Baseline outside counsel spend by firm, matter type, and billing arrangement; identify concentration",
+          "owner_role": "Legal Ops",
           "duration_weeks": 3
         },
         {
-          "step": "Implement system controls and communicate standards",
-          "owner_role": "IT / Shared Services",
+          "step": "Publish outside counsel guidelines: staffing, billing rules, budget caps, and e-billing enforcement",
+          "owner_role": "General Counsel",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Tier the panel: premium firms for bet-the-company matters, mid-tier and ALSPs for routine work",
+          "owner_role": "Legal Ops / Procurement",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Negotiate alternative fee arrangements (fixed, capped, success-linked) for predictable matter types",
+          "owner_role": "General Counsel / Legal Ops",
           "duration_weeks": 4
         },
         {
-          "step": "Monitor compliance and reset budgets to hold savings",
-          "owner_role": "FP&A",
-          "duration_weeks": 4
+          "step": "Insource high-volume routine work with legal tech (contract review, compliance filings)",
+          "owner_role": "Legal Ops",
+          "duration_weeks": 6
         }
       ],
       "diagnostic_signals": [
         {
-          "signal": "Maverick or off-catalog spend share elevated",
+          "signal": "Hourly-rate billing dominates with no matter budgets or e-billing validation",
           "evidence_source": "spend_profile",
-          "confirms": "Demand leakage is present"
+          "confirms": "Fee arrangement and enforcement savings available"
         },
         {
-          "signal": "Policy exceptions rising period-on-period",
+          "signal": "Premium firms handling routine, repeatable matters",
+          "evidence_source": "vendor_master",
+          "confirms": "Right-tiering panel cuts blended rate"
+        },
+        {
+          "signal": "Legal spend per matter rising with invoice write-off rates near zero",
           "evidence_source": "p2p_logs",
-          "confirms": "Governance gap is widening"
+          "confirms": "Bill review discipline is missing"
         }
       ],
       "required_data_fields": [
-        "Transaction-level spend with requester/BU",
-        "Approval workflow configuration",
-        "Policy exception log"
+        "Outside counsel invoices by firm, matter, timekeeper grade (24-36 months)",
+        "Matter census with type, complexity, and outcome",
+        "Current billing guidelines and e-billing system rules",
+        "In-house team capacity and utilisation"
       ],
       "applicability_threshold_pct": 0.03
     },
@@ -2456,42 +2544,53 @@
       "lever_id": "ld_rationalization",
       "execution_playbook": [
         {
-          "step": "Confirm scope for Loyalty Programme Cost Efficiency: validate baseline and stakeholders",
-          "owner_role": "Process Owner",
+          "step": "Consolidate all L&D spend: vendors, platforms, content licences, internal academy costs, and travel",
+          "owner_role": "L&D / FP&A",
           "duration_weeks": 2
         },
         {
-          "step": "Define target operating policy and approval workflow",
-          "owner_role": "CFO / Functional Head",
+          "step": "Map curriculum against strategic skill gaps; cut low-completion and duplicative programmes",
+          "owner_role": "CHRO / L&D",
           "duration_weeks": 3
         },
         {
-          "step": "Implement system controls and communicate standards",
-          "owner_role": "IT / Shared Services",
+          "step": "Consolidate content platforms onto one enterprise licence with usage-based tiers",
+          "owner_role": "L&D / Procurement",
           "duration_weeks": 4
         },
         {
-          "step": "Monitor compliance and reset budgets to hold savings",
-          "owner_role": "FP&A",
+          "step": "Shift generic training to digital/cohort formats; reserve instructor-led for high-value skills",
+          "owner_role": "L&D",
           "duration_weeks": 4
+        },
+        {
+          "step": "Install per-learner cost and completion dashboards with quarterly portfolio reviews",
+          "owner_role": "HR Analytics",
+          "duration_weeks": 3
         }
       ],
       "diagnostic_signals": [
         {
-          "signal": "Maverick or off-catalog spend share elevated",
-          "evidence_source": "spend_profile",
-          "confirms": "Demand leakage is present"
+          "signal": "Multiple overlapping content platforms with sub-40% licence activation",
+          "evidence_source": "hr_analytics",
+          "confirms": "Platform consolidation savings are immediate"
         },
         {
-          "signal": "Policy exceptions rising period-on-period",
-          "evidence_source": "p2p_logs",
-          "confirms": "Governance gap is widening"
+          "signal": "L&D cost per employee above benchmark with completion rates below 50%",
+          "evidence_source": "hr_analytics",
+          "confirms": "Portfolio is oversized relative to value delivered"
+        },
+        {
+          "signal": "Instructor-led and travel-heavy delivery for content available digitally",
+          "evidence_source": "spend_profile",
+          "confirms": "Delivery mode shift cuts cost per learning hour"
         }
       ],
       "required_data_fields": [
-        "Transaction-level spend with requester/BU",
-        "Approval workflow configuration",
-        "Policy exception log"
+        "L&D spend by vendor, platform, programme (24 months)",
+        "Licence counts vs active usage per platform",
+        "Completion and satisfaction metrics by programme",
+        "Skill gap priorities from workforce planning"
       ],
       "applicability_threshold_pct": 0.03
     },
@@ -2523,42 +2622,53 @@
       "lever_id": "agency_fee_optimization",
       "execution_playbook": [
         {
-          "step": "Confirm scope for Loyalty Programme Cost Efficiency: validate baseline and stakeholders",
-          "owner_role": "Process Owner",
-          "duration_weeks": 2
-        },
-        {
-          "step": "Define target operating policy and approval workflow",
-          "owner_role": "CFO / Functional Head",
+          "step": "Disaggregate agency fees: retainers, project fees, media commissions, and pass-through costs by agency",
+          "owner_role": "Marketing Procurement",
           "duration_weeks": 3
         },
         {
-          "step": "Implement system controls and communicate standards",
-          "owner_role": "IT / Shared Services",
-          "duration_weeks": 4
+          "step": "Benchmark scopes of work against rate cards and FTE-based pricing models",
+          "owner_role": "Marketing Procurement",
+          "duration_weeks": 3
         },
         {
-          "step": "Monitor compliance and reset budgets to hold savings",
-          "owner_role": "FP&A",
+          "step": "Restructure remuneration: move eligible scopes from retainer to project or performance-based fees",
+          "owner_role": "CMO / Procurement",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Consolidate agency roster and in-house high-volume production/digital execution",
+          "owner_role": "CMO",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Audit media transparency: rebates, unbilled media, and principal-based buys",
+          "owner_role": "Media Auditor",
           "duration_weeks": 4
         }
       ],
       "diagnostic_signals": [
         {
-          "signal": "Maverick or off-catalog spend share elevated",
+          "signal": "Retainer scopes not reconciled to delivered outputs or staffing plans",
           "evidence_source": "spend_profile",
-          "confirms": "Demand leakage is present"
+          "confirms": "Fee-for-scope realignment saves without volume loss"
         },
         {
-          "signal": "Policy exceptions rising period-on-period",
-          "evidence_source": "p2p_logs",
-          "confirms": "Governance gap is widening"
+          "signal": "Agency roster exceeds 6-8 agencies with overlapping capabilities",
+          "evidence_source": "vendor_master",
+          "confirms": "Roster consolidation increases leverage"
+        },
+        {
+          "signal": "Production and adaptation costs above in-house or offshore studio benchmarks",
+          "evidence_source": "benchmark",
+          "confirms": "Execution insourcing/right-shoring is cheaper"
         }
       ],
       "required_data_fields": [
-        "Transaction-level spend with requester/BU",
-        "Approval workflow configuration",
-        "Policy exception log"
+        "Agency contracts, scopes of work, and staffing plans",
+        "Fee breakdown by agency and remuneration model (24 months)",
+        "Media billing detail with rebate/AVB clauses",
+        "Output volume metrics (campaigns, assets, adaptations)"
       ],
       "applicability_threshold_pct": 0.03
     },
@@ -3151,49 +3261,64 @@
       "lever_id": "cost_avoidance",
       "execution_playbook": [
         {
-          "step": "Confirm scope for Loyalty Programme Cost Efficiency: validate baseline and stakeholders",
-          "owner_role": "Process Owner",
+          "step": "Build a forward price-risk register: contract renewals, indexation clauses, and announced vendor increases",
+          "owner_role": "Procurement Analytics",
           "duration_weeks": 2
         },
         {
-          "step": "Define target operating policy and approval workflow",
-          "owner_role": "CFO / Functional Head",
+          "step": "Prioritise renewals by increase exposure; prepare negotiation counters before notice periods lapse",
+          "owner_role": "Category Managers",
           "duration_weeks": 3
         },
         {
-          "step": "Implement system controls and communicate standards",
-          "owner_role": "IT / Shared Services",
+          "step": "Negotiate caps, multi-year locks, or indexation formula changes on top exposures",
+          "owner_role": "Strategic Sourcing",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Pre-buy or hedge categories with confirmed price escalations where storage/commitment economics work",
+          "owner_role": "CFO / Treasury",
           "duration_weeks": 4
         },
         {
-          "step": "Monitor compliance and reset budgets to hold savings",
+          "step": "Report avoided cost separately from run-rate savings with auditable baseline vs quote evidence",
           "owner_role": "FP&A",
-          "duration_weeks": 4
+          "duration_weeks": 2
         }
       ],
       "diagnostic_signals": [
         {
-          "signal": "Maverick or off-catalog spend share elevated",
-          "evidence_source": "spend_profile",
-          "confirms": "Demand leakage is present"
+          "signal": "Contracts with uncapped CPI/indexation clauses approaching renewal",
+          "evidence_source": "contract_repository",
+          "confirms": "Avoidable escalation is negotiable before lock-in"
         },
         {
-          "signal": "Policy exceptions rising period-on-period",
+          "signal": "Vendor increase notices exceeding market inflation for the category",
           "evidence_source": "p2p_logs",
-          "confirms": "Governance gap is widening"
+          "confirms": "Counter-negotiation evidence exists"
+        },
+        {
+          "signal": "Historical renewals signed at first-quote price without competitive tension",
+          "evidence_source": "vendor_master",
+          "confirms": "Renewal discipline will avoid future increases"
         }
       ],
       "required_data_fields": [
-        "Transaction-level spend with requester/BU",
-        "Approval workflow configuration",
-        "Policy exception log"
+        "Contract register with renewal dates and indexation clauses",
+        "Vendor price-increase notices and category inflation indices",
+        "Renewal negotiation history and outcomes",
+        "Budgeted vs quoted price for upcoming buys"
       ],
       "applicability_threshold_pct": 0.03
     },
     "travel_policy_optimization": {
       "lever_name": "Travel Policy Compliance & TMC Consolidation",
       "lever_family": "demand",
-      "phasing_curve": [0.35, 0.45, 0.2],
+      "phasing_curve": [
+        0.35,
+        0.45,
+        0.2
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.04,
       "sustainability_score": 0.55,
@@ -3206,17 +3331,45 @@
       ],
       "complexity_tier": "low",
       "base_execution_probability": 0.82,
-      "implementation_weeks": { "p10": 4, "p50": 8, "p90": 14 },
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 14
+      },
       "lever_id": "travel_policy_optimization",
       "execution_playbook": [
-        { "step": "Audit T&E spend by category, traveller grade, and booking channel; quantify out-of-policy leakage", "owner_role": "Travel Manager / FP&A", "duration_weeks": 2 },
-        { "step": "Consolidate to preferred TMC or corporate booking tool; negotiate airline and hotel programme rates", "owner_role": "Procurement / Travel", "duration_weeks": 4 },
-        { "step": "Deploy policy guardrails and pre-trip approval; communicate video-first norms for short engagements", "owner_role": "HR / Travel", "duration_weeks": 3 },
-        { "step": "Track compliance rate, average ticket price, and leakage monthly vs baseline", "owner_role": "FP&A", "duration_weeks": 4 }
+        {
+          "step": "Audit T&E spend by category, traveller grade, and booking channel; quantify out-of-policy leakage",
+          "owner_role": "Travel Manager / FP&A",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Consolidate to preferred TMC or corporate booking tool; negotiate airline and hotel programme rates",
+          "owner_role": "Procurement / Travel",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Deploy policy guardrails and pre-trip approval; communicate video-first norms for short engagements",
+          "owner_role": "HR / Travel",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Track compliance rate, average ticket price, and leakage monthly vs baseline",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
       ],
       "diagnostic_signals": [
-        { "signal": "Policy compliance rate below 80% or >15% spend booked outside managed channel", "evidence_source": "tmc_report", "confirms": "Travel governance gap is material" },
-        { "signal": "Average hotel/airfare rates above GSA or peer benchmark for top routes", "evidence_source": "benchmark", "confirms": "Rate renegotiation and channel consolidation will close price gap" }
+        {
+          "signal": "Policy compliance rate below 80% or >15% spend booked outside managed channel",
+          "evidence_source": "tmc_report",
+          "confirms": "Travel governance gap is material"
+        },
+        {
+          "signal": "Average hotel/airfare rates above GSA or peer benchmark for top routes",
+          "evidence_source": "benchmark",
+          "confirms": "Rate renegotiation and channel consolidation will close price gap"
+        }
       ],
       "required_data_fields": [
         "T&E transaction detail by traveller, category, and booking channel",
@@ -3228,7 +3381,11 @@
     "telecom_expense_management": {
       "lever_name": "Telecom Expense Management (TEM)",
       "lever_family": "supply",
-      "phasing_curve": [0.25, 0.5, 0.25],
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.05,
       "sustainability_score": 0.75,
@@ -3241,17 +3398,45 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.78,
-      "implementation_weeks": { "p10": 6, "p50": 12, "p90": 20 },
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 12,
+        "p90": 20
+      },
       "lever_id": "telecom_expense_management",
       "execution_playbook": [
-        { "step": "Build telecom asset inventory: voice, data, mobile, and conferencing by site and cost centre", "owner_role": "IT / Telecom Manager", "duration_weeks": 3 },
-        { "step": "Run invoice audit for billing errors, zombie circuits, and duplicate services", "owner_role": "Finance / TEM vendor", "duration_weeks": 4 },
-        { "step": "Consolidate carriers and renegotiate enterprise agreements; right-size mobile plans", "owner_role": "Procurement / IT", "duration_weeks": 6 },
-        { "step": "Embed ongoing TEM monitoring and MACD governance", "owner_role": "IT Operations", "duration_weeks": 4 }
+        {
+          "step": "Build telecom asset inventory: voice, data, mobile, and conferencing by site and cost centre",
+          "owner_role": "IT / Telecom Manager",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Run invoice audit for billing errors, zombie circuits, and duplicate services",
+          "owner_role": "Finance / TEM vendor",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Consolidate carriers and renegotiate enterprise agreements; right-size mobile plans",
+          "owner_role": "Procurement / IT",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed ongoing TEM monitoring and MACD governance",
+          "owner_role": "IT Operations",
+          "duration_weeks": 4
+        }
       ],
       "diagnostic_signals": [
-        { "signal": "Telecom spend per employee above industry median or invoice error rate >3%", "evidence_source": "tem_audit", "confirms": "TEM programme will recover waste" },
-        { "signal": ">10% of lines inactive or duplicate circuits across locations", "evidence_source": "inventory_report", "confirms": "Inventory rationalisation is high-ROI" }
+        {
+          "signal": "Telecom spend per employee above industry median or invoice error rate >3%",
+          "evidence_source": "tem_audit",
+          "confirms": "TEM programme will recover waste"
+        },
+        {
+          "signal": ">10% of lines inactive or duplicate circuits across locations",
+          "evidence_source": "inventory_report",
+          "confirms": "Inventory rationalisation is high-ROI"
+        }
       ],
       "required_data_fields": [
         "Telecom invoices by carrier and service type (12 months)",
@@ -3263,7 +3448,11 @@
     "office_supplies_consolidation": {
       "lever_name": "Office Supplies & Indirect Consumables Consolidation",
       "lever_family": "supply",
-      "phasing_curve": [0.3, 0.5, 0.2],
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.04,
       "sustainability_score": 0.65,
@@ -3276,17 +3465,45 @@
       ],
       "complexity_tier": "low",
       "base_execution_probability": 0.8,
-      "implementation_weeks": { "p10": 4, "p50": 8, "p90": 14 },
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 14
+      },
       "lever_id": "office_supplies_consolidation",
       "execution_playbook": [
-        { "step": "Aggregate office supplies spend by supplier, site, and category; quantify fragmentation", "owner_role": "Category Manager", "duration_weeks": 2 },
-        { "step": "Consolidate to 1-2 preferred suppliers with volume rebates and e-catalog integration", "owner_role": "Strategic Sourcing", "duration_weeks": 4 },
-        { "step": "Deploy P2P controls and communicate catalog-first policy", "owner_role": "Procurement / IT", "duration_weeks": 3 },
-        { "step": "Track catalog adoption, supplier count, and unit price vs baseline", "owner_role": "FP&A", "duration_weeks": 4 }
+        {
+          "step": "Aggregate office supplies spend by supplier, site, and category; quantify fragmentation",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Consolidate to 1-2 preferred suppliers with volume rebates and e-catalog integration",
+          "owner_role": "Strategic Sourcing",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Deploy P2P controls and communicate catalog-first policy",
+          "owner_role": "Procurement / IT",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Track catalog adoption, supplier count, and unit price vs baseline",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
       ],
       "diagnostic_signals": [
-        { "signal": ">15 active suppliers in office supplies with low line-item visibility", "evidence_source": "spend_profile", "confirms": "Supplier consolidation will reduce purchased cost" },
-        { "signal": "Off-catalog or maverick spend >20% of office category", "evidence_source": "p2p_logs", "confirms": "Catalog enforcement will capture savings" }
+        {
+          "signal": ">15 active suppliers in office supplies with low line-item visibility",
+          "evidence_source": "spend_profile",
+          "confirms": "Supplier consolidation will reduce purchased cost"
+        },
+        {
+          "signal": "Off-catalog or maverick spend >20% of office category",
+          "evidence_source": "p2p_logs",
+          "confirms": "Catalog enforcement will capture savings"
+        }
       ],
       "required_data_fields": [
         "Office supplies transaction detail by supplier and site",
@@ -3298,7 +3515,11 @@
     "brsr_reporting_efficiency": {
       "lever_name": "BRSR / ESG Reporting & Assurance Efficiency",
       "lever_family": "process",
-      "phasing_curve": [0.4, 0.4, 0.2],
+      "phasing_curve": [
+        0.4,
+        0.4,
+        0.2
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.06,
       "sustainability_score": 0.7,
@@ -3311,17 +3532,45 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.72,
-      "implementation_weeks": { "p10": 8, "p50": 16, "p90": 28 },
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 16,
+        "p90": 28
+      },
       "lever_id": "brsr_reporting_efficiency",
       "execution_playbook": [
-        { "step": "Map BRSR Core KPI data sources across entities; identify duplication and manual collection effort", "owner_role": "Sustainability / Finance", "duration_weeks": 3 },
-        { "step": "Implement integrated ESG data platform or group reporting hub", "owner_role": "IT / ESG", "duration_weeks": 8 },
-        { "step": "Consolidate assurance providers and align to SEBI assessment standards where applicable", "owner_role": "Company Secretary / ESG", "duration_weeks": 6 },
-        { "step": "Track cost per entity for BRSR preparation and assurance vs prior year", "owner_role": "FP&A", "duration_weeks": 4 }
+        {
+          "step": "Map BRSR Core KPI data sources across entities; identify duplication and manual collection effort",
+          "owner_role": "Sustainability / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Implement integrated ESG data platform or group reporting hub",
+          "owner_role": "IT / ESG",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Consolidate assurance providers and align to SEBI assessment standards where applicable",
+          "owner_role": "Company Secretary / ESG",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track cost per entity for BRSR preparation and assurance vs prior year",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
       ],
       "diagnostic_signals": [
-        { "signal": "BRSR preparation cost rising faster than entity count; duplicate data collection across BUs", "evidence_source": "esg_cost_tracker", "confirms": "Integrated reporting platform will reduce per-entity cost" },
-        { "signal": "Multiple assurance providers across group entities without coordinated scope", "evidence_source": "audit_register", "confirms": "Assurance consolidation will reduce fees" }
+        {
+          "signal": "BRSR preparation cost rising faster than entity count; duplicate data collection across BUs",
+          "evidence_source": "esg_cost_tracker",
+          "confirms": "Integrated reporting platform will reduce per-entity cost"
+        },
+        {
+          "signal": "Multiple assurance providers across group entities without coordinated scope",
+          "evidence_source": "audit_register",
+          "confirms": "Assurance consolidation will reduce fees"
+        }
       ],
       "required_data_fields": [
         "BRSR preparation and assurance cost by entity",
@@ -3333,7 +3582,11 @@
     "intercompany_charge_benchmarking": {
       "lever_name": "Intercompany & Related-Party Charge Benchmarking",
       "lever_family": "finance",
-      "phasing_curve": [0.35, 0.45, 0.2],
+      "phasing_curve": [
+        0.35,
+        0.45,
+        0.2
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.05,
       "sustainability_score": 0.8,
@@ -3346,17 +3599,45 @@
       ],
       "complexity_tier": "high",
       "base_execution_probability": 0.65,
-      "implementation_weeks": { "p10": 10, "p50": 20, "p90": 36 },
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 20,
+        "p90": 36
+      },
       "lever_id": "intercompany_charge_benchmarking",
       "execution_playbook": [
-        { "step": "Inventory all intercompany charges: management fees, royalties, shared services allocations", "owner_role": "Tax / Treasury", "duration_weeks": 4 },
-        { "step": "Apply OECD benefits test and benchmark markups vs arm's-length range", "owner_role": "Transfer Pricing Advisor", "duration_weeks": 6 },
-        { "step": "Renegotiate or restructure non-arm's-length charges; eliminate duplicate IC services", "owner_role": "CFO / Group Tax", "duration_weeks": 8 },
-        { "step": "Update IC agreements and SEBI RPT disclosure pack", "owner_role": "Company Secretary", "duration_weeks": 4 }
+        {
+          "step": "Inventory all intercompany charges: management fees, royalties, shared services allocations",
+          "owner_role": "Tax / Treasury",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Apply OECD benefits test and benchmark markups vs arm's-length range",
+          "owner_role": "Transfer Pricing Advisor",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Renegotiate or restructure non-arm's-length charges; eliminate duplicate IC services",
+          "owner_role": "CFO / Group Tax",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Update IC agreements and SEBI RPT disclosure pack",
+          "owner_role": "Company Secretary",
+          "duration_weeks": 4
+        }
       ],
       "diagnostic_signals": [
-        { "signal": "Management fee or royalty charges above OECD LVAS or benchmarking median for routine services", "evidence_source": "tp_study", "confirms": "IC charge reduction is defensible at arm's length" },
-        { "signal": "Duplicate shared services billed by multiple group entities to same recipient", "evidence_source": "ic_register", "confirms": "Service duplication elimination is addressable" }
+        {
+          "signal": "Management fee or royalty charges above OECD LVAS or benchmarking median for routine services",
+          "evidence_source": "tp_study",
+          "confirms": "IC charge reduction is defensible at arm's length"
+        },
+        {
+          "signal": "Duplicate shared services billed by multiple group entities to same recipient",
+          "evidence_source": "ic_register",
+          "confirms": "Service duplication elimination is addressable"
+        }
       ],
       "required_data_fields": [
         "Related-party transaction schedule (SEBI Form A)",
@@ -3368,7 +3649,11 @@
     "energy_procurement_optimization": {
       "lever_name": "Energy Procurement & Demand Optimisation",
       "lever_family": "supply",
-      "phasing_curve": [0.2, 0.5, 0.3],
+      "phasing_curve": [
+        0.2,
+        0.5,
+        0.3
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.06,
       "sustainability_score": 0.82,
@@ -3381,17 +3666,45 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.75,
-      "implementation_weeks": { "p10": 8, "p50": 16, "p90": 28 },
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 16,
+        "p90": 28
+      },
       "lever_id": "energy_procurement_optimization",
       "execution_playbook": [
-        { "step": "Disaggregate power spend: grid tariff, open access, captive, fuel, and demand charges", "owner_role": "Plant Finance / Energy Manager", "duration_weeks": 3 },
-        { "step": "Evaluate procurement options: group PPA, open-access, tariff reclassification, demand management", "owner_role": "Energy / Procurement", "duration_weeks": 6 },
-        { "step": "Execute quick wins (power factor, load shifting) and negotiate supply contracts", "owner_role": "Operations / Procurement", "duration_weeks": 8 },
-        { "step": "Track energy cost per unit output and % renewable mix monthly", "owner_role": "FP&A / Sustainability", "duration_weeks": 4 }
+        {
+          "step": "Disaggregate power spend: grid tariff, open access, captive, fuel, and demand charges",
+          "owner_role": "Plant Finance / Energy Manager",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Evaluate procurement options: group PPA, open-access, tariff reclassification, demand management",
+          "owner_role": "Energy / Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Execute quick wins (power factor, load shifting) and negotiate supply contracts",
+          "owner_role": "Operations / Procurement",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Track energy cost per unit output and % renewable mix monthly",
+          "owner_role": "FP&A / Sustainability",
+          "duration_weeks": 4
+        }
       ],
       "diagnostic_signals": [
-        { "signal": "Energy cost per unit output above BEE PAT sector benchmark or peer disclosure", "evidence_source": "energy_audit", "confirms": "Procurement and efficiency levers are material" },
-        { "signal": "Demand charges >25% of electricity bill without load management programme", "evidence_source": "utility_bills", "confirms": "Demand optimisation will reduce tariff leakage" }
+        {
+          "signal": "Energy cost per unit output above BEE PAT sector benchmark or peer disclosure",
+          "evidence_source": "energy_audit",
+          "confirms": "Procurement and efficiency levers are material"
+        },
+        {
+          "signal": "Demand charges >25% of electricity bill without load management programme",
+          "evidence_source": "utility_bills",
+          "confirms": "Demand optimisation will reduce tariff leakage"
+        }
       ],
       "required_data_fields": [
         "Electricity and fuel invoices by site (24 months)",
@@ -3403,7 +3716,11 @@
     "rnd_portfolio_rationalization": {
       "lever_name": "R&D Portfolio Rationalisation & Vendor Governance",
       "lever_family": "demand",
-      "phasing_curve": [0.3, 0.45, 0.25],
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
       "savings_type": "run_rate",
       "cta_rate": 0.07,
       "sustainability_score": 0.6,
@@ -3416,17 +3733,45 @@
       ],
       "complexity_tier": "medium",
       "base_execution_probability": 0.7,
-      "implementation_weeks": { "p10": 10, "p50": 20, "p90": 32 },
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 20,
+        "p90": 32
+      },
       "lever_id": "rnd_portfolio_rationalization",
       "execution_playbook": [
-        { "step": "Inventory R&D spend by project, vendor, and stage; classify strategic vs discretionary", "owner_role": "R&D Finance / CTO office", "duration_weeks": 4 },
-        { "step": "Apply portfolio prioritisation; exit or pause tail projects below ROI threshold", "owner_role": "R&D Leadership", "duration_weeks": 6 },
-        { "step": "Consolidate CRO, lab, and tooling vendors; renegotiate framework agreements", "owner_role": "R&D Procurement", "duration_weeks": 6 },
-        { "step": "Embed stage-gate ROI reviews in annual planning cycle", "owner_role": "FP&A / R&D", "duration_weeks": 4 }
+        {
+          "step": "Inventory R&D spend by project, vendor, and stage; classify strategic vs discretionary",
+          "owner_role": "R&D Finance / CTO office",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Apply portfolio prioritisation; exit or pause tail projects below ROI threshold",
+          "owner_role": "R&D Leadership",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Consolidate CRO, lab, and tooling vendors; renegotiate framework agreements",
+          "owner_role": "R&D Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed stage-gate ROI reviews in annual planning cycle",
+          "owner_role": "FP&A / R&D",
+          "duration_weeks": 4
+        }
       ],
       "diagnostic_signals": [
-        { "signal": ">30% of R&D projects in late stage with no defined commercialisation path", "evidence_source": "project_portfolio", "confirms": "Portfolio rationalisation will release spend" },
-        { "signal": "CRO and lab vendor fragmentation with >10 suppliers for similar services", "evidence_source": "spend_profile", "confirms": "Vendor consolidation is addressable" }
+        {
+          "signal": ">30% of R&D projects in late stage with no defined commercialisation path",
+          "evidence_source": "project_portfolio",
+          "confirms": "Portfolio rationalisation will release spend"
+        },
+        {
+          "signal": "CRO and lab vendor fragmentation with >10 suppliers for similar services",
+          "evidence_source": "spend_profile",
+          "confirms": "Vendor consolidation is addressable"
+        }
       ],
       "required_data_fields": [
         "R&D project register with spend and stage",
@@ -3662,13 +4007,41 @@
       0.4,
       0.4
     ],
-    "travel_policy_optimization": [0.35, 0.45, 0.2],
-    "telecom_expense_management": [0.25, 0.5, 0.25],
-    "office_supplies_consolidation": [0.3, 0.5, 0.2],
-    "brsr_reporting_efficiency": [0.4, 0.4, 0.2],
-    "intercompany_charge_benchmarking": [0.35, 0.45, 0.2],
-    "energy_procurement_optimization": [0.2, 0.5, 0.3],
-    "rnd_portfolio_rationalization": [0.3, 0.45, 0.25]
+    "travel_policy_optimization": [
+      0.35,
+      0.45,
+      0.2
+    ],
+    "telecom_expense_management": [
+      0.25,
+      0.5,
+      0.25
+    ],
+    "office_supplies_consolidation": [
+      0.3,
+      0.5,
+      0.2
+    ],
+    "brsr_reporting_efficiency": [
+      0.4,
+      0.4,
+      0.2
+    ],
+    "intercompany_charge_benchmarking": [
+      0.35,
+      0.45,
+      0.2
+    ],
+    "energy_procurement_optimization": [
+      0.2,
+      0.5,
+      0.3
+    ],
+    "rnd_portfolio_rationalization": [
+      0.3,
+      0.45,
+      0.25
+    ]
   },
   "savings_type_by_lever": {
     "contract_renegotiation": "run_rate",
