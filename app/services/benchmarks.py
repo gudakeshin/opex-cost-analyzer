@@ -267,7 +267,7 @@ def _attach_linked_levers(
 
 def sector_pack_detail_payload(pack_id: str) -> Dict[str, Any] | None:
     """Full browsable sector pack payload (benchmarks, levers, KPIs, peers, etc.)."""
-    from app.services.sector_packs import pack_dir, pack_file_counts, pack_levers_list
+    from app.services.sector_packs import pack_dir, pack_file_counts
 
     d = pack_dir(pack_id)
     if not d.is_dir():
@@ -899,15 +899,21 @@ def resolve_benchmark_payload(
         pack_data = _load_sector_pack_benchmarks(industry)
         if pack_data:
             selected_meta = _sector_pack_dataset_meta(industry, pack_data)
+            sector_pack_rationale: Dict[str, Any] = {
+                "source": "sector_pack_percentiles",
+                "pack_id": industry,
+                "specificity_score": 0.85,
+                "confidence": pack_data.get("confidence_overall", "public_disclosure"),
+            }
+            if industry in FALLBACK_MAPPINGS:
+                sector_pack_rationale["benchmark_confidence_note"] = (
+                    f"'{industry}' has no dedicated benchmark set; comparison uses "
+                    f"'{FALLBACK_MAPPINGS[industry]}' percentiles as an approximation."
+                )
             return {
                 "benchmark_data": pack_data,
                 "selected_dataset": selected_meta,
-                "selection_rationale": {
-                    "source": "sector_pack_percentiles",
-                    "pack_id": industry,
-                    "specificity_score": 0.85,
-                    "confidence": pack_data.get("confidence_overall", "public_disclosure"),
-                },
+                "selection_rationale": sector_pack_rationale,
                 "candidates": [{"dataset_id": selected_meta["dataset_id"], "source": selected_meta["source"], "score": 0.85}],
             }
 

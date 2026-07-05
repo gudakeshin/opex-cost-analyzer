@@ -36,10 +36,15 @@ Rules:
 {routing_examples}
 """
 
+# Session-independent system prompt text — used for provenance/versioning via
+# app.llm.prompts. The per-session prompt (_build_agent_system) starts from
+# this and appends the spend schema when a store is available.
+_AGENT_SYSTEM = _AGENT_SYSTEM_BASE.format(routing_examples=NL_QUERY_ROUTING_EXAMPLES)
+
 
 def _build_agent_system(session: ToolSessionContext) -> str:
     """Inject spend schema context when a store is available."""
-    parts = [_AGENT_SYSTEM_BASE.format(routing_examples=NL_QUERY_ROUTING_EXAMPLES)]
+    parts = [_AGENT_SYSTEM]
     try:
         from app.services.spend_base import open_spend_query
 

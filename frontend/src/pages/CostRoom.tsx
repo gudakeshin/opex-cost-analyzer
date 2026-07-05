@@ -225,17 +225,19 @@ export default function CostRoom() {
     [liveInitiatives],
   );
 
-  const portfolioP50Cr = useMemo(
-    () => filteredInitiatives.reduce((sum, r) => sum + getBandSavings(r, 'p50'), 0),
-    [filteredInitiatives],
+  // Tracks the topbar P10/P50/P90 toggle so the hero EBITDA-bps metric stays
+  // consistent with the per-initiative figures shown elsewhere on the page.
+  const portfolioBandCr = useMemo(
+    () => filteredInitiatives.reduce((sum, r) => sum + getBandSavings(r, percentileBand), 0),
+    [filteredInitiatives, percentileBand],
   );
 
   const baseEbitdaBps = useMemo(() => {
     const revenueCr = engagement.annual_revenue_cr ?? 25000;
     if (revenueCr <= 0) return 0;
-    const portfolioCr = toCr(portfolioP50Cr, engagement.currency);
+    const portfolioCr = toCr(portfolioBandCr, engagement.currency);
     return Math.round((portfolioCr / revenueCr) * 10000);
-  }, [portfolioP50Cr, engagement.annual_revenue_cr, engagement.currency]);
+  }, [portfolioBandCr, engagement.annual_revenue_cr, engagement.currency]);
 
   const ebitdaBps = useMemo(() => macroScenarioBps(baseEbitdaBps, scenario), [baseEbitdaBps, scenario]);
 
@@ -292,8 +294,12 @@ export default function CostRoom() {
     } else if (item.action === 'portfolio') {
       workSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
       if (item.id) selectInitiative(item.id);
+      // Drill-through from the exception inbox into an initiative's detail panel
+      // (which surfaces its AqsBadge) — record it like every other page action
+      // so a low-AQS review is traceable in the audit log.
+      appendAudit(`exception_drill_through: ${item.title} — ${item.detail}`);
     }
-  }, [selectInitiative]);
+  }, [selectInitiative, appendAudit]);
 
   const acceptInit = async (initiativeId: string) => {
     try {
@@ -501,15 +507,19 @@ export default function CostRoom() {
               <Loader label="Loading pipeline…" />
             ) : (
               <>
-                <CostRoomHero
-                  initiatives={filteredInitiatives}
-                  percentileBand={percentileBand}
-                  scenario={scenario}
-                  scenarioFactor={factor}
-                  ebitdaBps={ebitdaBps}
-                  currency={engagement.currency}
-                  revenueCr={engagement.annual_revenue_cr}
-                />
+                <div
+                  title="Percentile band: p10 = conservative case, p50 = base case, p90 = stretch case. Toggle in the topbar changes the hero metrics and per-initiative figures together."
+                >
+                  <CostRoomHero
+                    initiatives={filteredInitiatives}
+                    percentileBand={percentileBand}
+                    scenario={scenario}
+                    scenarioFactor={factor}
+                    ebitdaBps={ebitdaBps}
+                    currency={engagement.currency}
+                    revenueCr={engagement.annual_revenue_cr}
+                  />
+                </div>
                 <SignalStrip
                   initiatives={initiatives}
                   currency={engagement.currency}

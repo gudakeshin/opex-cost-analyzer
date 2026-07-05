@@ -61,10 +61,13 @@ def test_attach_discovered_outputs_heavy_board_deck() -> None:
 
 def test_attach_discovered_outputs_auto_runs_light_output() -> None:
     tasks = _expand(["spend-profiler", "value-bridge-calculator", "data-validator"])
+    # intent_class deliberately avoids "value_bridge"/"benchmark"/"general_qa" — those
+    # skip analysis-synthesizer/executive-communication because their narratives are
+    # composed in reflect, not act-phase synthesis (see _attach_discovered_outputs).
     ctx = ObserveContext(
         user_message="synthesize executive summary for leadership",
         session_id="sess-2",
-        intent_class="value_bridge",
+        intent_class="drill_down",
     )
     fake_hit = [{"name": "analysis-synthesizer", "description": "synth", "score": 0.9}]
     with patch("app.skills.discovery.discover_relevant_skills", return_value=fake_hit):

@@ -291,7 +291,6 @@ def test_skill(name: str) -> Dict[str, Any]:
     try:
         output, degraded = invoke_skill(name, ctx)
         status, details = _evaluate_smoke_result(output, degraded, is_declarative=is_declarative)
-        ok = status == "pass"
         return {
             "skill": name,
             "status": status,
