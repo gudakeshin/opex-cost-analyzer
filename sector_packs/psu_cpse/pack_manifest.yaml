@@ -1,9 +1,13 @@
 pack_id: psu_cpse
 sector: Public Sector Undertakings & CPSEs (India)
-version: "0.1"
+version: "1.0"
 schema_version: "1"
-status: scaffold
-description: Scaffold for Central and State PSUs / CPSEs. Covers DPE guidelines, CAG audit, and DIPAM performance metrics. Full content deferred.
+status: full
+description: >
+  Full sector pack for Central and State PSUs / CPSEs. Covers DPE pay and
+  perquisite structures, contract labour, township and welfare operations,
+  GeM procurement, CAG/vigilance compliance, project overheads, and
+  arbitration claims cost structures.
 applicable_entity_types: [cpse_navratna, cpse_maharatna, cpse_miniratna, state_psu]
 regulatory_bodies: [DPE, CAG, DIPAM, sectoral_ministry, CVC]
 fiscal_year_end: "March 31"

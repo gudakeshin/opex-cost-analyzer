@@ -8,7 +8,9 @@
       "lever_name": "Store Network & Real Estate Portfolio Optimisation",
       "description": "Exit sub-performing stores (below threshold revenue/sqft); renegotiate leases at renewal; shift from revenue-share to fixed-rent structures where profitable.",
       "category_ids": [
-        "FACILITIES"
+        "FACILITIES",
+        "store_occupancy",
+        "store_energy_utilities"
       ],
       "p10_pct": 8.0,
       "p50_pct": 16.0,
@@ -28,7 +30,8 @@
       "description": "Deploy RFID, AI-vision cameras, electronic article surveillance; improve inventory reconciliation frequency; staff awareness training.",
       "category_ids": [
         "OUTSOURCED",
-        "IT"
+        "IT",
+        "shrinkage_loss"
       ],
       "p10_pct": 15.0,
       "p50_pct": 25.0,
@@ -48,7 +51,8 @@
       "description": "Grow private label share of assortment in high-volume categories to capture 15-25pp margin premium vs. branded products.",
       "category_ids": [
         "MARKETING",
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "private_label_sourcing"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -67,7 +71,8 @@
       "lever_name": "Direct Farm/Factory Sourcing & Supply Chain Compression",
       "description": "Eliminate distributors and C&F agents; source directly from manufacturers and farms; deploy cross-docking to reduce handling touches.",
       "category_ids": [
-        "LOGISTICS_INDIA"
+        "LOGISTICS_INDIA",
+        "supply_chain_dc_ops"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -105,7 +110,8 @@
       "lever_name": "Omnichannel & Digital Integration",
       "description": "Consolidate online and offline technology stacks (OMS, WMS, loyalty). Reduce duplicate IT maintenance costs; enable ship-from-store to reduce fulfilment cost.",
       "category_ids": [
-        "IT"
+        "IT",
+        "payment_gateway_costs"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -181,7 +187,8 @@
       "lever_name": "Category Management & Vendor Funding Optimisation",
       "description": "Deploy category captaincy with joint business plans, planogram discipline, and margin-mix targets across grocery and general merchandise categories.",
       "category_ids": [
-        "MARKETING"
+        "MARKETING",
+        "merchandising_ops"
       ],
       "p10_pct": 4.0,
       "p50_pct": 9.0,
@@ -201,7 +208,8 @@
       "description": "Expand private-label penetration in high-margin categories with dedicated sourcing and quality programmes to improve blended margin.",
       "category_ids": [
         "MARKETING",
-        "RAW_MATERIALS"
+        "RAW_MATERIALS",
+        "private_label_sourcing"
       ],
       "p10_pct": 8.0,
       "p50_pct": 14.0,
@@ -219,7 +227,10 @@
       "lever_name": "Omnichannel Fulfilment Cost Optimisation",
       "description": "Optimise split between store-fulfilled, dark-store, and DC e-commerce fulfilment to cut cost per order without degrading promise times.",
       "category_ids": [
-        "LOGISTICS"
+        "LOGISTICS",
+        "last_mile_delivery",
+        "ecommerce_fulfilment_costs",
+        "supply_chain_dc_ops"
       ],
       "p10_pct": 8.0,
       "p50_pct": 16.0,
@@ -255,7 +266,8 @@
       "lever_name": "Loyalty Programme Cost Efficiency",
       "description": "Re-engineer loyalty economics — tier thresholds, breakage assumptions, and partner-funded rewards — to cut programme cost per active member.",
       "category_ids": [
-        "MARKETING"
+        "MARKETING",
+        "loyalty_retention"
       ],
       "p10_pct": 12.0,
       "p50_pct": 22.0,
@@ -273,7 +285,8 @@
       "lever_name": "Store Network Rationalisation",
       "description": "Exit persistently sub-threshold stores, renegotiate renewal leases, and rebalance formats toward higher-productivity footprints.",
       "category_ids": [
-        "FACILITIES"
+        "FACILITIES",
+        "store_occupancy"
       ],
       "p10_pct": 12.0,
       "p50_pct": 22.0,

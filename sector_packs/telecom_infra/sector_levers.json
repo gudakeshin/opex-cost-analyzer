@@ -9,7 +9,8 @@
       "description": "Expand tower sharing (passive) and radio access network sharing (active) with other operators to reduce site O&M, power, and spectrum costs per subscriber.",
       "category_ids": [
         "OUTSOURCED",
-        "POWER_ENERGY"
+        "POWER_ENERGY",
+        "network_opex_access"
       ],
       "p10_pct": 8.0,
       "p50_pct": 16.0,
@@ -28,7 +29,8 @@
       "lever_name": "Tower Energy Optimisation (Solar, Li-ion, Free Cooling)",
       "description": "Deploy rooftop solar + Li-ion batteries at towers to reduce diesel generator use. Implement free-air cooling for equipment rooms. Renegotiate grid power tariffs.",
       "category_ids": [
-        "POWER_ENERGY"
+        "POWER_ENERGY",
+        "tower_power_diesel"
       ],
       "p10_pct": 10.0,
       "p50_pct": 20.0,
@@ -68,7 +70,8 @@
       "description": "AI-driven churn prediction; personalised retention offers; postpaid migration of high-value prepaid customers; value-added services bundling to increase ARPU.",
       "category_ids": [
         "MARKETING",
-        "IT"
+        "IT",
+        "sac_distribution_costs"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -87,7 +90,8 @@
       "lever_name": "OSS/BSS IT System Modernisation",
       "description": "Replace siloed legacy OSS/BSS with cloud-native unified platforms. Automate fault management, service provisioning, and revenue assurance.",
       "category_ids": [
-        "IT"
+        "IT",
+        "regulatory_usof_levies"
       ],
       "p10_pct": 10.0,
       "p50_pct": 18.0,
@@ -126,7 +130,9 @@
       "lever_name": "Network OPEX Optimisation",
       "description": "Disaggregate network OPEX by cost driver; optimise RAN managed services, spares pooling, and passive infrastructure cost.",
       "category_ids": [
-        "NETWORK_OPEX"
+        "NETWORK_OPEX",
+        "network_opex_access",
+        "fiber_leaseline_costs"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -145,7 +151,8 @@
       "lever_name": "Spectrum Utilisation & Licence Cost Audit",
       "description": "Audit spectrum holding vs traffic load; exit underutilised bands where permitted; optimise spectrum trading and liberalisation benefits.",
       "category_ids": [
-        "SPECTRUM_LICENSING"
+        "SPECTRUM_LICENSING",
+        "spectrum_license_fees"
       ],
       "p10_pct": 3.0,
       "p50_pct": 6.0,
@@ -202,7 +209,8 @@
       "lever_name": "Network Operations Facilities Right-Sizing",
       "description": "Rationalise NOC, exchange, and field office footprint; renegotiate leases for network operations facilities.",
       "category_ids": [
-        "FACILITIES"
+        "FACILITIES",
+        "data_centre_ops"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -240,7 +248,8 @@
       "lever_name": "Spectrum Utilisation & Dynamic Allocation Optimisation",
       "description": "Refarm legacy-band spectrum to 4G/5G, optimise carrier aggregation, and rationalise redundant legacy network layers.",
       "category_ids": [
-        "SPECTRUM_LICENSING"
+        "SPECTRUM_LICENSING",
+        "spectrum_license_fees"
       ],
       "p10_pct": 8.0,
       "p50_pct": 14.0,
@@ -259,7 +268,8 @@
       "lever_name": "Customer Service Automation (IVR / Chatbot / Digital Deflection)",
       "description": "Deflect contact volume to self-care apps, bots, and IVR containment; consolidate contact-centre vendors on outcome-based pricing.",
       "category_ids": [
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "customer_service_costs"
       ],
       "p10_pct": 18.0,
       "p50_pct": 28.0,
@@ -278,7 +288,9 @@
       "lever_name": "High-Value Customer Churn Reduction",
       "description": "Deploy churn-propensity models and save-desk playbooks to reduce gross churn and the acquisition spend needed to replace lost subscribers.",
       "category_ids": [
-        "IT"
+        "IT",
+        "content_platform_costs",
+        "sac_distribution_costs"
       ],
       "p10_pct": 2.0,
       "p50_pct": 5.0,
@@ -296,7 +308,8 @@
       "lever_name": "International Roaming Cost Optimisation",
       "description": "Renegotiate IOT roaming agreements, steer traffic to preferred partners, and deploy local breakout to cut wholesale roaming cost.",
       "category_ids": [
-        "NETWORK_OPEX"
+        "NETWORK_OPEX",
+        "roaming_ir_costs"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -315,7 +328,8 @@
       "lever_name": "IT / BSS / OSS Modernisation (Cloud-Native)",
       "description": "Consolidate BSS/OSS stacks post-merger, decommission legacy platforms, and shift to cloud-native charging and assurance systems.",
       "category_ids": [
-        "IT"
+        "IT",
+        "data_centre_ops"
       ],
       "p10_pct": 18.0,
       "p50_pct": 28.0,
@@ -334,7 +348,8 @@
       "lever_name": "Network Site Energy Management",
       "description": "Deploy site-level energy management — RF sleep modes, lithium-ion + solar hybridisation, and diesel elimination at tower and node sites.",
       "category_ids": [
-        "POWER_ENERGY"
+        "POWER_ENERGY",
+        "tower_power_diesel"
       ],
       "p10_pct": 12.0,
       "p50_pct": 20.0,

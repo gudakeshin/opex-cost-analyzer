@@ -10,7 +10,9 @@
       "category_ids": [
         "HR",
         "OUTSOURCED",
-        "IT"
+        "IT",
+        "origination_collections",
+        "kyc_onboarding_costs"
       ],
       "p10_pct": 10.0,
       "p50_pct": 20.0,
@@ -30,7 +32,8 @@
       "description": "Deploy AI-based collections prioritisation, automated IVR and WhatsApp reminders, predictive dialler to reduce cost-per-recovered-rupee.",
       "category_ids": [
         "HR",
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "origination_collections"
       ],
       "p10_pct": 12.0,
       "p50_pct": 22.0,
@@ -50,7 +53,8 @@
       "description": "Grow direct digital channel (app, website, partnerships) share from ~20% to 40%+ of disbursals to reduce DSA and direct sales agent commissions.",
       "category_ids": [
         "MARKETING",
-        "HR"
+        "HR",
+        "aum_distribution_commissions"
       ],
       "p10_pct": 8.0,
       "p50_pct": 16.0,
@@ -70,7 +74,8 @@
       "description": "Consolidate credit bureau pulls (CIBIL, Experian, CRIF) with intelligent sequential querying; renegotiate volume-based contracts.",
       "category_ids": [
         "OUTSOURCED",
-        "IT"
+        "IT",
+        "credit_bureau"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -90,7 +95,8 @@
       "description": "Replace legacy loan management systems with modern cloud-native platforms to reduce maintenance cost, improve automation, and cut per-account processing cost.",
       "category_ids": [
         "IT",
-        "OUTSOURCED"
+        "OUTSOURCED",
+        "grievance_servicing_ops"
       ],
       "p10_pct": 10.0,
       "p50_pct": 18.0,
@@ -150,7 +156,9 @@
       "lever_name": "Payment Processing & Treasury Fee Optimisation",
       "description": "Renegotiate payment gateway, NACH, and banking fees; optimise cash management and FX hedging costs.",
       "category_ids": [
-        "FIN_SVCS"
+        "FIN_SVCS",
+        "brokerage_clearing",
+        "treasury_borrowing_ops"
       ],
       "p10_pct": 5.0,
       "p50_pct": 10.0,
@@ -189,7 +197,8 @@
       "description": "Consolidate fund accounting, transfer agency, and custody mandates to fewer providers at tiered AUM-linked fees.",
       "category_ids": [
         "PROF_SERVICES",
-        "IT_SOFTWARE"
+        "IT_SOFTWARE",
+        "fund_admin"
       ],
       "p10_pct": 12.0,
       "p50_pct": 20.0,
@@ -208,7 +217,9 @@
       "lever_name": "Trading Technology & Market Data Cost Optimisation (OMS/EMS & Data Feeds)",
       "description": "Rationalise OMS/EMS platforms, market-data entitlements, and connectivity spend against desk-level usage.",
       "category_ids": [
-        "IT"
+        "IT",
+        "brokerage_clearing",
+        "technology_market_data"
       ],
       "p10_pct": 15.0,
       "p50_pct": 25.0,
@@ -227,7 +238,8 @@
       "lever_name": "Regulatory Compliance Operations Automation (SEBI / MiFID II / AML Reporting)",
       "description": "Automate KYC refresh, transaction monitoring tuning, and regulatory reporting workflows to cut compliance operations cost per account.",
       "category_ids": [
-        "PROF_SVCS"
+        "PROF_SVCS",
+        "regulatory_filings"
       ],
       "p10_pct": 20.0,
       "p50_pct": 32.0,
@@ -246,7 +258,8 @@
       "lever_name": "Performance Attribution & Risk Platform Consolidation (Bloomberg/MSCI/FactSet Overlap)",
       "description": "Consolidate performance, attribution, and risk analytics platforms; replace bespoke builds with vendor utilities priced per portfolio.",
       "category_ids": [
-        "IT"
+        "IT",
+        "technology_market_data"
       ],
       "p10_pct": 15.0,
       "p50_pct": 25.0,
@@ -263,7 +276,8 @@
       "lever_name": "Investment Research Cost Management (MiFID II Unbundling & Broker Vote Optimisation)",
       "description": "Unbundle and rationalise external research spend post-MiFID economics; consolidate providers and enforce usage-based allocation.",
       "category_ids": [
-        "PROF_SVCS"
+        "PROF_SVCS",
+        "technology_market_data"
       ],
       "p10_pct": 10.0,
       "p50_pct": 18.0,

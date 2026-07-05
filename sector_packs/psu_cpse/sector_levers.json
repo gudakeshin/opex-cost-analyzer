@@ -8,7 +8,8 @@
       "lever_name": "Manpower Rationalisation & VRS",
       "description": "Implement Voluntary Retirement Scheme (VRS) to reduce headcount in overstaffed functions; redeploy staff to growth areas; contract-out non-core services.",
       "category_ids": [
-        "HR"
+        "HR",
+        "dpe_hr_perquisites"
       ],
       "p10_pct": 6.0,
       "p50_pct": 14.0,
@@ -106,7 +107,9 @@
       "description": "Improve debtor days through active collection of government dues, advance payment clauses in new contracts, and legal proceedings for aged receivables.",
       "category_ids": [
         "HR",
-        "PROF_SVCS"
+        "PROF_SVCS",
+        "govt_levy_dividends",
+        "legal_arbitration_claims"
       ],
       "p10_pct": 3.0,
       "p50_pct": 8.0,
@@ -163,7 +166,9 @@
       "lever_name": "Township & Establishment Cost Optimisation",
       "description": "Rationalise captive townships, canteens, and establishment charges; outsource non-core facilities services; monetise surplus residential assets.",
       "category_ids": [
-        "FACILITIES"
+        "FACILITIES",
+        "township_welfare_ops",
+        "security_services_cisf"
       ],
       "p10_pct": 4.0,
       "p50_pct": 8.0,
@@ -182,7 +187,9 @@
       "lever_name": "CAG Audit Readiness & Advisory Cost Control",
       "description": "Reduce repeat CAG observations through process fixes; cap external legal and consulting spend tied to audit remediation.",
       "category_ids": [
-        "PROF_SVCS"
+        "PROF_SVCS",
+        "cag_audit_costs",
+        "vigilance_compliance_ops"
       ],
       "p10_pct": 4.0,
       "p50_pct": 8.0,
@@ -239,7 +246,8 @@
       "lever_name": "CSR Spend Efficiency & Impact Optimisation",
       "description": "Consolidate CSR programme administration, co-fund with government schemes, and shift to outcome-based partner contracts to raise impact per rupee.",
       "category_ids": [
-        "CSR"
+        "CSR",
+        "csr_mandatory_spend"
       ],
       "p10_pct": 8.0,
       "p50_pct": 15.0,
@@ -315,7 +323,9 @@
       "lever_name": "Manpower Rationalisation (VRS / Role Automation)",
       "description": "Rebalance workforce through VRS design, redeployment to growth units, and freeze-and-attrite plans aligned with DPE guidelines.",
       "category_ids": [
-        "HR"
+        "HR",
+        "dpe_hr_perquisites",
+        "contract_labour_costs"
       ],
       "p10_pct": 8.0,
       "p50_pct": 18.0,
@@ -334,7 +344,8 @@
       "lever_name": "Capital Project Cost & Overrun Control",
       "description": "Institute stage-gate reviews, EPC contract discipline, and independent cost audits to arrest project time and cost overruns.",
       "category_ids": [
-        "PROF_SVCS"
+        "PROF_SVCS",
+        "project_epc_overheads"
       ],
       "p10_pct": 4.0,
       "p50_pct": 10.0,
