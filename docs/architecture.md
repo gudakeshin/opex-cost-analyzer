@@ -133,7 +133,7 @@ C4Context
    - Group 3 (Analysis) — Root cause analyzer identifies that MRO (Materials/Repairs) is 2× peer median → "MRO consolidation" lever triggered
    - Group 4 (India Tax) — Indian-tax-optimizer flags IT outsourcing category for 18% GST optimization
    - Group 5 (Financial Modeling) → Savings-modeler calculates P50 savings per lever, confidence bands, phasing
-3. **Lever Intelligence** → `resolve_eligible_levers()` merges BFSI sector pack (8 levers) + universal 30+ levers → ranks by eligibility score
+3. **Lever Intelligence** → `resolve_eligible_levers()` merges BFSI sector pack (8 levers) + universal 53 levers → ranks by eligibility score
    - Top initiatives: MRO consolidation (₹15 Cr run-rate), IT contract renegotiation (₹8 Cr), GST ITC recovery (₹3 Cr)
 4. **Scenario Modeling** → Sensitivity engine runs 7 scenarios (conservative 60%, base 80%, accelerated 90%, etc.)
 5. **Output** → Business case document with NPV (tax-adjusted), payback period, bounce-back risk, condition precedents
@@ -214,7 +214,7 @@ C4Container
     ContainerDb(parquet, "Parquet / DuckDB", "Columnar storage", "Streaming ingestion for large-cap (>100k lines) and conglomerate (>5M lines)")
     ContainerDb(audit, "Audit Log", "Append-only file", "SHA-256 hash chain; shipped to client SIEM")
     ContainerDb(sector_packs, "Sector Packs", "JSON files", "11 packs — ALL FULL: bfsi_banks, manufacturing_diversified, it_ites, fmcg_consumer, pharma_lifesciences, energy_utilities, insurance_general, retail_organized, telecom_infra, psu_cpse, conglomerate")
-    ContainerDb(ref_data, "Reference Data", "JSON files", "switching_cost_benchmarks.json · regulatory_exclusions.json · model_parameters.json (30+ levers)")
+    ContainerDb(ref_data, "Reference Data", "JSON files", "switching_cost_benchmarks.json · regulatory_exclusions.json · model_parameters.json (53 levers)")
 
     Rel(user, frontend, "HTTP/HTTPS (VPN only)")
     Rel(frontend, api, "REST calls")
@@ -702,9 +702,9 @@ classDiagram
 
 ---
 
-## 8. Sector Pack Architecture — 11 Full Packs
+## 8. Sector Pack Architecture — 15 Full Packs
 
-**Why This Matters:** Different industries face different cost pressures. Rather than one-size-fits-all, we've built 11 complete, industry-specific sector packs that codify consulting best practices for each sector. This is how the platform scales to 11 different verticals without manual customization.
+**Why This Matters:** Different industries face different cost pressures. Rather than one-size-fits-all, we've built 15 complete, industry-specific sector packs that codify consulting best practices for each sector. This is how the platform scales to 15 different verticals without manual customization.
 
 ```mermaid
 flowchart LR
@@ -750,7 +750,7 @@ flowchart LR
 
 **Fig. 8 — Sector Pack Architecture & Calibration Loop**
 
-**11 Sector Packs (All Complete):**
+**15 Sector Packs (All Complete):**
 
 | Pack | Industry | Key Levers (Sample) |
 |------|----------|-------------------|
@@ -765,6 +765,10 @@ flowchart LR
 | **telecom_infra** | Telecom, tower companies | Network OpEx optimization, tower sharing, IT/BSS/OSS modernization, workforce optimization, energy efficiency |
 | **psu_cpse** | Public sector, state enterprises | Public procurement reform, manpower rationalization, project cost control, asset monetization, shared services consolidation |
 | **conglomerate** | Multi-business groups | Shared services center, group procurement, portfolio rationalization, inter-company billing optimization |
+| **gcc_capability_centers** | Global capability centers, captive SSCs | Tier-2 location strategy, seat utilization, parent recharge rationalization, pyramid upskilling, GenAI productivity |
+| **healthcare_hospitals** | Hospital chains, diagnostics | Consumables GPO, clinical workforce optimization, pharmacy cost, revenue cycle automation, space utilization |
+| **hospitality_travel** | Hotels, QSR, travel | OTA commission reduction, F&B procurement, energy per key, housekeeping optimization, revenue management |
+| **financial_services_nonbank** | NBFCs, AMCs, brokers | Digital onboarding/KYC, collections automation, fund administration consolidation, market data rationalization |
 
 **Lever Structure (per pack):**
 - **lever_id** (unique key)
@@ -781,7 +785,7 @@ flowchart LR
 - **implementation_weeks** (p10/p50/p90 effort estimate)
 
 **Universal Levers (model_parameters.json):**
-30+ levers applicable across all sectors:
+53 levers applicable across all sectors:
 - Contract renegotiation, demand management, supplier consolidation, maverick spend compliance
 - Zero-based rebaseline, shared services consolidation, geographic arbitrage, should-cost modeling
 - Tail spend automation, process automation (RPA), workforce optimization, footprint rationalization
@@ -807,8 +811,8 @@ Post-engagement (T+12 months), track actual vs. planned savings:
 6. **Feedback Loop** → Next engagement uses refined ranges; platform improves over time
 
 **Section Summary:**
-- 11 complete, industry-specific sector packs codify consulting best practices
-- 30+ universal levers provide cross-industry options
+- 15 complete, industry-specific sector packs codify consulting best practices
+- 53 universal levers provide cross-industry options
 - Lever Intelligence Engine resolves eligible levers per company (typically 8–12 top opportunities)
 - Calibration loop continuously refines lever ranges based on realised outcomes
 
@@ -923,7 +927,7 @@ flowchart TD
 
 ## 10. Lever Intelligence Engine
 
-**Why This Matters:** Knowing 30+ levers is useless if you recommend the wrong ones to a company. The Lever Intelligence Engine infers industry from spend signals, then resolves the most relevant levers with eligibility scoring. This is how the platform scales to diverse customers without manual configuration.
+**Why This Matters:** Knowing 300+ levers is useless if you recommend the wrong ones to a company. The Lever Intelligence Engine infers industry from spend signals, then resolves the most relevant levers with eligibility scoring. This is how the platform scales to diverse customers without manual configuration.
 
 ```mermaid
 flowchart TD
@@ -1374,7 +1378,7 @@ flowchart TB
 
 **OPAR Loop:** Observe-Plan-Act-Reflect agentic orchestration pattern. Iterative cycle allowing the platform to refine recommendations as data emerges.
 
-**Sector Packs:** Industry-specific lever libraries. 11 complete packs (BFSI, Manufacturing, IT/ITeS, FMCG, Pharma, Energy, Insurance, Retail, Telecom, PSU, Conglomerate) codifying consulting best practices.
+**Sector Packs:** Industry-specific lever libraries. 15 complete packs (BFSI, Manufacturing, IT/ITeS, FMCG, Pharma, Energy, Insurance, Retail, Telecom, PSU, Conglomerate, GCC, Healthcare, Hospitality, Financial Services Non-Bank) codifying consulting best practices.
 
 **Lever Intelligence Engine:** Auto-detects industry and resolves eligible cost-reduction opportunities. Outputs ranked list of levers with eligibility scores.
 
