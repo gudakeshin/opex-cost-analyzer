@@ -342,3 +342,59 @@ def test_value_bridge_uses_overlap_matrix_when_present() -> None:
     flat = (100 + 80 + 60) * 0.75
     assert row["deduped_mid_savings"] < flat
     assert row["deduped_mid_savings"] > 100.0
+
+
+# ---------------------------------------------------------------------------
+# Industry-variant cost-per-transaction thresholds
+# ---------------------------------------------------------------------------
+
+def test_cpt_threshold_varies_by_industry() -> None:
+    from app.skills.engine.benchmarking import _resolve_cost_per_transaction_max
+    from app.skills.engine._loaders import _get_root_cause_thresholds
+
+    cfg = _get_root_cause_thresholds().get("thresholds", {}).get("cost_per_transaction_max", {})
+    bfsi_amt, bfsi_key, bfsi_label = _resolve_cost_per_transaction_max(cfg, "bfsi_banks", "INR")
+    mfg_amt, _, mfg_label = _resolve_cost_per_transaction_max(cfg, "manufacturing_diversified", "INR")
+    assert bfsi_amt == 3500.0
+    assert mfg_amt == 800.0
+    assert bfsi_amt > mfg_amt
+    assert "Financial" in bfsi_label
+    assert "Manufacturing" in mfg_label
+
+
+def test_cpt_diagnosis_uses_industry_threshold_in_root_cause() -> None:
+    profile = {
+        "category_profile": [
+            {"category_id": "IT", "category_name": "IT", "spend": 40_000.0, "share_of_total": 1.0},
+        ]
+    }
+    lines = [
+        NormalizedSpendLine(
+            row_id="1",
+            supplier="V1",
+            description="po 123 services",
+            category_id="IT",
+            category_name="IT",
+            amount=40_000.0,
+            spend_date="2025-01-15",
+            currency="INR",
+            fx_rate_to_reporting=1.0,
+        )
+    ]
+    # ₹4,000/txn — above BFSI norm (₹3,500) but would be below if threshold were ₹800.
+    bfsi = engine.root_cause_analyzer(
+        profile, {"comparisons": []}, lines, industry="bfsi_banks",
+        transaction_count=10, reporting_currency="INR",
+    )
+    mfg = engine.root_cause_analyzer(
+        profile, {"comparisons": []}, lines, industry="manufacturing_diversified",
+        transaction_count=100, reporting_currency="INR",
+    )
+    bfsi_cpt = next(
+        rc for rc in bfsi["root_cause_findings"][0]["root_causes"]
+        if "Cost per transaction" in rc.get("diagnosis", "")
+    )
+    mfg_causes = mfg["root_cause_findings"][0]["root_causes"]
+    assert not any("Cost per transaction" in rc.get("diagnosis", "") for rc in mfg_causes)
+    assert bfsi_cpt["cost_per_transaction"]["threshold"] == 3500.0
+    assert bfsi_cpt["cost_per_transaction"]["industry_key"] == "financial_services"

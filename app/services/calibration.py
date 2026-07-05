@@ -19,6 +19,96 @@ log = logging.getLogger(__name__)
 _CALIBRATION_ROOT = Path("data") / "calibration"
 _SECTOR_PACKS_ROOT = Path(__file__).resolve().parents[2] / "sector_packs"
 
+# Client-facing gate copy for steering committees and audit exports.
+_CALIBRATION_GATE_THRESHOLDS = {
+    "auto_approve_min": 0.80,
+    "senior_review_min": 0.60,
+}
+
+
+def explain_calibration_gate(gate: str, overall_rate: float = 0.0) -> Dict[str, Any]:
+    """Plain-language explanation of the calibration gate for client-facing surfaces."""
+    rate_pct = f"{overall_rate:.0%}"
+    auto_min = _CALIBRATION_GATE_THRESHOLDS["auto_approve_min"]
+    review_min = _CALIBRATION_GATE_THRESHOLDS["senior_review_min"]
+
+    if gate == "no_data":
+        return {
+            "recommendation": gate,
+            "label": "Awaiting realisation data",
+            "narrative": (
+                "No T+12 realised savings have been uploaded yet, so the model cannot be "
+                "calibrated against actual outcomes."
+            ),
+            "steering_committee_note": (
+                "Upload finance-sign-off or auditor-confirmed realised savings at programme "
+                "close before applying lever-range updates to sector packs."
+            ),
+            "overall_realisation_rate": overall_rate,
+            "thresholds": dict(_CALIBRATION_GATE_THRESHOLDS),
+        }
+    if gate == "auto_approve":
+        return {
+            "recommendation": gate,
+            "label": "High model credibility",
+            "narrative": (
+                f"Portfolio realisation averaged {rate_pct} of the mid-case plan — at or above "
+                f"the {auto_min:.0%} auto-approve bar. Observed savings align closely with "
+                "modeled ranges."
+            ),
+            "steering_committee_note": (
+                f"Realisation ≥ {auto_min:.0%} supports applying proposed lever-range updates "
+                "without a deep model audit. A partner may still spot-check high-variance "
+                "initiatives before the pack version bump."
+            ),
+            "overall_realisation_rate": overall_rate,
+            "thresholds": dict(_CALIBRATION_GATE_THRESHOLDS),
+        }
+    if gate == "senior_review":
+        return {
+            "recommendation": gate,
+            "label": "Partner review recommended",
+            "narrative": (
+                f"Portfolio realisation averaged {rate_pct} — between {review_min:.0%} and "
+                f"{auto_min:.0%}. The model directionally holds but material variance exists "
+                "on some initiatives."
+            ),
+            "steering_committee_note": (
+                f"Realisation in the {review_min:.0%}–{auto_min:.0%} band requires a senior "
+                "advisor to review lever-range proposals before updating sector packs. "
+                "Investigate under-performing initiatives and document assumption changes "
+                "for the steering committee."
+            ),
+            "overall_realisation_rate": overall_rate,
+            "thresholds": dict(_CALIBRATION_GATE_THRESHOLDS),
+        }
+    if gate == "deep_audit":
+        return {
+            "recommendation": gate,
+            "label": "Deep model audit required",
+            "narrative": (
+                f"Portfolio realisation averaged {rate_pct} — below the {review_min:.0%} "
+                "minimum for routine calibration. Model assumptions or execution tracking "
+                "need formal review."
+            ),
+            "steering_committee_note": (
+                f"Realisation below {review_min:.0%} indicates the savings model did not "
+                "predict outcomes reliably for this engagement. Do not auto-apply pack updates; "
+                "commission a root-cause review of lever selection, addressable-spend baselines, "
+                "and execution probability before the next client cycle."
+            ),
+            "overall_realisation_rate": overall_rate,
+            "thresholds": dict(_CALIBRATION_GATE_THRESHOLDS),
+        }
+    return {
+        "recommendation": gate,
+        "label": "Review required",
+        "narrative": "Calibration gate outcome requires manual review.",
+        "steering_committee_note": "Confirm realised savings data quality before updating sector packs.",
+        "overall_realisation_rate": overall_rate,
+        "thresholds": dict(_CALIBRATION_GATE_THRESHOLDS),
+    }
+
 
 # ---------------------------------------------------------------------------
 # Data structures
@@ -74,6 +164,7 @@ class CalibrationReport:
     lever_proposals: List[LeverRangeProposal] = field(default_factory=list)
     overall_realisation_rate: float = 0.0
     gate_recommendation: str = "review"
+    gate_explanation: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         d = {
@@ -84,6 +175,7 @@ class CalibrationReport:
             "lever_proposals": [p.to_dict() for p in self.lever_proposals],
             "overall_realisation_rate": self.overall_realisation_rate,
             "gate_recommendation": self.gate_recommendation,
+            "gate_explanation": self.gate_explanation,
         }
         return d
 
@@ -260,6 +352,7 @@ def generate_calibration_report(engagement_id: str) -> CalibrationReport:
             engagement_id=engagement_id,
             generated_at=ts,
             gate_recommendation="no_data",
+            gate_explanation=explain_calibration_gate("no_data", 0.0),
         )
 
     # Variance by initiative
@@ -288,6 +381,7 @@ def generate_calibration_report(engagement_id: str) -> CalibrationReport:
         else "senior_review" if overall_rate >= 0.60
         else "deep_audit"
     )
+    gate_expl = explain_calibration_gate(gate, overall_rate)
 
     report = CalibrationReport(
         engagement_id=engagement_id,
@@ -301,6 +395,7 @@ def generate_calibration_report(engagement_id: str) -> CalibrationReport:
         lever_proposals=proposals,
         overall_realisation_rate=overall_rate,
         gate_recommendation=gate,
+        gate_explanation=gate_expl,
     )
 
     # Persist report

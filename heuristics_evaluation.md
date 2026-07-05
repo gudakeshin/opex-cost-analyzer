@@ -5,7 +5,7 @@
 
 ## Executive Summary
 
-The heuristics layer is **production-ready for consultant-driven engagements** on core diagnostic and scenario paths. Source provenance, externalized parameters, calibration governance, and sector-pack versioning remain strengths. Recent work (June–July 2026) closed the highest-impact gaps: graduated maverick severity, spend-floor fragmentation gates, sustainability/specificity-driven confidence bands, lever-family dedup overlap, per-lever bounce-back and execution-probability weighting, EBITDA bps framing, horizon classification, regulatory-headwind scenario, populated `effort_weeks`, and industry-differentiated benchmark categories.
+The heuristics layer is **production-ready for consultant-driven engagements** on core diagnostic and scenario paths. Source provenance, externalized parameters, calibration governance, and sector-pack versioning remain strengths. Recent work (June–July 2026) closed the highest-impact gaps: graduated maverick severity, spend-floor fragmentation gates, sustainability/specificity-driven confidence bands, lever-family dedup overlap, per-lever bounce-back and execution-probability weighting, EBITDA bps framing, horizon classification, regulatory-headwind scenario, populated `effort_weeks`, industry-differentiated benchmark categories, industry-variant cost-per-transaction thresholds, and client-facing calibration gate explanations.
 
 **Remaining gaps** are mostly medium/low priority: industry-variant cost-per-transaction thresholds, client-facing calibration gate explanations, and licensed benchmark feed enrichment (CMIE/Capitaline/CRISIL stubs).
 
@@ -45,14 +45,6 @@ The heuristics layer is **production-ready for consultant-driven engagements** o
 
 ## Open Issues
 
-### Thresholds needing industry variants
-
-**Cost-per-transaction threshold (₹1,000) has no industry variant.** A bank processing high-value treasury invoices at ₹1,200/transaction is not comparable to a manufacturer at the same rate. Low priority — affects root-cause narrative precision, not portfolio totals.
-
-### Client-facing explanations
-
-**Calibration gate thresholds (60%, 80%) lack steering-committee narrative.** The `gate_recommendation` field returns `auto_approve` / `senior_review` / `deep_audit` without a plain-language credibility explanation for clients.
-
 ### Licensed benchmark feeds
 
 **CMIE/Capitaline/CRISIL connectors remain stubs** in `benchmarks_india.py`. Production deployments should enrich seed percentiles with licensed data; the platform honestly labels seed data as illustrative (`specificity_score: 0.55`).
@@ -61,13 +53,9 @@ The heuristics layer is **production-ready for consultant-driven engagements** o
 
 ## Prioritized Remaining Roadmap
 
-**Medium effort:**
-1. Industry-variant cost-per-transaction thresholds (BFSI vs manufacturing vs healthcare)
-2. Surface calibration gate rationale in client-facing audit exports
-
 **Higher effort / parallel-safe:**
-3. Licensed benchmark feed ingestion (CMIE Prowess, Capitaline, CRISIL)
-4. Initiative-pair overlap matrix exposed in UI (dedup is computed; transparency layer optional)
+1. Licensed benchmark feed ingestion (CMIE Prowess, Capitaline, CRISIL)
+2. Initiative-pair overlap matrix exposed in UI (dedup is computed; transparency layer optional)
 
 ---
 
@@ -87,6 +75,6 @@ The heuristics layer is **production-ready for consultant-driven engagements** o
 | Industry benchmark categories | **Improved** | Sector-specific keys; seed still illustrative |
 | specificity_score → band width | **Fixed** | Via benchmark_specificity param |
 | Regulatory risk scenario | **Fixed** | regulatory_headwind in sensitivity |
-| Cost-per-transaction by industry | Open | Single global threshold |
-| Calibration gate client narrative | Open | Technical labels only |
+| Cost-per-transaction by industry | **Fixed** | Per-industry thresholds in diagnostic config |
+| Calibration gate client narrative | **Fixed** | `gate_explanation` on calibration reports |
 | Licensed benchmark feeds | Stubbed | Connectors exist; no live data |

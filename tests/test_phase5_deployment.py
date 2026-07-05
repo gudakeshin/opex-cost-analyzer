@@ -376,6 +376,26 @@ class TestCalibrationReport:
         assert "variance_summary" in d
         assert "lever_proposals" in d
         assert "gate_recommendation" in d
+        assert "gate_explanation" in d
+        assert d["gate_explanation"]["label"]
+        assert d["gate_explanation"]["steering_committee_note"]
+
+    def test_gate_explanation_auto_approve(self, tmp_path, monkeypatch):
+        from app.services import calibration
+        monkeypatch.setattr(calibration, "_CALIBRATION_ROOT", tmp_path)
+        calibration.ingest_realised_savings(self.ENG, _realised_records(self.ENG))
+        report = calibration.generate_calibration_report(self.ENG)
+        assert report.gate_recommendation == "auto_approve"
+        expl = report.gate_explanation
+        assert expl["label"] == "High model credibility"
+        assert "80%" in expl["steering_committee_note"] or "80" in expl["narrative"]
+
+    def test_gate_explanation_no_data(self, tmp_path, monkeypatch):
+        from app.services import calibration
+        monkeypatch.setattr(calibration, "_CALIBRATION_ROOT", tmp_path)
+        expl = calibration.explain_calibration_gate("no_data", 0.0)
+        assert expl["label"] == "Awaiting realisation data"
+        assert "Upload" in expl["steering_committee_note"]
 
     def test_report_written_to_disk(self, tmp_path, monkeypatch):
         from app.services import calibration

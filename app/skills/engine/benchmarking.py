@@ -22,6 +22,12 @@ from .profiler import resolve_eligible_levers
 _PO_TOKEN_RE = re.compile(r"\b(?:po|p\.?\s?o\.?|purchase order)\b")
 
 
+def _fmt_money(amount: float, currency: str) -> str:
+    from app.utils.inr_format import format_money
+
+    return format_money(float(amount or 0.0), currency)
+
+
 def _category_pct_of_revenue(category_spend: float, revenue: float) -> float:
     if revenue <= 0:
         return 0.0
@@ -35,6 +41,31 @@ def _threshold_val(raw: Any, default: Any) -> Any:
     if isinstance(raw, dict):
         return raw.get("value", default)
     return raw
+
+
+def _resolve_cost_per_transaction_max(
+    cpt_cfg: Any,
+    industry: str,
+    reporting_currency: str,
+) -> Tuple[float, str, str]:
+    """Return (threshold amount, benchmark industry key, client-facing industry label)."""
+    from app.services.benchmarks import benchmark_industry_for
+
+    bench_key = benchmark_industry_for(industry) if industry else "default"
+    default_cfg: Dict[str, Any] = cpt_cfg if isinstance(cpt_cfg, dict) else {"value": cpt_cfg}
+    by_industry: Dict[str, Any] = {}
+    if isinstance(cpt_cfg, dict) and ("default" in cpt_cfg or "by_benchmark_industry" in cpt_cfg):
+        default_cfg = cpt_cfg.get("default") or {}
+        by_industry = cpt_cfg.get("by_benchmark_industry") or cpt_cfg.get("by_industry") or {}
+
+    chosen = by_industry.get(bench_key) or by_industry.get(industry) or default_cfg
+    if not isinstance(chosen, dict):
+        chosen = {"value": float(chosen or 1000.0)}
+
+    use_usd = reporting_currency.upper() != "INR" and chosen.get("value_usd") is not None
+    amount = float(chosen["value_usd"] if use_usd else _threshold_val(chosen, 1000.0))
+    label = str(chosen.get("label") or bench_key.replace("_", " ").title())
+    return amount, bench_key, label
 
 
 def peer_benchmarker(
@@ -258,10 +289,9 @@ def root_cause_analyzer(
         return None
 
     cpt_cfg = th.get("cost_per_transaction_max", {})
-    if reporting_currency.upper() != "INR" and isinstance(cpt_cfg, dict) and "value_usd" in cpt_cfg:
-        cpt_max = float(cpt_cfg["value_usd"])
-    else:
-        cpt_max = float(_threshold_val(cpt_cfg, 1000.0))
+    cpt_max, cpt_industry_key, cpt_industry_label = _resolve_cost_per_transaction_max(
+        cpt_cfg, industry, reporting_currency
+    )
 
     spend_by_cat = {c["category_id"]: c for c in profile.get("category_profile", [])}
     suppliers_by_cat: Dict[str, Dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -351,15 +381,27 @@ def root_cause_analyzer(
             root_causes.append(maverick_rc)
 
         if transaction_count and transaction_count > 0 and (total / transaction_count) > cpt_max:
+            cpt_actual = total / transaction_count
             root_causes.append(
                 {
-                    "diagnosis": "Cost per transaction above expected norm",
+                    "diagnosis": (
+                        f"Cost per transaction {_fmt_money(cpt_actual, reporting_currency)} exceeds "
+                        f"{cpt_industry_label} norm "
+                        f"({_fmt_money(cpt_max, reporting_currency)}/txn)"
+                    ),
                     "confidence": "medium",
                     "addressable_spend": total * float(_threshold_val(rates.get("demand_management"), 0.08)),
                     "recommended_lever": "demand_management",
                     "implementation_approach": "Tighten demand policies and approvals for low-value requests.",
                     "implementation_complexity": "medium",
                     "estimated_timeline_months": 9,
+                    "cost_per_transaction": {
+                        "actual": round(cpt_actual, 2),
+                        "threshold": cpt_max,
+                        "industry_key": cpt_industry_key,
+                        "industry_label": cpt_industry_label,
+                        "currency": reporting_currency.upper(),
+                    },
                 }
             )
 
