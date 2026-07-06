@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { Button } from '../components/Common/Button';
@@ -6,7 +6,17 @@ import { Card } from '../components/Common/Card';
 import { Loader } from '../components/Common/Loader';
 import { Alert } from '../components/Common/Alert';
 import { PageHeader } from '../components/Common/PageHeader';
-import type { SectorPackRow } from '../components/PageComponents/Benchmarks/SectorPackDetailDrawer';
+import type { SectorPackRow } from '../types/sectorPack';
+import type {
+  BenchmarksDraft,
+  KpiRow,
+  LeversDraft,
+  PackEditorDraft,
+  PackEditorTabId,
+  PeersDraft,
+  SourcesDraft,
+  TaxonomyDraft,
+} from '../types/sectorPack';
 import { parse_regulatory_triggers_count } from '../utils/regulatoryTriggers';
 import {
   useCreateSectorPack,
@@ -19,6 +29,24 @@ import {
 } from '../api/hooks/useBenchmarksQueries';
 import { getApiErrorMessage } from '../hooks/useApi';
 import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
+import { BenchmarksEditor } from '../components/PageComponents/SectorPacks/BenchmarksEditor';
+import { ImportPreviewPanel } from '../components/PageComponents/SectorPacks/ImportPreviewPanel';
+import { KpiPackEditor } from '../components/PageComponents/SectorPacks/KpiPackEditor';
+import { LeversEditor } from '../components/PageComponents/SectorPacks/LeversEditor';
+import { PackEditorShell } from '../components/PageComponents/SectorPacks/PackEditorShell';
+import { PeersEditor } from '../components/PageComponents/SectorPacks/PeersEditor';
+import { SourcesEditor } from '../components/PageComponents/SectorPacks/SourcesEditor';
+import { TaxonomyEditor } from '../components/PageComponents/SectorPacks/TaxonomyEditor';
+import { ValidationResultPanel } from '../components/PageComponents/SectorPacks/ValidationResultPanel';
+import {
+  deepEqual,
+  draftToJson,
+  isPackEditorTab,
+  parseDetailToDraft,
+  parseDraftFromJson,
+  serializeDraftToPayload,
+} from '../utils/sectorPackEditors';
+import { buildManifestForm, hydrateEditorDrafts } from '../utils/sectorPackStudioState';
 
 type TabId =
   | 'manifest'
@@ -48,32 +76,11 @@ function statusBadge(status?: string) {
   return 'bg-slate-100 text-slate-600';
 }
 
-function payloadForTab(tab: TabId, detail: Record<string, unknown> | null): unknown {
-  if (!detail) return null;
-  switch (tab) {
-    case 'manifest':
-      return detail.manifest ?? {};
-    case 'taxonomy':
-      return detail.taxonomy_extension ?? { additional_categories: [], overrides: [] };
-    case 'peers':
-      return { sector: detail.pack_id, currency: 'INR', peers: detail.peers ?? [] };
-    case 'levers':
-      return { sector: detail.pack_id, source_type: 'studio', levers: detail.levers ?? [] };
-    case 'kpis':
-      return detail.kpi_pack ?? [];
-    case 'benchmarks':
-      return {
-        sector: detail.pack_id,
-        version: detail.version ?? '0.1',
-        benchmarks: { [String(detail.pack_id)]: { categories: detail.categories ?? {} } },
-      };
-    case 'sources':
-      return detail.benchmark_sources ?? { free_sources: [], licensed_sources_stubs: [] };
-    case 'regulatory':
-      return detail.regulatory_layer ?? '';
-    default:
-      return null;
-  }
+function manifestDirty(
+  form: Record<string, string>,
+  baseline: Record<string, string>,
+): boolean {
+  return JSON.stringify(form) !== JSON.stringify(baseline);
 }
 
 export const SectorPackStudio: React.FC = () => {
@@ -81,9 +88,15 @@ export const SectorPackStudio: React.FC = () => {
   const packs = useMemo(() => packsQuery.data?.packs ?? [], [packsQuery.data]);
   const [selectedId, setSelectedId] = useState('');
   const [tab, setTab] = useState<TabId>('manifest');
-  const [editorText, setEditorText] = useState('');
-  const [savedText, setSavedText] = useState('');
+  const [draftByTab, setDraftByTab] = useState<Partial<Record<PackEditorTabId, PackEditorDraft>>>({});
+  const [baselineByTab, setBaselineByTab] = useState<Partial<Record<PackEditorTabId, PackEditorDraft>>>({});
+  const [viewModeByTab, setViewModeByTab] = useState<Partial<Record<PackEditorTabId, 'structured' | 'json'>>>({});
+  const [jsonTextByTab, setJsonTextByTab] = useState<Partial<Record<PackEditorTabId, string>>>({});
+  const [jsonErrorByTab, setJsonErrorByTab] = useState<Partial<Record<PackEditorTabId, string | null>>>({});
+  const [regulatoryText, setRegulatoryText] = useState('');
+  const [regulatoryBaseline, setRegulatoryBaseline] = useState('');
   const [manifestForm, setManifestForm] = useState<Record<string, string>>({});
+  const [manifestBaseline, setManifestBaseline] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [validation, setValidation] = useState<Record<string, unknown> | null>(null);
   const [showPublish, setShowPublish] = useState(false);
@@ -102,8 +115,40 @@ export const SectorPackStudio: React.FC = () => {
 
   const selectedPack = packs.find((p) => p.pack_id === selectedId);
   const activeTab = TABS.find((t) => t.id === tab)!;
-  const isJsonTab = tab !== 'manifest' && tab !== 'regulatory';
-  const hasDiff = editorText !== savedText;
+
+  const packSelected = Boolean(selectedId);
+  const detailPending = packSelected && (detailQuery.isPending || detailQuery.isFetching);
+  const detailReady = packSelected && Boolean(detail);
+  const packsLoading = packsQuery.isLoading;
+  const showPackLoader = packsLoading || detailPending;
+
+  const hasEditorDiff = useMemo(() => {
+    if (!isPackEditorTab(tab) || !detail) return false;
+    const draft = draftByTab[tab];
+    const baseline = baselineByTab[tab];
+    if (!draft || !baseline) return false;
+    if (viewModeByTab[tab] === 'json') {
+      const jsonText = jsonTextByTab[tab];
+      if (!jsonText) return false;
+      try {
+        const parsed = parseDraftFromJson(tab, jsonText);
+        return !deepEqual(
+          serializeDraftToPayload(tab, parsed, detail),
+          serializeDraftToPayload(tab, baseline, detail),
+        );
+      } catch {
+        return true;
+      }
+    }
+    return !deepEqual(draft, baseline);
+  }, [tab, draftByTab, baselineByTab, viewModeByTab, jsonTextByTab, detail]);
+
+  const hasDiff =
+    tab === 'manifest'
+      ? manifestDirty(manifestForm, manifestBaseline)
+      : tab === 'regulatory'
+        ? regulatoryText !== regulatoryBaseline
+        : hasEditorDiff;
 
   useUnsavedGuard('sector-pack-studio', hasDiff);
 
@@ -111,52 +156,75 @@ export const SectorPackStudio: React.FC = () => {
     if (packs.length && !selectedId) setSelectedId(packs[0].pack_id);
   }, [packs, selectedId]);
 
-  const loadEditorFromDetail = useCallback(() => {
-    if (!detail) return;
-    if (tab === 'manifest') {
-      const m = (detail.manifest ?? {}) as Record<string, unknown>;
-      setManifestForm({
-        sector: String(m.sector ?? ''),
-        status: String(m.status ?? 'scaffold'),
-        description: String(m.description ?? ''),
-        effective_from: String(m.effective_from ?? ''),
-        reporting_currency: String(m.reporting_currency ?? 'INR'),
-        fiscal_year_end: String(m.fiscal_year_end ?? 'March 31'),
-      });
-      setEditorText('');
-      setSavedText('');
-    } else if (tab === 'regulatory') {
-      const text = detail.regulatory_layer ?? '';
-      setEditorText(text);
-      setSavedText(text);
-    } else {
-      const payload = payloadForTab(tab, detail as unknown as Record<string, unknown>);
-      const text = JSON.stringify(payload, null, 2);
-      setEditorText(text);
-      setSavedText(text);
-    }
-  }, [detail, tab]);
-
   useEffect(() => {
-    loadEditorFromDetail();
-  }, [loadEditorFromDetail, selectedId, tab]);
+    if (!detail || !selectedId) {
+      setDraftByTab({});
+      setBaselineByTab({});
+      setJsonTextByTab({});
+      setJsonErrorByTab({});
+      setManifestForm({});
+      setManifestBaseline({});
+      setRegulatoryText('');
+      setRegulatoryBaseline('');
+      return;
+    }
+
+    const { drafts, jsonText } = hydrateEditorDrafts(detail);
+    setDraftByTab(drafts);
+    setBaselineByTab(JSON.parse(JSON.stringify(drafts)));
+    setJsonTextByTab(jsonText);
+    setJsonErrorByTab({});
+
+    const pack = packs.find((p) => p.pack_id === selectedId);
+    const form = buildManifestForm(detail, pack);
+    setManifestForm(form);
+    setManifestBaseline(form);
+
+    const regulatory = detail.regulatory_layer ?? '';
+    setRegulatoryText(regulatory);
+    setRegulatoryBaseline(regulatory);
+  }, [detail, selectedId, packs]);
+
+  const resolveEditorDraft = (editorTab: PackEditorTabId): PackEditorDraft => {
+    if (viewModeByTab[editorTab] === 'json') {
+      const jsonText = jsonTextByTab[editorTab] ?? '';
+      return parseDraftFromJson(editorTab, jsonText);
+    }
+    const draft = draftByTab[editorTab] ?? (detail ? parseDetailToDraft(editorTab, detail) : undefined);
+    if (!draft) {
+      throw new Error(`No draft available for ${editorTab}`);
+    }
+    return draft;
+  };
 
   const handleSave = async () => {
-    if (!selectedId) return;
+    if (!selectedId || !detail) return;
     setError(null);
     try {
       let payload: unknown;
       if (tab === 'manifest') {
-        const m = { ...(detail?.manifest as Record<string, unknown>), ...manifestForm };
-        payload = m;
+        payload = { ...(detail.manifest as Record<string, unknown>), ...manifestForm };
       } else if (tab === 'regulatory') {
-        payload = editorText;
+        payload = regulatoryText;
+      } else if (isPackEditorTab(tab)) {
+        const draft = resolveEditorDraft(tab);
+        payload = serializeDraftToPayload(tab, draft, detail);
       } else {
-        payload = JSON.parse(editorText);
+        return;
       }
+
       await updateMutation.mutateAsync({ component: activeTab.component, payload });
-      if (tab !== 'manifest') {
-        setSavedText(editorText);
+
+      if (tab === 'manifest') {
+        setManifestBaseline({ ...manifestForm });
+      } else if (tab === 'regulatory') {
+        setRegulatoryBaseline(regulatoryText);
+      } else if (isPackEditorTab(tab)) {
+        const draft = resolveEditorDraft(tab);
+        setDraftByTab((prev) => ({ ...prev, [tab]: draft }));
+        setBaselineByTab((prev) => ({ ...prev, [tab]: JSON.parse(JSON.stringify(draft)) }));
+        setJsonTextByTab((prev) => ({ ...prev, [tab]: draftToJson(draft) }));
+        await detailQuery.refetch();
       }
     } catch (err) {
       setError(getApiErrorMessage(err));
@@ -212,16 +280,148 @@ export const SectorPackStudio: React.FC = () => {
       } else {
         setImportPreview(null);
         await packsQuery.refetch();
+        await detailQuery.refetch();
       }
     } catch (err) {
       setError(getApiErrorMessage(err));
     }
   };
 
-  const triggerCount =
-    tab === 'regulatory' ? parse_regulatory_triggers_count(editorText) : 0;
+  const renderPackEditor = (editorTab: PackEditorTabId) => {
+    const draft =
+      draftByTab[editorTab] ?? (detail ? parseDetailToDraft(editorTab, detail) : undefined);
+    if (!draft) {
+      return <p className="text-sm text-brand-muted">Loading editor…</p>;
+    }
 
-  const loading = packsQuery.isLoading || detailQuery.isLoading;
+    const shellProps = {
+      tab: editorTab,
+      draft,
+      onDraftChange: (next: PackEditorDraft) =>
+        setDraftByTab((prev) => ({ ...prev, [editorTab]: next })),
+      viewMode: viewModeByTab[editorTab] ?? 'structured',
+      onViewModeChange: (mode: 'structured' | 'json') =>
+        setViewModeByTab((prev) => ({ ...prev, [editorTab]: mode })),
+      jsonText: jsonTextByTab[editorTab] ?? draftToJson(draft),
+      onJsonTextChange: (text: string) =>
+        setJsonTextByTab((prev) => ({ ...prev, [editorTab]: text })),
+      jsonError: jsonErrorByTab[editorTab] ?? null,
+      onJsonError: (err: string | null) =>
+        setJsonErrorByTab((prev) => ({ ...prev, [editorTab]: err })),
+    };
+
+    return (
+      <PackEditorShell {...shellProps}>
+        {editorTab === 'kpis' && (
+          <KpiPackEditor draft={draft as KpiRow[]} onChange={shellProps.onDraftChange} />
+        )}
+        {editorTab === 'taxonomy' && (
+          <TaxonomyEditor draft={draft as TaxonomyDraft} onChange={shellProps.onDraftChange} />
+        )}
+        {editorTab === 'peers' && (
+          <PeersEditor draft={draft as PeersDraft} onChange={shellProps.onDraftChange} />
+        )}
+        {editorTab === 'benchmarks' && (
+          <BenchmarksEditor draft={draft as BenchmarksDraft} onChange={shellProps.onDraftChange} />
+        )}
+        {editorTab === 'sources' && (
+          <SourcesEditor draft={draft as SourcesDraft} onChange={shellProps.onDraftChange} />
+        )}
+        {editorTab === 'levers' && (
+          <LeversEditor draft={draft as LeversDraft} onChange={shellProps.onDraftChange} />
+        )}
+      </PackEditorShell>
+    );
+  };
+
+  const triggerCount = tab === 'regulatory' ? parse_regulatory_triggers_count(regulatoryText) : 0;
+  const detailFetchError = detailQuery.isError ? getApiErrorMessage(detailQuery.error) : null;
+
+  const renderTabContent = () => {
+    if (showPackLoader) {
+      return <Loader label="Loading pack…" />;
+    }
+
+    if (!packs.length && !packsLoading) {
+      return (
+        <Card className="border-brand-border bg-white">
+          <p className="text-sm text-brand-muted">No sector packs found. Create a pack to get started.</p>
+        </Card>
+      );
+    }
+
+    if (detailFetchError) {
+      return (
+        <div className="space-y-3">
+          <Alert variant="error" title="Could not load pack detail">
+            {detailFetchError}
+          </Alert>
+          <Button variant="secondary" onClick={() => void detailQuery.refetch()}>
+            Retry
+          </Button>
+        </div>
+      );
+    }
+
+    if (!detailReady) {
+      return (
+        <Card className="border-brand-border bg-white">
+          <p className="text-sm text-brand-muted">Select a pack from the list to edit its components.</p>
+        </Card>
+      );
+    }
+
+    return (
+      <>
+        {detail?.pack_error && (
+          <Alert variant="warning" title="Pack validation warning">
+            {detail.pack_error}
+          </Alert>
+        )}
+
+        {tab === 'manifest' ? (
+          <Card title="Manifest" className="border-brand-border bg-white">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+              {(['sector', 'status', 'description', 'effective_from', 'reporting_currency', 'fiscal_year_end'] as const).map(
+                (key) => (
+                  <label key={key} className="block">
+                    <span className="text-xs text-brand-muted">{key}</span>
+                    <input
+                      className="w-full border rounded px-2 py-1 mt-0.5"
+                      value={manifestForm[key] ?? ''}
+                      onChange={(e) => setManifestForm((f) => ({ ...f, [key]: e.target.value }))}
+                      disabled={key === 'status'}
+                    />
+                  </label>
+                ),
+              )}
+            </div>
+            <p className="text-xs text-brand-muted mt-2">
+              pack_id and version are immutable here; version bumps on Publish. Industry free-text mapping for new packs
+              requires explicit pack selection in engagements.
+            </p>
+          </Card>
+        ) : tab === 'regulatory' ? (
+          <Card
+            title={`Regulatory (${triggerCount} triggers parsed)`}
+            className="border-brand-border bg-white"
+          >
+            <textarea
+              value={regulatoryText}
+              onChange={(e) => setRegulatoryText(e.target.value)}
+              className="w-full px-3 py-2 border border-brand-border rounded-lg font-mono text-sm h-96"
+              spellCheck={false}
+            />
+          </Card>
+        ) : isPackEditorTab(tab) ? (
+          <Card title={activeTab.label} className="border-brand-border bg-white">
+            {renderPackEditor(tab)}
+            <p className="text-xs text-brand-muted mt-2">Changes are validated server-side before write.</p>
+          </Card>
+        ) : null}
+      </>
+    );
+  };
 
   return (
     <MainLayout hideHeader>
@@ -317,13 +517,20 @@ export const SectorPackStudio: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button onClick={handleSave} disabled={!selectedId || updateMutation.isPending}>
+            <Button
+              onClick={handleSave}
+              disabled={!detailReady || updateMutation.isPending}
+            >
               Save {activeTab.label}
             </Button>
-            <Button variant="secondary" onClick={handleValidate} disabled={!selectedId || regressionMutation.isPending}>
+            <Button
+              variant="secondary"
+              onClick={handleValidate}
+              disabled={!detailReady || regressionMutation.isPending}
+            >
               Run validation
             </Button>
-            <Button variant="ghost" onClick={() => setShowPublish(true)} disabled={!selectedId}>
+            <Button variant="ghost" onClick={() => setShowPublish(true)} disabled={!detailReady}>
               Publish
             </Button>
             <label className="text-xs border border-brand-border rounded px-3 py-2 cursor-pointer hover:bg-brand-surface-muted">
@@ -360,58 +567,17 @@ export const SectorPackStudio: React.FC = () => {
 
           {hasDiff && <p className="text-xs text-amber-700">Unsaved changes on this tab.</p>}
 
-          {loading ? (
-            <Loader label="Loading pack…" />
-          ) : tab === 'manifest' ? (
-            <Card title="Manifest" className="border-brand-border bg-white">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                {(['sector', 'status', 'description', 'effective_from', 'reporting_currency', 'fiscal_year_end'] as const).map(
-                  (key) => (
-                    <label key={key} className="block">
-                      <span className="text-xs text-brand-muted">{key}</span>
-                      <input
-                        className="w-full border rounded px-2 py-1 mt-0.5"
-                        value={manifestForm[key] ?? ''}
-                        onChange={(e) => setManifestForm((f) => ({ ...f, [key]: e.target.value }))}
-                        disabled={key === 'status'}
-                      />
-                    </label>
-                  ),
-                )}
-              </div>
-              <p className="text-xs text-brand-muted mt-2">
-                pack_id and version are immutable here; version bumps on Publish. Industry free-text mapping for new packs
-                requires explicit pack selection in engagements.
-              </p>
-            </Card>
-          ) : (
-            <Card
-              title={tab === 'regulatory' ? `Regulatory (${triggerCount} triggers parsed)` : activeTab.label}
-              className="border-brand-border bg-white"
-            >
-              <textarea
-                value={editorText}
-                onChange={(e) => setEditorText(e.target.value)}
-                className={`w-full px-3 py-2 border border-brand-border rounded-lg font-mono text-sm ${
-                  tab === 'regulatory' ? 'h-96' : 'h-[28rem]'
-                }`}
-                spellCheck={false}
-              />
-              {isJsonTab && (
-                <p className="text-xs text-brand-muted mt-2">JSON is validated server-side before write.</p>
-              )}
-            </Card>
-          )}
+          {renderTabContent()}
 
           {validation && (
             <Card title="Validation / publish result" className="border-brand-border bg-white">
-              <pre className="text-xs overflow-auto max-h-64">{JSON.stringify(validation, null, 2)}</pre>
+              <ValidationResultPanel result={validation} />
             </Card>
           )}
 
           {importPreview && (
             <Card title="Import preview (dry run)" className="border-brand-border bg-white">
-              <pre className="text-xs overflow-auto max-h-48">{JSON.stringify(importPreview, null, 2)}</pre>
+              <ImportPreviewPanel result={importPreview} />
             </Card>
           )}
 

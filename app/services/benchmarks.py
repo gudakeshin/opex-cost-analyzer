@@ -317,6 +317,9 @@ def sector_pack_detail_payload(pack_id: str) -> Dict[str, Any] | None:
     if reg_path.exists():
         regulatory_layer = reg_path.read_text(encoding="utf-8")
 
+    levers_document = _load_sector_pack_levers_raw(pack_id)
+    benchmarks_document = read_json(d / "benchmarks_percentiles.json", {}) if (d / "benchmarks_percentiles.json").exists() else {}
+
     counts = pack_file_counts(pack_id)
     pack_error: str | None = None
     try:
@@ -342,6 +345,8 @@ def sector_pack_detail_payload(pack_id: str) -> Dict[str, Any] | None:
         "pack_error": pack_error,
         "categories": categories,
         "levers": lever_detail,
+        "levers_document": levers_document,
+        "benchmarks_document": benchmarks_document,
         "category_lever_map": category_lever_map,
         "kpi_pack": kpi_pack,
         "peer_set": peer_set,

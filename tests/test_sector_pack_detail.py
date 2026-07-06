@@ -32,6 +32,9 @@ def test_sector_pack_detail_payload_full():
     assert "RBI" in detail.get("regulatory_layer", "")
     assert detail.get("benchmark_sources")
     assert detail.get("categories")
+    assert detail.get("levers_document")
+    assert detail.get("benchmarks_document")
+    assert detail["levers_document"].get("source_verification_note")
 
 
 def test_dataset_coverage_includes_levers():

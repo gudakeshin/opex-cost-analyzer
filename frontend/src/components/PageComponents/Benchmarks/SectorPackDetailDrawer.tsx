@@ -4,89 +4,15 @@ import { Loader } from '../../Common/Loader';
 import { getApiErrorMessage } from '../../../hooks/useApi';
 import { specificityBadge } from './BenchmarkDetailDrawer';
 import { useSectorPackDetail } from '../../../api/hooks/useBenchmarksQueries';
+import type {
+  CategoryBenchmark,
+  KpiRow,
+  LeverRow,
+  SectorPackDetailResponse,
+  SectorPackRow,
+} from '../../../types/sectorPack';
 
-export interface SectorPackRow {
-  pack_id: string;
-  sector?: string;
-  version?: string;
-  status?: string;
-  error?: string;
-  lever_count?: number;
-  kpi_count?: number;
-  peer_count?: number;
-  category_count?: number;
-}
-
-interface CategoryBenchmark {
-  P25?: number;
-  P50?: number;
-  P75?: number;
-  P90?: number;
-  unit?: string;
-  confidence?: string;
-  source_note?: string;
-  linked_levers?: string[];
-}
-
-interface LeverRow {
-  lever_id?: string;
-  lever_name?: string;
-  description?: string;
-  category_ids?: string[];
-  p10_pct?: number;
-  p50_pct?: number;
-  p90_pct?: number;
-  implementation_weeks?: number;
-  savings_type?: string;
-  industry_sources?: string[];
-}
-
-interface KpiRow {
-  kpi_id?: string;
-  kpi_name?: string;
-  unit?: string;
-  formula?: string;
-  target_direction?: string;
-  p50_benchmark_pct?: number;
-  p50_benchmark_cr?: number;
-  p50_benchmark_inr?: number;
-}
-
-export interface SectorPackDetailResponse {
-  pack_id: string;
-  sector?: string;
-  version?: string;
-  vintage_date?: string;
-  confidence_overall?: string;
-  source_metadata?: {
-    methodology?: string;
-    sample_size?: number;
-    primary_sources?: Array<{ source_name?: string; source_type?: string; notes?: string }>;
-  };
-  manifest?: Record<string, unknown>;
-  pack_error?: string | null;
-  categories?: Record<string, CategoryBenchmark>;
-  levers?: LeverRow[];
-  category_lever_map?: Record<string, string[]>;
-  kpi_pack?: KpiRow[];
-  peers?: Array<{ name?: string; ticker?: string; revenue_cr?: number }>;
-  peer_benchmark_metrics?: Record<string, { p25?: number; p50?: number; p75?: number }>;
-  taxonomy_extension?: {
-    additional_categories?: Array<{ category_id?: string; category_name?: string; gl_prefix?: string }>;
-    overrides?: Array<{ category_id?: string; category_name?: string }>;
-  };
-  benchmark_sources?: {
-    free_sources?: Array<{ id?: string; name?: string; url?: string; sample_metric?: string }>;
-    licensed_sources_stubs?: Array<{ id?: string; name?: string }>;
-  };
-  regulatory_layer?: string;
-  counts?: {
-    peer_count?: number;
-    lever_count?: number;
-    kpi_count?: number;
-    category_count?: number;
-  };
-}
+export type { SectorPackRow, SectorPackDetailResponse };
 
 type TabId = 'overview' | 'benchmarks' | 'levers' | 'kpis' | 'peers' | 'taxonomy' | 'regulatory' | 'sources';
 
