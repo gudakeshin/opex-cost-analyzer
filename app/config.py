@@ -176,6 +176,12 @@ AGENT_LLM_NUMERIC_ADJUSTMENT_PCT = float(os.getenv("AGENT_LLM_NUMERIC_ADJUSTMENT
 ANTHROPIC_MODEL = _clean_env("ANTHROPIC_MODEL", "claude-sonnet-4-6")
 ANTHROPIC_AGENT_MODEL = os.getenv("ANTHROPIC_AGENT_MODEL", "claude-sonnet-4-6")
 ANTHROPIC_TOOL_MODEL = os.getenv("ANTHROPIC_TOOL_MODEL", "claude-sonnet-4-6")
+# Small/fast model for high-volume, low-stakes structured calls (NL→SQL,
+# scenario parsing, chart titling); the agent loop keeps ANTHROPIC_TOOL_MODEL.
+ANTHROPIC_FAST_MODEL = _clean_env("ANTHROPIC_FAST_MODEL", "claude-haiku-4-5")
+# Wall-clock cap for one Analyst-tab agent run (12 tool iterations × 45s each
+# would exceed typical proxy limits; keep the endpoint bounded well below that).
+ANALYST_TIMEOUT_SECONDS = int(_clean_env("ANALYST_TIMEOUT_SECONDS", "240") or "240")
 SKILL_CATALOG_COLLECTION = os.getenv("SKILL_CATALOG_COLLECTION", "skill_catalog")
 
 # Qdrant vector memory (replaces Mem0; self-hosted, no external SaaS dependency)

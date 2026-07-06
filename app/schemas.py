@@ -543,6 +543,13 @@ class SavedQueryRequest(BaseModel):
     description: str | None = None
 
 
+class NlQueryRequest(BaseModel):
+    """Natural-language question to translate into read-only spend SQL."""
+
+    question: str
+    execute: bool = False
+
+
 class CustomScenarioSpec(BaseModel):
     name: str
     target: str = "portfolio"  # portfolio | lever | vendor | category
@@ -561,3 +568,11 @@ class CustomSensitivityRequest(BaseModel):
     scenarios: List[CustomScenarioSpec]
     discount_rate: float | None = None
     effective_tax_rate: float | None = None
+    drivers: Dict[str, float] | None = None
+
+
+class ScenarioParseRequest(BaseModel):
+    """Natural-language what-if question to parse into scenario specs."""
+
+    session_id: str
+    question: str

@@ -241,6 +241,7 @@ def run_agent_chat_controller(
     seed_skill_outputs: Dict[str, Any] | None = None,
     progress_callback: Callable[[str, str], None] | None = None,
     thinking_callback: Callable[[str], None] | None = None,
+    tool_audit_callback: Callable[[ToolCall], None] | None = None,
     transport: Any | None = None,
 ) -> AgentRunResult:
     """Lightweight agent loop for general_qa chat — accepts tool-only outcomes."""
@@ -259,6 +260,8 @@ def run_agent_chat_controller(
     def dispatch(call: ToolCall) -> Any:
         if progress_callback:
             progress_callback("act", f"Agent tool: {call.name}")
+        if tool_audit_callback:
+            tool_audit_callback(call)
         return dispatch_tool_call(session, call)
 
     last_exc: Exception | None = None

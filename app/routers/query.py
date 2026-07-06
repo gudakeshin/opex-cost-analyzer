@@ -23,7 +23,13 @@ from fastapi.responses import FileResponse
 from app.config import OUTPUT_DIR
 from app.memory import MemoryStore
 from app.routers._shared import validate_session_id
-from app.schemas import CustomSensitivityRequest, SavedQueryRequest, SpendQueryRequest
+from app.schemas import (
+    CustomSensitivityRequest,
+    NlQueryRequest,
+    SavedQueryRequest,
+    ScenarioParseRequest,
+    SpendQueryRequest,
+)
 from app.security.auth import check_session_owner
 from app.services.compliance import append_audit_event
 from app.services.sensitivity import compute_sensitivity
@@ -55,7 +61,12 @@ def _open_store(session_id: str):
 
 
 @router.post("/api/v1/query/{session_id}")
-def run_spend_query(request: Request, session_id: str, payload: SpendQueryRequest) -> Dict[str, Any]:
+def run_spend_query(
+    request: Request,
+    session_id: str,
+    payload: SpendQueryRequest,
+    chart: bool = Query(False, description="Attach a ChartSpec inferred from the result"),
+) -> Dict[str, Any]:
     validate_session_id(session_id)
     check_session_owner(request, session_id)
     store = _open_store(session_id)
@@ -68,7 +79,66 @@ def run_spend_query(request: Request, session_id: str, payload: SpendQueryReques
     append_audit_event(
         f"spend_query session_id={session_id} rows={result.row_count} ms={result.elapsed_ms:.0f}"
     )
-    return {"session_id": session_id, **result.to_dict()}
+    out: Dict[str, Any] = {"session_id": session_id, **result.to_dict()}
+    if chart:
+        from app.services.query_chart import chart_spec_for_result
+
+        out["chart"] = chart_spec_for_result(result.columns, result.rows)
+    return out
+
+
+@router.post("/api/v1/query/{session_id}/nl2sql")
+def generate_query_from_nl(
+    request: Request, session_id: str, payload: NlQueryRequest
+) -> Dict[str, Any]:
+    """Translate a natural-language question into reviewed, read-only spend SQL.
+
+    The generated SQL is returned for FDE review (source: rules|llm|unavailable);
+    execute=true also runs it through the standard guardrails with the LLM
+    repair loop. Provenance-tagged and WORM-audited like every other query.
+    """
+    validate_session_id(session_id)
+    check_session_owner(request, session_id)
+    store = _open_store(session_id)
+    from app.config import ANTHROPIC_FAST_MODEL
+    from app.opar.provenance import build_provenance_tag
+    from app.opar.tools.nl_query import generate_sql_from_question
+    from app.services.query_chart import chart_spec_for_result
+
+    try:
+        out = generate_sql_from_question(
+            store,
+            payload.question,
+            execute=payload.execute,
+            model=ANTHROPIC_FAST_MODEL,
+        )
+    except ValueError as exc:  # includes SpendQueryError (non-SELECT LLM output)
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except SpendStoreUnavailable as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    result = out.get("result")
+    chart = None
+    if isinstance(result, dict) and result.get("rows"):
+        chart = chart_spec_for_result(
+            result.get("columns") or [],
+            result.get("rows") or [],
+            payload.question,
+            llm_polish=out.get("source") == "llm",
+            model=ANTHROPIC_FAST_MODEL,
+        )
+    provenance = build_provenance_tag(
+        ["nl2sql"],
+        prompt_text=f"nl2sql:{payload.question}",
+        model_version=ANTHROPIC_FAST_MODEL if out.get("source") == "llm" else "deterministic",
+    )
+    append_audit_event(
+        f"nl2sql session_id={session_id} source={out.get('source')} "
+        f"prompt_hash={provenance['prompt_hash']} "
+        f"rows={(result or {}).get('row_count', 0) if isinstance(result, dict) else 0} "
+        f"sql={str(out.get('sql') or '')[:200]!r}"
+    )
+    return {"session_id": session_id, **out, "chart": chart, "provenance": provenance}
 
 
 @router.get("/api/v1/query/{session_id}/schema")
@@ -138,6 +208,48 @@ def delete_saved_query(request: Request, session_id: str, query_id: str) -> Dict
     return {"status": "deleted", "query_id": query_id}
 
 
+@router.post("/api/v1/sensitivity/parse")
+def parse_sensitivity_question(
+    request: Request, payload: ScenarioParseRequest
+) -> Dict[str, Any]:
+    """Parse a natural-language what-if question into reviewable scenario specs.
+
+    Never runs anything — the FDE reviews the prefilled scenarios in the UI and
+    triggers /sensitivity/custom explicitly (review gate). LLM-primary with the
+    regex fast-path as offline fallback (parse_source reports which one fired).
+    """
+    validate_session_id(payload.session_id)
+    check_session_owner(request, payload.session_id)
+    from app.opar.models import ObserveContext
+    from app.opar.tools.context import ToolSessionContext
+    from app.opar.tools.scenario_parser import parse_what_if_request
+
+    from app.services.spend_base import _session_engagement_id
+
+    analysis = _memory.get("session", payload.session_id) or {}
+    engagement_id = (
+        (analysis.get("manifest") or {}).get("engagement_id")
+        or analysis.get("engagement_id")
+        or _session_engagement_id(payload.session_id)
+        or ""
+    )
+    ctx = ObserveContext(
+        user_message=payload.question,
+        session_id=payload.session_id,
+        engagement_id=engagement_id,
+    )
+    session = ToolSessionContext(ctx=ctx)
+    session.skill_outputs = dict(analysis.get("skill_outputs") or {})
+    session.manifest = dict(analysis.get("manifest") or {})
+
+    out = parse_what_if_request(session, payload.question)
+    append_audit_event(
+        f"whatif_parse session_id={payload.session_id} source={out.get('parse_source')} "
+        f"scenarios={len(out.get('scenarios') or [])} q={payload.question[:80]!r}"
+    )
+    return out
+
+
 @router.post("/api/v1/sensitivity/custom")
 def run_custom_sensitivity(request: Request, payload: CustomSensitivityRequest) -> Dict[str, Any]:
     """Run sensitivity with user-defined what-if scenarios."""
@@ -159,6 +271,7 @@ def run_custom_sensitivity(request: Request, payload: CustomSensitivityRequest) 
         effective_tax_rate=float(
             payload.effective_tax_rate or manifest.get("effective_tax_rate") or 0.0
         ),
+        drivers=payload.drivers or None,
         custom_scenarios=custom,
     )
     from app.opar.sensitivity_narrative import synthesize_sensitivity_narrative

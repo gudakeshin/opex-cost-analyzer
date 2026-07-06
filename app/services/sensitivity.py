@@ -350,8 +350,11 @@ def compute_sensitivity(
         pool_delta = float(custom.get("spend_pool_delta_pct", 0.0))
         addr_delta = float(custom.get("addressable_spend_delta_pct", 0.0))
         combined_delta = delta + pool_delta + addr_delta
-        tl = float(custom.get("timeline_factor", timeline_factor))
-        exec_r = float(custom.get("execution_rate", base_exec))
+        tl_raw = custom.get("timeline_factor")
+        tl = float(tl_raw) if tl_raw is not None else timeline_factor
+        # execution_rate is Optional in CustomScenarioSpec — None means "use base"
+        exec_raw = custom.get("execution_rate")
+        exec_r = float(exec_raw) if exec_raw is not None else base_exec
         target = str(custom.get("target") or "portfolio")
         target_id = str(custom.get("id") or "")
         cost_drivers = custom.get("cost_driver_deltas") or {}

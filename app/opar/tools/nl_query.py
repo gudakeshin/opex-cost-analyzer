@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Literal, Tuple
 from app.opar.tools.context import ToolSessionContext
 from app.services.compliance import append_audit_event
 from app.services.spend_schema import load_spend_schema
-from app.services.spend_store import SpendQueryError, SpendStore
+from app.services.spend_store import SpendQueryError, SpendStore, validate_readonly_sql
 
 from app.opar.tools.catalog import _open_agent_store
 
@@ -142,6 +142,7 @@ def _llm_aggregate_or_sql(
     *,
     tier: Literal["aggregate", "sql"],
     max_tokens: int | None = None,
+    model: str | None = None,
 ) -> Dict[str, Any] | str | None:
     from app.opar.llm_provider import call_llm_structured
     from app.opar.llm_schemas import NL_AGGREGATE_SPEC_SCHEMA, NL_SQL_SCHEMA
@@ -159,6 +160,7 @@ def _llm_aggregate_or_sql(
             NL_AGGREGATE_SPEC_SCHEMA,
             max_tokens=max_tokens or 800,
             skill_name="natural_language_query",
+            model=model,
         )
         return data if isinstance(data, dict) else None
 
@@ -173,6 +175,7 @@ def _llm_aggregate_or_sql(
         NL_SQL_SCHEMA,
         max_tokens=max_tokens or NL_SQL_MAX_TOKENS,
         skill_name="natural_language_query",
+        model=model,
     )
     if isinstance(data, dict):
         sql = str(data.get("sql") or "").strip()
@@ -196,6 +199,7 @@ def _execute_sql_with_repair_loop(
     schema: Dict[str, Any],
     *,
     initial_sql: str | None = None,
+    model: str | None = None,
 ) -> Dict[str, Any]:
     """Generate SQL, execute, inspect errors, and revise up to MAX_SQL_ATTEMPTS times."""
     sql_text = (initial_sql or "").strip()
@@ -204,7 +208,7 @@ def _execute_sql_with_repair_loop(
 
     for attempt in range(MAX_SQL_ATTEMPTS):
         if not sql_text:
-            generated = _llm_aggregate_or_sql(question, schema, tier="sql")
+            generated = _llm_aggregate_or_sql(question, schema, tier="sql", model=model)
             sql_text = str(generated or "").strip()
         if not sql_text:
             break
@@ -227,7 +231,7 @@ def _execute_sql_with_repair_loop(
                 f"{question}\n\nPrevious SQL failed:\n{sql_text}\n\nError: {exc}\n"
                 f"Fix the SQL. Attempt {attempt + 2}/{MAX_SQL_ATTEMPTS}."
             )
-            repaired = _llm_aggregate_or_sql(repair_prompt, schema, tier="sql")
+            repaired = _llm_aggregate_or_sql(repair_prompt, schema, tier="sql", model=model)
             next_sql = str(repaired or "").strip()
             sql_text = next_sql if next_sql and next_sql != sql_text else ""
 
@@ -244,6 +248,76 @@ def _execute_sql_with_repair_loop(
         "error": str(last_err) if last_err else "sql_generation_failed",
         "sql_attempts": len(attempts) + (1 if sql_text else 0),
         "repair_trace": attempts,
+    }
+
+
+def generate_sql_from_question(
+    store: SpendStore,
+    question: str,
+    *,
+    execute: bool = False,
+    model: str | None = None,
+) -> Dict[str, Any]:
+    """NL→SQL for the HTTP query surface (review-gate flow).
+
+    Rules first: "top N X by Y"-shaped questions compile deterministically
+    (source="rules"). Everything else goes to the LLM (source="llm"); when no
+    provider is available the caller gets sql=None with source="unavailable"
+    so the UI can fall back to the manual builder. Generated SQL is validated
+    read-only before it is returned or executed; SpendQueryError propagates.
+    """
+    question = (question or "").strip()
+    if not question:
+        raise ValueError("generate_sql_from_question requires a question")
+
+    schema = load_spend_schema(store)
+    valid_cols = {c["name"] for c in schema.get("columns", [])}
+
+    sql_text: str | None = None
+    source = "unavailable"
+    if classify_nl_query_tier(question) == "aggregate":
+        spec = _rule_based_aggregate_spec(question, valid_cols)
+        if isinstance(spec, dict):
+            sql_text = _aggregate_spec_to_sql(spec)
+            source = "rules"
+    if not sql_text:
+        generated = _llm_aggregate_or_sql(question, schema, tier="sql", model=model)
+        sql_text = str(generated or "").strip() or None
+        source = "llm" if sql_text else "unavailable"
+
+    if not sql_text:
+        return {
+            "question": question,
+            "sql": None,
+            "source": "unavailable",
+            "result": None,
+            "repair_trace": [],
+            "sql_attempts": 0,
+        }
+
+    validate_readonly_sql(sql_text)
+
+    if not execute:
+        return {
+            "question": question,
+            "sql": sql_text,
+            "source": source,
+            "result": None,
+            "repair_trace": [],
+            "sql_attempts": 0,
+        }
+
+    out = _execute_sql_with_repair_loop(
+        store, question, schema, initial_sql=sql_text, model=model
+    )
+    return {
+        "question": question,
+        "sql": out.get("sql"),
+        "source": source,
+        "result": out.get("result"),
+        "repair_trace": out.get("repair_trace") or [],
+        "sql_attempts": out.get("sql_attempts") or 0,
+        **({"error": out["error"]} if out.get("error") else {}),
     }
 
 

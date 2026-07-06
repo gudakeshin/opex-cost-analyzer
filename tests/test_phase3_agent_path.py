@@ -73,7 +73,7 @@ def test_sql_repair_loop_retries_until_success(tmp_path, monkeypatch) -> None:
 
     calls = {"n": 0}
 
-    def fake_llm(question, schema, *, tier, max_tokens=None):
+    def fake_llm(question, schema, *, tier, max_tokens=None, model=None):
         calls["n"] += 1
         if calls["n"] == 1:
             return "SELECT bad_col FROM spend"

@@ -13,6 +13,7 @@ import { RunCompareView } from '../components/PageComponents/Workbench/RunCompar
 import { RunDetail } from '../components/PageComponents/Workbench/RunDetail';
 import { QueryPanel } from '../components/PageComponents/Workbench/QueryPanel';
 import { SensitivityPanel } from '../components/PageComponents/Workbench/SensitivityPanel';
+import { AnalystPanel } from '../components/PageComponents/Workbench/AnalystPanel';
 import { apiPost, apiDelete, getApiErrorMessage } from '../hooks/useApi';
 import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
 import { useSession } from '../context/SessionContext';
@@ -97,7 +98,9 @@ export const Workbench: React.FC = () => {
   const [includeLightReflect, setIncludeLightReflect] = useState(false);
   const [runningRunId, setRunningRunId] = useState<string | null>(null);
   const [promoting, setPromoting] = useState(false);
-  const [workbenchTab, setWorkbenchTab] = useState<'compose' | 'query' | 'whatif'>('compose');
+  const [workbenchTab, setWorkbenchTab] = useState<'compose' | 'query' | 'whatif' | 'analyst'>(
+    'compose',
+  );
 
   const validateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const progressQuery = useWorkbenchProgress(runningRunId, running);
@@ -365,6 +368,17 @@ export const Workbench: React.FC = () => {
             >
               What-if
             </button>
+            <button
+              type="button"
+              className={`px-3 py-2 text-sm border-b-2 -mb-px ${
+                workbenchTab === 'analyst'
+                  ? 'border-brand-primary text-brand-primary font-medium'
+                  : 'border-transparent text-brand-muted'
+              }`}
+              onClick={() => setWorkbenchTab('analyst')}
+            >
+              Analyst
+            </button>
           </div>
 
           {workbenchTab === 'query' ? (
@@ -374,6 +388,10 @@ export const Workbench: React.FC = () => {
           ) : workbenchTab === 'whatif' ? (
             <Card title="Custom sensitivity">
               <SensitivityPanel sessionId={activeSid} />
+            </Card>
+          ) : workbenchTab === 'analyst' ? (
+            <Card title="Analyst">
+              <AnalystPanel sessionId={activeSid} />
             </Card>
           ) : (
         <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4">
