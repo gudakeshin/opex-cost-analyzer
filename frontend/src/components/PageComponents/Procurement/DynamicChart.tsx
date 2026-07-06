@@ -106,8 +106,8 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({ spec, currency }) =>
           <XAxis dataKey="label" tick={axisTick} interval={0} angle={-20} textAnchor="end" height={48} axisLine={false} tickLine={false} />
           <YAxis tickFormatter={fmt} tick={axisTick} width={60} axisLine={false} tickLine={false} />
           <Tooltip formatter={(_v, _n, p) => [fmt(Number((p?.payload as { display?: number })?.display ?? 0)), spec.series[0]?.name ?? 'Value']} contentStyle={tooltipStyle} />
-          <Bar dataKey="base" stackId="w" fill="transparent" />
-          <Bar dataKey="bar" stackId="w" radius={[4, 4, 0, 0]} maxBarSize={48}>
+          <Bar dataKey="base" stackId="w" fill="transparent" isAnimationActive={false} />
+          <Bar dataKey="bar" stackId="w" radius={[4, 4, 0, 0]} maxBarSize={48} isAnimationActive={false}>
             {wf.map((r, i) => (
               <Cell key={i} fill={r.color} />
             ))}
@@ -186,6 +186,7 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({ spec, currency }) =>
               fill={s.color ?? PALETTE[i % PALETTE.length]}
               radius={[0, 4, 4, 0]}
               maxBarSize={20}
+              isAnimationActive={false}
             >
               {series.length === 1 &&
                 data.map((_, idx) => <Cell key={idx} fill={s.color ?? PALETTE[idx % PALETTE.length]} />)}
@@ -215,6 +216,7 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({ spec, currency }) =>
             fill={s.color ?? PALETTE[i % PALETTE.length]}
             radius={stacked ? [0, 0, 0, 0] : [4, 4, 0, 0]}
             maxBarSize={36}
+            isAnimationActive={false}
           >
             {series.length === 1 &&
               data.map((_, idx) => <Cell key={idx} fill={s.color ?? PALETTE[idx % PALETTE.length]} />)}
