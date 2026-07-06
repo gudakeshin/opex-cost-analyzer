@@ -16,6 +16,13 @@ import {
 } from '../api/hooks/useSkillsQueries';
 import { friendlyErrorMessage } from '../utils/errorMessages';
 
+const STATUS_OPTIONS = [
+  { value: '', label: 'All statuses' },
+  { value: 'active', label: 'Active' },
+  { value: 'draft', label: 'Draft' },
+  { value: 'archived', label: 'Archived' },
+];
+
 const KIND_OPTIONS = [
   { value: '', label: 'All kinds' },
   { value: 'analysis', label: 'Analysis' },
@@ -32,6 +39,21 @@ const KIND_BADGE: Record<string, string> = {
   security: 'bg-rose-100 text-rose-800',
   ingestion: 'bg-violet-100 text-violet-800',
 };
+
+const STATUS_BADGE: Record<string, string> = {
+  active: 'bg-emerald-100 text-emerald-800',
+  draft: 'bg-amber-100 text-amber-800',
+  archived: 'bg-slate-200 text-slate-600',
+};
+
+function StatusBadge({ status }: { status?: string }) {
+  const s = status || 'active';
+  return (
+    <span className={`text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded ${STATUS_BADGE[s] || STATUS_BADGE.active}`}>
+      {s}
+    </span>
+  );
+}
 
 function KindBadge({ kind }: { kind?: string }) {
   const k = kind || 'analysis';
@@ -53,6 +75,9 @@ export const SkillsManagement: React.FC = () => {
   );
   const [selectedSkill, setSelectedSkill] = useState('');
   const [kindFilter, setKindFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [createMode, setCreateMode] = useState<'declarative' | 'raw'>('declarative');
+  const [rawSkillContent, setRawSkillContent] = useState('---\nname: my-skill\nstatus: draft\nruntime: declarative\n---\n\n# My Skill\n');
   const [content, setContent] = useState('');
   const [savedContent, setSavedContent] = useState('');
   const [output, setOutput] = useState('');
@@ -79,8 +104,13 @@ export const SkillsManagement: React.FC = () => {
   useUnsavedGuard('skills-editor', hasDiff);
 
   const filteredSkills = useMemo(
-    () => skills.filter((s) => !kindFilter || s.kind === kindFilter),
-    [skills, kindFilter],
+    () =>
+      skills.filter((s) => {
+        if (kindFilter && s.kind !== kindFilter) return false;
+        if (statusFilter && (s.status || 'active') !== statusFilter) return false;
+        return true;
+      }),
+    [skills, kindFilter, statusFilter],
   );
 
   const selectedMeta = skills.find((s) => s.name === selectedSkill);
@@ -268,6 +298,55 @@ export const SkillsManagement: React.FC = () => {
     }
   };
 
+  const handleCreateRaw = async () => {
+    const name = newName.trim();
+    if (!name) return;
+    setLoading(true);
+    setError(null);
+    try {
+      await apiPost('/api/v1/skills', { name, content: rawSkillContent });
+      await invalidateCatalog();
+      setSelectedSkill(name);
+      setShowCreate(false);
+      setOutput(`Created raw SKILL.md: ${name}`);
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleActivate = async () => {
+    if (!selectedSkill) return;
+    setLoading(true);
+    setError(null);
+    try {
+      await apiPost(`/api/v1/skills/${selectedSkill}/activate`, {});
+      await invalidateCatalog();
+      setOutput(`Activated ${selectedSkill}`);
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleArchive = async () => {
+    if (!selectedSkill) return;
+    if (!window.confirm(`Archive ${selectedSkill}? It will drop out of the active DAG.`)) return;
+    setLoading(true);
+    setError(null);
+    try {
+      await apiPost(`/api/v1/skills/${selectedSkill}/archive`, {});
+      await invalidateCatalog();
+      setOutput(`Archived ${selectedSkill}`);
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const toggleDependsOn = (name: string) => {
     setNewDependsOn((prev) => (prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]));
   };
@@ -297,6 +376,13 @@ export const SkillsManagement: React.FC = () => {
             onChange={(e) => setKindFilter(e.target.value)}
             options={KIND_OPTIONS}
           />
+          <Select
+            label="Filter by status"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            options={STATUS_OPTIONS}
+            className="mt-2"
+          />
           <div className="mt-3 max-h-64 overflow-y-auto space-y-1 border border-brand-border rounded-lg p-2">
             {filteredSkills.map((s) => (
               <button
@@ -309,7 +395,10 @@ export const SkillsManagement: React.FC = () => {
               >
                 <div className="flex items-center justify-between gap-1">
                   <span className="truncate">{s.name}</span>
-                  <KindBadge kind={s.kind} />
+                  <div className="flex gap-1 shrink-0">
+                    <StatusBadge status={s.status} />
+                    <KindBadge kind={s.kind} />
+                  </div>
                 </div>
                 <p className="text-[10px] text-brand-muted mt-0.5">
                   {s.execution_status || 'python'}
@@ -322,6 +411,7 @@ export const SkillsManagement: React.FC = () => {
 
           {selectedMeta && (
             <div className="mt-3 text-xs text-brand-muted space-y-1">
+              <p>Status: <StatusBadge status={selectedMeta.status} /></p>
               <p>Tier: {selectedMeta.tier || 'Other'}</p>
               <p>Runtime: {selectedMeta.runtime || 'python'}</p>
               {selectedDeps.length > 0 && (
@@ -347,18 +437,44 @@ export const SkillsManagement: React.FC = () => {
             <Button className="w-full" variant="ghost" onClick={handleTest} disabled={!selectedSkill || loading}>
               Test
             </Button>
+            {(selectedMeta?.status === 'draft' || selectedMeta?.status === 'archived') && (
+              <Button className="w-full" onClick={handleActivate} disabled={!selectedSkill || loading}>
+                Activate
+              </Button>
+            )}
+            {selectedMeta?.status !== 'archived' && (
+              <Button className="w-full" variant="ghost" onClick={handleArchive} disabled={!selectedSkill || loading}>
+                Archive
+              </Button>
+            )}
             <Button className="w-full" variant="ghost" onClick={handleReindex} disabled={loading}>
               Re-index for discovery
             </Button>
             <Button className="w-full" onClick={() => setShowCreate((v) => !v)} disabled={loading}>
-              {showCreate ? 'Cancel create' : 'Create declarative skill'}
+              {showCreate ? 'Cancel create' : 'Create skill'}
             </Button>
           </div>
         </Card>
 
         <div className="lg:col-span-3 space-y-6">
           {showCreate && (
-            <Card title="New declarative skill" className="border-brand-border bg-white">
+            <Card title="New skill" className="border-brand-border bg-white">
+              <div className="flex gap-2 mb-4">
+                <button
+                  type="button"
+                  onClick={() => setCreateMode('declarative')}
+                  className={`text-xs px-3 py-1 rounded border ${createMode === 'declarative' ? 'bg-brand-ink text-white' : 'border-brand-border'}`}
+                >
+                  Declarative (no-code)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCreateMode('raw')}
+                  className={`text-xs px-3 py-1 rounded border ${createMode === 'raw' ? 'bg-brand-ink text-white' : 'border-brand-border'}`}
+                >
+                  Advanced: raw SKILL.md
+                </button>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input
                   type="text"
@@ -367,20 +483,24 @@ export const SkillsManagement: React.FC = () => {
                   onChange={(e) => setNewName(e.target.value)}
                   className="px-3 py-2 border border-brand-border rounded-lg text-sm"
                 />
+                {createMode === 'declarative' && (
                 <Select
                   label="Kind"
                   value={newKind}
                   onChange={(e) => setNewKind(e.target.value)}
                   options={KIND_OPTIONS.filter((o) => o.value)}
                 />
-                <input
-                  type="text"
-                  placeholder="Description"
-                  value={newDescription}
-                  onChange={(e) => setNewDescription(e.target.value)}
-                  className="md:col-span-2 px-3 py-2 border border-brand-border rounded-lg text-sm"
-                />
+                )}
               </div>
+              {createMode === 'declarative' ? (
+              <>
+              <input
+                type="text"
+                placeholder="Description"
+                value={newDescription}
+                onChange={(e) => setNewDescription(e.target.value)}
+                className="md:col-span-2 w-full mt-4 px-3 py-2 border border-brand-border rounded-lg text-sm"
+              />
               <p className="text-xs font-medium text-brand-muted mt-4 mb-2">Upstream inputs (SKILL.md)</p>
               <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto">
                 {depSkills.map((d) => (
@@ -430,6 +550,22 @@ export const SkillsManagement: React.FC = () => {
               <Button className="mt-4" onClick={handleCreateDeclarative} disabled={loading || !newName.trim()}>
                 Create &amp; register
               </Button>
+              </>
+              ) : (
+              <>
+              <p className="text-xs text-brand-muted mt-2">
+                Posts to POST /api/v1/skills. Python-runtime skills still need a handler module in the repo.
+              </p>
+              <textarea
+                value={rawSkillContent}
+                onChange={(e) => setRawSkillContent(e.target.value)}
+                className="w-full h-48 mt-2 px-3 py-2 border border-brand-border rounded-lg text-sm font-mono"
+              />
+              <Button className="mt-4" onClick={handleCreateRaw} disabled={loading || !newName.trim()}>
+                Create from SKILL.md
+              </Button>
+              </>
+              )}
             </Card>
           )}
 

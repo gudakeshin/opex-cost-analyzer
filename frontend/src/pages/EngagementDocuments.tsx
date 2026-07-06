@@ -21,7 +21,7 @@ import {
 } from '../api/hooks/useEngagementQueries';
 import { engagementKeys, procurementKeys } from '../api/queryKeys';
 import { formatFileSize } from '../utils/sessionFiles';
-import { SECTOR_OPTIONS } from '../constants/sectors';
+import { useSectorOptions } from '../api/hooks/useBenchmarksQueries';
 import type { EngagementSummary } from '../types';
 
 const ACCEPT =
@@ -57,6 +57,7 @@ export const EngagementDocuments: React.FC = () => {
     createEngagement,
     engagement,
   } = useSession();
+  const sectorOptions = useSectorOptions();
   const engagementsQuery = useEngagementsList();
   const engagements = engagementsQuery.data ?? [];
   const [engagementSearch, setEngagementSearch] = useState('');
@@ -606,7 +607,7 @@ export const EngagementDocuments: React.FC = () => {
                 label="Industry"
                 value={newIndustry}
                 onChange={(e) => setNewIndustry(e.target.value)}
-                options={SECTOR_OPTIONS as unknown as { value: string; label: string }[]}
+                options={sectorOptions}
               />
               <Input
                 label="Annual Revenue (₹ Cr)"

@@ -4,6 +4,7 @@ import { Diagnostic } from './pages/Diagnostic';
 import { Workbench } from './pages/Workbench';
 import CostRoom from './pages/CostRoom';
 import { SkillsManagement } from './pages/SkillsManagement';
+import { SectorPackStudio } from './pages/SectorPackStudio';
 import { SessionHistory } from './pages/SessionHistory';
 import { Benchmarks } from './pages/Benchmarks';
 import { Guidebook } from './pages/Guidebook';
@@ -29,6 +30,7 @@ function App() {
             <Route path="/workbench" element={<Workbench />} />
             <Route path="/cost-room" element={<CostRoom />} />
             <Route path="/skills" element={<SkillsManagement />} />
+            <Route path="/sector-packs" element={<SectorPackStudio />} />
             <Route path="/history" element={<SessionHistory />} />
             <Route path="/benchmarks" element={<Benchmarks />} />
             <Route path="/guidebook" element={<Guidebook />} />

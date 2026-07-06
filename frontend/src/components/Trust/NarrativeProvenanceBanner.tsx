@@ -39,8 +39,14 @@ export const NarrativeProvenanceBanner: React.FC<NarrativeProvenanceBannerProps>
   );
 };
 
+type NarrativeMetadataSource =
+  | Record<string, unknown>
+  | { narrative_mode?: string; llm_skip_reason?: string }
+  | null
+  | undefined;
+
 export function narrativeModeFromMetadata(
-  metadata?: Record<string, unknown> | null,
+  metadata?: NarrativeMetadataSource,
   fallbackReasons?: Record<string, unknown> | null,
 ): NarrativeProvenance | null {
   const mode = String(metadata?.narrative_mode ?? '').trim();

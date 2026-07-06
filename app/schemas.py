@@ -442,6 +442,28 @@ class SectorPackOverrideRequest(BaseModel):
     engagement_id: Optional[str] = None
 
 
+class SectorPackCreateRequest(BaseModel):
+    pack_id: str
+    sector: str
+    description: str = ""
+
+    @field_validator("pack_id")
+    @classmethod
+    def validate_pack_id(cls, v: str) -> str:
+        from app.services.sector_pack_authoring import validate_pack_id
+
+        return validate_pack_id(v)
+
+
+class SectorPackComponentUpdateRequest(BaseModel):
+    payload: Any
+
+
+class SectorPackPublishRequest(BaseModel):
+    bump: str = "minor"
+    target_status: str | None = None
+
+
 class CostToServeRequest(BaseModel):
     session_id: str
     segment_revenue: Optional[Dict[str, float]] = None

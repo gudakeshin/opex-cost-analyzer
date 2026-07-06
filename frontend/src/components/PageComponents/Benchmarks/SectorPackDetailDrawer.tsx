@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Loader } from '../../Common/Loader';
 import { getApiErrorMessage } from '../../../hooks/useApi';
 import { specificityBadge } from './BenchmarkDetailDrawer';
@@ -133,6 +134,13 @@ export const SectorPackDetailDrawer: React.FC<SectorPackDetailDrawerProps> = ({ 
           <div>
             <h2 className="text-lg font-bold text-brand-ink">{title}</h2>
             <p className="text-xs text-brand-muted mt-0.5">{pack.pack_id}</p>
+            <Link
+              to="/sector-packs"
+              className="text-xs text-deloitte-green hover:underline mt-1 inline-block"
+              onClick={onClose}
+            >
+              Edit pack in Studio →
+            </Link>
           </div>
           <button type="button" onClick={onClose} className="text-brand-muted hover:text-brand-ink text-xl">
             ×

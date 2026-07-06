@@ -46,7 +46,7 @@ function synthesisDegradationDetail(reasons?: Record<string, unknown>): string |
   return `LLM narrative skipped (${advisory.replace(/_/g, ' ')}); deterministic narrative was used.`;
 }
 
-function degradedDetail(entries: Array<[string, string]>, fallbackReasons?: Record<string, unknown>): string {
+function degradedDetail(entries: Array<[string, string]>): string {
   if (entries.length === 0) {
     return 'Some analysis skills used deterministic fallback paths instead of full LLM enrichment.';
   }
@@ -82,7 +82,7 @@ export const LogicTrace: React.FC<LogicTraceProps> = ({
         <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
           <span className="font-semibold">Degraded mode</span>
           {' — '}
-          {synthesisDetail ?? degradedDetail(skillEntries, fallbackReasons)}
+          {synthesisDetail ?? degradedDetail(skillEntries)}
         </p>
       )}
       {!steps?.length ? (

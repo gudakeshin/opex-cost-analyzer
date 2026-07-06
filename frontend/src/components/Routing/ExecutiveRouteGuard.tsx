@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAudience } from '../../context/AudienceContext';
 
-const CONSULTANT_ONLY = ['/', '/diagnostic', '/skills'];
+const CONSULTANT_ONLY = ['/', '/diagnostic', '/skills', '/sector-packs'];
 
 export const ExecutiveRouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isExecutive } = useAudience();

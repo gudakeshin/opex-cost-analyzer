@@ -16,7 +16,8 @@ import { PlanApprovalModal } from '../components/PageComponents/Procurement/Plan
 import { ChatComposer } from '../components/PageComponents/Analysis/ChatComposer';
 import { TrustRail } from '../components/Trust/TrustRail';
 import { DeloitteLogo } from '../components/Brand/DeloitteLogo';
-import { SECTOR_OPTIONS } from '../constants/sectors';
+import { sectorLabel } from '../constants/sectors';
+import { useSectorOptions } from '../api/hooks/useBenchmarksQueries';
 import { useSession } from '../context/SessionContext';
 import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
 import { useQueryClient, type QueryClient } from '@tanstack/react-query';
@@ -216,6 +217,7 @@ export const ProcurementAnalysis: React.FC = () => {
     refreshSessionAnalysis,
     deepResearchSummary,
   } = useSession();
+  const sectorOptions = useSectorOptions();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   // A typed-but-unsent chat message is lost on navigation.
@@ -1370,7 +1372,7 @@ export const ProcurementAnalysis: React.FC = () => {
                   className="py-1.5 px-2.5 text-xs"
                   options={[
                     { value: '', label: 'Select sector…' },
-                    ...SECTOR_OPTIONS.map((o) => ({ value: o.value, label: o.label })),
+                    ...sectorOptions.map((o) => ({ value: o.value, label: o.label })),
                   ]}
                 />
               </div>
@@ -1379,7 +1381,7 @@ export const ProcurementAnalysis: React.FC = () => {
                   variant="compact"
                   label={
                     engagement.detected_industry_label ||
-                    SECTOR_OPTIONS.find((o) => o.value === engagement.detected_industry)?.label ||
+                    sectorLabel(engagement.detected_industry) ||
                     engagement.detected_industry
                   }
                   matches={currentIndustry === engagement.detected_industry}

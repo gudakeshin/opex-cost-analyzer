@@ -95,6 +95,7 @@ def list_skills() -> List[Dict[str, Any]]:
     rows: List[Dict[str, Any]] = []
     for item in discover_skills():
         row = item.model_dump()
+        row["status"] = row.get("status") or "active"
         row["tier"] = TIER_MAP.get(item.name, "Other")
         row["execution_status"] = _skill_execution_status(item.name)
         rows.append(row)
@@ -361,3 +362,60 @@ def activate_skill(name: str) -> Dict[str, str]:
     _invalidate_discovery_index()
     append_audit_event("skill_activated", data={"skill": name})
     return {"status": "activated", "name": name}
+
+
+@router.post("/api/skills/{name}/archive")
+@router.post("/api/v1/skills/{name}/archive")
+def archive_skill(name: str) -> Dict[str, str]:
+    validate_skill_slug_http(name)
+    path = resolve_skill_md_path(name)
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Skill not found")
+
+    from app.skills.manifest import manifest_skills, update_manifest_skill
+
+    dependents = sorted(
+        str(row.get("name"))
+        for row in manifest_skills()
+        if name in (row.get("depends_on") or []) and str(row.get("name")) != name
+    )
+    if dependents:
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "message": "Cannot archive skill referenced by other manifest skills",
+                "dependents": dependents,
+            },
+        )
+
+    text = path.read_text(encoding="utf-8")
+    fm = parse_skill_md(path)
+    m = re.match(r"^---\s*\n.*?\n---\s*\n", text, re.DOTALL)
+    if not m:
+        raise HTTPException(status_code=400, detail="SKILL.md missing frontmatter")
+    rest = text[m.end():]
+    frontmatter_keys = (
+        "name", "description", "kind", "runtime", "discoverable", "weight", "version", "status",
+    )
+    updated_fm = {k: fm[k] for k in frontmatter_keys if k in fm}
+    updated_fm["status"] = "archived"
+    path.write_text(compose_frontmatter(updated_fm) + "\n" + rest.lstrip("\n"), encoding="utf-8")
+
+    if update_manifest_skill(name, status="archived") is None:
+        from app.skills.manifest import append_manifest_entry
+
+        append_manifest_entry({
+            "name": name,
+            "tier": TIER_MAP.get(name, "Other"),
+            "parallel_group": 8,
+            "depends_on": [],
+            "estimated_tokens": 400,
+            "kind": fm.get("kind") or "analysis",
+            "weight": fm.get("weight") or "light",
+            "runtime": fm.get("runtime") or "declarative",
+            "status": "archived",
+        })
+
+    _invalidate_discovery_index()
+    append_audit_event("skill_archived", data={"skill": name})
+    return {"status": "archived", "name": name}

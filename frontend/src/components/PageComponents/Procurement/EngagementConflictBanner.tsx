@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SECTOR_OPTIONS } from '../../../constants/sectors';
+import { useSectorOptions } from '../../../api/hooks/useBenchmarksQueries';
 import { Select } from '../../Common/Select';
 import {
   activeEngagementConflicts,
@@ -36,6 +36,7 @@ export const EngagementConflictBanner: React.FC<EngagementConflictBannerProps> =
   onKeepEngagementCompany,
   resolving,
 }) => {
+  const sectorOptions = useSectorOptions();
   const conflicts = activeEngagementConflicts(manifest, sessionId, dismissedKeys);
   const detectedIndustry = primaryDetectedIndustry(conflicts);
   const currentIndustry = effectiveAnalysisIndustry(manifest, engagement);
@@ -106,7 +107,7 @@ export const EngagementConflictBanner: React.FC<EngagementConflictBannerProps> =
               disabled={resolving}
               options={[
                 { value: '', label: 'Select sector pack…' },
-                ...SECTOR_OPTIONS.map((o) => ({ value: o.value, label: o.label })),
+                ...sectorOptions.map((o) => ({ value: o.value, label: o.label })),
               ]}
             />
           </div>
