@@ -179,6 +179,31 @@ def test_quality_gates_option_attaches_sme() -> None:
     assert "sme-critique" in run["resolved_skills"] or "data-quality-gate" in run["resolved_skills"]
 
 
+def test_workbench_merges_outputs_into_session_analysis() -> None:
+    sid = _seed_session()
+    draft = wb.create_draft(
+        session_id=sid,
+        name="merge-test",
+        selected_skills=["spend-profiler"],
+        engagement_id="eng-merge",
+    )
+    draft["skill_outputs"] = {
+        "value-bridge-calculator": {"confidence_bands": {"low": 1, "mid": 2, "high": 3}},
+        "savings-modeler": {"initiatives": []},
+    }
+    wb._merge_outputs_into_session_analysis(sid, draft["skill_outputs"], draft)
+    blob = MemoryStore().get("session", sid)
+    assert blob["skill_outputs"]["value-bridge-calculator"]["confidence_bands"]["mid"] == 2
+    assert blob["last_workbench_run_id"] == draft["run_id"]
+
+    bridge, savings = wb.latest_bridge_from_workbench(sid)
+    assert bridge is None  # run not saved yet
+    wb.save_run({**draft, "status": "complete", "created_at": "2026-01-01T00:00:00Z"})
+    bridge, savings = wb.latest_bridge_from_workbench(sid)
+    assert bridge and bridge["confidence_bands"]["mid"] == 2
+    assert savings == {"initiatives": []}
+
+
 def test_promote_run_initiatives() -> None:
     sid = _seed_session()
     run = asyncio.run(wb.run_workbench_run(wb.create_draft(

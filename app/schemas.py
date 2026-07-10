@@ -574,7 +574,7 @@ class NlQueryRequest(BaseModel):
 
 class CustomScenarioSpec(BaseModel):
     name: str
-    target: str = "portfolio"  # portfolio | lever | vendor | category
+    target: str = "portfolio"  # portfolio | category | lever
     id: str | None = None
     savings_pct_delta: float = 0.0
     timeline_factor: float = 1.0
@@ -591,6 +591,13 @@ class CustomSensitivityRequest(BaseModel):
     discount_rate: float | None = None
     effective_tax_rate: float | None = None
     drivers: Dict[str, float] | None = None
+
+
+class SavedScenarioSetRequest(BaseModel):
+    name: str
+    scenarios: List[CustomScenarioSpec]
+    drivers: Dict[str, float] | None = None
+    description: str | None = None
 
 
 class ScenarioParseRequest(BaseModel):

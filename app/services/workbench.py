@@ -596,4 +596,45 @@ async def run_workbench_run(
     run["status"] = "complete"
     run["completed_at"] = _now()
     save_run(run)
+    # Soft-merge into the session analysis blob so What-If / sessionAnalysis /
+    # chat consumers see workbench skill outputs without overwriting the run card.
+    _merge_outputs_into_session_analysis(session_id, merged_outputs, run)
     return run
+
+
+def _merge_outputs_into_session_analysis(
+    session_id: str,
+    skill_outputs: Dict[str, Any],
+    run: Dict[str, Any],
+) -> None:
+    """Union-merge workbench skill outputs into the session analysis record.
+
+    Workbench runs are discrete cards; sensitivity and SessionContext still read
+    the shared ``session`` MemoryStore blob. Merging (never replacing) keeps
+    prior chat analysis while unlocking What-If after a Compose value-bridge run.
+    """
+    if not skill_outputs:
+        return
+    existing = _memory.get("session", session_id) or {}
+    merged_skills = dict(existing.get("skill_outputs") or {})
+    merged_skills.update({k: v for k, v in skill_outputs.items() if v is not None})
+    existing["skill_outputs"] = merged_skills
+    existing.setdefault("session_id", session_id)
+    if run.get("engagement_id"):
+        existing.setdefault("engagement_id", run["engagement_id"])
+    if run.get("headline"):
+        existing["last_workbench_headline"] = run["headline"]
+    existing["last_workbench_run_id"] = run.get("run_id")
+    _memory.put("session", session_id, existing)
+
+
+def latest_bridge_from_workbench(session_id: str) -> tuple[Dict[str, Any] | None, Dict[str, Any] | None]:
+    """Return (bridge, savings_model) from the newest workbench run that has a bridge."""
+    for run in list_runs(session_id=session_id):
+        outs = run.get("skill_outputs") or {}
+        bridge = outs.get("value-bridge-calculator")
+        if isinstance(bridge, dict) and bridge:
+            savings = outs.get("savings-modeler")
+            return bridge, savings if isinstance(savings, dict) else None
+    return None, None
+

@@ -37,9 +37,10 @@ interface AnalystRunResponse extends Omit<AnalystTurn, 'ts'> {
 
 interface AnalystPanelProps {
   sessionId: string | null;
+  currency: string;
 }
 
-export const AnalystPanel: React.FC<AnalystPanelProps> = ({ sessionId }) => {
+export const AnalystPanel: React.FC<AnalystPanelProps> = ({ sessionId, currency }) => {
   const [history, setHistory] = useState<AnalystTurn[]>([]);
   const [question, setQuestion] = useState('');
   const [runningRunId, setRunningRunId] = useState<string | null>(null);
@@ -132,7 +133,7 @@ export const AnalystPanel: React.FC<AnalystPanelProps> = ({ sessionId }) => {
                 <Markdown className="text-sm text-brand-ink">{turn.answer}</Markdown>
                 {turn.charts?.map((c) => (
                   <div key={c.id} className="rounded border border-brand-border p-2">
-                    <DynamicChart spec={c} currency="INR" />
+                    <DynamicChart spec={c} currency={currency} />
                   </div>
                 ))}
                 {turn.agent_trace?.length > 0 && (

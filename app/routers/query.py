@@ -6,27 +6,31 @@ POST /api/v1/query/{session_id}         run one SELECT against the session
 GET  /api/v1/query/{session_id}/schema  columns + sample dimension values for
                                         the editor and the agent tool
 GET/POST/DELETE .../saved               saved queries per engagement
+GET/DELETE .../history                  execution history per engagement
 
 Safety lives in app/services/spend_store.py (single SELECT/WITH statement,
 read-only connection with external access disabled, wrapped LIMIT, interrupt
 timeout) — this router only adds ownership checks and the legacy backfill.
 """
-from __future__ import annotations
-
+# NOTE: no `from __future__ import annotations` here — slowapi's @limiter.limit
+# wrapper cannot resolve postponed annotations because FastAPI evaluates them
+# against the wrapper's __globals__, not this module's.
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import FileResponse
 
 from app.config import OUTPUT_DIR
 from app.memory import MemoryStore
+from app.ratelimit import RATE_LIMIT_LLM, limiter
 from app.routers._shared import validate_session_id
 from app.schemas import (
     CustomSensitivityRequest,
     NlQueryRequest,
     SavedQueryRequest,
+    SavedScenarioSetRequest,
     ScenarioParseRequest,
     SpendQueryRequest,
 )
@@ -40,6 +44,9 @@ router = APIRouter()
 
 _memory = MemoryStore()
 _SAVED_SCOPE = "saved_query"
+_HISTORY_SCOPE = "query_history"
+_SCENARIO_SCOPE = "saved_scenario_set"
+_HISTORY_CAP = 50
 
 
 def _open_store(session_id: str):
@@ -60,6 +67,39 @@ def _open_store(session_id: str):
     return store
 
 
+def _saved_key(session_id: str) -> str:
+    from app.services.spend_base import _session_engagement_id
+
+    return _session_engagement_id(session_id) or session_id
+
+
+def _log_history(
+    session_id: str,
+    *,
+    sql: str,
+    row_count: int,
+    elapsed_ms: float,
+    source: str,
+    question: Optional[str] = None,
+) -> None:
+    """Prepend an execution entry to the engagement's query history (cap 50)."""
+    key = _saved_key(session_id)
+    record = _memory.get(_HISTORY_SCOPE, key) or {}
+    entries = list(record.get("entries") or [])
+    entry: Dict[str, Any] = {
+        "history_id": str(uuid.uuid4()),
+        "sql": sql,
+        "row_count": row_count,
+        "elapsed_ms": round(float(elapsed_ms), 1),
+        "source": source,
+        "executed_at": datetime.now(timezone.utc).isoformat(),
+    }
+    if question:
+        entry["question"] = question
+    entries.insert(0, entry)
+    _memory.put(_HISTORY_SCOPE, key, {"entries": entries[:_HISTORY_CAP]})
+
+
 @router.post("/api/v1/query/{session_id}")
 def run_spend_query(
     request: Request,
@@ -76,6 +116,13 @@ def run_spend_query(
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except SpendStoreUnavailable as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+    _log_history(
+        session_id,
+        sql=payload.sql,
+        row_count=result.row_count,
+        elapsed_ms=result.elapsed_ms,
+        source="manual",
+    )
     append_audit_event(
         f"spend_query session_id={session_id} rows={result.row_count} ms={result.elapsed_ms:.0f}"
     )
@@ -88,6 +135,7 @@ def run_spend_query(
 
 
 @router.post("/api/v1/query/{session_id}/nl2sql")
+@limiter.limit(RATE_LIMIT_LLM)
 def generate_query_from_nl(
     request: Request, session_id: str, payload: NlQueryRequest
 ) -> Dict[str, Any]:
@@ -118,6 +166,15 @@ def generate_query_from_nl(
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     result = out.get("result")
+    if payload.execute and isinstance(result, dict) and out.get("sql"):
+        _log_history(
+            session_id,
+            sql=str(out["sql"]),
+            row_count=int(result.get("row_count") or 0),
+            elapsed_ms=float(result.get("elapsed_ms") or 0),
+            source=str(out.get("source") or "unavailable"),
+            question=payload.question,
+        )
     chart = None
     if isinstance(result, dict) and result.get("rows"):
         chart = chart_spec_for_result(
@@ -154,11 +211,6 @@ def get_spend_schema(request: Request, session_id: str) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Saved queries — one MemoryStore record per engagement (scope "saved_query").
 # ---------------------------------------------------------------------------
-
-def _saved_key(session_id: str) -> str:
-    from app.services.spend_base import _session_engagement_id
-
-    return _session_engagement_id(session_id) or session_id
 
 
 @router.get("/api/v1/query/{session_id}/saved")
@@ -208,7 +260,29 @@ def delete_saved_query(request: Request, session_id: str, query_id: str) -> Dict
     return {"status": "deleted", "query_id": query_id}
 
 
+# ---------------------------------------------------------------------------
+# Query history — one MemoryStore record per engagement (scope "query_history").
+# ---------------------------------------------------------------------------
+
+
+@router.get("/api/v1/query/{session_id}/history")
+def list_query_history(request: Request, session_id: str) -> Dict[str, Any]:
+    validate_session_id(session_id)
+    check_session_owner(request, session_id)
+    record = _memory.get(_HISTORY_SCOPE, _saved_key(session_id)) or {}
+    return {"entries": record.get("entries") or []}
+
+
+@router.delete("/api/v1/query/{session_id}/history")
+def clear_query_history(request: Request, session_id: str) -> Dict[str, Any]:
+    validate_session_id(session_id)
+    check_session_owner(request, session_id)
+    _memory.put(_HISTORY_SCOPE, _saved_key(session_id), {"entries": []})
+    return {"status": "cleared"}
+
+
 @router.post("/api/v1/sensitivity/parse")
+@limiter.limit(RATE_LIMIT_LLM)
 def parse_sensitivity_question(
     request: Request, payload: ScenarioParseRequest
 ) -> Dict[str, Any]:
@@ -255,14 +329,35 @@ def run_custom_sensitivity(request: Request, payload: CustomSensitivityRequest) 
     """Run sensitivity with user-defined what-if scenarios."""
     validate_session_id(payload.session_id)
     check_session_owner(request, payload.session_id)
-    analysis = _memory.get("session", payload.session_id)
-    if not analysis:
-        raise HTTPException(status_code=404, detail="No analysis for session")
-    bridge = analysis.get("skill_outputs", {}).get("value-bridge-calculator")
+    analysis = _memory.get("session", payload.session_id) or {}
+    bridge = (analysis.get("skill_outputs") or {}).get("value-bridge-calculator")
+    savings_model = (analysis.get("skill_outputs") or {}).get("savings-modeler")
+    if not bridge:
+        from app.services.workbench import latest_bridge_from_workbench
+
+        wb_bridge, wb_savings = latest_bridge_from_workbench(payload.session_id)
+        bridge = wb_bridge
+        savings_model = savings_model or wb_savings
     if not bridge:
         raise HTTPException(status_code=422, detail="Run value-bridge-calculator first")
-    savings_model = analysis.get("skill_outputs", {}).get("savings-modeler")
+    for scen in payload.scenarios:
+        target = (scen.target or "portfolio").strip().lower()
+        if target not in ("portfolio", "category", "lever"):
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    f"Unsupported scenario target '{scen.target}'. "
+                    "Only 'portfolio', 'category', and 'lever' are supported."
+                ),
+            )
     manifest = analysis.get("manifest") or {}
+    if not manifest:
+        from app.routers._shared import read_manifest
+
+        try:
+            manifest = read_manifest(payload.session_id) or {}
+        except Exception:
+            manifest = {}
     custom = [s.model_dump() for s in payload.scenarios]
     result = compute_sensitivity(
         bridge,
@@ -285,19 +380,86 @@ def run_custom_sensitivity(request: Request, payload: CustomSensitivityRequest) 
     return result
 
 
+
+# ---------------------------------------------------------------------------
+# Saved scenario sets — MemoryStore scope "saved_scenario_set".
+# ---------------------------------------------------------------------------
+
+
+@router.get("/api/v1/sensitivity/{session_id}/saved")
+def list_saved_scenario_sets(request: Request, session_id: str) -> Dict[str, Any]:
+    validate_session_id(session_id)
+    check_session_owner(request, session_id)
+    record = _memory.get(_SCENARIO_SCOPE, _saved_key(session_id)) or {}
+    return {"sets": record.get("sets") or []}
+
+
+@router.post("/api/v1/sensitivity/{session_id}/saved")
+def save_scenario_set(
+    request: Request, session_id: str, payload: SavedScenarioSetRequest
+) -> Dict[str, Any]:
+    validate_session_id(session_id)
+    check_session_owner(request, session_id)
+    if not payload.scenarios:
+        raise HTTPException(status_code=422, detail="At least one scenario is required")
+    for scen in payload.scenarios:
+        target = (scen.target or "portfolio").strip().lower()
+        if target not in ("portfolio", "category", "lever"):
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    f"Unsupported scenario target '{scen.target}'. "
+                    "Only 'portfolio', 'category', and 'lever' are supported."
+                ),
+            )
+    key = _saved_key(session_id)
+    record = _memory.get(_SCENARIO_SCOPE, key) or {}
+    sets = [s for s in (record.get("sets") or []) if s.get("name") != payload.name]
+    entry = {
+        "set_id": str(uuid.uuid4()),
+        "name": payload.name,
+        "description": payload.description or "",
+        "scenarios": [s.model_dump() for s in payload.scenarios],
+        "drivers": payload.drivers or {},
+        "saved_at": datetime.now(timezone.utc).isoformat(),
+    }
+    sets.append(entry)
+    _memory.put(_SCENARIO_SCOPE, key, {"sets": sets})
+    append_audit_event(
+        f"scenario_set_saved session_id={session_id} name={payload.name!r} "
+        f"scenarios={len(payload.scenarios)}"
+    )
+    return entry
+
+
+@router.delete("/api/v1/sensitivity/{session_id}/saved/{set_id}")
+def delete_saved_scenario_set(
+    request: Request, session_id: str, set_id: str
+) -> Dict[str, Any]:
+    validate_session_id(session_id)
+    check_session_owner(request, session_id)
+    key = _saved_key(session_id)
+    record = _memory.get(_SCENARIO_SCOPE, key) or {}
+    sets = record.get("sets") or []
+    remaining = [s for s in sets if s.get("set_id") != set_id]
+    if len(remaining) == len(sets):
+        raise HTTPException(status_code=404, detail="Saved scenario set not found")
+    _memory.put(_SCENARIO_SCOPE, key, {"sets": remaining})
+    append_audit_event(f"scenario_set_deleted session_id={session_id} set_id={set_id}")
+    return {"status": "deleted", "set_id": set_id}
+
+
 @router.get("/api/v1/engagements/{engagement_id}/export")
 def export_spend_data(
     request: Request,
     engagement_id: str,
     session_id: str = Query(..., description="Session that owns the spend store"),
     fmt: str = Query("csv", pattern="^(csv|parquet|xlsx)$"),
-    sql: str | None = Query(None, description="SELECT to export; default exports all spend lines"),
-    query_id: str | None = Query(None, description="Saved query id to export"),
+    sql: Optional[str] = Query(None, description="SELECT to export; default exports all spend lines"),
+    query_id: Optional[str] = Query(None, description="Saved query id to export"),
     limit: int = Query(1_000_000, le=1_000_000),
 ) -> FileResponse:
     """Stream raw spend export via DuckDB materialization."""
-    import uuid
-
     validate_session_id(session_id)
     check_session_owner(request, session_id)
     store = _open_store(session_id)

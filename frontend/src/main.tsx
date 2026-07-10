@@ -9,6 +9,7 @@ import { AudienceProvider } from './context/AudienceContext';
 import { SessionProvider } from './context/SessionContext';
 import { ExceptionProvider } from './context/ExceptionContext';
 import { UnsavedChangesProvider } from './context/UnsavedChangesContext';
+import { ToastProvider } from './context/ToastContext';
 import { createQueryClient } from './api/queryClient';
 
 const queryClient = createQueryClient();
@@ -21,7 +22,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <SidebarProvider>
             <UnsavedChangesProvider>
               <SessionProvider>
-                <App />
+                <ToastProvider>
+                  <App />
+                </ToastProvider>
               </SessionProvider>
             </UnsavedChangesProvider>
           </SidebarProvider>

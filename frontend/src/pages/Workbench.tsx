@@ -29,8 +29,6 @@ import type {
   WorkbenchAssumptionField,
 } from '../types';
 
-const CURRENCY = 'INR';
-
 function buildOverrides(
   values: Record<string, string>,
   fields: WorkbenchAssumptionField[],
@@ -70,7 +68,9 @@ function overridesToFormValues(
 
 export const Workbench: React.FC = () => {
   const queryClient = useQueryClient();
-  const { sessionId, engagementId, ensureSession } = useSession();
+  const { sessionId, engagementId, ensureSession, engagement, refreshSessionAnalysis } =
+    useSession();
+  const currency = engagement.currency || 'INR';
   const [activeSid, setActiveSid] = useState<string | null>(sessionId);
   const [sessionResolving, setSessionResolving] = useState(true);
   const catalogQuery = useWorkbenchCatalog();
@@ -213,6 +213,9 @@ export const Workbench: React.FC = () => {
           runs: [run, ...(prev?.runs ?? [])],
         }),
       );
+      // Workbench soft-merges skill_outputs into session analysis — refresh so
+      // What-If can see value-bridge without a full page reload.
+      void refreshSessionAnalysis();
       setRunName('');
       setParentRunId(null);
       setSeedFromRunId(null);
@@ -383,15 +386,22 @@ export const Workbench: React.FC = () => {
 
           {workbenchTab === 'query' ? (
             <Card title="Ad-hoc SQL">
-              <QueryPanel sessionId={activeSid} />
+              <QueryPanel sessionId={activeSid} currency={currency} />
             </Card>
           ) : workbenchTab === 'whatif' ? (
             <Card title="Custom sensitivity">
-              <SensitivityPanel sessionId={activeSid} />
+              <SensitivityPanel
+                sessionId={activeSid}
+                currency={currency}
+                onRequestValueBridge={() => {
+                  setWorkbenchTab('compose');
+                  setSelected(['value-bridge-calculator']);
+                }}
+              />
             </Card>
           ) : workbenchTab === 'analyst' ? (
             <Card title="Analyst">
-              <AnalystPanel sessionId={activeSid} />
+              <AnalystPanel sessionId={activeSid} currency={currency} />
             </Card>
           ) : (
         <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4">
@@ -439,7 +449,7 @@ export const Workbench: React.FC = () => {
               )}
               <ResultsBoard
                 runs={runs}
-                currency={CURRENCY}
+                currency={currency}
                 compareIds={compareIds}
                 onOpen={setOpenRun}
                 onBranch={(r) => loadComposition(r, 'branch')}
@@ -457,7 +467,7 @@ export const Workbench: React.FC = () => {
       {openRun && (
         <RunDetail
           run={openRun}
-          currency={CURRENCY}
+          currency={currency}
           onClose={() => setOpenRun(null)}
           onBranch={(r) => loadComposition(r, 'branch')}
           onChain={(r) => loadComposition(r, 'chain')}
@@ -467,7 +477,7 @@ export const Workbench: React.FC = () => {
       )}
 
       {compareRuns && (
-        <RunCompareView runs={compareRuns} currency={CURRENCY} onClose={() => setCompareIds([])} />
+        <RunCompareView runs={compareRuns} currency={currency} onClose={() => setCompareIds([])} />
       )}
     </MainLayout>
   );

@@ -36,6 +36,51 @@ def test_llm_endpoint_returns_429_beyond_limit() -> None:
     assert statuses[10] == 429
 
 
+def test_nl2sql_returns_429_beyond_limit() -> None:
+    client = TestClient(app)
+    sid = str(uuid.uuid4())
+    payload = {"question": "top suppliers", "execute": False}
+    limiter.reset()
+    limiter.enabled = True
+    try:
+        statuses = [
+            client.post(f"/api/v1/query/{sid}/nl2sql", json=payload).status_code
+            for _ in range(11)
+        ]
+    finally:
+        limiter.enabled = False
+        limiter.reset()
+    # Session validation 404s (or 422) before LLM work; limit still counts.
+    assert statuses[10] == 429
+    assert all(c != 429 for c in statuses[:10])
+
+
+def test_sensitivity_parse_returns_429_beyond_limit() -> None:
+    client = TestClient(app)
+    payload = {"session_id": str(uuid.uuid4()), "question": "what if savings drop 10%"}
+    limiter.reset()
+    limiter.enabled = True
+    try:
+        statuses = [
+            client.post("/api/v1/sensitivity/parse", json=payload).status_code
+            for _ in range(11)
+        ]
+    finally:
+        limiter.enabled = False
+        limiter.reset()
+    assert statuses[10] == 429
+    assert all(c != 429 for c in statuses[:10])
+
+
+def test_analyst_and_workbench_routes_are_llm_rate_limited() -> None:
+    """Heavy fixtures — assert the decorator is wired without exhausting the limit."""
+    from app.routers import analyst, workbench
+
+    # slowapi wraps the endpoint; presence of __wrapped__ proves decoration.
+    assert hasattr(analyst.run_analyst_turn, "__wrapped__")
+    assert hasattr(workbench.post_workbench_run, "__wrapped__")
+
+
 def test_health_endpoints_exempt_from_limits() -> None:
     client = TestClient(app)
     limiter.reset()

@@ -1,11 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { apiPost, getApiErrorMessage } from '../../../hooks/useApi';
+import { useSession } from '../../../context/SessionContext';
+import { useToast } from '../../../context/ToastContext';
+import { useWorkbenchRuns } from '../../../api/hooks/useWorkbenchQueries';
+import {
+  useDeleteScenarioSet,
+  useSaveScenarioSet,
+  useSavedScenarioSets,
+  type SavedScenarioSet,
+  type ScenarioSpec,
+} from '../../../api/hooks/useWorkbenchPanelQueries';
 import { Alert } from '../../Common/Alert';
 import { Loader } from '../../Common/Loader';
+import { DynamicChart } from '../Procurement/DynamicChart';
+import { formatCr } from '../../../utils/formatInr';
+import { copyText, downloadTextFile, toCsv, toTsv } from '../../../utils/exportTable';
+import type { ChartSpec } from '../../../types';
 
 export interface CustomScenarioRow {
   name: string;
-  target: 'portfolio' | 'lever' | 'vendor' | 'category';
+  target: 'portfolio' | 'category' | 'lever';
   id: string;
   savings_pct_delta: string;
   timeline_factor: string;
@@ -52,11 +66,14 @@ interface ParseResponse {
   scenarios: ParsedScenario[];
   validation_errors: string[];
   known_categories: { category_id: string; category_name: string }[];
+  known_levers: { lever_id: string; lever_name: string }[];
   parse_source: 'llm' | 'regex';
 }
 
 interface SensitivityPanelProps {
   sessionId: string | null;
+  currency: string;
+  onRequestValueBridge?: () => void;
 }
 
 const EMPTY_ROW = (): CustomScenarioRow => ({
@@ -74,9 +91,10 @@ const EMPTY_ROW = (): CustomScenarioRow => ({
 
 const rowFromParsed = (s: ParsedScenario, idx: number): CustomScenarioRow => ({
   name: s.name || `scenario_${idx + 1}`,
-  target: (['portfolio', 'lever', 'vendor', 'category'].includes(s.target)
-    ? s.target
-    : 'portfolio') as CustomScenarioRow['target'],
+  target: (['portfolio', 'category', 'lever'].includes(s.target) ? s.target : 'portfolio') as
+    | 'portfolio'
+    | 'category'
+    | 'lever',
   id: s.id ?? '',
   savings_pct_delta: String(Math.round(s.savings_pct_delta * 10000) / 100),
   timeline_factor: String(s.timeline_factor ?? 1),
@@ -92,6 +110,23 @@ const rowFromParsed = (s: ParsedScenario, idx: number): CustomScenarioRow => ({
     .join(', '),
 });
 
+const rowFromSpec = (s: ScenarioSpec, idx: number): CustomScenarioRow =>
+  rowFromParsed(
+    {
+      name: s.name,
+      target: s.target,
+      id: s.id ?? null,
+      savings_pct_delta: s.savings_pct_delta,
+      timeline_factor: s.timeline_factor,
+      execution_rate: s.execution_rate ?? null,
+      addressable_spend_delta_pct: s.addressable_spend_delta_pct,
+      spend_pool_delta_pct: s.spend_pool_delta_pct,
+      bounce_back_override: s.bounce_back_override ?? null,
+      cost_driver_deltas: s.cost_driver_deltas ?? {},
+    },
+    idx,
+  );
+
 const parseDriverDeltas = (text: string): Record<string, number> | undefined => {
   const out: Record<string, number> = {};
   for (const pair of text.split(',')) {
@@ -101,12 +136,43 @@ const parseDriverDeltas = (text: string): Record<string, number> | undefined => 
   return Object.keys(out).length ? out : undefined;
 };
 
-export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({ sessionId }) => {
+const buildScenarioSpecs = (rows: CustomScenarioRow[]): ScenarioSpec[] =>
+  rows
+    .filter((r) => r.name.trim())
+    .map((r) => ({
+      name: r.name.trim(),
+      target: r.target,
+      id: r.id.trim() || undefined,
+      savings_pct_delta: Number(r.savings_pct_delta) / 100,
+      timeline_factor: Number(r.timeline_factor) || 1,
+      execution_rate: r.execution_rate.trim() ? Number(r.execution_rate) / 100 : undefined,
+      spend_pool_delta_pct: Number(r.spend_pool_delta_pct || 0) / 100,
+      addressable_spend_delta_pct: Number(r.addressable_spend_delta_pct || 0) / 100,
+      bounce_back_override: r.bounce_back_override || undefined,
+      cost_driver_deltas: parseDriverDeltas(r.cost_driver_deltas),
+    }));
+
+const mentionsValueBridge = (msg: string): boolean =>
+  /value-bridge|value bridge|value_bridge/i.test(msg);
+
+export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({
+  sessionId,
+  currency,
+  onRequestValueBridge,
+}) => {
+  const { sessionAnalysis, refreshSessionAnalysis, engagementId } = useSession();
+  const { toast } = useToast();
+  const runsQuery = useWorkbenchRuns(engagementId, sessionId);
+  const savedSetsQuery = useSavedScenarioSets(sessionId);
+  const saveSetMutation = useSaveScenarioSet(sessionId);
+  const deleteSetMutation = useDeleteScenarioSet(sessionId);
+  const savedSets = savedSetsQuery.data ?? [];
   const [open, setOpen] = useState(true);
   const [rows, setRows] = useState<CustomScenarioRow[]>([EMPTY_ROW()]);
   const [result, setResult] = useState<SensitivityResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [bridgeMissing, setBridgeMissing] = useState(false);
 
   const [question, setQuestion] = useState('');
   const [parsing, setParsing] = useState(false);
@@ -114,6 +180,44 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({ sessionId })
   const [parseWarnings, setParseWarnings] = useState<string[]>([]);
   const [drivers, setDrivers] = useState<{ key: string; value: string }[]>([]);
   const [advancedOpen, setAdvancedOpen] = useState<Record<number, boolean>>({});
+  const [knownCategories, setKnownCategories] = useState<
+    { category_id: string; category_name: string }[]
+  >([]);
+  const [knownLevers, setKnownLevers] = useState<
+    { lever_id: string; lever_name: string }[]
+  >([]);
+  const [view, setView] = useState<'table' | 'chart'>('table');
+  const [saveName, setSaveName] = useState('');
+  const [copyStatus, setCopyStatus] = useState<string | null>(null);
+
+  const hasBridge = Boolean(
+    sessionAnalysis?.skill_outputs?.['value-bridge-calculator'] ||
+      (runsQuery.data?.runs ?? []).some(
+        (r) => r.skill_outputs && r.skill_outputs['value-bridge-calculator'],
+      ),
+  );
+
+  useEffect(() => {
+    void refreshSessionAnalysis();
+  }, [refreshSessionAnalysis]);
+
+  useEffect(() => {
+    const inits =
+      (sessionAnalysis?.skill_outputs?.['savings-modeler'] as { initiatives?: Record<string, unknown>[] } | undefined)
+        ?.initiatives ?? [];
+    const seen = new Map<string, { lever_id: string; lever_name: string }>();
+    for (const i of inits) {
+      const lid = String(i.lever || i.lever_id || '');
+      if (lid && !seen.has(lid)) {
+        seen.set(lid, { lever_id: lid, lever_name: String(i.lever_name || lid) });
+      }
+    }
+    if (seen.size) setKnownLevers(Array.from(seen.values()));
+  }, [sessionAnalysis]);
+
+  useEffect(() => {
+    setBridgeMissing(!hasBridge);
+  }, [hasBridge]);
 
   const updateRow = (idx: number, patch: Partial<CustomScenarioRow>) => {
     setRows((prev) => prev.map((r, i) => (i === idx ? { ...r, ...patch } : r)));
@@ -123,6 +227,13 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({ sessionId })
 
   const removeRow = (idx: number) =>
     setRows((prev) => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== idx)));
+
+  const driverMap = () =>
+    Object.fromEntries(
+      drivers
+        .filter((d) => d.key.trim() && !Number.isNaN(Number(d.value)))
+        .map((d) => [d.key.trim(), Number(d.value)]),
+    );
 
   const parseQuestion = async () => {
     if (!sessionId || !question.trim()) return;
@@ -136,6 +247,8 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({ sessionId })
       });
       setParseSource(data.parse_source);
       setParseWarnings(data.validation_errors ?? []);
+      setKnownCategories(data.known_categories ?? []);
+      setKnownLevers(data.known_levers ?? []);
       if (data.scenarios.length > 0) {
         setRows(data.scenarios.map(rowFromParsed));
         setAdvancedOpen(
@@ -174,47 +287,74 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({ sessionId })
     setLoading(true);
     setError(null);
     try {
-      const scenarios = rows
-        .filter((r) => r.name.trim())
-        .map((r) => ({
-          name: r.name.trim(),
-          target: r.target,
-          id: r.id.trim() || undefined,
-          savings_pct_delta: Number(r.savings_pct_delta) / 100,
-          timeline_factor: Number(r.timeline_factor) || 1,
-          execution_rate: r.execution_rate.trim()
-            ? Number(r.execution_rate) / 100
-            : undefined,
-          spend_pool_delta_pct: Number(r.spend_pool_delta_pct || 0) / 100,
-          addressable_spend_delta_pct: Number(r.addressable_spend_delta_pct || 0) / 100,
-          bounce_back_override: r.bounce_back_override || undefined,
-          cost_driver_deltas: parseDriverDeltas(r.cost_driver_deltas),
-        }));
+      const scenarios = buildScenarioSpecs(rows);
       if (scenarios.length === 0) {
         setError('Add at least one named scenario.');
         return;
       }
-      const driverMap = Object.fromEntries(
-        drivers
-          .filter((d) => d.key.trim() && !Number.isNaN(Number(d.value)))
-          .map((d) => [d.key.trim(), Number(d.value)]),
-      );
+      const dm = driverMap();
       const data = await apiPost<SensitivityResult>('/api/v1/sensitivity/custom', {
         session_id: sessionId,
         scenarios,
-        ...(Object.keys(driverMap).length ? { drivers: driverMap } : {}),
+        ...(Object.keys(dm).length ? { drivers: dm } : {}),
       });
       setResult(data);
+      setBridgeMissing(false);
+      toast('Sensitivity scenarios computed');
     } catch (e) {
-      setError(getApiErrorMessage(e));
+      const msg = getApiErrorMessage(e);
+      if (mentionsValueBridge(msg)) {
+        setBridgeMissing(true);
+        setError(null);
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  if (!sessionId) {
-    return <p className="text-sm text-brand-muted">Select a session to model custom what-if scenarios.</p>;
-  }
+  const saveSet = async () => {
+    if (!sessionId || !saveName.trim()) return;
+    const scenarios = buildScenarioSpecs(rows);
+    if (scenarios.length === 0) {
+      setError('Add at least one named scenario before saving.');
+      return;
+    }
+    try {
+      const dm = driverMap();
+      await saveSetMutation.mutateAsync({
+        name: saveName.trim(),
+        scenarios,
+        ...(Object.keys(dm).length ? { drivers: dm } : {}),
+      });
+      setSaveName('');
+      toast('Scenario set saved');
+    } catch (e) {
+      setError(getApiErrorMessage(e));
+    }
+  };
+
+  const loadSet = (set: SavedScenarioSet) => {
+    setRows(set.scenarios.map(rowFromSpec));
+    setDrivers(
+      Object.entries(set.drivers ?? {}).map(([key, value]) => ({
+        key,
+        value: String(value),
+      })),
+    );
+    toast(`Loaded “${set.name}”`, 'info');
+  };
+
+  const deleteSet = async (setId: string) => {
+    if (!sessionId) return;
+    try {
+      await deleteSetMutation.mutateAsync(setId);
+      toast('Scenario set deleted', 'info');
+    } catch (e) {
+      setError(getApiErrorMessage(e));
+    }
+  };
 
   const baseScenario = result?.scenarios.find((s) => s.name === 'base') ?? null;
   const visibleScenarios = result
@@ -223,11 +363,74 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({ sessionId })
       )
     : [];
 
+  const comparisonChart: ChartSpec | null = useMemo(() => {
+    if (!result || !baseScenario) return null;
+    const nonBase = visibleScenarios.filter((s) => s.name !== 'base');
+    if (nonBase.length === 0) return null;
+    return {
+      id: 'whatif-comparison',
+      type: 'bar',
+      title: 'Scenario deltas vs base',
+      x_key: 'scenario',
+      unit: 'currency',
+      series: [
+        { key: 'delta_savings', name: 'Δ 3yr savings' },
+        { key: 'delta_npv', name: 'Δ NPV after tax' },
+      ],
+      data: nonBase.map((s) => ({
+        scenario: s.name,
+        delta_savings: s.savings_3yr - baseScenario.savings_3yr,
+        delta_npv: s.npv_aftertax - baseScenario.npv_aftertax,
+      })),
+    };
+  }, [result, baseScenario, visibleScenarios]);
+
   const fmtDelta = (value: number, base: number) => {
     const d = value - base;
     const sign = d >= 0 ? '+' : '';
-    return `${sign}${d.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+    return `${sign}${formatCr(d, { currency })}`;
   };
+
+  const exportColumns = [
+    'scenario',
+    'savings_3yr',
+    'delta_savings',
+    'npv_aftertax',
+    'delta_npv',
+    'timeline_months',
+  ];
+
+  const exportRows = (): unknown[][] =>
+    visibleScenarios.map((s) => {
+      const isBase = s.name === 'base';
+      return [
+        s.name,
+        s.savings_3yr,
+        baseScenario && !isBase ? s.savings_3yr - baseScenario.savings_3yr : null,
+        s.npv_aftertax,
+        baseScenario && !isBase ? s.npv_aftertax - baseScenario.npv_aftertax : null,
+        s.timeline_months,
+      ];
+    });
+
+  const handleCopy = async () => {
+    try {
+      await copyText(toTsv(exportColumns, exportRows()));
+      setCopyStatus('Copied');
+      setTimeout(() => setCopyStatus(null), 1500);
+    } catch {
+      setCopyStatus('Copy failed');
+      setTimeout(() => setCopyStatus(null), 1500);
+    }
+  };
+
+  if (!sessionId) {
+    return (
+      <p className="text-sm text-brand-muted">Select a session to model custom what-if scenarios.</p>
+    );
+  }
+
+  const showBridgeCta = bridgeMissing || !hasBridge;
 
   return (
     <div className="border border-brand-border rounded-lg">
@@ -242,8 +445,26 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({ sessionId })
       {open && (
         <div className="px-3 pb-3 space-y-3">
           <p className="text-xs text-brand-muted">
-            Requires a prior value-bridge run on this session. Savings delta is entered as % (e.g. 15 = +15%).
+            Requires a prior value-bridge run on this session. Savings delta is entered as %
+            (e.g. 15 = +15%).
           </p>
+
+          {showBridgeCta && (
+            <Alert variant="info" title="Value bridge required">
+              <p className="mb-2">
+                Run the value-bridge calculator on this session before modeling what-if scenarios.
+              </p>
+              {onRequestValueBridge && (
+                <button
+                  type="button"
+                  className="rounded bg-brand-primary px-3 py-1.5 text-sm text-white"
+                  onClick={onRequestValueBridge}
+                >
+                  Run value bridge
+                </button>
+              )}
+            </Alert>
+          )}
 
           <div className="rounded border border-brand-border p-2 space-y-2">
             <label className="block text-xs font-medium text-brand-muted">
@@ -355,7 +576,6 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({ sessionId })
                 >
                   <option value="portfolio">Portfolio</option>
                   <option value="category">Category</option>
-                  <option value="vendor">Vendor</option>
                   <option value="lever">Lever</option>
                 </select>
               </label>
@@ -366,6 +586,7 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({ sessionId })
                   value={row.id}
                   onChange={(e) => updateRow(idx, { id: e.target.value })}
                   placeholder="CAT_LOGISTICS"
+                  list={row.target === 'lever' ? 'whatif-known-levers' : 'whatif-known-categories'}
                 />
               </label>
               <label className="block text-xs">
@@ -472,23 +693,84 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({ sessionId })
               </button>
             </div>
           ))}
-          <div className="flex gap-2">
-            <button
-              type="button"
-              className="text-sm text-brand-primary"
-              onClick={addRow}
-            >
+          <datalist id="whatif-known-categories">
+            {knownCategories.map((c) => (
+              <option key={c.category_id} value={c.category_id}>
+                {c.category_name}
+              </option>
+            ))}
+          </datalist>
+          <datalist id="whatif-known-levers">
+            {knownLevers.map((l) => (
+              <option key={l.lever_id} value={l.lever_id}>
+                {l.lever_name}
+              </option>
+            ))}
+          </datalist>
+          <div className="flex flex-wrap gap-2 items-center">
+            <button type="button" className="text-sm text-brand-primary" onClick={addRow}>
               + Add scenario
             </button>
             <button
               type="button"
-              disabled={loading}
+              disabled={loading || showBridgeCta}
               className="rounded bg-brand-primary px-3 py-1.5 text-sm text-white disabled:opacity-50"
               onClick={() => void runSensitivity()}
             >
               {loading ? 'Running…' : 'Run sensitivity'}
             </button>
+            <input
+              className="rounded border border-brand-border bg-brand-surface px-2 py-1.5 text-sm"
+              placeholder="Save set as…"
+              value={saveName}
+              onChange={(e) => setSaveName(e.target.value)}
+            />
+            <button
+              type="button"
+              disabled={!saveName.trim()}
+              className="rounded border border-brand-border px-3 py-1.5 text-sm disabled:opacity-50"
+              onClick={() => void saveSet()}
+            >
+              Save set
+            </button>
           </div>
+
+          {savedSets.length > 0 && (
+            <details className="text-xs" open>
+              <summary className="cursor-pointer font-medium text-brand-muted">
+                Saved scenario sets ({savedSets.length})
+              </summary>
+              <ul className="mt-1 divide-y divide-brand-border/50 rounded border border-brand-border">
+                {savedSets.map((s) => (
+                  <li key={s.set_id} className="flex items-center gap-2 px-2 py-1.5">
+                    <button
+                      type="button"
+                      className="flex-1 text-left hover:underline"
+                      title={s.description || `${s.scenarios.length} scenarios`}
+                      onClick={() => loadSet(s)}
+                    >
+                      {s.name}
+                    </button>
+                    <button
+                      type="button"
+                      className="text-brand-primary hover:underline"
+                      onClick={() => loadSet(s)}
+                    >
+                      Load
+                    </button>
+                    <button
+                      type="button"
+                      className="text-red-600 hover:underline"
+                      onClick={() => void deleteSet(s.set_id)}
+                    >
+                      delete
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+
           {loading && <Loader label="Computing scenarios…" />}
           {result && (
             <>
@@ -497,51 +779,97 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({ sessionId })
                   {result.narrative}
                 </div>
               )}
-            <div className="overflow-auto max-h-80 border border-brand-border rounded">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="bg-brand-surface-elevated text-left">
-                    <th className="px-2 py-1">Scenario</th>
-                    <th className="px-2 py-1">3yr savings</th>
-                    <th className="px-2 py-1">Δ vs base</th>
-                    <th className="px-2 py-1">NPV (after tax)</th>
-                    <th className="px-2 py-1">Δ NPV vs base</th>
-                    <th className="px-2 py-1">Months</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {visibleScenarios.map((s) => {
-                    const isBase = s.name === 'base';
-                    return (
-                      <tr
-                        key={s.name}
-                        className={`border-t border-brand-border/50 ${
-                          isBase ? 'text-brand-muted italic' : ''
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                {comparisonChart && (
+                  <div className="flex gap-1">
+                    {(['table', 'chart'] as const).map((v) => (
+                      <button
+                        key={v}
+                        type="button"
+                        className={`rounded px-2 py-1 border ${
+                          view === v
+                            ? 'bg-brand-primary text-white border-brand-primary'
+                            : 'border-brand-border text-brand-muted'
                         }`}
+                        onClick={() => setView(v)}
                       >
-                        <td className="px-2 py-1 font-medium">
-                          {s.name}
-                          {isBase ? ' (reference)' : ''}
-                        </td>
-                        <td className="px-2 py-1">{s.savings_3yr.toLocaleString()}</td>
-                        <td className="px-2 py-1">
-                          {baseScenario && !isBase
-                            ? fmtDelta(s.savings_3yr, baseScenario.savings_3yr)
-                            : '—'}
-                        </td>
-                        <td className="px-2 py-1">{s.npv_aftertax.toLocaleString()}</td>
-                        <td className="px-2 py-1">
-                          {baseScenario && !isBase
-                            ? fmtDelta(s.npv_aftertax, baseScenario.npv_aftertax)
-                            : '—'}
-                        </td>
-                        <td className="px-2 py-1">{s.timeline_months}</td>
+                        {v === 'table' ? 'Table' : 'Chart'}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  className="rounded border border-brand-border px-2 py-0.5"
+                  onClick={() => void handleCopy()}
+                >
+                  {copyStatus ?? 'Copy TSV'}
+                </button>
+                <button
+                  type="button"
+                  className="rounded border border-brand-border px-2 py-0.5"
+                  onClick={() =>
+                    downloadTextFile('whatif_results.csv', toCsv(exportColumns, exportRows()))
+                  }
+                >
+                  Download CSV
+                </button>
+              </div>
+              {comparisonChart && view === 'chart' ? (
+                <div className="rounded border border-brand-border p-2">
+                  <DynamicChart spec={comparisonChart} currency={currency} />
+                </div>
+              ) : (
+                <div className="overflow-auto max-h-80 border border-brand-border rounded">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="bg-brand-surface-elevated text-left">
+                        <th className="px-2 py-1">Scenario</th>
+                        <th className="px-2 py-1">3yr savings</th>
+                        <th className="px-2 py-1">Δ vs base</th>
+                        <th className="px-2 py-1">NPV (after tax)</th>
+                        <th className="px-2 py-1">Δ NPV vs base</th>
+                        <th className="px-2 py-1">Months</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                    </thead>
+                    <tbody>
+                      {visibleScenarios.map((s) => {
+                        const isBase = s.name === 'base';
+                        return (
+                          <tr
+                            key={s.name}
+                            className={`border-t border-brand-border/50 ${
+                              isBase ? 'text-brand-muted italic' : ''
+                            }`}
+                          >
+                            <td className="px-2 py-1 font-medium">
+                              {s.name}
+                              {isBase ? ' (reference)' : ''}
+                            </td>
+                            <td className="px-2 py-1">
+                              {formatCr(s.savings_3yr, { currency })}
+                            </td>
+                            <td className="px-2 py-1">
+                              {baseScenario && !isBase
+                                ? fmtDelta(s.savings_3yr, baseScenario.savings_3yr)
+                                : '—'}
+                            </td>
+                            <td className="px-2 py-1">
+                              {formatCr(s.npv_aftertax, { currency })}
+                            </td>
+                            <td className="px-2 py-1">
+                              {baseScenario && !isBase
+                                ? fmtDelta(s.npv_aftertax, baseScenario.npv_aftertax)
+                                : '—'}
+                            </td>
+                            <td className="px-2 py-1">{s.timeline_months}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </>
           )}
         </div>

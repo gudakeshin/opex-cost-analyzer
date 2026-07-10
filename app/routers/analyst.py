@@ -13,8 +13,9 @@ ANALYST_TIMEOUT_SECONDS). When no LLM transport is available the endpoint
 degrades to one deterministic natural-language query so the FDE still gets a
 table (available=false + fallback reason).
 """
-from __future__ import annotations
-
+# NOTE: no `from __future__ import annotations` here — slowapi's @limiter.limit
+# wrapper cannot resolve postponed annotations because FastAPI evaluates them
+# against the wrapper's __globals__, not this module's.
 import asyncio
 from datetime import datetime, timezone
 from typing import Any, Dict, List
@@ -23,6 +24,7 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
 from app.memory import MemoryStore
+from app.ratelimit import RATE_LIMIT_LLM, limiter
 from app.routers._shared import (
     progress_append,
     progress_append_thinking,
@@ -193,6 +195,7 @@ def _persist_turn(session_id: str, question: str, outcome: Dict[str, Any]) -> No
 
 
 @router.post("/api/v1/analyst/{session_id}/run")
+@limiter.limit(RATE_LIMIT_LLM)
 async def run_analyst_turn(
     request: Request, session_id: str, payload: AnalystRunRequest
 ) -> Dict[str, Any]:

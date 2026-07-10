@@ -4,8 +4,9 @@ Thin HTTP layer over app.services.workbench. Runs execute synchronously (like
 /api/v1/chat) with live progress pollable via the shared progress store using the
 run's ``run_id``.
 """
-from __future__ import annotations
-
+# NOTE: no `from __future__ import annotations` here — slowapi's @limiter.limit
+# wrapper cannot resolve postponed annotations because FastAPI evaluates them
+# against the wrapper's __globals__, not this module's.
 import asyncio
 import os
 import uuid
@@ -14,6 +15,7 @@ from typing import Any, Dict
 from fastapi import APIRouter, HTTPException, Request
 
 from app.config import logger
+from app.ratelimit import RATE_LIMIT_LLM, limiter
 from app.routers._shared import (
     progress_append,
     progress_complete,
@@ -72,6 +74,7 @@ def post_workbench_preview(request: Request, payload: WorkbenchValidateRequest) 
 
 
 @router.post("/api/v1/workbench/runs")
+@limiter.limit(RATE_LIMIT_LLM)
 async def post_workbench_run(request: Request, payload: WorkbenchRunRequest) -> Dict[str, Any]:
     validate_session_id(payload.session_id)
     check_session_owner(request, payload.session_id)

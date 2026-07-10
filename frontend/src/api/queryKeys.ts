@@ -45,6 +45,14 @@ export const workbenchKeys = {
   runs: (engagementId: string | null | undefined, sessionId: string | null | undefined) =>
     ['workbenchRuns', engagementId, sessionId] as const,
   progress: (runId: string | null | undefined) => ['workbenchProgress', runId] as const,
+  querySchema: (sessionId: string | null | undefined) =>
+    ['workbenchQuerySchema', sessionId] as const,
+  queryHistory: (sessionId: string | null | undefined) =>
+    ['workbenchQueryHistory', sessionId] as const,
+  savedQueries: (sessionId: string | null | undefined) =>
+    ['workbenchSavedQueries', sessionId] as const,
+  savedScenarioSets: (sessionId: string | null | undefined) =>
+    ['workbenchSavedScenarioSets', sessionId] as const,
 };
 
 export const benchmarkKeys = {

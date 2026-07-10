@@ -368,6 +368,15 @@ def compute_sensitivity(
                 if str(i.get("category_id") or i.get("category")) == target_id
             )
             adjusted_mid = mid - cat_savings + cat_savings * (1.0 + combined_delta)
+        elif target == "lever" and target_id and savings_model and savings_model.get("initiatives"):
+            tid_l = target_id.lower()
+            lever_savings = sum(
+                float(i.get("net_savings", {}).get("total_3yr", 0.0))
+                for i in savings_model["initiatives"]
+                if str(i.get("lever") or i.get("lever_id") or "") == target_id
+                or str(i.get("lever_name") or "").lower() == tid_l
+            )
+            adjusted_mid = mid - lever_savings + lever_savings * (1.0 + combined_delta)
 
         if bounce_override in BOUNCE_BACK_RATES:
             exec_r = exec_r * (1.0 - BOUNCE_BACK_RATES[bounce_override] * 0.12)

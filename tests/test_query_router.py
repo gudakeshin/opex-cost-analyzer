@@ -249,3 +249,109 @@ def test_manual_query_chart_flag(client, monkeypatch, tmp_path):
     body = resp.json()
     assert body["chart"] is not None
     assert body["chart"]["type"] == "bar"
+
+
+def test_query_history_logged_on_manual_run(client, monkeypatch, tmp_path):
+    sid = _seed_session(monkeypatch, tmp_path)
+    sql = "SELECT supplier, SUM(amount) AS spend FROM spend GROUP BY supplier"
+    resp = client.post(f"/api/v1/query/{sid}", json={"sql": sql})
+    assert resp.status_code == 200
+    body = resp.json()
+
+    hist = client.get(f"/api/v1/query/{sid}/history")
+    assert hist.status_code == 200
+    entries = hist.json()["entries"]
+    assert len(entries) >= 1
+    entry = entries[0]
+    assert entry["sql"] == sql
+    assert entry["source"] == "manual"
+    assert entry["row_count"] == body["row_count"]
+    assert "elapsed_ms" in entry and "history_id" in entry and "executed_at" in entry
+    assert "question" not in entry
+
+
+def test_query_history_cap_and_newest_first(client, monkeypatch, tmp_path):
+    sid = _seed_session(monkeypatch, tmp_path)
+    from app.memory import MemoryStore
+    from app.routers import query as query_router
+
+    key = query_router._saved_key(sid)
+    # Seed 50 entries so the next run trims to the cap.
+    seeded = [
+        {
+            "history_id": str(uuid.uuid4()),
+            "sql": f"SELECT {i}",
+            "row_count": i,
+            "elapsed_ms": 1.0,
+            "source": "manual",
+            "executed_at": f"2020-01-01T00:00:{i:02d}Z",
+        }
+        for i in range(50)
+    ]
+    MemoryStore().put(query_router._HISTORY_SCOPE, key, {"entries": seeded})
+
+    resp = client.post(
+        f"/api/v1/query/{sid}",
+        json={"sql": "SELECT COUNT(*) AS n FROM spend"},
+    )
+    assert resp.status_code == 200
+    entries = client.get(f"/api/v1/query/{sid}/history").json()["entries"]
+    assert len(entries) == 50
+    assert "COUNT(*)" in entries[0]["sql"]
+    assert entries[0]["source"] == "manual"
+
+
+def test_nl2sql_execute_logs_history_with_source(client, monkeypatch, tmp_path):
+    sid = _seed_session(monkeypatch, tmp_path)
+    resp = client.post(
+        f"/api/v1/query/{sid}/nl2sql",
+        json={"question": "top 3 suppliers by spend", "execute": True},
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["source"] == "rules"
+    assert body["result"] is not None
+
+    entries = client.get(f"/api/v1/query/{sid}/history").json()["entries"]
+    assert entries
+    entry = entries[0]
+    assert entry["source"] == "rules"
+    assert entry["question"] == "top 3 suppliers by spend"
+    assert entry["sql"] == body["sql"]
+
+
+def test_clear_query_history(client, monkeypatch, tmp_path):
+    sid = _seed_session(monkeypatch, tmp_path)
+    client.post(
+        f"/api/v1/query/{sid}",
+        json={"sql": "SELECT 1 AS n FROM spend LIMIT 1"},
+    )
+    assert client.get(f"/api/v1/query/{sid}/history").json()["entries"]
+    cleared = client.delete(f"/api/v1/query/{sid}/history")
+    assert cleared.status_code == 200
+    assert cleared.json()["status"] == "cleared"
+    assert client.get(f"/api/v1/query/{sid}/history").json()["entries"] == []
+
+
+def test_export_endpoint_csv_and_rejects_non_select(client, monkeypatch, tmp_path):
+    sid = _seed_session(monkeypatch, tmp_path)
+    from app.memory import MemoryStore
+
+    record = MemoryStore().get("session", sid)
+    eid = record["engagement_id"]
+
+    ok = client.get(
+        f"/api/v1/engagements/{eid}/export",
+        params={"session_id": sid, "fmt": "csv", "sql": "SELECT supplier, amount FROM spend LIMIT 5"},
+    )
+    assert ok.status_code == 200
+    assert "text/csv" in ok.headers.get("content-type", "")
+    text = ok.content.decode("utf-8")
+    assert "supplier" in text.splitlines()[0]
+    assert len(text.splitlines()) >= 2
+
+    bad = client.get(
+        f"/api/v1/engagements/{eid}/export",
+        params={"session_id": sid, "fmt": "csv", "sql": "DELETE FROM spend"},
+    )
+    assert bad.status_code == 422

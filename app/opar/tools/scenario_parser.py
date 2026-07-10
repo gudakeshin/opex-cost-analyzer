@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Tuple
 from app.opar.tools.context import ToolSessionContext
 from app.schemas import CustomScenarioSpec
 
-_VALID_TARGETS = frozenset({"portfolio", "category"})
+_VALID_TARGETS = frozenset({"portfolio", "category", "lever"})
 _DRIVER_KEYS = (
     "headcount_growth_pct",
     "revenue_growth_pct",
@@ -67,6 +67,21 @@ def _session_categories(session: ToolSessionContext) -> List[Dict[str, str]]:
         return cats
     session.load_session_data()
     return cats
+
+
+def _session_levers(session: ToolSessionContext) -> List[Dict[str, str]]:
+    """Distinct lever ids from savings-modeler initiatives (for UI datalist / validation)."""
+    savings = session.skill_outputs.get("savings-modeler") or {}
+    seen: dict[str, Dict[str, str]] = {}
+    for init in savings.get("initiatives") or []:
+        lid = str(init.get("lever") or init.get("lever_id") or "").strip()
+        if not lid or lid in seen:
+            continue
+        seen[lid] = {
+            "lever_id": lid,
+            "lever_name": str(init.get("lever_name") or lid),
+        }
+    return list(seen.values())[:30]
 
 
 def _match_category(question: str, categories: List[Dict[str, str]]) -> str | None:
@@ -209,18 +224,25 @@ def _llm_parse_what_if(
 def validate_custom_scenarios(
     specs: List[Dict[str, Any]],
     categories: List[Dict[str, str]],
+    levers: List[Dict[str, str]] | None = None,
 ) -> Tuple[List[CustomScenarioSpec], List[str]]:
-    """Validate and normalize scenario dicts against session categories."""
+    """Validate and normalize scenario dicts against session categories/levers."""
     valid_ids = {c.get("category_id") or "" for c in categories}
     valid_ids |= {c.get("category_name") or "" for c in categories}
     valid_ids.discard("")
+    lever_list = levers or []
+    valid_levers = {l.get("lever_id") or "" for l in lever_list}
+    valid_levers |= {(l.get("lever_name") or "").lower() for l in lever_list}
+    valid_levers.discard("")
 
     validated: List[CustomScenarioSpec] = []
     errors: List[str] = []
     for raw in specs:
         target = str(raw.get("target") or "portfolio")
         if target not in _VALID_TARGETS:
-            errors.append(f"Unsupported target '{target}' — use portfolio or category")
+            errors.append(
+                f"Unsupported target '{target}' — use portfolio, category, or lever"
+            )
             target = "portfolio"
         target_id = raw.get("id")
         if target == "category" and target_id:
@@ -229,6 +251,15 @@ def validate_custom_scenarios(
                 tid.lower() in (c.get("category_name") or "").lower() for c in categories
             ):
                 errors.append(f"Unknown category '{target_id}' — not in session data")
+                continue
+        if target == "lever" and target_id:
+            tid = str(target_id)
+            if (
+                valid_levers
+                and tid not in valid_levers
+                and tid.lower() not in valid_levers
+            ):
+                errors.append(f"Unknown lever '{target_id}' — not in savings model")
                 continue
         bounce = raw.get("bounce_back_override")
         if bounce is not None and str(bounce).lower() not in ("high", "medium", "low"):
@@ -265,6 +296,7 @@ def parse_what_if_request(
     """NL → drivers + custom scenarios with validation (LLM primary, regex fast-path)."""
     question = (question or "").strip()
     categories = _session_categories(session)
+    levers = _session_levers(session)
 
     llm_parsed = _llm_parse_what_if(question, categories)
     drivers = dict(llm_parsed.get("drivers") or {})
@@ -280,13 +312,14 @@ def parse_what_if_request(
         for key, val in (spec.get("cost_driver_deltas") or {}).items():
             drivers.setdefault(str(key), float(val))
 
-    validated, errors = validate_custom_scenarios(scenarios, categories)
+    validated, errors = validate_custom_scenarios(scenarios, categories, levers)
     return {
         "question": question,
         "drivers": drivers,
         "scenarios": [s.model_dump() for s in validated],
         "validation_errors": errors,
         "known_categories": categories[:20],
+        "known_levers": levers,
         "parse_source": "llm" if llm_parsed.get("scenarios") else "regex",
     }
 
