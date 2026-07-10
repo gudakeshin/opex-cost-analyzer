@@ -56,10 +56,16 @@ function renderBlock(block: PresentationBlock, currency: string, key: string) {
           <p className="text-xs font-bold uppercase text-brand-muted mb-1">{block.title}</p>
           <ul className="text-xs space-y-2">
             {levers.map((lv, i) => (
-              <li key={String(lv.lever_name ?? i)} className="border-l-2 border-deloitte-green pl-2">
+              <li key={`${i}-${String(lv.lever_name ?? 'lever')}`} className="border-l-2 border-deloitte-green pl-2">
                 <span className="font-semibold">{String(lv.lever_name ?? 'Lever')}</span>
                 {lv.what_changes ? (
                   <p className="text-brand-muted mt-0.5">{String(lv.what_changes)}</p>
+                ) : null}
+                {lv.so_what ? (
+                  <p className="text-brand-ink mt-1 font-medium">
+                    <span className="text-brand-muted font-normal">So what: </span>
+                    {String(lv.so_what)}
+                  </p>
                 ) : null}
               </li>
             ))}

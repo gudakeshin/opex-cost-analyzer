@@ -51,6 +51,7 @@ import {
   wantsPeerSavingsInsight,
   type TopProbeQuestion,
 } from '../utils/analysisInsights';
+import { deriveProvenanceFromSession, deriveRunProvenance, type ProvenanceSource } from '../utils/provenance';
 import { VerticalResizeHandle } from '../components/Common/VerticalResizeHandle';
 import { EngagementConflictBanner } from '../components/PageComponents/Procurement/EngagementConflictBanner';
 import { useResizableWidth } from '../hooks/useResizableWidth';
@@ -63,6 +64,7 @@ import type { EngagementSanityConflict } from '../types';
 import type { ManifestFileEntry } from '../utils/sessionFiles';
 import type {
   AnalysisTraceStep,
+  AuditLogEntry,
   ChatMessage,
   ChatPlanPreview,
   ChatProgressResponse,
@@ -80,6 +82,7 @@ import type {
 const LLM_MODEL_STORAGE_KEY = 'opex_llm_model';
 
 const CONFLICT_DISMISS_PREFIX = 'opex_conflict_dismiss_';
+const DEEP_RESEARCH_DISMISS_PREFIX = 'opex_deep_research_dismiss_';
 const INSIGHTS_PANEL_WIDTH_KEY = 'opex_analysis_insights_width';
 const INSIGHTS_PANEL_DEFAULT_WIDTH = 320;
 const INSIGHTS_PANEL_MIN_WIDTH = 260;
@@ -101,16 +104,41 @@ function saveDismissedConflictKeys(sessionId: string | null, keys: Set<string>):
   localStorage.setItem(`${CONFLICT_DISMISS_PREFIX}${sessionId}`, JSON.stringify([...keys]));
 }
 
+function loadDeepResearchDismissed(sessionId: string | null): boolean {
+  if (!sessionId) return false;
+  return localStorage.getItem(`${DEEP_RESEARCH_DISMISS_PREFIX}${sessionId}`) === '1';
+}
+
+function saveDeepResearchDismissed(sessionId: string) {
+  localStorage.setItem(`${DEEP_RESEARCH_DISMISS_PREFIX}${sessionId}`, '1');
+}
+
+const PRE_RUN_PROVENANCE: ProvenanceSource[] = [
+  { label: 'Uploaded spend', detail: 'Session files — run analysis for skill citations', kind: 'fact' },
+  { label: 'OPAR synthesis', detail: 'Awaiting first run', kind: 'inference' },
+];
+
 const DeepResearchBanner: React.FC<{ companyName: string; onDismiss: () => void }> = ({
   companyName,
+  onDismiss,
 }) => (
-  <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border-b border-blue-200 text-xs text-blue-800">
-    <span className="font-semibold">Deep research context loaded</span>
-    <span className="text-blue-600">·</span>
-    <span>
-      Google Deep Research findings for{' '}
-      <span className="font-medium">{companyName}</span> are active as analysis context.
-    </span>
+  <div className="flex items-center justify-between gap-2 px-4 py-2 bg-blue-50 border-b border-blue-200 text-xs text-blue-800">
+    <div className="flex items-center gap-2 min-w-0">
+      <span className="font-semibold shrink-0">Deep research context loaded</span>
+      <span className="text-blue-600">·</span>
+      <span className="truncate">
+        Google Deep Research findings for{' '}
+        <span className="font-medium">{companyName}</span> are active as analysis context.
+      </span>
+    </div>
+    <button
+      type="button"
+      onClick={onDismiss}
+      className="shrink-0 text-blue-700 hover:text-blue-900 font-bold px-1"
+      aria-label="Dismiss deep research banner"
+    >
+      ×
+    </button>
   </div>
 );
 
@@ -257,6 +285,12 @@ export const ProcurementAnalysis: React.FC = () => {
   const [lastRunId, setLastRunId] = useState<string | undefined>();
   const [lastSignals, setLastSignals] = useState<V1ChatResponse['quality_signals']>();
   const [lastSteps, setLastSteps] = useState<V1ChatResponse['progress_steps']>();
+  const [provenanceSources, setProvenanceSources] = useState<ProvenanceSource[]>(PRE_RUN_PROVENANCE);
+  const [narrativeTag, setNarrativeTag] = useState<Record<string, unknown> | null>(null);
+  const [localAudit, setLocalAudit] = useState<AuditLogEntry[]>([]);
+  const [deepResearchDismissed, setDeepResearchDismissed] = useState(() =>
+    loadDeepResearchDismissed(sessionId),
+  );
   const [agentSteps, setAgentSteps] = useState<ProgressStep[] | undefined>();
   const [agentDegraded, setAgentDegraded] = useState(false);
   const [agentFallbackReasons, setAgentFallbackReasons] = useState<
@@ -284,7 +318,20 @@ export const ProcurementAnalysis: React.FC = () => {
 
   useEffect(() => {
     setDismissedConflictKeys(loadDismissedConflictKeys(sessionId));
+    setDeepResearchDismissed(loadDeepResearchDismissed(sessionId));
   }, [sessionId]);
+
+  const applyRunProvenance = useCallback(
+    (chat: V1ChatResponse, runId?: string) => {
+      const prov = deriveRunProvenance({ chat, manifest, runId });
+      setProvenanceSources(prov.sources.length > 0 ? prov.sources : PRE_RUN_PROVENANCE);
+      setNarrativeTag(prov.narrativeTag);
+      if (prov.localAudit.length > 0) {
+        setLocalAudit((prev) => [...prov.localAudit, ...prev].slice(0, 40));
+      }
+    },
+    [manifest],
+  );
 
   const llmModelsQuery = useLlmModels();
   const llmModels = useMemo(() => llmModelsQuery.data?.models ?? [], [llmModelsQuery.data]);
@@ -373,6 +420,21 @@ export const ProcurementAnalysis: React.FC = () => {
             const runSummary = (sess as SessionResponse).last_analysis_run;
             if (runSummary?.run_id) {
               setLastRunId(runSummary.run_id);
+            }
+            const advisorySections =
+              sess && typeof sess.advisory_sections === 'object'
+                ? (sess.advisory_sections as Record<string, unknown>)
+                : undefined;
+            if (advisorySections && Object.keys(advisorySections).length > 0) {
+              const restoredProv = deriveProvenanceFromSession({
+                manifest: m,
+                advisorySections,
+                runId: runSummary?.run_id ?? undefined,
+              });
+              setProvenanceSources(
+                restoredProv.sources.length > 0 ? restoredProv.sources : PRE_RUN_PROVENANCE,
+              );
+              setNarrativeTag(restoredProv.narrativeTag);
             }
             const fallbackSteps = runSummary?.progress_steps;
             if ((!agentSteps || agentSteps.length === 0) && fallbackSteps?.length) {
@@ -604,6 +666,7 @@ export const ProcurementAnalysis: React.FC = () => {
       setAgentSteps(chat.progress_steps);
       setAgentDegraded(!!chat.degraded_mode);
       setAgentFallbackReasons(chat.fallback_reasons);
+      applyRunProvenance(chat, chat.run_id ?? runId);
       let session: SessionResponse | null = null;
       let latestManifest = manifest;
       try {
@@ -652,6 +715,8 @@ export const ProcurementAnalysis: React.FC = () => {
                 show_peer_savings: showPeer,
                 charts: chat.charts,
                 suggested_outputs: chat.suggested_outputs,
+                response_metadata: chat.response_metadata,
+                run_delta: chat.run_delta,
               }
             : msg,
         ),
@@ -680,6 +745,7 @@ export const ProcurementAnalysis: React.FC = () => {
       setAgentSteps(res.progress_steps);
       setAgentDegraded(!!res.degraded_mode);
       setAgentFallbackReasons(res.fallback_reasons);
+      applyRunProvenance(res, res.run_id ?? runId);
       let session: SessionResponse | null = null;
       let latestManifest = manifest;
       try {
@@ -727,6 +793,8 @@ export const ProcurementAnalysis: React.FC = () => {
           show_peer_savings: showPeer,
           charts: res.charts,
           suggested_outputs: res.suggested_outputs,
+          response_metadata: res.response_metadata,
+          run_delta: res.run_delta,
         },
       ]);
       maybeAutoOpenProbeModal(insightSnap, currentAnsweredProbeFamilies(), res.run_id);
@@ -1083,6 +1151,7 @@ export const ProcurementAnalysis: React.FC = () => {
       setAgentSteps(res.progress_steps);
       setAgentDegraded(!!res.degraded_mode);
       setAgentFallbackReasons(res.fallback_reasons);
+      applyRunProvenance(res, res.run_id ?? runId);
       const sid = await ensureSession();
       let session: SessionResponse | null = null;
       let latestManifest = manifest;
@@ -1131,6 +1200,8 @@ export const ProcurementAnalysis: React.FC = () => {
           show_peer_savings: showPeer,
           charts: res.charts,
           suggested_outputs: res.suggested_outputs,
+          response_metadata: res.response_metadata,
+          run_delta: res.run_delta,
         },
       ]);
       maybeAutoOpenProbeModal(insightSnap, answeredProbeFamilies, res.run_id);
@@ -1188,7 +1259,37 @@ export const ProcurementAnalysis: React.FC = () => {
       const fallbackSteps = progressStepsFromTrace(trace);
       setLastSteps(fallbackSteps);
       setPipelineLabel(undefined);
+      const advisorySections =
+        session && typeof session.advisory_sections === 'object'
+          ? (session.advisory_sections as Record<string, unknown>)
+          : undefined;
+      const analyzeProv = deriveProvenanceFromSession({
+        manifest: m,
+        advisorySections,
+        runId,
+      });
+      setProvenanceSources(analyzeProv.sources.length > 0 ? analyzeProv.sources : PRE_RUN_PROVENANCE);
+      setNarrativeTag(analyzeProv.narrativeTag);
+      if (analyzeProv.localAudit.length > 0) {
+        setLocalAudit((prev) => [...analyzeProv.localAudit, ...prev].slice(0, 40));
+      }
       if (snapshot) {
+        const sessionExtras: Partial<ChatMessage> = {};
+        if (advisorySections && Object.keys(advisorySections).length > 0) {
+          sessionExtras.advisory_sections = advisorySections;
+        }
+        if (session?.response_metadata && typeof session.response_metadata === 'object') {
+          sessionExtras.response_metadata = session.response_metadata as ChatMessage['response_metadata'];
+        }
+        if (session?.used_llm_synthesis === false) {
+          sessionExtras.used_llm_synthesis = false;
+        }
+        if (Array.isArray(session?.suggested_outputs) && session!.suggested_outputs!.length > 0) {
+          sessionExtras.suggested_outputs = session!.suggested_outputs as ChatMessage['suggested_outputs'];
+        }
+        if (session?.run_delta && typeof session.run_delta === 'object') {
+          sessionExtras.run_delta = session.run_delta as ChatMessage['run_delta'];
+        }
         setMessages((prev) => [
           ...prev,
           {
@@ -1204,6 +1305,7 @@ export const ProcurementAnalysis: React.FC = () => {
               snapshot,
               answeredProbeFamilies,
             ),
+            ...sessionExtras,
           },
         ]);
         maybeAutoOpenProbeModal(snapshot, answeredProbeFamilies, runId);
@@ -1480,10 +1582,13 @@ export const ProcurementAnalysis: React.FC = () => {
 
         <div className="flex flex-1 min-h-0 overflow-hidden">
           <section className="flex flex-col flex-1 min-w-0 bg-brand-surface">
-            {deepResearchSummary && (
+            {deepResearchSummary && !deepResearchDismissed && (
               <DeepResearchBanner
                 companyName={engagement.company_name}
-                onDismiss={() => {/* banner is informational — no dismiss needed for now */}}
+                onDismiss={() => {
+                  if (sessionId) saveDeepResearchDismissed(sessionId);
+                  setDeepResearchDismissed(true);
+                }}
               />
             )}
             <div className="flex-1 overflow-y-auto">
@@ -1543,6 +1648,8 @@ export const ProcurementAnalysis: React.FC = () => {
                         liveSnapshot={insightSnapshot}
                         currency={engagement.currency || 'INR'}
                         sessionId={sessionId || undefined}
+                        engagementId={engagementId ?? engagement.engagement_id}
+                        onExportError={(msg) => setError(msg)}
                         onOptionClick={(text) => sendMessage(text)}
                         answeredProbeFamilies={answeredProbeFamilies}
                         onOpenProbes={
@@ -1612,6 +1719,11 @@ export const ProcurementAnalysis: React.FC = () => {
                     agentFallbackReasons={agentFallbackReasons}
                     pipelineLabel={pipelineLabel}
                     onOpenCostRoom={syncEngagementFromAnalysis}
+                    onOpenProbes={
+                      insightSnapshot
+                        ? () => openSmeProbeModal(insightSnapshot, answeredProbeFamilies)
+                        : undefined
+                    }
                   />
                 </div>
               </aside>
@@ -1656,6 +1768,11 @@ export const ProcurementAnalysis: React.FC = () => {
                   agentFallbackReasons={agentFallbackReasons}
                   pipelineLabel={pipelineLabel}
                   onOpenCostRoom={syncEngagementFromAnalysis}
+                  onOpenProbes={
+                    insightSnapshot
+                      ? () => openSmeProbeModal(insightSnapshot, answeredProbeFamilies)
+                      : undefined
+                  }
                 />
               </div>
             </div>
@@ -1710,14 +1827,13 @@ export const ProcurementAnalysis: React.FC = () => {
       <TrustRail
         open={trustOpen}
         onClose={() => setTrustOpen(false)}
-        localAudit={[]}
+        localAudit={localAudit}
         runId={lastRunId}
         progressSteps={lastSteps}
+        degradedMode={agentDegraded}
         qualitySignals={lastSignals}
-        provenanceSources={[
-          { label: 'Uploaded spend', detail: 'Session files', kind: 'fact' },
-          { label: 'OPAR synthesis', detail: 'Model-assisted narrative', kind: 'inference' },
-        ]}
+        provenanceSources={provenanceSources}
+        narrativeTag={narrativeTag}
       />
     </MainLayout>
   );

@@ -132,6 +132,12 @@ _HEAVY_EXPORT_CTAS: list[dict[str, object]] = [
         "endpoint": "/api/v1/pmo-export/{session_id}",
         "keywords": ("pmo", "excel", "xlsx", "portfolio export", "tracker"),
     },
+    {
+        "skill": "evidence-appendix",
+        "label": "Evidence appendix (DOCX)",
+        "endpoint": "/api/v1/evidence-appendix/{session_id}",
+        "keywords": ("evidence", "appendix", "citation", "provenance", "audit trail"),
+    },
 ]
 
 _SKILL_HEAVY_ENDPOINTS: dict[str, dict[str, str]] = {

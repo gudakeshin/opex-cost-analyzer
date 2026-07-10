@@ -17,13 +17,14 @@ import {
   formatEvidenceUsedLine,
   formatSpendAmount,
 } from '../../../utils/analysisInsights';
+import { benchmarkVintageWarning } from '../../../utils/provenance';
 import { CollapsibleDetail } from '../../Common/CollapsibleDetail';
 import { Badge } from '../../Common/Badge';
 import {
   showZeroSpendIngestionWarning,
 } from '../../../utils/ingestionWarnings';
 import type { ManifestFileEntry } from '../../../utils/sessionFiles';
-import type { ProgressStep, SessionManifest, SessionResponse } from '../../../types';
+import type { ProgressStep, RunDelta, SessionManifest, SessionResponse } from '../../../types';
 
 interface InsightCardsProps {
   analysis: SessionResponse | null;
@@ -35,6 +36,7 @@ interface InsightCardsProps {
   agentFallbackReasons?: Record<string, unknown>;
   pipelineLabel?: string;
   onOpenCostRoom?: () => void | Promise<void>;
+  onOpenProbes?: () => void;
 }
 
 function asRecord(v: unknown): Record<string, unknown> | null {
@@ -51,6 +53,7 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
   agentFallbackReasons,
   pipelineLabel,
   onOpenCostRoom,
+  onOpenProbes,
 }) => {
   const [showRaw, setShowRaw] = useState(false);
 
@@ -132,6 +135,9 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
 
   const zeroSpendWarning = showZeroSpendIngestionWarning(manifest, analysis);
 
+  const runDelta = asRecord(analysis?.run_delta) as RunDelta | null;
+  const smeSummary = snapshot?.sme_qualification;
+
   const engagementStats = useMemo((): StatStripItem[] => {
     const stats: StatStripItem[] = [
       {
@@ -191,6 +197,76 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
 
   return (
     <div className="space-y-5">
+      {runDelta && runDelta.delta_mid_savings != null && runDelta.delta_mid_savings !== 0 && (
+        <div className="rounded-lg border border-brand-border bg-brand-surface-muted px-3 py-2 text-xs">
+          <p className="font-semibold text-brand-ink">Since last run</p>
+          <p className="text-brand-muted mt-1">
+            Mid-case savings moved by{' '}
+            <span className="font-semibold text-brand-ink tabular-nums">
+              {formatSpendAmount(Math.abs(runDelta.delta_mid_savings), runDelta.currency ?? currency)}
+            </span>{' '}
+            {runDelta.delta_mid_savings > 0 ? 'up' : 'down'}.
+          </p>
+        </div>
+      )}
+
+      {smeSummary && (smeSummary.ready_count + smeSummary.probe_count + smeSummary.insufficient_count) > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <FactVsInferenceLabel kind="inference" />
+            <p className="text-xs font-semibold uppercase text-brand-muted">Decision readiness</p>
+          </div>
+          {(() => {
+            const total =
+              (smeSummary.savings_ready ?? 0) +
+              (smeSummary.savings_probe ?? 0) +
+              (smeSummary.savings_insufficient ?? 0);
+            const pct = (n: number) => (total > 0 ? (n / total) * 100 : 0);
+            return (
+              <>
+                <div className="flex h-3 rounded-full overflow-hidden bg-slate-100 text-[10px]">
+                  {smeSummary.savings_ready > 0 && (
+                    <div
+                      className="bg-emerald-500"
+                      style={{ width: `${pct(smeSummary.savings_ready)}%` }}
+                      title={`Ready: ${formatSpendAmount(smeSummary.savings_ready, currency)}`}
+                    />
+                  )}
+                  {smeSummary.savings_probe > 0 && (
+                    <div
+                      className="bg-amber-400"
+                      style={{ width: `${pct(smeSummary.savings_probe)}%` }}
+                      title={`Probe: ${formatSpendAmount(smeSummary.savings_probe, currency)}`}
+                    />
+                  )}
+                  {smeSummary.savings_insufficient > 0 && (
+                    <div
+                      className="bg-slate-300"
+                      style={{ width: `${pct(smeSummary.savings_insufficient)}%` }}
+                      title={`Insufficient: ${formatSpendAmount(smeSummary.savings_insufficient, currency)}`}
+                    />
+                  )}
+                </div>
+                <p className="text-xs text-brand-muted mt-1.5">
+                  Ready {smeSummary.ready_count} · Probe {smeSummary.probe_count} · Insufficient{' '}
+                  {smeSummary.insufficient_count}
+                </p>
+                {smeSummary.probe_count > 0 && onOpenProbes && (
+                  <button
+                    type="button"
+                    onClick={onOpenProbes}
+                    className="mt-2 text-xs font-semibold text-brand-navy hover:text-deloitte-green"
+                  >
+                    Answer {smeSummary.probe_count} probe{smeSummary.probe_count === 1 ? '' : 's'} to unlock{' '}
+                    {formatSpendAmount(smeSummary.savings_probe, currency)}
+                  </button>
+                )}
+              </>
+            );
+          })()}
+        </div>
+      )}
+
       <SessionFilesPanel files={files} />
 
       <WorkbookIngestionPanel
@@ -269,6 +345,17 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
             <p className="text-xs font-semibold uppercase text-brand-muted">Above peer (P75+)</p>
           </div>
           <CompactStatStrip items={peerGapStats} />
+          <ul className="mt-2 space-y-1">
+            {peerGapDetails.map((gap) => {
+              const warn = benchmarkVintageWarning(gap.benchmark_vintage, gap.benchmark_sample_n);
+              if (!warn) return null;
+              return (
+                <li key={gap.category_id} className="text-[10px] text-amber-800 bg-amber-50 rounded px-2 py-0.5">
+                  {gap.category_name}: {warn}
+                </li>
+              );
+            })}
+          </ul>
         </div>
       )}
 
@@ -407,7 +494,7 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
         </Link>
       )}
 
-      {analysis && (
+      {typeof import.meta !== 'undefined' && (import.meta as ImportMeta & { env?: { DEV?: boolean } }).env?.DEV && analysis && (
         <>
           <button
             type="button"

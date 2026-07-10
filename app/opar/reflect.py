@@ -15,6 +15,7 @@ from app.opar.models import (
     ExecutionPlan,
     ObserveContext,
     ReflectOutput,
+    SuggestedOutput,
 )
 from app.opar.reflect_persistence import (
     apply_memory_updates,
@@ -51,6 +52,26 @@ from app.opar.reflect_validation import (
 )
 
 _memory = MemoryStore()
+
+
+def _ensure_evidence_appendix_cta(
+    suggested: List[SuggestedOutput],
+    session_id: str | None,
+    validated: Dict[str, Dict[str, Any]],
+) -> List[SuggestedOutput]:
+    if not session_id or "value-bridge-calculator" not in validated:
+        return suggested
+    if any(s.skill == "evidence-appendix" for s in suggested):
+        return suggested
+    return [
+        *suggested,
+        SuggestedOutput(
+            skill="evidence-appendix",
+            label="Evidence appendix (DOCX)",
+            endpoint=f"/api/v1/evidence-appendix/{session_id}",
+            score=0.85,
+        ),
+    ]
 
 # Reflect-phase LLM paths — not deterministic skill fallbacks.
 _SYNTHESIS_DEGRADATION_KEYS = frozenset({"llm_advisory", "chat_synthesis"})
@@ -260,7 +281,7 @@ def reflect(
     gate2_blocked, gate2_narrative = _run_gate2_check(validated, ctx)
     forced_reg_decision, reg_events, _reg_prompt = _run_reg_watcher(validated, ctx, manifest=manifest)
 
-    persist_session_analysis(
+    run_delta = persist_session_analysis(
         ctx=ctx,
         act_result=act_result,
         validated=validated,
@@ -277,7 +298,12 @@ def reflect(
         gate2_blocked=gate2_blocked,
         forced_reg_decision=forced_reg_decision,
     )
-    provenance_tag = record_advisory_provenance(ctx, validated, advisory_sections)
+    provenance_tag = record_advisory_provenance(
+        ctx,
+        validated,
+        advisory_sections,
+        narrative_mode=str(response_metadata.get("narrative_mode") or "llm"),
+    )
 
     # LLM suggests the most relevant chart(s); numbers come from skill outputs.
     chart_specs = build_chart_specs(ctx.user_message, composition_validated)
@@ -319,6 +345,11 @@ def reflect(
         regulatory_events=reg_events,
         forced_regulatory_decision=forced_reg_decision,
         narrative_provenance_tag=provenance_tag,
+        run_delta=run_delta,
         presentation=presentation.model_dump() if presentation else None,
-        suggested_outputs=list(plan.suggested_outputs or []),
+        suggested_outputs=_ensure_evidence_appendix_cta(
+            list(plan.suggested_outputs or []),
+            ctx.session_id,
+            validated,
+        ),
     )

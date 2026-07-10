@@ -132,6 +132,7 @@ async def _chat_stream_events(
                         token_callback=token_cb,
                         thinking_enabled=thinking_enabled,
                         chat_history=_serialize_chat_history(payload.chat_history),
+                        turn_id=run_id,
                     ),
                     timeout=float(_OPAR_TIMEOUT_S),
                 )
@@ -208,6 +209,8 @@ def _opar_response(result: Any, run_id: str, session_id: str | None = None) -> D
         "thinking": getattr(result, "thinking_text", None),
         "degraded_mode": getattr(result, "degraded_mode", False),
         "fallback_reasons": getattr(result, "fallback_reasons", {}),
+        "narrative_provenance_tag": getattr(result, "narrative_provenance_tag", None),
+        "run_delta": getattr(result, "run_delta", None),
         "loop_complete": result.loop_complete,
         "next_loop_trigger": result.next_loop_trigger,
         "progress_steps": getattr(result, "progress_steps", []),
@@ -366,6 +369,7 @@ async def chat_v1_with_files(
                 None,
                 progress_cb,
                 thinking_cb,
+                turn_id=run_id,
             ),
             timeout=float(_OPAR_TIMEOUT_S),
         )
@@ -428,6 +432,7 @@ async def chat_v1_opar(request: Request, payload: V1ChatRequest) -> Dict[str, An
                     thinking_cb,
                     thinking_enabled=thinking_enabled,
                     chat_history=_serialize_chat_history(payload.chat_history),
+                    turn_id=run_id,
                 ),
                 timeout=float(_OPAR_TIMEOUT_S),
             )
@@ -494,6 +499,7 @@ async def chat_v1_resume(request: Request, payload: ClarificationResumeRequest) 
                     thinking_cb,
                     thinking_enabled=thinking_enabled,
                     chat_history=_serialize_chat_history(payload.chat_history),
+                    turn_id=run_id,
                 ),
                 timeout=float(_OPAR_TIMEOUT_S),
             )

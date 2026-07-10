@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ConfidenceBadge } from '../../Trust/ConfidenceBadge';
 import { NarrativeProvenanceBanner, narrativeModeFromMetadata } from '../../Trust/NarrativeProvenanceBanner';
+import { ProvenanceTakeaway } from './ProvenanceTakeaway';
 import { AnalysisTraceBlock } from './AnalysisTraceBlock';
 import { ChatInsightBlock } from './ChatInsightBlock';
 import { DynamicCharts } from './DynamicCharts';
@@ -10,17 +11,20 @@ import { Markdown } from '../../Common/Markdown';
 import { AssistantMessageBody } from './AssistantMessageBody';
 import { artefactLinks } from '../../../utils/chatMarkdown';
 import { filterProbeNextOptions, mergeLiveSpendIntoSnapshot, shouldShowSpendInsightBlock } from '../../../utils/analysisInsights';
+import { ADVISORY_HANDLED_KEYS } from '../../../utils/provenance';
 import type { AnalysisInsightSnapshot, ChatMessage, SuggestedOutput } from '../../../types';
-import { apiPost } from '../../../hooks/useApi';
+import { apiPost, getApiErrorMessage } from '../../../hooks/useApi';
 
 interface StructuredChatMessageProps {
   message: ChatMessage;
   onOptionClick?: (text: string) => void;
   onOpenProbes?: () => void;
+  onExportError?: (message: string) => void;
   answeredProbeFamilies?: Set<string>;
   currency?: string;
   liveSnapshot?: AnalysisInsightSnapshot | null;
   sessionId?: string;
+  engagementId?: string;
 }
 
 function AssistantAvatar() {
@@ -86,7 +90,29 @@ function asRecord(v: unknown): Record<string, unknown> | null {
   return v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : null;
 }
 
-function AdvisorySections({ sections }: { sections: Record<string, unknown> }) {
+function renderAdvisoryFallbackValue(val: unknown): React.ReactNode {
+  if (typeof val === 'string') return <Markdown className="text-xs leading-relaxed">{val}</Markdown>;
+  if (Array.isArray(val) && val.every((x) => typeof x === 'string')) {
+    return (
+      <ul className="text-xs mt-0.5 list-disc list-inside space-y-0.5">
+        {(val as string[]).map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    );
+  }
+  return <p className="text-xs text-brand-muted mt-0.5">Structured data available — see Provenance tab.</p>;
+}
+
+function AdvisorySections({
+  sections,
+  engagementId,
+  turnId,
+}: {
+  sections: Record<string, unknown>;
+  engagementId?: string;
+  turnId?: string;
+}) {
   const takeaway = String(sections.executive_takeaway ?? '').trim();
   const smeQualification = String(sections.sme_qualification_narrative ?? '').trim();
   const categoryFocus = String(sections.category_focus_section ?? '').trim();
@@ -111,16 +137,16 @@ function AdvisorySections({ sections }: { sections: Record<string, unknown> }) {
     actions.length > 0;
 
   if (!hasTyped) {
-    const fallback = Object.entries(sections).filter(([, v]) => v != null && v !== '');
+    const fallback = Object.entries(sections).filter(
+      ([key, v]) => !ADVISORY_HANDLED_KEYS.has(key) && v != null && v !== '',
+    );
     if (fallback.length === 0) return null;
     return (
       <div className="mt-3 space-y-2 border-t border-brand-border pt-2">
         {fallback.map(([key, val]) => (
           <div key={key}>
             <p className="text-xs font-bold uppercase text-brand-muted">{key.replace(/_/g, ' ')}</p>
-            <p className="text-xs mt-0.5 opacity-90">
-              {typeof val === 'string' ? val : JSON.stringify(val, null, 0).slice(0, 400)}
-            </p>
+            {renderAdvisoryFallbackValue(val)}
           </div>
         ))}
       </div>
@@ -132,7 +158,7 @@ function AdvisorySections({ sections }: { sections: Record<string, unknown> }) {
       {takeaway && (
         <div>
           <p className="text-xs font-bold uppercase text-brand-muted">Executive takeaway</p>
-          <Markdown className="text-xs leading-relaxed">{takeaway}</Markdown>
+          <ProvenanceTakeaway text={takeaway} engagementId={engagementId} turnId={turnId} />
         </div>
       )}
       {smeQualification && (
@@ -175,10 +201,16 @@ function AdvisorySections({ sections }: { sections: Record<string, unknown> }) {
               const row = asRecord(item);
               if (!row) return null;
               return (
-                <li key={String(row.lever_name ?? i)} className="border-l-2 border-deloitte-green pl-2">
+                <li key={`${i}-${String(row.lever_name ?? 'lever')}`} className="border-l-2 border-deloitte-green pl-2">
                   <span className="font-semibold">{String(row.lever_name ?? 'Lever')}</span>
                   {row.what_changes ? (
                     <p className="text-brand-muted mt-0.5">{String(row.what_changes)}</p>
+                  ) : null}
+                  {row.so_what ? (
+                    <p className="text-brand-ink mt-1 font-medium">
+                      <span className="text-brand-muted font-normal">So what: </span>
+                      {String(row.so_what)}
+                    </p>
                   ) : null}
                 </li>
               );
@@ -208,14 +240,71 @@ function AdvisorySections({ sections }: { sections: Record<string, unknown> }) {
   );
 }
 
+function SuggestedOutputButtons({
+  outputs,
+  sessionId,
+  onExportError,
+}: {
+  outputs: SuggestedOutput[];
+  sessionId?: string;
+  onExportError?: (message: string) => void;
+}) {
+  const [exportState, setExportState] = useState<Record<string, 'idle' | 'pending' | 'failed'>>({});
+
+  return (
+    <div className="flex flex-wrap gap-2 mt-3">
+      {outputs.map((cta) => {
+        const key = `${cta.skill}-${cta.endpoint}`;
+        const state = exportState[key] ?? 'idle';
+        return (
+          <button
+            key={key}
+            type="button"
+            disabled={state === 'pending'}
+            onClick={async () => {
+              const ep = cta.endpoint.includes('{session_id}')
+                ? cta.endpoint.replace('{session_id}', sessionId || '')
+                : cta.endpoint;
+              setExportState((s) => ({ ...s, [key]: 'pending' }));
+              try {
+                const res = await apiPost<{ export_url?: string; exports?: { docx?: string; pptx?: string } }>(ep, {});
+                const url = String(res.export_url || res.exports?.docx || res.exports?.pptx || '');
+                if (url) {
+                  window.open(url.startsWith('/') ? url : url, '_blank');
+                  setExportState((s) => ({ ...s, [key]: 'idle' }));
+                } else {
+                  setExportState((s) => ({ ...s, [key]: 'failed' }));
+                  onExportError?.(`Export for "${cta.label}" returned no download URL.`);
+                }
+              } catch (err) {
+                setExportState((s) => ({ ...s, [key]: 'failed' }));
+                onExportError?.(getApiErrorMessage(err));
+              }
+            }}
+            className={`text-xs px-3 py-1.5 rounded-full border ${
+              state === 'failed'
+                ? 'border-red-400 text-red-700 hover:bg-red-50'
+                : 'border-deloitte-green text-deloitte-green hover:bg-emerald-50'
+            } disabled:opacity-60`}
+          >
+            {state === 'pending' ? 'Exporting…' : state === 'failed' ? `${cta.label} — retry` : cta.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
   message,
   onOptionClick,
   onOpenProbes,
+  onExportError,
   answeredProbeFamilies,
   currency,
   liveSnapshot,
   sessionId,
+  engagementId,
 }) => {
   const isUser = message.role === 'user';
   const sections = message.advisory_sections;
@@ -243,6 +332,14 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
             )}
             {message.used_llm_synthesis === false && (
               <span className="text-[10px] uppercase font-bold text-amber-700">Offline</span>
+            )}
+            {message.response_metadata?.narrative_mode === 'deterministic' && (
+              <span
+                className="text-[10px] uppercase font-bold text-slate-600 border border-slate-300 rounded px-1.5 py-0.5"
+                title="Narrative composed from skill outputs — see Trust rail Provenance"
+              >
+                Composed from data
+              </span>
             )}
           </div>
         )}
@@ -296,7 +393,11 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
           )}
 
         {!isUser && !hasPresentationBlocks && sections && typeof sections === 'object' && (
-          <AdvisorySections sections={sections} />
+          <AdvisorySections
+            sections={sections}
+            engagementId={engagementId}
+            turnId={message.run_id ?? sessionId}
+          />
         )}
 
         {!isUser && urls.length > 0 && (
@@ -316,29 +417,11 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
         )}
 
         {!isUser && message.suggested_outputs && message.suggested_outputs.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-3">
-            {message.suggested_outputs.map((cta: SuggestedOutput) => (
-              <button
-                key={`${cta.skill}-${cta.endpoint}`}
-                type="button"
-                onClick={async () => {
-                  const ep = cta.endpoint.includes('{session_id}')
-                    ? cta.endpoint.replace('{session_id}', sessionId || '')
-                    : cta.endpoint;
-                  try {
-                    const res = await apiPost<{ export_url?: string; exports?: { docx?: string; pptx?: string } }>(ep, {});
-                    const url = String(res.export_url || res.exports?.docx || res.exports?.pptx || '');
-                    if (url) window.open(url.startsWith('/') ? url : url, '_blank');
-                  } catch {
-                    /* surfaced via parent error handling if wired */
-                  }
-                }}
-                className="text-xs px-3 py-1.5 rounded-full border border-deloitte-green text-deloitte-green hover:bg-emerald-50"
-              >
-                {cta.label}
-              </button>
-            ))}
-          </div>
+          <SuggestedOutputButtons
+            outputs={message.suggested_outputs}
+            sessionId={sessionId}
+            onExportError={onExportError}
+          />
         )}
 
         {!isUser && message.next_options && message.next_options.length > 0 && (() => {

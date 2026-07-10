@@ -126,6 +126,119 @@ def _executive_takeaway(
     return " ".join(sentences)
 
 
+def _spend_by_category(outputs: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    out: Dict[str, Dict[str, Any]] = {}
+    for row in outputs.get("spend-profiler", {}).get("category_profile", []) or []:
+        if isinstance(row, dict):
+            cid = str(row.get("category_id") or "")
+            if cid:
+                out[cid] = row
+    return out
+
+
+def _lever_so_what(
+    init: Dict[str, Any],
+    bench: Dict[str, Any] | None,
+    spend_cat: Dict[str, Any] | None,
+    currency: str,
+) -> str:
+    """Per-lever implication line from data at hand — never fabricated."""
+    parts: List[str] = []
+    eb = (init.get("ebitda_impact") or {}).get("ebitda_bps")
+    if eb is not None:
+        bps = float(eb)
+        if bps != 0:
+            parts.append(f"~{bps:.0f} bps EBITDA uplift at mid-case realization")
+    if bench:
+        gap = float(bench.get("estimated_saving_amount") or 0)
+        if gap > 0:
+            parts.append(f"closing peer gap unlocks {_fmt(gap, currency)}")
+    if spend_cat and spend_cat.get("concentration_flag") == "high":
+        suppliers = spend_cat.get("top_suppliers") or []
+        if suppliers and isinstance(suppliers[0], dict):
+            share = float(suppliers[0].get("share_of_category") or 0)
+            if share >= 0.4:
+                name = suppliers[0].get("supplier") or "top supplier"
+                parts.append(f"{name} holds {share:.0%} — negotiation leverage is high")
+    payback = init.get("payback_months")
+    if payback is not None:
+        parts.append(f"{int(payback)}-month payback if executed")
+    return "; ".join(parts[:3])
+
+
+def _sme_qualification_narrative(outputs: Dict[str, Any], currency: str) -> str:
+    """Compose SME critique narrative from sme-critique skill output."""
+    sme = outputs.get("sme-critique", {}) or {}
+    summary = sme.get("critique_summary") or {}
+    critiques = [c for c in (sme.get("initiative_critiques") or []) if isinstance(c, dict)]
+    if not summary and not critiques:
+        return ""
+
+    parts: List[str] = []
+    total = int(summary.get("total_initiatives") or len(critiques))
+    if total > 0:
+        ready = int(summary.get("ready_count") or 0)
+        probe = int(summary.get("probe_count") or 0)
+        insufficient = int(summary.get("insufficient_count") or 0)
+        savings_ready = float(summary.get("savings_ready") or 0)
+        savings_probe = float(summary.get("savings_probe") or 0)
+        savings_insufficient = float(summary.get("savings_insufficient") or 0)
+        parts.append(
+            f"Of {total} modeled initiatives, {ready} are ready to proceed "
+            f"({_fmt(savings_ready, currency)}), {probe} need probe validation "
+            f"({_fmt(savings_probe, currency)}), and {insufficient} have insufficient evidence "
+            f"({_fmt(savings_insufficient, currency)})."
+        )
+
+    weak = sorted(
+        critiques,
+        key=lambda c: (int(c.get("maturity_score") or 0), float(c.get("modelled_saving_3yr") or 0)),
+    )
+    named = 0
+    for c in weak:
+        if named >= 3:
+            break
+        verdict = str(c.get("sme_verdict") or "")
+        maturity = str(c.get("evidence_maturity") or "hypothesis")
+        if verdict == "proceed" and maturity in ("validated", "supported"):
+            continue
+        cat = c.get("category_name") or c.get("category_id") or "Category"
+        lever = c.get("lever_name") or c.get("lever") or "initiative"
+        saving = float(c.get("modelled_saving_3yr") or 0)
+        gaps = c.get("gaps") or []
+        gap_text = str(gaps[0]) if gaps else "limited supporting data"
+        parts.append(
+            f"**{cat} / {lever}** ({_fmt(saving, currency)}, {maturity} evidence): {gap_text}."
+        )
+        named += 1
+
+    dc = [c for c in critiques if c.get("double_count_risk")]
+    if dc:
+        labels = ", ".join(
+            f"{c.get('category_name', c.get('category_id'))}/{c.get('lever_name', c.get('lever'))}"
+            for c in dc[:2]
+        )
+        parts.append(
+            f"Double-count risk flagged for {labels} — validate savings stacking before committing."
+        )
+
+    top_probes = sme.get("top_probes") or sme.get("portfolio_probes") or []
+    for probe in top_probes:
+        if not isinstance(probe, dict):
+            continue
+        question = str(probe.get("question") or probe.get("probe_question") or "").strip()
+        if not question:
+            continue
+        data_req = str(probe.get("data_to_request") or probe.get("why_critical") or "").strip()
+        line = f"Priority probe: {question}"
+        if data_req:
+            line += f" Data to request: {data_req}."
+        parts.append(line)
+        break
+
+    return " ".join(parts)
+
+
 def _lever_evidence(
     init: Dict[str, Any],
     rc_row: Dict[str, Any] | None,
@@ -169,6 +282,7 @@ def _business_levers(
     initiatives = outputs.get("savings-modeler", {}).get("initiatives", []) or []
     rc_by_cat = _root_causes_by_category(outputs)
     bench_by_cat = {str(r.get("category_id")): r for r in _benchmark_rows(outputs) if r.get("category_id")}
+    spend_by_cat = _spend_by_category(outputs)
 
     levers: List[AdvisoryBusinessLever] = []
     for init in initiatives:
@@ -217,6 +331,7 @@ def _business_levers(
                 what_changes=what_changes,
                 why_it_works=why_it_works,
                 evidence=_lever_evidence(init, rc, bench, currency),
+                so_what=_lever_so_what(init, bench, spend_by_cat.get(cid), currency),
             )
         )
     return levers
@@ -529,8 +644,8 @@ def compose_deterministic_advisory(
     focus = _category_focus_section(outputs, currency, focus_category_id=focus_category_id)
     actions = _priority_actions(outputs, currency)
 
-    sme_note = ""
-    if sparse_note or len(levers) < 3:
+    sme_note = _sme_qualification_narrative(outputs, currency)
+    if not sme_note and (sparse_note or len(levers) < 3):
         sme_note = (
             "Deterministic narrative composed from available skill outputs; "
             "some portfolio sections are sparse — upload fuller spend or run additional skills for depth."

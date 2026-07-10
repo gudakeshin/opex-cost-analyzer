@@ -457,6 +457,7 @@ async def run_opar_loop(
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
     chat_history: list[dict[str, str]] | None = None,
+    turn_id: str | None = None,
 ) -> ReflectOutput:
     """Run full Observe -> Plan -> Act -> Reflect cycle (async-native)."""
     _opar_start = time.perf_counter()
@@ -470,6 +471,7 @@ async def run_opar_loop(
             thinking_enabled=thinking_enabled,
             thinking_budget_tokens=thinking_budget_tokens,
             chat_history=chat_history,
+            turn_id=turn_id,
         )
     finally:
         opar_cycle_duration_seconds.observe(time.perf_counter() - _opar_start)
@@ -484,6 +486,7 @@ async def resume_opar_loop(
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
     chat_history: list[dict[str, str]] | None = None,
+    turn_id: str | None = None,
 ) -> ReflectOutput:
     """Resume a suspended OPAR run after the user answers a clarification probe."""
     cp = checkpoint_store.get(checkpoint_id)
@@ -518,6 +521,7 @@ async def resume_opar_loop(
         waive_spend_requirement=bool(overrides["waive_spend_requirement"]),
         business_override_note=overrides.get("business_override_note"),
         chat_history=chat_history,
+        turn_id=turn_id,
     )
     checkpoint_store.mark_resumed(checkpoint_id, result_snapshot=result.model_dump(mode="json"))
     return result
@@ -539,6 +543,7 @@ async def _run_opar_loop_inner(
     waive_spend_requirement: bool = False,
     business_override_note: str | None = None,
     chat_history: list[dict[str, str]] | None = None,
+    turn_id: str | None = None,
 ) -> ReflectOutput:
 
     _add_progress_step(progress, "observe", "Understanding your request...")
@@ -549,6 +554,7 @@ async def _run_opar_loop_inner(
         session_id,
         user_id,
         file_ids,
+        turn_id=turn_id,
         clarification_answer=clarification_answer,
         clarification_resolved=clarification_resolved,
         waive_spend_requirement=waive_spend_requirement,

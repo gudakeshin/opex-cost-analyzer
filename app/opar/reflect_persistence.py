@@ -117,6 +117,41 @@ def apply_memory_updates(
     return user_updates, agent_updates
 
 
+def _compute_run_delta(
+    prior: Dict[str, Any] | None,
+    merged_outputs: Dict[str, Any],
+    currency: str,
+) -> Dict[str, Any] | None:
+    if not prior or not isinstance(prior, dict):
+        return None
+    prior_outputs = prior.get("skill_outputs") or {}
+    if not isinstance(prior_outputs, dict) or not prior_outputs:
+        return None
+
+    def _mid(outputs: Dict[str, Any]) -> float:
+        bridge = outputs.get("value-bridge-calculator") or {}
+        conf = bridge.get("confidence_bands") or {}
+        return float(conf.get("mid") or 0)
+
+    prior_mid = _mid(prior_outputs)
+    new_mid = _mid(merged_outputs)
+    if prior_mid <= 0 and new_mid <= 0:
+        return None
+
+    prior_adv = prior.get("advisory_sections") or {}
+    prior_headline = ""
+    if isinstance(prior_adv, dict):
+        prior_headline = str(prior_adv.get("executive_takeaway") or "")[:240]
+
+    return {
+        "previous_headline": prior_headline,
+        "prior_mid_savings": prior_mid,
+        "current_mid_savings": new_mid,
+        "delta_mid_savings": new_mid - prior_mid,
+        "currency": currency,
+    }
+
+
 def persist_session_analysis(
     *,
     ctx: ObserveContext,
@@ -126,9 +161,9 @@ def persist_session_analysis(
     reporting_currency: str,
     advisory_sections: AdvisorySections | None,
     regulatory_events: List[Dict[str, Any]] | None = None,
-) -> None:
+) -> Dict[str, Any] | None:
     if not validated:
-        return
+        return None
     existing_analysis = _memory.get("session", ctx.session_id)
     analysis_snapshot: Dict[str, Any] = dict(existing_analysis) if isinstance(existing_analysis, dict) else {}
     merged_outputs: Dict[str, Any] = {}
@@ -163,12 +198,21 @@ def persist_session_analysis(
     })
     if regulatory_events is not None:
         analysis_snapshot["regulatory_events"] = regulatory_events
+    run_delta = _compute_run_delta(
+        existing_analysis if isinstance(existing_analysis, dict) else None,
+        merged_outputs,
+        reporting_currency,
+    )
+    if run_delta:
+        analysis_snapshot["run_delta"] = run_delta
+        analysis_snapshot["previous_headline"] = run_delta.get("previous_headline") or ""
     if "spend-profiler" in validated:
         from app.services.spend_base import repair_spend_base_if_needed
 
         analysis_snapshot = repair_spend_base_if_needed(ctx.session_id, analysis_snapshot)
     _memory.put("session", ctx.session_id, analysis_snapshot)
     _maybe_seed_pipeline(ctx, manifest, analysis_snapshot, merged_outputs, validated, advisory_sections)
+    return run_delta
 
 
 def _maybe_seed_pipeline(
@@ -233,11 +277,20 @@ def record_advisory_provenance(
     ctx: ObserveContext,
     validated: Dict[str, Dict[str, Any]],
     advisory_sections: AdvisorySections | None,
+    *,
+    narrative_mode: str = "llm",
 ) -> Dict[str, Any] | None:
     if not advisory_sections or not advisory_sections.executive_takeaway:
         return None
     try:
         from app.llm.prompts import prompt_version_map
+
+        model_version = (
+            "deterministic-composer" if narrative_mode == "deterministic" else "claude-sonnet-4-6"
+        )
+        metadata: Dict[str, Any] = {"narrative_mode": narrative_mode}
+        if narrative_mode == "llm":
+            metadata["prompt_versions"] = prompt_version_map()
 
         return record_llm_narrative(
             narrative=advisory_sections.executive_takeaway,
@@ -245,9 +298,9 @@ def record_advisory_provenance(
             turn_id=ctx.turn_id,
             skill_outputs_used=list(validated.keys()),
             prompt_text=ctx.user_message,
-            model_version="claude-sonnet-4-6",
+            model_version=model_version,
             seed=0,
-            metadata={"prompt_versions": prompt_version_map()},
+            metadata=metadata,
         )
     except Exception:
         # Provenance is the audit trail for LLM narratives; losing a record

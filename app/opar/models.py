@@ -192,6 +192,7 @@ class AdvisoryBusinessLever(BaseModel):
     what_changes: str
     why_it_works: str
     evidence: List[str] = Field(default_factory=list)
+    so_what: str = ""
 
 
 class AdvisoryActionItem(BaseModel):
@@ -286,3 +287,4 @@ class ReflectOutput(BaseModel):
     regulatory_events: List[Dict[str, Any]] = Field(default_factory=list)
     forced_regulatory_decision: bool = False
     narrative_provenance_tag: Optional[Dict[str, Any]] = None
+    run_delta: Optional[Dict[str, Any]] = None

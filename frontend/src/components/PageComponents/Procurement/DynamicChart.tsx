@@ -13,6 +13,9 @@ import {
   ResponsiveContainer,
   CartesianGrid,
   Cell,
+  ScatterChart,
+  Scatter,
+  ZAxis,
 } from 'recharts';
 import { formatSpendAmount } from '../../../utils/analysisInsights';
 import type { ChartSpec, ChartSeries, ChartUnit } from '../../../types';
@@ -95,6 +98,33 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({ spec, currency }) =>
 
   const tooltipStyle = { fontSize: 11, borderRadius: 8, border: '1px solid #E0E0E0' };
   const axisTick = { fontSize: 9, fill: GRAY } as const;
+
+  // ----- Scatter -----
+  if (type === 'scatter') {
+    const xKeyScatter = series[0]?.key ?? 'x';
+    const yKey = series[1]?.key ?? series[0]?.key ?? 'y';
+    const scatterData = data.map((row) => ({
+      x: Number(row[xKey] ?? row[xKeyScatter] ?? 0),
+      y: Number(row[yKey] ?? 0),
+      name: String(row.name ?? row[xKey] ?? ''),
+    }));
+    return (
+      <ResponsiveContainer width="100%" height={220}>
+        <ScatterChart margin={{ top: 8, right: 16, left: 4, bottom: 4 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#E0E0E0" />
+          <XAxis type="number" dataKey="x" name={series[0]?.name ?? xKey} tickFormatter={fmt} tick={axisTick} axisLine={false} tickLine={false} />
+          <YAxis type="number" dataKey="y" name={series[1]?.name ?? yKey} tickFormatter={fmt} tick={axisTick} width={60} axisLine={false} tickLine={false} />
+          <ZAxis range={[48, 48]} />
+          <Tooltip
+            cursor={{ strokeDasharray: '3 3' }}
+            formatter={(v: number, n: string) => [fmt(Number(v)), n]}
+            contentStyle={tooltipStyle}
+          />
+          <Scatter data={scatterData} fill={GREEN} />
+        </ScatterChart>
+      </ResponsiveContainer>
+    );
+  }
 
   // ----- Waterfall -----
   if (type === 'waterfall') {

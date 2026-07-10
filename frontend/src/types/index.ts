@@ -222,6 +222,15 @@ export interface ChatMessage {
   charts?: ChartSpec[];
   suggested_outputs?: SuggestedOutput[];
   response_metadata?: ChatResponseMetadata;
+  run_delta?: RunDelta;
+}
+
+export interface RunDelta {
+  previous_headline?: string;
+  prior_mid_savings?: number;
+  current_mid_savings?: number;
+  delta_mid_savings?: number;
+  currency?: string;
 }
 
 export interface SessionCreatePayload {
@@ -485,6 +494,8 @@ export interface V1ChatResponse {
   response_metadata?: ChatResponseMetadata;
   charts?: ChartSpec[];
   suggested_outputs?: SuggestedOutput[];
+  narrative_provenance_tag?: Record<string, unknown>;
+  run_delta?: RunDelta;
 }
 
 export interface ChatPlanPreview {

@@ -12,6 +12,7 @@ from app.services.business_case import build_business_case, export_docx, export_
 from app.services.cfo_brief import build_cfo_brief, export_cfo_brief_docx
 from app.services.compliance import append_audit_event
 from app.services.dashboard import build_dashboard_html
+from app.services.evidence_appendix import build_evidence_appendix, export_evidence_appendix_docx
 from app.services.mor_pack import build_mor_pack, export_mor_docx
 from app.services.pipeline import list_initiatives, pipeline_summary
 from app.services.pipeline_seed import seed_initiatives_from_analysis
@@ -178,6 +179,23 @@ def create_pmo_export(session_id: str) -> Dict[str, Any]:
         "filename": path.name,
         "initiative_count": len(initiatives),
     }
+
+
+@router.post("/api/evidence-appendix/{session_id}")
+@router.post("/api/v1/evidence-appendix/{session_id}")
+def create_evidence_appendix(session_id: str) -> Dict[str, Any]:
+    validate_session_id(session_id)
+    analysis = _memory.get("session", session_id)
+    if not analysis:
+        raise HTTPException(status_code=404, detail="No analysis for session")
+    ctx = _engagement_context(session_id, analysis)
+    appendix = build_evidence_appendix(
+        analysis,
+        company_name=ctx["company_name"],
+    )
+    path = export_evidence_appendix_docx(appendix, f"{session_id}_evidence_appendix.docx")
+    append_audit_event(f"evidence_appendix_generated session_id={session_id}")
+    return {"evidence_appendix": appendix, "export_url": f"/api/exports/{path.name}", "filename": path.name}
 
 
 @router.get("/api/sensitivity/{session_id}")

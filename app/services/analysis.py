@@ -41,6 +41,59 @@ def load_taxonomy() -> Dict[str, Any]:
     return _TAXONOMY
 
 
+def _attach_deterministic_advisory(
+    state_dict: Dict[str, Any],
+    *,
+    skill_outputs: Dict[str, Dict[str, Any]],
+    prior_session: Dict[str, Any] | None,
+    company_name: str,
+    reporting_currency: str,
+    session_id: str,
+    engagement_id: str | None,
+    run_id: str | None,
+) -> None:
+    """Compose deterministic advisory sections for the batch analyze path (mirrors OPAR reflect)."""
+    from app.opar.reflect import _ensure_evidence_appendix_cta
+    from app.opar.reflect_persistence import _compute_run_delta
+    from app.opar.provenance import record_llm_narrative
+    from app.services.narrative_composer import compose_deterministic_advisory
+
+    advisory = compose_deterministic_advisory(
+        skill_outputs,
+        company_name=company_name,
+        currency=reporting_currency,
+    )
+    state_dict["advisory_sections"] = advisory.model_dump()
+    state_dict["response_metadata"] = {"narrative_mode": "deterministic"}
+    state_dict["used_llm_synthesis"] = False
+
+    run_delta = _compute_run_delta(prior_session, skill_outputs, reporting_currency)
+    if run_delta:
+        state_dict["run_delta"] = run_delta
+        state_dict["previous_headline"] = run_delta.get("previous_headline") or ""
+
+    suggested = _ensure_evidence_appendix_cta([], session_id, skill_outputs)
+    if suggested:
+        state_dict["suggested_outputs"] = [s.model_dump() for s in suggested]
+
+    prov_eid = engagement_id or session_id
+    if advisory.executive_takeaway and prov_eid and run_id:
+        try:
+            tag = record_llm_narrative(
+                narrative=advisory.executive_takeaway,
+                engagement_id=prov_eid,
+                turn_id=run_id,
+                skill_outputs_used=list(skill_outputs.keys()),
+                prompt_text="run analysis",
+                model_version="deterministic-composer",
+                seed=0,
+                metadata={"narrative_mode": "deterministic"},
+            )
+            state_dict["narrative_provenance_tag"] = tag
+        except Exception:
+            pass
+
+
 def run_core_pipeline(
     session_id: str,
     lines: List[NormalizedSpendLine],
@@ -59,6 +112,7 @@ def run_core_pipeline(
     ingestion_summary: str | None = None,
     progress_cb: Callable[[str, str], None] | None = None,
     source_files: Dict[str, List[str]] | None = None,
+    run_id: str | None = None,
 ) -> Dict[str, Any]:
     # --- Traceability scaffolding --------------------------------------------
     # Build a human-readable, ordered trace of how the analysis is derived, with
@@ -376,6 +430,8 @@ def run_core_pipeline(
     has_contracts = any(ln.contract_expiry_date or ln.contract_status for ln in lines)
     has_multi_entity = len({ln.legal_entity_id for ln in lines if ln.legal_entity_id}) >= 2 or entity_tree is not None
 
+    prior_session = _memory.get("session", session_id)
+
     state = SessionAnalysisState(
         session_id=session_id,
         engagement_id=engagement_id,
@@ -392,6 +448,16 @@ def run_core_pipeline(
     if conflict_user_actions:
         state_dict["conflict_user_actions"] = conflict_user_actions
     state_dict = bump_spend_base_revision(state_dict)
+    _attach_deterministic_advisory(
+        state_dict,
+        skill_outputs=skill_outputs,
+        prior_session=prior_session if isinstance(prior_session, dict) else None,
+        company_name=company_name or "Client",
+        reporting_currency=reporting_currency,
+        session_id=session_id,
+        engagement_id=engagement_id,
+        run_id=run_id,
+    )
     _memory.put("session", session_id, state_dict)
     # Persist a thin manifest snapshot so get_session_manifest can recover the
     # session directory even if data/uploads/{id}/ is wiped after analysis.
@@ -431,7 +497,7 @@ def run_core_pipeline(
             "conflict_count": conflict_detection.get("conflict_count", 0),
         },
     )
-    return state.model_dump(mode="json")
+    return state_dict
 
 
 def run_incremental_pipeline(

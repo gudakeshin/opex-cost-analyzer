@@ -460,6 +460,7 @@ async def analyze_session(request: Request, session_id: str, payload: AnalyzeReq
             ingestion_summary=ingestion_summary or None,
             progress_cb=progress_cb,
             source_files=source_files,
+            run_id=run_id,
         )
     except Exception as exc:
         if run_id:

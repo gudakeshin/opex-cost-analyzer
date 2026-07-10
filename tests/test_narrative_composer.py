@@ -6,6 +6,7 @@ from app.services.narrative_composer import (
     build_citations,
     compose_deterministic_advisory,
     provenance_banner_text,
+    _sme_qualification_narrative,
 )
 
 
@@ -179,3 +180,73 @@ def test_sparse_data_partial_mode() -> None:
 def test_provenance_banner_only_for_deterministic() -> None:
     assert provenance_banner_text({"mode": "deterministic", "llm_skip_reason": "provider_billing"})
     assert provenance_banner_text({"mode": "llm"}) is None
+
+
+def _sme_outputs() -> dict:
+    base = _rich_outputs()
+    base["sme-critique"] = {
+        "critique_summary": {
+            "total_initiatives": 3,
+            "ready_count": 1,
+            "probe_count": 1,
+            "insufficient_count": 1,
+            "savings_ready": 2_500_000,
+            "savings_probe": 1_100_000,
+            "savings_insufficient": 600_000,
+        },
+        "initiative_critiques": [
+            {
+                "category_id": "MKT",
+                "category_name": "Marketing",
+                "lever": "agency_fee_reset",
+                "lever_name": "Agency Fee Reset",
+                "modelled_saving_3yr": 600_000,
+                "evidence_maturity": "hypothesis",
+                "maturity_score": 1,
+                "sme_verdict": "insufficient_data",
+                "double_count_risk": False,
+                "gaps": ["No contract expiry data on file"],
+            },
+            {
+                "category_id": "IT",
+                "category_name": "IT & Technology",
+                "lever": "license_rightsizing",
+                "lever_name": "License Rightsizing",
+                "modelled_saving_3yr": 2_500_000,
+                "evidence_maturity": "indicative",
+                "maturity_score": 2,
+                "sme_verdict": "probe_first",
+                "double_count_risk": True,
+                "gaps": ["Utilization baseline not validated"],
+            },
+        ],
+        "top_probes": [
+            {
+                "question": "What percentage of EA seats are actively used?",
+                "data_to_request": "License utilization report from SAM tool",
+            }
+        ],
+    }
+    return base
+
+
+def test_sme_qualification_narrative_names_categories_and_maturity() -> None:
+    text = _sme_qualification_narrative(_sme_outputs(), "INR")
+    assert "Marketing" in text
+    assert "hypothesis" in text
+    assert "Double-count risk" in text
+    assert "Priority probe" in text
+    assert "License utilization" in text or "SAM tool" in text
+
+
+def test_compose_advisory_uses_sme_critique_not_sparse_stub() -> None:
+    advisory = compose_deterministic_advisory(_sme_outputs(), company_name="Acme", currency="INR")
+    assert "Marketing" in advisory.sme_qualification_narrative
+    assert "Deterministic narrative composed" not in advisory.sme_qualification_narrative
+
+
+def test_business_lever_so_what_contains_currency_or_bps() -> None:
+    advisory = compose_deterministic_advisory(_rich_outputs(), company_name="Acme", currency="INR")
+    assert advisory.business_levers
+    with_figure = [lv for lv in advisory.business_levers if lv.so_what and ("₹" in lv.so_what or "bps" in lv.so_what)]
+    assert with_figure, "expected at least one lever with currency or bps in so_what"
