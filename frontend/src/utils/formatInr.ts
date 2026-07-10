@@ -44,6 +44,26 @@ export function formatCr(value: number, opts?: FormatCrOptions): string {
   return `${sym}${formatted} ${unit}${suffix}`;
 }
 
+export function currencySymbol(currency = 'INR'): string {
+  const c = currency.toUpperCase();
+  return c === 'USD' ? '$' : c === 'EUR' ? '€' : c === 'GBP' ? '£' : '₹';
+}
+
+/** Adaptive amount formatting: Cr/M units when the scaled value is readable
+ * (≥ 0.05 Cr / 0.05 M), otherwise the raw amount — invoice-level lines would
+ * all collapse to "₹0 Cr" under the fixed Cr scale. */
+export function formatAmount(value: number, currency = 'INR'): string {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return '—';
+  const scaled = toCr(n, currency);
+  if (n === 0 || Math.abs(scaled) >= 0.05) {
+    const decimals = Math.abs(scaled) >= 100 ? 0 : Math.abs(scaled) >= 1 ? 1 : 2;
+    return formatCr(n, { currency, decimals });
+  }
+  const locale = currency.toUpperCase() === 'INR' ? 'en-IN' : 'en-US';
+  return `${currencySymbol(currency)}${n.toLocaleString(locale, { maximumFractionDigits: 0 })}`;
+}
+
 export function formatBps(value: number): string {
   const n = Number(value);
   if (!Number.isFinite(n)) return '—';

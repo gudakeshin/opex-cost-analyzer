@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { formatCr } from '../../../utils/formatInr';
+import { formatAmount } from '../../../utils/formatInr';
 import { copyText, downloadTextFile, toCsv, toTsv } from '../../../utils/exportTable';
 
 export interface QueryResultLike {
@@ -103,7 +103,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, currency }) 
     if (kind === 'currency') {
       const n = asNumber(v);
       if (n === null) return { text: String(v) };
-      return { text: formatCr(n, { currency }), title: String(n) };
+      return { text: formatAmount(n, currency), title: String(n) };
     }
     if (kind === 'number') {
       const n = asNumber(v);

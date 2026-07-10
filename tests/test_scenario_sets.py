@@ -209,3 +209,20 @@ def test_custom_sensitivity_accepts_lever_target(client, monkeypatch, tmp_path):
     assert custom["target_id"] == "license_rightsizing"
     # mid=100, lever share=40 → adjusted = 100 - 40 + 40*0.5 = 80; * base exec (~1)
     assert custom["savings_3yr"] == pytest.approx(80.0, rel=0.05)
+
+
+def test_base_npv_falls_back_to_mid_band_without_phased_savings():
+    """Base NPV must not collapse to 0 when the savings model has no initiatives —
+    every Δ-vs-base comparison in the What-If UI would be meaningless."""
+    from app.services.sensitivity import compute_sensitivity
+
+    result = compute_sensitivity(
+        {"confidence_bands": {"low": 80, "mid": 100, "high": 120}},
+        savings_model={"initiatives": []},
+        discount_rate=0.10,
+    )
+    base = next(s for s in result["scenarios"] if s["name"] == "base")
+    assert base["npv_pretax"] > 0
+    # Annuity of mid/3 per year over 3 years at 10% ≈ 82.9
+    assert base["npv_pretax"] == pytest.approx(82.9, rel=0.01)
+    assert base["npv_aftertax"] == base["npv_pretax"]  # tax defaults to 0

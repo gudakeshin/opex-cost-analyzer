@@ -171,6 +171,14 @@ def compute_sensitivity(
     conservative_exec = base_exec * _conservative_rate
     accelerated_exec = base_exec * _accelerated_rate
 
+    # Base NPV uses phased cash flows only when the savings model actually has
+    # them; otherwise fall back to the mid-band annuity like every other
+    # scenario — a zero base NPV makes the "Δ NPV vs base" comparison meaningless.
+    def _base_npv(tax_rate: float) -> float:
+        if any(phased_savings):
+            return _scenario_npv(base_exec, int(36 * timeline_factor), tax_rate)
+        return _simple_npv(mid * base_exec, 3.0 * timeline_factor, tax_rate)
+
     # Driver-adjusted savings (e.g., headcount growth increases HR/IT spend opportunity)
     headcount_growth = float(drivers.get("headcount_growth_pct", 0.0))
     revenue_growth = float(drivers.get("revenue_growth_pct", 0.0))
@@ -213,8 +221,8 @@ def compute_sensitivity(
             ),
             "savings_3yr": round(mid * base_exec, 2),
             "timeline_months": int(36 * timeline_factor),
-            "npv_pretax": round(_scenario_npv(base_exec, int(36 * timeline_factor), 0.0), 2),
-            "npv_aftertax": round(_scenario_npv(base_exec, int(36 * timeline_factor), effective_tax_rate), 2),
+            "npv_pretax": round(_base_npv(0.0), 2),
+            "npv_aftertax": round(_base_npv(effective_tax_rate), 2),
             "execution_rate": base_exec,
             "driver_adjusted": bool(drivers),
         },
