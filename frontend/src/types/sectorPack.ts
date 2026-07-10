@@ -41,8 +41,10 @@ export interface PeerRow {
   ticker?: string;
   exchange?: string;
   entity_type?: string;
-  total_assets_cr?: number;
   revenue_cr?: number;
+  group_revenue_cr?: number;
+  total_assets_cr?: number;
+  gwp_cr?: number;
 }
 
 export interface TaxonomyCategoryRow {

@@ -1,13 +1,30 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { PeerMetricDraftRow, PeerRow, PeersDraft } from '../../../types/sectorPack';
-import { EditableTable } from './EditableTable';
+import { activePeerSizeColumns } from '../../../utils/peerSizeFields';
+import { EditableTable, type EditableColumnDef } from './EditableTable';
 
 interface PeersEditorProps {
   draft: PeersDraft;
   onChange: (draft: PeersDraft) => void;
 }
 
-export const PeersEditor: React.FC<PeersEditorProps> = ({ draft, onChange }) => (
+export const PeersEditor: React.FC<PeersEditorProps> = ({ draft, onChange }) => {
+  const peerColumns = useMemo((): EditableColumnDef<PeerRow>[] => {
+    const base: EditableColumnDef<PeerRow>[] = [
+      { key: 'name', header: 'Name', minWidth: '12rem' },
+      { key: 'ticker', header: 'Ticker' },
+      { key: 'exchange', header: 'Exchange' },
+      { key: 'entity_type', header: 'Entity type' },
+    ];
+    const sizeColumns = activePeerSizeColumns(draft.peers).map(({ key, header }) => ({
+      key,
+      header,
+      type: 'number' as const,
+    }));
+    return [...base, ...sizeColumns];
+  }, [draft.peers]);
+
+  return (
   <div className="space-y-6">
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
       {(['sector', 'currency', 'data_source', 'refresh_date'] as const).map((key) => (
@@ -25,13 +42,7 @@ export const PeersEditor: React.FC<PeersEditorProps> = ({ draft, onChange }) => 
     <section>
       <h3 className="text-xs font-semibold uppercase text-brand-muted mb-2">Peers</h3>
       <EditableTable<PeerRow>
-        columns={[
-          { key: 'name', header: 'Name', minWidth: '12rem' },
-          { key: 'ticker', header: 'Ticker' },
-          { key: 'exchange', header: 'Exchange' },
-          { key: 'entity_type', header: 'Entity type' },
-          { key: 'total_assets_cr', header: 'Assets (Cr)', type: 'number' },
-        ]}
+        columns={peerColumns}
         rows={draft.peers}
         onChange={(peers) => onChange({ ...draft, peers })}
         newRow={() => ({ name: '', ticker: '' })}
@@ -55,4 +66,5 @@ export const PeersEditor: React.FC<PeersEditorProps> = ({ draft, onChange }) => 
       />
     </section>
   </div>
-);
+  );
+};

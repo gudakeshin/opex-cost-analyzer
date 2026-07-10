@@ -8,9 +8,11 @@ import type {
   CategoryBenchmark,
   KpiRow,
   LeverRow,
+  PeerRow,
   SectorPackDetailResponse,
   SectorPackRow,
 } from '../../../types/sectorPack';
+import { peerSizeColumnHeader, peerSizeValue } from '../../../utils/peerSizeFields';
 
 export type { SectorPackRow, SectorPackDetailResponse };
 
@@ -302,9 +304,11 @@ function PeersPanel({
   peers,
   metrics,
 }: {
-  peers: Array<{ name?: string; ticker?: string; revenue_cr?: number }>;
+  peers: PeerRow[];
   metrics: Record<string, { p25?: number; p50?: number; p75?: number }>;
 }) {
+  const sizeHeader = peerSizeColumnHeader(peers);
+
   return (
     <div className="space-y-4">
       {peers.length > 0 ? (
@@ -314,19 +318,22 @@ function PeersPanel({
               <tr>
                 <th className="text-left p-2">Peer</th>
                 <th className="text-left p-2">Ticker</th>
-                <th className="text-right p-2">Revenue (Cr)</th>
+                <th className="text-right p-2">{sizeHeader}</th>
               </tr>
             </thead>
             <tbody>
-              {peers.map((p) => (
+              {peers.map((p) => {
+                const size = peerSizeValue(p);
+                return (
                 <tr key={p.ticker || p.name} className="border-t border-brand-border">
                   <td className="p-2">{p.name}</td>
                   <td className="p-2 text-brand-muted">{p.ticker || '—'}</td>
                   <td className="p-2 text-right tabular-nums">
-                    {p.revenue_cr != null ? p.revenue_cr.toLocaleString('en-IN') : '—'}
+                    {size != null ? size.toLocaleString('en-IN') : '—'}
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
