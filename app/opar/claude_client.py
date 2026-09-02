@@ -1060,10 +1060,10 @@ def _scale_thinking_budget(payload: Dict[str, Any], budget: int) -> int:
 
 
 # Strict-mode advisory JSON (250+ word category section, 3+ levers with evidence,
-# quick wins, callouts, 30/60/90 plan) measures 2.2–3k output tokens; a lower cap
-# truncates mid-JSON (stop_reason=max_tokens) and the parse failure degrades the
-# whole turn to provider_failed.
-_ADVISORY_MAX_OUTPUT_TOKENS = 4096
+# quick wins, callouts, 30/60/90 plan) measures 2.2–3k output tokens, but portfolio-scope
+# payloads (one category_focus_section per priority category) can exceed 4096 and truncate
+# mid-JSON (stop_reason=max_tokens), degrading the whole turn to provider_failed.
+_ADVISORY_MAX_OUTPUT_TOKENS = 8192
 
 
 def _timeout_budget_seconds(payload: Dict[str, Any], strict_mode: bool = False) -> int:

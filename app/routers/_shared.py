@@ -225,6 +225,7 @@ def merge_context_into_manifest(
     audience: str | None = None,
     headcount: float | None = None,
     peer_set_name: str | None = None,
+    industry_user_set: bool = False,
 ) -> bool:
     changed = False
     if company_name is not None and manifest.get("company_name") != company_name:
@@ -234,9 +235,13 @@ def merge_context_into_manifest(
         from app.services.sector_packs import normalize_industry_selection
 
         normalized = normalize_industry_selection(industry)
-        if normalized and manifest.get("industry") != normalized:
-            manifest["industry"] = normalized
-            changed = True
+        if normalized:
+            if industry_user_set and not manifest.get("industry_user_set"):
+                manifest["industry_user_set"] = True
+                changed = True
+            if manifest.get("industry") != normalized:
+                manifest["industry"] = normalized
+                changed = True
     if annual_revenue is not None:
         rev = max(float(annual_revenue), 0.0)
         if float(manifest.get("annual_revenue") or 0.0) != rev:

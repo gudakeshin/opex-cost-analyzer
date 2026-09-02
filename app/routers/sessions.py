@@ -445,6 +445,7 @@ async def analyze_session(request: Request, session_id: str, payload: AnalyzeReq
         selected_industry = resolve_sector_pack_id(
             payload.industry or manifest.get("industry") or ""
         ) or (payload.industry or manifest.get("industry") or "")
+        industry_user_set = bool(manifest.get("industry_user_set")) or payload.industry is not None
         analysis = await asyncio.to_thread(
             run_core_pipeline,
             session_id=session_id,
@@ -461,6 +462,7 @@ async def analyze_session(request: Request, session_id: str, payload: AnalyzeReq
             progress_cb=progress_cb,
             source_files=source_files,
             run_id=run_id,
+            industry_user_set=industry_user_set,
         )
     except Exception as exc:
         if run_id:
@@ -476,7 +478,11 @@ async def analyze_session(request: Request, session_id: str, payload: AnalyzeReq
     from app.services.engagement_sanity import is_placeholder_industry
 
     analysis_industry = str(analysis.get("industry") or "").strip()
-    if analysis_industry and is_placeholder_industry(manifest.get("industry")):
+    if (
+        analysis_industry
+        and is_placeholder_industry(manifest.get("industry"))
+        and not manifest.get("industry_user_set")
+    ):
         manifest["industry"] = analysis_industry
         manifest_changed = True
     if analysis.get("annual_revenue") and not manifest.get("annual_revenue"):
@@ -557,6 +563,7 @@ async def patch_session_manifest(session_id: str, payload: SessionManifestPatch)
             currency=payload.currency,
             audience=payload.audience,
             peer_set_name=payload.peer_set_name,
+            industry_user_set=payload.industry is not None,
         ):
             write_manifest(session_id, manifest)
     manifest.setdefault("session_id", session_id)

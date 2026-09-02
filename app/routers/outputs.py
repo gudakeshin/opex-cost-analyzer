@@ -6,6 +6,7 @@ from fastapi import APIRouter, Form, HTTPException, Query
 from fastapi.responses import FileResponse
 
 from app.config import OUTPUT_DIR
+from app.opar.models import AdvisorySections
 from app.routers._shared import _memory, read_manifest, validate_session_id
 from app.services.board_deck import build_board_deck, export_board_deck_pptx
 from app.services.business_case import build_business_case, export_docx, export_pdf_like_text
@@ -62,6 +63,25 @@ def create_dashboard(session_id: str) -> Dict[str, str]:
     return {"dashboard_url": f"/api/exports/{path.name}"}
 
 
+def _stored_advisory_and_provenance(
+    analysis: Dict[str, Any],
+) -> tuple[AdvisorySections | None, Dict[str, Any] | None]:
+    """Reuse the LLM-synthesized advisory from the last analysis run, if any,
+    so exports carry the same narrative instead of silently re-deriving a
+    deterministic one."""
+    metadata = analysis.get("response_metadata") or {}
+    if str(metadata.get("narrative_mode") or "") != "llm":
+        return None, None
+    raw = analysis.get("advisory_sections")
+    if not raw:
+        return None, None
+    try:
+        advisory = AdvisorySections.model_validate(raw)
+    except Exception:
+        return None, None
+    return advisory, {"mode": "llm"}
+
+
 def _engagement_context(session_id: str, analysis: Dict[str, Any]) -> Dict[str, Any]:
     """Resolve company / engagement-week / pack from analysis state + manifest."""
     manifest = read_manifest(session_id)
@@ -80,11 +100,14 @@ def create_board_deck(session_id: str) -> Dict[str, Any]:
     if not analysis:
         raise HTTPException(status_code=404, detail="No analysis for session")
     ctx = _engagement_context(session_id, analysis)
+    advisory, provenance = _stored_advisory_and_provenance(analysis)
     deck = build_board_deck(
         analysis,
         company_name=ctx["company_name"],
         engagement_week=ctx["engagement_week"],
         pack_id=ctx["pack_id"],
+        advisory=advisory,
+        narrative_provenance=provenance,
     )
     path = export_board_deck_pptx(deck, f"{session_id}_board_deck.pptx")
     append_audit_event(f"board_deck_generated session_id={session_id}")
@@ -99,11 +122,14 @@ def create_cfo_brief(session_id: str) -> Dict[str, Any]:
     if not analysis:
         raise HTTPException(status_code=404, detail="No analysis for session")
     ctx = _engagement_context(session_id, analysis)
+    advisory, provenance = _stored_advisory_and_provenance(analysis)
     brief = build_cfo_brief(
         analysis,
         engagement_week=ctx["engagement_week"],
         pack_id=ctx["pack_id"],
         company_name=ctx["company_name"],
+        advisory=advisory,
+        narrative_provenance=provenance,
     )
     path = export_cfo_brief_docx(brief, f"{session_id}_cfo_brief.docx")
     append_audit_event(f"cfo_brief_generated session_id={session_id}")
@@ -189,9 +215,11 @@ def create_evidence_appendix(session_id: str) -> Dict[str, Any]:
     if not analysis:
         raise HTTPException(status_code=404, detail="No analysis for session")
     ctx = _engagement_context(session_id, analysis)
+    _advisory, provenance = _stored_advisory_and_provenance(analysis)
     appendix = build_evidence_appendix(
         analysis,
         company_name=ctx["company_name"],
+        narrative_provenance=provenance,
     )
     path = export_evidence_appendix_docx(appendix, f"{session_id}_evidence_appendix.docx")
     append_audit_event(f"evidence_appendix_generated session_id={session_id}")

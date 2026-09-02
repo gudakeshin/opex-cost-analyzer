@@ -51,21 +51,64 @@ def _attach_deterministic_advisory(
     session_id: str,
     engagement_id: str | None,
     run_id: str | None,
+    industry: str = "",
+    annual_revenue: float = 0.0,
 ) -> None:
-    """Compose deterministic advisory sections for the batch analyze path (mirrors OPAR reflect)."""
+    """Compose advisory sections for the batch analyze path (mirrors OPAR reflect).
+
+    Tries live LLM synthesis first (same synthesizer chain the chat path uses);
+    falls back to the deterministic composer when the LLM is unavailable, out of
+    budget, or produces a low-quality result.
+    """
+    from app.opar.models import ObserveContext
     from app.opar.reflect import _ensure_evidence_appendix_cta
     from app.opar.reflect_persistence import _compute_run_delta
+    from app.opar.reflect_synthesis import generate_llm_advisory_sections
     from app.opar.provenance import record_llm_narrative
-    from app.services.narrative_composer import compose_deterministic_advisory
+    from app.services.llm_selection import get_resolved_llm_model
+    from app.services.narrative_composer import attach_citations, compose_deterministic_advisory
 
-    advisory = compose_deterministic_advisory(
-        skill_outputs,
-        company_name=company_name,
-        currency=reporting_currency,
+    manifest = {
+        "company_name": company_name,
+        "industry": industry,
+        "annual_revenue": annual_revenue,
+        "currency": reporting_currency,
+    }
+    ctx = ObserveContext(
+        user_message="Run full spend analysis and synthesize executive recommendations.",
+        wants_executive_narrative=True,
+        engagement_id=engagement_id or "",
+        session_id=session_id,
     )
+
+    llm_skip_reason: str | None = None
+    advisory = None
+    narrative_mode = "deterministic"
+    model_version = "deterministic-composer"
+    try:
+        llm_advisory, _thinking, llm_skip_reason = generate_llm_advisory_sections(
+            ctx, manifest, skill_outputs
+        )
+    except Exception:
+        llm_advisory, llm_skip_reason = None, "provider_failed"
+
+    if llm_advisory is not None:
+        advisory = attach_citations(llm_advisory, skill_outputs, currency=reporting_currency)
+        narrative_mode = "llm"
+        model_version = get_resolved_llm_model()
+    else:
+        advisory = compose_deterministic_advisory(
+            skill_outputs,
+            company_name=company_name,
+            currency=reporting_currency,
+        )
+
     state_dict["advisory_sections"] = advisory.model_dump()
-    state_dict["response_metadata"] = {"narrative_mode": "deterministic"}
-    state_dict["used_llm_synthesis"] = False
+    response_metadata: Dict[str, Any] = {"narrative_mode": narrative_mode}
+    if narrative_mode == "deterministic" and llm_skip_reason:
+        response_metadata["llm_skip_reason"] = llm_skip_reason
+    state_dict["response_metadata"] = response_metadata
+    state_dict["used_llm_synthesis"] = narrative_mode == "llm"
 
     run_delta = _compute_run_delta(prior_session, skill_outputs, reporting_currency)
     if run_delta:
@@ -85,9 +128,9 @@ def _attach_deterministic_advisory(
                 turn_id=run_id,
                 skill_outputs_used=list(skill_outputs.keys()),
                 prompt_text="run analysis",
-                model_version="deterministic-composer",
+                model_version=model_version,
                 seed=0,
-                metadata={"narrative_mode": "deterministic"},
+                metadata={"narrative_mode": narrative_mode},
             )
             state_dict["narrative_provenance_tag"] = tag
         except Exception:
@@ -109,6 +152,7 @@ def run_core_pipeline(
     entity_tree: Dict[str, Any] | None = None,
     segment_revenue: Dict[str, float] | None = None,
     sector_weights: Dict[str, float] | None = None,
+    industry_user_set: bool = False,
     ingestion_summary: str | None = None,
     progress_cb: Callable[[str, str], None] | None = None,
     source_files: Dict[str, List[str]] | None = None,
@@ -234,7 +278,7 @@ def run_core_pipeline(
             # Auto-detect industry (document signals → spend patterns) before any
             # benchmark-dependent skill runs and reads ctx.industry from manifest.
             ind = resolved["industry"]
-            if not ind or is_placeholder_industry(ind):
+            if not ind or (is_placeholder_industry(ind) and not industry_user_set):
                 inferred = str(output.get("inferred_industry") or "")
                 if not inferred and lines:
                     total_spend = float(outputs.get("spend-profiler", {}).get("total_spend", 0.0) or 0.0)
@@ -457,6 +501,8 @@ def run_core_pipeline(
         session_id=session_id,
         engagement_id=engagement_id,
         run_id=run_id,
+        industry=industry,
+        annual_revenue=annual_revenue,
     )
     _memory.put("session", session_id, state_dict)
     # Persist a thin manifest snapshot so get_session_manifest can recover the
