@@ -4,6 +4,7 @@ import json
 from typing import Any, Callable, Dict, List
 
 from app.config import ROOT_DIR
+from app.services.analysis_runs import AnalysisCancelled
 from app.memory import MemoryStore
 from app.models import NormalizedSpendLine, SessionAnalysisState
 from app.services.benchmarks import resolve_benchmark_payload
@@ -181,6 +182,8 @@ def run_core_pipeline(
         if progress_cb:
             try:
                 progress_cb("act", f"{title} — {detail}")
+            except AnalysisCancelled:
+                raise  # cooperative cancel: stop between stages
             except Exception:  # pragma: no cover - never let tracing break analysis
                 pass
 

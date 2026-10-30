@@ -37,6 +37,7 @@ from app.schemas import (
     SessionSummaryResponse,
 )
 from app.security.auth import current_principal, visible_to_principal
+from app.services import analysis_runs
 from app.services.analysis import load_taxonomy, run_core_pipeline
 from app.services.compliance import append_audit_event
 from app.services.pipeline_seed import seed_initiatives_from_analysis
@@ -353,6 +354,81 @@ async def analyze_session(request: Request, session_id: str, payload: AnalyzeReq
     validate_session_id(session_id)
     if not session_dir(session_id).exists():
         raise HTTPException(status_code=404, detail="Session not found")
+    run_id = payload.run_id or str(uuid.uuid4())
+    try:
+        analysis_runs.start(session_id, run_id)
+    except analysis_runs.AnalysisAlreadyRunning as exc:
+        if payload.background:
+            # Idempotent for background callers (e.g. a page reload): follow the run already in flight.
+            return {"run_id": exc.run_id, "status": "running", "already_running": True}
+        raise HTTPException(
+            status_code=409,
+            detail=f"An analysis is already running for this session (run {exc.run_id}).",
+        ) from exc
+    if payload.background:
+        task = asyncio.create_task(_execute_analysis(session_id, payload, run_id, foreground=False))
+        analysis_runs.attach_task(run_id, task)
+        return {"run_id": run_id, "status": "running"}
+    return await _execute_analysis(session_id, payload, run_id, foreground=True)
+
+
+async def _execute_analysis(
+    session_id: str, payload: AnalyzeRequest, run_id: str, *, foreground: bool
+) -> Dict[str, Any]:
+    """Run one analysis and record its outcome in the run registry."""
+    try:
+        analysis = await _analyze_session_impl(session_id, payload, run_id)
+    except analysis_runs.AnalysisCancelled:
+        analysis_runs.finish(run_id, "cancelled")
+        progress_complete(run_id, failed=True, error="cancelled")
+        append_audit_event(f"analysis_cancelled session_id={session_id} run_id={run_id}")
+        if foreground:
+            raise HTTPException(status_code=409, detail="Analysis cancelled.") from None
+        return {}
+    except HTTPException as exc:
+        analysis_runs.finish(run_id, "failed", error=str(exc.detail))
+        if foreground:
+            raise
+        progress_complete(run_id, failed=True, error=str(exc.detail)[:300])
+        return {}
+    except Exception as exc:
+        logger.exception("analysis_failed session_id=%s run_id=%s", session_id, run_id)
+        analysis_runs.finish(run_id, "failed", error=str(exc)[:300])
+        if foreground:
+            raise
+        progress_complete(run_id, failed=True, error=str(exc)[:300])
+        return {}
+    analysis_runs.finish(run_id, "completed")
+    return analysis
+
+
+@router.get("/api/v1/analyze/runs/{run_id}")
+def get_analysis_run(run_id: str) -> Dict[str, Any]:
+    """Status of one analysis run: running | cancelling | completed | failed | cancelled."""
+    run = analysis_runs.get(run_id)
+    if not run:
+        raise HTTPException(status_code=404, detail="Unknown analysis run (the server may have restarted).")
+    return run.to_dict()
+
+
+@router.post("/api/v1/analyze/runs/{run_id}/cancel")
+def cancel_analysis_run(run_id: str) -> Dict[str, Any]:
+    """Cooperative cancel: the run stops at its next checkpoint (between stages)."""
+    run = analysis_runs.request_cancel(run_id)
+    if not run:
+        raise HTTPException(status_code=404, detail="Unknown analysis run.")
+    return run.to_dict()
+
+
+@router.get("/api/v1/sessions/{session_id}/analysis-run")
+def get_active_analysis_run(session_id: str) -> Dict[str, Any]:
+    """The analysis currently in flight for this session, if any (lets a reloaded page resume)."""
+    validate_session_id(session_id)
+    run = analysis_runs.active_for_session(session_id)
+    return {"run": run.to_dict() if run else None}
+
+
+async def _analyze_session_impl(session_id: str, payload: AnalyzeRequest, run_id: str) -> Dict[str, Any]:
     manifest = read_manifest(session_id)
     if should_run_model_contextualizer(manifest.get("files", []), "run analysis"):
         model_manifest = manifest.get("model_manifest") if isinstance(manifest, dict) else None
@@ -431,14 +507,16 @@ async def analyze_session(request: Request, session_id: str, payload: AnalyzeReq
     # extension). Names let each trace step cite where its insight came from.
     source_files = _collect_source_files(manifest)
 
-    # Live progress: when the client supplies a run_id it polls
-    # GET /api/v1/chat/progress/{run_id} while the pipeline runs.
-    run_id = payload.run_id
-    progress_cb = None
-    if run_id:
-        progress_init(run_id, session_id)
-        progress_append(run_id, "observe", "Loading spend and context documents…")
-        progress_cb = lambda phase, msg: progress_append(run_id, phase, msg)  # noqa: E731
+    # Live progress: clients poll GET /api/v1/chat/progress/{run_id} while the pipeline runs.
+    # The callback is also the cancel checkpoint: it raises once a cancel was requested.
+    progress_init(run_id, session_id)
+    progress_append(run_id, "observe", "Loading spend and context documents…")
+
+    def progress_cb(phase: str, msg: str) -> None:
+        analysis_runs.check_cancel(run_id)
+        progress_append(run_id, phase, msg)
+
+    analysis_runs.check_cancel(run_id)
 
     try:
         from app.services.sector_packs import resolve_sector_pack_id

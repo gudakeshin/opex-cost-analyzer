@@ -121,6 +121,9 @@ class AnalyzeRequest(_FinancialParamsMixin):
     # Optional client-generated run id; when present, the analysis streams live
     # progress steps to GET /api/v1/chat/progress/{run_id} as it executes.
     run_id: str | None = None
+    # True = start the analysis in the background and return immediately with the run_id
+    # (poll GET /api/v1/analyze/runs/{run_id}); False = wait for the result in this request.
+    background: bool = False
 
 
 class SessionManifestPatch(BaseModel):
