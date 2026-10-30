@@ -406,6 +406,16 @@ def load_cached_spend_lines(engagement_id: str, document_id: str) -> List[Normal
     return _deserialize_lines(data)
 
 
+def load_cached_ingestion_report(engagement_id: str, document_id: str) -> Dict[str, Any]:
+    """The ingest report written when the document was parsed ({} when absent or unreadable)."""
+    path = document_parsed_dir(engagement_id, document_id) / "ingestion_report.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
 def load_cached_markdown(engagement_id: str, document_id: str) -> str:
     parsed = document_parsed_dir(engagement_id, document_id)
     for name in ("markdown.md", "text.md"):

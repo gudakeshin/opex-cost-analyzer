@@ -15,6 +15,7 @@ from docx import Document
 from docx.shared import Pt
 
 from app.config import OUTPUT_DIR
+from app.services.figure_basis import basis_lines, basis_of_figures
 from app.services.narrative_composer import compose_deterministic_advisory, provenance_banner_text
 from app.utils.inr_format import fmt_inr_cr
 
@@ -135,6 +136,7 @@ def build_cfo_brief(
         "next_decision_gate": f"Gate-{min(4, (engagement_week // 3) + 1)} (Week {min(12, engagement_week + 3 - (engagement_week % 3) or 3)})",
         "executive_takeaway": exec_takeaway[:600] if exec_takeaway else None,
         "narrative_provenance_banner": banner,
+        "basis_of_figures": basis_lines(basis_of_figures(analysis)),
     }
 
     return {
@@ -169,6 +171,11 @@ def export_cfo_brief_docx(brief: Dict[str, Any], filename: str) -> Path:
     run.bold = True
     run.font.size = Pt(18)
     p.add_run(f"(Range: {headline['range_display']})")
+    basis = brief["sections"].get("basis_of_figures") or []
+    if basis:
+        doc.add_heading("Basis of figures", level=2)
+        for line in basis:
+            doc.add_paragraph(line, style="List Bullet")
 
     bridge = brief["sections"]["shareholder_bridge"]
     doc.add_heading("Shareholder Value Bridge", level=1)

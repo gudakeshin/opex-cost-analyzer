@@ -130,3 +130,28 @@ def test_duplicate_upload_is_rejected_unless_allowed(client, tmp_path, monkeypat
     assert dup.status_code == 409
     assert "already uploaded" in dup.json()["detail"]
     assert _upload(allow_duplicate="true").status_code == 200
+
+
+def test_ingest_warnings_reach_the_analysis_corpus(client, tmp_path, monkeypatch):
+    _patch_engagements_dir(monkeypatch, tmp_path)
+    eid = client.post(
+        "/api/v1/engagements",
+        json={"company_name": "Messy Co", "industry": "it_ites", "annual_revenue": 1e9, "currency": "INR"},
+    ).json()["engagement_id"]
+    body = (
+        b"supplier,description,amount,currency\n"
+        b"Acme,cloud hosting,100000,INR\n"
+        b"Beta,freight charges,45000 Cr,INR\n"
+        b"Gamma,software licences,300,USD\n"
+    )
+    assert client.post(
+        f"/api/v1/engagements/{eid}/documents", files={"file": ("m.csv", body, "text/csv")}
+    ).status_code == 200
+
+    from app.services.engagement_corpus import load_engagement_corpus
+
+    _, _, reports, _ = load_engagement_corpus(eid)
+    assert len(reports) == 1
+    joined = " ".join(reports[0].get("warnings") or [])
+    assert "could not be read" in joined and "FX rate" in joined
+    assert reports[0]["quality"]["rows_dropped_unparseable_amount"] == 1

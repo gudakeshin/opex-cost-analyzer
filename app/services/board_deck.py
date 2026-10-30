@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from app.config import OUTPUT_DIR
+from app.services.figure_basis import basis_lines, basis_of_figures
 from app.services.narrative_composer import (
     compose_deterministic_advisory,
     provenance_banner_text,
@@ -290,6 +291,8 @@ def build_board_deck(
             "skill_count": len(outputs),
             "data_classification": "B2 (aggregates only; no raw PII in deck)",
             "narrative_provenance": "Snapshot stored; reproducible from seed+prompt+model.",
+            "basis_of_figures": " ".join(basis_lines(basis_of_figures(analysis)))
+            or "Headline savings assume full delivery of each initiative.",
         },
     })
 

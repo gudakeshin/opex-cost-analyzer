@@ -11,7 +11,11 @@ from app.services.engagements_store import (
     backfill_engagement_for_session,
     read_engagement_manifest,
 )
-from app.services.document_pipeline import load_cached_markdown, load_cached_spend_lines
+from app.services.document_pipeline import (
+    load_cached_ingestion_report,
+    load_cached_markdown,
+    load_cached_spend_lines,
+)
 from app.services.ingestion import parse_document, parse_spend_file, parse_spend_json
 
 
@@ -85,12 +89,20 @@ def load_engagement_corpus(
         cached_lines = load_cached_spend_lines(engagement_id, doc_id)
         if cached_lines:
             lines.extend(cached_lines)
-            reports.append({
+            report: Dict[str, Any] = {
                 "source_file": filename,
                 "document_id": doc_id,
                 "rows_parsed": len(cached_lines),
                 "origin": "engagement",
-            })
+            }
+            # Carry the parse-time quality stats and warnings (rows dropped, FX defaults, …)
+            # through to the session so the UI and exports can show them.
+            stored = load_cached_ingestion_report(engagement_id, doc_id)
+            if stored.get("warnings"):
+                report["warnings"] = list(stored["warnings"])
+            if isinstance(stored.get("quality"), dict):
+                report["quality"] = stored["quality"]
+            reports.append(report)
         markdown = load_cached_markdown(engagement_id, doc_id)
         if markdown.strip():
             docs_text.append(f"## {filename}\n{markdown.strip()}")

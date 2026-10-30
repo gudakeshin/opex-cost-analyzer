@@ -8,6 +8,7 @@ from typing import Any, Dict, List
 from docx import Document
 
 from app.config import OUTPUT_DIR
+from app.services.figure_basis import basis_lines, basis_of_figures
 from app.services.narrative_composer import build_citations, provenance_banner_text
 from app.utils.inr_format import format_money
 
@@ -74,6 +75,7 @@ def build_evidence_appendix(
         "benchmark_rows": benchmark_rows,
         "ingestion_summary": ingestion,
         "critique_summary": sme.get("critique_summary") or {},
+        "basis_of_figures": basis_lines(basis_of_figures(analysis)),
     }
 
 
@@ -87,6 +89,12 @@ def export_evidence_appendix_docx(appendix: Dict[str, Any], filename: str) -> Pa
         p = doc.add_paragraph(str(banner))
         p.italic = True
     doc.add_paragraph(f"Generated {appendix.get('generated_on')} · Currency {appendix.get('currency')}")
+
+    basis = appendix.get("basis_of_figures") or []
+    if basis:
+        doc.add_heading("Basis of figures", level=1)
+        for line in basis:
+            doc.add_paragraph(line, style="List Bullet")
 
     doc.add_heading("Claim citations", level=1)
     cites = appendix.get("citations") or []
