@@ -1,8 +1,8 @@
 # OpEx Platform Feature Completeness Eval
 
-**Eval date**: 2026-06-28  
+**Eval date**: 2026-10-30  
 **Platform version**: 2.0  
-**Overall score**: 9.84/10  
+**Overall score**: 9.65/10  
 **Status**: PASS ✓
 
 > ⚠️ **SCORE TYPE: STRUCTURAL** — This score measures skill wiring, API route coverage,
@@ -16,9 +16,19 @@
 | Domain | Score | Status |
 |--------|-------|--------|
 | Skill Pipeline Completeness (w=0.35) | 10.00/10 | PASS ✓ |
-| Frontend-Backend API Connectivity (w=0.35) | 9.54/10 | PASS ✓ |
+| Frontend-Backend API Connectivity (w=0.35) | 9.00/10 | PASS ✓ |
 | OPAR Loop Completeness (w=0.20) | 10.00/10 | PASS ✓ |
 | Infrastructure Completeness (w=0.10) | 10.00/10 | PASS ✓ |
+
+---
+
+## Top Gaps (ranked by severity)
+
+### API_04 — FP&A Endpoint Wiring Completeness
+- **Score**: 5.00/10 (threshold 9.0, gap 4.00)
+- **Finding**: 3/6 FP&A endpoint check-points pass (backend+frontend per endpoint)
+- **Remediation**: Wire missing FP&A endpoints: ['trends (frontend missing)', 'bva (frontend missing)', 'payment-terms (frontend missing)'].
+
 ---
 
 ## Skill Pipeline Completeness
@@ -36,9 +46,9 @@ Domain score: **10.00/10** (PASS ✓)
 
 **Score**: 10.00/10 (threshold 9.0) — PASS ✓
 
-**Finding**: 38/38 skills registered in dispatch.py
+**Finding**: 40/40 skills registered in dispatch.py
 
-**Detail**: Found 38 skills/ dirs with SKILL.md. 38 are registered via @register() in dispatch.py. Unregistered (dead code): none.
+**Detail**: Found 40 skills/ dirs with SKILL.md. 40 are registered via @register() in dispatch.py. Unregistered (dead code): none.
 
 **Remediation**: All skills registered. Add CI parity check to prevent future drift.
 
@@ -46,9 +56,9 @@ Domain score: **10.00/10** (PASS ✓)
 
 **Score**: 10.00/10 (threshold 8.0) — PASS ✓
 
-**Finding**: 39/39 handlers implemented (≥5 lines or engine delegation)
+**Finding**: 41/41 handlers implemented (≥5 lines or engine delegation)
 
-**Detail**: Checked 39 @register() handlers. 39 have substantive dispatch logic or delegate to app.skills.engine. Potential stubs: none.
+**Detail**: Checked 41 @register() handlers. 41 have substantive dispatch logic or delegate to app.skills.engine. Potential stubs: none.
 
 **Remediation**: All handlers appear substantively implemented.
 
@@ -56,9 +66,9 @@ Domain score: **10.00/10** (PASS ✓)
 
 **Score**: 10.00/10 (threshold 7.0) — PASS ✓
 
-**Finding**: 39/39 registered skills have output contracts (or intentionally use inline dict)
+**Finding**: 41/41 registered skills have output contracts (or intentionally use inline dict)
 
-**Detail**: Checked contracts.py for Output class per registered skill. Skills missing a dedicated contract class: none. Skills intentionally using inline dict (no dedicated class): ['my-new-skill', 'root-cause-analyzer', 'savings-modeler', 'data-validator', 'data-quality-gate', 'evidence-gatherer', 'sme-critique', 'chart-builder', 'business-case-builder', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'brsr-cobenefit-calculator', 'scenario-modeler', 'value-to-shareholder-bridge', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler', 'zbb-modeler', 'cost-to-serve-analyzer', 'dashboard-builder', 'export-formatter'].
+**Detail**: Checked contracts.py for Output class per registered skill. Skills missing a dedicated contract class: none. Skills intentionally using inline dict (no dedicated class): ['my-new-skill', 'cohort-segmenter', 'root-cause-analyzer', 'savings-modeler', 'data-validator', 'data-quality-gate', 'evidence-gatherer', 'sme-critique', 'chart-builder', 'business-case-builder', 'pii-stripper', 'data-classifier', 'llm-context-builder', 'assumption-register', 'indian-tax-optimizer', 'brsr-cobenefit-calculator', 'scenario-modeler', 'sensitivity-analyzer', 'value-to-shareholder-bridge', 'peer-disclosure-miner', 'conflict-detector', 'vendor-master-builder', 'consolidation-analyzer', 'msme-compliance-checker', 'contract-lifecycle-manager', 'gstr-reconciler', 'zbb-modeler', 'cost-to-serve-analyzer', 'dashboard-builder', 'export-formatter'].
 
 **Remediation**: Contract coverage adequate. Consider adding classes for inline-dict skills.
 
@@ -76,41 +86,40 @@ Domain score: **10.00/10** (PASS ✓)
 
 ## Frontend-Backend API Connectivity
 
-Domain score: **9.54/10** (PASS ✓)
+Domain score: **9.00/10** (PASS ✓)
 
 | Dimension | Score | Threshold | Status |
 |-----------|-------|-----------|--------|
-| Frontend Call Resolution Rate | 9.66 | 9.0 | ✓ |
-| Backend Feature Frontend Exposure | 8.75 | 6.0 | ✓ |
+| Frontend Call Resolution Rate | 10.00 | 9.0 | ✓ |
+| Backend Feature Frontend Exposure | 10.00 | 6.0 | ✓ |
 | API Version Consistency | 10.00 | 6.0 | ✓ |
-| FP&A Endpoint Wiring Completeness | 10.00 | 9.0 | ✓ |
+| FP&A Endpoint Wiring Completeness | 5.00 | 9.0 | ✗ |
 
 ### API_01 — Frontend Call Resolution Rate
 
-**Score**: 9.66/10 (threshold 9.0) — PASS ✓
+**Score**: 10.00/10 (threshold 9.0) — PASS ✓
 
-**Finding**: 56/58 unique frontend API calls resolve to a backend route
+**Finding**: 73/73 unique frontend API calls resolve to a backend route
 
-**Detail**: Scanned all .tsx/.ts files under frontend/src for apiGet/apiPost/apiPut/apiUpload calls and href=/api/... links. Found 58 unique paths. Unresolved (would 404): ['/api/v1/initiatives{param}', '/api/v1/pipeline/summary{param}'].
+**Detail**: Scanned all .tsx/.ts files under frontend/src for apiGet/apiPost/apiPut/apiUpload calls and href=/api/... links. Found 73 unique paths. Unresolved (would 404): none.
 
-**Remediation**: These frontend calls have no matching backend route: ['/api/v1/initiatives{param}', '/api/v1/pipeline/summary{param}']. Either add the backend route or fix the frontend URL.
+**Remediation**: All frontend calls resolve. No broken links.
 
 ### API_02 — Backend Feature Frontend Exposure
 
-**Score**: 8.75/10 (threshold 6.0) — PASS ✓
+**Score**: 10.00/10 (threshold 6.0) — PASS ✓
 
-**Finding**: 7/8 backend feature groups have at least one frontend page calling them
+**Finding**: 8/8 backend feature groups have at least one frontend page calling them
 
-**Detail**: Checked 8 backend feature groups for at least one matching frontend API call. Groups with NO frontend exposure: ['output_board_cfo'].
+**Detail**: Checked 8 backend feature groups for at least one matching frontend API call. Groups with NO frontend exposure: none.
 
-**Remediation**: Build frontend pages or components for these backend features:
-  - output_board_cfo: /api/v1/business-case
+**Remediation**: All backend feature groups have frontend coverage.
 
 ### API_03 — API Version Consistency
 
 **Score**: 10.00/10 (threshold 6.0) — PASS ✓
 
-**Finding**: 58/58 unique frontend API calls use /api/v1/ prefix
+**Finding**: 73/73 unique frontend API calls use /api/v1/ prefix
 
 **Detail**: Backend marks /api/ (unversioned) paths as deprecated (Sunset: 2027-01-01). 0 frontend calls still use the deprecated /api/ prefix: [].
 
@@ -118,13 +127,13 @@ Domain score: **9.54/10** (PASS ✓)
 
 ### API_04 — FP&A Endpoint Wiring Completeness
 
-**Score**: 10.00/10 (threshold 9.0) — PASS ✓
+**Score**: 5.00/10 (threshold 9.0) — FAIL ✗
 
-**Finding**: 6/6 FP&A endpoint check-points pass (backend+frontend per endpoint)
+**Finding**: 3/6 FP&A endpoint check-points pass (backend+frontend per endpoint)
 
-**Detail**: Checked 3 FP&A endpoints for presence in app/routers/outputs.py (backend) and frontend/src/pages/CostRoom.tsx (frontend). Missing: none.
+**Detail**: Checked 3 FP&A endpoints for presence in app/routers/outputs.py (backend) and frontend/src/pages/CostRoom.tsx (frontend). Missing: ['trends (frontend missing)', 'bva (frontend missing)', 'payment-terms (frontend missing)'].
 
-**Remediation**: All 3 FP&A endpoints fully wired in backend and frontend.
+**Remediation**: Wire missing FP&A endpoints: ['trends (frontend missing)', 'bva (frontend missing)', 'payment-terms (frontend missing)'].
 
 ---
 
@@ -144,7 +153,7 @@ Domain score: **10.00/10** (PASS ✓)
 
 **Finding**: 4/4 OPAR phase modules exist with >100 lines
 
-**Detail**: Checked app/opar/observe.py, plan.py, act.py, reflect.py for existence and line count >100. Thin/missing: none. observe: 741 lines, plan: 1017 lines, act: 351 lines, reflect: 322 lines
+**Detail**: Checked app/opar/observe.py, plan.py, act.py, reflect.py for existence and line count >100. Thin/missing: none. observe: 742 lines, plan: 1031 lines, act: 362 lines, reflect: 362 lines
 
 **Remediation**: All 4 OPAR phase modules are substantively implemented.
 
@@ -209,3 +218,10 @@ Domain score: **10.00/10** (PASS ✓)
 **Detail**: Checked for a Limiter() instantiation (in main.py or app/ratelimit.py) attached via app.state.limiter in main.py, and chat.py for @limiter.limit() per-route decorators on LLM endpoints.
 
 **Remediation**: Rate limiting fully configured.
+
+---
+
+## Remediation Roadmap
+
+**1.** `api_04` — Wire missing FP&A endpoints: ['trends (frontend missing)', 'bva (frontend missing)', 'payment-terms (frontend missing)'].  
+*Closes gap of 4.0 pts (severity 0.2800)*

@@ -1,10 +1,12 @@
 # OpEx Platform — Document Processing Quality Eval
 
-**Date:** 2026-06-07  |  **Platform:** v2.1  |  **Overall:** 9.91/10  |  **Status:** ✅ PASS
+**Date:** 2026-10-30  |  **Platform:** v2.1  |  **Overall:** 9.91/10  |  **Status:** ✅ PASS
 
-Fixtures: 7  |  LLM judge (DP-07): active  |  Retrieval backend: local keyword index (deterministic)
+Fixtures: 7  |  LLM judge (DP-07): skipped (no LLM provider)  |  Retrieval backend: local keyword index (deterministic)
 
 > Scores the document ingestion pipeline — parse → schema inference → sheet selection → normalization → hierarchical chunking → retrieval — against synthetic golden fixtures. DP-01..06 and DP-08 are deterministic; DP-07 uses a provider-agnostic LLM judge.
+>
+> ⚠️ **SCORE TYPE: STRUCTURAL** — Pipeline correctness, not analytical quality. Does NOT validate savings recommendations. See `run_llm_judge_eval.py`.
 
 ## Parse & Normalize — 10.0/10 [PASS]
 

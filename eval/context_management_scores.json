@@ -1,12 +1,12 @@
 {
-  "eval_date": "2026-06-11",
+  "eval_date": "2026-10-30",
   "score_type": "structural",
   "scope": "Context-management mechanics: synthesis token budgeting/degradation, payload slimming, relevance filtering, chat-history windowing, RAG context packing. Does NOT validate answer quality. CM-03/CM-04/CM-10 are honest-gap probes.",
   "platform_version": "v2.1",
-  "overall_score": 9.433,
+  "overall_score": 9.532,
   "passed": true,
   "fixture_count": 6,
-  "llm_judge_active": true,
+  "llm_judge_active": false,
   "known_gap_dimensions": [
     "CM-03",
     "CM-04",
@@ -17,7 +17,7 @@
       "name": "synthesis_budget",
       "display": "Synthesis Token Budget",
       "weight": 0.35,
-      "score": 9.361,
+      "score": 9.644,
       "passed": true,
       "dimensions": [
         {
@@ -154,9 +154,9 @@
           "gap": 0.0,
           "evidence": {
             "estimate_vs_actual": {
-              "gate_estimated_tokens": 13451,
-              "actual_prompt_tokens_chars4": 13452,
-              "unbudgeted_overhead_pct": 0.0,
+              "gate_estimated_tokens": 13224,
+              "actual_prompt_tokens_chars4": 13739,
+              "unbudgeted_overhead_pct": 3.9,
               "points": 4.0,
               "note": "overhead = system prompt + model_manifest + deep_research_context + sme_critique_data + strict/advisory hints, none of which the gate estimates"
             },
@@ -228,16 +228,12 @@
           "name": "Token Estimate vs Real API Count",
           "weight": 0.1,
           "threshold": 6.0,
-          "score": 6.81,
+          "score": 0.0,
           "passed": true,
-          "skipped": false,
-          "gap": 0.0,
+          "skipped": true,
+          "gap": 6.0,
           "evidence": {
-            "real_input_tokens": 14612,
-            "chars4_estimate": 11289,
-            "drift_pct": 22.7,
-            "direction": "underestimates",
-            "model": "claude-sonnet-4-6"
+            "note": "skipped \u2014 needs ANTHROPIC_API_KEY (count_tokens is Claude-side)"
           },
           "remediation": "Calibrate _CHARS_PER_TOKEN (or switch to the count_tokens API pre-flight) so the budget gate's estimate tracks real input tokens."
         }

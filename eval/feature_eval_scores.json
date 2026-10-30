@@ -1,7 +1,7 @@
 {
-  "overall_score": 9.839,
+  "overall_score": 9.65,
   "passed": true,
-  "eval_date": "2026-06-28",
+  "eval_date": "2026-10-30",
   "score_type": "structural",
   "scope": "Structural completeness: skill wiring, API routes, OPAR coverage, infrastructure readiness. Does NOT validate whether the analysis content is analytically correct.",
   "dimensions": [
@@ -13,10 +13,10 @@
       "threshold_pass": 9.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "38/38 skills registered in dispatch.py",
+      "finding_summary": "40/40 skills registered in dispatch.py",
       "evidence": {
-        "total_skill_dirs_with_SKILL_md": 38,
-        "registered_count": 38,
+        "total_skill_dirs_with_SKILL_md": 40,
+        "registered_count": 40,
         "registered": [
           "analysis-synthesizer",
           "assumption-register",
@@ -24,6 +24,7 @@
           "business-case-builder",
           "bva-analyzer",
           "chart-builder",
+          "cohort-segmenter",
           "conflict-detector",
           "consolidation-analyzer",
           "contract-lifecycle-manager",
@@ -49,6 +50,7 @@
           "root-cause-analyzer",
           "savings-modeler",
           "scenario-modeler",
+          "sensitivity-analyzer",
           "sme-critique",
           "spend-profiler",
           "temporal-analyzer",
@@ -68,10 +70,10 @@
       "threshold_pass": 8.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "39/39 handlers implemented (\u22655 lines or engine delegation)",
+      "finding_summary": "41/41 handlers implemented (\u22655 lines or engine delegation)",
       "evidence": {
-        "total_registered": 39,
-        "implemented_count": 39,
+        "total_registered": 41,
+        "implemented_count": 41,
         "stubs": []
       }
     },
@@ -83,13 +85,14 @@
       "threshold_pass": 7.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "39/39 registered skills have output contracts (or intentionally use inline dict)",
+      "finding_summary": "41/41 registered skills have output contracts (or intentionally use inline dict)",
       "evidence": {
-        "total_registered": 39,
-        "with_contract_or_intentionally_none": 39,
+        "total_registered": 41,
+        "with_contract_or_intentionally_none": 41,
         "missing_contract_class": [],
         "intentionally_no_dedicated_class": [
           "my-new-skill",
+          "cohort-segmenter",
           "root-cause-analyzer",
           "savings-modeler",
           "data-validator",
@@ -105,6 +108,7 @@
           "indian-tax-optimizer",
           "brsr-cobenefit-calculator",
           "scenario-modeler",
+          "sensitivity-analyzer",
           "value-to-shareholder-bridge",
           "peer-disclosure-miner",
           "conflict-detector",
@@ -173,40 +177,33 @@
       "dimension_id": "api_01",
       "name": "Frontend Call Resolution Rate",
       "domain": "api_connectivity",
-      "raw_score": 9.655,
+      "raw_score": 10.0,
       "threshold_pass": 9.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "56/58 unique frontend API calls resolve to a backend route",
+      "finding_summary": "73/73 unique frontend API calls resolve to a backend route",
       "evidence": {
-        "total_unique_frontend_calls": 58,
-        "resolved_count": 56,
-        "unresolved": [
-          "/api/v1/initiatives{param}",
-          "/api/v1/pipeline/summary{param}"
-        ],
+        "total_unique_frontend_calls": 73,
+        "resolved_count": 73,
+        "unresolved": [],
         "resolved": [
-          "/api/v1/engagements/{param}",
-          "/api/v1/sessions/{param}/status",
-          "/api/v1/sessions/{param}/manifest",
-          "/api/v1/sessions/{param}",
           "/api/v1/engagements",
           "/api/v1/sessions",
           "/api/v1/template/spend-csv",
-          "/api/v1/diagnostic/deep-research/{param}{param}",
           "/api/v1/diagnostic/deep-research",
-          "/api/v1/conflicts/{param}",
-          "/api/v1/benchmarks/{param}/coverage",
-          "/api/v1/sector-packs/{param}/detail",
-          "/api/v1/benchmarks",
+          "/api/v1/sensitivity/parse",
+          "/api/v1/sensitivity/custom",
+          "/api/v1/query/{param}",
+          "/api/v1/query/{param}/nl2sql",
+          "/api/v1/analyst/{param}/history",
+          "/api/v1/analyst/{param}/run",
+          "/api/v1/provenance/{param}/{param}",
           "/api/v1/benchmarks/upload",
           "/api/v1/benchmarks/select",
           "/api/v1/benchmarks/peer-sets",
-          "/api/v1/compliance/audit-log",
           "/api/v1/chat/progress/{param}",
-          "/api/v1/llm/models",
-          "/api/v1/engagements/{param}/documents",
           "/api/v1/chat",
+          "/api/v1/engagements/{param}/documents",
           "/api/v1/chat/plan",
           "/api/v1/chat/probe-answer",
           "/api/v1/chat/resume",
@@ -215,33 +212,54 @@
           "/api/v1/samples/spend-ledger.csv",
           "/api/v1/samples/pnl-expense.xlsx",
           "/api/v1/diagnostic/company-research",
+          "/api/v1/engagements/{param}/documents/{param}/reprocess",
+          "/api/v1/workbench/preview",
+          "/api/v1/workbench/runs",
+          "/api/v1/workbench/runs/{param}/promote",
+          "/api/v1/skills/{param}",
+          "/api/v1/skills/discover",
+          "/api/v1/skills/reindex",
+          "/api/v1/skills/structured",
+          "/api/v1/skills",
+          "/api/v1/skills/{param}/activate",
+          "/api/v1/skills/{param}/archive",
+          "/api/v1/sector-packs",
+          "/api/v1/benchmarks",
+          "/api/v1/benchmarks/{param}/coverage",
+          "/api/v1/sector-packs/{param}/detail",
+          "/api/v1/sector-packs/{param}/components/{param}",
+          "/api/v1/sector-packs/{param}/publish",
+          "/api/v1/sessions/{param}/manifest",
+          "/api/v1/sessions/{param}/status",
+          "/api/v1/sessions/{param}",
+          "/api/v1/engagements/{param}",
+          "/api/v1/skills/catalog/dependencies",
+          "/api/v1/llm/models",
+          "/api/v1/diagnostic/deep-research/{param}{param}",
+          "/api/v1/initiatives",
+          "/api/v1/pipeline/summary",
           "/api/v1/sensitivity/{param}{param}",
+          "/api/v1/conflicts/{param}",
           "/api/v1/trends/{param}",
           "/api/v1/bva/{param}",
           "/api/v1/payment-terms/{param}",
           "/api/v1/cost-to-serve",
           "/api/v1/initiatives/{param}/milestones",
           "/api/v1/initiatives/{param}/provenance",
+          "/api/v1/compliance/audit-log",
           "/api/v1/initiatives/{param}/stage",
           "/api/v1/initiatives/{param}/reject",
           "/api/v1/initiatives/{param}/actuals",
-          "/api/v1/conflicts/resolve",
-          "/api/v1/board-deck/{param}",
-          "/api/v1/pmo-export/{param}",
           "/api/v1/consolidate/{param}",
-          "/api/v1/engagements/{param}/documents/{param}/reprocess",
-          "/api/v1/sector-packs",
+          "/api/v1/conflicts/resolve",
+          "/api/v1/business-case/{param}",
+          "/api/v1/pmo-export/{param}",
+          "/api/v1/query/{param}/schema",
+          "/api/v1/query/{param}/history",
+          "/api/v1/query/{param}/saved",
+          "/api/v1/sensitivity/{param}/saved",
           "/api/v1/workbench/catalog",
-          "/api/v1/workbench/runs",
-          "/api/v1/workbench/preview",
-          "/api/v1/workbench/progress/{param}",
-          "/api/v1/workbench/runs/{param}/promote",
-          "/api/v1/skills",
-          "/api/v1/skills/catalog/dependencies",
-          "/api/v1/skills/{param}",
-          "/api/v1/skills/discover",
-          "/api/v1/skills/reindex",
-          "/api/v1/skills/structured"
+          "/api/v1/workbench/progress/{param}"
         ]
       }
     },
@@ -249,14 +267,14 @@
       "dimension_id": "api_02",
       "name": "Backend Feature Frontend Exposure",
       "domain": "api_connectivity",
-      "raw_score": 8.75,
+      "raw_score": 10.0,
       "threshold_pass": 6.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "7/8 backend feature groups have at least one frontend page calling them",
+      "finding_summary": "8/8 backend feature groups have at least one frontend page calling them",
       "evidence": {
         "total_feature_groups": 8,
-        "exposed_count": 7,
+        "exposed_count": 8,
         "exposure_detail": {
           "benchmarks_api": true,
           "sector_packs": true,
@@ -264,12 +282,10 @@
           "initiative_actuals": true,
           "enterprise_consolidation": true,
           "cost_to_serve": true,
-          "output_board_cfo": false,
+          "output_board_cfo": true,
           "incremental_analyze": true
         },
-        "not_exposed": [
-          "output_board_cfo"
-        ]
+        "not_exposed": []
       }
     },
     {
@@ -280,12 +296,14 @@
       "threshold_pass": 6.0,
       "passed": true,
       "gap": 0.0,
-      "finding_summary": "58/58 unique frontend API calls use /api/v1/ prefix",
+      "finding_summary": "73/73 unique frontend API calls use /api/v1/ prefix",
       "evidence": {
-        "total_unique_calls": 58,
-        "v1_prefixed_count": 58,
+        "total_unique_calls": 73,
+        "v1_prefixed_count": 73,
         "unversioned_count": 0,
         "v1_calls": [
+          "/api/v1/analyst/{param}/history",
+          "/api/v1/analyst/{param}/run",
           "/api/v1/analyze/{param}",
           "/api/v1/analyze/{param}/incremental",
           "/api/v1/benchmarks",
@@ -293,7 +311,7 @@
           "/api/v1/benchmarks/select",
           "/api/v1/benchmarks/upload",
           "/api/v1/benchmarks/{param}/coverage",
-          "/api/v1/board-deck/{param}",
+          "/api/v1/business-case/{param}",
           "/api/v1/bva/{param}",
           "/api/v1/chat",
           "/api/v1/chat/plan",
@@ -312,20 +330,31 @@
           "/api/v1/engagements/{param}",
           "/api/v1/engagements/{param}/documents",
           "/api/v1/engagements/{param}/documents/{param}/reprocess",
+          "/api/v1/initiatives",
           "/api/v1/initiatives/{param}/actuals",
           "/api/v1/initiatives/{param}/milestones",
           "/api/v1/initiatives/{param}/provenance",
           "/api/v1/initiatives/{param}/reject",
           "/api/v1/initiatives/{param}/stage",
-          "/api/v1/initiatives{param}",
           "/api/v1/llm/models",
           "/api/v1/payment-terms/{param}",
-          "/api/v1/pipeline/summary{param}",
+          "/api/v1/pipeline/summary",
           "/api/v1/pmo-export/{param}",
+          "/api/v1/provenance/{param}/{param}",
+          "/api/v1/query/{param}",
+          "/api/v1/query/{param}/history",
+          "/api/v1/query/{param}/nl2sql",
+          "/api/v1/query/{param}/saved",
+          "/api/v1/query/{param}/schema",
           "/api/v1/samples/pnl-expense.xlsx",
           "/api/v1/samples/spend-ledger.csv",
           "/api/v1/sector-packs",
+          "/api/v1/sector-packs/{param}/components/{param}",
           "/api/v1/sector-packs/{param}/detail",
+          "/api/v1/sector-packs/{param}/publish",
+          "/api/v1/sensitivity/custom",
+          "/api/v1/sensitivity/parse",
+          "/api/v1/sensitivity/{param}/saved",
           "/api/v1/sensitivity/{param}{param}",
           "/api/v1/sessions",
           "/api/v1/sessions/{param}",
@@ -337,6 +366,8 @@
           "/api/v1/skills/reindex",
           "/api/v1/skills/structured",
           "/api/v1/skills/{param}",
+          "/api/v1/skills/{param}/activate",
+          "/api/v1/skills/{param}/archive",
           "/api/v1/template/spend-csv",
           "/api/v1/trends/{param}",
           "/api/v1/workbench/catalog",
@@ -352,11 +383,11 @@
       "dimension_id": "api_04",
       "name": "FP&A Endpoint Wiring Completeness",
       "domain": "api_connectivity",
-      "raw_score": 10.0,
+      "raw_score": 5.0,
       "threshold_pass": 9.0,
-      "passed": true,
-      "gap": 0.0,
-      "finding_summary": "6/6 FP&A endpoint check-points pass (backend+frontend per endpoint)",
+      "passed": false,
+      "gap": 4.0,
+      "finding_summary": "3/6 FP&A endpoint check-points pass (backend+frontend per endpoint)",
       "evidence": {
         "endpoints_checked": [
           "trends",
@@ -366,18 +397,18 @@
         "detail": {
           "trends": {
             "backend": true,
-            "frontend": true
+            "frontend": false
           },
           "bva": {
             "backend": true,
-            "frontend": true
+            "frontend": false
           },
           "payment-terms": {
             "backend": true,
-            "frontend": true
+            "frontend": false
           }
         },
-        "points_scored": 6,
+        "points_scored": 3,
         "points_possible": 6
       }
     },
@@ -394,19 +425,19 @@
         "phases": {
           "observe": {
             "exists": true,
-            "line_count": 741
+            "line_count": 742
           },
           "plan": {
             "exists": true,
-            "line_count": 1017
+            "line_count": 1031
           },
           "act": {
             "exists": true,
-            "line_count": 351
+            "line_count": 362
           },
           "reflect": {
             "exists": true,
-            "line_count": 322
+            "line_count": 362
           }
         },
         "thin_or_missing": []

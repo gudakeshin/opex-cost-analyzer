@@ -1,14 +1,16 @@
 # OPAR Loop Eval Report
 
-**Eval date:** 2026-06-05  
-**Overall score:** 9.932 / 10  
+**Eval date:** 2026-10-30  
+**Overall score:** 9.864 / 10  
 **Status:** PASS
+
+> ⚠️ **SCORE TYPE: STRUCTURAL** — OPAR loop wiring and intent routing coverage. Does NOT validate analytical content quality. See `run_llm_judge_eval.py`.
 
 ## Summary
 
 | ID | Dimension | Domain | Score | Threshold | Status | Cases |
 |----|-----------|--------|-------|-----------|--------|-------|
-| OB_01 | Intent Classification Accuracy | observe | 9.50 | 8.5 | PASS | 19/20 |
+| OB_01 | Intent Classification Accuracy | observe | 9.00 | 8.5 | PASS | 18/20 |
 | OB_02 | Clarification Gate Correctness | observe | 10.00 | 9.0 | PASS | 8/8 |
 | OB_03 | Query Capability Detection | observe | 10.00 | 8.0 | PASS | 10/10 |
 | OB_04 | Context Assembly Correctness | observe | 10.00 | 8.0 | PASS | 10/10 |
@@ -23,14 +25,15 @@
 
 ## Dimension Details
 
-### Observe (score: 9.83)
+### Observe (score: 9.67)
 
 #### OB_01: Intent Classification Accuracy
-- **Score:** 9.500 / 8.5 (weight 0.15) — **PASS**
-- **Cases:** 19/20
-- **Finding:** 19/20 cases correct
+- **Score:** 9.000 / 8.5 (weight 0.15) — **PASS**
+- **Cases:** 18/20
+- **Finding:** 18/20 cases correct
 - **Detail:**
 ```
+✗ 'show me the IT spend breakdown' → general_qa (got: drill_down)
 ✗ 'reconcile gstr2a with our books' → gstr_reconcile (got: conflict_review)
 ```
 

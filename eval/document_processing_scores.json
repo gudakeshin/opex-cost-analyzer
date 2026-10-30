@@ -1,5 +1,7 @@
 {
-  "eval_date": "2026-06-07",
+  "eval_date": "2026-10-30",
+  "score_type": "structural",
+  "scope": "Document ingestion pipeline quality: parse, schema inference, sheet selection, normalization, chunking, retrieval. Does NOT validate downstream analytical accuracy.",
   "platform_version": "v2.1",
   "overall_score": 9.912,
   "passed": true,

@@ -1,13 +1,13 @@
 {
-  "eval_date": "2026-06-10",
+  "eval_date": "2026-10-30",
   "score_type": "categorical_accuracy",
   "scope": "keyword-classifier accuracy only \u2014 measures whether ingestion.py::_classify maps spend descriptions to taxonomy categories correctly. Does NOT validate savings recommendations or analytical quality.",
   "pass_threshold_micro_f1": 0.8,
   "total": 77,
-  "correct": 69,
-  "accuracy": 0.8961,
-  "micro_f1": 0.8961,
-  "macro_f1": 0.907,
+  "correct": 72,
+  "accuracy": 0.9351,
+  "micro_f1": 0.9351,
+  "macro_f1": 0.9438,
   "edge_case_accuracy": 0.625,
   "passed": true,
   "per_category": {
@@ -21,22 +21,22 @@
       "fn": 1
     },
     "FACILITIES": {
-      "precision": 0.75,
+      "precision": 1.0,
       "recall": 1.0,
-      "f1": 0.857,
+      "f1": 1.0,
       "support": 6,
       "tp": 6,
-      "fp": 2,
+      "fp": 0,
       "fn": 0
     },
     "HR": {
-      "precision": 0.75,
-      "recall": 0.6,
-      "f1": 0.667,
+      "precision": 0.667,
+      "recall": 0.8,
+      "f1": 0.727,
       "support": 5,
-      "tp": 3,
-      "fp": 1,
-      "fn": 2
+      "tp": 4,
+      "fp": 2,
+      "fn": 1
     },
     "INSURANCE": {
       "precision": 1.0,
@@ -66,12 +66,12 @@
       "fn": 0
     },
     "MARKETING": {
-      "precision": 0.875,
+      "precision": 1.0,
       "recall": 0.778,
-      "f1": 0.824,
+      "f1": 0.875,
       "support": 9,
       "tp": 7,
-      "fp": 1,
+      "fp": 0,
       "fn": 2
     },
     "OFFICE": {
@@ -111,12 +111,12 @@
       "fn": 0
     },
     "PROF_SVCS": {
-      "precision": 0.857,
+      "precision": 1.0,
       "recall": 1.0,
-      "f1": 0.923,
+      "f1": 1.0,
       "support": 6,
       "tp": 6,
-      "fp": 1,
+      "fp": 0,
       "fn": 0
     },
     "RND": {
@@ -129,32 +129,25 @@
       "fn": 0
     },
     "TELECOM": {
-      "precision": 0.8,
-      "recall": 0.8,
-      "f1": 0.8,
+      "precision": 0.833,
+      "recall": 1.0,
+      "f1": 0.909,
       "support": 5,
-      "tp": 4,
+      "tp": 5,
       "fp": 1,
-      "fn": 1
+      "fn": 0
     },
     "TRAVEL": {
       "precision": 1.0,
-      "recall": 0.8,
-      "f1": 0.889,
+      "recall": 1.0,
+      "f1": 1.0,
       "support": 5,
-      "tp": 4,
+      "tp": 5,
       "fp": 0,
-      "fn": 1
+      "fn": 0
     }
   },
   "false_positives": [
-    {
-      "description": "Cab and taxi reimbursements",
-      "supplier": "Ola Corporate",
-      "expected": "TRAVEL",
-      "predicted": "PROF_SVCS",
-      "note": "clear"
-    },
     {
       "description": "LinkedIn Recruiter license",
       "supplier": "LinkedIn India",
@@ -163,24 +156,10 @@
       "note": "clear"
     },
     {
-      "description": "Payroll processing services",
-      "supplier": "ADP India",
-      "expected": "HR",
-      "predicted": "MARKETING",
-      "note": "clear"
-    },
-    {
-      "description": "MPLS leased line",
-      "supplier": "Tata Communications",
-      "expected": "TELECOM",
-      "predicted": "FACILITIES",
-      "note": "clear"
-    },
-    {
-      "description": "Contract worker placement",
-      "supplier": "TeamLease Services",
+      "description": "Temporary staffing \u2014 peak season",
+      "supplier": "Manpower India",
       "expected": "CONTINGENT",
-      "predicted": "FACILITIES",
+      "predicted": "HR",
       "note": "clear"
     },
     {
