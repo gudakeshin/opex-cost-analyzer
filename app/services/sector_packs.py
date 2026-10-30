@@ -358,8 +358,9 @@ def _full_pack_depth_checks(
 
     stub_ids = {lv.get("lever_id") for lv in pack_levers_list(pack.get("sector_levers"))}
     runtime_ids = {lv.get("lever_id") for lv in runtime_levers}
-    missing_stub = sorted(runtime_ids - stub_ids)
-    orphan_stub = sorted(stub_ids - runtime_ids)
+    # key=str: lever ids can be None (missing lever_id), which sorted() cannot order against str
+    missing_stub = sorted(runtime_ids - stub_ids, key=str)
+    orphan_stub = sorted(stub_ids - runtime_ids, key=str)
     checks["full_lever_parity"] = not missing_stub and not orphan_stub
     if missing_stub:
         errors.append(f"Runtime levers missing stub entries in sector_packs/{pack_id}: {missing_stub[:10]}")

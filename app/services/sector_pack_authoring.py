@@ -8,7 +8,7 @@ import threading
 from datetime import date
 from io import BytesIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import yaml
 
@@ -16,12 +16,10 @@ from app.config import DATA_DIR, ROOT_DIR
 from app.services.compliance import append_audit_event
 from app.services.lever_runtime_sync import RUNTIME_DIR, sync_pack
 from app.services.sector_packs import (
-    SectorPackError,
     _BENCHMARK_REQUIRED_FIELDS,
     _load_pack_cached,
     pack_dir,
     pack_levers_list,
-    parse_regulatory_triggers,
     run_regression_test,
 )
 
@@ -432,7 +430,6 @@ def _sheet_kind(name: str) -> Optional[str]:
 
 def _parse_workbook_sheets(wb: Any) -> Dict[str, Any]:
     """Parse workbook rows into per-pack component payloads."""
-    import openpyxl
 
     packs: Dict[str, Dict[str, Any]] = {}
 

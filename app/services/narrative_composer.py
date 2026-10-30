@@ -449,7 +449,7 @@ def _category_section_for_row(
     lines.append("")
     rr = float((init or {}).get("annualized_run_rate_savings") or 0.0)
     decision = (
-        f"CFO and category owner must commit a 90-day mandate"
+        "CFO and category owner must commit a 90-day mandate"
         + (f" targeting {_fmt(rr, currency)} run-rate" if rr > 0 else "")
         + f" in {cat_name}, with monthly realization tracking."
     )

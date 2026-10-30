@@ -18,7 +18,7 @@ table (available=false + fallback reason).
 # against the wrapper's __globals__, not this module's.
 import asyncio
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any, Dict, List, cast
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
@@ -83,7 +83,7 @@ def _deterministic_fallback(session_id: str, question: str, analysis: Dict[str, 
 
 def _run_agent_turn(session_id: str, run_id: str, question: str) -> Dict[str, Any]:
     from app.opar.agent_controller import run_agent_chat_controller
-    from app.services.llm_selection import get_resolved_llm_provider, model_for_provider
+    from app.services.llm_selection import Provider, get_resolved_llm_provider, model_for_provider
 
     ctx, analysis = _build_context(session_id, question)
     engagement_id = ctx.engagement_id or session_id
@@ -146,7 +146,7 @@ def _run_agent_turn(session_id: str, run_id: str, question: str) -> Dict[str, An
     if answer:
         from app.opar.provenance import record_llm_narrative
 
-        model_version = model_for_provider(get_resolved_llm_provider())
+        model_version = model_for_provider(cast(Provider, get_resolved_llm_provider()))
         provenance = record_llm_narrative(
             answer,
             engagement_id=engagement_id,

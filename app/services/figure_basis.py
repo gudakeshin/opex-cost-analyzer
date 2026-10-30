@@ -15,7 +15,8 @@ def _ingestion_warnings(analysis: Dict[str, Any]) -> List[str]:
     report = analysis.get("ingestion_report")
     if not isinstance(report, dict):
         return []
-    reports = report.get("files") if isinstance(report.get("files"), list) and report.get("files") else [report]
+    files = report.get("files")
+    reports = files if isinstance(files, list) and files else [report]
     out: List[str] = []
     for r in reports:
         if not isinstance(r, dict):

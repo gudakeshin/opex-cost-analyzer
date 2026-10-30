@@ -1,7 +1,6 @@
 """LLM provider error classification — permanent failures should not be retried."""
 from __future__ import annotations
 
-from typing import Any
 
 
 class ProviderPermanentError(Exception):

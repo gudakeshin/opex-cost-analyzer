@@ -231,8 +231,8 @@ def validate_custom_scenarios(
     valid_ids |= {c.get("category_name") or "" for c in categories}
     valid_ids.discard("")
     lever_list = levers or []
-    valid_levers = {l.get("lever_id") or "" for l in lever_list}
-    valid_levers |= {(l.get("lever_name") or "").lower() for l in lever_list}
+    valid_levers = {lv.get("lever_id") or "" for lv in lever_list}
+    valid_levers |= {(lv.get("lever_name") or "").lower() for lv in lever_list}
     valid_levers.discard("")
 
     validated: List[CustomScenarioSpec] = []
