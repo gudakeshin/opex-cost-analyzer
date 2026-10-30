@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { currencySymbol } from '../../../utils/currencySymbol';
 import { ConfidenceBandTrack } from './primitives/ConfidenceBandTrack';
 import { GateProgressBar } from './primitives/GateProgressBar';
 import type { ScenarioPreset } from './ScenarioControls';
@@ -77,7 +78,7 @@ export const CostRoomHero: React.FC<CostRoomHeroProps> = ({
   const roceBps = Math.round(ebitdaBps * 0.85);
   const epsUplift = (portfolioP50Cr * 0.0011).toFixed(2);
   const equityCr = Math.round(portfolioP50Cr * 0.75 * 15);
-  const sym = currency === 'INR' ? '₹' : '$';
+  const sym = currencySymbol(currency);
 
   const scenarioSuffix =
     scenario !== 'base' ? ` · ${SCENARIO_LABELS[scenario] ?? scenario}` : '';

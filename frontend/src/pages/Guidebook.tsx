@@ -60,7 +60,7 @@ export const Guidebook: React.FC = () => {
   }, []);
 
   return (
-    <MainLayout title="Guidebook">
+    <MainLayout hideHeader title="Guidebook">
       <PageHeader
         title="Guidebook"
         subtitle="Client data sources for deep OpEx analysis — what to request, why it matters, and how each input adds value"
@@ -83,7 +83,7 @@ export const Guidebook: React.FC = () => {
       </Card>
 
       <nav
-        className="sticky top-[4.5rem] z-20 -mx-1 mb-6 flex flex-wrap gap-2 rounded-lg border border-brand-border bg-white/95 backdrop-blur px-3 py-3 shadow-sm"
+        className="sticky top-14 md:top-0 z-20 -mx-1 mb-6 flex flex-wrap gap-2 rounded-lg border border-brand-border bg-white/95 backdrop-blur px-3 py-3 shadow-sm"
         aria-label="Guidebook tiers"
       >
         {TIER_NAV.map((t) => (
@@ -93,7 +93,7 @@ export const Guidebook: React.FC = () => {
             onClick={() => scrollToTier(t.id)}
             className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
               activeTier === t.id
-                ? 'bg-deloitte-green text-white'
+                ? 'bg-deloitte-green text-black'
                 : 'bg-brand-surface-muted text-brand-ink hover:bg-brand-border/40'
             }`}
           >

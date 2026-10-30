@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useConfirm } from '../hooks/useConfirm';
 import '../styles/costRoom.css';
 import { useGuardedNavigate } from '../hooks/useGuardedNavigate';
 import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
@@ -96,7 +97,7 @@ function EmptyPipeline({ onGoToAnalysis }: { onGoToAnalysis: () => void }) {
         <button
           type="button"
           onClick={onGoToAnalysis}
-          className="px-5 py-2.5 rounded-xl bg-deloitte-green text-white text-sm font-medium"
+          className="px-5 py-2.5 rounded-xl bg-deloitte-green text-black text-sm font-medium"
         >
           Go to Analysis →
         </button>
@@ -125,6 +126,7 @@ export default function CostRoom() {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const [auditLog, setAuditLog] = useState<AuditLogEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [confirm, confirmDialog] = useConfirm();
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [rejectTargetId, setRejectTargetId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
@@ -303,6 +305,13 @@ export default function CostRoom() {
   }, [selectInitiative, appendAudit]);
 
   const acceptInit = async (initiativeId: string) => {
+    const target = initiatives.find((x) => x.initiative_id === initiativeId);
+    const ok = await confirm({
+      title: 'Commit this initiative?',
+      message: `“${target?.lever ?? initiativeId}” will count toward committed savings and be tracked against actuals. You can move it back to another stage later.`,
+      confirmLabel: 'Commit',
+    });
+    if (!ok) return;
     try {
       await initiativeStageMutation.mutateAsync({ initiativeId, stage: 'committed' });
       const init = initiatives.find((x) => x.initiative_id === initiativeId);
@@ -314,6 +323,13 @@ export default function CostRoom() {
   };
 
   const deferInit = async (initiativeId: string) => {
+    const target = initiatives.find((x) => x.initiative_id === initiativeId);
+    const ok = await confirm({
+      title: 'Defer this initiative?',
+      message: `“${target?.lever ?? initiativeId}” will leave the active pipeline until you bring it back.`,
+      confirmLabel: 'Defer',
+    });
+    if (!ok) return;
     try {
       await initiativeStageMutation.mutateAsync({ initiativeId, stage: 'deferred' });
       const init = initiatives.find((x) => x.initiative_id === initiativeId);
@@ -481,6 +497,7 @@ export default function CostRoom() {
 
   return (
     <MainLayout variant={isExecutive ? 'executive' : 'default'} hideHeader>
+      {confirmDialog}
       <div className="cost-room-page space-y-[var(--cr-gap)] min-w-0">
         <CostRoomTopbar
           percentileBand={percentileBand}

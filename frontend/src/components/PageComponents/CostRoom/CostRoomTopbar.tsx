@@ -66,7 +66,7 @@ export const CostRoomTopbar: React.FC<CostRoomTopbarProps> = ({
           <span className="text-[11px] font-bold text-[var(--cr-green-dk)] bg-[var(--cr-green-soft)] border border-[#cfe39f] px-2 py-0.5 rounded-full">
             {engagement.gate_label}
           </span>
-          <span className="text-[var(--cr-gray-3)]">Group CFO · SSO</span>
+          <span className="text-[var(--cr-gray-3)]">{isExecutive ? 'Executive view' : 'Consultant view'}</span>
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-3 shrink-0">

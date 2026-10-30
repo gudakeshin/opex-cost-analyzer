@@ -58,7 +58,7 @@ function ConflictRow({
       <div className="flex-1 min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-bold text-sm">{title}</span>
-          <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${conflictSeverityBadge(severity)}`}>
+          <span className={`text-[11px] font-bold uppercase px-2 py-0.5 rounded-full ${conflictSeverityBadge(severity)}`}>
             {severity}
           </span>
         </div>

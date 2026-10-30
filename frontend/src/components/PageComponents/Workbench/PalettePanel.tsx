@@ -51,7 +51,7 @@ export const PalettePanel: React.FC<PalettePanelProps> = ({ catalog, selected, o
                     <span className="text-xs shrink-0">{active ? '✓' : '+'}</span>
                   </span>
                   {(hardReq || skill.degrades_without.length > 0) && (
-                    <span className="block mt-0.5 text-[10px] text-amber-700">
+                    <span className="block mt-0.5 text-[11px] text-amber-700">
                       {hardReq
                         ? `needs ${skill.data_requirements.join(', ')}`
                         : `better with ${skill.degrades_without.join(', ')}`}

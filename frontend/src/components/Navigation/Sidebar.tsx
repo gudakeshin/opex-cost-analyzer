@@ -1,4 +1,5 @@
 import React from 'react';
+import { ThemeToggle } from './ThemeToggle';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { NavLink } from './NavLink';
 import { useSidebar } from '../../context/SidebarContext';
@@ -87,7 +88,7 @@ export const Sidebar: React.FC = () => {
 
         {collapsed && !isMobile && activeLink && (
           <p
-            className="px-2 py-2 text-[10px] font-semibold uppercase tracking-wider text-center text-brand-primary border-b border-brand-border leading-tight"
+            className="px-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-center text-brand-primary border-b border-brand-border leading-tight"
             title={activeLink.label}
           >
             {activeLink.label.split(' ')[0]}
@@ -131,12 +132,13 @@ export const Sidebar: React.FC = () => {
             >
               {audience === 'executive' ? 'Consultant view' : 'Executive view'}
               {!executiveReady && (
-                <span className="block mt-1 text-[10px]">Available after analysis</span>
+                <span className="block mt-1 text-[11px]">Available after analysis</span>
               )}
             </button>
-            <p className="text-[10px] text-brand-muted leading-snug">
-              OpEx Intelligence Platform
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] text-brand-muted leading-snug">OpEx Intelligence Platform</p>
+              <ThemeToggle />
+            </div>
           </div>
         )}
       </aside>

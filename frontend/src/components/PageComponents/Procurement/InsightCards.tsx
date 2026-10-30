@@ -250,7 +250,7 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
             const pct = (n: number) => (total > 0 ? (n / total) * 100 : 0);
             return (
               <>
-                <div className="flex h-3 rounded-full overflow-hidden bg-slate-100 text-[10px]">
+                <div className="flex h-3 rounded-full overflow-hidden bg-slate-100 text-[11px]">
                   {smeSummary.savings_ready > 0 && (
                     <div
                       className="bg-emerald-500"
@@ -378,7 +378,7 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
               const warn = benchmarkVintageWarning(gap.benchmark_vintage, gap.benchmark_sample_n);
               if (!warn) return null;
               return (
-                <li key={gap.category_id} className="text-[10px] text-amber-800 bg-amber-50 rounded px-2 py-0.5">
+                <li key={gap.category_id} className="text-[11px] text-amber-800 bg-amber-50 rounded px-2 py-0.5">
                   {gap.category_name}: {warn}
                 </li>
               );
@@ -458,12 +458,12 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
                     </div>
                   </div>
                   {smeCritique?.evidenceUsed && (
-                    <p className="text-[10px] text-emerald-700 leading-snug break-words">
+                    <p className="text-[11px] text-emerald-700 leading-snug break-words">
                       Evidence used: {smeCritique.evidenceUsed}
                     </p>
                   )}
                   {smeCritique?.criticalRisk && smeCritique.verdict !== 'proceed' && (
-                    <p className="text-[10px] text-amber-700 leading-snug break-words">
+                    <p className="text-[11px] text-amber-700 leading-snug break-words">
                       {smeCritique.gaps?.length ? 'Still needed: ' : ''}
                       {smeCritique.criticalRisk}
                     </p>

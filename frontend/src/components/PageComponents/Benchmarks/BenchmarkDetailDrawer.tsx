@@ -110,7 +110,7 @@ export const BenchmarkDetailDrawer: React.FC<BenchmarkDetailDrawerProps> = ({
           </button>
         </div>
 
-        <span className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded ${badge.className}`}>
+        <span className={`text-[11px] uppercase tracking-wide px-2 py-0.5 rounded ${badge.className}`}>
           {badge.label}
         </span>
 
@@ -185,7 +185,7 @@ export const BenchmarkDetailDrawer: React.FC<BenchmarkDetailDrawerProps> = ({
                           <td className="p-2 text-right tabular-nums">{cat.P75 ?? '—'}</td>
                           <td className="p-2 text-right tabular-nums">{cat.P90 ?? '—'}</td>
                           <td className="p-2 text-brand-muted">{cat.unit || '% of revenue'}</td>
-                          <td className="p-2 text-brand-muted text-[10px]">
+                          <td className="p-2 text-brand-muted text-[11px]">
                             {cat.linked_levers?.length ? cat.linked_levers.join(', ') : '—'}
                           </td>
                         </tr>

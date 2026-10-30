@@ -135,7 +135,7 @@ export const SectorPackGrid: React.FC<SectorPackGridProps> = ({
 
 function StatChip({ label }: { label: string }) {
   return (
-    <span className="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-brand-surface-muted text-brand-muted">
+    <span className="text-[11px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-brand-surface-muted text-brand-muted">
       {label}
     </span>
   );
@@ -159,7 +159,7 @@ function SectorPackCard({ pack, onClick }: { pack: SectorPackRow; onClick: () =>
           <p className="text-sm font-semibold text-brand-ink truncate">{pack.sector || pack.pack_id}</p>
           <p className="text-xs text-brand-muted mt-0.5 font-mono truncate">{pack.pack_id}</p>
         </div>
-        <span className={`shrink-0 text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded ${badgeClass}`}>
+        <span className={`shrink-0 text-[11px] uppercase tracking-wide px-1.5 py-0.5 rounded ${badgeClass}`}>
           {statusLabel(pack)}
         </span>
       </div>

@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { currencySymbol } from '../../../utils/currencySymbol';
 import { SignalChip } from './primitives/SignalChip';
 import { getAqs, isNeedsActionInitiative } from '../../../utils/initiativeHelpers';
 import type { Initiative } from '../../../types';
@@ -34,7 +35,7 @@ export const SignalStrip: React.FC<SignalStripProps> = ({
       .reduce((s, x) => s + toCr(x.gross_savings_y1 ?? 0, currency), 0);
   }, [live, realizedCr, currency]);
 
-  const sym = currency === 'INR' ? '₹' : '$';
+  const sym = currencySymbol(currency);
 
   return (
     <div className="flex flex-wrap gap-2.5">

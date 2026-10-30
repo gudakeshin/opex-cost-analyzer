@@ -373,7 +373,7 @@ export const BenchmarkToolsPanel: React.FC<BenchmarkToolsPanelProps> = ({
                           >
                             <div className="flex items-center gap-2 flex-wrap">
                               <p className="text-sm font-medium text-brand-ink">{datasetTitle(d)}</p>
-                              <span className={`text-[10px] uppercase px-1.5 py-0.5 rounded ${badge.className}`}>
+                              <span className={`text-[11px] uppercase px-1.5 py-0.5 rounded ${badge.className}`}>
                                 {badge.label}
                               </span>
                             </div>

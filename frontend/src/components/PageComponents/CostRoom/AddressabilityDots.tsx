@@ -26,7 +26,7 @@ export const AddressabilityDots: React.FC<AddressabilityDotsProps> = ({ initiati
         return (
           <span
             key={key}
-            className={`w-5 h-5 rounded text-[10px] font-semibold flex items-center justify-center border ${
+            className={`w-5 h-5 rounded text-[11px] font-semibold flex items-center justify-center border ${
               filled
                 ? 'bg-brand-green/20 border-brand-green text-brand-navy'
                 : 'bg-brand-surface-muted border-brand-border text-brand-muted'

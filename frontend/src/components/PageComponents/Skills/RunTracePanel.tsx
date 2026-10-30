@@ -67,7 +67,7 @@ export const RunTracePanel: React.FC<RunTracePanelProps> = ({ output, skillName 
             <dt className="text-brand-muted mb-1">Output keys</dt>
             <dd className="flex flex-wrap gap-1">
               {outputKeys.map((k) => (
-                <span key={k} className="text-[10px] px-1.5 py-0.5 rounded bg-brand-surface-muted text-brand-ink">
+                <span key={k} className="text-[11px] px-1.5 py-0.5 rounded bg-brand-surface-muted text-brand-ink">
                   {k}
                 </span>
               ))}

@@ -367,11 +367,13 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({
   };
 
   const baseScenario = result?.scenarios.find((s) => s.name === 'base') ?? null;
-  const visibleScenarios = result
-    ? result.scenarios.filter(
-        (s) => s.name === 'base' || s.custom || rows.some((r) => r.name === s.name),
-      )
-    : [];
+  const visibleScenarios = useMemo(
+    () =>
+      result
+        ? result.scenarios.filter((s) => s.name === 'base' || s.custom || rows.some((r) => r.name === s.name))
+        : [],
+    [result, rows],
+  );
 
   const comparisonChart: ChartSpec | null = useMemo(() => {
     if (!result || !baseScenario) return null;

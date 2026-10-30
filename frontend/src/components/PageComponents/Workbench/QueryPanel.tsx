@@ -525,7 +525,7 @@ export const QueryPanel: React.FC<QueryPanelProps> = ({ sessionId, currency }) =
                       <li key={h.history_id} className="px-2 py-1.5 space-y-1">
                         <div className="flex items-center gap-1.5">
                           <span
-                            className={`rounded border px-1.5 py-0.5 text-[10px] ${badge.className}`}
+                            className={`rounded border px-1.5 py-0.5 text-[11px] ${badge.className}`}
                           >
                             {badge.label}
                           </span>

@@ -122,7 +122,6 @@ export const DeepResearchSection: React.FC<Props> = ({
       setInteractionId(initialInteractionId);
       setPhase('polling');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrateReady, initialSummary, initialFullReport, initialInteractionId, sessionId, onSummaryReady]);
 
   const handleStart = async () => {

@@ -47,7 +47,7 @@ export const AnalysisTraceBlock: React.FC<AnalysisTraceBlockProps> = ({ steps })
         <span className="text-xs font-semibold uppercase tracking-wide text-brand-muted">
           How this analysis was derived
         </span>
-        <span className="ml-auto text-[10px] text-brand-muted">
+        <span className="ml-auto text-[11px] text-brand-muted">
           {steps.length} step{steps.length === 1 ? '' : 's'}
         </span>
       </button>
@@ -60,10 +60,10 @@ export const AnalysisTraceBlock: React.FC<AnalysisTraceBlockProps> = ({ steps })
               className="border-l-2 border-brand-navy pl-3"
             >
               <div className="flex items-baseline gap-2">
-                <span className="text-[10px] font-bold text-brand-navy">
+                <span className="text-[11px] font-bold text-brand-navy">
                   {String(step.step).padStart(2, '0')}
                 </span>
-                <span className="text-[10px] font-semibold uppercase tracking-wide text-brand-muted">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted">
                   {phaseLabel(step.phase)}
                 </span>
               </div>
@@ -75,13 +75,13 @@ export const AnalysisTraceBlock: React.FC<AnalysisTraceBlockProps> = ({ steps })
               </p>
               {step.source_documents.length > 0 && (
                 <div className="mt-1.5 flex flex-wrap items-center gap-1">
-                  <span className="text-[10px] uppercase tracking-wide text-brand-muted">
+                  <span className="text-[11px] uppercase tracking-wide text-brand-muted">
                     Source:
                   </span>
                   {step.source_documents.map((doc) => (
                     <span
                       key={doc}
-                      className="rounded bg-white border border-brand-border px-1.5 py-0.5 text-[10px] font-mono text-brand-ink"
+                      className="rounded bg-white border border-brand-border px-1.5 py-0.5 text-[11px] font-mono text-brand-ink"
                       title={doc}
                     >
                       {doc}

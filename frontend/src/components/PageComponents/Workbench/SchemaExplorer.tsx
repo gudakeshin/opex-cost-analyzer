@@ -35,7 +35,7 @@ export const SchemaExplorer: React.FC<SchemaExplorerProps> = ({ schema, onInsert
                 >
                   {col.name}
                 </button>
-                <span className="rounded bg-brand-surface-elevated px-1 py-0.5 text-[10px] text-brand-muted">
+                <span className="rounded bg-brand-surface-elevated px-1 py-0.5 text-[11px] text-brand-muted">
                   {col.type}
                 </span>
                 {samples.length > 0 && (
@@ -57,7 +57,7 @@ export const SchemaExplorer: React.FC<SchemaExplorerProps> = ({ schema, onInsert
                     <button
                       key={v}
                       type="button"
-                      className="rounded border border-brand-border bg-brand-surface px-1.5 py-0.5 font-mono text-[10px] hover:border-brand-primary"
+                      className="rounded border border-brand-border bg-brand-surface px-1.5 py-0.5 font-mono text-[11px] hover:border-brand-primary"
                       title={`Insert ${col.name} = '${v}'`}
                       onClick={() => onInsert(`${col.name} = '${v.replace(/'/g, "''")}'`)}
                     >

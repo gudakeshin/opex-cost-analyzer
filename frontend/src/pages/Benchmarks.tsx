@@ -76,7 +76,7 @@ export const Benchmarks: React.FC = () => {
   };
 
   return (
-    <MainLayout>
+    <MainLayout hideHeader title="Benchmarks">
       <PageHeader
         title="Sector Packs"
         subtitle="Sector reference data for peer comparison, lever modelling, and diagnostics"

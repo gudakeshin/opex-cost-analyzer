@@ -268,7 +268,7 @@ export const EngagementDocuments: React.FC = () => {
   const noDocEngagements = engagements.filter((e) => e.document_count === 0);
 
   return (
-    <MainLayout>
+    <MainLayout hideHeader title="Documents">
       {confirmDialog}
       <PageHeader
         title="Documents"
@@ -324,7 +324,7 @@ export const EngagementDocuments: React.FC = () => {
             </button>
             <button
               type="button"
-              className="px-3 py-1.5 rounded-lg bg-deloitte-green text-white text-xs font-medium hover:bg-[#6fa31e] transition-colors"
+              className="px-3 py-1.5 rounded-lg bg-deloitte-green text-black text-xs font-medium hover:bg-[#6fa31e] transition-colors"
               onClick={() => navigate('/diagnostic')}
             >
               Diagnostic →
@@ -342,9 +342,9 @@ export const EngagementDocuments: React.FC = () => {
           {activeEngagement && (
             <div className="mb-3 p-2.5 bg-brand-surface-muted rounded-lg border border-brand-border">
               <p className="text-xs font-semibold text-brand-ink">{activeEngagement.company_name}</p>
-              <p className="text-[10px] font-mono text-brand-muted mt-0.5">{engagementId}</p>
+              <p className="text-[11px] font-mono text-brand-muted mt-0.5">{engagementId}</p>
               {readyDocCount > 0 && (
-                <p className="text-[10px] text-emerald-700 mt-1 font-medium">
+                <p className="text-[11px] text-emerald-700 mt-1 font-medium">
                   {readyDocCount} document{readyDocCount !== 1 ? 's' : ''} ready
                 </p>
               )}
@@ -552,7 +552,7 @@ export const EngagementDocuments: React.FC = () => {
                     </td>
                     <td className="py-3 pr-4 align-top">
                       <span
-                        className={`text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded border ${
+                        className={`text-[11px] font-semibold uppercase px-1.5 py-0.5 rounded border ${
                           STATUS_STYLES[doc.status || 'pending'] ?? STATUS_STYLES.pending
                         }`}
                       >

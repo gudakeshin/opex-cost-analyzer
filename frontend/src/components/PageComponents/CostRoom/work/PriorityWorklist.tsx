@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { currencySymbol } from '../../../../utils/currencySymbol';
 import { AqsBadge } from '../AqsBadge';
 import { StageTag } from '../primitives/StageTag';
 import { PENDING_STAGES } from '../primitives/stageMeta';
@@ -34,7 +35,7 @@ export const PriorityWorklist: React.FC<PriorityWorklistProps> = ({
     () => [...list].sort((a, b) => priorityScore(b) - priorityScore(a)),
     [list],
   );
-  const sym = currency === 'INR' ? '₹' : '$';
+  const sym = currencySymbol(currency);
 
   return (
     <div className="flex flex-col">

@@ -1,4 +1,5 @@
 import React from 'react';
+import { currencySymbol } from '../../../../utils/currencySymbol';
 import { AqsBadge } from '../AqsBadge';
 import { STAGE_META, KANBAN_STAGES } from '../primitives/stageMeta';
 import { formatBandDisplay, valForBand } from '../../../../utils/initiativeHelpers';
@@ -22,7 +23,7 @@ export const StageKanban: React.FC<StageKanbanProps> = ({
   selectedId,
   onSelect,
 }) => {
-  const sym = currency === 'INR' ? '₹' : '$';
+  const sym = currencySymbol(currency);
 
   return (
     <div className="grid grid-flow-col auto-cols-[minmax(220px,1fr)] gap-3 overflow-x-auto pb-2">

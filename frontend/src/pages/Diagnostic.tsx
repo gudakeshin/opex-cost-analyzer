@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { useAutosave } from '../hooks/useAutosave';
 import { useGuardedNavigate } from '../hooks/useGuardedNavigate';
@@ -74,7 +75,8 @@ export const Diagnostic: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState('');
-  const [industry, setIndustry] = useState('manufacturing_diversified');
+  // Empty until the engagement's industry (or the user) supplies one: a preset value looked like input.
+  const [industry, setIndustry] = useState('');
   const [revenueCr, setRevenueCr] = useState('');
   const [urlsText, setUrlsText] = useState('');
   const [result, setResult] = useState<DiagnosticResponse | null>(null);
@@ -170,7 +172,10 @@ export const Diagnostic: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [sessionId, engagementId, ensureSessionForEngagement, engagement, queryClient]);
+  // Re-hydrate when the session/engagement changes, not on every engagement refresh (that flashed the
+  // loader and overwrote the form after each run).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, engagementId, ensureSessionForEngagement, engagement.engagement_id, queryClient]);
 
   // Pre-fill form from engagement metadata (once, after hydration, only if form is empty)
   useEffect(() => {
@@ -262,6 +267,10 @@ export const Diagnostic: React.FC = () => {
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!companyName.trim()) return;
+    if (!industry) {
+      setError('Choose an industry before running the diagnostic.');
+      return;
+    }
     const parsedRevenue = parseFloat(revenueCr);
     if (!revenueCr.trim() || Number.isNaN(parsedRevenue) || parsedRevenue <= 0) {
       setError('Enter annual revenue (₹ Cr) before running the diagnostic.');
@@ -353,7 +362,7 @@ export const Diagnostic: React.FC = () => {
               <span className="font-semibold">{engagement.company_name}</span>
               {' — diagnostic will use actual spend data where available.'}
               {' '}
-              <a href="/ui/documents" className="underline hover:text-blue-900">Manage documents</a>
+              <Link to="/documents" className="underline hover:text-blue-900">Manage documents</Link>
             </div>
           </div>
         )}
@@ -364,7 +373,7 @@ export const Diagnostic: React.FC = () => {
             </svg>
             <div>
               No documents uploaded for <span className="font-semibold">{engagement.company_name}</span> — diagnostic will use benchmark proxies.{' '}
-              <a href="/ui/documents" className="underline hover:text-amber-900">Upload documents</a> for actual-spend analysis.
+              <Link to="/documents" className="underline hover:text-amber-900">Upload documents</Link> for actual-spend analysis.
             </div>
           </div>
         )}
@@ -415,7 +424,7 @@ export const Diagnostic: React.FC = () => {
             </div>
             <div>
               <Input
-                label="Annual Revenue (₹ Cr)"
+                label={`Annual Revenue (${engagement.currency && engagement.currency !== 'INR' ? engagement.currency + ' ' : '₹ '}Cr)`}
                 type="number"
                 value={revenueCr}
                 onChange={(e) => setRevenueCr(e.target.value)}

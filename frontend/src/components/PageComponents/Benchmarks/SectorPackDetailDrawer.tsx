@@ -83,7 +83,7 @@ export const SectorPackDetailDrawer: React.FC<SectorPackDetailDrawerProps> = ({ 
           </button>
         </div>
 
-        <span className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded ${badge.className}`}>
+        <span className={`text-[11px] uppercase tracking-wide px-2 py-0.5 rounded ${badge.className}`}>
           {badge.label}
         </span>
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { currencySymbol } from '../../../../utils/currencySymbol';
 import { AqsBadge } from '../AqsBadge';
 import { AddressabilityDots } from '../AddressabilityDots';
 import { StageTag } from '../primitives/StageTag';
@@ -54,7 +55,7 @@ export const InitiativeDetailPanel: React.FC<InitiativeDetailPanelProps> = ({
   actualsSaving,
 }) => {
   const [actualsInput, setActualsInput] = useState('');
-  const sym = currency === 'INR' ? '₹' : '$';
+  const sym = currencySymbol(currency);
 
   if (!initiative) {
     return (
@@ -162,7 +163,7 @@ export const InitiativeDetailPanel: React.FC<InitiativeDetailPanelProps> = ({
               return (
                 <div key={i} className="flex items-start gap-2 py-1.5 text-xs">
                   <span
-                    className={`w-4 h-4 rounded-full shrink-0 flex items-center justify-center text-[10px] ${
+                    className={`w-4 h-4 rounded-full shrink-0 flex items-center justify-center text-[11px] ${
                       done
                         ? 'bg-[var(--cr-green)] text-white'
                         : 'bg-white border border-[var(--cr-line)]'

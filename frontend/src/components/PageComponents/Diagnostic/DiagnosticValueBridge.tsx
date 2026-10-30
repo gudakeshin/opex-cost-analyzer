@@ -55,7 +55,7 @@ function ComplexityBadge({ tier }: { tier: string | null }) {
         : 'bg-amber-50 text-amber-900 border-amber-200';
   return (
     <span
-      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${styles}`}
+      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${styles}`}
     >
       {label}
     </span>
@@ -82,7 +82,7 @@ function LeverUncertaintyControl({
 
   return (
     <div className="min-w-[168px] space-y-2">
-      <div className="flex items-center justify-between gap-2 text-[10px] tabular-nums text-brand-muted">
+      <div className="flex items-center justify-between gap-2 text-[11px] tabular-nums text-brand-muted">
         <span>P10 {formatCr(p10, { bare: true, alreadyInCr: true })}</span>
         <span className="font-semibold text-brand-ink">{percentileScenarioShort(percentile)}</span>
         <span>P90 {formatCr(p90, { bare: true, alreadyInCr: true })}</span>
@@ -102,7 +102,7 @@ function LeverUncertaintyControl({
         aria-valuenow={percentile}
         aria-valuetext={`${label} · ${formatCr(scenarioCr, { bare: true, alreadyInCr: true })} Cr/yr`}
       />
-      <p className="text-[10px] text-brand-muted leading-snug">
+      <p className="text-[11px] text-brand-muted leading-snug">
         {formatCr(scenarioCr, { bare: true, alreadyInCr: true })} Cr/yr · {label}
       </p>
     </div>
@@ -141,7 +141,7 @@ function PortfolioBandSummary({
           style={{ left: `${Math.min(Math.max(scenarioPct, 2), 98)}%` }}
         />
       </div>
-      <div className="flex justify-between text-[10px] tabular-nums text-brand-muted">
+      <div className="flex justify-between text-[11px] tabular-nums text-brand-muted">
         <span>P10 {formatCr(p10, { bare: true, alreadyInCr: true })}</span>
         <span>P50 {formatCr(p50, { bare: true, alreadyInCr: true })}</span>
         <span>P90 {formatCr(p90, { bare: true, alreadyInCr: true })}</span>
@@ -342,7 +342,7 @@ export const DiagnosticValueBridge: React.FC<DiagnosticValueBridgeProps> = ({
                           <div className="mt-1.5 flex flex-wrap gap-1.5">
                             <ComplexityBadge tier={segment.complexityTier} />
                             {segment.savingsTypeLabel && (
-                              <span className="inline-flex items-center rounded-full border border-brand-border bg-white px-2 py-0.5 text-[10px] font-medium text-brand-muted">
+                              <span className="inline-flex items-center rounded-full border border-brand-border bg-white px-2 py-0.5 text-[11px] font-medium text-brand-muted">
                                 {segment.savingsTypeLabel}
                               </span>
                             )}

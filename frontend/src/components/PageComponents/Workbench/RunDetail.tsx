@@ -152,7 +152,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
         {tab === 'charts' && <WorkbenchRunCharts run={run} currency={currency} />}
 
         {tab === 'raw' && (
-          <pre className="text-[10px] font-mono bg-brand-surface-muted p-2 rounded overflow-auto max-h-96">
+          <pre className="text-[11px] font-mono bg-brand-surface-muted p-2 rounded overflow-auto max-h-96">
             {JSON.stringify(run.skill_outputs, null, 2)}
           </pre>
         )}

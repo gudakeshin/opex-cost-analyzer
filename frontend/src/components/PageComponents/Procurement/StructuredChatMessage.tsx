@@ -30,7 +30,7 @@ interface StructuredChatMessageProps {
 function AssistantAvatar() {
   return (
     <span
-      className="w-8 h-8 rounded-full bg-black flex items-center justify-center shrink-0 text-[10px] font-bold text-white"
+      className="w-8 h-8 rounded-full bg-black flex items-center justify-center shrink-0 text-[11px] font-bold text-white"
       aria-hidden
     >
       AI
@@ -331,15 +331,15 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
           <div className="flex items-center gap-2 mb-2">
             <ConfidenceBadge signals={message.quality_signals} compact />
             {message.degraded_mode && (
-              <span className="text-[10px] uppercase font-bold text-amber-700">Degraded</span>
+              <span className="text-[11px] uppercase font-bold text-amber-700">Degraded</span>
             )}
             {message.used_llm_synthesis === false && (
-              <span className="text-[10px] uppercase font-bold text-amber-700">Offline</span>
+              <span className="text-[11px] uppercase font-bold text-amber-700">Offline</span>
             )}
             {message.response_metadata?.narrative_mode === 'deterministic' && (
               <span
-                className="text-[10px] uppercase font-bold text-slate-600 border border-slate-300 rounded px-1.5 py-0.5"
-                title="Narrative composed from skill outputs — see Trust rail Provenance"
+                className="text-[11px] uppercase font-bold text-slate-600 border border-slate-300 rounded px-1.5 py-0.5"
+                title="Narrative composed from skill outputs — see Sources & confidence → Provenance"
               >
                 Composed from data
               </span>

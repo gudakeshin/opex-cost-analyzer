@@ -240,6 +240,14 @@ async function pollChatProgress(
   }
 }
 
+function safeLocalStorageGet(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
 function isDesktopViewport(): boolean {
   return typeof window === 'undefined' || !window.matchMedia || window.matchMedia('(min-width: 1024px)').matches;
 }
@@ -376,6 +384,7 @@ export const ProcurementAnalysis: React.FC = () => {
   );
   const fileRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const stickToBottomRef = useRef(true);
   const pollAbortRef = useRef<AbortController | null>(null);
   const runAbortRef = useRef<AbortController | null>(null);
   // The background analysis run being followed (target of the server-side cancel).
@@ -455,7 +464,12 @@ export const ProcurementAnalysis: React.FC = () => {
     : null;
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Follow new content only while the reader is at the bottom; do not yank them away from
+    // something they scrolled up to read.
+    if (stickToBottomRef.current) {
+      const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      chatEndRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+    }
   }, [messages, loading]);
 
   useEffect(() => {
@@ -564,6 +578,8 @@ export const ProcurementAnalysis: React.FC = () => {
     return () => {
       cancelled = true;
     };
+    // agentSteps is read once to decide whether to seed fallback steps; re-running on every step would loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, engagementId, setSessionId, refreshSessionAnalysis, queryClient]);
 
   useEffect(() => {
@@ -693,6 +709,10 @@ export const ProcurementAnalysis: React.FC = () => {
         skipNextProbeAutoOpen.current = false;
         return;
       }
+      // Probes are offered (the "Open probe dialog" link under results, and the Insights panel)
+      // rather than forced open after every analysis, which interrupted people mid-task.
+      // Set localStorage opex_auto_open_probes=1 to restore the old auto-open behaviour.
+      if (safeLocalStorageGet('opex_auto_open_probes') !== '1') return;
       if (!snapshot || !hasUnansweredProbeQuestions(snapshot, answered)) return;
       const unanswered = collectUnansweredProbeQuestions(snapshot, answered, 5);
       const key =
@@ -1724,6 +1744,11 @@ export const ProcurementAnalysis: React.FC = () => {
                   options={[
                     { value: '', label: 'Select sector…' },
                     ...sectorOptions.map((o) => ({ value: o.value, label: o.label })),
+                    // Reflect an industry that is not a sector pack (e.g. a free-text or legacy value)
+                    // instead of silently showing "Select sector…".
+                    ...(currentIndustry && !sectorOptions.some((o) => o.value === currentIndustry)
+                      ? [{ value: currentIndustry, label: `${currentIndustry.replace(/_/g, ' ')} (no sector pack)` }]
+                      : []),
                   ]}
                 />
               </div>
@@ -1752,16 +1777,18 @@ export const ProcurementAnalysis: React.FC = () => {
               type="button"
               onClick={handleIncrementalAnalyze}
               disabled={loading}
+              title="Merge newly uploaded files into the current analysis without re-running everything"
               className="text-xs px-2 py-1 rounded-md border border-brand-border hover:bg-brand-surface-muted disabled:opacity-50"
             >
-              Incremental update
+              Merge new data
             </button>
             <button
               type="button"
               onClick={() => setTrustOpen(true)}
+              title="Audit log, logic trace, data sources and confidence scores for this analysis"
               className="text-xs px-2 py-1 rounded-md border border-brand-border hover:bg-brand-surface-muted"
             >
-              Trust rail
+              Sources & confidence
             </button>
             {llmModels.length > 0 && (
               <div className="w-44 min-w-[10rem]">
@@ -1786,9 +1813,10 @@ export const ProcurementAnalysis: React.FC = () => {
                   ? 'border-deloitte-green text-brand-primary bg-deloitte-green/5'
                   : 'border-brand-border hover:bg-brand-surface-muted'
               }`}
-              title="Enable extended chain-of-thought reasoning for deeper analysis"
+              aria-pressed={thinkingMode}
+              title="Deep reasoning: the model thinks step by step before answering. Slower and costs more, useful for hard questions."
             >
-              {thinkingMode ? 'Thinking: on' : 'Thinking: off'}
+              {thinkingMode ? 'Deep reasoning: on' : 'Deep reasoning: off'}
             </button>
           </div>
         </header>
@@ -1840,7 +1868,13 @@ export const ProcurementAnalysis: React.FC = () => {
                 }}
               />
             )}
-            <div className="flex-1 overflow-y-auto">
+            <div
+              className="flex-1 overflow-y-auto"
+              onScroll={(e) => {
+                const el = e.currentTarget;
+                stickToBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 160;
+              }}
+            >
               <div className="max-w-3xl mx-auto w-full px-4 py-8 space-y-6">
                 {messages.length === 0 && !loading ? (
                   <div className="text-center py-8 md:py-16">
@@ -1933,7 +1967,8 @@ export const ProcurementAnalysis: React.FC = () => {
                   <>
                     {messages.map((msg, idx) => (
                       <StructuredChatMessage
-                        key={idx}
+                        // run_id is shared by a streaming placeholder and its final message, so state survives the swap
+                        key={msg.run_id ? `${msg.role}-${msg.run_id}` : `${msg.role}-${idx}`}
                         message={msg}
                         liveSnapshot={insightSnapshot}
                         currency={engagement.currency || 'INR'}
@@ -1952,7 +1987,7 @@ export const ProcurementAnalysis: React.FC = () => {
                     {loading && (
                       <div className="flex justify-start gap-3 max-w-[85%] w-full">
                         <span
-                          className="w-8 h-8 rounded-full bg-black flex items-center justify-center shrink-0 text-[10px] font-bold text-white"
+                          className="w-8 h-8 rounded-full bg-black flex items-center justify-center shrink-0 text-[11px] font-bold text-white"
                           aria-hidden
                         >
                           AI
@@ -2111,7 +2146,13 @@ export const ProcurementAnalysis: React.FC = () => {
             setCheckpointId(null);
             setClarification(null);
             setPendingMessage('');
-            setError('Analysis paused — provide the requested data or resend your question when ready.');
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                content: 'Paused — provide the requested data, or resend your question when you are ready.',
+              },
+            ]);
           } else {
             resetSmeProbeState();
             setClarification(null);

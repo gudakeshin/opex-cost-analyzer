@@ -32,7 +32,7 @@ export const CompactStatStrip: React.FC<CompactStatStripProps> = ({ items, class
                   : 'border-brand-border bg-brand-surface-muted/80'
             }`}
           >
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-brand-muted">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted">
               {item.label}
             </span>
             <span
@@ -44,7 +44,7 @@ export const CompactStatStrip: React.FC<CompactStatStripProps> = ({ items, class
               {item.value}
             </span>
             {item.detail && (
-              <span className="text-[10px] text-brand-muted leading-snug truncate" title={item.detail}>
+              <span className="text-[11px] text-brand-muted leading-snug truncate" title={item.detail}>
                 {item.detail}
               </span>
             )}

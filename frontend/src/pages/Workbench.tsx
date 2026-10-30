@@ -93,7 +93,7 @@ export const Workbench: React.FC = () => {
   const [seedName, setSeedName] = useState<string | null>(null);
 
   const runsQuery = useWorkbenchRuns(engagementId, activeSid);
-  const runs = runsQuery.data?.runs ?? [];
+  const runs = useMemo(() => runsQuery.data?.runs ?? [], [runsQuery.data]);
   const [openRun, setOpenRun] = useState<WorkbenchRun | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [includeQualityGates, setIncludeQualityGates] = useState(false);
@@ -324,14 +324,14 @@ export const Workbench: React.FC = () => {
 
   if (hydrating) {
     return (
-      <MainLayout title="Workbench">
+      <MainLayout hideHeader title="Workbench">
         <Loader label="Loading workbench…" />
       </MainLayout>
     );
   }
 
   return (
-    <MainLayout title="Workbench">
+    <MainLayout hideHeader title="Workbench">
       {confirmDialog}
       <PageHeader
         title="Analysis Workbench"

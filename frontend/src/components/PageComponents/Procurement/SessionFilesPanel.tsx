@@ -40,7 +40,7 @@ export const SessionFilesPanel: React.FC<SessionFilesPanelProps> = ({ files }) =
                 <div className="flex items-start justify-between gap-2">
                   <span className="font-medium text-brand-ink break-all">{name}</span>
                   <span
-                    className={`shrink-0 text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded border ${chip.className}`}
+                    className={`shrink-0 text-[11px] font-semibold uppercase px-1.5 py-0.5 rounded border ${chip.className}`}
                   >
                     {chip.label}
                   </span>

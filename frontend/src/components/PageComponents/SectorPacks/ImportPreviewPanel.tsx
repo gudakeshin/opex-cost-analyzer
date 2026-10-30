@@ -34,7 +34,7 @@ export const ImportPreviewPanel: React.FC<ImportPreviewPanelProps> = ({ result }
               {packResult.components!.map((comp) => (
                 <span
                   key={comp}
-                  className="text-[10px] px-1.5 py-0.5 rounded bg-brand-surface-muted text-brand-muted uppercase"
+                  className="text-[11px] px-1.5 py-0.5 rounded bg-brand-surface-muted text-brand-muted uppercase"
                 >
                   {comp}
                 </span>

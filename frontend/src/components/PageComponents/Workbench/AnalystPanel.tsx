@@ -157,7 +157,7 @@ export const AnalystPanel: React.FC<AnalystPanelProps> = ({ sessionId, currency 
                   </details>
                 )}
                 {turn.provenance && (
-                  <p className="text-[10px] text-brand-muted">
+                  <p className="text-[11px] text-brand-muted">
                     {turn.provenance.model_version} · hash {turn.provenance.prompt_hash}
                   </p>
                 )}

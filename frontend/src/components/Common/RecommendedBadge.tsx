@@ -33,7 +33,7 @@ export const RecommendedBadge: React.FC<RecommendedBadgeProps> = ({
 
   if (variant === 'compact') {
     return (
-      <span className={`inline-flex items-center gap-1 text-[10px] text-brand-muted ${className}`}>
+      <span className={`inline-flex items-center gap-1 text-[11px] text-brand-muted ${className}`}>
         <span
           className="inline-flex items-center gap-0.5 rounded bg-brand-surface-muted px-1 py-0.5 max-w-[10rem]"
           title={`Recommended from your documents: ${label}`}

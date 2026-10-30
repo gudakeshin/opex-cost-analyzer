@@ -27,10 +27,10 @@ export const ThinkingBlock: React.FC<ThinkingBlockProps> = ({ thinking, live = f
         className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-slate-100 transition-colors"
       >
         <span className="text-slate-400 text-xs select-none">◈</span>
-        <span className="text-[10px] uppercase font-semibold text-slate-500 flex-1 tracking-wide">
+        <span className="text-[11px] uppercase font-semibold text-slate-500 flex-1 tracking-wide">
           Model reasoning
         </span>
-        <span className="text-[10px] text-slate-400 select-none">
+        <span className="text-[11px] text-slate-400 select-none">
           {open ? 'Hide ▲' : 'Show ▼'}
         </span>
       </button>

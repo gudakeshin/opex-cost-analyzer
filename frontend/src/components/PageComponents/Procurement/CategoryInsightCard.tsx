@@ -16,7 +16,7 @@ export const CategoryInsightCard: React.FC<CategoryInsightCardProps> = ({ data, 
       <div className="flex items-start justify-between gap-2">
         <h4 className="text-xs font-bold text-brand-navy">{data.category_name}</h4>
         {data.benchmark_gap && (
-          <span className="text-[10px] font-semibold uppercase tracking-wide text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded">
             {data.benchmark_gap}
           </span>
         )}
@@ -47,7 +47,7 @@ export const CategoryInsightCard: React.FC<CategoryInsightCardProps> = ({ data, 
       </dl>
       {data.top_suppliers && data.top_suppliers.length > 0 && (
         <div>
-          <p className="text-[10px] font-semibold uppercase text-brand-muted mb-1">Top suppliers</p>
+          <p className="text-[11px] font-semibold uppercase text-brand-muted mb-1">Top suppliers</p>
           <ul className="text-[11px] space-y-0.5">
             {data.top_suppliers.map((s) => (
               <li key={s.supplier} className="flex justify-between gap-2">

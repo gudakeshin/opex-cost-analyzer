@@ -188,11 +188,11 @@ export const SpendCharts: React.FC<SpendChartsProps> = ({ chartData, currency })
 
         return (
           <div key={chart}>
-            <p className="text-[10px] uppercase font-semibold text-brand-muted mb-1">
+            <p className="text-[11px] uppercase font-semibold text-brand-muted mb-1">
               {CHART_LABELS[chart] ?? chart.replace(/_/g, ' ')}
             </p>
             {reason && (
-              <p className="text-[10px] text-brand-muted mb-2 italic">{reason}</p>
+              <p className="text-[11px] text-brand-muted mb-2 italic">{reason}</p>
             )}
             <div className="rounded-xl bg-white border border-brand-border p-2">
               {chartEl}
@@ -203,7 +203,7 @@ export const SpendCharts: React.FC<SpendChartsProps> = ({ chartData, currency })
 
       {chartData.commentary_points.length > 0 && (
         <div className="rounded-xl bg-brand-surface-muted border border-brand-border px-3 py-2.5">
-          <p className="text-[10px] uppercase font-semibold text-brand-muted mb-1.5">AI analysis</p>
+          <p className="text-[11px] uppercase font-semibold text-brand-muted mb-1.5">AI analysis</p>
           <ul className="space-y-1">
             {chartData.commentary_points.map((point, i) => (
               <li key={i} className="text-xs text-brand-ink leading-relaxed flex gap-1.5">

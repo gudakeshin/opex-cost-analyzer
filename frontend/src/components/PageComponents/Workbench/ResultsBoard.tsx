@@ -59,13 +59,13 @@ export const ResultsBoard: React.FC<ResultsBoardProps> = ({
               >
                 {run.name}
               </button>
-              <span className={`text-[10px] px-1.5 py-0.5 rounded-full shrink-0 ${STATUS_STYLES[run.status] || ''}`}>
+              <span className={`text-[11px] px-1.5 py-0.5 rounded-full shrink-0 ${STATUS_STYLES[run.status] || ''}`}>
                 {run.status}
               </span>
             </div>
 
             {run.parent_run_id && (
-              <span className="text-[10px] text-brand-muted">↳ branched</span>
+              <span className="text-[11px] text-brand-muted">↳ branched</span>
             )}
 
             <dl className="grid grid-cols-2 gap-1.5 text-xs">

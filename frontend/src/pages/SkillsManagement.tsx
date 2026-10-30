@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useConfirm } from '../hooks/useConfirm';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { Button } from '../components/Common/Button';
 import { Card } from '../components/Common/Card';
@@ -49,7 +50,7 @@ const STATUS_BADGE: Record<string, string> = {
 function StatusBadge({ status }: { status?: string }) {
   const s = status || 'active';
   return (
-    <span className={`text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded ${STATUS_BADGE[s] || STATUS_BADGE.active}`}>
+    <span className={`text-[11px] uppercase tracking-wide px-1.5 py-0.5 rounded ${STATUS_BADGE[s] || STATUS_BADGE.active}`}>
       {s}
     </span>
   );
@@ -58,13 +59,14 @@ function StatusBadge({ status }: { status?: string }) {
 function KindBadge({ kind }: { kind?: string }) {
   const k = kind || 'analysis';
   return (
-    <span className={`text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded ${KIND_BADGE[k] || KIND_BADGE.analysis}`}>
+    <span className={`text-[11px] uppercase tracking-wide px-1.5 py-0.5 rounded ${KIND_BADGE[k] || KIND_BADGE.analysis}`}>
       {k.replace('_', ' ')}
     </span>
   );
 }
 
 export const SkillsManagement: React.FC = () => {
+  const [confirm, confirmDialog] = useConfirm();
   const skillsQuery = useSkillsCatalog();
   const dependenciesQuery = useSkillDependencies();
   const invalidateCatalog = useInvalidateSkillsCatalog();
@@ -227,7 +229,12 @@ export const SkillsManagement: React.FC = () => {
 
   const handleSave = async () => {
     if (!selectedSkill) return;
-    if (!window.confirm(`Save changes to ${selectedSkill}?`)) return;
+    const ok = await confirm({
+      title: 'Save skill changes?',
+      message: `Changes to “${selectedSkill}” take effect for new analyses straight away.`,
+      confirmLabel: 'Save',
+    });
+    if (!ok) return;
     setLoading(true);
     setError(null);
     try {
@@ -333,7 +340,13 @@ export const SkillsManagement: React.FC = () => {
 
   const handleArchive = async () => {
     if (!selectedSkill) return;
-    if (!window.confirm(`Archive ${selectedSkill}? It will drop out of the active DAG.`)) return;
+    const ok = await confirm({
+      title: 'Archive this skill?',
+      message: `“${selectedSkill}” will drop out of the active skill graph and stop running in analyses.`,
+      confirmLabel: 'Archive',
+      danger: true,
+    });
+    if (!ok) return;
     setLoading(true);
     setError(null);
     try {
@@ -357,6 +370,7 @@ export const SkillsManagement: React.FC = () => {
 
   return (
     <MainLayout hideHeader>
+      {confirmDialog}
       <PageHeader
         title="Skills"
         subtitle="Classify, author declarative skills, test, and re-index for agent discovery"
@@ -400,7 +414,7 @@ export const SkillsManagement: React.FC = () => {
                     <KindBadge kind={s.kind} />
                   </div>
                 </div>
-                <p className="text-[10px] text-brand-muted mt-0.5">
+                <p className="text-[11px] text-brand-muted mt-0.5">
                   {s.execution_status || 'python'}
                   {s.weight === 'heavy' ? ' · heavy' : ''}
                   {s.discoverable === false ? ' · hidden' : ''}

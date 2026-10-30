@@ -112,7 +112,7 @@ function AnomalyQualityCard({ flag, currency }: { flag: AnomalyFlag; currency: s
       <div className="flex flex-wrap items-center gap-2">
         <h4 className="text-sm font-semibold text-brand-ink">Spend anomaly · {flag.category_name}</h4>
         <span
-          className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${conflictSeverityBadge(flag.severity)}`}
+          className={`text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${conflictSeverityBadge(flag.severity)}`}
         >
           {flag.severity}
         </span>
@@ -135,17 +135,17 @@ function ConflictQualityCard({ conflict }: { conflict: DataConflict }) {
       <div className="flex flex-wrap items-center gap-2">
         <h4 className="text-sm font-semibold text-brand-ink">{title}</h4>
         <span
-          className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${conflictSeverityBadge(severity)}`}
+          className={`text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${conflictSeverityBadge(severity)}`}
         >
           {severity}
         </span>
-        <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+        <span className="text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
           cross-source
         </span>
       </div>
       <p className="text-sm text-brand-ink mt-1.5">{description}</p>
       <div className="mt-2 rounded-lg bg-white/80 border border-brand-border/60 px-2.5 py-2">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-brand-muted">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted">
           Recommended action
         </p>
         <p className="text-xs text-brand-ink mt-1">{recommendation}</p>

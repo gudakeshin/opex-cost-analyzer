@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Input } from '../components/Common/Input';
 import { Link } from 'react-router-dom';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { Button } from '../components/Common/Button';
@@ -104,6 +105,11 @@ export const SectorPackStudio: React.FC = () => {
   const [showPublish, setShowPublish] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [newPackId, setNewPackId] = useState('');
+  // Mirrors the server rule (app/services/sector_pack_authoring.py) so mistakes show before submitting.
+  const packIdError =
+    newPackId.trim() && !/^[a-z0-9][a-z0-9_-]{1,63}$/.test(newPackId.trim())
+      ? 'Use lowercase letters, numbers, _ or -, starting with a letter or number (2–64 characters).'
+      : undefined;
   const [newSector, setNewSector] = useState('');
   const [importPreview, setImportPreview] = useState<Record<string, unknown> | null>(null);
   const [importFile, setImportFile] = useState<File | null>(null);
@@ -516,11 +522,11 @@ export const SectorPackStudio: React.FC = () => {
               >
                 <div className="flex items-center justify-between gap-1">
                   <span className="truncate">{p.sector || p.pack_id}</span>
-                  <span className={`text-[10px] px-1 rounded ${statusBadge(p.status)}`}>
+                  <span className={`text-[11px] px-1 rounded ${statusBadge(p.status)}`}>
                     {p.status || 'scaffold'}
                   </span>
                 </div>
-                <p className="text-[10px] text-brand-muted">v{p.version || '?'} · {p.pack_id}</p>
+                <p className="text-[11px] text-brand-muted">v{p.version || '?'} · {p.pack_id}</p>
               </button>
             ))}
           </div>
@@ -531,19 +537,27 @@ export const SectorPackStudio: React.FC = () => {
           </div>
           {showCreate && (
             <div className="mt-3 space-y-2">
-              <input
-                className="w-full border rounded px-2 py-1 text-sm"
+              <Input
+                aria-label="Pack id"
+                className="!px-2 !py-1"
                 placeholder="pack_id (slug)"
                 value={newPackId}
                 onChange={(e) => setNewPackId(e.target.value)}
+                hint="Lowercase letters, numbers, _ or -; 2–64 characters; cannot be changed later."
+                error={packIdError}
               />
               <input
+                aria-label="Sector label"
                 className="w-full border rounded px-2 py-1 text-sm"
                 placeholder="Sector label"
                 value={newSector}
                 onChange={(e) => setNewSector(e.target.value)}
               />
-              <Button className="w-full" onClick={handleCreate} disabled={createMutation.isPending}>
+              <Button
+                className="w-full"
+                onClick={handleCreate}
+                disabled={createMutation.isPending || !newPackId.trim() || !newSector.trim() || Boolean(packIdError)}
+              >
                 Scaffold pack
               </Button>
             </div>

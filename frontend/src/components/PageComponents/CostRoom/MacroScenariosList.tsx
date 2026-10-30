@@ -36,7 +36,7 @@ export const MacroScenariosList: React.FC<MacroScenariosListProps> = ({
             <span className="text-brand-ink min-w-0 pr-2 leading-snug">
               {s.label}
               {s.illustrative && (
-                <span className="ml-1 text-[10px] text-brand-muted">(illustrative)</span>
+                <span className="ml-1 text-[11px] text-brand-muted">(illustrative)</span>
               )}
             </span>
             <span className="tabular-nums text-brand-navy shrink-0">{formatBps(s.ebitdaBps)}</span>
@@ -44,7 +44,7 @@ export const MacroScenariosList: React.FC<MacroScenariosListProps> = ({
         );
       })}
     </ul>
-    <p className="text-[10px] text-brand-muted">Base scenario: {formatBps(baseBps)} EBITDA impact</p>
+    <p className="text-[11px] text-brand-muted">Base scenario: {formatBps(baseBps)} EBITDA impact</p>
   </div>
 );
 
