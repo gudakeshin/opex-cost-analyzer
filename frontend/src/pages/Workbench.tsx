@@ -23,6 +23,7 @@ import {
   useWorkbenchRuns,
 } from '../api/hooks/useWorkbenchQueries';
 import { workbenchKeys } from '../api/queryKeys';
+import { useConfirm } from '../hooks/useConfirm';
 import type {
   WorkbenchRun,
   WorkbenchValidation,
@@ -228,7 +229,15 @@ export const Workbench: React.FC = () => {
     }
   };
 
+  const [confirm, confirmDialog] = useConfirm();
+
   const handlePromote = async (run: WorkbenchRun) => {
+    const ok = await confirm({
+      title: 'Promote to Cost Room?',
+      message: `Create initiatives from “${run.name}” in the Cost Room pipeline. You can reject them there later, but they will appear on the board straight away.`,
+      confirmLabel: 'Promote',
+    });
+    if (!ok) return;
     setPromoting(true);
     setError(null);
     try {
@@ -279,6 +288,13 @@ export const Workbench: React.FC = () => {
   };
 
   const handleDelete = async (run: WorkbenchRun) => {
+    const ok = await confirm({
+      title: 'Delete run?',
+      message: `“${run.name}” and its results will be permanently deleted. This cannot be undone.`,
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await apiDelete(`/api/v1/workbench/runs/${run.run_id}`);
       queryClient.setQueryData(
@@ -315,6 +331,7 @@ export const Workbench: React.FC = () => {
 
   return (
     <MainLayout title="Workbench">
+      {confirmDialog}
       <PageHeader
         title="Analysis Workbench"
         subtitle="Compose analyses, tweak assumptions, run, and compare"

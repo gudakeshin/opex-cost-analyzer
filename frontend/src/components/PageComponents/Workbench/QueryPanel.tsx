@@ -17,6 +17,7 @@ import { DynamicChart } from '../Procurement/DynamicChart';
 import { SchemaExplorer } from './SchemaExplorer';
 import { ResultsTable } from './ResultsTable';
 import type { ChartSpec } from '../../../types';
+import { useConfirm } from '../../../hooks/useConfirm';
 
 interface QueryResult {
   columns: string[];
@@ -226,8 +227,17 @@ export const QueryPanel: React.FC<QueryPanelProps> = ({ sessionId, currency }) =
     }
   };
 
+  const [confirm, confirmDialog] = useConfirm();
+
   const deleteSaved = async (queryId: string) => {
     if (!sessionId) return;
+    const ok = await confirm({
+      title: 'Delete saved query?',
+      message: 'This saved query will be permanently deleted.',
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await deleteMutation.mutateAsync(queryId);
       toast('Saved query deleted', 'info');
@@ -270,6 +280,7 @@ export const QueryPanel: React.FC<QueryPanelProps> = ({ sessionId, currency }) =
 
   return (
     <div className="space-y-4">
+      {confirmDialog}
       {schemaQuery.isLoading && <Loader label="Loading schema…" />}
       {schema && (
         <p className="text-xs text-brand-muted">

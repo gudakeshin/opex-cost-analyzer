@@ -25,8 +25,8 @@ export async function apiGet<T>(url: string): Promise<T> {
   return data;
 }
 
-export async function apiPost<T>(url: string, body?: unknown): Promise<T> {
-  const { data } = await client.post<T>(url, body);
+export async function apiPost<T>(url: string, body?: unknown, signal?: AbortSignal): Promise<T> {
+  const { data } = await client.post<T>(url, body, signal ? { signal } : undefined);
   return data;
 }
 

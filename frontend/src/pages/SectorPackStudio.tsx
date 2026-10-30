@@ -47,6 +47,7 @@ import {
   serializeDraftToPayload,
 } from '../utils/sectorPackEditors';
 import { buildManifestForm, hydrateEditorDrafts } from '../utils/sectorPackStudioState';
+import { useConfirm } from '../hooks/useConfirm';
 
 type TabId =
   | 'manifest'
@@ -104,6 +105,7 @@ export const SectorPackStudio: React.FC = () => {
   const [newPackId, setNewPackId] = useState('');
   const [newSector, setNewSector] = useState('');
   const [importPreview, setImportPreview] = useState<Record<string, unknown> | null>(null);
+  const [importFile, setImportFile] = useState<File | null>(null);
 
   const detailQuery = useSectorPackDetail(selectedId || null);
   const detail = detailQuery.data ?? null;
@@ -122,35 +124,56 @@ export const SectorPackStudio: React.FC = () => {
   const packsLoading = packsQuery.isLoading;
   const showPackLoader = packsLoading || detailPending;
 
-  const hasEditorDiff = useMemo(() => {
-    if (!isPackEditorTab(tab) || !detail) return false;
-    const draft = draftByTab[tab];
-    const baseline = baselineByTab[tab];
-    if (!draft || !baseline) return false;
-    if (viewModeByTab[tab] === 'json') {
-      const jsonText = jsonTextByTab[tab];
-      if (!jsonText) return false;
-      try {
-        const parsed = parseDraftFromJson(tab, jsonText);
-        return !deepEqual(
-          serializeDraftToPayload(tab, parsed, detail),
-          serializeDraftToPayload(tab, baseline, detail),
-        );
-      } catch {
-        return true;
+  // Unsaved edits on ANY tab, not just the visible one: switching tabs keeps drafts in
+  // state, but switching packs (or leaving the page) discards them.
+  const dirtyTabIds = useMemo(() => {
+    const dirty = new Set<TabId>();
+    if (!detail) return dirty;
+    for (const t of TABS) {
+      if (!isPackEditorTab(t.id)) continue;
+      const draft = draftByTab[t.id];
+      const baseline = baselineByTab[t.id];
+      if (!draft || !baseline) continue;
+      if (viewModeByTab[t.id] === 'json') {
+        const jsonText = jsonTextByTab[t.id];
+        if (!jsonText) continue;
+        try {
+          const parsed = parseDraftFromJson(t.id, jsonText);
+          if (
+            !deepEqual(
+              serializeDraftToPayload(t.id, parsed, detail),
+              serializeDraftToPayload(t.id, baseline, detail),
+            )
+          ) {
+            dirty.add(t.id);
+          }
+        } catch {
+          dirty.add(t.id);
+        }
+      } else if (!deepEqual(draft, baseline)) {
+        dirty.add(t.id);
       }
     }
-    return !deepEqual(draft, baseline);
-  }, [tab, draftByTab, baselineByTab, viewModeByTab, jsonTextByTab, detail]);
+    if (manifestDirty(manifestForm, manifestBaseline)) dirty.add('manifest');
+    if (regulatoryText !== regulatoryBaseline) dirty.add('regulatory');
+    return dirty;
+  }, [
+    detail,
+    draftByTab,
+    baselineByTab,
+    viewModeByTab,
+    jsonTextByTab,
+    manifestForm,
+    manifestBaseline,
+    regulatoryText,
+    regulatoryBaseline,
+  ]);
 
-  const hasDiff =
-    tab === 'manifest'
-      ? manifestDirty(manifestForm, manifestBaseline)
-      : tab === 'regulatory'
-        ? regulatoryText !== regulatoryBaseline
-        : hasEditorDiff;
+  const anyDiff = dirtyTabIds.size > 0;
+  const dirtyTabLabels = TABS.filter((t) => dirtyTabIds.has(t.id)).map((t) => t.label);
+  const [confirm, confirmDialog] = useConfirm();
 
-  useUnsavedGuard('sector-pack-studio', hasDiff);
+  useUnsavedGuard('sector-pack-studio', anyDiff);
 
   useEffect(() => {
     if (packs.length && !selectedId) setSelectedId(packs[0].pack_id);
@@ -244,6 +267,27 @@ export const SectorPackStudio: React.FC = () => {
 
   const handlePublish = async (bump: string, targetStatus?: string) => {
     if (!selectedId) return;
+    const isMajor = bump === 'major' && !targetStatus;
+    const ok = await confirm({
+      title: targetStatus === 'draft' ? 'Publish as draft?' : `Publish ${bump} version?`,
+      message: (
+        <>
+          <p>
+            This runs regression tests, bumps the {bump} version of <strong>{selectedId}</strong> and updates
+            effective_from.{isMajor ? ' A major bump cannot be undone.' : ''}
+          </p>
+          {anyDiff && (
+            <p className="mt-2 text-amber-700">
+              You have unsaved edits ({dirtyTabLabels.join(', ')}). Publishing uses the last saved version, so these
+              edits will not be included.
+            </p>
+          )}
+        </>
+      ),
+      confirmLabel: 'Publish',
+      danger: isMajor,
+    });
+    if (!ok) return;
     setError(null);
     try {
       const res = await publishMutation.mutateAsync({ bump, target_status: targetStatus ?? null });
@@ -277,8 +321,10 @@ export const SectorPackStudio: React.FC = () => {
       const res = await importMutation.mutateAsync({ file, dryRun, packId: selectedId || undefined });
       if (dryRun) {
         setImportPreview(res);
+        setImportFile(file);
       } else {
         setImportPreview(null);
+        setImportFile(null);
         await packsQuery.refetch();
         await detailQuery.refetch();
       }
@@ -425,6 +471,7 @@ export const SectorPackStudio: React.FC = () => {
 
   return (
     <MainLayout hideHeader>
+      {confirmDialog}
       <PageHeader
         title="Sector Pack Studio"
         subtitle="Author benchmarks, levers, KPIs, peers, taxonomy, and regulatory layers. New packs appear in engagement sector dropdowns after publish."
@@ -449,7 +496,19 @@ export const SectorPackStudio: React.FC = () => {
               <button
                 key={p.pack_id}
                 type="button"
-                onClick={() => setSelectedId(p.pack_id)}
+                onClick={async () => {
+                  if (p.pack_id === selectedId) return;
+                  if (anyDiff) {
+                    const ok = await confirm({
+                      title: 'Discard unsaved changes?',
+                      message: `You have unsaved edits on ${dirtyTabLabels.join(', ')}. Switching packs will discard them.`,
+                      confirmLabel: 'Discard and switch',
+                      danger: true,
+                    });
+                    if (!ok) return;
+                  }
+                  setSelectedId(p.pack_id);
+                }}
                 className={`w-full text-left px-2 py-1.5 rounded text-sm ${
                   selectedId === p.pack_id ? 'bg-brand-surface-muted font-medium' : 'hover:bg-brand-surface-muted/60'
                 }`}
@@ -533,12 +592,12 @@ export const SectorPackStudio: React.FC = () => {
             <Button variant="ghost" onClick={() => setShowPublish(true)} disabled={!detailReady}>
               Publish
             </Button>
-            <label className="text-xs border border-brand-border rounded px-3 py-2 cursor-pointer hover:bg-brand-surface-muted">
+            <label className="text-xs border border-brand-border rounded px-3 py-2 cursor-pointer hover:bg-brand-surface-muted focus-within:ring-2 focus-within:ring-brand-primary">
               Import Excel (preview)
               <input
                 type="file"
                 accept=".xlsx"
-                className="hidden"
+                className="sr-only"
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   if (f) void handleImport(f, true);
@@ -546,18 +605,17 @@ export const SectorPackStudio: React.FC = () => {
                 }}
               />
             </label>
-            {importPreview && (
+            {importPreview && importFile && (
               <Button
                 variant="secondary"
-                onClick={() => {
-                  const input = document.createElement('input');
-                  input.type = 'file';
-                  input.accept = '.xlsx';
-                  input.onchange = () => {
-                    const f = input.files?.[0];
-                    if (f) void handleImport(f, false);
-                  };
-                  input.click();
+                onClick={async () => {
+                  const ok = await confirm({
+                    title: 'Apply import?',
+                    message: `Apply “${importFile.name}” to ${selectedId || 'the selected pack'} exactly as shown in the preview. This overwrites existing pack content.`,
+                    confirmLabel: 'Apply import',
+                    danger: true,
+                  });
+                  if (ok) void handleImport(importFile, false);
                 }}
               >
                 Confirm import
@@ -565,7 +623,11 @@ export const SectorPackStudio: React.FC = () => {
             )}
           </div>
 
-          {hasDiff && <p className="text-xs text-amber-700">Unsaved changes on this tab.</p>}
+          {anyDiff && (
+            <p className="text-xs text-amber-700">
+              Unsaved changes on: {dirtyTabLabels.join(', ')}.
+            </p>
+          )}
 
           {renderTabContent()}
 

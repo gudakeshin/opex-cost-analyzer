@@ -12,6 +12,7 @@ import { EngagementDocuments } from './pages/EngagementDocuments';
 import { ExecutiveRouteGuard } from './components/Routing/ExecutiveRouteGuard';
 import { ErrorBoundary } from './components/Common/ErrorBoundary';
 import { useAudience } from './context/AudienceContext';
+import { NotFound } from './pages/NotFound';
 
 function HomeRoute() {
   const { isExecutive } = useAudience();
@@ -35,6 +36,7 @@ function App() {
             <Route path="/benchmarks" element={<Benchmarks />} />
             <Route path="/guidebook" element={<Guidebook />} />
             <Route path="/documents" element={<EngagementDocuments />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </ExecutiveRouteGuard>
       </Router>

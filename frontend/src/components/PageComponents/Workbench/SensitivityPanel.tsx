@@ -16,6 +16,7 @@ import { DynamicChart } from '../Procurement/DynamicChart';
 import { formatCr } from '../../../utils/formatInr';
 import { copyText, downloadTextFile, toCsv, toTsv } from '../../../utils/exportTable';
 import type { ChartSpec } from '../../../types';
+import { useConfirm } from '../../../hooks/useConfirm';
 
 export interface CustomScenarioRow {
   name: string;
@@ -346,8 +347,17 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({
     toast(`Loaded “${set.name}”`, 'info');
   };
 
+  const [confirm, confirmDialog] = useConfirm();
+
   const deleteSet = async (setId: string) => {
     if (!sessionId) return;
+    const ok = await confirm({
+      title: 'Delete scenario set?',
+      message: 'This saved scenario set will be permanently deleted.',
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await deleteSetMutation.mutateAsync(setId);
       toast('Scenario set deleted', 'info');
@@ -434,6 +444,7 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({
 
   return (
     <div className="border border-brand-border rounded-lg">
+      {confirmDialog}
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

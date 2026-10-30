@@ -128,6 +128,7 @@ export default function CostRoom() {
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [rejectTargetId, setRejectTargetId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [rejectReasonMissing, setRejectReasonMissing] = useState(false);
   useUnsavedGuard('cost-room-reject', rejectModalOpen && rejectReason.trim().length > 0);
   const [exportNotice, setExportNotice] = useState<string | null>(null);
   const [trustOpen, setTrustOpen] = useState(false);
@@ -326,11 +327,16 @@ export default function CostRoom() {
   const rejectInit = (initiativeId: string) => {
     setRejectTargetId(initiativeId);
     setRejectReason('');
+    setRejectReasonMissing(false);
     setRejectModalOpen(true);
   };
 
   const confirmReject = async () => {
-    if (!rejectTargetId || !rejectReason.trim()) return;
+    if (!rejectTargetId) return;
+    if (!rejectReason.trim()) {
+      setRejectReasonMissing(true);
+      return;
+    }
     try {
       await initiativeRejectMutation.mutateAsync({
         initiativeId: rejectTargetId,
@@ -698,9 +704,17 @@ export default function CostRoom() {
         <Input
           label="Reason (required)"
           value={rejectReason}
-          onChange={(e) => setRejectReason(e.target.value)}
+          onChange={(e) => {
+            setRejectReason(e.target.value);
+            setRejectReasonMissing(false);
+          }}
           placeholder="Why is this initiative rejected?"
         />
+        {rejectReasonMissing && (
+          <p role="alert" className="mt-2 text-sm text-error">
+            Enter a reason to reject this initiative.
+          </p>
+        )}
       </Modal>
     </MainLayout>
   );

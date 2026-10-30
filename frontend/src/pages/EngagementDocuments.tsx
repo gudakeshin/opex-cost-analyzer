@@ -23,6 +23,7 @@ import { engagementKeys, procurementKeys } from '../api/queryKeys';
 import { formatFileSize } from '../utils/sessionFiles';
 import { useSectorOptions } from '../api/hooks/useBenchmarksQueries';
 import type { EngagementSummary } from '../types';
+import { useConfirm } from '../hooks/useConfirm';
 
 const ACCEPT =
   '.csv,.xlsx,.xls,.json,.pdf,.docx,.txt,.md,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json';
@@ -179,8 +180,18 @@ export const EngagementDocuments: React.FC = () => {
     }
   };
 
+  const [confirm, confirmDialog] = useConfirm();
+
   const handleDelete = async (docId: string) => {
     if (!engagementId) return;
+    const doc = documents.find((d) => d.document_id === docId);
+    const ok = await confirm({
+      title: 'Delete document?',
+      message: `${doc?.filename ? `“${doc.filename}”` : 'This document'} will be permanently removed from the engagement. Analyses that used it will not update until you re-run them.`,
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await apiDelete(`/api/v1/engagements/${engagementId}/documents/${docId}`);
       await invalidateDocuments(engagementId);
@@ -251,6 +262,7 @@ export const EngagementDocuments: React.FC = () => {
 
   return (
     <MainLayout>
+      {confirmDialog}
       <PageHeader
         title="Documents"
         subtitle="Upload and manage engagement data sources — shared across all analysis sessions"
