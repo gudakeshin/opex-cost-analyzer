@@ -254,7 +254,8 @@ async def _global_exception_handler(request: Request, exc: Exception) -> JSONRes
 # Health endpoints
 # ---------------------------------------------------------------------------
 
-@app.get("/health")
+# HEAD too: load balancers and CI waiters (wait-on) probe with HEAD, which used to get a 405.
+@app.api_route("/health", methods=["GET", "HEAD"])
 @limiter.exempt
 def health():  # type: ignore[return]
     # Liveness must be cheap and never block on Qdrant or an embedding-model load, so report the

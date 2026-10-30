@@ -216,3 +216,14 @@ def test_health_is_a_cheap_liveness_probe():
     body = TestClient(app).get("/health").json()
     assert body["status"] == "ok"
     assert "document_index_backend" in body["connectors"]
+
+
+def test_health_accepts_head_requests():
+    """CI's wait-on (and many load balancers) probe with HEAD; a 405 there looks like a dead backend."""
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    client = TestClient(app)
+    assert client.head("/health").status_code == 200
+    assert client.get("/health").status_code == 200
