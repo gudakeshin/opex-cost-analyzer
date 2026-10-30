@@ -90,3 +90,9 @@ def record_llm_usage(
             cache_creation_input_tokens
         )
     llm_cost_usd_total.labels(provider=provider, model=model).inc(cost)
+    try:  # attribute to the engagement in scope; never let accounting break an LLM call
+        from app.services.llm_budget import add_spend
+
+        add_spend(cost)
+    except Exception:  # pragma: no cover
+        pass

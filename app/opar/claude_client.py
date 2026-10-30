@@ -8,6 +8,7 @@ import re
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from typing import Any, Callable, Dict, List, Tuple, cast
 
+from app.services.llm_budget import check_budget
 from app.config import (
     ANTHROPIC_API_KEY,
     ANTHROPIC_ENABLED,
@@ -224,6 +225,7 @@ def _call_anthropic_native(
     user_content_blocks: list[dict[str, Any]] | None = None,
 ) -> str:
     """Call Anthropic directly — never routed through Gemini."""
+    check_budget()
     active_model = model or get_resolved_llm_model(provider="anthropic")
     if os.getenv("PYTEST_CURRENT_TEST"):
         raise RuntimeError("Claude calls disabled during pytest runs")
@@ -298,6 +300,7 @@ def _stream_anthropic_native(
     on_token: Callable[[str], None] | None = None,
 ) -> str:
     """Stream Anthropic text deltas via ``on_token``; returns the full assembled text."""
+    check_budget()
     active_model = model or get_resolved_llm_model(provider="anthropic")
     if os.getenv("PYTEST_CURRENT_TEST"):
         raise RuntimeError("Claude calls disabled during pytest runs")
@@ -408,6 +411,7 @@ async def call_claude_async(
     Falls back to Gemini (via asyncio.to_thread) when Anthropic is unavailable.
     Raises RuntimeError if no provider is configured.
     """
+    check_budget()
     import asyncio as _asyncio
 
     if os.getenv("PYTEST_CURRENT_TEST"):
@@ -459,6 +463,7 @@ def _call_claude_with_thinking(
     user_content_blocks: list[dict[str, Any]] | None = None,
 ) -> Tuple[str, str | None]:
     """Call LLM with extended thinking. Preferred provider first, cross-provider fallback."""
+    check_budget()
     effective_user = user_content
     if user_content_blocks is not None:
         effective_user = "\n\n".join(

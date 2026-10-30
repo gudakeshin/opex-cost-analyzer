@@ -26,6 +26,12 @@ class ProviderRateLimitError(ProviderPermanentError):
     skip_reason = "provider_rate_limit"
 
 
+class LLMBudgetExceeded(ProviderPermanentError):
+    """The engagement's configured LLM spend cap has been reached."""
+
+    skip_reason = "llm_budget_exceeded"
+
+
 def _message_text(exc: BaseException) -> str:
     parts = [str(exc)]
     body = getattr(exc, "body", None)

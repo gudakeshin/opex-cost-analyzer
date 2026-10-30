@@ -82,6 +82,13 @@ def _deterministic_fallback(session_id: str, question: str, analysis: Dict[str, 
 
 
 def _run_agent_turn(session_id: str, run_id: str, question: str) -> Dict[str, Any]:
+    from app.services.llm_budget import budget_scope, resolve_scope
+
+    with budget_scope(resolve_scope(session_id)):
+        return _run_agent_turn_impl(session_id, run_id, question)
+
+
+def _run_agent_turn_impl(session_id: str, run_id: str, question: str) -> Dict[str, Any]:
     from app.opar.agent_controller import run_agent_chat_controller
     from app.services.llm_selection import Provider, get_resolved_llm_provider, model_for_provider
 

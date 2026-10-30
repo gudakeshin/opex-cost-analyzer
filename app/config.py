@@ -122,6 +122,10 @@ _llm_temp_raw = _clean_env("LLM_TEMPERATURE", "")
 LLM_TEMPERATURE: float | None = float(_llm_temp_raw) if _llm_temp_raw else None
 # Ceiling for the automatic retry when a response is cut off at max_tokens.
 LLM_TRUNCATION_RETRY_MAX_TOKENS = int(_clean_env("LLM_TRUNCATION_RETRY_MAX_TOKENS", "8192") or "8192")
+# Hard cap on estimated LLM spend (USD) per engagement; unset/0 = no cap (usage is still recorded).
+# When reached, live synthesis is skipped and the deterministic narrative is used.
+_llm_cap_raw = _clean_env("LLM_MAX_COST_USD_PER_ENGAGEMENT", "")
+LLM_MAX_COST_USD_PER_ENGAGEMENT: float | None = float(_llm_cap_raw) if _llm_cap_raw else None
 
 # Optional external connectors; app works in local mode without these.
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")

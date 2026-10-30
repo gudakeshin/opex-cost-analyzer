@@ -318,6 +318,16 @@ def remove_document(engagement_id: str, document_id: str) -> Dict[str, Any]:
     return {"deleted": document_id}
 
 
+@router.get("/api/v1/engagements/{engagement_id}/llm-usage")
+def get_engagement_llm_usage(engagement_id: str) -> Dict[str, Any]:
+    """Estimated LLM spend for this engagement against the optional cap (LLM_MAX_COST_USD_PER_ENGAGEMENT)."""
+    validate_engagement_id(engagement_id)
+    ensure_engagement_exists(engagement_id)
+    from app.services.llm_budget import status
+
+    return status(engagement_id)
+
+
 class ReprocessRequest(BaseModel):
     # field -> source column name ("" ignores the field). Omit to keep the current mapping;
     # send {} to clear manual overrides and return to automatic matching.

@@ -8,6 +8,7 @@ import time
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from typing import Any, Dict, List, Tuple
 
+from app.services.llm_budget import check_budget
 from app.config import (
     AGENT_THINKING_BUDGET,
     GEMINI_API_KEY,
@@ -74,6 +75,7 @@ def call_gemini(
     model: str | None = None,
 ) -> str:
     """Call Gemini via google-genai SDK and return response text."""
+    check_budget()
     if is_gemini_quota_exhausted():
         raise RuntimeError("Gemini quota exhausted (cached)")
     from google.genai import types  # type: ignore
@@ -105,6 +107,7 @@ def call_gemini_with_thinking(
     thinking_budget: int | None = None,
 ) -> Tuple[str, str | None]:
     """Call a Gemini 2.5 reasoning model with thinking budget enabled."""
+    check_budget()
     if is_gemini_quota_exhausted():
         raise RuntimeError("Gemini quota exhausted (cached)")
     from google.genai import types  # type: ignore

@@ -113,6 +113,7 @@ Copy `.env.example` to `.env`. The important settings:
 | `QDRANT_ENABLED` / `DOC_RAG_ENABLED` | `true` | Document retrieval; set to `false` to run without Qdrant |
 | `REDIS_URL` | unset | Required for more than one worker (distributed locks) |
 | `LLM_TEMPERATURE` | unset | Lower for more repeatable narratives |
+| `LLM_MAX_COST_USD_PER_ENGAGEMENT` | unset | Cap on estimated LLM spend per engagement; when reached, narratives fall back to the deterministic composer. Usage: `GET /api/v1/engagements/{id}/llm-usage` |
 
 All variables the code reads are listed, with defaults, in `.env.example`.
 

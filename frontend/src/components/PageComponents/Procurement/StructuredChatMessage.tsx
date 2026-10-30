@@ -57,6 +57,9 @@ function llmFallbackDetail(reasons?: Record<string, unknown>): string {
       'Live LLM narrative synthesis did not complete. A deterministic, data-backed narrative was used instead.'
     );
   }
+  if (advisory === 'llm_budget_exceeded') {
+    return "LLM narrative skipped — this engagement's LLM spend cap has been reached. Deterministic narrative composed from skill outputs.";
+  }
   if (advisory === 'provider_billing') {
     return 'LLM narrative skipped — API credits exhausted. Deterministic narrative composed from skill outputs.';
   }

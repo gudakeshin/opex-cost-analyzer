@@ -164,11 +164,14 @@ def get_resolved_llm_model(*, thinking: bool = False, provider: Provider | None 
 
 
 @contextmanager
-def llm_selection_context(model_id: str | None) -> Generator[None, None, None]:
-    """Set per-request model override for the duration of an OPAR/chat call."""
+def llm_selection_context(model_id: str | None, session_id: str | None = None) -> Generator[None, None, None]:
+    """Set per-request model override (and the LLM budget scope) for an OPAR/chat call."""
+    from app.services.llm_budget import budget_scope, resolve_scope
+
     token = llm_model_override_var.set(normalize_model_id(model_id))
     try:
-        yield
+        with budget_scope(resolve_scope(session_id)):
+            yield
     finally:
         llm_model_override_var.reset(token)
 

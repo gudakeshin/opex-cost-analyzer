@@ -120,7 +120,7 @@ async def _chat_stream_events(
 
     async def run_opar() -> None:
         try:
-            with llm_selection_context(payload.llm_model):
+            with llm_selection_context(payload.llm_model, session_id=payload.session_id):
                 result = await asyncio.wait_for(
                     run_opar_loop(
                         payload.message,
@@ -421,7 +421,7 @@ async def chat_v1_opar(request: Request, payload: V1ChatRequest) -> Dict[str, An
     thinking_enabled = (payload.thinking_mode == "extended")
     progress_cb, thinking_cb = _progress_callbacks(run_id)
     try:
-        with llm_selection_context(payload.llm_model):
+        with llm_selection_context(payload.llm_model, session_id=payload.session_id):
             result = await asyncio.wait_for(
                 run_opar_loop(
                     payload.message,
@@ -490,7 +490,7 @@ async def chat_v1_resume(request: Request, payload: ClarificationResumeRequest) 
     )
     progress_cb, thinking_cb = _progress_callbacks(run_id)
     try:
-        with llm_selection_context(payload.llm_model):
+        with llm_selection_context(payload.llm_model, session_id=session_id):
             result = await asyncio.wait_for(
                 resume_opar_loop(
                     payload.checkpoint_id,

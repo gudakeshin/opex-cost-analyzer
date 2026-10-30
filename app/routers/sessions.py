@@ -525,24 +525,28 @@ async def _analyze_session_impl(session_id: str, payload: AnalyzeRequest, run_id
             payload.industry or manifest.get("industry") or ""
         ) or (payload.industry or manifest.get("industry") or "")
         industry_user_set = bool(manifest.get("industry_user_set")) or payload.industry is not None
-        analysis = await asyncio.to_thread(
-            run_core_pipeline,
-            session_id=session_id,
-            lines=spend_lines,
-            docs_text=docs_text,
-            industry=selected_industry,
-            annual_revenue=payload.annual_revenue or float(manifest.get("annual_revenue") or 0.0),
-            company_name=payload.company_name or manifest.get("company_name"),
-            wacc=float(manifest.get("wacc") or payload.wacc or 0.10),
-            effective_tax_rate=float(manifest.get("effective_tax_rate") or payload.effective_tax_rate or 0.0),
-            reporting_currency=reporting_currency,
-            engagement_id=manifest.get("engagement_id"),
-            ingestion_summary=ingestion_summary or None,
-            progress_cb=progress_cb,
-            source_files=source_files,
-            run_id=run_id,
-            industry_user_set=industry_user_set,
-        )
+        from app.services.llm_budget import budget_scope
+
+        with budget_scope(manifest.get("engagement_id") or session_id):
+            analysis = await asyncio.to_thread(
+                run_core_pipeline,
+                session_id=session_id,
+                lines=spend_lines,
+                docs_text=docs_text,
+                industry=selected_industry,
+                annual_revenue=payload.annual_revenue or float(manifest.get("annual_revenue") or 0.0),
+                company_name=payload.company_name or manifest.get("company_name"),
+                wacc=float(manifest.get("wacc") or payload.wacc or 0.10),
+                effective_tax_rate=float(manifest.get("effective_tax_rate") or payload.effective_tax_rate or 0.0),
+                reporting_currency=reporting_currency,
+                engagement_id=manifest.get("engagement_id"),
+                ingestion_summary=ingestion_summary or None,
+                progress_cb=progress_cb,
+                source_files=source_files,
+                run_id=run_id,
+                industry_user_set=industry_user_set,
+
+            )
     except Exception as exc:
         if run_id:
             progress_complete(run_id, failed=True, error=str(exc)[:300])
