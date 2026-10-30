@@ -12,11 +12,13 @@ import statistics
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
+
+from app.config import DATA_DIR
 from typing import Any, Dict, List, Optional
 
 log = logging.getLogger(__name__)
 
-_CALIBRATION_ROOT = Path("data") / "calibration"
+_CALIBRATION_ROOT = DATA_DIR / "calibration"
 _SECTOR_PACKS_ROOT = Path(__file__).resolve().parents[2] / "sector_packs"
 
 # Client-facing gate copy for steering committees and audit exports.

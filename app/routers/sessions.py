@@ -10,7 +10,7 @@ from typing import Any, Dict, List
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 from fastapi.responses import Response
 
-from app.config import DATA_DIR, MAX_UPLOAD_MB, logger
+from app.config import DATA_DIR, MAX_UPLOAD_MB, ROOT_DIR, logger
 from app.ratelimit import RATE_LIMIT_LLM, limiter
 from app.routers._shared import (
     _memory,
@@ -55,7 +55,8 @@ from app.skills.model_contextualizer import (
 
 router = APIRouter()
 
-SAMPLES_DIR = DATA_DIR / "samples"
+# Samples are committed fixtures, so they stay in the repo even when DATA_DIR is redirected.
+SAMPLES_DIR = ROOT_DIR / "data" / "samples"
 
 _SAMPLE_FILES: Dict[str, Dict[str, str]] = {
     "spend-ledger.csv": {

@@ -14,9 +14,9 @@ import threading
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-from app.config import ROOT_DIR
+from app.config import DATA_DIR
 
-_EVENTS_PATH = ROOT_DIR / "data" / "reg_events.jsonl"
+_EVENTS_PATH = DATA_DIR / "reg_events.jsonl"
 _lock = threading.Lock()
 
 # --------------------------------------------------------------------------- #

@@ -20,6 +20,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from app.config import DATA_DIR
+
 import yaml
 
 log = logging.getLogger(__name__)
@@ -251,7 +253,7 @@ def lock_pack_version(pack_id: str, engagement_id: str) -> Dict[str, str]:
         "engagement_id": engagement_id,
         "locked_at": datetime.now(timezone.utc).isoformat(),
     }
-    lock_dir = Path("data") / "pack_locks"
+    lock_dir = DATA_DIR / "pack_locks"
     lock_dir.mkdir(parents=True, exist_ok=True)
     lock_file = lock_dir / f"{engagement_id}_{pack_id}.json"
     lock_file.write_text(json.dumps(record, indent=2))
@@ -260,7 +262,7 @@ def lock_pack_version(pack_id: str, engagement_id: str) -> Dict[str, str]:
 
 
 def get_locked_version(pack_id: str, engagement_id: str) -> Optional[str]:
-    lock_file = Path("data") / "pack_locks" / f"{engagement_id}_{pack_id}.json"
+    lock_file = DATA_DIR / "pack_locks" / f"{engagement_id}_{pack_id}.json"
     if lock_file.exists():
         return json.loads(lock_file.read_text()).get("version")
     return None
@@ -470,7 +472,7 @@ def run_regression_test(pack_id: str) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 _OVERRIDE_LOCK = _threading.Lock()
-_OVERRIDES_PATH = Path("data") / "sector_pack_overrides.json"
+_OVERRIDES_PATH = DATA_DIR / "sector_pack_overrides.json"
 
 
 def _load_overrides() -> Dict[str, Any]:

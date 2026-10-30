@@ -16,11 +16,13 @@ import shutil
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
+
+from app.config import DATA_DIR
 from typing import Any, Dict, List, Optional
 
 log = logging.getLogger(__name__)
 
-_DATA_ROOT = Path("data")
+_DATA_ROOT = DATA_DIR
 _MEMORY_ROOT = _DATA_ROOT / "memory"
 _PACK_LOCKS_ROOT = _DATA_ROOT / "pack_locks"
 _CALIBRATION_ROOT = _DATA_ROOT / "calibration"

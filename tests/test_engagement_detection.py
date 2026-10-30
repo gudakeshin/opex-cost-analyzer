@@ -407,10 +407,17 @@ def test_revenue_detected_from_annual_report_context(monkeypatch, tmp_path) -> N
     ],
 )
 def test_real_engagement_regression_fixtures(engagement_id, expected_company, expected_revenue, monkeypatch) -> None:
+    import shutil
     from pathlib import Path
 
-    if not Path(f"data/engagements/{engagement_id}/manifest.json").exists():
+    from app.config import ENGAGEMENTS_DIR
+
+    # The suite runs against a throwaway data dir, so copy the developer's fixture
+    # engagement (if they have it) into it rather than reading or repairing it in place.
+    real = Path(__file__).resolve().parents[1] / "data" / "engagements" / engagement_id
+    if not (real / "manifest.json").exists():
         pytest.skip("fixture engagement not present")
+    shutil.copytree(real, ENGAGEMENTS_DIR / engagement_id, dirs_exist_ok=True)
     # Fixture engagements are JSON manifests on disk; read them via the json
     # backend regardless of the default.
     monkeypatch.setenv("REPOSITORY_BACKEND", "json")

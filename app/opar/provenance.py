@@ -21,9 +21,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from app.config import ROOT_DIR
+from app.config import DATA_DIR
 
-_PROVENANCE_DIR = ROOT_DIR / "data" / "provenance"
+_PROVENANCE_DIR = DATA_DIR / "provenance"
 _lock = threading.Lock()
 
 

@@ -8,7 +8,9 @@ from pathlib import Path
 
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
-DATA_DIR = ROOT_DIR / "data"
+# OPEX_DATA_DIR lets the test suite (and anyone sandboxing the app) point all runtime state
+# somewhere other than the real ./data. Unset = the project's data/ directory.
+DATA_DIR = Path(os.environ["OPEX_DATA_DIR"]).resolve() if os.environ.get("OPEX_DATA_DIR") else ROOT_DIR / "data"
 UPLOAD_DIR = DATA_DIR / "uploads"
 ENGAGEMENTS_DIR = DATA_DIR / "engagements"
 OUTPUT_DIR = DATA_DIR / "outputs"

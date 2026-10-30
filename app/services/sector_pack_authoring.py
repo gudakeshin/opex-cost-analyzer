@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import yaml
 
-from app.config import ROOT_DIR
+from app.config import DATA_DIR, ROOT_DIR
 from app.services.compliance import append_audit_event
 from app.services.lever_runtime_sync import RUNTIME_DIR, sync_pack
 from app.services.sector_packs import (
@@ -323,7 +323,7 @@ def _bump_version(version: str, bump: str) -> str:
 
 
 def _engagements_on_version(pack_id: str, version: str) -> List[Dict[str, Any]]:
-    lock_dir = Path("data") / "pack_locks"
+    lock_dir = DATA_DIR / "pack_locks"
     if not lock_dir.is_dir():
         return []
     results: List[Dict[str, Any]] = []
