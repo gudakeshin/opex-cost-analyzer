@@ -15,6 +15,7 @@ venv/
 .coverage
 .mypy_cache/
 .ruff_cache/
+.firecrawl/
 
 # Data — session uploads and outputs contain client data
 data/uploads/
