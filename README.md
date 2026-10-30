@@ -124,6 +124,11 @@ Interactive docs at `http://127.0.0.1:8000/docs` (OpenAPI). About 115 endpoints 
 `benchmarks`, `initiatives` / `pipeline` (Cost Room), `connectors`, `jobs`, `compliance`, plus export routes
 (`board-deck`, `cfo-brief`, `mor-pack`, `pmo-export`, `business-case`, `evidence-appendix`, `dashboard`).
 
+Conventions: errors are `{"detail": "...", "code": "not_found"}` (a stable machine-readable `code` beside the
+human-readable `detail`); the engagement and session lists accept `limit`/`offset` and return the full count in
+`X-Total-Count`; `GET /api/v1/engagements/{id}/llm-usage` reports estimated LLM spend; `PUT /api/v1/engagements/{id}/gl-mapping`
+supplies the client's GL-code ranges for classification.
+
 ## Testing and evaluation
 
 ```bash
