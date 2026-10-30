@@ -246,6 +246,36 @@ function isDesktopViewport(): boolean {
 const STOPPED_MESSAGE =
   'Stopped waiting for this run. The server may still finish it in the background — check History or re-run if results look incomplete.';
 
+const CANCELLED_MESSAGE =
+  'Analysis stopped. It ended between steps, so no partial results were saved. Run it again when ready.';
+
+interface AnalysisRunStatus {
+  run_id: string;
+  status: 'running' | 'cancelling' | 'completed' | 'failed' | 'cancelled';
+  error?: string | null;
+}
+
+/** Poll a background analysis run until it reaches a terminal state. */
+async function waitForAnalysisRun(runId: string, signal: AbortSignal): Promise<AnalysisRunStatus> {
+  let failures = 0;
+  for (;;) {
+    if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+    try {
+      const run = await apiGet<AnalysisRunStatus>(`/api/v1/analyze/runs/${runId}`);
+      failures = 0;
+      if (run.status === 'completed' || run.status === 'failed' || run.status === 'cancelled') return run;
+    } catch (err) {
+      failures += 1;
+      const status = (err as { response?: { status?: number } }).response?.status;
+      if (status === 404) {
+        throw new Error('The analysis run was lost (the server may have restarted). Run it again.');
+      }
+      if (failures >= 8) throw err;
+    }
+    await new Promise((r) => setTimeout(r, 1000));
+  }
+}
+
 const STALL_STEP: ProgressStep = {
   phase: 'observe',
   message: 'Live progress is unavailable — still waiting on the server…',
@@ -342,6 +372,31 @@ export const ProcurementAnalysis: React.FC = () => {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const pollAbortRef = useRef<AbortController | null>(null);
   const runAbortRef = useRef<AbortController | null>(null);
+  // The background analysis run being followed (target of the server-side cancel).
+  const analysisRunIdRef = useRef<string | null>(null);
+  const analysisStopRequestedRef = useRef(false);
+
+  // Resume: if this session already has an analysis running (page reload, second tab), follow it.
+  useEffect(() => {
+    if (!sessionId) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await apiGet<{ run: AnalysisRunStatus | null }>(`/api/v1/sessions/${sessionId}/analysis-run`);
+        if (cancelled || !res.run || analysisRunIdRef.current) return;
+        setAgentSteps([{ phase: 'observe', message: 'Resuming the analysis already in progress…' }]);
+        setPipelineLabel('Core analysis pipeline');
+        openInsightsOnDesktop();
+        await followAnalysisRun(sessionId, res.run.run_id);
+      } catch {
+        /* no active run, or the check failed: nothing to resume */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId]);
 
   const refreshManifest = useCallback(async (sid: string) => {
     const m = await fetchSessionManifest(queryClient, sid);
@@ -578,6 +633,21 @@ export const ProcurementAnalysis: React.FC = () => {
   };
 
   const stopRun = () => {
+    const analysisRunId = analysisRunIdRef.current;
+    if (analysisRunId) {
+      // Cooperative cancel: the server stops the run between stages (the current stage finishes first).
+      analysisStopRequestedRef.current = true;
+      setAgentSteps((prev) => [
+        ...(prev ?? []),
+        { phase: 'observe', message: 'Stopping after the current step…' },
+      ]);
+      void apiPost(`/api/v1/analyze/runs/${analysisRunId}/cancel`).catch(() => runAbortRef.current?.abort());
+      // Safety net: if the server never confirms, stop waiting rather than hang.
+      window.setTimeout(() => {
+        if (analysisRunIdRef.current === analysisRunId) runAbortRef.current?.abort();
+      }, 30000);
+      return;
+    }
     runAbortRef.current?.abort();
     stopPolling();
   };
@@ -1334,7 +1404,29 @@ export const ProcurementAnalysis: React.FC = () => {
       typeof crypto !== 'undefined' && 'randomUUID' in crypto
         ? crypto.randomUUID()
         : `run-${Date.now()}`;
+    try {
+      const sid = await ensureSession();
+      // Background run: returns at once with a run id, so the run survives a page reload
+      // and can be cancelled server-side. If one is already running for this session we join it.
+      const started = await apiPost<{ run_id: string }>(`/api/v1/analyze/${sid}`, {
+        ...contextPayload(engagement, manifest),
+        run_id: runId,
+        background: true,
+      });
+      await followAnalysisRun(sid, started.run_id);
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+      setAgentSteps([{ phase: 'reflect', message: 'Analysis failed. See error above.' }]);
+      setLoading(false);
+    }
+  };
+
+  /** Follow a background analysis run to its end, then load and present the result. */
+  const followAnalysisRun = async (sid: string, runId: string) => {
+    setLoading(true);
     setLastRunId(runId);
+    analysisRunIdRef.current = runId;
+    analysisStopRequestedRef.current = false;
     const controller = new AbortController();
     runAbortRef.current = controller;
     const pollPromise = pollChatProgress(
@@ -1346,17 +1438,18 @@ export const ProcurementAnalysis: React.FC = () => {
       () => setAgentSteps((prev) => [...(prev ?? []), STALL_STEP]),
     );
     try {
-      const sid = await ensureSession();
-      const analysisResult = await apiPost<SessionResponse>(
-        `/api/v1/analyze/${sid}`,
-        {
-          ...contextPayload(engagement, manifest),
-          run_id: runId,
-        },
-        controller.signal,
-      );
+      const run = await waitForAnalysisRun(runId, controller.signal);
       controller.abort();
       await pollPromise.catch(() => undefined);
+      if (run.status === 'cancelled') {
+        setAgentSteps([{ phase: 'reflect', message: 'Stopped.' }]);
+        setMessages((prev) => [...prev, { role: 'assistant', content: CANCELLED_MESSAGE }]);
+        return;
+      }
+      if (run.status === 'failed') {
+        throw new Error(run.error || 'Analysis failed.');
+      }
+      const analysisResult = await apiGet<SessionResponse>(`/api/v1/sessions/${sid}`);
       const rawTrace = (analysisResult as { analysis_trace?: unknown }).analysis_trace;
       const trace = Array.isArray(rawTrace) ? (rawTrace as AnalysisTraceStep[]) : undefined;
       await syncEngagementFromAnalysis();
@@ -1435,7 +1528,7 @@ export const ProcurementAnalysis: React.FC = () => {
         ]);
       }
     } catch (err) {
-      const userStopped = controller.signal.aborted;
+      const userStopped = analysisStopRequestedRef.current;
       controller.abort();
       if (userStopped) {
         setAgentSteps([{ phase: 'reflect', message: 'Stopped.' }]);
@@ -1446,6 +1539,7 @@ export const ProcurementAnalysis: React.FC = () => {
       setAgentSteps([{ phase: 'reflect', message: 'Analysis failed. See error above.' }]);
       setLastSteps([{ phase: 'reflect', message: 'Analysis failed. See error above.' }]);
     } finally {
+      analysisRunIdRef.current = null;
       setLoading(false);
     }
   };

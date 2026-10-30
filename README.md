@@ -119,7 +119,7 @@ All variables the code reads are listed, with defaults, in `.env.example`.
 ## API
 
 Interactive docs at `http://127.0.0.1:8000/docs` (OpenAPI). About 115 endpoints live under `/api/v1/`, grouped by:
-`engagements`, `sessions`, `analyze`, `chat`, `workbench`, `query`, `sensitivity`, `analyst`, `skills`, `sector-packs`,
+`engagements`, `sessions`, `analyze` (background runs: `/analyze/runs/{id}`, `/cancel`), `chat`, `workbench`, `query`, `sensitivity`, `analyst`, `skills`, `sector-packs`,
 `benchmarks`, `initiatives` / `pipeline` (Cost Room), `connectors`, `jobs`, `compliance`, plus export routes
 (`board-deck`, `cfo-brief`, `mor-pack`, `pmo-export`, `business-case`, `evidence-appendix`, `dashboard`).
 
@@ -147,7 +147,9 @@ Stated plainly so nobody mistakes them for finished work (more detail in [docs/k
   sector (typically 6 to 10), so confidence intervals are wide. The platform's generic seed benchmarks (used when no
   sector pack matches) have no sample at all: no interval is shown and the output is flagged illustrative. Licensed
   feeds (CMIE, Capitaline, CRISIL, ICRA) are integration stubs and are not on any live path.
-- **Analysis runs as one long request.** There is no server-side cancel; **Stop** in the UI only stops waiting. There is no job id or resume for analysis itself.
+- **Analysis cancel is cooperative.** A run is a background job (one per session) that survives a page reload and can be
+  resumed. **Stop** asks the server to cancel; it takes effect between pipeline stages, so the stage already running
+  finishes first and nothing partial is saved. Chat requests are not cancellable server-side. Run state is per process.
 - **Single-node by default.** Locks are in-process unless `REDIS_URL` is set.
 - **Column mapping is automatic.** The detected mapping is not shown for confirmation; check the ingest report's dropped-row counts and warnings.
 - **Regulatory watcher** uses a static sample catalogue unless `REG_WATCHER_LIVE=1`.
