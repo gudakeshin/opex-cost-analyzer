@@ -1,6 +1,7 @@
 import React from 'react';
 import { FactVsInferenceLabel } from '../../Common/FactVsInferenceLabel';
 import { SpendCharts } from './SpendCharts';
+import { DataCaveats } from './DataCaveats';
 import { formatSpendAmount } from '../../../utils/analysisInsights';
 import type { AnalysisInsightSnapshot } from '../../../types';
 
@@ -77,6 +78,8 @@ export const ChatInsightBlock: React.FC<ChatInsightBlockProps> = ({
         </p>
       )}
 
+      <DataCaveats snapshot={snapshot} includeBenchmarks={showPeerSavings} />
+
       {showPeerSavings && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {(snapshot.peer_comparison_count ?? 0) > 0 && (
@@ -95,6 +98,22 @@ export const ChatInsightBlock: React.FC<ChatInsightBlockProps> = ({
             <div className="rounded-lg border border-brand-border px-2.5 py-2">
               <p className="text-[10px] uppercase font-semibold text-brand-muted">Top savings signal</p>
               <p className="text-sm font-bold text-deloitte-green">{snapshot.savings_headline}</p>
+            </div>
+          )}
+          {snapshot.expected_net_3yr != null && (
+            <div className="rounded-lg border border-brand-border px-2.5 py-2 sm:col-span-2">
+              <p className="text-[10px] uppercase font-semibold text-brand-muted">
+                Expected 3-year net savings (after execution risk)
+              </p>
+              <p className="text-sm font-bold text-brand-ink tabular-nums">
+                {formatSpendAmount(snapshot.expected_net_3yr, currency)}
+                {snapshot.full_delivery_net_3yr != null && (
+                  <span className="text-xs font-normal text-brand-muted">
+                    {' '}
+                    vs {formatSpendAmount(snapshot.full_delivery_net_3yr, currency)} if every initiative is delivered in full
+                  </span>
+                )}
+              </p>
             </div>
           )}
         </div>

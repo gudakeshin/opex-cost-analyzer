@@ -360,6 +360,17 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
           <Markdown className="text-sm leading-relaxed">{message.content}</Markdown>
         )}
 
+        {!isUser && (message.quality_signals?.unverified_figures?.length ?? 0) > 0 && (
+          <p
+            className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-xs text-amber-900"
+            role="note"
+          >
+            <span className="font-semibold">Check these figures:</span>{' '}
+            {message.quality_signals!.unverified_figures!.join(', ')} could not be matched to the analysis outputs. They
+            may be derived values, so verify before quoting.
+          </p>
+        )}
+
         {!isUser && message.thinking && (
           <ThinkingBlock thinking={message.thinking} />
         )}

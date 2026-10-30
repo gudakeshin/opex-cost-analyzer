@@ -143,8 +143,10 @@ Sample data: see [test_data/README.md](test_data/README.md).
 
 Stated plainly so nobody mistakes them for finished work (more detail in [docs/known_stubs.md](docs/known_stubs.md)):
 
-- **Peer benchmarks are illustrative.** Bundled percentiles are seed/public-disclosure data with no sample behind them,
-  so no confidence interval is shown. Licensed feeds (CMIE, Capitaline, CRISIL, ICRA) are integration stubs and are not on any live path.
+- **Peer benchmarks are thin.** Sector-pack percentiles come from the public disclosures of a handful of companies per
+  sector (typically 6 to 10), so confidence intervals are wide. The platform's generic seed benchmarks (used when no
+  sector pack matches) have no sample at all: no interval is shown and the output is flagged illustrative. Licensed
+  feeds (CMIE, Capitaline, CRISIL, ICRA) are integration stubs and are not on any live path.
 - **Analysis runs as one long request.** There is no server-side cancel; **Stop** in the UI only stops waiting. There is no job id or resume for analysis itself.
 - **Single-node by default.** Locks are in-process unless `REDIS_URL` is set.
 - **Column mapping is automatic.** The detected mapping is not shown for confirmation; check the ingest report's dropped-row counts and warnings.

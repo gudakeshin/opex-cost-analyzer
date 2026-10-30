@@ -1036,7 +1036,8 @@ export const ProcurementAnalysis: React.FC = () => {
       const file = new File([await res.blob()], 'spend_ledger_sample.csv', { type: 'text/csv' });
       const eid = await createEngagement({
         company_name: 'Demo engagement (sample ledger)',
-        industry: 'manufacturing_diversified',
+        // The bundled ledger is IT/cloud/services-heavy, so use the matching sector pack.
+        industry: 'it_ites',
         annual_revenue: 5000 * 1e7,
         currency: 'INR',
       });

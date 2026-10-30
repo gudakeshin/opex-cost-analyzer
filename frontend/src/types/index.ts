@@ -4,6 +4,8 @@ export interface QualitySignals {
   faithfulness_score?: number;
   relevance_score?: number;
   grounding_coverage?: number;
+  /** Money figures in the narrative that match no skill output; informational, may be derived values. */
+  unverified_figures?: string[];
 }
 
 export interface ProgressStep {
@@ -156,6 +158,15 @@ export interface AnalysisInsightSnapshot {
   modelled_savings?: string;
   modelled_savings_raw?: number;
   savings_opportunity_count?: number;
+  /** Probability-weighted 3-year net savings across initiatives (execution risk applied). */
+  expected_net_3yr?: number;
+  /** Same portfolio assuming every initiative is delivered in full. */
+  full_delivery_net_3yr?: number;
+  /** True when peer benchmarks have no sample behind them (seed / public-disclosure data). */
+  benchmarks_illustrative?: boolean;
+  benchmark_warnings?: string[];
+  /** Warnings from the ingest report (rows dropped, FX rate missing, …). */
+  ingestion_warnings?: string[];
   ingestion_note?: string;
   chart_data?: SpendChartData;
   sme_qualification?: SmeQualificationSummary;

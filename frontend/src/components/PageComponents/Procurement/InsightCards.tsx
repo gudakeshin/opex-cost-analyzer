@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { AutoCollapsibleList } from '../../Common/AutoCollapsibleList';
 import { CompactStatStrip, type StatStripItem } from '../../Common/CompactStatStrip';
 import { FactVsInferenceLabel } from '../../Common/FactVsInferenceLabel';
+import { DataCaveats } from './DataCaveats';
 import { AnalysisDataQualityPanel } from './AnalysisDataQualityPanel';
 import { SessionFilesPanel } from './SessionFilesPanel';
 import { AgentActivityPanel } from './AgentActivityPanel';
@@ -77,6 +78,8 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
       : null;
 
   const savingsHeadline = snapshot?.savings_headline ?? null;
+  const expectedNet3yr = snapshot?.expected_net_3yr ?? null;
+  const fullDeliveryNet3yr = snapshot?.full_delivery_net_3yr ?? null;
   const abovePeerCount = snapshot?.peer_gap_count ?? 0;
   const comparisonCount = snapshot?.peer_comparison_count ?? 0;
   const topCategories = snapshot?.top_categories ?? [];
@@ -174,6 +177,16 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
         detail: 'Savings model',
       });
     }
+    if (expectedNet3yr) {
+      stats.push({
+        id: 'expected-savings',
+        label: 'Expected 3-yr net',
+        value: formatSpendAmount(expectedNet3yr, snapshot?.reporting_currency ?? 'INR'),
+        detail: fullDeliveryNet3yr
+          ? `after execution risk · ${formatSpendAmount(fullDeliveryNet3yr, snapshot?.reporting_currency ?? 'INR')} if fully delivered`
+          : 'after execution risk',
+      });
+    }
     return stats;
   }, [
     company,
@@ -183,6 +196,9 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
     comparisonCount,
     abovePeerCount,
     savingsHeadline,
+    expectedNet3yr,
+    fullDeliveryNet3yr,
+    snapshot?.reporting_currency,
   ]);
 
   const hasContent = analysis || files.length > 0 || agentSteps?.length || agentLoading;
@@ -276,6 +292,8 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
         industry={industry}
         lineCount={lineCount}
       />
+
+      <DataCaveats snapshot={snapshot} includeIngestion={false} />
 
       <AnalysisDataQualityPanel analysis={analysis} currency={currency} />
 

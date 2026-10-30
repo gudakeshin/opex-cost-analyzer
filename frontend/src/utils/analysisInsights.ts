@@ -182,6 +182,20 @@ function ingestionNoteFromManifest(manifest: SessionManifest | null | undefined)
   return `Ingested ${parts.join(', ')}${confPct}.${mappingNote}`;
 }
 
+function ingestionWarningsFromManifest(manifest: SessionManifest | null | undefined): string[] {
+  const report = manifest?.ingestion_report;
+  if (!report) return [];
+  const reports = report.files && report.files.length > 0 ? report.files : [report];
+  const out: string[] = [];
+  for (const r of reports) {
+    for (const w of r.warnings ?? []) {
+      const text = String(w).trim();
+      if (text && !out.includes(text)) out.push(text);
+    }
+  }
+  return out;
+}
+
 export function extractInsightSnapshot(
   session: SessionResponse | null,
   manifest?: SessionManifest | null,
@@ -229,6 +243,13 @@ export function extractInsightSnapshot(
   const oppCount = initiativesArr.filter(
     (i) => Number(asRecord(i.net_savings)?.total_3yr ?? 0) > 0,
   ).length;
+  const savingsSummary = asRecord(savingsModel?.summary);
+  const expectedNet = Number(savingsSummary?.total_expected_net_3yr ?? 0);
+  const fullNet = Number(savingsSummary?.total_net_3yr_full_delivery ?? 0);
+  const peerOut = asRecord(skillOutputs['peer-benchmarker']);
+  const benchWarnings = Array.isArray(peerOut?.warnings)
+    ? (peerOut!.warnings as unknown[]).map(String).filter(Boolean)
+    : [];
 
   const chartData = extractChartData(spendProfiler);
   const smeData = smeQualificationFromOutputs(skillOutputs);
@@ -275,6 +296,15 @@ export function extractInsightSnapshot(
     modelled_savings: midRaw > 0 ? formatSpendAmount(midRaw, reportingCurrency) : undefined,
     modelled_savings_raw: midRaw > 0 ? midRaw : undefined,
     savings_opportunity_count: oppCount > 0 ? oppCount : undefined,
+    expected_net_3yr: expectedNet > 0 ? expectedNet : undefined,
+    full_delivery_net_3yr: fullNet > 0 ? fullNet : undefined,
+    benchmarks_illustrative:
+      asRecord(peerOut?.benchmark_metadata)?.is_illustrative === true ? true : undefined,
+    benchmark_warnings: benchWarnings.length > 0 ? benchWarnings : undefined,
+    ingestion_warnings: (() => {
+      const w = ingestionWarningsFromManifest(manifest);
+      return w.length > 0 ? w : undefined;
+    })(),
     ingestion_note: ingestionNoteFromManifest(manifest ?? null),
     chart_data: chartData ?? undefined,
     sme_qualification: smeData.summary ?? undefined,

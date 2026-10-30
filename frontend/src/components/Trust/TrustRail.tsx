@@ -103,6 +103,20 @@ export const TrustRail: React.FC<TrustRailProps> = ({
                 )}
               </dl>
             )}
+            {(qualitySignals?.unverified_figures?.length ?? 0) > 0 && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                <p className="font-semibold">Unverified figures in the narrative</p>
+                <p className="mt-1">
+                  These amounts match no value in the analysis outputs. They may be sums or ratios the model derived, or
+                  they may be wrong — check them before quoting.
+                </p>
+                <ul className="mt-1.5 list-disc pl-4 font-mono">
+                  {qualitySignals!.unverified_figures!.map((f) => (
+                    <li key={f}>{f}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <p className="text-xs text-brand-muted">
               Deterministic ledger data is tagged Fact; model outputs are tagged AI inference.
             </p>
