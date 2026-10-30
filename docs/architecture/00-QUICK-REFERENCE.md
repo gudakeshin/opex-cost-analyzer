@@ -70,7 +70,7 @@ For technical deep-dives, implementation planning, or security audits.
 | Term | Definition |
 |------|-----------|
 | **OPAR Loop** | Observe-Plan-Act-Reflect agentic cycle; orchestrates iterative cost analysis |
-| **Sector Pack** | Industry-specific library of 8–9 levers (11 packs for 11 sectors) |
+| **Sector Pack** | Industry-specific library of 8–9 levers (16 packs for 16 sectors) |
 | **Addressability** | 4-dimensional model: regulatory override, contract window, switching cost, cost behaviour |
 | **Lever Intelligence** | Engine that auto-detects industry, resolves eligible levers, scores by relevance |
 | **B1–B4 Classification** | Data sensitivity bands; B4=PII quarantined, B1–B3 proceed with band enforcement |
@@ -94,7 +94,7 @@ For technical deep-dives, implementation planning, or security audits.
 | **5** | LLM Modes (M1/M2/M3) | Fig. 5 — Mode selection | 7 min |
 | **6** | Security Architecture | Fig. 6 — Classification → Audit | 10 min |
 | **7** | Data Model | Fig. 7 — Class diagram | 8 min |
-| **8** | Sector Packs (11 packs) | Fig. 8 — Pack + calibration | 10 min |
+| **8** | Sector Packs (16 packs) | Fig. 8 — Pack + calibration | 10 min |
 | **9** | Addressability (4-dim) | Fig. 9 — Dimension flow | 10 min |
 | **10** | Lever Intelligence | Fig. 10 — Inference + scoring | 12 min |
 | **11** | Sensitivity (7 scenarios) | Fig. 11 — Scenario matrix | 5 min |
@@ -116,7 +116,7 @@ A: B1–B4 classification with automatic PII detection (≥99.2% recall). B4 (PI
 A: Three modes: M1 (no LLM, rule-based), M2 (cloud India, zero-retention), M3 (on-prem Ollama). See § 5 (LLM Providers).
 
 **Q: How many industries does the platform support?**
-A: 11 complete sector packs + 30+ universal levers. Auto-detects industry from spend signals. See § 8 (Sector Packs) & § 10 (Lever Intelligence).
+A: 16 complete sector packs + 30+ universal levers. Auto-detects industry from spend signals. See § 8 (Sector Packs) & § 10 (Lever Intelligence).
 
 **Q: What's the typical engagement timeline?**
 A: 12 weeks from data upload to board-ready business case. Calibration cycle at T+12M. See Appendix C (Engagement Lifecycle).

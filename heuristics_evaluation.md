@@ -7,7 +7,7 @@
 
 The heuristics layer is **production-ready for consultant-driven engagements** on core diagnostic and scenario paths. Source provenance, externalized parameters, calibration governance, and sector-pack versioning remain strengths. Recent work (June–July 2026) closed the highest-impact gaps: graduated maverick severity, spend-floor fragmentation gates, sustainability/specificity-driven confidence bands, lever-family dedup overlap, per-lever bounce-back and execution-probability weighting, EBITDA bps framing, horizon classification, regulatory-headwind scenario, populated `effort_weeks`, industry-differentiated benchmark categories, industry-variant cost-per-transaction thresholds, and client-facing calibration gate explanations.
 
-**Remaining gaps** are mostly medium/low priority: industry-variant cost-per-transaction thresholds, client-facing calibration gate explanations, and licensed benchmark feed enrichment (CMIE/Capitaline/CRISIL stubs).
+**Remaining gaps** are mostly medium/low priority: licensed benchmark feed enrichment (CMIE/Capitaline/CRISIL stubs). Industry-variant cost-per-transaction thresholds and client-facing calibration gate explanations were previously listed here but are marked **Fixed** in the status table below.
 
 ---
 

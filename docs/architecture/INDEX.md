@@ -160,7 +160,7 @@ Start here if you're deploying and operating the platform.
 - **Fig. 5** — LLM Mode Selection (M1/M2/M3 + data band enforcement)
 - **Fig. 6** — Security Architecture (PII detection → classification → band enforcement → audit log)
 - **Fig. 7** — Data Model (class diagram, 4 core classes)
-- **Fig. 8** — Sector Pack Architecture (11 packs + universal + calibration loop)
+- **Fig. 8** — Sector Pack Architecture (16 packs + universal + calibration loop)
 - **Fig. 9** — Addressability Engine (4 sequential dimensions)
 - **Fig. 10** — Lever Intelligence Engine (industry inference + eligibility scoring)
 - **Fig. 11** — Sensitivity Scenarios (7 scenarios, bounce-back risk)

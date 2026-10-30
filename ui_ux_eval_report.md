@@ -7,6 +7,26 @@
 
 ---
 
+## Status update — 2026-10-30
+
+> **The scores and findings below are from 2026-05-20 and have not been re-scored.** They need a fresh live-browser pass
+> to be trusted. What follows is only what has changed since, from code changes and spot checks in the running app.
+
+| Finding in this report | Status now |
+|---|---|
+| Mobile navigation broken on Analysis (no hamburger) | Hamburger menu is present on Analysis at phone width (observed). The Insights panel no longer opens as a full-screen sheet on first load below 1024px. |
+| "Attach data" is the weakest element | The empty state now has a primary **Attach your data** button plus **Load demo engagement**, a four-step first-run guide, and a visible engagement switcher. |
+| Interaction & feedback scored 2 (no progress/stop) | Running chats and analyses show a status bar (latest step, step count, elapsed time) and a **Stop** button; stream fallbacks and lost progress polling are now announced. Stop only stops the browser waiting — the server may still finish. |
+| Primary buttons/tabs not visible in Workbench | Three undefined colour tokens were defined, so Workbench action buttons and active tabs render. |
+| Destructive actions unguarded | Delete (run, document, saved query, scenario set), promote and New session now confirm; Pack Studio warns before discarding unsaved edits and before publishing. |
+| Unknown URLs render a blank page | A "Page not found" page now shows. |
+| Executive view leaks consultant-only pages | Consultant-only routes now redirect to the Cost Room in executive mode. |
+
+Still open from the wider audit: modal/drawer focus management and tab ARIA roles, small-text and green-on-white text contrast,
+unexplained jargon in the Analysis header (Trust rail, Thinking, Incremental update), and dark-mode coverage.
+
+---
+
 ## Executive Summary
 
 The platform has a strong FP&A-domain model — percentile scenarios, macroeconomic stress tests, audit chain, FACT vs AI-INFERENCE provenance labels — all concepts that resonate with CFO-office users. The visual language (Deloitte green, clean cards, Open Sans typography) is professional and on-brand.

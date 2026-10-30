@@ -74,7 +74,7 @@ C4Context
     Person(consultant, "Engagement Consultant", "Runs 12-week cost diagnostic for Indian enterprise clients")
     Person(cfo, "CFO / C-Suite", "Consumes board deck, CFO brief, cost room, MOR pack")
 
-    System(opex, "OpEx Intelligence Platform", "FastAPI backend + OPAR loop + 26 skills + 11 sector packs + lever intelligence engine")
+    System(opex, "OpEx Intelligence Platform", "FastAPI backend + OPAR loop + 40 skills + 16 sector packs + lever intelligence engine")
 
     System_Ext(llm_m2, "LLM (M2 Mode)", "AWS Bedrock ap-south-1 / Azure OpenAI centralindia / Anthropic-India")
     System_Ext(llm_m3, "LLM (M3 Mode)", "On-prem Ollama (Llama / Mistral)")
@@ -213,7 +213,7 @@ C4Container
     ContainerDb(redis, "Redis Cache", "Redis 7.2 + TLS", "Cost-room filter cache < 200 ms (falls back to in-process dict in CI)")
     ContainerDb(parquet, "Parquet / DuckDB", "Columnar storage", "Streaming ingestion for large-cap (>100k lines) and conglomerate (>5M lines)")
     ContainerDb(audit, "Audit Log", "Append-only file", "SHA-256 hash chain; shipped to client SIEM")
-    ContainerDb(sector_packs, "Sector Packs", "JSON files", "11 packs — ALL FULL: bfsi_banks, manufacturing_diversified, it_ites, fmcg_consumer, pharma_lifesciences, energy_utilities, insurance_general, retail_organized, telecom_infra, psu_cpse, conglomerate")
+    ContainerDb(sector_packs, "Sector Packs", "JSON files", "16 packs: bfsi_banks, conglomerate, energy_utilities, financial_services_nonbank, fmcg_consumer, gcc_capability_centers, healthcare_hospitals, hospitality_travel, insurance_general, it_ites, manufacturing_cement, manufacturing_diversified, pharma_lifesciences, psu_cpse, retail_organized, telecom_infra")
     ContainerDb(ref_data, "Reference Data", "JSON files", "switching_cost_benchmarks.json · regulatory_exclusions.json · model_parameters.json (53 levers)")
 
     Rel(user, frontend, "HTTP/HTTPS (VPN only)")
@@ -750,11 +750,12 @@ flowchart LR
 
 **Fig. 8 — Sector Pack Architecture & Calibration Loop**
 
-**15 Sector Packs (All Complete):**
+**16 Sector Packs (All Complete):**
 
 | Pack | Industry | Key Levers (Sample) |
 |------|----------|-------------------|
 | **bfsi_banks** | Banking, Financial Services | Branch network optimization, KYC/AML automation, collections efficiency, interest rate repricing, loan loss provisioning, treasury ops optimization |
+| **manufacturing_cement** | Integrated cement plants, clinker and grinding units | Clinker factor and blended cement, kiln thermal efficiency, alternative fuel substitution, waste-heat recovery and renewable power, grinding efficiency, refractory and shutdown optimisation |
 | **manufacturing_diversified** | Discrete manufacturing, conglomerates | Predictive maintenance, MRO consolidation, energy audit, factory automation, procurement rationalization, supply chain optimization |
 | **it_ites** | IT services, IT-enabled services | License rightsizing, cloud FinOps, GenAI productivity, build-vs-buy optimization, attrition reduction, offshore arbitrage |
 | **fmcg_consumer** | Consumer goods, retail FMCG | COGS/direct materials, SKU rationalization, logistics mode shift, demand planning, promotional effectiveness, private label mix |
@@ -1378,7 +1379,7 @@ flowchart TB
 
 **OPAR Loop:** Observe-Plan-Act-Reflect agentic orchestration pattern. Iterative cycle allowing the platform to refine recommendations as data emerges.
 
-**Sector Packs:** Industry-specific lever libraries. 15 complete packs (BFSI, Manufacturing, IT/ITeS, FMCG, Pharma, Energy, Insurance, Retail, Telecom, PSU, Conglomerate, GCC, Healthcare, Hospitality, Financial Services Non-Bank) codifying consulting best practices.
+**Sector Packs:** Industry-specific lever libraries. 16 complete packs (BFSI, Manufacturing — Diversified, Manufacturing — Cement, IT/ITeS, FMCG, Pharma, Energy, Insurance, Retail, Telecom, PSU, Conglomerate, GCC, Healthcare, Hospitality, Financial Services Non-Bank) codifying consulting best practices.
 
 **Lever Intelligence Engine:** Auto-detects industry and resolves eligible cost-reduction opportunities. Outputs ranked list of levers with eligibility scores.
 
