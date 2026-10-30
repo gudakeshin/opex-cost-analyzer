@@ -54,8 +54,10 @@ class MemoryStore:
                 data = read_json(f, {})
                 if data.get("engagement_id") == engagement_id:
                     sessions.append(f.stem)
-            except Exception:
-                pass
+            except Exception as exc:
+                # Skip unreadable session files but leave a trace: a session
+                # silently missing here escapes engagement teardown/deletion.
+                logger.warning('"session_file_unreadable path=%s error=%s"', f, exc)
         return sessions
 
     def teardown_engagement(self, engagement_id: str) -> Dict[str, Any]:

@@ -1,0 +1,11 @@
+{
+  "company": "Pragati Telecom Networks Ltd",
+  "sector": "telecom_infra",
+  "wacc": 0.135,
+  "effective_tax_rate": 0.2517,
+  "reporting_currency": "INR",
+  "annual_revenue_inr_cr": 38000,
+  "discount_rate": 0.135,
+  "execution_rate_pct": 70,
+  "notes": "WACC and tax rate per FY25 board pack for Pragati Telecom Networks Ltd."
+}

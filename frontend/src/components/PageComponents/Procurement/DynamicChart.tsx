@@ -13,6 +13,9 @@ import {
   ResponsiveContainer,
   CartesianGrid,
   Cell,
+  ScatterChart,
+  Scatter,
+  ZAxis,
 } from 'recharts';
 import { formatSpendAmount } from '../../../utils/analysisInsights';
 import type { ChartSpec, ChartSeries, ChartUnit } from '../../../types';
@@ -96,6 +99,33 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({ spec, currency }) =>
   const tooltipStyle = { fontSize: 11, borderRadius: 8, border: '1px solid #E0E0E0' };
   const axisTick = { fontSize: 9, fill: GRAY } as const;
 
+  // ----- Scatter -----
+  if (type === 'scatter') {
+    const xKeyScatter = series[0]?.key ?? 'x';
+    const yKey = series[1]?.key ?? series[0]?.key ?? 'y';
+    const scatterData = data.map((row) => ({
+      x: Number(row[xKey] ?? row[xKeyScatter] ?? 0),
+      y: Number(row[yKey] ?? 0),
+      name: String(row.name ?? row[xKey] ?? ''),
+    }));
+    return (
+      <ResponsiveContainer width="100%" height={220}>
+        <ScatterChart margin={{ top: 8, right: 16, left: 4, bottom: 4 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#E0E0E0" />
+          <XAxis type="number" dataKey="x" name={series[0]?.name ?? xKey} tickFormatter={fmt} tick={axisTick} axisLine={false} tickLine={false} />
+          <YAxis type="number" dataKey="y" name={series[1]?.name ?? yKey} tickFormatter={fmt} tick={axisTick} width={60} axisLine={false} tickLine={false} />
+          <ZAxis range={[48, 48]} />
+          <Tooltip
+            cursor={{ strokeDasharray: '3 3' }}
+            formatter={(v: number, n: string) => [fmt(Number(v)), n]}
+            contentStyle={tooltipStyle}
+          />
+          <Scatter data={scatterData} fill={GREEN} />
+        </ScatterChart>
+      </ResponsiveContainer>
+    );
+  }
+
   // ----- Waterfall -----
   if (type === 'waterfall') {
     const wf = buildWaterfall(spec);
@@ -106,8 +136,8 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({ spec, currency }) =>
           <XAxis dataKey="label" tick={axisTick} interval={0} angle={-20} textAnchor="end" height={48} axisLine={false} tickLine={false} />
           <YAxis tickFormatter={fmt} tick={axisTick} width={60} axisLine={false} tickLine={false} />
           <Tooltip formatter={(_v, _n, p) => [fmt(Number((p?.payload as { display?: number })?.display ?? 0)), spec.series[0]?.name ?? 'Value']} contentStyle={tooltipStyle} />
-          <Bar dataKey="base" stackId="w" fill="transparent" />
-          <Bar dataKey="bar" stackId="w" radius={[4, 4, 0, 0]} maxBarSize={48}>
+          <Bar dataKey="base" stackId="w" fill="transparent" isAnimationActive={false} />
+          <Bar dataKey="bar" stackId="w" radius={[4, 4, 0, 0]} maxBarSize={48} isAnimationActive={false}>
             {wf.map((r, i) => (
               <Cell key={i} fill={r.color} />
             ))}
@@ -186,6 +216,7 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({ spec, currency }) =>
               fill={s.color ?? PALETTE[i % PALETTE.length]}
               radius={[0, 4, 4, 0]}
               maxBarSize={20}
+              isAnimationActive={false}
             >
               {series.length === 1 &&
                 data.map((_, idx) => <Cell key={idx} fill={s.color ?? PALETTE[idx % PALETTE.length]} />)}
@@ -215,6 +246,7 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({ spec, currency }) =>
             fill={s.color ?? PALETTE[i % PALETTE.length]}
             radius={stacked ? [0, 0, 0, 0] : [4, 4, 0, 0]}
             maxBarSize={36}
+            isAnimationActive={false}
           >
             {series.length === 1 &&
               data.map((_, idx) => <Cell key={idx} fill={s.color ?? PALETTE[idx % PALETTE.length]} />)}

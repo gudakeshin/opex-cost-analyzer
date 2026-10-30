@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import os
 from pathlib import Path
 import re
@@ -13,7 +12,6 @@ from app.config import (
     GEMINI_ENABLED,
     LLM_INTENT_CLASSIFICATION_ENABLED,
     MEMORY_DIR,
-    UPLOAD_DIR,
 )
 from app.opar.memory_adapter import get_memory_adapter
 from app.opar.hitl.clarification_tool import ClarificationAnswer
@@ -60,11 +58,20 @@ def _detect_query_capabilities(msg: str) -> List[str]:
             "cost reduction",
             "cost optimization",
             "cost optimisation",
+            "renegotiat",
+            "re-negotiat",
+            "contract renewal",
+            "renewal detail",
+            "initiative detail",
+            "lever detail",
         ],
         "variance_analysis": ["budget vs actual", "variance", "over budget", "under budget", "bva"],
         "temporal_trend": ["trend", "month", "quarter", "season", "time", "over time"],
         "working_capital": ["payment terms", "dpo", "net 30", "net 45", "working capital"],
-        "root_cause": ["why", "driver", "root cause", "cause", "bottleneck"],
+        "root_cause": [
+            "why", "driver", "drivers", "drives", "drive", "root cause", "cause",
+            "bottleneck", "what's behind", "whats behind", "what causes", "underlying",
+        ],
         "visualization": ["chart", "graph", "plot", "dashboard", "visual"],
         "schema_lookup": ["schema", "columns", "headers", "semantic map", "field mapping"],
         "document_context": ["document", "contract", "policy", "constraint", "pdf", "docx", "txt"],
@@ -201,6 +208,11 @@ def _classify_intent_rule_based(msg: str) -> Tuple[str, str | None]:
     # 2. Business case / proposal
     if any(w in lowered for w in ["business case", "businesscase", "proposal", "generate case"]):
         return "business_case", None
+
+    # 2.5 Lever / contract detail asks on modeled initiatives
+    if any(w in lowered for w in ["renegotiat", "re-negotiat", "contract renewal", "renewal detail"]):
+        if any(w in lowered for w in ["detail", "details", "tell me", "show me", "what", "give me", "list", "explain", "describe"]):
+            return "savings_plan", None
 
     # 3. Value bridge / savings matrix
     if any(w in lowered for w in [
@@ -454,6 +466,7 @@ def observe(
     file_ids: List[str] | None = None,
     manifest: Dict[str, Any] | None = None,
     *,
+    turn_id: str | None = None,
     clarification_answer: ClarificationAnswer | None = None,
     clarification_resolved: bool = False,
     waive_spend_requirement: bool = False,
@@ -464,8 +477,9 @@ def observe(
     user_mem = adapter.get_user_memory(user_id)
     session_mem = adapter.get_session_memory(session_id, query=msg, limit=10)
     if manifest is None:
-        manifest_path = UPLOAD_DIR / session_id / "manifest.json"
-        manifest = read_json(manifest_path, {"files": [], "industry": "", "annual_revenue": 0.0})
+        from app.routers._shared import read_manifest
+
+        manifest = read_manifest(session_id, {"files": [], "industry": "", "annual_revenue": 0.0})
 
     engagement_id = str(manifest.get("engagement_id") or session_id)
     files = manifest.get("files", [])
@@ -620,9 +634,10 @@ def observe(
                     continue
             # Persist newly computed manifest for downstream turns.
             if model_manifest:
-                manifest_path = UPLOAD_DIR / session_id / "manifest.json"
                 try:
-                    manifest_path.write_text(json.dumps(manifest, indent=2))
+                    from app.routers._shared import write_manifest
+
+                    write_manifest(session_id, manifest)
                 except Exception:
                     pass
                 adapter.add_session(
@@ -714,7 +729,7 @@ def observe(
         probe_answers=probe_answers,
         session_id=session_id,
         user_id=user_id,
-        turn_id=session_id,
+        turn_id=turn_id or session_id,
         engagement_id=engagement_id,
         engagement_week=engagement_week,
         decision_gate=decision_gate,

@@ -1,0 +1,46 @@
+business_unit,function,location,band,headcount
+Technology CoE,Operations,India,Entry (B1-B2),360
+Technology CoE,Operations,India,Mid (B3-B4),280
+Technology CoE,Operations,India,Senior (B5-B6),120
+Technology CoE,Finance,India,Entry (B1-B2),360
+Technology CoE,Finance,India,Mid (B3-B4),280
+Technology CoE,Finance,India,Senior (B5-B6),120
+Technology CoE,HR,India,Entry (B1-B2),360
+Technology CoE,HR,India,Mid (B3-B4),280
+Technology CoE,HR,India,Senior (B5-B6),120
+Finance & Accounting,Operations,India,Entry (B1-B2),450
+Finance & Accounting,Operations,India,Mid (B3-B4),350
+Finance & Accounting,Operations,India,Senior (B5-B6),150
+Finance & Accounting,Finance,India,Entry (B1-B2),450
+Finance & Accounting,Finance,India,Mid (B3-B4),350
+Finance & Accounting,Finance,India,Senior (B5-B6),150
+Finance & Accounting,HR,India,Entry (B1-B2),450
+Finance & Accounting,HR,India,Mid (B3-B4),350
+Finance & Accounting,HR,India,Senior (B5-B6),150
+Analytics & Data,Operations,India,Entry (B1-B2),540
+Analytics & Data,Operations,India,Mid (B3-B4),420
+Analytics & Data,Operations,India,Senior (B5-B6),180
+Analytics & Data,Finance,India,Entry (B1-B2),540
+Analytics & Data,Finance,India,Mid (B3-B4),420
+Analytics & Data,Finance,India,Senior (B5-B6),180
+Analytics & Data,HR,India,Entry (B1-B2),540
+Analytics & Data,HR,India,Mid (B3-B4),420
+Analytics & Data,HR,India,Senior (B5-B6),180
+HR Shared Services,Operations,India,Entry (B1-B2),630
+HR Shared Services,Operations,India,Mid (B3-B4),489
+HR Shared Services,Operations,India,Senior (B5-B6),210
+HR Shared Services,Finance,India,Entry (B1-B2),630
+HR Shared Services,Finance,India,Mid (B3-B4),489
+HR Shared Services,Finance,India,Senior (B5-B6),210
+HR Shared Services,HR,India,Entry (B1-B2),630
+HR Shared Services,HR,India,Mid (B3-B4),489
+HR Shared Services,HR,India,Senior (B5-B6),210
+Operations,Operations,India,Entry (B1-B2),720
+Operations,Operations,India,Mid (B3-B4),560
+Operations,Operations,India,Senior (B5-B6),240
+Operations,Finance,India,Entry (B1-B2),720
+Operations,Finance,India,Mid (B3-B4),560
+Operations,Finance,India,Senior (B5-B6),240
+Operations,HR,India,Entry (B1-B2),720
+Operations,HR,India,Mid (B3-B4),560
+Operations,HR,India,Senior (B5-B6),240

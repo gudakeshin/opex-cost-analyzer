@@ -1162,6 +1162,12 @@ def build_report(report: EvalReport) -> str:
     lines.append(f"**Platform version:** {report.platform_version}  ")
     lines.append(f"**Overall score:** {_bar(report.overall_score)}  ")
     lines.append(f"**Overall verdict:** {'PASS ✓' if report.passed else 'FAIL ✗ — remediation required'}  ")
+    lines.append(
+        "\n> ⚠️ **SCORE TYPE: STRUCTURAL** — This score measures lever taxonomy completeness "
+        "and benchmark reference-data quality. It does NOT validate that benchmarks are "
+        "calibrated against real-world data or that savings assumptions are correct. "
+        "See `run_llm_judge_eval.py` for content-quality assessment.\n"
+    )
 
     # Executive summary
     lines.append("\n---\n\n## Executive Summary\n")
@@ -1266,6 +1272,11 @@ def build_report(report: EvalReport) -> str:
         "overall_score": round(report.overall_score, 3),
         "passed": report.passed,
         "eval_date": report.eval_date,
+        "score_type": "structural",
+        "scope": (
+            "Lever taxonomy completeness and benchmark reference-data quality. "
+            "Does NOT validate real-world calibration of assumptions."
+        ),
         "domains": [
             {
                 "name": dr.domain_name,

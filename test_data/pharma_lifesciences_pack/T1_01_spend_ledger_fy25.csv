@@ -1,0 +1,11 @@
+supplier,description,amount,currency,category,gl_code,spend_date,business_unit,country
+Divi Laboratories,API sourcing — formulations India & export FY25,1440000000,INR,API & Raw Materials,510010,2024-12-01,Formulations India,India
+Laurus Labs,API & key starting materials — regulated markets,980000000,INR,API & Raw Materials,510011,2024-11-15,Formulations Exports,India
+Jubilant Biosys,Contract research — NCE discovery services,620000000,INR,Contract Research & Manufacturing,520010,2025-01-10,CDMO,India
+Syngene International,CDMO formulation development & scale-up,480000000,INR,Contract Research & Manufacturing,520011,2024-10-05,CDMO,India
+IQVIA India,Clinical data management & regulatory submissions,540000000,INR,Regulatory & Quality,530010,2024-09-12,Formulations Exports,India
+SGS India,QC testing laboratory services & GMP audits,320000000,INR,Regulatory & Quality,530011,2024-08-20,API,India
+Ogilvy Health,Medical affairs & field force support — India market,680000000,INR,Marketing & Medical Affairs,540010,2024-07-01,Formulations India,India
+DHL Supply Chain,Temperature-controlled export logistics,480000000,INR,Logistics & Cold Chain,550010,2024-06-15,Formulations Exports,US
+FedEx India,Express pharma courier — samples & clinical supplies,280000000,INR,Logistics & Cold Chain,550011,2025-02-01,Formulations Exports,India
+KPMG India,Statutory audit & US GAAP advisory,320000000,INR,Professional Services,560010,2025-01-08,Corporate,India

@@ -1,0 +1,11 @@
+vendor,vendor_category,gstin,vendor_pan,msme_flag,spend_category,legal_entity,related_party
+Mahindra Logistics,large,27AABCM4421L1Z8,AABCM4421L,no,Logistics & Freight,UIL-IN,no
+Blue Dart Express,large,27AABCB5531D1Z1,AABCB5531D,no,Logistics & Freight,UIL-IN,no
+Tata Power,large,27AABCT6641P1Z4,AABCT6641P,no,Energy & Utilities,UIL-IN,no
+Adani Electricity,large,27AABCA7751E1Z7,AABCA7751E,no,Energy & Utilities,UIL-IN,no
+SKF India,large,27AABCS8861S1Z0,AABCS8861S,no,Maintenance & Spares,UIL-IN,no
+Bosch India,large,27AABCB9971B1Z3,AABCB9971B,no,Maintenance & Spares,UIL-IN,no
+Quippo Industrial,msme,27AABCQ3211Q1Z6,AABCQ3211Q,yes,Contract Manufacturing & Subcontracting,UIL-IN,no
+EY India,large,27AABCE5521Y1Z0,AABCE5521Y,no,Professional Services,UIL-IN,no
+KPMG India,large,29AABCK3201F1Z9,AABCK3201F,no,Professional Services,UIL-IN,no
+DB Schenker India,large,27AABCD2221S1Z9,AABCD2221S,no,Logistics & Freight,UIL-DE,no

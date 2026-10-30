@@ -105,18 +105,27 @@ def _minimal_analysis(skill_outputs: Dict | None = None) -> Dict[str, Any]:
 
 # ─── 1. Sector Pack Loader ───────────────────────────────────────────────────
 
+ALL_PACK_IDS = sorted(
+    d.name for d in (ROOT / "sector_packs").iterdir()
+    if d.is_dir() and (d / "pack_manifest.yaml").exists()
+)
+
+
+def _manifest_status(pack_id: str) -> str:
+    return load_pack(pack_id)["status"]
+
+
 class TestSectorPackLoader:
     def test_list_available_packs_includes_full_packs(self):
         packs = list_available_packs()
         assert "bfsi_banks" in packs
         assert "manufacturing_diversified" in packs
 
-    def test_list_available_packs_includes_scaffolds(self):
+    def test_list_available_packs_includes_all_pack_dirs(self):
         packs = list_available_packs()
-        for expected in ["insurance_general", "it_ites", "pharma_lifesciences",
-                          "fmcg_consumer", "retail_organized", "telecom_infra",
-                          "energy_utilities", "conglomerate", "psu_cpse"]:
-            assert expected in packs, f"Scaffold pack '{expected}' missing from list"
+        for expected in ALL_PACK_IDS:
+            assert expected in packs, f"Pack '{expected}' missing from list"
+        assert len(packs) >= 15
 
     def test_load_bfsi_pack(self):
         pack = load_pack("bfsi_banks")
@@ -132,10 +141,10 @@ class TestSectorPackLoader:
         levers = pack["sector_levers"].get("levers", [])
         assert len(levers) >= 5
 
-    def test_load_scaffold_pack(self):
+    def test_load_it_ites_pack(self):
         pack = load_pack("it_ites")
-        assert pack["status"] == "scaffold"
-        assert pack["version"] == "0.1"
+        assert pack["status"] in {"scaffold", "draft", "full"}
+        assert pack["version"]
 
     def test_load_nonexistent_pack_raises(self):
         _load_pack_cached.cache_clear()
@@ -154,6 +163,16 @@ class TestSectorPackLoader:
         assert "RBI" in pack["regulatory_layer"]
         assert "KYC" in pack["regulatory_layer"]
 
+    def test_pharma_regulatory_layer(self):
+        pack = load_pack("pharma_lifesciences")
+        assert "CDSCO" in pack["regulatory_layer"]
+        assert "pharmacovigilance" in pack["regulatory_layer"].lower()
+
+    def test_telecom_regulatory_layer(self):
+        pack = load_pack("telecom_infra")
+        assert "TRAI" in pack["regulatory_layer"]
+        assert "spectrum" in pack["regulatory_layer"].lower()
+
     def test_manufacturing_benchmark_sources(self):
         pack = load_pack("manufacturing_diversified")
         bs = pack["benchmark_sources"]
@@ -164,8 +183,8 @@ class TestSectorPackLoader:
 # ─── 2. Sector Pack Regression Tests ────────────────────────────────────────
 
 class TestSectorPackRegression:
-    @pytest.mark.parametrize("pack_id", ["bfsi_banks", "manufacturing_diversified"])
-    def test_full_packs_pass_regression(self, pack_id):
+    @pytest.mark.parametrize("pack_id", ALL_PACK_IDS)
+    def test_all_packs_pass_regression(self, pack_id):
         _load_pack_cached.cache_clear()
         result = run_regression_test(pack_id)
         assert result["passed"], f"Pack '{pack_id}' regression failed: {result['errors']}"
@@ -173,38 +192,33 @@ class TestSectorPackRegression:
         assert result["checks"]["taxonomy_non_empty"]
         assert result["checks"]["peer_set_non_empty"]
         assert result["checks"]["version_semver"]
+        assert result["checks"]["regulatory_layer_present"]
 
-    @pytest.mark.parametrize("pack_id", [
-        "insurance_general", "it_ites", "pharma_lifesciences",
-        "fmcg_consumer", "retail_organized", "telecom_infra",
-        "energy_utilities", "conglomerate", "psu_cpse"
-    ])
-    def test_scaffold_packs_have_required_files(self, pack_id):
+    @pytest.mark.parametrize("pack_id", ALL_PACK_IDS)
+    def test_packs_have_required_files(self, pack_id):
         pack_dir = ROOT / "sector_packs" / pack_id
         assert (pack_dir / "pack_manifest.yaml").exists(), f"{pack_id}/pack_manifest.yaml missing"
         assert (pack_dir / "taxonomy_extension.json").exists(), f"{pack_id}/taxonomy_extension.json missing"
         assert (pack_dir / "peer_set.json").exists(), f"{pack_id}/peer_set.json missing"
 
-    def test_scaffold_packs_have_at_least_one_peer(self):
-        for pack_id in ["insurance_general", "it_ites", "pharma_lifesciences",
-                         "fmcg_consumer", "retail_organized", "telecom_infra",
-                         "energy_utilities", "conglomerate", "psu_cpse"]:
-            pack = load_pack(pack_id)
-            peers = pack["peer_set"].get("peers", [])
-            assert len(peers) >= 3, f"Pack '{pack_id}' has < 3 peers"
+    @pytest.mark.parametrize("pack_id", ALL_PACK_IDS)
+    def test_packs_have_at_least_three_peers(self, pack_id):
+        pack = load_pack(pack_id)
+        peers = pack["peer_set"].get("peers", [])
+        assert len(peers) >= 3, f"Pack '{pack_id}' has < 3 peers"
 
-    def test_scaffold_packs_have_sector_categories(self):
-        for pack_id in ["insurance_general", "it_ites", "pharma_lifesciences"]:
-            pack = load_pack(pack_id)
-            cats = pack["taxonomy_extension"].get("additional_categories", [])
-            assert len(cats) >= 3, f"Pack '{pack_id}' has < 3 taxonomy categories"
+    @pytest.mark.parametrize("pack_id", ALL_PACK_IDS)
+    def test_packs_have_sector_categories(self, pack_id):
+        pack = load_pack(pack_id)
+        cats = pack["taxonomy_extension"].get("additional_categories", [])
+        assert len(cats) >= 3, f"Pack '{pack_id}' has < 3 taxonomy categories"
 
-    def test_all_full_pack_levers_have_p50(self):
-        for pack_id in ["bfsi_banks", "manufacturing_diversified"]:
-            pack = load_pack(pack_id)
-            levers = pack["sector_levers"].get("levers", [])
-            for lv in levers:
-                assert "p50_pct" in lv, f"Lever '{lv.get('lever_id')}' in {pack_id} missing p50_pct"
+    @pytest.mark.parametrize("pack_id", ALL_PACK_IDS)
+    def test_all_pack_levers_have_p50(self, pack_id):
+        pack = load_pack(pack_id)
+        levers = pack["sector_levers"].get("levers", [])
+        for lv in levers:
+            assert "p50_pct" in lv, f"Lever '{lv.get('lever_id')}' in {pack_id} missing p50_pct"
 
 
 # ─── 3. Taxonomy Merge ───────────────────────────────────────────────────────

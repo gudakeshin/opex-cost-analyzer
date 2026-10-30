@@ -1,0 +1,38 @@
+[
+  {
+    "engagement_id": "eng-spul-fy24",
+    "initiative_id": "INI-1",
+    "lever_id": "scada_consolidation",
+    "pack_id": "energy_utilities",
+    "planned_p50_cr": 22.0,
+    "realised_cr": 17.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "medium",
+    "notes": "ABB SCADA consolidation slipped one quarter; partial savings on redundant licences."
+  },
+  {
+    "engagement_id": "eng-spul-fy24",
+    "initiative_id": "INI-2",
+    "lever_id": "contract_labour_rate",
+    "pack_id": "energy_utilities",
+    "planned_p50_cr": 18.0,
+    "realised_cr": 21.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Favourable market rate environment allowed deeper cuts."
+  },
+  {
+    "engagement_id": "eng-spul-fy24",
+    "initiative_id": "INI-3",
+    "lever_id": "spare_parts_optimisation",
+    "pack_id": "energy_utilities",
+    "planned_p50_cr": 14.0,
+    "realised_cr": 9.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "low",
+    "notes": "Supply chain disruptions delayed draw-down; partially deferred to FY26."
+  }
+]

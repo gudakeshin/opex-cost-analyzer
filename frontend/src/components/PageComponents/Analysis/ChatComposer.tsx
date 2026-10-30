@@ -9,6 +9,7 @@ interface ChatComposerProps {
   onUploadClick: () => void;
   onAnalyzeClick: () => void;
   onNewSessionClick: () => void;
+  onStop?: () => void;
 }
 
 export const ChatComposer: React.FC<ChatComposerProps> = ({
@@ -19,6 +20,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   onUploadClick,
   onAnalyzeClick,
   onNewSessionClick,
+  onStop,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -48,6 +50,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={handleKeyDown}
+            aria-label="Message the planning agent"
             placeholder="Ask about spend, benchmarks, or savings opportunities…"
             disabled={loading}
             className="w-full resize-none bg-transparent px-4 pt-4 pb-2 text-sm text-brand-ink placeholder:text-brand-muted focus:outline-none min-h-[52px] max-h-[160px]"
@@ -79,13 +82,19 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                 New session
               </button>
             </div>
-            <Button
-              type="submit"
-              disabled={loading || !value.trim()}
-              className="!rounded-xl !px-5 !py-2 text-sm"
-            >
-              Send
-            </Button>
+            {loading && onStop ? (
+              <Button type="button" variant="secondary" onClick={onStop} className="!rounded-xl !px-5 !py-2 text-sm">
+                Stop
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                disabled={loading || !value.trim()}
+                className="!rounded-xl !px-5 !py-2 text-sm"
+              >
+                Send
+              </Button>
+            )}
           </div>
         </div>
         <p className="text-[11px] text-center text-brand-muted mt-2">

@@ -1,0 +1,95 @@
+{
+  "sector": "hospitality_travel",
+  "currency": "INR",
+  "peers": [
+    {
+      "name": "Indian Hotels Company (Taj)",
+      "ticker": "INDHOTEL.NS",
+      "exchange": "NSE",
+      "revenue_cr": 7200,
+      "entity_type": "Hotel_Chain"
+    },
+    {
+      "name": "Lemon Tree Hotels",
+      "ticker": "LEMONTREE.NS",
+      "exchange": "NSE",
+      "revenue_cr": 1800,
+      "entity_type": "Hotel_Chain"
+    },
+    {
+      "name": "EIH (Oberoi Hotels)",
+      "ticker": "EIHOTEL.NS",
+      "exchange": "NSE",
+      "revenue_cr": 3200,
+      "entity_type": "Hotel_Chain"
+    },
+    {
+      "name": "Chalet Hotels",
+      "ticker": "CHALET.NS",
+      "exchange": "NSE",
+      "revenue_cr": 1100,
+      "entity_type": "Hotel_Chain"
+    },
+    {
+      "name": "Mahindra Holidays",
+      "ticker": "MHRIL.NS",
+      "exchange": "NSE",
+      "revenue_cr": 2400,
+      "entity_type": "Hotel_Chain"
+    },
+    {
+      "name": "MakeMyTrip",
+      "ticker": "MMYT",
+      "exchange": "NASDAQ",
+      "revenue_cr": 5800,
+      "entity_type": "OTA"
+    },
+    {
+      "name": "Devyani International (KFC/Pizza Hut India)",
+      "ticker": "DEVYANI.NS",
+      "exchange": "NSE",
+      "entity_type": "QSR_Chain",
+      "revenue_cr": 3500
+    },
+    {
+      "name": "Jubilant FoodWorks",
+      "ticker": "JUBLFOOD.NS",
+      "exchange": "NSE",
+      "entity_type": "QSR_Chain",
+      "revenue_cr": 5700
+    },
+    {
+      "name": "ITC Hotels",
+      "ticker": "ITCHOTELS.NS",
+      "exchange": "NSE",
+      "entity_type": "Hotel_Chain",
+      "revenue_cr": 3200
+    },
+    {
+      "name": "Juniper Hotels (Hyatt India)",
+      "ticker": "JUNIPER.NS",
+      "exchange": "NSE",
+      "entity_type": "Hotel_Chain",
+      "revenue_cr": 900
+    }
+  ],
+  "benchmark_metrics": {
+    "ebitda_margin_pct": {
+      "p25": 18.0,
+      "p50": 24.0,
+      "p75": 30.0
+    },
+    "employee_cost_to_revenue_pct": {
+      "p25": 24.0,
+      "p50": 28.0,
+      "p75": 32.0
+    },
+    "utilities_to_revenue_pct": {
+      "p25": 9.0,
+      "p50": 12.0,
+      "p75": 14.0
+    }
+  },
+  "data_source": "BSE/NSE annual reports FY25; FHRAI survey 2024",
+  "refresh_date": "2026-04-01"
+}

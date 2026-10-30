@@ -1,10 +1,11 @@
 """Savings modeler, value bridge, data validator, IRR helper."""
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
 from app.models import NormalizedSpendLine
+from app.opar.numeric_provenance import tag_deterministic
 
 from ._loaders import _get_model_params
 from .lever_rules import build_line_flags, build_signal_corpus
@@ -50,6 +51,101 @@ _OCR_HAIRCUTS: Dict[str, float] = {"high": 0.80, "medium": 0.90, "low": 1.0}
 _GOVERNANCE_Y3_UPLIFT = 1.06
 
 
+def _classify_horizon(
+    phasing_curve: List[float],
+    payback_months: int,
+    effort_weeks_p50: int | None = None,
+) -> str:
+    """Classify an initiative as quick_win / structural / transformational.
+
+    Effort (implementation weeks, P50) is the primary signal when available — it is
+    the most reliable delivery-speed measure and what the effort-vs-impact matrix
+    consumes. Thresholds: ≤12 weeks quick_win, ≤30 weeks structural, else
+    transformational. (A phasing/payback-only rule cannot reproduce the expected
+    quick-win→transformation spread on real lever data — e.g. contract renegotiation
+    front-loads only 15% in Y1 yet pays back in ~3 months — so effort_weeks leads and
+    the phasing/payback heuristic is a fallback when effort is unknown.)
+    """
+    if effort_weeks_p50:
+        if effort_weeks_p50 <= 12:
+            return "quick_win"
+        if effort_weeks_p50 <= 30:
+            return "structural"
+        return "transformational"
+    y1_pct = phasing_curve[0] if phasing_curve else 0.25
+    if y1_pct >= 0.60 or payback_months < 6:
+        return "quick_win"
+    if y1_pct >= 0.20 and payback_months <= 18:
+        return "structural"
+    return "transformational"
+
+
+def _payback_months(gross: Tuple[float, float, float], cta: Tuple[float, float, float]) -> int:
+    """Months until cumulative savings recoup cost-to-achieve (CTA).
+
+    CTA is treated as spent up front in its year and savings accrue evenly through each year.
+    Returns 60 when the cost is not recovered within the 3-year model horizon.
+    """
+    y1, y2, y3 = gross
+    n1, n2, n3 = y1 - cta[0], y2 - cta[1], y3 - cta[2]
+    if n1 > 0:
+        return max(1, int((cta[0] / y1) * 12)) if y1 > 0 else 12
+    if n1 + n2 > 0:
+        # cost still unrecovered after year 1 is -n1; year 2 then earns n2 net of its own CTA
+        return 12 + max(1, int((-n1 / n2) * 12)) if n2 > 0 else 24
+    if n1 + n2 + n3 > 0:
+        return 24 + max(1, int((-(n1 + n2) / n3) * 12)) if n3 > 0 else 36
+    return 60
+
+
+def _overlap_factor(
+    family_a: str,
+    family_b: str,
+    overlap_matrix: Dict[str, float],
+    fallback: float,
+) -> float:
+    if family_a == family_b:
+        key = f"{family_a}:{family_b}"
+        return float(overlap_matrix.get(key, fallback))
+    key_ab = f"{family_a}:{family_b}"
+    key_ba = f"{family_b}:{family_a}"
+    if key_ab in overlap_matrix:
+        return float(overlap_matrix[key_ab])
+    if key_ba in overlap_matrix:
+        return float(overlap_matrix[key_ba])
+    return float(fallback)
+
+
+def _category_deduped_mid(
+    values: Dict[str, float],
+    *,
+    lever_by_source: Dict[str, str],
+    levers_meta: Dict[str, Any],
+    overlap_matrix: Dict[str, float],
+    fallback: float,
+) -> float:
+    """Combine peer/internal/heuristic savings using lever-family overlap factors."""
+    source_keys = ("peer", "internal", "heuristic")
+    parts: List[Tuple[str, float, str]] = []
+    for src in source_keys:
+        amt = float(values.get(src, 0.0) or 0.0)
+        if amt <= 0:
+            continue
+        lever_id = lever_by_source.get(src, "")
+        family = str(levers_meta.get(lever_id, {}).get("lever_family", "supply"))
+        parts.append((src, amt, family))
+    if not parts:
+        return 0.0
+    if len(parts) == 1:
+        return parts[0][1]
+    parts.sort(key=lambda x: x[1], reverse=True)
+    total = parts[0][1]
+    primary_family = parts[0][2]
+    for _, amt, family in parts[1:]:
+        total += amt * _overlap_factor(primary_family, family, overlap_matrix, fallback)
+    return total
+
+
 def savings_modeler(
     value_bridge_raw: Dict[str, Any],
     root_cause_outputs: Dict[str, Any],
@@ -79,10 +175,21 @@ def savings_modeler(
     cost_to_achieve_inputs = cost_to_achieve_inputs or {}
     root_by_cat = {x["category_id"]: x for x in root_cause_outputs.get("root_cause_findings", [])}
 
+    # Portfolio data-quality score: mean of per-line scores; excludes credits/reversals from baseline
+    if spend_lines:
+        baseline_lines = [ln for ln in spend_lines if not ln.is_credit_or_reversal]
+        portfolio_quality = (
+            sum(ln.data_quality_score for ln in baseline_lines) / len(baseline_lines)
+            if baseline_lines else 1.0
+        )
+    else:
+        baseline_lines = None
+        portfolio_quality = 1.0
+
     root_cause_list = root_cause_outputs.get("root_cause_findings", [])
     profile = spend_profile or {}
     signal_corpus = build_signal_corpus(profile, document_context)
-    line_flags = build_line_flags(spend_lines) if spend_lines else None
+    line_flags = build_line_flags(baseline_lines) if baseline_lines else None
     eligible_levers = resolve_eligible_levers(
         industry=industry,
         spend_profile=profile,
@@ -207,14 +314,12 @@ def savings_modeler(
         irr_cashflows = [-cta_y1 * tax_multiplier, any1, any2, any3]
         irr_pct = _compute_irr(irr_cashflows) if cta_y1 > 0 else None
 
-        payback_months = 60
-        if ny1 > 0:
-            payback_months = max(1, int((cta_y1 / y1) * 12)) if y1 > 0 else 12
-        elif (ny1 + ny2) > 0:
-            remaining = cta_y1 - ny1
-            payback_months = 12 + max(1, int((remaining / ny2) * 12)) if ny2 > 0 else 24
-        elif (ny1 + ny2 + ny3) > 0:
-            payback_months = 36
+        payback_months = _payback_months((y1, y2, y3), (cta_y1, cta_y2, cta_y3))
+
+        spread = float((defaults.get("execution_spread_by_risk") or {}).get(org_change_risk, 0.15))
+        p10_prob = max(base_execution_probability - spread, 0.05)
+        p90_prob = min(base_execution_probability + spread, 1.0)
+        net_total_3yr = ny1 + ny2 + ny3
 
         initiative_dict: Dict[str, Any] = {
             "category_id": cid,
@@ -256,7 +361,50 @@ def savings_modeler(
             },
             "payback_months": payback_months,
             "irr_pct": irr_pct,
+            # Probability-weighted view. The headline gross/net figures above assume
+            # full delivery; this is what the portfolio can expect after lever-specific
+            # execution risk (base probability x org-change haircut).
+            "risk_adjusted": {
+                "execution_probability": round(float(base_execution_probability), 2),
+                "expected_gross_3yr": round((y1 + y2 + y3) * base_execution_probability, 2),
+                "expected_net_3yr": round(net_total_3yr * base_execution_probability, 2),
+                # Range across plausible delivery: base probability -/+ a spread set by org-change risk.
+                "p10_net_3yr": round(net_total_3yr * p10_prob, 2),
+                "p50_net_3yr": round(net_total_3yr * base_execution_probability, 2),
+                "p90_net_3yr": round(net_total_3yr * p90_prob, 2),
+                "probability_range": [round(p10_prob, 2), round(p90_prob, 2)],
+                "basis": "Headline figures assume 100% delivery; multiply by execution_probability for the expected case.",
+            },
+            "timeline_weeks": (lv_meta.get("effort_weeks") or {}).get("p50"),
         }
+        # Numeric provenance: all figures in this initiative are deterministic outputs
+        # from the value-bridge gap, phasing curves, and model parameters — no LLM adjustment.
+        initiative_dict["provenance"] = {
+            "addressable_gap":  tag_deterministic(round(gap, 2),          field="addressable_gap"),
+            "p50":              tag_deterministic(
+                round((y1 + y2 + y3) * base_execution_probability, 2), field="p50_3yr"
+            ),
+            "gross_3yr_full_delivery": tag_deterministic(round(y1 + y2 + y3, 2), field="gross_3yr_full_delivery"),
+            "npv_pretax":       tag_deterministic(round(npv_pretax, 2),   field="npv_pretax"),
+            "npv_aftertax":     tag_deterministic(round(npv_aftertax, 2), field="npv_aftertax"),
+            "cta_total":        tag_deterministic(round(cta_total, 2),    field="cta_total"),
+            "irr_pct":          tag_deterministic(irr_pct or 0.0,         field="irr_pct"),
+            "method":           "deterministic_skill",
+            "model_version":    _get_model_params().get("model_version", "1.0"),
+        }
+        # EBITDA basis-point framing — savings as bps of annual revenue (CFO lens).
+        revenue_base = float(annual_revenue or 0.0)
+        ebitda_bps = round((run_rate_savings / revenue_base) * 10000, 1) if revenue_base else None
+        initiative_dict["ebitda_impact"] = {
+            "run_rate_savings_annualized": round(run_rate_savings, 2),
+            "ebitda_bps": ebitda_bps,
+            "ebitda_bps_label": f"{ebitda_bps} bps" if ebitda_bps is not None else "N/A",
+            "revenue_base_used": round(revenue_base, 0),
+        }
+        # Delivery horizon for the quick-win → transformation waterfall.
+        initiative_dict["horizon"] = _classify_horizon(
+            curve, payback_months, (lv_meta.get("effort_weeks") or {}).get("p50")
+        )
         if tco_adjusted:
             initiative_dict["tco_breakdown"] = tco_breakdown
         initiatives.append(initiative_dict)
@@ -266,9 +414,25 @@ def savings_modeler(
         for i in initiatives:
             if i["lever"] != "cost_governance":
                 i["net_savings"]["y3"] = round(i["net_savings"]["y3"] * _GOVERNANCE_Y3_UPLIFT, 2)
-                i["net_savings"]["total_3yr"] = round(
-                    i["net_savings"]["y1"] + i["net_savings"]["y2"] + i["net_savings"]["y3"], 2
+                ns = i["net_savings"]
+                ns["total_3yr"] = round(ns["y1"] + ns["y2"] + ns["y3"], 2)
+                # The uplift changes Y3, so NPV (and its provenance) must follow it.
+                npv_pre = round(
+                    ns["y1"] / (1 + discount_rate)
+                    + ns["y2"] / (1 + discount_rate) ** 2
+                    + ns["y3"] / (1 + discount_rate) ** 3,
+                    2,
                 )
+                npv_after = round(npv_pre * (1.0 - tax_rate), 2)
+                ns["npv_pretax"], ns["npv_10pct"], ns["npv_aftertax"] = npv_pre, npv_pre, npv_after
+                prov = i.get("provenance", {})
+                prov["npv_pretax"] = tag_deterministic(npv_pre, field="npv_pretax")
+                prov["npv_aftertax"] = tag_deterministic(npv_after, field="npv_aftertax")
+                prov["governance_y3_uplift_applied"] = True
+                ra = i["risk_adjusted"]
+                ra["expected_net_3yr"] = ra["p50_net_3yr"] = round(ns["total_3yr"] * ra["execution_probability"], 2)
+                ra["p10_net_3yr"] = round(ns["total_3yr"] * ra["probability_range"][0], 2)
+                ra["p90_net_3yr"] = round(ns["total_3yr"] * ra["probability_range"][1], 2)
 
     total_run_rate = sum(
         i["annualized_run_rate_savings"] for i in initiatives if i["savings_type"] in ("run_rate", "mixed")
@@ -285,6 +449,14 @@ def savings_modeler(
         "effective_tax_rate": tax_rate,
         "planning_horizon_years": planning_horizon_years,
         "initiatives": initiatives,
+        "model_notes": (
+            []
+            if planning_horizon_years == 3
+            else [
+                f"planning_horizon_years={planning_horizon_years} was requested, but phasing curves, "
+                "cost-to-achieve and NPV are modelled over 3 years; results are 3-year figures."
+            ]
+        ),
         "eligible_levers": eligible_levers,
         "summary": {
             "total_run_rate_savings": round(total_run_rate, 2),
@@ -296,6 +468,28 @@ def savings_modeler(
             "eligible_lever_count": len(eligible_levers),
             "high_bounce_back_count": sum(1 for lv in eligible_levers if lv["bounce_back_risk"] == "high"),
             "governance_y3_uplift_applied": any(i["lever"] == "cost_governance" for i in initiatives),
+            "total_expected_net_3yr": round(sum(i["risk_adjusted"]["expected_net_3yr"] for i in initiatives), 2),
+            "total_net_3yr_full_delivery": round(sum(i["net_savings"]["total_3yr"] for i in initiatives), 2),
+            "total_p10_net_3yr": round(sum(i["risk_adjusted"]["p10_net_3yr"] for i in initiatives), 2),
+            "total_p90_net_3yr": round(sum(i["risk_adjusted"]["p90_net_3yr"] for i in initiatives), 2),
+            "percentile_note": (
+                "Portfolio P10/P90 are sums of per-initiative values, i.e. they assume initiatives "
+                "succeed or fail together, so the true portfolio range is narrower."
+            ),
+            "portfolio_ebitda_impact_bps": (
+                round((total_run_rate / float(annual_revenue)) * 10000, 1) if annual_revenue else None
+            ),
+            "horizon_summary": dict(Counter(i.get("horizon", "structural") for i in initiatives)),
+            # Data quality context — consumed by value_bridge and frontend
+            "portfolio_data_quality_score": round(portfolio_quality, 3),
+            "credit_or_reversal_lines_excluded": (
+                len(spend_lines) - len(baseline_lines)
+                if spend_lines and baseline_lines is not None else 0
+            ),
+            "confidence_band_quality_note": (
+                "Confidence bands widened due to low field-coverage in source data."
+                if portfolio_quality < 0.60 else None
+            ),
         },
     }
 
@@ -343,6 +537,25 @@ def build_raw_rows(
     return raw_rows
 
 
+def _band_factors(
+    sustainability_score: float,
+    benchmark_specificity: float = 0.70,
+    data_quality_score: float = 1.0,
+) -> Tuple[float, float]:
+    """Confidence-band multipliers that widen as sustainability, benchmark
+    specificity, or source data quality fall.
+
+    Base low=0.80 / high=1.20 at sustainability=0.65, specificity=0.70, quality=1.0.
+    Any shortfall widens the band (low ↓, high ↑); clamped to [0.55, 1.55].
+    """
+    sust_adj = 0.25 * (0.65 - sustainability_score)   # positive = riskier saving
+    spec_adj = 0.15 * (0.70 - benchmark_specificity)   # positive = less specific data
+    qual_adj = 0.20 * (1.0 - data_quality_score)       # positive = lower fill-ratio
+    low = max(0.55, 0.80 - sust_adj - spec_adj - qual_adj)
+    high = min(1.55, 1.20 + sust_adj + spec_adj + qual_adj)
+    return round(low, 3), round(high, 3)
+
+
 def value_bridge_calculator(
     peer: Dict[str, Any],
     internal: Dict[str, Any],
@@ -350,11 +563,14 @@ def value_bridge_calculator(
     total_spend: float,
     savings_model: Dict[str, Any] | None = None,
     committed_initiatives: List[Dict[str, Any]] | None = None,
+    benchmark_specificity: float = 0.70,
+    data_quality_score: float = 1.0,
 ) -> Dict[str, Any]:
     vb_cfg = _get_model_params().get("defaults", {}).get("value_bridge", {})
     dedup_mid_factor = float(vb_cfg.get("dedup_mid_factor", 0.75))
-    low_factor = float(vb_cfg.get("low_factor", 0.8))
-    high_factor = float(vb_cfg.get("high_factor", 1.2))
+    overlap_matrix = vb_cfg.get("dedup_overlap_matrix") or {}
+    lever_by_source = _get_model_params().get("lever_by_source", {})
+    levers_meta = _get_model_params().get("levers", {})
 
     if savings_model and savings_model.get("initiatives"):
         committed = committed_initiatives or []
@@ -363,6 +579,16 @@ def value_bridge_calculator(
             for i in committed
             if i.get("stage") in ("committed", "in_flight", "realized")
         }
+        # Per-category benchmark source so each value-bridge row is traceable to
+        # the benchmark lens it rests on (falls back to the dataset-level source).
+        # Carried verbatim — if the source is a seed, the row says so honestly.
+        peer_source_by_cat = {
+            c.get("category_id"): c.get("source")
+            for c in (peer or {}).get("comparisons", [])
+            if c.get("source")
+        }
+        dataset_source = ((peer or {}).get("benchmark_dataset") or {}).get("source")
+
         matrix = []
         low = mid = high = 0.0
         confidence_penalty = 0.0
@@ -372,6 +598,9 @@ def value_bridge_calculator(
             gross = float(item.get("net_savings", {}).get("total_3yr", 0.0))
             already = committed_lookup.get((cat, lever), 0.0)
             deduped_mid = max(0.0, gross - already)
+            low_factor, high_factor = _band_factors(
+                float(item.get("sustainability_score", 0.65)), benchmark_specificity, data_quality_score
+            )
             deduped_low = deduped_mid * low_factor
             deduped_high = deduped_mid * high_factor
             low += deduped_low
@@ -389,6 +618,11 @@ def value_bridge_calculator(
                     "payback_months": item.get("payback_months", 0),
                     "confidence": item.get("confidence", "medium"),
                     "deduped_mid_savings": deduped_mid,
+                    # Surface execution accountability + benchmark provenance onto
+                    # the row consumed by response composition (previously dropped).
+                    "assumptions": item.get("assumptions") or [],
+                    "condition_precedents": item.get("condition_precedents") or [],
+                    "benchmark_source": peer_source_by_cat.get(cat) or dataset_source,
                 }
             )
             confidence = str(item.get("confidence", "medium")).lower()
@@ -416,9 +650,21 @@ def value_bridge_calculator(
 
     matrix = []
     low = mid = high = 0.0
+    # No per-category sustainability in the raw-rows fallback — apply a single
+    # category-average band using the default sustainability and the run specificity.
+    low_factor, high_factor = _band_factors(0.65, benchmark_specificity, data_quality_score)
     for cat, values in merged.items():
-        combined = values["peer"] + values["internal"] + values["heuristic"]
-        deduped_mid = combined * dedup_mid_factor
+        if overlap_matrix:
+            deduped_mid = _category_deduped_mid(
+                values,
+                lever_by_source=lever_by_source,
+                levers_meta=levers_meta,
+                overlap_matrix=overlap_matrix,
+                fallback=dedup_mid_factor,
+            )
+        else:
+            combined = values["peer"] + values["internal"] + values["heuristic"]
+            deduped_mid = combined * dedup_mid_factor
         deduped_low = deduped_mid * low_factor
         deduped_high = deduped_mid * high_factor
         low += deduped_low

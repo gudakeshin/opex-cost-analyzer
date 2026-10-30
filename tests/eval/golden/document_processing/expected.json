@@ -1,0 +1,128 @@
+{
+  "clean_spend.csv": {
+    "name": "clean_spend.csv",
+    "kind": "tabular",
+    "format": "csv",
+    "expected": {
+      "parse_ok": true,
+      "line_count": 6,
+      "total_amount": 9700000.0,
+      "currency": "INR",
+      "schema_roles": {
+        "supplier": "Supplier",
+        "description": "Description",
+        "amount": "Amount",
+        "date": "Invoice Date",
+        "currency": "Currency"
+      },
+      "zero_spend_warning": false
+    }
+  },
+  "multi_sheet.xlsx": {
+    "name": "multi_sheet.xlsx",
+    "kind": "tabular",
+    "format": "xlsx",
+    "expected": {
+      "parse_ok": true,
+      "line_count": 6,
+      "total_amount": 9700000.0,
+      "currency": "INR",
+      "schema_roles": {
+        "supplier": "Supplier",
+        "description": "Description",
+        "amount": "Amount",
+        "date": "Date"
+      },
+      "ledger_sheet": "Transactions",
+      "ledger_header_row": 0,
+      "zero_spend_warning": false
+    }
+  },
+  "spend.json": {
+    "name": "spend.json",
+    "kind": "tabular",
+    "format": "json",
+    "expected": {
+      "parse_ok": true,
+      "line_count": 6,
+      "total_amount": 9700000.0,
+      "currency": "INR",
+      "schema_roles": {},
+      "zero_spend_warning": false
+    }
+  },
+  "malformed.csv": {
+    "name": "malformed.csv",
+    "kind": "tabular",
+    "format": "csv",
+    "expected": {
+      "parse_ok": true,
+      "zero_spend_warning": true,
+      "expect_warnings": true
+    }
+  },
+  "context_memo.txt": {
+    "name": "context_memo.txt",
+    "kind": "document",
+    "format": "txt",
+    "expected": {
+      "parse_ok": true,
+      "min_chars": 400,
+      "has_markdown_headings": true,
+      "min_parents": 3,
+      "min_children": 4,
+      "expect_heading_path": true,
+      "expect_table_rows": true,
+      "retrieval": [
+        {
+          "query": "IT & Technology annual spend in the cost summary",
+          "expect_contains": "1,200"
+        },
+        {
+          "query": "When does the Oracle maintenance contract renew?",
+          "expect_contains": "March 2027"
+        }
+      ]
+    }
+  },
+  "notes.txt": {
+    "name": "notes.txt",
+    "kind": "document",
+    "format": "txt",
+    "expected": {
+      "parse_ok": true,
+      "min_chars": 150,
+      "has_markdown_headings": false,
+      "min_parents": 1,
+      "min_children": 1,
+      "expect_heading_path": false,
+      "expect_table_rows": false,
+      "retrieval": [
+        {
+          "query": "How many regional travel desks are there?",
+          "expect_contains": "three regional desks"
+        }
+      ]
+    }
+  },
+  "context_memo.docx": {
+    "name": "context_memo.docx",
+    "kind": "document",
+    "format": "docx",
+    "expected": {
+      "parse_ok": true,
+      "min_chars": 200,
+      "has_markdown_headings": false,
+      "min_parents": 1,
+      "min_children": 1,
+      "expect_heading_path": false,
+      "expect_table_rows": false,
+      "retrieval": [
+        {
+          "query": "Oracle contract renewal date",
+          "expect_contains": "March 2027"
+        }
+      ]
+    }
+  }
+}

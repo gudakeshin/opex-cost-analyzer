@@ -1,0 +1,6 @@
+supplier,category,contract_status,contract_expiry_date,auto_renewal_notice_days,early_exit_penalty_pct,min_purchase_commitment,currency
+FIS Global India,Technology & Analytics Platform,in_contract,2027-09-30,90,15,2040000000,INR
+Salesforce India,Technology & Analytics Platform,in_contract,2026-06-30,60,12,1260000000,INR
+S&P Global India,Technology & Analytics Platform,in_contract,2026-12-31,60,0,720000000,INR
+KPMG India,Compliance & Legal,rolling,,30,0,0,INR
+DSP Group,Distribution & Agency,in_contract,2025-09-30,30,0,1620000000,INR

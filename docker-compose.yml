@@ -29,6 +29,9 @@ services:
       - .env
     environment:
       - LOG_LEVEL=INFO
+      # Raise workers ONLY together with REDIS_URL — locks are per-process
+      # without Redis and concurrent workers corrupt JSON session state.
+      - UVICORN_WORKERS=1
       - SESSION_TTL_DAYS=30
       - CLEANUP_INTERVAL_HOURS=24
       - QDRANT_HOST=qdrant

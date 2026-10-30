@@ -1,0 +1,38 @@
+[
+  {
+    "engagement_id": "eng-iabl-fy24",
+    "initiative_id": "INI-1",
+    "lever_id": "branch_rationalisation",
+    "pack_id": "bfsi_banks",
+    "planned_p50_cr": 42.0,
+    "realised_cr": 36.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "ATM fleet outsourced; branch closures delivered within plan."
+  },
+  {
+    "engagement_id": "eng-iabl-fy24",
+    "initiative_id": "INI-2",
+    "lever_id": "core_banking_cloud",
+    "pack_id": "bfsi_banks",
+    "planned_p50_cr": 28.0,
+    "realised_cr": 19.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "medium",
+    "notes": "Cloud migration slipped two quarters; partial savings on dev/test consolidation."
+  },
+  {
+    "engagement_id": "eng-iabl-fy24",
+    "initiative_id": "INI-3",
+    "lever_id": "procurement_controls",
+    "pack_id": "bfsi_banks",
+    "planned_p50_cr": 15.0,
+    "realised_cr": 18.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Competitive re-tendering exceeded plan."
+  }
+]

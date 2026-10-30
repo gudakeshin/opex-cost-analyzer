@@ -1,0 +1,11 @@
+{
+  "company": "Sahyadri Power & Utilities Ltd",
+  "sector": "energy_utilities",
+  "wacc": 0.12,
+  "effective_tax_rate": 0.2517,
+  "reporting_currency": "INR",
+  "annual_revenue_inr_cr": 22000,
+  "discount_rate": 0.12,
+  "execution_rate_pct": 70,
+  "notes": "WACC and tax rate per FY25 board pack for Sahyadri Power & Utilities Ltd."
+}

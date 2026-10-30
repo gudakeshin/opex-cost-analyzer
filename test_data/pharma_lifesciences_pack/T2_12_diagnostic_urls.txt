@@ -1,0 +1,7 @@
+Zenith Pharma Ltd — Diagnostic URLs (synthetic/illustrative)
+
+1. Investor relations: https://www.zenithpharma.example/investors
+2. CDSCO drug list: https://www.cdsco.gov.in/example/zenith
+3. Annual report: https://www.zenithpharma.example/ir/annual-report-fy25.pdf
+4. NSE: https://www.nseindia.example/get-quotes/equity?symbol=ZENITHPH
+5. PHARMEXCIL exports: https://www.pharmexcil.example/member-data/zenith

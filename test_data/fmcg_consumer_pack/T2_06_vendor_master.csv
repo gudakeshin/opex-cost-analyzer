@@ -1,0 +1,11 @@
+vendor,vendor_category,gstin,vendor_pan,msme_flag,spend_category,legal_entity,related_party
+Ogilvy India,large,27AABCO4521L1Z3,AABCO4521L,no,Marketing & Advertising,PCBL-IN,no
+DDB Mudra,large,27AABCD9821M1Z6,AABCD9821M,no,Marketing & Advertising,PCBL-IN,no
+Maersk India,large,27AABCM3421I1Z9,AABCM3421I,no,Logistics & Distribution,PCBL-IN,no
+Delhivery,large,29AABCD8831L1Z2,AABCD8831L,no,Logistics & Distribution,PCBL-IN,no
+Nippon Paint India,large,27AABCN7721P1Z5,AABCN7721P,no,Contract Manufacturing,PCBL-IN,no
+Haldirams,msme,27AABCH4421R1Z8,AABCH4421R,yes,Contract Manufacturing,PCBL-IN,no
+Reliance Retail,large,27AABCR8891R1Z1,AABCR8891R,no,Modern Trade,PCBL-IN,no
+Blue Star Infotech,large,27AABCB5511I1Z4,AABCB5511I,no,Technology & Analytics,PCBL-IN,no
+Nielsen India,large,27AABCN2231I1Z7,AABCN2231I,no,Technology & Analytics,PCBL-IN,no
+Amazon India,large,27AABCA4221I1Z0,AABCA4221I,no,Modern Trade,PCBL-IN,no

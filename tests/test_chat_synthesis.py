@@ -1,14 +1,15 @@
-"""Tests for Gemini-primary chat synthesis."""
+"""Tests for provider-agnostic chat synthesis."""
 
 from __future__ import annotations
 
 from unittest.mock import patch
 
-import pytest
 
+import app.opar.chat_synthesis as cs
 from app.opar.chat_synthesis import (
     build_chat_context,
     extract_query_dimensions,
+    resolve_chat_synthesizer,
     synthesize_chat_response,
 )
 from app.opar.models import ObserveContext
@@ -97,7 +98,10 @@ def test_build_chat_context_includes_session_and_suppliers() -> None:
     )
     assert context["session_context"]["company_name"] == "Aranya Digital Services Ltd."
     assert context["query_analysis"]["breakdown_dimension"] == "supplier"
-    assert context["relevant_data"]["top_suppliers"][0]["supplier"] == "Infosys"
+    # Full context exposed (no keyword pre-filter): the focused category detail is
+    # present AND the whole category list is available for the model to choose from.
+    assert context["spend_data"]["focus_category_detail"]["top_suppliers"][0]["supplier"] == "Infosys"
+    assert len(context["spend_data"]["categories"]) == 1
     assert len(context["recent_turns"]) == 1
 
 
@@ -138,9 +142,31 @@ def test_build_chat_context_portfolio_suppliers() -> None:
         }
     }
     context = build_chat_context(ctx, manifest, skill_outputs, currency="INR")
-    portfolio = context["relevant_data"]["top_suppliers_portfolio"]
+    portfolio = context["spend_data"]["portfolio_top_suppliers"]
     assert portfolio[0]["supplier"] == "Infosys"
     assert context["query_analysis"]["breakdown_dimension"] == "supplier"
+
+
+def test_build_chat_context_exposes_all_data_regardless_of_query() -> None:
+    """A vague question must still surface every category + the portfolio supplier
+    ranking — the LLM picks the relevant slice; we never withhold by keyword."""
+    ctx = ObserveContext(
+        user_message="tell me about my spend",
+        intent_class="general_qa",
+        session_id="s1",
+        has_tabular_spend=True,
+    )
+    manifest = {"company_name": "Acme", "currency": "INR"}
+    skill_outputs = {
+        "spend-profiler": {
+            "total_spend": 1_800_000_000,
+            "category_profile": _multi_category_profile(),
+        }
+    }
+    context = build_chat_context(ctx, manifest, skill_outputs, currency="INR")
+    assert len(context["spend_data"]["categories"]) == 2
+    assert context["spend_data"]["portfolio_top_suppliers"][0]["supplier"] == "Infosys"
+    assert context["spend_data"]["category_count"] == 2
 
 
 def test_answer_general_qa_portfolio_top_suppliers() -> None:
@@ -173,9 +199,9 @@ def test_answer_general_qa_supplier_fallback() -> None:
     assert "supplier" in answer.lower() or "Infosys" in answer
 
 
-@patch("app.opar.chat_synthesis.synthesize_chat_response_gemini")
-def test_synthesize_chat_response_uses_gemini(mock_gemini) -> None:
-    mock_gemini.return_value = ("**IT & Technology** top supplier: **Infosys**", None)
+@patch("app.opar.chat_synthesis._synthesize_via_llm")
+def test_synthesize_chat_response_uses_llm(mock_llm) -> None:
+    mock_llm.return_value = ("**IT & Technology** top supplier: **Infosys**", None)
     ctx = ObserveContext(
         user_message="Break down IT & Technology spend by supplier",
         intent_class="general_qa",
@@ -187,12 +213,12 @@ def test_synthesize_chat_response_uses_gemini(mock_gemini) -> None:
     assert result.used_llm is True
     assert "Infosys" in result.response_text
     assert result.response_metadata.get("insight_dimension") == "supplier"
-    mock_gemini.assert_called_once()
+    mock_llm.assert_called_once()
 
 
-@patch("app.opar.chat_synthesis.synthesize_chat_response_gemini")
-def test_synthesize_chat_response_fallback_when_gemini_off(mock_gemini) -> None:
-    mock_gemini.return_value = (None, None)
+@patch("app.opar.chat_synthesis._synthesize_via_llm")
+def test_synthesize_chat_response_fallback_when_llm_off(mock_llm) -> None:
+    mock_llm.return_value = (None, None)
     ctx = ObserveContext(
         user_message="Break down IT & Technology spend by supplier",
         intent_class="general_qa",
@@ -203,6 +229,238 @@ def test_synthesize_chat_response_fallback_when_gemini_off(mock_gemini) -> None:
     result = synthesize_chat_response(ctx, manifest, skill_outputs, currency="INR")
     assert result.used_llm is False
     assert "Infosys" in result.response_text
+
+
+def test_resolve_chat_synthesizer_claude_default(monkeypatch) -> None:
+    from app.opar.claude_client import synthesize_chat_response_claude
+
+    monkeypatch.setattr(cs, "get_resolved_llm_provider", lambda: "anthropic")
+    monkeypatch.setattr(cs, "ANTHROPIC_ENABLED", True)
+    monkeypatch.setattr(cs, "GEMINI_ENABLED", False)
+    assert resolve_chat_synthesizer() is synthesize_chat_response_claude
+
+
+def test_resolve_chat_synthesizer_gemini_when_preferred(monkeypatch) -> None:
+    monkeypatch.setattr(cs, "get_resolved_llm_provider", lambda: "gemini")
+    monkeypatch.setattr(cs, "GEMINI_ENABLED", True)
+    monkeypatch.setattr(cs, "ANTHROPIC_ENABLED", False)
+    assert resolve_chat_synthesizer() is cs.synthesize_chat_response_gemini
+
+
+def test_resolve_chat_synthesizer_cross_fallback_to_gemini(monkeypatch) -> None:
+    monkeypatch.setattr(cs, "get_resolved_llm_provider", lambda: "anthropic")
+    monkeypatch.setattr(cs, "ANTHROPIC_ENABLED", False)
+    monkeypatch.setattr(cs, "GEMINI_ENABLED", True)
+    assert resolve_chat_synthesizer() is cs.synthesize_chat_response_gemini
+
+
+def test_resolve_chat_synthesizer_none_when_no_provider(monkeypatch) -> None:
+    monkeypatch.setattr(cs, "ANTHROPIC_ENABLED", False)
+    monkeypatch.setattr(cs, "GEMINI_ENABLED", False)
+    assert resolve_chat_synthesizer() is None
+
+
+def test_build_chat_context_includes_modeled_initiatives_and_contracts() -> None:
+    ctx = ObserveContext(
+        user_message="Give me the details of the contract renegotiations",
+        intent_class="general_qa",
+        session_id="s1",
+        has_tabular_spend=True,
+    )
+    manifest = {"company_name": "Prakrit", "currency": "INR"}
+    skill_outputs = {
+        "spend-profiler": {
+            "total_spend": 77_354_600_000,
+            "category_profile": _it_category_profile(),
+        },
+        "savings-modeler": {
+            "initiatives": [
+                {
+                    "category_id": "IT_TECH",
+                    "category_name": "IT & Technology",
+                    "lever": "contract_renegotiation",
+                    "lever_name": "Contract Renegotiation",
+                    "confidence": "high",
+                    "net_savings": {"total_3yr": 120_000_000},
+                }
+            ]
+        },
+        "value-bridge-calculator": {
+            "confidence_bands": {"low": 50_000_000, "mid": 100_000_000, "high": 150_000_000},
+            "value_matrix": [
+                {
+                    "category_id": "IT_TECH",
+                    "category_name": "IT & Technology",
+                    "lever": "contract_renegotiation",
+                    "deduped_mid_savings": 80_000_000,
+                    "payback_months": 9,
+                }
+            ],
+        },
+        "contract-lifecycle-manager": {
+            "renewal_alerts": [
+                {"supplier": "Infosys", "alert_type": "renewal_due", "annual_spend": 450_000_000, "days_to_expiry": 25}
+            ]
+        },
+        "document-contextualizer": {
+            "constraints": ["Oracle maintenance contract renews in Q3 — renegotiate before auto-renewal"],
+            "context_summary": "Contract register notes upcoming renewals.",
+        },
+    }
+    context = build_chat_context(ctx, manifest, skill_outputs, currency="INR")
+    assert context["modeled_initiatives"][0]["lever"] == "contract_renegotiation"
+    assert context["value_matrix_rows"][0]["deduped_mid_savings"] == 80_000_000
+    assert context["contract_renewals"][0]["supplier"] == "Infosys"
+    assert "Oracle" in context["document_context"]["constraints"][0]
+
+
+def test_answer_general_qa_contract_renegotiation_details() -> None:
+    validated = {
+        "spend-profiler": {
+            "total_spend": 77_354_600_000,
+            "category_profile": _it_category_profile(),
+        },
+        "savings-modeler": {
+            "initiatives": [
+                {
+                    "category_id": "IT_TECH",
+                    "category_name": "IT & Technology",
+                    "lever": "contract_renegotiation",
+                    "lever_name": "Contract Renegotiation",
+                    "confidence": "high",
+                    "net_savings": {"total_3yr": 120_000_000},
+                }
+            ]
+        },
+        "value-bridge-calculator": {
+            "value_matrix": [
+                {
+                    "category_id": "IT_TECH",
+                    "category_name": "IT & Technology",
+                    "lever": "contract_renegotiation",
+                    "deduped_mid_savings": 80_000_000,
+                    "payback_months": 9,
+                }
+            ]
+        },
+    }
+    answer = answer_general_qa(
+        "Give me the details of the contract renegotiations",
+        validated,
+        currency="INR",
+    )
+    assert "Contract renegotiation" in answer
+    assert "IT & Technology" in answer
+    assert "Top categories" not in answer
+    assert "total spend is" not in answer.lower()
+
+
+def test_answer_general_qa_contract_without_model_prompts_value_bridge() -> None:
+    validated = {
+        "spend-profiler": {
+            "total_spend": 1_000_000,
+            "category_profile": _it_category_profile(),
+        }
+    }
+    answer = answer_general_qa(
+        "Give me the details of the contract renegotiations",
+        validated,
+        currency="INR",
+    )
+    assert "value-at-the-table" in answer.lower()
+    assert "total spend is" not in answer.lower()
+
+
+@patch("app.opar.chat_synthesis._synthesize_via_llm")
+def test_synthesize_chat_response_contract_question_uses_deterministic_when_llm_off(mock_llm) -> None:
+    mock_llm.return_value = (None, None)
+    ctx = ObserveContext(
+        user_message="Give me the details of the contract renegotiations",
+        intent_class="general_qa",
+        session_id="s1",
+    )
+    manifest = {"currency": "INR"}
+    skill_outputs = {
+        "spend-profiler": {"total_spend": 1e9, "category_profile": _it_category_profile()},
+        "savings-modeler": {
+            "initiatives": [
+                {
+                    "category_id": "IT_TECH",
+                    "category_name": "IT & Technology",
+                    "lever": "contract_renegotiation",
+                    "lever_name": "Contract Renegotiation",
+                    "net_savings": {"total_3yr": 120_000_000},
+                }
+            ]
+        },
+    }
+    result = synthesize_chat_response(ctx, manifest, skill_outputs, currency="INR")
+    assert result.used_llm is False
+    assert "Contract renegotiation" in result.response_text
+
+
+def test_build_chat_context_truncates_oversized_manifest_fields() -> None:
+    fat = "z" * 200_000
+    ctx = ObserveContext(user_message="summarize spend", intent_class="drill_down")
+    manifest = {
+        "deep_research_summary": fat,
+        "business_override_note": fat,
+        "probe_answers": [{"answer": fat}],
+    }
+    with patch("app.opar.chat_synthesis._fetch_document_excerpts", lambda *a, **k: []):
+        context = build_chat_context(ctx, manifest, {}, currency="INR")
+    assert len(context["deep_research_summary"]) <= 1200
+    assert len(context["business_override_note"]) <= 1200
+    assert len(context["probe_context"]["probe_answers"][0]["answer"]) <= 400
+
+
+def test_build_chat_context_fat_row_strings_bounded() -> None:
+    fat = "n" * 200_000
+    ctx = ObserveContext(user_message="payment terms", intent_class="drill_down")
+    skill_outputs = {
+        "spend-profiler": {
+            "total_spend": 1_000_000,
+            "category_profile": [{
+                "category_id": "IT",
+                "category_name": fat,
+                "spend": 500_000,
+                "top_suppliers": [{"supplier": "S1", "spend": 100, "note": fat}],
+            }],
+        },
+        "payment-terms-optimizer": {
+            "opportunities": [{"supplier": "Zenmark", "note": fat, "annual_cash_value": 1}],
+        },
+    }
+    with patch("app.opar.chat_synthesis._fetch_document_excerpts", lambda *a, **k: []):
+        context = build_chat_context(ctx, {}, skill_outputs, currency="INR")
+    cat = context["spend_data"]["categories"][0]
+    assert len(cat["category_name"]) <= 120
+    assert len(cat["top_suppliers"][0]["note"]) <= 120
+    assert len(context["spend_data"]["payment_terms_opportunities"][0]["note"]) <= 200
+
+
+def test_build_chat_context_overall_budget_trim() -> None:
+    fat = "b" * 200_000
+    ctx = ObserveContext(user_message="overview", intent_class="drill_down")
+    manifest = {"deep_research_summary": fat, "probe_answers": [{"answer": fat} for _ in range(10)]}
+    history = [{"role": "user", "content": fat} for _ in range(6)]
+    skill_outputs = {
+        "spend-profiler": {
+            "total_spend": 1_000_000,
+            "category_profile": [
+                {"category_id": f"C{i}", "category_name": fat, "spend": 10_000,
+                 "top_suppliers": [{"supplier": f"S{j}", "note": fat} for j in range(10)]}
+                for i in range(12)
+            ],
+        },
+        "document-contextualizer": {"context_summary": fat, "constraints": [fat] * 8},
+    }
+    with patch("app.opar.chat_synthesis._fetch_document_excerpts", lambda *a, **k: [fat] * 4):
+        context = build_chat_context(ctx, manifest, skill_outputs, chat_history=history, currency="INR")
+    from app.opar.reflect_advisory import _estimate_tokens
+    from app.opar.chat_synthesis import _CHAT_CONTEXT_TOKEN_LIMIT
+
+    assert _estimate_tokens(context) <= _CHAT_CONTEXT_TOKEN_LIMIT
 
 
 @patch("app.opar.hitl.clarification_generator._call_clarification_gemini")

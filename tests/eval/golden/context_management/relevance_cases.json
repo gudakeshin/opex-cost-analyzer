@@ -1,0 +1,397 @@
+{
+ "validated_outputs": {
+  "spend-profiler": {
+   "category_profile": [
+    {
+     "category_id": "CAT00"
+    }
+   ],
+   "total_spend": 1000000
+  },
+  "savings-modeler": {
+   "initiatives": [
+    {
+     "lever": "x"
+    }
+   ],
+   "summary": {}
+  },
+  "value-bridge-calculator": {
+   "value_matrix": [
+    {
+     "lever": "x"
+    }
+   ]
+  },
+  "sme-critique": {
+   "critique_summary": {},
+   "initiative_critiques": []
+  },
+  "evidence-gatherer": {
+   "evidence_items": [
+    {
+     "claim": "c"
+    }
+   ]
+  },
+  "peer-benchmarker": {
+   "comparisons": [
+    {
+     "cat": "IT"
+    },
+    {
+     "cat": "HR"
+    },
+    {
+     "cat": "TR"
+    }
+   ]
+  },
+  "internal-benchmarker": {
+   "comparisons": [
+    {
+     "unit": "BU-1"
+    }
+   ]
+  },
+  "bva-analyzer": {
+   "variances": [
+    {
+     "cat": "c0"
+    },
+    {
+     "cat": "c1"
+    },
+    {
+     "cat": "c2"
+    },
+    {
+     "cat": "c3"
+    },
+    {
+     "cat": "c4"
+    },
+    {
+     "cat": "c5"
+    },
+    {
+     "cat": "c6"
+    },
+    {
+     "cat": "c7"
+    },
+    {
+     "cat": "c8"
+    }
+   ]
+  },
+  "temporal-analyzer": {
+   "period_trends": [
+    {
+     "period": "p0"
+    },
+    {
+     "period": "p1"
+    },
+    {
+     "period": "p2"
+    },
+    {
+     "period": "p3"
+    },
+    {
+     "period": "p4"
+    },
+    {
+     "period": "p5"
+    },
+    {
+     "period": "p6"
+    }
+   ]
+  },
+  "payment-terms-optimizer": {
+   "opportunities": [
+    {
+     "supplier": "s0"
+    },
+    {
+     "supplier": "s1"
+    },
+    {
+     "supplier": "s2"
+    },
+    {
+     "supplier": "s3"
+    }
+   ]
+  },
+  "root-cause-analyzer": {
+   "root_cause_findings": [
+    {
+     "finding": "f"
+    }
+   ]
+  },
+  "vendor-master-builder": {
+   "vendor_count": 12
+  },
+  "chart-builder": {
+   "charts": []
+  },
+  "document-contextualizer": {
+   "context_summary": "memo"
+  }
+ },
+ "selection_cases": [
+  {
+   "name": "benchmarking_only",
+   "query": "benchmark my IT spend vs peers",
+   "intent_class": "benchmark",
+   "capabilities": [
+    "benchmarking"
+   ],
+   "explicit_category": null,
+   "expected_selected": [
+    "evidence-gatherer",
+    "internal-benchmarker",
+    "peer-benchmarker",
+    "savings-modeler",
+    "sme-critique",
+    "spend-profiler",
+    "value-bridge-calculator"
+   ],
+   "expected_excluded": [
+    "bva-analyzer",
+    "payment-terms-optimizer",
+    "root-cause-analyzer",
+    "temporal-analyzer",
+    "vendor-master-builder"
+   ]
+  },
+  {
+   "name": "value_modeling_only",
+   "query": "what savings opportunities exist",
+   "intent_class": "value_bridge",
+   "capabilities": [
+    "value_modeling"
+   ],
+   "explicit_category": null,
+   "expected_selected": [
+    "evidence-gatherer",
+    "savings-modeler",
+    "sme-critique",
+    "spend-profiler",
+    "value-bridge-calculator"
+   ],
+   "expected_excluded": [
+    "bva-analyzer",
+    "internal-benchmarker",
+    "payment-terms-optimizer",
+    "peer-benchmarker",
+    "root-cause-analyzer",
+    "temporal-analyzer",
+    "vendor-master-builder"
+   ]
+  },
+  {
+   "name": "variance_plus_trend",
+   "query": "budget vs actual variance and the monthly trend",
+   "intent_class": "drill_down",
+   "capabilities": [
+    "variance_analysis",
+    "temporal_trend"
+   ],
+   "explicit_category": null,
+   "expected_selected": [
+    "bva-analyzer",
+    "evidence-gatherer",
+    "savings-modeler",
+    "sme-critique",
+    "spend-profiler",
+    "temporal-analyzer",
+    "value-bridge-calculator"
+   ],
+   "expected_excluded": [
+    "internal-benchmarker",
+    "payment-terms-optimizer",
+    "peer-benchmarker",
+    "root-cause-analyzer",
+    "vendor-master-builder"
+   ]
+  },
+  {
+   "name": "working_capital_with_category",
+   "query": "improve payment terms for IT",
+   "intent_class": "drill_down",
+   "capabilities": [
+    "working_capital"
+   ],
+   "explicit_category": "IT",
+   "expected_selected": [
+    "evidence-gatherer",
+    "payment-terms-optimizer",
+    "root-cause-analyzer",
+    "savings-modeler",
+    "sme-critique",
+    "spend-profiler",
+    "value-bridge-calculator"
+   ],
+   "expected_excluded": [
+    "bva-analyzer",
+    "internal-benchmarker",
+    "peer-benchmarker",
+    "temporal-analyzer",
+    "vendor-master-builder"
+   ]
+  },
+  {
+   "name": "root_cause_only",
+   "query": "why is logistics cost so high",
+   "intent_class": "drill_down",
+   "capabilities": [
+    "root_cause"
+   ],
+   "explicit_category": null,
+   "expected_selected": [
+    "evidence-gatherer",
+    "root-cause-analyzer",
+    "savings-modeler",
+    "sme-critique",
+    "spend-profiler",
+    "value-bridge-calculator"
+   ],
+   "expected_excluded": [
+    "bva-analyzer",
+    "internal-benchmarker",
+    "payment-terms-optimizer",
+    "peer-benchmarker",
+    "temporal-analyzer",
+    "vendor-master-builder"
+   ]
+  },
+  {
+   "name": "supplier_breakdown_only",
+   "query": "break down spend by supplier",
+   "intent_class": "drill_down",
+   "capabilities": [
+    "supplier_breakdown"
+   ],
+   "explicit_category": null,
+   "expected_selected": [
+    "evidence-gatherer",
+    "savings-modeler",
+    "sme-critique",
+    "spend-profiler",
+    "value-bridge-calculator",
+    "vendor-master-builder"
+   ],
+   "expected_excluded": [
+    "bva-analyzer",
+    "internal-benchmarker",
+    "payment-terms-optimizer",
+    "peer-benchmarker",
+    "root-cause-analyzer",
+    "temporal-analyzer"
+   ]
+  }
+ ],
+ "detection_cases": [
+  {
+   "query": "benchmark my IT spend against industry peers",
+   "expected": [
+    "benchmarking"
+   ]
+  },
+  {
+   "query": "what savings opportunities exist and what's the NPV",
+   "expected": [
+    "value_modeling"
+   ]
+  },
+  {
+   "query": "show budget vs actual variance",
+   "expected": [
+    "variance_analysis"
+   ]
+  },
+  {
+   "query": "how has spend trended month on month",
+   "expected": [
+    "temporal_trend"
+   ]
+  },
+  {
+   "query": "can we shift payment terms and lift DPO",
+   "expected": [
+    "working_capital"
+   ]
+  },
+  {
+   "query": "why is logistics cost so high",
+   "expected": [
+    "root_cause"
+   ]
+  },
+  {
+   "query": "plot a chart of spend split",
+   "expected": [
+    "visualization"
+   ]
+  },
+  {
+   "query": "which columns map to which schema roles",
+   "expected": [
+    "schema_lookup"
+   ]
+  },
+  {
+   "query": "what constraints do our contracts impose",
+   "expected": [
+    "document_context"
+   ]
+  },
+  {
+   "query": "prepare an executive readout for the CFO",
+   "expected": [
+    "executive_narrative"
+   ]
+  },
+  {
+   "query": "break down spend by supplier",
+   "expected": [
+    "supplier_breakdown"
+   ]
+  },
+  {
+   "query": "compare quarter trends for travel by vendor",
+   "expected": [
+    "benchmarking",
+    "temporal_trend",
+    "supplier_breakdown"
+   ]
+  },
+  {
+   "query": "hello",
+   "expected": []
+  },
+  {
+   "query": "thanks, sounds good",
+   "expected": []
+  }
+ ],
+ "headline_checks": [
+  {
+   "skill": "temporal-analyzer",
+   "expected_headline": "period-over-period trends across 7 periods"
+  },
+  {
+   "skill": "bva-analyzer",
+   "expected_headline": "budget-vs-actuals variance for 9 categories"
+  },
+  {
+   "skill": "payment-terms-optimizer",
+   "expected_headline": "4 payment-terms / working-capital opportunities"
+  }
+ ]
+}

@@ -184,4 +184,16 @@ def run_profile(
         outputs[name] = output
         if on_complete is not None:
             on_complete(name, output)
+
+    # Layer A: attach deterministic business-perspective detail (owner, vendors,
+    # risks, KPIs, change-management) to modeled initiatives once savings-modeler
+    # and spend-profiler have produced output. Idempotent + guarded, so partial
+    # profiles and re-runs are safe; additive, so it never breaks the pipeline.
+    try:
+        from app.skills.engine.business_detail import enrich_initiatives_business_detail
+
+        enrich_initiatives_business_detail(outputs)
+    except Exception:  # pragma: no cover - enrichment is best-effort
+        pass
+
     return outputs, degraded

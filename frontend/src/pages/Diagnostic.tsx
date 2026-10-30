@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { MainLayout } from '../components/Layout/MainLayout';
+import { useAutosave } from '../hooks/useAutosave';
+import { useGuardedNavigate } from '../hooks/useGuardedNavigate';
 import { Button } from '../components/Common/Button';
 import { Card } from '../components/Common/Card';
 import { Input } from '../components/Common/Input';
@@ -19,14 +21,17 @@ import {
 import { BenchmarkProxyDisclaimer } from '../components/PageComponents/Diagnostic/BenchmarkProxyDisclaimer';
 import { DeepResearchSection } from '../components/PageComponents/Diagnostic/DeepResearchSection';
 import { isBenchmarkProxyProfile } from '../utils/diagnosticProxyDisclaimer';
-import { apiGet, apiPatch, apiPost, getApiErrorMessage } from '../hooks/useApi';
+import { useQueryClient } from '@tanstack/react-query';
+import { apiPatch, apiPost, getApiErrorMessage } from '../hooks/useApi';
+import { fetchSessionManifest } from '../api/hooks/useSessionQueries';
+import { useEngagementDocuments } from '../api/hooks/useProcurementQueries';
 import { friendlyErrorMessage } from '../utils/errorMessages';
 import { useSession } from '../context/SessionContext';
 import {
   buildDiagnosticContextPatch,
   formStateFromManifest,
-  isDiagnosticResponse,
   parseUrlsText,
+  sessionDiagnosticResult,
 } from '../utils/diagnosticPersistence';
 import type {
   DiagnosticContextPatch,
@@ -60,22 +65,27 @@ function sectorLabel(value: string): string {
 const FORM_SAVE_DEBOUNCE_MS = 500;
 
 export const Diagnostic: React.FC = () => {
-  const navigate = useNavigate();
-  const { sessionId, engagementId, ensureSession, refreshEngagement, engagement } = useSession();
+  const navigate = useGuardedNavigate();
+  const queryClient = useQueryClient();
+  const { sessionId, engagementId, ensureSessionForEngagement, refreshEngagement, engagement } =
+    useSession();
   const [activeSid, setActiveSid] = useState<string | null>(sessionId);
   const [hydrating, setHydrating] = useState(true);
   const [manifest, setManifest] = useState<SessionManifest | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState('');
-  const [industry, setIndustry] = useState('manufacturing_diversified');
-  const [revenueCr, setRevenueCr] = useState('5000');
+  // Empty until the engagement's industry (or the user) supplies one: a preset value looked like input.
+  const [industry, setIndustry] = useState('');
+  const [revenueCr, setRevenueCr] = useState('');
   const [urlsText, setUrlsText] = useState('');
   const [result, setResult] = useState<DiagnosticResponse | null>(null);
   const [deepResearchSummary, setDeepResearchSummary] = useState<string | null>(null);
   const [handoffLoading, setHandoffLoading] = useState(false);
-  const [engagementDocCount, setEngagementDocCount] = useState(0);
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const engagementDocumentsQuery = useEngagementDocuments(engagementId);
+  const engagementDocCount = engagementDocumentsQuery.data
+    ? engagementDocumentsQuery.data.documents.filter((d) => d.status === 'ready').length
+    : 0;
   const skipFormSaveRef = useRef(true);
   const engagementHydratedRef = useRef(false);
 
@@ -105,38 +115,47 @@ export const Diagnostic: React.FC = () => {
   );
 
   useEffect(() => {
+    engagementHydratedRef.current = false;
+  }, [engagementId]);
+
+  useEffect(() => {
     let cancelled = false;
 
     (async () => {
       setHydrating(true);
       skipFormSaveRef.current = true;
       try {
-        const sid = await ensureSession();
+        const sid = await ensureSessionForEngagement(engagementId ?? undefined);
         if (cancelled) return;
         setActiveSid(sid);
 
-        const m = await apiGet<SessionManifest>(`/api/v1/sessions/${sid}/manifest`);
+        const m = await fetchSessionManifest(queryClient, sid);
         if (cancelled) return;
         setManifest(m);
 
-        const form = formStateFromManifest(m, {
-          company_name: engagement.company_name,
-          industry: engagement.industry,
-          annual_revenue_cr: engagement.annual_revenue_cr,
-          detected_company_name: engagement.detected_company_name,
-          detected_industry: engagement.detected_industry,
-        });
+        const staleOpts = {
+          sessionEngagementId: m.engagement_id,
+          activeEngagementId: engagementId ?? undefined,
+        };
+        const form = formStateFromManifest(
+          m,
+          {
+            company_name: engagement.company_name,
+            industry: engagement.industry,
+            industry_user_set: engagement.industry_user_set,
+            annual_revenue_cr: engagement.annual_revenue_cr,
+            detected_company_name: engagement.detected_company_name,
+            detected_industry: engagement.detected_industry,
+            detected_annual_revenue_cr: engagement.detected_annual_revenue_cr,
+          },
+          staleOpts,
+        );
         setCompanyName(form.companyName);
         setIndustry(form.industry);
         setRevenueCr(form.revenueCr);
         setUrlsText(form.urlsText);
 
-        if (m.diagnostic_result && isDiagnosticResponse(m.diagnostic_result)) {
-          setResult(m.diagnostic_result);
-        } else {
-          setResult(null);
-        }
-
+        setResult(sessionDiagnosticResult(m, staleOpts));
         setDeepResearchSummary(m.deep_research_summary ?? null);
       } catch {
         if (!cancelled) {
@@ -153,7 +172,10 @@ export const Diagnostic: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [sessionId, ensureSession]);
+  // Re-hydrate when the session/engagement changes, not on every engagement refresh (that flashed the
+  // loader and overwrote the form after each run).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, engagementId, ensureSessionForEngagement, engagement.engagement_id, queryClient]);
 
   // Pre-fill form from engagement metadata (once, after hydration, only if form is empty)
   useEffect(() => {
@@ -164,6 +186,7 @@ export const Diagnostic: React.FC = () => {
         : engagement.detected_company_name || '';
     const effectiveIndustry =
       engagement.detected_industry &&
+      !engagement.industry_user_set &&
       (!engagement.industry || engagement.industry === 'manufacturing_diversified')
         ? engagement.detected_industry
         : engagement.industry || engagement.detected_industry || '';
@@ -173,49 +196,34 @@ export const Diagnostic: React.FC = () => {
     if (!industry && effectiveIndustry) setIndustry(effectiveIndustry);
     if (engagement.annual_revenue_cr && engagement.annual_revenue_cr > 0) {
       setRevenueCr(String(engagement.annual_revenue_cr));
+    } else if (
+      engagement.detected_annual_revenue_cr &&
+      engagement.detected_annual_revenue_cr > 0 &&
+      !revenueCr
+    ) {
+      setRevenueCr(String(engagement.detected_annual_revenue_cr));
     }
   }, [
     hydrating,
     engagement.company_name,
     engagement.detected_company_name,
     engagement.industry,
+    engagement.industry_user_set,
     engagement.detected_industry,
     engagement.annual_revenue_cr,
+    engagement.detected_annual_revenue_cr,
     companyName,
     industry,
+    revenueCr,
   ]);
 
-  // Fetch engagement document count for the context banner
-  useEffect(() => {
-    if (!engagementId) return;
-    apiGet<{ documents: { status: string }[] }>(`/api/v1/engagements/${engagementId}/documents`)
-      .then((res) => {
-        const ready = (res.documents ?? []).filter((d) => d.status === 'ready').length;
-        setEngagementDocCount(ready);
-      })
-      .catch(() => setEngagementDocCount(0));
-  }, [engagementId]);
-
-  useEffect(() => {
-    if (!activeSid || hydrating || skipFormSaveRef.current) return;
-
-    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => {
-      persistContext(activeSid).catch(() => {});
-    }, FORM_SAVE_DEBOUNCE_MS);
-
-    return () => {
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    };
-  }, [activeSid, hydrating, companyName, industry, revenueCr, urlsText, persistContext]);
-
-  useEffect(() => {
-    return () => {
-      if (!activeSid || skipFormSaveRef.current) return;
-      const patch = buildDiagnosticContextPatch(formState());
-      apiPatch(`/api/v1/sessions/${activeSid}/diagnostic-context`, patch).catch(() => {});
-    };
-  }, [activeSid, formState]);
+  useAutosave({
+    id: 'diagnostic-form',
+    data: { companyName, industry, revenueCr, urlsText },
+    enabled: Boolean(activeSid) && !hydrating && !skipFormSaveRef.current,
+    onSave: () => persistContext(activeSid as string),
+    debounceMs: FORM_SAVE_DEBOUNCE_MS,
+  });
 
   const friendlyError = error ? friendlyErrorMessage(error) : null;
 
@@ -230,11 +238,13 @@ export const Diagnostic: React.FC = () => {
   const handleStartSession = async () => {
     setHandoffLoading(true);
     try {
-      const sid = activeSid ?? (await ensureSession());
+      const sid = activeSid ?? (await ensureSessionForEngagement(engagementId ?? undefined));
       const patch: DiagnosticContextPatch = {
         company_name: companyName.trim() || undefined,
         industry,
-        annual_revenue_cr: parseFloat(revenueCr) || 5000,
+        annual_revenue_cr: revenueCr.trim()
+          ? parseFloat(revenueCr) || undefined
+          : undefined,
         diagnostic_urls: parseUrlsText(urlsText),
       };
       if (result) {
@@ -257,16 +267,25 @@ export const Diagnostic: React.FC = () => {
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!companyName.trim()) return;
+    if (!industry) {
+      setError('Choose an industry before running the diagnostic.');
+      return;
+    }
+    const parsedRevenue = parseFloat(revenueCr);
+    if (!revenueCr.trim() || Number.isNaN(parsedRevenue) || parsedRevenue <= 0) {
+      setError('Enter annual revenue (₹ Cr) before running the diagnostic.');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const sid = activeSid ?? (await ensureSession());
+      const sid = activeSid ?? (await ensureSessionForEngagement(engagementId ?? undefined));
       setActiveSid(sid);
 
       const payload: DiagnosticRequest = {
         company_name: companyName.trim(),
         industry,
-        annual_revenue_cr: parseFloat(revenueCr) || 5000,
+        annual_revenue_cr: parsedRevenue,
         urls: parseUrlsText(urlsText),
         ...(engagementId ? { engagement_id: engagementId } : {}),
       };
@@ -280,7 +299,7 @@ export const Diagnostic: React.FC = () => {
         diagnosticResult: res,
         markDiagnosticComplete: true,
       });
-      const updated = await apiGet<SessionManifest>(`/api/v1/sessions/${sid}/manifest`);
+      const updated = await fetchSessionManifest(queryClient, sid);
       setManifest(updated);
       await refreshEngagement();
       skipFormSaveRef.current = false;
@@ -343,7 +362,7 @@ export const Diagnostic: React.FC = () => {
               <span className="font-semibold">{engagement.company_name}</span>
               {' — diagnostic will use actual spend data where available.'}
               {' '}
-              <a href="/ui/documents" className="underline hover:text-blue-900">Manage documents</a>
+              <Link to="/documents" className="underline hover:text-blue-900">Manage documents</Link>
             </div>
           </div>
         )}
@@ -354,7 +373,7 @@ export const Diagnostic: React.FC = () => {
             </svg>
             <div>
               No documents uploaded for <span className="font-semibold">{engagement.company_name}</span> — diagnostic will use benchmark proxies.{' '}
-              <a href="/ui/documents" className="underline hover:text-amber-900">Upload documents</a> for actual-spend analysis.
+              <Link to="/documents" className="underline hover:text-amber-900">Upload documents</Link> for actual-spend analysis.
             </div>
           </div>
         )}
@@ -403,12 +422,30 @@ export const Diagnostic: React.FC = () => {
                 />
               )}
             </div>
-            <Input
-              label="Annual Revenue (₹ Cr)"
-              type="number"
-              value={revenueCr}
-              onChange={(e) => setRevenueCr(e.target.value)}
-            />
+            <div>
+              <Input
+                label={`Annual Revenue (${engagement.currency && engagement.currency !== 'INR' ? engagement.currency + ' ' : '₹ '}Cr)`}
+                type="number"
+                value={revenueCr}
+                onChange={(e) => setRevenueCr(e.target.value)}
+                placeholder="Enter annual revenue…"
+                required
+              />
+              {engagement.detected_annual_revenue_cr != null &&
+                engagement.detected_annual_revenue_cr > 0 && (
+                  <RecommendedBadge
+                    className="mt-1"
+                    label={`${engagement.detected_annual_revenue_cr.toLocaleString('en-IN')} Cr`}
+                    matches={
+                      revenueCr.trim() !== '' &&
+                      parseFloat(revenueCr) === engagement.detected_annual_revenue_cr
+                    }
+                    onApply={() =>
+                      setRevenueCr(String(engagement.detected_annual_revenue_cr))
+                    }
+                  />
+                )}
+            </div>
             <div>
               <label className="block text-sm font-medium text-brand-ink mb-2">
                 Source URLs (one per line, optional)
@@ -451,7 +488,7 @@ export const Diagnostic: React.FC = () => {
                 key={`${activeSid ?? ''}-${manifest?.deep_research_interaction_id ?? 'none'}`}
                 companyName={companyName}
                 industry={industry}
-                revenueCr={parseFloat(revenueCr) || 5000}
+                revenueCr={parseFloat(revenueCr) || 0}
                 sessionId={activeSid}
                 onSummaryReady={handleDeepResearchReady}
                 initialInteractionId={manifest?.deep_research_interaction_id}

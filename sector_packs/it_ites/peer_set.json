@@ -2,18 +2,98 @@
   "sector": "it_ites",
   "currency": "INR",
   "peers": [
-    {"name": "Tata Consultancy Services", "ticker": "TCS.NS", "exchange": "NSE", "revenue_cr": 240000},
-    {"name": "Infosys", "ticker": "INFY.NS", "exchange": "NSE", "revenue_cr": 162000},
-    {"name": "Wipro", "ticker": "WIPRO.NS", "exchange": "NSE", "revenue_cr": 90000},
-    {"name": "HCL Technologies", "ticker": "HCLTECH.NS", "exchange": "NSE", "revenue_cr": 115000},
-    {"name": "Tech Mahindra", "ticker": "TECHM.NS", "exchange": "NSE", "revenue_cr": 54000},
-    {"name": "Mphasis", "ticker": "MPHASIS.NS", "exchange": "NSE", "revenue_cr": 15000}
+    {
+      "name": "Tata Consultancy Services",
+      "ticker": "TCS.NS",
+      "exchange": "NSE",
+      "revenue_cr": 240000,
+      "entity_type": "it_services_tier1"
+    },
+    {
+      "name": "Infosys",
+      "ticker": "INFY.NS",
+      "exchange": "NSE",
+      "revenue_cr": 162000,
+      "entity_type": "it_services_tier1"
+    },
+    {
+      "name": "Wipro",
+      "ticker": "WIPRO.NS",
+      "exchange": "NSE",
+      "revenue_cr": 90000,
+      "entity_type": "it_services_tier1"
+    },
+    {
+      "name": "HCL Technologies",
+      "ticker": "HCLTECH.NS",
+      "exchange": "NSE",
+      "revenue_cr": 115000,
+      "entity_type": "it_services_tier1"
+    },
+    {
+      "name": "Tech Mahindra",
+      "ticker": "TECHM.NS",
+      "exchange": "NSE",
+      "revenue_cr": 54000,
+      "entity_type": "it_services_tier1"
+    },
+    {
+      "name": "Mphasis",
+      "ticker": "MPHASIS.NS",
+      "exchange": "NSE",
+      "revenue_cr": 15000,
+      "entity_type": "it_services_mid"
+    },
+    {
+      "name": "LTIMindtree",
+      "ticker": "LTIM.NS",
+      "exchange": "NSE",
+      "entity_type": "it_services_tier1",
+      "revenue_cr": 38000
+    },
+    {
+      "name": "Coforge",
+      "ticker": "COFORGE.NS",
+      "exchange": "NSE",
+      "entity_type": "it_services_mid",
+      "revenue_cr": 12000
+    },
+    {
+      "name": "Persistent Systems",
+      "ticker": "PERSISTENT.NS",
+      "exchange": "NSE",
+      "entity_type": "it_services_mid",
+      "revenue_cr": 12000
+    },
+    {
+      "name": "Birlasoft",
+      "ticker": "BSOFT.NS",
+      "exchange": "NSE",
+      "entity_type": "it_services_mid",
+      "revenue_cr": 5400
+    }
   ],
   "benchmark_metrics": {
-    "ebit_margin_pct": {"p25": 16.0, "p50": 20.0, "p75": 25.5},
-    "opex_to_revenue_pct": {"p25": 68.0, "p50": 74.0, "p75": 80.0},
-    "employee_cost_to_revenue_pct": {"p25": 52.0, "p50": 58.0, "p75": 65.0},
-    "subcon_to_revenue_pct": {"p25": 5.0, "p50": 9.0, "p75": 14.0}
+    "ebit_margin_pct": {
+      "p25": 16.0,
+      "p50": 20.0,
+      "p75": 25.5
+    },
+    "opex_to_revenue_pct": {
+      "p25": 68.0,
+      "p50": 74.0,
+      "p75": 80.0
+    },
+    "employee_cost_to_revenue_pct": {
+      "p25": 52.0,
+      "p50": 58.0,
+      "p75": 65.0
+    },
+    "subcon_to_revenue_pct": {
+      "p25": 5.0,
+      "p50": 9.0,
+      "p75": 14.0
+    }
   },
   "data_source": "BSE/NSE annual reports FY25",
   "refresh_date": "2026-04-01"

@@ -1,0 +1,38 @@
+[
+  {
+    "engagement_id": "eng-shrl-fy24",
+    "initiative_id": "INI-1",
+    "lever_id": "ota_commission_renegotiation",
+    "pack_id": "hospitality_travel",
+    "planned_p50_cr": 28.0,
+    "realised_cr": 22.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "medium",
+    "notes": "OTA leverage limited; direct booking incentive programme partially offset commission costs."
+  },
+  {
+    "engagement_id": "eng-shrl-fy24",
+    "initiative_id": "INI-2",
+    "lever_id": "housekeeping_outsourcing",
+    "pack_id": "hospitality_travel",
+    "planned_p50_cr": 12.0,
+    "realised_cr": 14.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Outsourced 3 properties to ISS; headcount right-sized; exceeded plan."
+  },
+  {
+    "engagement_id": "eng-shrl-fy24",
+    "initiative_id": "INI-3",
+    "lever_id": "pms_consolidation",
+    "pack_id": "hospitality_travel",
+    "planned_p50_cr": 10.0,
+    "realised_cr": 7.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "medium",
+    "notes": "Oracle PMS migration delayed by 2 quarters; partial savings on retired legacy systems."
+  }
+]

@@ -1,0 +1,7 @@
+Pragati Telecom Networks Ltd — Procurement Policy
+
+1) Network equipment (RAN, core): approved vendor panel (Ericsson, Nokia, Huawei); 5-year managed service contracts; CTO + CFO approval above 500 Cr.
+2) Tower energy: 3PL energy aggregator or direct Tata Power; solar vendor bidding for new sites; 10-year PPA for captive solar.
+3) IT/Cloud: preferred vendor panel (Amdocs, AWS, Microsoft); category manager approval above 50 Cr.
+4) MSME tower maintenance: MSME vendors preferred for passive O&M contracts; payment 45 days.
+5) FY26 target: solar PPA to 35% of tower energy; AI-RAN managed services framework with Ericsson.

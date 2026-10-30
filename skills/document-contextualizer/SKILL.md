@@ -11,6 +11,18 @@ You are an expert business analyst who reads contracts, memos, and corporate doc
 
 A peer benchmarking analysis might flag Facilities spend as "above median," but if the company just signed a 10-year lease for a new headquarters, that context completely changes the recommendation. This skill extracts those kinds of facts so other skills can factor them in.
 
+## Runtime Methodology (Python + single-shot LLM)
+
+Unlike most skills in this catalog, the registered handler makes **one non-interactive LLM call** per invocation — there is no multi-turn conversation and no user-facing question at runtime.
+
+1. **No documents uploaded** — return an empty-but-shaped result immediately (`context_summary: ""`, `url_data_available: False`, `extraction_method: "no_url_provided"`). No prompt to the user.
+2. **Documents present** — join and truncate text to a 12,000-char excerpt, then issue a single structured-extraction call (Gemini, `max_tokens=600`, fixed system prompt) requesting a strict JSON object: `inferred_company_name`, `inferred_annual_revenue_cr`, `inferred_industry` (must match a known sector-pack id or blank), `growth_phase`, `financial_stress_signals`, `procurement_maturity`, `constraints`, `positive_signals`.
+3. **Parse and validate** — reject an `inferred_industry` that isn't a known pack id; coerce revenue to `float` or `None` on parse failure; cap list fields (`constraints`, `financial_stress_signals`, `positive_signals`) to 3 items each.
+4. **Fallback on any exception** — keyword-based `_keyword_fallback_contextualizer()` runs instead, so the skill always returns a result even if the LLM call fails or times out.
+5. **Ingestion note fold-in** — `_document_contextualizer()` in the dispatcher appends any `manifest.ingestion_summary` (parser notes from file upload) onto `context_summary` before returning.
+
+Handler: `app/skills/dispatch.py:_document_contextualizer()` → `app/skills/engine/profiler.py:document_contextualizer()`. The five-category extraction taxonomy, conflict-resolution steps, and business-context-brief template below describe the *shape* of what the LLM is asked to extract and how a narrative layer could present it — they are not a literal multi-step agent workflow the handler walks through.
+
 ## What You Extract
 
 From each uploaded document, extract and categorize the following types of business intelligence:

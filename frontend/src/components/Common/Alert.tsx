@@ -26,7 +26,11 @@ export const Alert: React.FC<AlertProps> = ({
   onDismiss,
   className,
 }) => (
-  <div role="alert" className={`p-4 rounded-xl border text-sm ${styles[variant]}${className ? ` ${className}` : ''}`}>
+  <div
+    // Errors interrupt screen readers; info/success/warning are announced politely.
+    role={variant === 'error' ? 'alert' : 'status'}
+    className={`p-4 rounded-xl border text-sm ${styles[variant]}${className ? ` ${className}` : ''}`}
+  >
     <div className="flex items-start justify-between gap-3">
       <div>
         <p className="font-semibold">{title}</p>

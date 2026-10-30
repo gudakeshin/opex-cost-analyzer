@@ -1,0 +1,25 @@
+asset_class,fiscal_period,amount,currency,status
+Automated assembly line,FY23-Q1,251881926,INR,actual
+Automated assembly line,FY23-Q2,279868807,INR,actual
+Automated assembly line,FY23-Q3,265875366,INR,actual
+Automated assembly line,FY23-Q4,302258311,INR,actual
+Automated assembly line,FY24-Q1,296660935,INR,actual
+Automated assembly line,FY24-Q2,305056999,INR,actual
+Solar plant rooftop,FY23-Q1,354791448,INR,actual
+Solar plant rooftop,FY23-Q2,394212720,INR,actual
+Solar plant rooftop,FY23-Q3,374502084,INR,actual
+Solar plant rooftop,FY23-Q4,425749737,INR,actual
+Solar plant rooftop,FY24-Q1,417865483,INR,actual
+Solar plant rooftop,FY24-Q2,429691864,INR,actual
+ERP S4HANA upgrade,FY23-Q1,201423411,INR,actual
+ERP S4HANA upgrade,FY23-Q2,223803791,INR,actual
+ERP S4HANA upgrade,FY23-Q3,212613601,INR,actual
+ERP S4HANA upgrade,FY23-Q4,241708094,INR,actual
+ERP S4HANA upgrade,FY24-Q1,237232018,INR,actual
+ERP S4HANA upgrade,FY24-Q2,243946132,INR,actual
+Warehouse automation,FY23-Q1,348506055,INR,actual
+Warehouse automation,FY23-Q2,387228950,INR,actual
+Warehouse automation,FY23-Q3,367867502,INR,actual
+Warehouse automation,FY23-Q4,418207266,INR,actual
+Warehouse automation,FY24-Q1,410462687,INR,actual
+Warehouse automation,FY24-Q2,422079555,INR,actual

@@ -1485,6 +1485,11 @@ def _to_json(report: EvalReport, dimension_results: List[DimensionResult]) -> Di
     return {
         "eval_name": "Diagnostic Readability Eval",
         "eval_date": report.eval_date,
+        "score_type": "structural",
+        "scope": (
+            "Output readability: formatting, label clarity, structure consistency. "
+            "Does NOT validate analytical accuracy of the underlying content."
+        ),
         "platform_version": report.platform_version,
         "overall_score": report.overall_score,
         "passed": report.passed,
@@ -1529,6 +1534,9 @@ def _to_markdown(report: EvalReport, dimension_results: List[DimensionResult]) -
         f"**Date:** {report.eval_date}  |  **Version:** {report.platform_version}  "
         f"|  **Overall Score:** {report.overall_score}/10  |  "
         f"**Pass threshold:** 7.0/10",
+        f"",
+        f"> ⚠️ **SCORE TYPE: STRUCTURAL** — Output readability: formatting, label clarity, "
+        f"structure consistency. Does NOT validate analytical accuracy. See `run_llm_judge_eval.py`.",
         f"",
         "## Summary",
         "",

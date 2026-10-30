@@ -32,6 +32,20 @@ free_sources:
     refresh_frequency: annual
     parser: cea_excel_parser
     sample_metric: 'Industrial electricity tariff average: ₹7.2–9.5/kWh across states; industry energy consumption: 42% of total national consumption (CEA Annual Report 2023-24)'
+  - id: cii_manufacturing_excellence
+    name: CII Manufacturing Excellence & National Manufacturing Competitiveness Council
+    url: 'https://www.cii.in/'
+    data_available: [conversion_cost_structure, oee_benchmarks, kaizen_case_studies, scrap_rate_norms]
+    refresh_frequency: annual
+    parser: cii_report_parser
+    sample_metric: 'CII Manufacturing Excellence Awards case studies: OEE improvement 65–85%; Kaizen/lean programmes reduce conversion cost 6–14% in award-winning plants (CII 2024)'
+  - id: acma_cost_reduction
+    name: Automotive Component Manufacturers Association of India (ACMA)
+    url: 'https://www.acma.in/'
+    data_available: [vave_benchmarks, supplier_consolidation_norms, raw_material_sourcing]
+    refresh_frequency: annual
+    parser: acma_report_parser
+    sample_metric: 'ACMA cost-reduction programmes: VAVE and supplier consolidation deliver 5–15% savings on targeted BOM components in auto ancillary sector (ACMA Annual Report 2024)'
 
 licensed_sources_stubs:
   - id: cmie_prowess_iq

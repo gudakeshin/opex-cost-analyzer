@@ -1,0 +1,9 @@
+Deep Research Brief — India GCC cost structure (Meridian Global Services)
+
+India GCC market: 1700+ centres, 1.9M employees (2024). Cost per FTE 35-50% cheaper than US/UK equivalents. Talent inflation: 10-14% salary increase per year for tech roles. Real estate: Bengaluru SEZ average 85-100 INR/sqft/month; Hyderabad 65-80 INR/sqft. Cloud costs: 15-20% of non-talent opex for tech CoEs; FinOps typically delivers 12-20% reduction.
+
+Peer observations: Seat utilisation optimisation (hybrid work 0.7:1): 15-25% RE cost reduction. Cloud FinOps wave 2: 10-18% of cloud spend. Contract staff harmonisation: 6-10% on rate cards. M365 edition rationalisation: 8-15% on licence cost (limited by security policy).
+
+Constraints: SEZ exit penalties and tax benefit loss limit real estate actions. Parent security policies constrain cloud/licence choices. Attrition risk limits aggressive contract staff cuts.
+
+Addressable non-talent opex ~40-50% of total cost base.

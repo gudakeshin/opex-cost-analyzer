@@ -1,0 +1,11 @@
+supplier,description,amount,currency,category,gl_code,spend_date,business_unit,country
+GIC Re,Domestic reinsurance cessions — motor & property FY25,1680000000,INR,Reinsurance,510010,2024-12-01,Motor Insurance,India
+Munich Re India,International treaty reinsurance — large risk,980000000,INR,Reinsurance,510011,2024-11-15,Property & Casualty,India
+PolicyBazaar,Online aggregator distribution commission,820000000,INR,Distribution & Agency,520010,2024-10-01,Motor Insurance,India
+Bajaj Alliance Partner,Agent & broker distribution network,1240000000,INR,Distribution & Agency,520011,2024-09-01,Health Insurance,India
+TCS Insurance,Policy admin system licences & IT services,680000000,INR,IT & Policy Admin,530010,2024-08-01,Corporate,India
+Xceltrait,Motor claims investigation & settlement,540000000,INR,Claims Processing & Management,540010,2024-07-01,Motor Insurance,India
+Innovative Claims,Health claims processing & TPA services,480000000,INR,Claims Processing & Management,540011,2024-06-15,Health Insurance,India
+Ogilvy India,Brand advertising & digital campaigns,380000000,INR,Marketing & Brand,550010,2024-05-01,Corporate,India
+IBM India,Data analytics & fraud detection platform,320000000,INR,IT & Policy Admin,530011,2025-01-10,Corporate,India
+EY India,Actuarial advisory & IRDAI compliance,280000000,INR,Compliance & Actuarial,560010,2025-02-01,Corporate,India

@@ -1,0 +1,9 @@
+Deep Research Brief — Indian general insurance cost structure (Pragati General Insurance)
+
+Indian GI industry growing 14% p.a.; Motor and Health dominate. Combined ratios: private sector 96-102%. Expense ratios 25-32% for mid-size insurers. Aggregator channel now 40-50% of motor new business; commission rates 18-25%.
+
+Peer observations: AI fraud detection: 15-25% reduction in fraudulent claim payouts. Claims process automation (STP): 20-35% reduction in claims processing cost. Aggregator commission renegotiation (volume leverage): 2-4% rate reduction. Policy admin modernisation: 15-22% IT cost reduction post-migration.
+
+Constraints: IRDAI regulates GIC Re cession, TP rates, TPA empanelment. Munich Re/Swiss Re treaty terms have minimum volumes. IT changes require IRDAI notification.
+
+Addressable claims, distribution, and IT opex ~60-70% of total non-claim expense.

@@ -158,7 +158,7 @@ export const BusinessClarificationModal: React.FC<BusinessClarificationModalProp
           setFreeText(e.target.value);
           setValidationError(null);
         }}
-        placeholder='e.g. "Ignore the variance if it is strictly related to the Wonder Cement subsidiary"'
+        placeholder='e.g. "Ignore the variance if it relates to the acquired subsidiary"'
         rows={3}
         className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder:text-gray-400 text-sm font-sans resize-y"
       />

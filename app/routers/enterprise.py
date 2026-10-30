@@ -25,12 +25,13 @@ from app.services.sector_packs import (
     list_available_packs,
     list_pack_overrides,
     load_pack,
+    pack_file_counts,
+    pack_levers_list,
     run_regression_test,
     set_pack_override,
 )
 from app.skills import engine as _engine
 from app.skills.registry import discover_skills
-from app.storage import read_json, write_json
 
 router = APIRouter()
 
@@ -56,8 +57,7 @@ def get_conflicts(session_id: str) -> Dict[str, Any]:
         conflicts,
     )
     summary = resolver.summary(conflicts, user_actions=user_actions)
-    manifest_path = UPLOAD_DIR / session_id / "manifest.json"
-    manifest = read_json(manifest_path, {})
+    manifest = read_manifest(session_id, {})
     manifest["conflict_state"] = {
         "total": summary["total"],
         "unresolved": summary["unresolved"],
@@ -66,7 +66,7 @@ def get_conflicts(session_id: str) -> Dict[str, Any]:
         "has_intercompany": bool(summary["by_type"].get("intercompany_inflation", 0) > 0),
     }
     try:
-        write_json(manifest_path, manifest)
+        write_manifest(session_id, manifest)
     except Exception:
         pass
     append_audit_event(f"conflict_detection session={session_id} total={summary['total']}")
@@ -214,7 +214,7 @@ def consolidate_session(session_id: str, req: ConsolidateRequest) -> Dict[str, A
 
 @router.get("/api/metrics")
 def get_metrics() -> Dict[str, Any]:
-    from app.config import OUTPUT_DIR, UPLOAD_DIR
+    from app.config import OUTPUT_DIR
     sessions = [p for p in UPLOAD_DIR.glob("*") if p.is_dir()]
     outputs = list(OUTPUT_DIR.glob("*"))
     return {
@@ -230,6 +230,7 @@ def get_metrics() -> Dict[str, Any]:
 def list_sector_packs() -> Dict[str, Any]:
     packs = []
     for pid in list_available_packs():
+        counts = pack_file_counts(pid)
         try:
             p = load_pack(pid)
             packs.append({
@@ -238,10 +239,42 @@ def list_sector_packs() -> Dict[str, Any]:
                 "version": p["version"],
                 "effective_from": p.get("effective_from", ""),
                 "status": p["status"],
+                "lever_count": counts["lever_count"],
+                "kpi_count": counts["kpi_count"],
+                "peer_count": counts["peer_count"],
+                "category_count": counts["category_count"],
+                "taxonomy_count": counts["taxonomy_count"],
             })
         except Exception as exc:
-            packs.append({"pack_id": pid, "error": str(exc)})
+            packs.append({
+                "pack_id": pid,
+                "error": str(exc),
+                "lever_count": counts["lever_count"],
+                "kpi_count": counts["kpi_count"],
+                "peer_count": counts["peer_count"],
+                "category_count": counts["category_count"],
+            })
     return {"packs": packs, "total": len(packs)}
+
+
+@router.get("/api/v1/sector-packs/{pack_id}/detail")
+def get_sector_pack_detail(pack_id: str) -> Dict[str, Any]:
+    from app.services.benchmarks import sector_pack_detail_payload
+
+    payload = sector_pack_detail_payload(pack_id)
+    if not payload:
+        raise HTTPException(status_code=404, detail=f"Sector pack not found: {pack_id}")
+    return payload
+
+
+@router.get("/api/v1/sector-packs/{pack_id}/benchmarks")
+def get_sector_pack_benchmarks(pack_id: str) -> Dict[str, Any]:
+    from app.services.benchmarks import sector_pack_benchmarks_payload
+
+    payload = sector_pack_benchmarks_payload(pack_id)
+    if not payload:
+        raise HTTPException(status_code=404, detail=f"No benchmark data for pack {pack_id}")
+    return payload
 
 
 @router.get("/api/v1/sector-packs/{pack_id}")
@@ -256,7 +289,7 @@ def get_sector_pack(pack_id: str) -> Dict[str, Any]:
         "version": p["version"],
         "effective_from": p.get("effective_from", ""),
         "status": p["status"],
-        "sector_levers_count": len(p.get("sector_levers", {}).get("sector_specific_levers", [])),
+        "sector_levers_count": len(pack_levers_list(p.get("sector_levers"))),
         "kpi_count": len(p.get("kpi_pack", [])),
         "peer_count": len(p.get("peer_set", {}).get("peers", [])),
     }
@@ -306,6 +339,7 @@ def cost_to_serve_endpoint(req: CostToServeRequest) -> Dict[str, Any]:
         segment_revenue=req.segment_revenue,
         annual_revenue=annual_revenue,
         headcount=headcount,
+        allocation_method=req.allocation_method,
     )
     append_audit_event("cost_to_serve_analysis", session_id=req.session_id)
     return result
@@ -1008,6 +1042,11 @@ def start_deep_research_endpoint(req: DeepResearchStartRequest) -> Dict[str, Any
         try:
             manifest = read_manifest(req.session_id)
             manifest["deep_research_interaction_id"] = interaction_id
+            # Persist the research subject so the completion handler can render an
+            # accurate document header (revenue here is already in ₹ Cr).
+            manifest["deep_research_company_name"] = req.company_name
+            manifest["deep_research_industry"] = req.industry
+            manifest["deep_research_annual_revenue_cr"] = req.annual_revenue_cr
             if req.research_prompt:
                 manifest["deep_research_prompt"] = req.research_prompt.strip()
             write_manifest(req.session_id, manifest)
@@ -1042,9 +1081,40 @@ def poll_deep_research_endpoint(
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
 
-    status = result["status"]
-    if status != "completed":
-        return {"status": status, "summary": None, "full_report": None, "sources": []}
+    raw_status = result["status"]
+    # Google's Interactions API can return any of: in_progress, requires_action,
+    # completed, failed, cancelled, incomplete, budget_exceeded. Normalize to the
+    # three states the client understands so the UI can never hang on an
+    # unrecognized terminal status.
+    if raw_status == "in_progress":
+        return {"status": "in_progress", "summary": None, "full_report": None, "sources": []}
+    if raw_status != "completed":
+        terminal_messages = {
+            "budget_exceeded": (
+                "Deep Research stopped: the Google account budget was exceeded "
+                "(Gemini credits depleted). Top up the account to run Deep Research."
+            ),
+            "cancelled": "Deep Research job was cancelled.",
+            "incomplete": "Deep Research job ended incomplete. Please try again.",
+            "requires_action": (
+                "Deep Research paused awaiting input, which isn't supported here. "
+                "Please try again."
+            ),
+            "failed": "Deep research job failed. Please try again.",
+        }
+        error = terminal_messages.get(raw_status, f"Deep research ended unexpectedly ({raw_status}).")
+        logger.warning(
+            '"deep_research_terminal_status","interaction_id":"%s","status":"%s"',
+            interaction_id,
+            raw_status,
+        )
+        return {
+            "status": "failed",
+            "error": error,
+            "summary": None,
+            "full_report": None,
+            "sources": [],
+        }
 
     full_report = result.get("output_text") or ""
     summary = _summarize_deep_research_llm(full_report)
@@ -1064,6 +1134,64 @@ def poll_deep_research_endpoint(
             )
         except Exception as exc:
             logger.warning('"deep_research_manifest_save_failed","error":"%s"', exc)
+
+        # Save the research output as a markdown document in the engagement folder
+        # and run it through the standard parse + index pipeline so it becomes
+        # durable, RAG-retrievable context picked up by all downstream analysis.
+        try:
+            from app.services.deep_research_prompt import build_research_markdown
+            from app.services.document_pipeline import ingest_markdown_document
+            from app.services.engagements_store import (
+                backfill_engagement_for_session,
+                delete_document,
+            )
+
+            manifest = read_manifest(session_id)
+            engagement_id = backfill_engagement_for_session(session_id, manifest)
+            currency = str(manifest.get("currency") or "INR")
+            company_name = str(
+                manifest.get("deep_research_company_name")
+                or manifest.get("company_name")
+                or "Company"
+            )
+            industry = str(
+                manifest.get("deep_research_industry") or manifest.get("industry") or ""
+            )
+            revenue_cr = float(manifest.get("deep_research_annual_revenue_cr") or 0.0)
+
+            md_body = build_research_markdown(
+                company_name,
+                industry,
+                revenue_cr,
+                summary=summary,
+                full_report=full_report,
+                sources=result.get("sources") or [],
+            )
+            filename = f"Deep Research — {company_name} Industry & Business Context.md"
+
+            # Replace the prior auto-generated research doc so only the latest
+            # industry/business context lives in the corpus.
+            prior_id = manifest.get("deep_research_document_id")
+            if prior_id:
+                try:
+                    delete_document(engagement_id, str(prior_id))
+                except Exception:
+                    pass  # already gone — ignore
+
+            new_doc_id = ingest_markdown_document(
+                engagement_id, md_body, filename, reporting_currency=currency
+            )
+            manifest["engagement_id"] = engagement_id
+            manifest["deep_research_document_id"] = new_doc_id
+            write_manifest(session_id, manifest)
+            logger.info(
+                '"deep_research_doc_ingested","session_id":"%s","engagement_id":"%s","document_id":"%s"',
+                session_id,
+                engagement_id,
+                new_doc_id,
+            )
+        except Exception as exc:
+            logger.warning('"deep_research_doc_ingest_failed","error":"%s"', exc)
 
     append_audit_event(
         "deep_research_completed",

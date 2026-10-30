@@ -69,12 +69,65 @@ def manifest_path(session_id: str) -> Path:
     return session_dir(session_id) / "manifest.json"
 
 
-def read_manifest(session_id: str) -> Dict[str, Any]:
-    return read_json(manifest_path(session_id), {"files": []})
+def _use_repo() -> bool:
+    """True when session manifests live in a repository backend (e.g. SQLite)
+    rather than in manifest.json files. The JSON file logic below IS the json
+    backend (JsonSessionRepository delegates here), so only dispatch out for
+    non-json backends.
+    """
+    from app.repositories import active_backend
+
+    return active_backend() != "json"
+
+
+def read_manifest(session_id: str, default: Dict[str, Any] | None = None) -> Dict[str, Any]:
+    fallback: Dict[str, Any] = {"files": []} if default is None else default
+    if _use_repo():
+        from app.repositories import session_repo
+
+        try:
+            return session_repo().get(session_id)
+        except (KeyError, HTTPException):
+            # Missing session, or an id the repo's UUID validation rejects —
+            # same outcome as the json backend's missing-file read: fallback.
+            return fallback
+    return read_json(manifest_path(session_id), fallback)
 
 
 def write_manifest(session_id: str, payload: Dict[str, Any]) -> None:
+    if _use_repo():
+        from app.repositories import session_repo
+
+        session_repo().save(session_id, payload)
+        # Uploads and derived artifacts still live under session_dir; keep
+        # creating it so "does this session exist" directory checks and the
+        # upload path behave identically across backends.
+        session_dir(session_id).mkdir(parents=True, exist_ok=True)
+        return
     write_json(manifest_path(session_id), payload)
+
+
+def session_manifest_exists(session_id: str) -> bool:
+    if _use_repo():
+        from app.repositories import session_repo
+
+        return session_repo().exists(session_id)
+    return manifest_path(session_id).exists()
+
+
+def list_session_ids() -> list[str]:
+    """All session ids known to the active backend, unordered."""
+    if _use_repo():
+        from app.repositories import session_repo
+
+        return session_repo().list_ids()
+    if not UPLOAD_DIR.exists():
+        return []
+    return [
+        p.name
+        for p in UPLOAD_DIR.iterdir()
+        if p.is_dir() and (p / "manifest.json").exists()
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -106,6 +159,11 @@ class _SessionLockBackend:
                 logger.info('"session_lock backend=redis"')
             except Exception as exc:
                 logger.warning('"session_lock redis_unavailable error=%s using=local"', exc)
+        if self._redis is None:
+            logger.warning(
+                '"session_lock backend=local — in-process only; '
+                'concurrent writes WILL race with >1 worker/replica (set REDIS_URL)"'
+            )
 
     @contextlib.asynccontextmanager
     async def acquire(self, session_id: str):  # type: ignore[return]
@@ -151,8 +209,10 @@ def session_lock(session_id: str):
 
 
 def engagement_lock(engagement_id: str):
-    """Reuse session lock backend keyed by engagement_id."""
-    return _session_lock_backend.acquire(engagement_id)
+    """Async manifest lock — shared with all engagement manifest mutations."""
+    from app.services.manifest_lock import manifest_lock
+
+    return manifest_lock.acquire_async(engagement_id)
 
 
 def merge_context_into_manifest(
@@ -164,14 +224,24 @@ def merge_context_into_manifest(
     currency: str | None = None,
     audience: str | None = None,
     headcount: float | None = None,
+    peer_set_name: str | None = None,
+    industry_user_set: bool = False,
 ) -> bool:
     changed = False
     if company_name is not None and manifest.get("company_name") != company_name:
         manifest["company_name"] = company_name
         changed = True
-    if industry is not None and manifest.get("industry") != industry:
-        manifest["industry"] = industry
-        changed = True
+    if industry is not None:
+        from app.services.sector_packs import normalize_industry_selection
+
+        normalized = normalize_industry_selection(industry)
+        if normalized:
+            if industry_user_set and not manifest.get("industry_user_set"):
+                manifest["industry_user_set"] = True
+                changed = True
+            if manifest.get("industry") != normalized:
+                manifest["industry"] = normalized
+                changed = True
     if annual_revenue is not None:
         rev = max(float(annual_revenue), 0.0)
         if float(manifest.get("annual_revenue") or 0.0) != rev:
@@ -188,6 +258,11 @@ def merge_context_into_manifest(
         normalized_hc = hc if hc > 0 else None
         if manifest.get("headcount") != normalized_hc:
             manifest["headcount"] = normalized_hc
+            changed = True
+    if peer_set_name is not None:
+        normalized_ps = peer_set_name.strip() or None
+        if manifest.get("peer_set_name") != normalized_ps:
+            manifest["peer_set_name"] = normalized_ps
             changed = True
     return changed
 
@@ -249,6 +324,27 @@ class _ProgressStore:
                     entry["steps"].append(step)
                     entry["updated_at"] = utc_now_iso()
 
+    def append_thinking(self, run_id: str, chunk: str) -> None:
+        """Append model reasoning text for live progress polling."""
+        text = (chunk or "").strip()
+        if not text:
+            return
+        if self._redis:
+            raw = self._redis.get(self._key(run_id))
+            if raw:
+                entry = json.loads(raw)
+                prev = str(entry.get("thinking_text") or "").strip()
+                entry["thinking_text"] = f"{prev}\n\n{text}" if prev else text
+                entry["updated_at"] = utc_now_iso()
+                self._redis.setex(self._key(run_id), self._TTL_S, json.dumps(entry))
+        else:
+            with self._lock:
+                entry = self._local.get(run_id)
+                if entry:
+                    prev = str(entry.get("thinking_text") or "").strip()
+                    entry["thinking_text"] = f"{prev}\n\n{text}" if prev else text
+                    entry["updated_at"] = utc_now_iso()
+
     def complete(self, run_id: str, *, failed: bool = False, error: str | None = None) -> None:
         if self._redis:
             raw = self._redis.get(self._key(run_id))
@@ -284,6 +380,10 @@ def progress_init(run_id: str, session_id: str) -> None:
 
 def progress_append(run_id: str, phase: str, message: str) -> None:
     _progress.append(run_id, phase, message)
+
+
+def progress_append_thinking(run_id: str, chunk: str) -> None:
+    _progress.append_thinking(run_id, chunk)
 
 
 def progress_complete(run_id: str, *, failed: bool = False, error: str | None = None) -> None:

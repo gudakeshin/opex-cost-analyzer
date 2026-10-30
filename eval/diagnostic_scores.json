@@ -1,9 +1,11 @@
 {
   "eval_name": "Diagnostic Feature Eval",
-  "eval_date": "2026-06-05",
+  "eval_date": "2026-10-30",
+  "score_type": "structural",
+  "scope": "Diagnostic skill wiring and output schema completeness. Does NOT validate analytical accuracy of diagnostic outputs.",
   "platform_version": "v2.1",
-  "overall_score": 8.45,
-  "passed": false,
+  "overall_score": 9.29,
+  "passed": true,
   "scenario_run_count": 5,
   "scenario_pass_count": 5,
   "domains": [
@@ -138,7 +140,7 @@
               },
               "passed": 6,
               "total": 6,
-              "gap_count": 20
+              "gap_count": 22
             },
             "S02": {
               "checks": {
@@ -151,7 +153,7 @@
               },
               "passed": 6,
               "total": 6,
-              "gap_count": 20
+              "gap_count": 23
             },
             "S03": {
               "checks": {
@@ -164,7 +166,7 @@
               },
               "passed": 6,
               "total": 6,
-              "gap_count": 18
+              "gap_count": 21
             },
             "S04": {
               "checks": {
@@ -185,7 +187,7 @@
               },
               "passed": 6,
               "total": 6,
-              "gap_count": 19
+              "gap_count": 21
             }
           }
         },
@@ -209,9 +211,9 @@
                 "no_lever_below_min_threshold": true,
                 "max_12_levers": true
               },
-              "lever_count": 9,
-              "computed_sum": 210.0,
-              "reported_total": 210.0,
+              "lever_count": 12,
+              "computed_sum": 287.3,
+              "reported_total": 287.3,
               "monotone_violations": [],
               "below_floor": []
             },
@@ -222,9 +224,9 @@
                 "no_lever_below_min_threshold": true,
                 "max_12_levers": true
               },
-              "lever_count": 8,
-              "computed_sum": 4344.0,
-              "reported_total": 4344.0,
+              "lever_count": 12,
+              "computed_sum": 6491.8,
+              "reported_total": 6491.8,
               "monotone_violations": [],
               "below_floor": []
             },
@@ -235,9 +237,9 @@
                 "no_lever_below_min_threshold": true,
                 "max_12_levers": true
               },
-              "lever_count": 9,
-              "computed_sum": 29.2,
-              "reported_total": 29.2,
+              "lever_count": 12,
+              "computed_sum": 48.3,
+              "reported_total": 48.3,
               "monotone_violations": [],
               "below_floor": []
             },
@@ -254,9 +256,9 @@
                 "no_lever_below_min_threshold": true,
                 "max_12_levers": true
               },
-              "lever_count": 9,
-              "computed_sum": 230.6,
-              "reported_total": 230.6,
+              "lever_count": 12,
+              "computed_sum": 184.2,
+              "reported_total": 184.2,
               "monotone_violations": [],
               "below_floor": []
             }
@@ -268,7 +270,7 @@
       "name": "analysis_completeness",
       "display": "Analysis Completeness",
       "weight": 0.35,
-      "score": 9.91,
+      "score": 9.75,
       "passed": true,
       "dimensions": [
         {
@@ -306,24 +308,24 @@
               83.3,
               65.6,
               65.6,
+              64.8,
               64.6,
               59.6,
+              57.6,
               53.6,
-              41.8,
-              38.7,
-              31.7,
-              2245.7
+              53.6,
+              41.8
             ],
             "lever_category_values_sampled": [
               "IT",
               "IT",
               "IT",
+              "OUTSOURCED",
               "FACILITIES",
               "IT",
+              "MARKETING",
               "IT",
               "IT",
-              "IT",
-              "CONTINGENT",
               "IT"
             ]
           }
@@ -333,32 +335,32 @@
           "name": "Lever Base Spend Coverage",
           "weight": 0.3,
           "threshold": 6.0,
-          "score": 9.71,
+          "score": 9.18,
           "passed": true,
           "gap": 0.0,
           "scenarios_run": 5,
           "scenarios_below_threshold": 0,
-          "finding_summary": "34/35 levers resolved a category spend (97%); 1 fell back to 10% floor",
+          "finding_summary": "67/73 levers resolved a category spend (92%); 6 fell back to 10% floor",
           "remediation": "Review trigger_signals in sector_levers.json \u2014 ensure category IDs match those returned by resolve_benchmark_payload. Consider a multi-signal resolver (not just first match). Also ensure category keys in cat_spend_cr are case-consistently matched.",
           "evidence": {
             "per_scenario": {
               "S01": {
-                "levers_with_category_match": 9,
-                "levers_using_floor": 0,
-                "total_eligible": 9,
-                "category_match_ratio": 1.0
+                "levers_with_category_match": 21,
+                "levers_using_floor": 1,
+                "total_eligible": 22,
+                "category_match_ratio": 0.955
               },
               "S02": {
-                "levers_with_category_match": 8,
-                "levers_using_floor": 0,
-                "total_eligible": 8,
-                "category_match_ratio": 1.0
+                "levers_with_category_match": 15,
+                "levers_using_floor": 4,
+                "total_eligible": 19,
+                "category_match_ratio": 0.789
               },
               "S03": {
-                "levers_with_category_match": 8,
+                "levers_with_category_match": 18,
                 "levers_using_floor": 1,
-                "total_eligible": 9,
-                "category_match_ratio": 0.889
+                "total_eligible": 19,
+                "category_match_ratio": 0.947
               },
               "S04": {
                 "levers_with_category_match": 0,
@@ -367,15 +369,15 @@
                 "category_match_ratio": 0.0
               },
               "S05": {
-                "levers_with_category_match": 9,
+                "levers_with_category_match": 13,
                 "levers_using_floor": 0,
-                "total_eligible": 9,
+                "total_eligible": 13,
                 "category_match_ratio": 1.0
               }
             },
-            "total_category_matched": 34,
-            "total_floor_fallback": 1,
-            "overall_match_ratio": 0.971
+            "total_category_matched": 67,
+            "total_floor_fallback": 6,
+            "overall_match_ratio": 0.918
           }
         },
         {
@@ -463,8 +465,8 @@
       "name": "schema_signal_integrity",
       "display": "Schema & Signal Integrity",
       "weight": 0.15,
-      "score": 4.0,
-      "passed": false,
+      "score": 10.0,
+      "passed": true,
       "dimensions": [
         {
           "id": "DG-07",
@@ -476,11 +478,11 @@
           "gap": 0.0,
           "scenarios_run": 0,
           "scenarios_below_threshold": 0,
-          "finding_summary": "127 levers checked, 369 signals validated, 0 violations",
+          "finding_summary": "300 levers checked, 569 signals validated, 0 violations",
           "remediation": "For each violation, add/fix diagnostic_signals in the corresponding sector_levers.json. Required schema: [{signal, evidence_source, confirms}].",
           "evidence": {
-            "total_levers_checked": 127,
-            "total_signals_found": 369,
+            "total_levers_checked": 300,
+            "total_signals_found": 569,
             "violation_count": 0,
             "violations": []
           }
@@ -490,13 +492,13 @@
           "name": "Sector Pack Mapping Coverage",
           "weight": 0.6,
           "threshold": 8.0,
-          "score": 0.0,
-          "passed": false,
-          "gap": 8.0,
+          "score": 10.0,
+          "passed": true,
+          "gap": 0.0,
           "scenarios_run": 0,
           "scenarios_below_threshold": 0,
-          "finding_summary": "0/15 sector packs mapped (0%). Missing: ['bfsi_banks', 'conglomerate', 'energy_utilities', 'financial_services_nonbank', 'fmcg_consumer', 'gcc_capability_centers', 'healthcare_hospitals', 'hospitality_travel', 'insurance_general', 'it_ites', 'manufacturing_diversified', 'pharma_lifesciences', 'psu_cpse', 'retail_organized', 'telecom_infra']",
-          "remediation": "Add the following to _PACK_TO_BENCH in app/routers/enterprise.py: \"bfsi_banks\": \"<benchmark_industry>\", \"conglomerate\": \"<benchmark_industry>\", \"energy_utilities\": \"<benchmark_industry>\", \"financial_services_nonbank\": \"<benchmark_industry>\", \"fmcg_consumer\": \"<benchmark_industry>\", \"gcc_capability_centers\": \"<benchmark_industry>\", \"healthcare_hospitals\": \"<benchmark_industry>\", \"hospitality_travel\": \"<benchmark_industry>\", \"insurance_general\": \"<benchmark_industry>\", \"it_ites\": \"<benchmark_industry>\", \"manufacturing_diversified\": \"<benchmark_industry>\", \"pharma_lifesciences\": \"<benchmark_industry>\", \"psu_cpse\": \"<benchmark_industry>\", \"retail_organized\": \"<benchmark_industry>\", \"telecom_infra\": \"<benchmark_industry>\". Suggested mappings: financial_services_nonbank\u2192financial_services, gcc_capability_centers\u2192technology, healthcare_hospitals\u2192healthcare, hospitality_travel\u2192retail_consumer.",
+          "finding_summary": "16/16 sector packs mapped (100%). Missing: []",
+          "remediation": "Add the following to SECTOR_PACK_TO_BENCHMARK in app/services/benchmarks.py: . Suggested mappings: financial_services_nonbank\u2192financial_services, gcc_capability_centers\u2192technology, healthcare_hospitals\u2192healthcare, hospitality_travel\u2192retail_consumer.",
           "evidence": {
             "discovered_packs": [
               "bfsi_banks",
@@ -509,15 +511,14 @@
               "hospitality_travel",
               "insurance_general",
               "it_ites",
+              "manufacturing_cement",
               "manufacturing_diversified",
               "pharma_lifesciences",
               "psu_cpse",
               "retail_organized",
               "telecom_infra"
             ],
-            "mapped_in_pack_to_bench": [],
-            "covered": [],
-            "missing_from_mapping": [
+            "mapped_in_sector_pack_to_benchmark": [
               "bfsi_banks",
               "conglomerate",
               "energy_utilities",
@@ -528,14 +529,34 @@
               "hospitality_travel",
               "insurance_general",
               "it_ites",
+              "manufacturing_cement",
               "manufacturing_diversified",
               "pharma_lifesciences",
               "psu_cpse",
               "retail_organized",
               "telecom_infra"
             ],
+            "covered": [
+              "bfsi_banks",
+              "conglomerate",
+              "energy_utilities",
+              "financial_services_nonbank",
+              "fmcg_consumer",
+              "gcc_capability_centers",
+              "healthcare_hospitals",
+              "hospitality_travel",
+              "insurance_general",
+              "it_ites",
+              "manufacturing_cement",
+              "manufacturing_diversified",
+              "pharma_lifesciences",
+              "psu_cpse",
+              "retail_organized",
+              "telecom_infra"
+            ],
+            "missing_from_mapping": [],
             "phantom_keys_in_dict": [],
-            "coverage_ratio": 0.0
+            "coverage_ratio": 1.0
           }
         }
       ]
@@ -628,20 +649,20 @@
             ],
             "per_scenario_circularity": {
               "S01": {
-                "total_gaps": 20,
-                "gaps_where_actual_eq_p50": 20,
+                "total_gaps": 22,
+                "gaps_where_actual_eq_p50": 22,
                 "circularity_ratio": 1.0,
                 "circular": true
               },
               "S02": {
-                "total_gaps": 20,
-                "gaps_where_actual_eq_p50": 20,
+                "total_gaps": 23,
+                "gaps_where_actual_eq_p50": 23,
                 "circularity_ratio": 1.0,
                 "circular": true
               },
               "S03": {
-                "total_gaps": 18,
-                "gaps_where_actual_eq_p50": 18,
+                "total_gaps": 21,
+                "gaps_where_actual_eq_p50": 21,
                 "circularity_ratio": 1.0,
                 "circular": true
               },
@@ -704,19 +725,6 @@
       ]
     }
   ],
-  "top_gaps": [
-    {
-      "dimension": "DG-08",
-      "name": "Sector Pack Mapping Coverage",
-      "gap": 8.0,
-      "remediation": "Add the following to _PACK_TO_BENCH in app/routers/enterprise.py: \"bfsi_banks\": \"<benchmark_industry>\", \"conglomerate\": \"<benchmark_industry>\", \"energy_utilities\": \"<benchmark_industry>\", \"financial_services_nonbank\": \"<benchmark_industry>\", \"fmcg_consumer\": \"<benchmark_industry>\", \"gcc_capability_centers\": \"<benchmark_industry>\", \"healthcare_hospitals\": \"<benchmark_industry>\", \"hospitality_travel\": \"<benchmark_industry>\", \"insurance_general\": \"<benchmark_industry>\", \"it_ites\": \"<benchmark_industry>\", \"manufacturing_diversified\": \"<benchmark_industry>\", \"pharma_lifesciences\": \"<benchmark_industry>\", \"psu_cpse\": \"<benchmark_industry>\", \"retail_organized\": \"<benchmark_industry>\", \"telecom_infra\": \"<benchmark_industry>\". Suggested mappings: financial_services_nonbank\u2192financial_services, gcc_capability_centers\u2192technology, healthcare_hospitals\u2192healthcare, hospitality_travel\u2192retail_consumer."
-    }
-  ],
-  "remediation_roadmap": [
-    {
-      "dimension_id": "DG-08",
-      "name": "Sector Pack Mapping Coverage",
-      "remediation": "Add the following to _PACK_TO_BENCH in app/routers/enterprise.py: \"bfsi_banks\": \"<benchmark_industry>\", \"conglomerate\": \"<benchmark_industry>\", \"energy_utilities\": \"<benchmark_industry>\", \"financial_services_nonbank\": \"<benchmark_industry>\", \"fmcg_consumer\": \"<benchmark_industry>\", \"gcc_capability_centers\": \"<benchmark_industry>\", \"healthcare_hospitals\": \"<benchmark_industry>\", \"hospitality_travel\": \"<benchmark_industry>\", \"insurance_general\": \"<benchmark_industry>\", \"it_ites\": \"<benchmark_industry>\", \"manufacturing_diversified\": \"<benchmark_industry>\", \"pharma_lifesciences\": \"<benchmark_industry>\", \"psu_cpse\": \"<benchmark_industry>\", \"retail_organized\": \"<benchmark_industry>\", \"telecom_infra\": \"<benchmark_industry>\". Suggested mappings: financial_services_nonbank\u2192financial_services, gcc_capability_centers\u2192technology, healthcare_hospitals\u2192healthcare, hospitality_travel\u2192retail_consumer."
-    }
-  ]
+  "top_gaps": [],
+  "remediation_roadmap": []
 }

@@ -1,0 +1,70 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {
+      "category_id": "origination_collections",
+      "category_name": "Origination, Collections & Recovery Ops",
+      "gl_prefix": "ORC"
+    },
+    {
+      "category_id": "fund_admin",
+      "category_name": "Fund Administration & Custody Fees",
+      "gl_prefix": "FAD"
+    },
+    {
+      "category_id": "regulatory_filings",
+      "category_name": "SEBI / RBI Regulatory Filings & Audit",
+      "gl_prefix": "REG"
+    },
+    {
+      "category_id": "brokerage_clearing",
+      "category_name": "Brokerage Clearing & Exchange Charges",
+      "gl_prefix": "BRK"
+    },
+    {
+      "category_id": "credit_bureau",
+      "category_name": "Credit Bureau & KYC Verification",
+      "gl_prefix": "KYC"
+    },
+    {
+      "category_id": "aum_distribution_commissions",
+      "category_name": "AUM Distribution & Trail Commissions",
+      "gl_prefix": "ADC",
+      "cost_nature": "commercial"
+    },
+    {
+      "category_id": "technology_market_data",
+      "category_name": "Market Data & Research Technology",
+      "gl_prefix": "TMD",
+      "cost_nature": "technology"
+    },
+    {
+      "category_id": "kyc_onboarding_costs",
+      "category_name": "KYC & Customer Onboarding Costs",
+      "gl_prefix": "KYC",
+      "cost_nature": "operations"
+    },
+    {
+      "category_id": "grievance_servicing_ops",
+      "category_name": "Customer Servicing & Grievance Operations",
+      "gl_prefix": "GSO",
+      "cost_nature": "operations"
+    },
+    {
+      "category_id": "treasury_borrowing_ops",
+      "category_name": "Treasury & Borrowing Operations",
+      "gl_prefix": "TBO",
+      "cost_nature": "finance"
+    }
+  ],
+  "overrides": [
+    {
+      "category_id": "it",
+      "category_name": "Core Banking / LOS / Trading Platforms"
+    },
+    {
+      "category_id": "prof_services",
+      "category_name": "Audit, Legal & Actuarial Services"
+    }
+  ]
+}

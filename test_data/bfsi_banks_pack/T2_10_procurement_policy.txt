@@ -1,0 +1,8 @@
+Indus Apex Bank Ltd — Procurement Policy
+
+1) Three competitive bids above 2 Cr. Single-source above 2 Cr: CTO + CPO + Compliance Officer approval.
+2) No PO no pay above 5 Lakh. Emergency regularised within 14 days.
+3) RBI data localisation: no core banking data outside India without RBI prior approval; 6-month parallel-run for Tier-1 system changes.
+4) MSME payment 45 days. New tech vendors: CISO + DPO security assessment.
+5) Auto-renewals reviewed 90 days before deadline. Exit penalties fully modelled.
+6) CPO FY26: consolidate tech vendor base, reduce tail spend.

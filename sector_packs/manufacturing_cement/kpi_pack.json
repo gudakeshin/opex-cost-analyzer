@@ -1,0 +1,14 @@
+[
+  {"kpi_id": "ebitda_per_tonne", "kpi_name": "EBITDA per Tonne of Cement", "unit": "inr_per_t", "formula": "ebitda_inr / cement_sales_t", "target_direction": "higher", "p50_benchmark": 850},
+  {"kpi_id": "specific_heat_consumption", "kpi_name": "Specific Heat Consumption", "unit": "kcal_per_kg_clinker", "formula": "thermal_energy_kcal / clinker_production_kg", "target_direction": "lower", "p50_benchmark": 730},
+  {"kpi_id": "specific_power_consumption", "kpi_name": "Specific Electrical Power Consumption", "unit": "kwh_per_t_cement", "formula": "electricity_kwh / cement_production_t", "target_direction": "lower", "p50_benchmark": 73},
+  {"kpi_id": "clinker_factor", "kpi_name": "Clinker Factor", "unit": "pct", "formula": "clinker_consumed_t / cement_produced_t * 100", "target_direction": "lower", "p50_benchmark_pct": 68.0},
+  {"kpi_id": "thermal_substitution_rate", "kpi_name": "Thermal Substitution Rate", "unit": "pct", "formula": "alternative_fuel_thermal_energy / total_kiln_thermal_energy * 100", "target_direction": "higher", "p50_benchmark_pct": 8.0},
+  {"kpi_id": "whr_generation_share", "kpi_name": "Waste-Heat Recovery Share of Power", "unit": "pct", "formula": "whr_generation_kwh / total_power_consumption_kwh * 100", "target_direction": "higher", "p50_benchmark_pct": 12.0},
+  {"kpi_id": "freight_cost_per_tonne", "kpi_name": "Freight Cost per Tonne Sold", "unit": "inr_per_t", "formula": "primary_secondary_freight_inr / cement_sales_t", "target_direction": "lower", "p50_benchmark": 1050},
+  {"kpi_id": "plant_capacity_utilisation", "kpi_name": "Cement Capacity Utilisation", "unit": "pct", "formula": "cement_production_t / available_capacity_t * 100", "target_direction": "higher", "p50_benchmark_pct": 72.0},
+  {"kpi_id": "kiln_availability", "kpi_name": "Kiln Availability", "unit": "pct", "formula": "kiln_running_hours / scheduled_kiln_hours * 100", "target_direction": "higher", "p50_benchmark_pct": 92.0},
+  {"kpi_id": "scope1_intensity", "kpi_name": "Scope 1 GHG Intensity", "unit": "tco2e_per_t_cementitious", "formula": "scope1_tco2e / cementitious_production_t", "target_direction": "lower", "p50_benchmark": 0.58},
+  {"kpi_id": "bag_cost_per_tonne", "kpi_name": "Packaging Cost per Tonne", "unit": "inr_per_t", "formula": "cement_packaging_inr / packed_cement_sales_t", "target_direction": "lower", "p50_benchmark": 210},
+  {"kpi_id": "refractory_consumption", "kpi_name": "Refractory Consumption", "unit": "kg_per_t_clinker", "formula": "refractory_consumed_kg / clinker_production_t", "target_direction": "lower", "p50_benchmark": 0.55}
+]

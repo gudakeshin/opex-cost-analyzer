@@ -42,7 +42,8 @@
     "lease_restructuring",
     "cost_governance",
     "bank_fee_optimization",
-    "p2p_o2c_automation"
+    "p2p_o2c_automation",
+    "insurance_premium_optimization"
   ],
   "sector_specific_levers": [
     {
@@ -130,7 +131,8 @@
         "Contract terms, SLA, and break-clause provisions",
         "NAV error/restatement history",
         "SEBI/AMFI compliance requirement mapping"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "trading_technology_optimization",
@@ -217,7 +219,8 @@
         "Trading volume by asset class and broker",
         "OMS/EMS vendor contracts and SLAs",
         "TCA analysis output for top-20 brokers"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "compliance_automation",
@@ -309,7 +312,8 @@
         "RegTech vendor landscape and integration requirements",
         "Late/restated filing history with root cause",
         "SEBI/IRDAI technical specification for digital filing"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "performance_attribution_tech",
@@ -394,7 +398,8 @@
         "Performance attribution vendor options and pricing",
         "OMS and portfolio management system integration architecture",
         "Client reporting SLA requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "research_cost_management",
@@ -480,7 +485,628 @@
         "Portfolio manager research utilisation and feedback by provider",
         "MiFID II/SEBI compliance framework for research payments",
         "Research management platform options and integration requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
+    },
+    {
+      "lever_id": "digital_onboarding_kyc",
+      "lever_name": "Digital Onboarding & Video KYC",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 20.0,
+        "p90": 32.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Digital Onboarding & Video KYC"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:IT present",
+        "category:HR present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "RBI Master Direction on KYC 2016 updated 2024 (rbi.org.in) — V-KYC framework enabling full digital onboarding",
+        "SEBI CKYC Registry (ckycindia.in) — shared KYC reduces per-customer KYC cost 60-70% vs. physical",
+        "INTERNAL_CALIBRATION — digital onboarding savings calibrated from 4 India NBFC and fintech mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Digital Onboarding & Video KYC: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "collections_automation",
+      "lever_name": "Collections Process Automation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 12.0,
+        "p50": 22.0,
+        "p90": 35.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Collections Process Automation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:HR present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "RBI Report on Trend and Progress of Banking 2023-24 (rbi.org.in) — NBFC collections cost benchmarks and digital collections trends",
+        "Bajaj Finance FY25 Annual Report (BSE 500034) — collections technology cited as key efficiency driver; NPA resolution cost reduction",
+        "INTERNAL_CALIBRATION — collections automation savings from 5 India NBFC collections transformation engagements"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Collections Process Automation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "distribution_channel_shift",
+      "lever_name": "Direct & Digital Channel Mix Shift",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 16.0,
+        "p90": 25.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Direct & Digital Channel Mix Shift"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:HR present",
+        "category:MARKETING present"
+      ],
+      "industry_sources": [
+        "RBI NBFC Report 2023-24 — digital channels growing; DSA commission 2-3% of disbursed amount vs. direct channel near-zero",
+        "AMFI FY25 (amfiindia.com) — direct plan MF penetration reducing distribution cost by 60-80 bps vs. regular plan",
+        "INTERNAL_CALIBRATION — channel shift savings from 3 NBFC distribution strategy engagements"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Direct & Digital Channel Mix Shift: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for MARKETING",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "credit_bureau_api_optimisation",
+      "lever_name": "Credit Bureau & Data API Cost Rationalisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 22.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Credit Bureau & Data API Cost Rationalisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 16
+      },
+      "applicable_if": [
+        "category:IT present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "TransUnion CIBIL Annual Report 2024 (cibil.com) — published bureau query pricing structure; volume discounts for 1M+ queries/month",
+        "RBI Master Direction on Credit Information Companies 2024 (rbi.org.in) — regulatory framework for bureau usage",
+        "INTERNAL_CALIBRATION — bureau API cost savings from 4 India NBFC credit decisioning reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Credit Bureau & Data API Cost Rationalisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "technology_core_modernisation",
+      "lever_name": "Core LMS / CBS Modernisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "mixed",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Core LMS / CBS Modernisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 36,
+        "p50": 40,
+        "p90": 48
+      },
+      "applicable_if": [
+        "category:IT present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "Gartner — Financial Services Core Modernisation 2024 (gartner.com) — cloud-native LMS reduces IT maintenance 20-35% vs legacy",
+        "Bajaj Finance FY25 Annual Report (BSE 500034) — BFL Tech 2.0 transformation programme: ₹2,500 Cr technology investment cited for long-term cost efficiency",
+        "INTERNAL_CALIBRATION — core LMS modernisation savings calibrated from 2 NBFC technology transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Core LMS / CBS Modernisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 20
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for IT",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "branch_network_rationalisation_nbfc",
+      "lever_name": "Branch & Touchpoint Network Rationalisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 24.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Branch & Touchpoint Network Rationalisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:FACILITIES present",
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "RBI NBFC Report 2023-24 — NBFC branch network expansion analysis; digital channels reducing physical requirement",
+        "Bajaj Finance Annual Report FY25 — asset-light model (fewer branches than peer NBFCs) as structural advantage",
+        "INTERNAL_CALIBRATION — branch rationalisation savings from 3 NBFC network optimisation reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Branch & Touchpoint Network Rationalisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FACILITIES",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "sga_vendor_consolidation",
+      "lever_name": "G&A and Vendor Spend Consolidation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for G&A and Vendor Spend Consolidation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 16
+      },
+      "applicable_if": [
+        "category:FACILITIES present",
+        "category:PROF_SVCS present",
+        "category:TRAVEL present"
+      ],
+      "industry_sources": [
+        "Hackett Group G&A Benchmarks 2024 (thehackettgroup.com) — world-class G&A at 1.1% of revenue vs median 1.8%; consolidation saves 20-30%",
+        "SEBI LODR compliance requirements — mandate on related-party transactions and procurement transparency for listed entities",
+        "INTERNAL_CALIBRATION — G&A consolidation savings from 4 NBFC and AMC procurement reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for G&A and Vendor Spend Consolidation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for PROF_SVCS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "payment_processing_optimisation",
+      "lever_name": "Payment Processing & Treasury Fee Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Payment Processing & Treasury Fee Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 16
+      },
+      "applicable_if": [
+        "category:FIN_SVCS present"
+      ],
+      "industry_sources": [
+        "RBI payment systems report 2023-24 — digital payment cost benchmarks for NBFCs",
+        "Hackett Group Treasury Benchmarks 2024 — bank and payment fee optimisation 8-15%",
+        "INTERNAL_CALIBRATION — NBFC treasury savings from 3 India NBFC finance mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Payment Processing & Treasury Fee Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FIN_SVCS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "NBFC Corporate Insurance Premium Optimisation",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.03,
+      "phasing_curve": [
+        0.6,
+        0.3,
+        0.1
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Insurance audit completed — coverage adequacy vs. over-insurance assessed by peril",
+        "Market submissions prepared for competitive renewal (3+ carriers benchmarked)",
+        "Risk management improvements documented as leverage for premium negotiation"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:INSURANCE present"
+      ],
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — corporate insurance competitive RFP savings 12-22%",
+        "SEBI LODR — D&O insurance disclosure requirements for listed NBFCs",
+        "INTERNAL_CALIBRATION — NBFC insurance savings from 2 India NBFC risk reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Ind AS 116 Lease Reclassification (Operating vs. Finance): validate baseline and stakeholders",
+          "owner_role": "Treasury",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Model supplier financial risk and term scenarios",
+          "owner_role": "Treasury / Procurement",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Negotiate term changes with top suppliers",
+          "owner_role": "Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Update ERP terms and monitor DPO/cash impact",
+          "owner_role": "AP Lead",
+          "duration_weeks": 2
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "DPO below sector benchmark with low supplier risk",
+          "evidence_source": "ap_aging",
+          "confirms": "Term extension is feasible"
+        }
+      ],
+      "required_data_fields": [
+        "AP aging by supplier",
+        "Payment terms master",
+        "Supplier credit/risk ratings"
+      ],
+      "applicability_threshold_pct": 0.02
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

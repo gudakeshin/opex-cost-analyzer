@@ -1,0 +1,7 @@
+Aarogya Health Network Ltd — Diagnostic URLs (synthetic/illustrative)
+
+1. Investor relations: https://www.aarogyahealth.example/investors
+2. NABH accreditation: https://www.nabh.co.example/hospitals/aarogya
+3. Annual report: https://www.aarogyahealth.example/ir/annual-report-fy25.pdf
+4. NSE: https://www.nseindia.example/get-quotes/equity?symbol=AAROGYAHN
+5. CRISIL health sector: https://www.crisil.example/reports/healthcare-india-fy25

@@ -38,7 +38,9 @@
     "lease_restructuring",
     "cost_governance",
     "bank_fee_optimization",
-    "p2p_o2c_automation"
+    "p2p_o2c_automation",
+    "brsr_reporting_efficiency",
+    "energy_procurement_optimization"
   ],
   "sector_specific_levers": [
     {
@@ -125,7 +127,8 @@
         "ERP/technology landscape across business units",
         "Chargeback/recharge model and inter-company billing data",
         "Location analysis for SSC hub (cost, talent, infrastructure)"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "group_procurement",
@@ -211,7 +214,8 @@
         "Existing contracts by BU with term and pricing details",
         "Demand forecast by category for next 12 months across group",
         "Specification alignment assessment for common categories"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "corporate_overhead_right_size",
@@ -302,7 +306,8 @@
         "Peer benchmark: corporate overhead % of revenue for listed conglomerates",
         "Group revenue and EBITDA trend (3 years)",
         "Org chart with span-of-control data by function"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "portfolio_rationalization",
@@ -387,7 +392,8 @@
         "WACC by business unit and group level",
         "Holding cost allocation (HQ charges, intercompany services) by business",
         "M&A market conditions and indicative valuation for exit candidates"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "group_insurance_pooling",
@@ -472,7 +478,8 @@
         "Broker arrangement and brokerage fee disclosure",
         "Benchmark premium rates for equivalent risk profiles from market survey",
         "Group risk register for key insured assets and liabilities"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "intercompany_pricing_optimization",
@@ -558,7 +565,8 @@
         "Comparable market benchmarks for each service/IP category",
         "Group structure chart with ownership percentages and jurisdictions",
         "Prior-year Form 3CEB and TP documentation"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     {
       "lever_id": "real_estate_portfolio_mgmt",
@@ -649,7 +657,8 @@
         "Headcount trend by location (3 years)",
         "Lease contracts with break-clause and expiry dates",
         "Sublease market rate benchmarks for key locations"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "group_treasury_netting",
@@ -735,7 +744,552 @@
         "FEMA and RBI compliance checklist for netting/pooling structures",
         "FX conversion costs by currency pair and BU",
         "Netting platform vendor options and integration requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
+    },
+    {
+      "lever_id": "shared_services_group",
+      "lever_name": "Group-Level Shared Services Centre",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 12.0,
+        "p50": 22.0,
+        "p90": 35.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Group-Level Shared Services Centre"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 26,
+        "p50": 30,
+        "p90": 38
+      },
+      "applicable_if": [
+        "category:IT present",
+        "category:PROF_SVCS present",
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "Hackett Group G&A Benchmarks 2024 (thehackettgroup.com) — world-class shared services: 25-35% G&A reduction vs. decentralised model",
+        "SEBI LODR — group entity governance and related-party frameworks enabling shared service arrangements",
+        "INTERNAL_CALIBRATION — group shared services savings calibrated from 3 India conglomerate G&A transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Group-Level Shared Services Centre: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 15
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "group_procurement_consolidation",
+      "lever_name": "Group Procurement Consolidation & Category Management",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 16.0,
+        "p90": 25.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Group Procurement Consolidation & Category Management"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:IT present",
+        "category:PROF_SVCS present",
+        "category:OUTSOURCED present",
+        "category:MARKETING present"
+      ],
+      "industry_sources": [
+        "M&M FY25 Annual Report (BSE 500520) — group procurement synergies cited for auto and farm equipment sourcing",
+        "Aditya Birla Group — group-level procurement arm consolidating spend across Hindalco, UltraTech, Grasim, Fashion & Lifestyle",
+        "INTERNAL_CALIBRATION — group procurement savings calibrated from 4 India conglomerate sourcing mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Group Procurement Consolidation & Category Management: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "portfolio_rationalisation",
+      "lever_name": "Portfolio Rationalisation & Sub-Optimal Business Exit",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 12.0,
+        "p90": 22.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "one_time",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Portfolio Rationalisation & Sub-Optimal Business Exit"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 36,
+        "p50": 40,
+        "p90": 48
+      },
+      "applicable_if": [
+        "category:PROF_SVCS present",
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "SEBI LODR — board-level portfolio review governance requirements for listed conglomerates",
+        "Tata Sons portfolio rationalization: Tata Steel Europe restructuring, Tata AIG stake management — published investor communications",
+        "INTERNAL_CALIBRATION — portfolio rationalisation savings from 2 India conglomerate strategic review mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Portfolio Rationalisation & Sub-Optimal Business Exit: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 20
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for PROF_SVCS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "treasury_working_capital",
+      "lever_name": "Group Treasury & Working Capital Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Group Treasury & Working Capital Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:HR present",
+        "category:FIN_SVCS present"
+      ],
+      "industry_sources": [
+        "SEBI RPT Regulations 2021 — inter-company loan frameworks and arm's-length pricing requirements",
+        "M&M FY25 Annual Report — treasury operations and inter-company financing structure detailed in RPT disclosures",
+        "INTERNAL_CALIBRATION — group treasury savings from 3 India conglomerate treasury transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Group Treasury & Working Capital Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FIN_SVCS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "real_estate_group_portfolio",
+      "lever_name": "Group Real Estate Portfolio Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 12.0,
+        "p90": 22.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "one_time",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Group Real Estate Portfolio Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 24,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:FACILITIES present"
+      ],
+      "industry_sources": [
+        "SEBI LODR — disclosure of significant real estate transactions and related-party property arrangements",
+        "Aditya Birla Group — surplus land monetisation from legacy manufacturing sites disclosed in annual reports",
+        "INTERNAL_CALIBRATION — group real estate monetisation from 2 India conglomerate property review mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Group Real Estate Portfolio Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FACILITIES",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "digital_group_platform",
+      "lever_name": "Group-Wide Digital Platform & IT Rationalisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "mixed",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Group-Wide Digital Platform & IT Rationalisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 32,
+        "p50": 36,
+        "p90": 44
+      },
+      "applicable_if": [
+        "category:IT present"
+      ],
+      "industry_sources": [
+        "Gartner G2000 IT Benchmark 2024 — group-level IT consolidation: 20-30% reduction in per-entity IT spend",
+        "Tata Consultancy Services (group IT arm) — Tata group companies' shared IT services model cited in TCS investor materials",
+        "INTERNAL_CALIBRATION — group IT rationalisation from 2 India conglomerate technology transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Group-Wide Digital Platform & IT Rationalisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 18
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for IT",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "brsr_esg_programme",
+      "lever_name": "Integrated ESG Programme & BRSR Compliance Efficiency",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Integrated ESG Programme & BRSR Compliance Efficiency"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:PROF_SVCS present",
+        "category:BRSR_ESG present"
+      ],
+      "industry_sources": [
+        "SEBI BRSR Core Circular 2023 (sebi.gov.in) — mandatory assured BRSR for top-1000 listed entities; integrated platform reduces per-entity assurance cost",
+        "M&M FY25 Annual Report — integrated sustainability reporting and CSR spend of ₹1,800 Cr disclosed with outcome metrics",
+        "INTERNAL_CALIBRATION — ESG programme efficiency savings from 2 India conglomerate sustainability mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Integrated ESG Programme & BRSR Compliance Efficiency: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for BRSR_ESG",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "group_energy_procurement",
+      "lever_name": "Group Energy Procurement & Industrial Utilities Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Group Energy Procurement & Industrial Utilities Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:POWER_ENERGY present"
+      ],
+      "industry_sources": [
+        "BEE PAT Scheme results (beeindia.gov.in) — designated consumers achieve 10-20% energy cost reduction",
+        "CEA Annual Report 2023-24 — industrial tariff and open-access benchmarks",
+        "INTERNAL_CALIBRATION — group energy procurement savings from 2 India conglomerate energy mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Group Energy Procurement & Industrial Utilities Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for POWER_ENERGY",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

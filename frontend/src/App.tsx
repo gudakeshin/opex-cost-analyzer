@@ -1,8 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ProcurementAnalysis } from './pages/ProcurementAnalysis';
 import { Diagnostic } from './pages/Diagnostic';
+import { Workbench } from './pages/Workbench';
 import CostRoom from './pages/CostRoom';
 import { SkillsManagement } from './pages/SkillsManagement';
+import { SectorPackStudio } from './pages/SectorPackStudio';
 import { SessionHistory } from './pages/SessionHistory';
 import { Benchmarks } from './pages/Benchmarks';
 import { Guidebook } from './pages/Guidebook';
@@ -10,6 +12,7 @@ import { EngagementDocuments } from './pages/EngagementDocuments';
 import { ExecutiveRouteGuard } from './components/Routing/ExecutiveRouteGuard';
 import { ErrorBoundary } from './components/Common/ErrorBoundary';
 import { useAudience } from './context/AudienceContext';
+import { NotFound } from './pages/NotFound';
 
 function HomeRoute() {
   const { isExecutive } = useAudience();
@@ -25,12 +28,15 @@ function App() {
           <Routes>
             <Route path="/" element={<HomeRoute />} />
             <Route path="/diagnostic" element={<Diagnostic />} />
+            <Route path="/workbench" element={<Workbench />} />
             <Route path="/cost-room" element={<CostRoom />} />
             <Route path="/skills" element={<SkillsManagement />} />
+            <Route path="/sector-packs" element={<SectorPackStudio />} />
             <Route path="/history" element={<SessionHistory />} />
             <Route path="/benchmarks" element={<Benchmarks />} />
             <Route path="/guidebook" element={<Guidebook />} />
             <Route path="/documents" element={<EngagementDocuments />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </ExecutiveRouteGuard>
       </Router>

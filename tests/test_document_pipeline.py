@@ -46,6 +46,57 @@ def test_process_txt_document(tmp_path, monkeypatch):
     assert "IT spend" in (result.get("text_preview") or "")
 
 
+def test_validate_upload_suffix_accepts_markdown():
+    assert validate_upload_suffix("research.md") == ".md"
+
+
+def test_process_md_document(tmp_path, monkeypatch):
+    monkeypatch.setattr("app.services.engagements_store.ENGAGEMENTS_DIR", tmp_path)
+    manifest = create_engagement_manifest(company_name="MD Test")
+    eid = manifest["engagement_id"]
+    doc_id = "00000000-0000-4000-8000-000000000097"
+    ddir = document_dir(eid, doc_id)
+    ddir.mkdir(parents=True)
+    (ddir / "raw.md").write_text("# Industry Context\nReduce telecom OpEx by 12%", encoding="utf-8")
+    add_document_record(
+        eid,
+        document_id=doc_id,
+        filename="industry.md",
+        content_type="text/markdown",
+        size_bytes=44,
+        raw_path=str(ddir / "raw.md"),
+    )
+    result = process_engagement_document(eid, doc_id, taxonomy=load_taxonomy())
+    assert result["status"] == "ready"
+    assert result["role"] == "context_doc"
+    assert "Industry Context" in (result.get("text_preview") or "")
+
+
+def test_ingest_markdown_document_is_picked_up_by_corpus(tmp_path, monkeypatch):
+    monkeypatch.setattr("app.services.engagements_store.ENGAGEMENTS_DIR", tmp_path)
+    from app.services.document_pipeline import ingest_markdown_document
+    from app.services.engagement_corpus import load_engagement_corpus
+
+    manifest = create_engagement_manifest(company_name="Corpus Test")
+    eid = manifest["engagement_id"]
+
+    doc_id = ingest_markdown_document(
+        eid,
+        "# Business Model\nSubscription revenue with high gross margin.",
+        "Deep Research — Corpus Test Industry & Business Context.md",
+    )
+
+    from app.services.engagements_store import get_document_record
+
+    record = get_document_record(eid, doc_id)
+    assert record["status"] == "ready"
+    assert record["role"] == "context_doc"
+
+    _, docs_text, _, _ = load_engagement_corpus(eid)
+    assert any("Business Model" in t for t in docs_text)
+    assert any("Subscription revenue" in t for t in docs_text)
+
+
 def test_process_pdf_fallback_without_llamaparse(tmp_path, monkeypatch):
     monkeypatch.setattr("app.services.engagements_store.ENGAGEMENTS_DIR", tmp_path)
     manifest = create_engagement_manifest()

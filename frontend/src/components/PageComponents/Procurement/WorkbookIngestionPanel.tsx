@@ -179,7 +179,7 @@ export const WorkbookIngestionPanel: React.FC<WorkbookIngestionPanelProps> = ({
         <CollapsibleOverflow maxLines={2} linePx={18} contentClassName="text-xs space-y-2">
           {graph.length > 0 && (
             <div>
-              <p className="text-[10px] font-semibold uppercase text-brand-muted mb-1">Sheet roles</p>
+              <p className="text-[11px] font-semibold uppercase text-brand-muted mb-1">Sheet roles</p>
               <ul className="space-y-1">
                 {graph.map((node) => (
                   <li key={node.sheet_name} className="flex justify-between gap-2 leading-snug">
@@ -194,11 +194,11 @@ export const WorkbookIngestionPanel: React.FC<WorkbookIngestionPanelProps> = ({
           {reports.map((rep, idx) => (
             <div key={rep.source_file ?? `report-${idx}`}>
               {rep.source_file && (
-                <p className="text-[10px] text-brand-muted mb-1">{rep.source_file}</p>
+                <p className="text-[11px] text-brand-muted mb-1">{rep.source_file}</p>
               )}
               {(rep.sheets_ingested?.length ?? 0) > 0 && (
                 <div className="mb-1">
-                  <p className="text-[10px] font-semibold uppercase text-emerald-800 mb-0.5">Ingested</p>
+                  <p className="text-[11px] font-semibold uppercase text-emerald-800 mb-0.5">Ingested</p>
                   <ul className="text-brand-ink space-y-0.5">
                     {rep.sheets_ingested!.map((s) => (
                       <li key={`${rep.source_file}-${s.sheet}`} className="leading-snug">
@@ -211,7 +211,7 @@ export const WorkbookIngestionPanel: React.FC<WorkbookIngestionPanelProps> = ({
               )}
               {(rep.sheets_skipped?.length ?? 0) > 0 && (
                 <div>
-                  <p className="text-[10px] font-semibold uppercase text-brand-muted mb-0.5">Skipped</p>
+                  <p className="text-[11px] font-semibold uppercase text-brand-muted mb-0.5">Skipped</p>
                   <ul className="text-brand-muted space-y-0.5">
                     {rep.sheets_skipped!.map((s) => (
                       <li key={`${rep.source_file}-skip-${s.sheet}`} className="leading-snug">
@@ -226,7 +226,7 @@ export const WorkbookIngestionPanel: React.FC<WorkbookIngestionPanelProps> = ({
 
           {!hasIngestionSheets && spendFiles.length > 0 && (
             <div>
-              <p className="text-[10px] font-semibold uppercase text-brand-muted mb-1">
+              <p className="text-[11px] font-semibold uppercase text-brand-muted mb-1">
                 Uploaded workbooks
               </p>
               <ul className="space-y-1">

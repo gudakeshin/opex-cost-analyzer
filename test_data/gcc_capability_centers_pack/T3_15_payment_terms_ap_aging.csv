@@ -1,0 +1,6 @@
+vendor,payment_terms_days,invoice_date,payment_date,amount,currency,aging_bucket
+Embassy Office Parks,45,2025-01-10,2025-02-26,425000000,INR,0-30
+RMZ Corp,60,2025-01-05,2025-03-10,170000000,INR,31-60
+Microsoft India,30,2025-01-18,2025-02-15,145000000,INR,61-90
+AWS India,30,2025-01-20,2025-02-18,105000000,INR,0-30
+TeamLease Digital,7,2025-01-01,2025-01-07,80000000,INR,31-60

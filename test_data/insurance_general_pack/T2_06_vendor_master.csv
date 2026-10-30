@@ -1,0 +1,11 @@
+vendor,vendor_category,gstin,vendor_pan,msme_flag,spend_category,legal_entity,related_party
+GIC Re,large,27AABCG1234R1Z2,AABCG1234R,no,Reinsurance,PGIL-IN,no
+Munich Re India,large,,,no,Reinsurance,PGIL-RE,no
+Bajaj Alliance Partner,large,27AABCB8821A1Z5,AABCB8821A,no,Distribution & Agency,PGIL-IN,no
+PolicyBazaar,large,29AABCP9921B1Z8,AABCP9921B,no,Distribution & Agency,PGIL-IN,no
+TCS Insurance,large,27AABCT3518Q1Z6,AABCT3518Q,no,IT & Policy Admin,PGIL-IN,no
+Xceltrait,large,27AABCX4421C1Z1,AABCX4421C,no,Claims Processing & Management,PGIL-IN,no
+Innovative Claims,msme,27AABCI5521C1Z4,AABCI5521C,yes,Claims Processing & Management,PGIL-IN,no
+Ogilvy India,large,27AABCO4521L1Z3,AABCO4521L,no,Marketing & Brand,PGIL-IN,no
+IBM India,large,29AABCI5553A1ZB,AABCI5553A,no,IT & Policy Admin,PGIL-IN,no
+EY India,large,27AABCE5521Y1Z0,AABCE5521Y,no,Compliance & Actuarial,PGIL-IN,no

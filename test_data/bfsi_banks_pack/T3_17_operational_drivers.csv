@@ -1,0 +1,7 @@
+metric,business_unit,value,unit
+Cost-to-Income ratio,Retail Banking,42.8,percent
+Cost-to-Income ratio,Corporate Banking,38.4,percent
+ATM uptime,Retail Banking,98.2,percent
+Digital transaction share,Digital Banking,76.5,percent
+Branch footfall daily avg,Retail Banking,1240,count
+Net NPA,Corporate Banking,1.82,percent

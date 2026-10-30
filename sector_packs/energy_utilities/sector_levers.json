@@ -7,8 +7,14 @@
       "lever_id": "renewable_transition",
       "lever_name": "Renewable Energy Portfolio Expansion",
       "description": "Accelerate shift from thermal to renewable generation (solar, wind, hydro); reduce variable fuel cost exposure; lock in long-term PPA rates.",
-      "category_ids": ["POWER_ENERGY", "OUTSOURCED"],
-      "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 22.0,
+      "category_ids": [
+        "POWER_ENERGY",
+        "OUTSOURCED",
+        "renewable_ppa_costs"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 12.0,
+      "p90_pct": 22.0,
       "implementation_weeks": 104,
       "brsr_principle": "P2",
       "savings_type": "run_rate",
@@ -16,14 +22,25 @@
         "CEA Annual Report 2023-24 (cea.nic.in) — RE generation cost ₹2.5-3.5/kWh vs thermal ₹4-6/kWh; fuel cost elimination on renewables",
         "NTPC FY25 Annual Report (BSE 532555) — NTPC Green Energy expansion: target 60 GW RE by 2032; cost competitiveness vs. coal-based",
         "INTERNAL_CALIBRATION — renewable transition savings from 3 India utility energy procurement mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 78,
+        "p50": 104,
+        "p90": 130
+      }
     },
     {
       "lever_id": "plant_load_factor_improvement",
       "lever_name": "Thermal Plant Efficiency & PLF Improvement",
       "description": "Improve plant load factor through better O&M practices, predictive maintenance, and startup/shutdown optimisation. Reduce heat rate (fuel consumption per kWh).",
-      "category_ids": ["PLANT_MAINTENANCE", "HR"],
-      "p10_pct": 5.0, "p50_pct": 10.0, "p90_pct": 18.0,
+      "category_ids": [
+        "PLANT_MAINTENANCE",
+        "HR",
+        "o_and_m_plant"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
       "implementation_weeks": 20,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -31,14 +48,24 @@
         "CEA Annual Report 2023-24 — heat rate benchmarks: NTPC fleet 2,200-2,400 kcal/kWh; best units at 2,100 kcal/kWh. Each 100 kcal/kWh improvement saves ₹0.1-0.15/kWh in fuel",
         "NTPC FY25 Annual Report — PLF improvement from 70% to 80% increases revenue 14% with same fixed cost base",
         "INTERNAL_CALIBRATION — PLF improvement savings from 2 India thermal generation efficiency mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "procurement_fuel_optimisation",
       "lever_name": "Fuel Procurement & Supply Chain Optimisation",
       "description": "Diversify coal/fuel sources; optimise blending (imported + domestic); renegotiate long-term fuel supply agreements; reduce fuel inventory carrying cost.",
-      "category_ids": ["OUTSOURCED"],
-      "p10_pct": 3.0, "p50_pct": 6.0, "p90_pct": 12.0,
+      "category_ids": [
+        "OUTSOURCED",
+        "fuel_cost"
+      ],
+      "p10_pct": 3.0,
+      "p50_pct": 6.0,
+      "p90_pct": 12.0,
       "implementation_weeks": 12,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -46,14 +73,25 @@
         "MoPNG Coal India annual data (coalindia.in) — domestic coal price vs. imported; blending economics disclosed in NTPC fuel cost notes",
         "NTPC FY25 Annual Report — fuel procurement strategy: coal supply from CIL + ECT; imported coal blending for coastal plants",
         "INTERNAL_CALIBRATION — fuel procurement savings from 3 India power generation procurement mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
     },
     {
       "lever_id": "at_c_loss_reduction",
       "lever_name": "AT&C Loss Reduction (Distribution Companies)",
       "description": "Deploy smart metering (RDSS scheme), aerial bundled cables in high-loss feeders, GIS mapping of network, consumer indexing, and feeder separation to reduce technical and commercial losses.",
-      "category_ids": ["OUTSOURCED", "IT"],
-      "p10_pct": 10.0, "p50_pct": 20.0, "p90_pct": 35.0,
+      "category_ids": [
+        "OUTSOURCED",
+        "IT",
+        "at_and_c_losses"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 20.0,
+      "p90_pct": 35.0,
       "implementation_weeks": 40,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -61,14 +99,24 @@
         "MoPNG/MoP RDSS (Revamped Distribution Sector Scheme) 2021 — ₹3 Lakh Cr investment to reduce AT&C losses to <12-15% nationally",
         "CEA Annual Report 2023-24 — best-performing DISCOMs (Gujarat, Maharashtra) at 10-12% AT&C losses vs national average 17-18%",
         "INTERNAL_CALIBRATION — AT&C loss reduction savings from 2 India DISCOM transformation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 30,
+        "p50": 40,
+        "p90": 50
+      }
     },
     {
       "lever_id": "contract_workforce_optimisation",
       "lever_name": "Contract & Outsourced Services Optimisation",
       "description": "Consolidate operations & maintenance contracts; implement performance-based contracts; renegotiate AMC agreements for balance of plant equipment.",
-      "category_ids": ["OUTSOURCED", "HR"],
-      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "category_ids": [
+        "OUTSOURCED",
+        "HR"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
       "implementation_weeks": 12,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -76,14 +124,25 @@
         "NTPC FY25 Annual Report — O&M contracts and outsourced services detailed in significant accounting policies",
         "CEA 2023-24 — O&M cost benchmarks for thermal generation ₹14-18 Lakh/MW/year; best-practice at ₹10-12 Lakh/MW",
         "INTERNAL_CALIBRATION — O&M contract savings from 3 India utility operations mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
     },
     {
       "lever_id": "scada_digital_grid",
       "lever_name": "SCADA, Smart Grid & Digital Operations",
       "description": "Deploy SCADA upgrades, IoT sensors for equipment health monitoring, AI-based predictive maintenance, and digital control rooms to reduce unplanned outages.",
-      "category_ids": ["IT", "PLANT_MAINTENANCE"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "category_ids": [
+        "IT",
+        "PLANT_MAINTENANCE",
+        "smart_metering_ops"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 25.0,
       "implementation_weeks": 30,
       "brsr_principle": "P6",
       "savings_type": "mixed",
@@ -91,7 +150,385 @@
         "MoPNG Smart Grid programme (mnre.gov.in) — RDSS scheme mandate: smart meters, SCADA for all feeders by 2025",
         "Gartner Utilities IT 2024 — IoT-based predictive maintenance reduces unplanned outage cost 20-35%",
         "INTERNAL_CALIBRATION — digital grid savings from 2 India utility technology transformation mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 22,
+        "p50": 30,
+        "p90": 37
+      }
+    },
+    {
+      "lever_id": "brsr_reporting_efficiency",
+      "lever_name": "BRSR / ESG Reporting & Assurance Efficiency",
+      "description": "Integrate ESG data platform for generation and distribution utilities; consolidate assurance for BRSR Core KPIs.",
+      "category_ids": [
+        "BRSR_ESG",
+        "carbon_compliance",
+        "ash_water_environment"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "SEBI BRSR Core Circular Jul 2023 (sebi.gov.in) — integrated reporting reduces per-entity assurance cost",
+        "NTPC FY25 Annual Report — sustainability reporting and ESG disclosures",
+        "INTERNAL_CALIBRATION — utility ESG reporting efficiency savings from 2 India power sector mandates"
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "Plant & Asset Insurance Premium Optimisation",
+      "description": "Competitive RFP for thermal plant, transmission, and asset insurance; optimise coverage vs risk retention.",
+      "category_ids": [
+        "INSURANCE"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 16.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — industrial asset insurance market benchmarks",
+        "Marsh Global Risk Report 2024 — power sector insurance RFP savings 8-15%",
+        "INTERNAL_CALIBRATION — utility insurance savings from 2 India power sector risk reviews"
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
+    },
+    {
+      "lever_id": "utility_advisory_governance",
+      "lever_name": "Regulatory, Legal & Advisory Spend Governance",
+      "description": "Cap external legal and regulatory advisory; panel-firm governance for CERC/SEBI compliance consulting.",
+      "category_ids": [
+        "PROF_SVCS",
+        "regulatory_tariff_filings"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 8.0,
+      "p90_pct": 14.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CERC regulatory framework — tariff and compliance advisory cost benchmarks",
+        "Hackett Group G&A Benchmarks 2024 — advisory spend governance 10-18% savings",
+        "INTERNAL_CALIBRATION — utility advisory governance savings from 2 India power sector mandates"
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
+    },
+    {
+      "lever_id": "fuel_mix_optimisation",
+      "lever_name": "Fuel Mix & Generation Cost Optimisation",
+      "description": "Optimise coal/gas blending, inventory levels, and fuel supply contracts to reduce variable generation cost per kWh.",
+      "category_ids": [
+        "FUEL_GENERATION",
+        "fuel_cost"
+      ],
+      "p10_pct": 3.0,
+      "p50_pct": 6.0,
+      "p90_pct": 12.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CEA Annual Report 2023-24 — fuel cost benchmarks and heat rate data for thermal plants",
+        "NTPC FY25 Annual Report — fuel procurement and blending strategy disclosures",
+        "INTERNAL_CALIBRATION — fuel mix optimisation savings from 3 India generation procurement mandates"
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
+    },
+    {
+      "lever_id": "grid_maintenance_predictive",
+      "lever_name": "Grid Maintenance & Predictive O&M",
+      "description": "Deploy predictive maintenance for transmission and distribution assets; consolidate AMC contracts; reduce emergency repair cost.",
+      "category_ids": [
+        "GRID_MAINTENANCE"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "MoP RDSS scheme — grid modernisation and maintenance benchmarks for DISCOMs",
+        "Gartner Utilities IT 2024 — predictive maintenance reduces unplanned outage cost 20-35%",
+        "INTERNAL_CALIBRATION — grid maintenance savings from 2 India DISCOM O&M mandates"
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
+    },
+    {
+      "lever_id": "utility_facilities_right_size",
+      "lever_name": "Utility Facilities & Office Footprint Right-Sizing",
+      "description": "Rationalise regional offices, substation support facilities, and corporate HQ footprint; renegotiate leases.",
+      "category_ids": [
+        "FACILITIES"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 8.0,
+      "p90_pct": 14.0,
+      "implementation_weeks": 14,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NTPC FY25 Annual Report — facilities and establishment cost disclosures",
+        "Hackett Group G&A Benchmarks 2024 — facilities right-sizing 10-18% savings",
+        "INTERNAL_CALIBRATION — utility facilities savings from 2 India power sector mandates"
+      ],
+      "effort_weeks": {
+        "p10": 10,
+        "p50": 14,
+        "p90": 17
+      }
+    },
+    {
+      "lever_id": "atc_loss_reduction",
+      "lever_name": "AT&C / T&D Loss Reduction Programme",
+      "description": "Deploy smart metering, feeder separation, and theft detection to reduce technical and commercial T&D losses.",
+      "category_ids": [
+        "T&D_LOSSES",
+        "at_and_c_losses"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 25.0,
+      "implementation_weeks": 40,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "MoP RDSS (Revamped Distribution Sector Scheme) 2021 — ₹3 Lakh Cr investment to reduce AT&C losses to <12-15%",
+        "CEA Annual Report 2023-24 — best-performing DISCOMs at 10-12% AT&C losses vs national average 17-18%",
+        "INTERNAL_CALIBRATION — T&D loss reduction savings from 2 India DISCOM transformation mandates"
+      ],
+      "effort_weeks": {
+        "p10": 30,
+        "p50": 40,
+        "p90": 50
+      }
+    },
+    {
+      "lever_id": "predictive_maintenance",
+      "lever_name": "Predictive / Condition-Based Maintenance",
+      "description": "Deploy condition-based monitoring on critical rotating equipment to convert breakdown and time-based maintenance into predictive interventions.",
+      "category_ids": [
+        "PLANT_MAINTENANCE",
+        "o_and_m_plant"
+      ],
+      "p10_pct": 18.0,
+      "p50_pct": 26.0,
+      "p90_pct": 34.0,
+      "implementation_weeks": 40,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
+        "Deloitte — Real Estate Predictions 2025 (deloitte.com/insights/real-estate)"
+      ],
+      "effort_weeks": {
+        "p10": 30,
+        "p50": 40,
+        "p90": 50
+      }
+    },
+    {
+      "lever_id": "energy_loss_reduction",
+      "lever_name": "AT&C / Technical Distribution Loss Reduction",
+      "description": "Reduce AT&C losses through feeder metering, theft analytics, and targeted network refurbishment in high-loss zones.",
+      "category_ids": [
+        "POWER_ENERGY",
+        "at_and_c_losses",
+        "grid_wheeling_charges"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
+      "implementation_weeks": 36,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "DPE — Survey of CPSEs 2023-24 (dpe.gov.in/reports/annual-report)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "effort_weeks": {
+        "p10": 27,
+        "p50": 36,
+        "p90": 45
+      }
+    },
+    {
+      "lever_id": "fuel_procurement_optimization",
+      "lever_name": "Fuel / Energy Procurement Optimisation",
+      "description": "Optimise coal/gas linkage mix, e-auction participation, and blending strategies; renegotiate transport contracts to lower landed fuel cost.",
+      "category_ids": [
+        "POWER_ENERGY",
+        "fuel_cost"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 7.0,
+      "p90_pct": 12.0,
+      "implementation_weeks": 18,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "Atradius — Payment Practices Barometer Asia-Pacific 2024 (atradius.us/knowledge-and-research/reports/payment-practices-barometer-asia-pacific.html)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "effort_weeks": {
+        "p10": 13,
+        "p50": 18,
+        "p90": 22
+      }
+    },
+    {
+      "lever_id": "workforce_scheduling",
+      "lever_name": "Field Workforce Scheduling & Route Optimisation",
+      "description": "Optimise field crew scheduling and dispatch with demand-based rostering and mobile workforce management tools.",
+      "category_ids": [
+        "HR",
+        "safety_hse_ops"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 16.0,
+      "p90_pct": 24.0,
+      "implementation_weeks": 22,
+      "brsr_principle": "P3",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "effort_weeks": {
+        "p10": 16,
+        "p50": 22,
+        "p90": 27
+      }
+    },
+    {
+      "lever_id": "grid_modernization",
+      "lever_name": "Grid / Network Modernisation (OPEX Reduction Component)",
+      "description": "Deploy smart meters, SCADA/ADMS upgrades, and self-healing feeder automation to cut outage response and manual operations cost.",
+      "category_ids": [
+        "POWER_ENERGY",
+        "smart_metering_ops"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 18.0,
+      "p90_pct": 28.0,
+      "implementation_weeks": 80,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "DPE — Survey of CPSEs 2023-24 (dpe.gov.in/reports/annual-report)",
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)"
+      ],
+      "effort_weeks": {
+        "p10": 60,
+        "p50": 80,
+        "p90": 100
+      }
+    },
+    {
+      "lever_id": "renewable_energy_transition",
+      "lever_name": "Renewable Energy Procurement / Captive Solar",
+      "description": "Contract round-the-clock renewable PPAs and group captive solar/wind to displace costlier grid and fossil generation.",
+      "category_ids": [
+        "POWER_ENERGY",
+        "renewable_ppa_costs"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 22.0,
+      "p90_pct": 32.0,
+      "implementation_weeks": 44,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "FinOps Foundation — State of FinOps 2025 (data.finops.org/2025-report/)",
+        "McKinsey & Company — Why Zero-Based Budgeting Makes Sense Again (mckinsey.com/capabilities/operations/our-insights/why-zero-based-budgeting-makes-sense-again)"
+      ],
+      "effort_weeks": {
+        "p10": 33,
+        "p50": 44,
+        "p90": 55
+      }
+    },
+    {
+      "lever_id": "outsourced_operations",
+      "lever_name": "O&M Contract Outsourcing (Distribution / Generation)",
+      "description": "Rebid O&M and outsourced field operations with output-based SLAs and benchmarked unit rates; insource where scale justifies.",
+      "category_ids": [
+        "OUTSOURCED",
+        "o_and_m_plant"
+      ],
+      "p10_pct": 15.0,
+      "p50_pct": 25.0,
+      "p90_pct": 36.0,
+      "implementation_weeks": 52,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "DPE — Survey of CPSEs 2023-24 (dpe.gov.in/reports/annual-report)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "effort_weeks": {
+        "p10": 39,
+        "p50": 52,
+        "p90": 65
+      }
+    },
+    {
+      "lever_id": "material_inventory_optimization",
+      "lever_name": "MRO Material & Spares Inventory Optimisation",
+      "description": "Optimise spares and consumables inventory with criticality-based min/max norms, obsolete stock disposal, and vendor-managed inventory for fast movers.",
+      "category_ids": [
+        "PLANT_MAINTENANCE"
+      ],
+      "p10_pct": 7.0,
+      "p50_pct": 12.0,
+      "p90_pct": 18.0,
+      "implementation_weeks": 22,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "CEA — Annual Report 2023-24 (cea.nic.in/annual-report/)",
+        "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/)",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "effort_weeks": {
+        "p10": 16,
+        "p50": 22,
+        "p90": 27
+      }
     }
   ]
 }

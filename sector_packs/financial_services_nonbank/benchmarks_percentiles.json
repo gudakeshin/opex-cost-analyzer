@@ -1,7 +1,7 @@
 {
   "sector": "financial_services_nonbank",
   "version": "1.0",
-  "vintage_date": "2025-04-01",
+  "vintage_date": "2026-05-01",
   "confidence_overall": "public_disclosure",
   "source_metadata": {
     "primary_sources": [
@@ -49,52 +49,166 @@
       "label": "Non-Bank Financial Services (NBFC, AMC, Fintech — India)",
       "categories": {
         "HR": {
-          "P25": 10.0, "P50": 16.0, "P75": 22.0, "P90": 30.0,
+          "P25": 10.0,
+          "P50": 16.0,
+          "P75": 22.0,
+          "P90": 30.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Staff cost % of total income. HDFC AMC FY25: 13.9%, Bajaj Finance FY25: ~15% of total income, mid-tier NBFCs: 18-25%. AMCs lower (asset-light); retail NBFCs higher due to field staff."
         },
         "IT": {
-          "P25": 2.0, "P50": 3.5, "P75": 5.5, "P90": 8.0,
+          "P25": 2.0,
+          "P50": 3.5,
+          "P75": 5.5,
+          "P90": 8.0,
           "unit": "% of revenue",
           "confidence": "published_research",
           "source_note": "Technology spend. Gartner FS Benchmark 2024: fintech-adjacent NBFCs spend 5-8% of revenue on tech. Traditional NBFCs 2-4%. AMCs at low end (outsource to RTAs)."
         },
         "MARKETING": {
-          "P25": 2.0, "P50": 4.0, "P75": 7.0, "P90": 11.0,
+          "P25": 2.0,
+          "P50": 4.0,
+          "P75": 7.0,
+          "P90": 11.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Sales & distribution, brand, customer acquisition. AMCs: ~1-2% (distributor commissions separate). Retail NBFCs: 5-9% for DSA, lead generation. Fintechs: 8-14%."
         },
         "PROF_SVCS": {
-          "P25": 0.8, "P50": 1.8, "P75": 3.0, "P90": 4.5,
+          "P25": 0.8,
+          "P50": 1.8,
+          "P75": 3.0,
+          "P90": 4.5,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Legal, audit, compliance advisory, actuarial. SEBI-mandated compliance costs + audit + legal for listed NBFCs and AMCs."
         },
         "FACILITIES": {
-          "P25": 0.5, "P50": 1.2, "P75": 2.0, "P90": 3.2,
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.0,
+          "P90": 3.2,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Rent + property. Asset-light NBFCs (AMCs, fintechs) low; retail NBFCs with branch networks higher. Bajaj Finance: ~1.5% of total income."
         },
         "OUTSOURCED": {
-          "P25": 2.0, "P50": 4.5, "P75": 7.0, "P90": 10.0,
+          "P25": 2.0,
+          "P50": 4.5,
+          "P75": 7.0,
+          "P90": 10.0,
           "unit": "% of revenue",
           "confidence": "published_research",
           "source_note": "Business process outsourcing: collections agencies, KYC, credit bureau API costs. RBI NBFC: outsourced collections common for retail lending NBFCs."
         },
         "FIN_SVCS": {
-          "P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5,
+          "P25": 0.3,
+          "P50": 0.8,
+          "P75": 1.5,
+          "P90": 2.5,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Bank charges, custodian fees, clearing costs. HDFC AMC: custodian and RTA fees included in administrative expenses."
         },
         "INSURANCE": {
-          "P25": 0.2, "P50": 0.5, "P75": 0.9, "P90": 1.5,
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 0.9,
+          "P90": 1.5,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "D&O, professional indemnity, group health. INTERNAL_CALIBRATION — calibrated from NBFC compliance and insurance cost surveys."
+        },
+        "origination_collections": {
+          "P25": 3.0,
+          "P50": 6.0,
+          "P75": 10.0,
+          "P90": 15.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Loan origination, credit ops, and field collections cost for NBFC books."
+        },
+        "fund_admin": {
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 1.8,
+          "P90": 3.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Fund accounting, RTA, custody, and audit fees for AMC/fund structures."
+        },
+        "regulatory_filings": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 0.9,
+          "P90": 1.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "SEBI/RBI/IRDAI filings, inspections readiness, and regulatory counsel."
+        },
+        "brokerage_clearing": {
+          "P25": 1.0,
+          "P50": 2.5,
+          "P75": 4.5,
+          "P90": 7.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Exchange transaction charges, clearing fees, and settlement costs for broking flows."
+        },
+        "credit_bureau": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 1.8,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Bureau pulls, alternate-data scores, and monitoring refreshes per origination volume."
+        },
+        "aum_distribution_commissions": {
+          "P25": 5.0,
+          "P50": 10.0,
+          "P75": 18.0,
+          "P90": 28.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Trail commissions to distributors; AMFI disclosure — direct vs regular plan mix dependent."
+        },
+        "technology_market_data": {
+          "P25": 1.0,
+          "P50": 2.0,
+          "P75": 3.5,
+          "P90": 5.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Bloomberg/Refinitiv terminals, exchange data feeds, and research platforms."
+        },
+        "kyc_onboarding_costs": {
+          "P25": 0.5,
+          "P50": 1.0,
+          "P75": 2.0,
+          "P90": 3.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "CKYC/video-KYC, document verification, and onboarding journey costs."
+        },
+        "grievance_servicing_ops": {
+          "P25": 0.3,
+          "P50": 0.7,
+          "P75": 1.2,
+          "P90": 2.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Service desks, SEBI SCORES/RBI ombudsman handling, and statement operations."
+        },
+        "treasury_borrowing_ops": {
+          "P25": 0.3,
+          "P50": 0.6,
+          "P75": 1.1,
+          "P90": 1.8,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Treasury team, rating fees, debenture trustee, and issuance administration (excl. interest)."
         }
       }
     }

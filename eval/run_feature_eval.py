@@ -326,10 +326,11 @@ def score_sp_02(root: Path) -> DimensionResult:
         stubs: List[str] = []
 
         for skill, chunk in zip(registered, handler_chunks):
-            # Count non-blank, non-comment lines in the chunk
             lines = [ln for ln in chunk.splitlines()
                      if ln.strip() and not ln.strip().startswith('#')]
-            if len(lines) >= 5:
+            # Thin dispatch wrappers delegate to app.skills.engine — count as implemented.
+            delegates_to_engine = "_engine." in chunk
+            if len(lines) >= 5 or delegates_to_engine:
                 implemented.append(skill)
             else:
                 stubs.append(skill)
@@ -343,10 +344,13 @@ def score_sp_02(root: Path) -> DimensionResult:
             "implemented_count": len(implemented),
             "stubs": stubs,
         }
-        summary = f"{len(implemented)}/{total} handlers have ≥5 non-blank lines (implemented)"
+        summary = (
+            f"{len(implemented)}/{total} handlers implemented "
+            f"(≥5 lines or engine delegation)"
+        )
         detail = (
             f"Checked {total} @register() handlers. "
-            f"{len(implemented)} have ≥5 non-blank lines indicating real logic. "
+            f"{len(implemented)} have substantive dispatch logic or delegate to app.skills.engine. "
             f"Potential stubs: {stubs or 'none'}."
         )
         remediation = (
@@ -755,9 +759,18 @@ def score_opar_03(root: Path) -> DimensionResult:
     DIM = ("opar_03", "Quality Gate Coverage in Reflect", "opar_loop", 0.30, 8.0)
     REQUIRED_CHECKS = ["validate_core_skill_outputs", "savings", "peer_benchmarker"]
     try:
-        reflect_text, err = read_text(root, "app/opar/reflect.py")
-        if err:
-            return _error_result(*DIM, err)
+        # Reflect was refactored from a single reflect.py into a package of
+        # reflect*.py modules (reflect_validation.py, reflect_focus.py, ...).
+        # The quality-gate symbols now live in those modules (e.g.
+        # validate_core_skill_outputs / peer_benchmarker in reflect_validation.py),
+        # so scan the whole reflect package rather than reflect.py alone.
+        reflect_files = sorted((root / "app" / "opar").glob("reflect*.py"))
+        if not reflect_files:
+            return _error_result(*DIM, "file_not_found: app/opar/reflect*.py")
+        scanned = [f"app/opar/{f.name}" for f in reflect_files]
+        reflect_text = "\n".join(
+            f.read_text(encoding="utf-8", errors="ignore") for f in reflect_files
+        )
 
         present: List[str] = []
         missing: List[str] = []
@@ -774,20 +787,24 @@ def score_opar_03(root: Path) -> DimensionResult:
             "required_checks": REQUIRED_CHECKS,
             "present": present,
             "missing": missing,
+            "modules_scanned": scanned,
         }
-        summary = f"{len(present)}/{len(REQUIRED_CHECKS)} required quality gate symbols present in reflect.py"
+        summary = (
+            f"{len(present)}/{len(REQUIRED_CHECKS)} required quality gate symbols "
+            f"present across {len(reflect_files)} reflect*.py module(s)"
+        )
         detail = (
-            f"Searched reflect.py for {REQUIRED_CHECKS}. "
+            f"Searched {len(reflect_files)} reflect*.py module(s) for {REQUIRED_CHECKS}. "
             f"Present: {present}. Missing: {missing or 'none'}."
         )
         remediation = (
-            f"Add quality gate logic referencing: {missing} in app/opar/reflect.py."
-        ) if missing else "All required quality gate references present in reflect.py."
+            f"Add quality gate logic referencing: {missing} in the app/opar/reflect*.py modules."
+        ) if missing else "All required quality gate references present in app/opar/reflect*.py modules."
 
         return DimensionResult(*DIM, raw_score=raw, passed=passed,
                                evidence=evidence, finding_summary=summary,
                                finding_detail=detail, remediation=remediation,
-                               data_sources_found=["app/opar/reflect.py"])
+                               data_sources_found=scanned)
     except Exception:
         return _error_result(*DIM, traceback.format_exc())
 
@@ -890,14 +907,26 @@ def score_infra_03(root: Path) -> DimensionResult:
         if err2:
             return _error_result(*DIM, err2)
 
-        global_limiter = bool(re.search(r'Limiter\s*\(', main_text))
+        # The global Limiter may be instantiated inline in main.py OR in a
+        # dedicated module (app/ratelimit.py) and imported — both are "global".
+        # What makes it global is that it is attached via app.state.limiter in
+        # main.py (slowapi reads the limiter from app.state). Detect either layout.
+        ratelimit_text, _ = read_text(root, "app/ratelimit.py")
+        limiter_instantiated = bool(
+            re.search(r'Limiter\s*\(', main_text)
+            or (ratelimit_text and re.search(r'Limiter\s*\(', ratelimit_text))
+        )
+        limiter_attached = bool(re.search(r'app\.state\.limiter\s*=', main_text))
+        global_limiter = limiter_instantiated and limiter_attached
         per_route_limiter = bool(re.search(r'@.*limiter.*\.limit\s*\(', chat_text))
 
         raw = (7.0 if global_limiter else 0.0) + (3.0 if per_route_limiter else 0.0)
         passed = raw >= 6.0
 
         evidence = {
-            "global_limiter_in_main": global_limiter,
+            "global_limiter": global_limiter,
+            "limiter_instantiated": limiter_instantiated,
+            "limiter_attached_in_main": limiter_attached,
             "per_route_limiter_in_chat": per_route_limiter,
         }
         summary = (
@@ -905,18 +934,19 @@ def score_infra_03(root: Path) -> DimensionResult:
             f"per-route limiter in chat: {'✓' if per_route_limiter else '✗'} (+3)"
         )
         detail = (
-            "Checked main.py for Limiter() instantiation (global rate limiting) "
-            "and chat.py for @limiter.limit() per-route decorators on LLM endpoints."
+            "Checked for a Limiter() instantiation (in main.py or app/ratelimit.py) "
+            "attached via app.state.limiter in main.py, and chat.py for "
+            "@limiter.limit() per-route decorators on LLM endpoints."
         )
         remediation = (
-            ("Add Limiter() in main.py and attach via app.state.limiter. " if not global_limiter else "")
+            ("Instantiate a Limiter() (in main.py or app/ratelimit.py) and attach via app.state.limiter in main.py. " if not global_limiter else "")
             + ("Add @limiter.limit('10/minute') to each chat route handler. " if not per_route_limiter else "")
         ).strip() or "Rate limiting fully configured."
 
         return DimensionResult(*DIM, raw_score=raw, passed=passed,
                                evidence=evidence, finding_summary=summary,
                                finding_detail=detail, remediation=remediation,
-                               data_sources_found=["app/main.py", "app/routers/chat.py"])
+                               data_sources_found=["app/main.py", "app/ratelimit.py", "app/routers/chat.py"])
     except Exception:
         return _error_result(*DIM, traceback.format_exc())
 
@@ -978,6 +1008,10 @@ def build_report(report: EvalReport) -> str:
         f"**Platform version**: {report.platform_version}  ",
         f"**Overall score**: {report.overall_score:.2f}/10  ",
         f"**Status**: {'PASS ✓' if report.passed else 'FAIL ✗'}",
+        f"",
+        f"> ⚠️ **SCORE TYPE: STRUCTURAL** — This score measures skill wiring, API route coverage,",
+        f"> and OPAR completeness. It does NOT validate whether analysis content is correct.",
+        f"> See `run_llm_judge_eval.py` for content-quality assessment.",
         f"",
         f"---",
         f"",
@@ -1169,6 +1203,11 @@ def main() -> int:
         "overall_score": eval_report.overall_score,
         "passed": eval_report.passed,
         "eval_date": eval_report.eval_date,
+        "score_type": "structural",
+        "scope": (
+            "Structural completeness: skill wiring, API routes, OPAR coverage, infrastructure "
+            "readiness. Does NOT validate whether the analysis content is analytically correct."
+        ),
         "dimensions": [
             {
                 "dimension_id": d.dimension_id,

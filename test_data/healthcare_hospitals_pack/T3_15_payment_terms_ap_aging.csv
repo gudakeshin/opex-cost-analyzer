@@ -1,0 +1,6 @@
+vendor,payment_terms_days,invoice_date,payment_date,amount,currency,aging_bucket
+Siemens Healthineers,45,2025-01-10,2025-02-26,145000000,INR,0-30
+GE Healthcare India,60,2025-01-05,2025-03-10,105000000,INR,31-60
+3M India,30,2025-01-18,2025-02-15,230000000,INR,61-90
+Johnson & Johnson India,30,2025-01-20,2025-02-18,195000000,INR,0-30
+ISS Facility Services,7,2025-01-01,2025-01-07,95000000,INR,31-60

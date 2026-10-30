@@ -25,8 +25,8 @@ export async function apiGet<T>(url: string): Promise<T> {
   return data;
 }
 
-export async function apiPost<T>(url: string, body?: unknown): Promise<T> {
-  const { data } = await client.post<T>(url, body);
+export async function apiPost<T>(url: string, body?: unknown, signal?: AbortSignal): Promise<T> {
+  const { data } = await client.post<T>(url, body, signal ? { signal } : undefined);
   return data;
 }
 
@@ -56,3 +56,67 @@ export async function apiUpload<T>(
 }
 
 export { client as apiClient };
+
+export type ChatStreamEvent =
+  | { event: 'run_id'; data: { run_id: string } }
+  | { event: 'progress'; data: { phase: string; message: string } }
+  | { event: 'thinking'; data: { chunk: string } }
+  | { event: 'token'; data: { delta: string } }
+  | { event: 'done'; data: Record<string, unknown> }
+  | { event: 'error'; data: { error?: string; message?: string } };
+
+function parseSseBlock(block: string): { event: string; data: string } | null {
+  let event = 'message';
+  let data = '';
+  for (const line of block.split('\n')) {
+    if (line.startsWith('event: ')) event = line.slice(7).trim();
+    if (line.startsWith('data: ')) data += line.slice(6);
+  }
+  if (!data) return null;
+  return { event, data };
+}
+
+/** POST + SSE stream for `/api/v1/chat/stream`. */
+export async function streamChatPost(
+  url: string,
+  body: unknown,
+  onEvent: (ev: ChatStreamEvent) => void,
+  signal?: AbortSignal,
+): Promise<Record<string, unknown> | null> {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
+    body: JSON.stringify(body),
+    signal,
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `Stream request failed (${res.status})`);
+  }
+  const reader = res.body?.getReader();
+  if (!reader) throw new Error('No response body for SSE stream');
+
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let finalPayload: Record<string, unknown> | null = null;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const parts = buffer.split('\n\n');
+    buffer = parts.pop() ?? '';
+    for (const part of parts) {
+      const parsed = parseSseBlock(part.trim());
+      if (!parsed) continue;
+      const payload = JSON.parse(parsed.data) as Record<string, unknown>;
+      const event = parsed.event as ChatStreamEvent['event'];
+      onEvent({ event, data: payload } as ChatStreamEvent);
+      if (event === 'done') finalPayload = payload;
+      if (event === 'error') {
+        throw new Error(String(payload.message || payload.error || 'Stream error'));
+      }
+    }
+  }
+  return finalPayload;
+}

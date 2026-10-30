@@ -1,0 +1,46 @@
+business_unit,function,location,band,headcount
+Food & Grocery,Operations,India,Entry (B1-B2),360
+Food & Grocery,Operations,India,Mid (B3-B4),280
+Food & Grocery,Operations,India,Senior (B5-B6),120
+Food & Grocery,Finance,India,Entry (B1-B2),360
+Food & Grocery,Finance,India,Mid (B3-B4),280
+Food & Grocery,Finance,India,Senior (B5-B6),120
+Food & Grocery,HR,India,Entry (B1-B2),360
+Food & Grocery,HR,India,Mid (B3-B4),280
+Food & Grocery,HR,India,Senior (B5-B6),120
+General Merchandise,Operations,India,Entry (B1-B2),450
+General Merchandise,Operations,India,Mid (B3-B4),350
+General Merchandise,Operations,India,Senior (B5-B6),150
+General Merchandise,Finance,India,Entry (B1-B2),450
+General Merchandise,Finance,India,Mid (B3-B4),350
+General Merchandise,Finance,India,Senior (B5-B6),150
+General Merchandise,HR,India,Entry (B1-B2),450
+General Merchandise,HR,India,Mid (B3-B4),350
+General Merchandise,HR,India,Senior (B5-B6),150
+Fashion & Lifestyle,Operations,India,Entry (B1-B2),540
+Fashion & Lifestyle,Operations,India,Mid (B3-B4),420
+Fashion & Lifestyle,Operations,India,Senior (B5-B6),180
+Fashion & Lifestyle,Finance,India,Entry (B1-B2),540
+Fashion & Lifestyle,Finance,India,Mid (B3-B4),420
+Fashion & Lifestyle,Finance,India,Senior (B5-B6),180
+Fashion & Lifestyle,HR,India,Entry (B1-B2),540
+Fashion & Lifestyle,HR,India,Mid (B3-B4),420
+Fashion & Lifestyle,HR,India,Senior (B5-B6),180
+Electronics,Operations,India,Entry (B1-B2),630
+Electronics,Operations,India,Mid (B3-B4),489
+Electronics,Operations,India,Senior (B5-B6),210
+Electronics,Finance,India,Entry (B1-B2),630
+Electronics,Finance,India,Mid (B3-B4),489
+Electronics,Finance,India,Senior (B5-B6),210
+Electronics,HR,India,Entry (B1-B2),630
+Electronics,HR,India,Mid (B3-B4),489
+Electronics,HR,India,Senior (B5-B6),210
+E-Commerce,Operations,India,Entry (B1-B2),720
+E-Commerce,Operations,India,Mid (B3-B4),560
+E-Commerce,Operations,India,Senior (B5-B6),240
+E-Commerce,Finance,India,Entry (B1-B2),720
+E-Commerce,Finance,India,Mid (B3-B4),560
+E-Commerce,Finance,India,Senior (B5-B6),240
+E-Commerce,HR,India,Entry (B1-B2),720
+E-Commerce,HR,India,Mid (B3-B4),560
+E-Commerce,HR,India,Senior (B5-B6),240

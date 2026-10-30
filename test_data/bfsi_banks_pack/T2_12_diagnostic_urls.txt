@@ -1,0 +1,7 @@
+Indus Apex Bank Ltd — Diagnostic URLs (synthetic/illustrative)
+
+1. Investor relations: https://www.indusapexbank.example/investors
+2. RBI data: https://www.rbi.org.in/Scripts/AnnualReportPublications.aspx
+3. Annual report: https://www.indusapexbank.example/ir/annual-report-fy25.pdf
+4. NSE: https://www.nseindia.example/get-quotes/equity?symbol=INDUSAPEX
+5. IBA benchmark: https://iba.org.in/publications/banking-technology-survey

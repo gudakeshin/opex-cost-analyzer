@@ -7,8 +7,13 @@
       "lever_id": "location_tier_shift",
       "lever_name": "Tier-2 / Tier-3 City Expansion",
       "description": "Shift 20-30% of workforce to Tier-2/3 Indian cities (Coimbatore, Indore, Bhubaneswar, Kochi) to capture salary arbitrage while maintaining quality.",
-      "category_ids": ["HR", "FACILITIES"],
-      "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "category_ids": [
+        "HR",
+        "FACILITIES"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
       "implementation_weeks": 26,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -16,14 +21,24 @@
         "NASSCOM GCC Report 2024 (nasscom.in) — Tier-2 salary differential 20-35% vs Bengaluru/Hyderabad for equivalent roles",
         "Everest Group — GCC Location Strategy India 2024 (everestgrp.com) — Tier-2 cities offer 15-25% total cost advantage",
         "INTERNAL_CALIBRATION — specific savings range calibrated from 4 GCC location-shift engagements in India"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 19,
+        "p50": 26,
+        "p90": 32
+      }
     },
     {
       "lever_id": "automation_rpa_ai",
       "lever_name": "RPA + AI Process Automation",
       "description": "Automate repetitive transactional processes (data entry, reconciliation, report generation) using RPA bots and AI/ML models.",
-      "category_ids": ["HR", "OUTSOURCED"],
-      "p10_pct": 8.0, "p50_pct": 18.0, "p90_pct": 30.0,
+      "category_ids": [
+        "HR",
+        "OUTSOURCED"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 18.0,
+      "p90_pct": 30.0,
       "implementation_weeks": 16,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -31,14 +46,23 @@
         "NASSCOM GCC 2024 (nasscom.in) — mature GCCs achieving 30-40% process automation",
         "Everest Group — Automation in GCCs 2024 — 15-25% FTE cost reduction in transactional processes",
         "INTERNAL_CALIBRATION — savings range calibrated from RPA deployments in 6 India GCCs"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "real_estate_optimization",
       "lever_name": "Real Estate Footprint Optimisation",
       "description": "Right-size office space with hybrid work policy (50-60% seat utilisation target), renegotiate leases, exit high-cost CBD locations.",
-      "category_ids": ["FACILITIES"],
-      "p10_pct": 10.0, "p50_pct": 20.0, "p90_pct": 30.0,
+      "category_ids": [
+        "FACILITIES"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 20.0,
+      "p90_pct": 30.0,
       "implementation_weeks": 12,
       "brsr_principle": "P4",
       "savings_type": "run_rate",
@@ -46,14 +70,23 @@
         "NASSCOM GCC 2024 — GCC real estate cost ₹14,000-₹28,000 per seat/month; hybrid reduces required seat count 30-40%",
         "Everest Group GCC Location 2024 — real estate 8-12% of GCC cost base; 20-30% savings from hybrid policy",
         "INTERNAL_CALIBRATION — specific savings range from lease renegotiation in 3 India GCC mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
     },
     {
       "lever_id": "attrition_reduction",
       "lever_name": "Attrition Reduction Programme",
       "description": "Structured career pathing, manager effectiveness programme, competitive benchmarked pay, and retention bonuses reduce attrition from 20%+ to 14-16%.",
-      "category_ids": ["HR"],
-      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "category_ids": [
+        "HR"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 8.0,
+      "p90_pct": 14.0,
       "implementation_weeks": 20,
       "brsr_principle": "P5",
       "savings_type": "run_rate",
@@ -61,14 +94,23 @@
         "NASSCOM Strategic Review 2025 — cost of attrition estimated at 50-100% of annual salary per departure (recruiting + training + productivity loss)",
         "Everest Group GCC Talent 2024 — attrition reduction from 22% to 16% saves 3-6% of total talent cost",
         "INTERNAL_CALIBRATION — GCC attrition programme savings calibrated from HR analytics engagements"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "vendor_consolidation_it",
       "lever_name": "IT Vendor & SaaS Consolidation",
       "description": "Consolidate fragmented software licences (multiple collaboration, project, HR tools); negotiate enterprise agreements for cloud/SaaS spend.",
-      "category_ids": ["IT"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 22.0,
+      "category_ids": [
+        "IT"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 22.0,
       "implementation_weeks": 8,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -76,14 +118,25 @@
         "Gartner IT Key Metrics 2024 — IT services firms typically overspend on SaaS by 20-30% due to shadow IT",
         "Everest Group GCC IT 2024 — tech infrastructure rationalisation saves 15-20% of IT cost",
         "INTERNAL_CALIBRATION — SaaS audit savings range from 3 GCC IT rationalisation engagements"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
     },
     {
       "lever_id": "shared_services_centralisation",
       "lever_name": "Shared Services Centralisation",
       "description": "Centralise back-office functions (HR ops, finance ops, procurement) into a shared service centre model to eliminate duplication across business units.",
-      "category_ids": ["HR", "PROF_SVCS", "OUTSOURCED"],
-      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "category_ids": [
+        "HR",
+        "PROF_SVCS",
+        "OUTSOURCED"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 18.0,
+      "p90_pct": 28.0,
       "implementation_weeks": 30,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -91,14 +144,24 @@
         "Hackett Group World-Class G&A 2024 (thehackettgroup.com) — shared services reduces G&A cost by 20-30% vs. distributed model",
         "NASSCOM GCC 2024 — GCCs delivering shared services to parent at 40-60% of equivalent onshore cost",
         "INTERNAL_CALIBRATION — savings range calibrated from 5 GCC shared services transitions"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 22,
+        "p50": 30,
+        "p90": 37
+      }
     },
     {
       "lever_id": "subcontractor_insourcing",
       "lever_name": "Subcontractor Insourcing & Optimisation",
       "description": "Analyse subcontractor spend for roles that can be insourced at lower cost via permanent India GCC headcount. Renegotiate retained contracts.",
-      "category_ids": ["OUTSOURCED", "CONTINGENT"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "category_ids": [
+        "OUTSOURCED",
+        "CONTINGENT"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 24.0,
       "implementation_weeks": 12,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -106,14 +169,23 @@
         "Everest Group GCC 2024 — insourcing vs. third-party: 30-50% cost differential for equivalent delivery",
         "NASSCOM GCC 2024 — subcontractor spend accounts for 6-12% of GCC cost in growth phase",
         "INTERNAL_CALIBRATION — insourcing savings range calibrated from 4 GCC strategic sourcing reviews"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
     },
     {
       "lever_id": "training_roi_optimisation",
       "lever_name": "Training Investment ROI Optimisation",
       "description": "Shift from classroom and vendor-led training to blended digital learning (Coursera, Udemy for Business, internal LMS). Tie training to billable skill creation.",
-      "category_ids": ["HR"],
-      "p10_pct": 5.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "category_ids": [
+        "HR"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
       "implementation_weeks": 8,
       "brsr_principle": "P5",
       "savings_type": "run_rate",
@@ -121,7 +193,553 @@
         "NASSCOM Strategic Review 2025 — India IT/GCC spend on L&D: ₹30,000-₹80,000 per employee per year; digital-first reduces to ₹15,000-₹30,000",
         "Gartner 2024 — digital learning platforms reduce training cost 40-60% vs instructor-led",
         "INTERNAL_CALIBRATION — training ROI optimisation savings from 3 GCC L&D transformation engagements"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
+    },
+    {
+      "lever_id": "telecom_expense_management",
+      "lever_name": "Telecom Expense Management (TEM)",
+      "description": "Audit connectivity, mobile, and conferencing spend; consolidate carriers; eliminate unused circuits.",
+      "category_ids": [
+        "TELECOM"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 22.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Gartner 2024 Market Guide for Telecom Expense Management Services — 15-30% recoverable waste",
+        "Everest Group GCC IT 2024 — connectivity cost benchmarks for India GCCs",
+        "INTERNAL_CALIBRATION — GCC TEM savings from 2 India GCC telecom audits"
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
+    },
+    {
+      "lever_id": "travel_policy_optimization",
+      "lever_name": "Client Travel & Visa Cost Optimisation",
+      "description": "Consolidate TMC; enforce travel policy for client-site visits; optimise visa and relocation spend.",
+      "category_ids": [
+        "TRAVEL"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 18.0,
+      "p90_pct": 28.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "GBTA 2025 Business Travel Index Outlook — managed travel saves 10-25%",
+        "Genpact FY25 Annual Report — T&E ~2.2% of revenue; travel policy as GCC cost lever",
+        "INTERNAL_CALIBRATION — GCC travel savings from 3 India GCC travel mandates"
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
+    },
+    {
+      "lever_id": "gcc_talent_branding_efficiency",
+      "lever_name": "Talent Branding & Recruitment Marketing Efficiency",
+      "description": "Shift to digital-first employer branding; consolidate recruitment marketing vendors; reduce agency dependency.",
+      "category_ids": [
+        "MARKETING"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM GCC 2024 — talent branding as GCC differentiator; digital channels reduce cost-per-hire",
+        "Gartner CMO Survey 2024 — digital recruitment marketing 40-60% better cost-per-lead",
+        "INTERNAL_CALIBRATION — GCC recruitment marketing savings from 2 India GCC HR mandates"
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "GCC Benefits & Insurance Premium Optimisation",
+      "description": "Competitive RFP for group health and professional indemnity; wellness programmes to reduce claims.",
+      "category_ids": [
+        "INSURANCE"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — group health competitive RFP savings 15-25%",
+        "NASSCOM GCC 2024 — benefits cost as component of talent cost base",
+        "INTERNAL_CALIBRATION — GCC insurance savings from 3 India GCC benefits reviews"
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
+    },
+    {
+      "lever_id": "rpa_intelligent_automation",
+      "lever_name": "RPA & Intelligent Process Automation",
+      "description": "Industrialise RPA/IDP pipelines for rule-based back-office processes with a reusable automation factory and benefits tracking.",
+      "category_ids": [
+        "digital_automation_ops",
+        "hr"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 18.0,
+      "p90_pct": 30.0,
+      "implementation_weeks": 26,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Gartner — Market Guide for Hyperautomation Service Providers (gartner.com/en/documents/4983531)",
+        "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)",
+        "Everest Group — Beyond Boundaries: GCCs Shaping Tomorrow's Enterprises (December 2024)"
+      ],
+      "effort_weeks": {
+        "p10": 19,
+        "p50": 26,
+        "p90": 32
+      }
+    },
+    {
+      "lever_id": "attrition_reduction_retention",
+      "lever_name": "Attrition Reduction & Talent Retention Programme",
+      "description": "Reduce regrettable attrition through compensation benchmarking, career pathing, and manager quality programmes; cut replacement hiring and ramp-up costs.",
+      "category_ids": [
+        "hr"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P3",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Deloitte — 2025 Global Human Capital Trends (deloitte.com/us/en/insights/topics/talent/human-capital-trends/2025.html)",
+        "Mercer — Total Remuneration Survey, India Edition (imercer.com/products/total-remuneration-surveys)",
+        "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
+    },
+    {
+      "lever_id": "seat_utilization_optimization",
+      "lever_name": "Seat Utilisation & Real Estate Rationalisation",
+      "description": "Raise seat-sharing ratios with hybrid scheduling and neighbourhood-based allocation, consolidating floors and exiting surplus leases.",
+      "category_ids": [
+        "seat_based_infra",
+        "facilities"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 24.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "JLL India — GCCs Drive Record 77.2 mn sq ft Office Leasing in India (jll.com/en-in/newsroom/gccs-drive-record-77-2-mn-sqft-office-leasing-in-india)",
+        "Everest Group — Global Locations State of the Market 2024 (everestgrp.com/wp-content/uploads/2024/09/...)",
+        "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
+    },
+    {
+      "lever_id": "shared_services_consolidation",
+      "lever_name": "Multi-Process Shared Services Consolidation",
+      "description": "Consolidate fragmented support functions into the GCC's shared-services towers with standardised processes and unit-rate charging.",
+      "category_ids": [
+        "gcc_governance_compliance",
+        "quality_certifications"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 20.0,
+      "p90_pct": 32.0,
+      "implementation_weeks": 52,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Accenture — Rise of the GCC as a Reinvention Engine (accenture.com/content/dam/accenture/final/accenture-com/document-2/Accenture-Rise-Of-GCC-As-A-Reinvention-Engine.pdf)",
+        "Everest Group — Beyond Boundaries: GCCs Shaping Tomorrow's Enterprises (December 2024)",
+        "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "effort_weeks": {
+        "p10": 39,
+        "p50": 52,
+        "p90": 65
+      }
+    },
+    {
+      "lever_id": "parent_recharge_rationalization",
+      "lever_name": "Parent Recharge & Intercompany Transfer Pricing Rationalisation",
+      "description": "Challenge and rebase parent-company recharges (brand fees, IT allocations, management charges) against service-level evidence.",
+      "category_ids": [
+        "parent_recharge_costs",
+        "parent_entity_it_license"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 14.0,
+      "p90_pct": 22.0,
+      "implementation_weeks": 40,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "EY — Driving Transfer Pricing Certainty in Uncertain Times: 2024 International Tax and Transfer Pricing Survey (ey.com/en_in/insights/tax/international-tax-and-transfer-pricing-survey)",
+        "KPMG — Global Transfer Pricing Review (kpmg.com/us/en/articles/2023/global-transfer-pricing-review.html)",
+        "Deloitte — Transfer Pricing Controversy Trends: 2024 Global Survey (internationaltaxreview.com)"
+      ],
+      "effort_weeks": {
+        "p10": 30,
+        "p50": 40,
+        "p90": 50
+      }
+    },
+    {
+      "lever_id": "vendor_managed_services_shift",
+      "lever_name": "Vendor & Managed Services Renegotiation",
+      "description": "Shift commodity IT operations from staff augmentation to outcome-based managed services with benchmarked unit pricing.",
+      "category_ids": [
+        "digital_automation_ops",
+        "parent_entity_it_license"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 16.0,
+      "p90_pct": 26.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Gartner — Market Guide for Hyperautomation Service Providers (gartner.com/en/documents/4983531)",
+        "Everest Group — Chasing the GCC Opportunity: The Next Big Providers Play (everestgrp.com/report/egr-2025-34-r-7314/)",
+        "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
+    },
+    {
+      "lever_id": "upskilling_pyramid_rebalancing",
+      "lever_name": "Talent Pyramid Rebalancing & Upskilling",
+      "description": "Rebalance the delivery pyramid via structured upskilling, fresher intake, and role-level output standards to lower blended cost per FTE.",
+      "category_ids": [
+        "captive_talent_development",
+        "hr"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
+      "implementation_weeks": 30,
+      "brsr_principle": "P3",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "WEF — Future of Jobs Report 2025 (weforum.org/publications/the-future-of-jobs-report-2025/)",
+        "Deloitte — 2025 Global Human Capital Trends (deloitte.com/us/en/insights/topics/talent/human-capital-trends/2025.html)",
+        "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "effort_weeks": {
+        "p10": 22,
+        "p50": 30,
+        "p90": 37
+      }
+    },
+    {
+      "lever_id": "cloud_infra_modernization",
+      "lever_name": "Cloud Infrastructure Modernisation & FinOps",
+      "description": "Migrate parent-mandated legacy hosting to modern cloud landing zones with autoscaling and reserved-capacity economics.",
+      "category_ids": [
+        "digital_automation_ops",
+        "parent_entity_it_license"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 22.0,
+      "p90_pct": 35.0,
+      "implementation_weeks": 36,
+      "brsr_principle": "P2",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "FinOps Foundation — State of FinOps 2025 (data.finops.org/2025-report/)",
+        "McKinsey — Projecting the Global Value of Cloud: $3 Trillion is Up for Grabs (mckinsey.com/capabilities/tech-and-ai/our-insights/projecting-the-global-value-of-cloud-3-trillion-is-up-for-grabs-for-companies-that-go-beyond-adoption)"
+      ],
+      "effort_weeks": {
+        "p10": 27,
+        "p50": 36,
+        "p90": 45
+      }
+    },
+    {
+      "lever_id": "bench_management_optimization",
+      "lever_name": "Bench & Unallocated Headcount Optimisation",
+      "description": "Tighten bench policies with demand-linked hiring triggers, internal redeployment marketplaces, and utilisation dashboards to shrink unbilled capacity.",
+      "category_ids": [
+        "bench_management"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 9.0,
+      "p90_pct": 16.0,
+      "implementation_weeks": 18,
+      "brsr_principle": "P3",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Everest Group — Beyond Boundaries: GCCs Shaping Tomorrow's Enterprises (December 2024)",
+        "Accenture — Rise of the GCC as a Reinvention Engine (accenture.com/content/dam/accenture/final/accenture-com/document-2/Accenture-Rise-Of-GCC-As-A-Reinvention-Engine.pdf)"
+      ],
+      "effort_weeks": {
+        "p10": 13,
+        "p50": 18,
+        "p90": 22
+      }
+    },
+    {
+      "lever_id": "parent_scope_rationalization",
+      "lever_name": "Scope Rationalisation with Parent Entity",
+      "description": "Renegotiate the GCC's chartered scope with the parent — exit low-value work, expand higher-value ownership, and reprice the service catalogue.",
+      "category_ids": [
+        "parent_recharge_costs",
+        "gcc_governance_compliance"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 12.0,
+      "p90_pct": 22.0,
+      "implementation_weeks": 40,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "McKinsey — Global Capability Centers: From Cost to Innovation (mckinsey.com/capabilities/operations/our-insights/beyond-cost-savings-the-global-footprint-of-innovation-hubs)",
+        "Accenture — Rise of the GCC as a Reinvention Engine (accenture.com/content/dam/accenture/final/accenture-com/document-2/Accenture-Rise-Of-GCC-As-A-Reinvention-Engine.pdf)",
+        "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "effort_weeks": {
+        "p10": 30,
+        "p50": 40,
+        "p90": 50
+      }
+    },
+    {
+      "lever_id": "perks_benefits_rationalisation",
+      "lever_name": "Employee Perks & Benefits Rationalisation",
+      "description": "Rationalise benefits portfolio against utilisation data — transport, cafeteria, insurance top-ups — while protecting high-value retention perks.",
+      "category_ids": [
+        "hr",
+        "expat_global_mobility"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
+      "implementation_weeks": 14,
+      "brsr_principle": "P3",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Mercer — Total Remuneration Survey, India Edition (imercer.com/products/total-remuneration-surveys)",
+        "Deloitte — 2025 Global Human Capital Trends (deloitte.com/us/en/insights/topics/talent/human-capital-trends/2025.html)",
+        "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "effort_weeks": {
+        "p10": 10,
+        "p50": 14,
+        "p90": 17
+      }
+    },
+    {
+      "lever_id": "genai_augmented_productivity",
+      "lever_name": "GenAI-Augmented Workforce Productivity",
+      "description": "Deploy GenAI copilots for coding, testing, documentation, and knowledge ops with adoption tracking tied to capacity release.",
+      "category_ids": [
+        "digital_automation_ops",
+        "hr"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 18.0,
+      "p90_pct": 30.0,
+      "implementation_weeks": 36,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)",
+        "Accenture — Rise of the GCC as a Reinvention Engine (accenture.com/content/dam/accenture/final/accenture-com/document-2/Accenture-Rise-Of-GCC-As-A-Reinvention-Engine.pdf)",
+        "Everest Group — Beyond Boundaries: GCCs Shaping Tomorrow's Enterprises (December 2024)"
+      ],
+      "effort_weeks": {
+        "p10": 27,
+        "p50": 36,
+        "p90": 45
+      }
+    },
+    {
+      "lever_id": "tier2_location_strategy",
+      "lever_name": "Tier-2 City Location Strategy & Hub-and-Spoke Migration",
+      "description": "Shift growth seats to tier-2 India locations with lower salary and real-estate cost while protecting niche-skill hubs.",
+      "category_ids": [
+        "hr",
+        "seat_based_infra"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 20.0,
+      "p90_pct": 30.0,
+      "implementation_weeks": 52,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM — India GCC Landscape Report: The 5-Year Journey, co-published with Zinnov (zinnov.com/centers-of-excellence/zinnov-nasscom-india-gcc-landscape-report-the-5-year-journey-report/)",
+        "Everest Group — Global Locations State of the Market 2024 (everestgrp.com/wp-content/uploads/2024/09/Everest-Group-Global-Locations-State-of-the-Market-2024-Key-Trends-Shaping-the-Landscape-Complimentary-Abstract.pdf)",
+        "JLL India — GCCs Drive Record 77.2 mn sq ft Office Leasing in India (jll.com/en-in/newsroom/gccs-drive-record-77-2-mn-sqft-office-leasing-in-india)"
+      ],
+      "effort_weeks": {
+        "p10": 39,
+        "p50": 52,
+        "p90": 65
+      }
+    },
+    {
+      "lever_id": "sez_stpi_tax_optimisation",
+      "lever_name": "SEZ / STPI Tax Benefit Optimisation (Section 10AA / 10B)",
+      "description": "Optimise SEZ/STPI unit structure, safe-harbour elections, and state incentive claims to reduce effective tax and compliance cost.",
+      "category_ids": [
+        "gcc_governance_compliance"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 14.0,
+      "p90_pct": 25.0,
+      "implementation_weeks": 32,
+      "brsr_principle": "P1",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "EY — Driving Transfer Pricing Certainty in Uncertain Times: 2024 International Tax and Transfer Pricing Survey (ey.com/en_in/insights/tax/international-tax-and-transfer-pricing-survey)",
+        "KPMG — Global Transfer Pricing Review (kpmg.com/us/en/articles/2023/global-transfer-pricing-review.html)",
+        "Deloitte — Transfer Pricing Controversy Trends: 2024 Global Survey (internationaltaxreview.com)"
+      ],
+      "effort_weeks": {
+        "p10": 24,
+        "p50": 32,
+        "p90": 40
+      }
+    },
+    {
+      "lever_id": "chargeback_model_transformation",
+      "lever_name": "Chargeback Model Transformation — Cost-Plus to Value-Based Billing",
+      "description": "Move from headcount-based to consumption-based chargeback with unit-rate transparency, driving demand discipline from parent business units.",
+      "category_ids": [
+        "parent_recharge_costs",
+        "gcc_governance_compliance"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 15.0,
+      "p90_pct": 26.0,
+      "implementation_weeks": 44,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Accenture — Rise of the GCC as a Reinvention Engine (accenture.com/content/dam/accenture/final/accenture-com/document-2/Accenture-Rise-Of-GCC-As-A-Reinvention-Engine.pdf)",
+        "Everest Group — Beyond Boundaries: GCCs Shaping Tomorrow's Enterprises (December 2024)",
+        "McKinsey — Global Capability Centers: From Cost to Innovation (mckinsey.com/capabilities/operations/our-insights/beyond-cost-savings-the-global-footprint-of-innovation-hubs)"
+      ],
+      "effort_weeks": {
+        "p10": 33,
+        "p50": 44,
+        "p90": 55
+      }
+    },
+    {
+      "lever_id": "org_span_control_optimisation",
+      "lever_name": "Org Layer & Span-of-Control Optimisation",
+      "description": "Widen manager spans and delayer the organisation against benchmark spans by function, converting freed capacity to billable or cut roles.",
+      "category_ids": [
+        "hr"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
+      "implementation_weeks": 30,
+      "brsr_principle": "P3",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Deloitte — 2025 Global Human Capital Trends (deloitte.com/us/en/insights/topics/talent/human-capital-trends/2025.html)",
+        "WEF — Future of Jobs Report 2025 (weforum.org/publications/the-future-of-jobs-report-2025/)",
+        "Mercer — Total Remuneration Survey, India Edition (imercer.com/products/total-remuneration-surveys)"
+      ],
+      "effort_weeks": {
+        "p10": 22,
+        "p50": 30,
+        "p90": 37
+      }
+    },
+    {
+      "lever_id": "shadow_it_saas_elimination",
+      "lever_name": "Shadow IT & Unauthorised SaaS Elimination",
+      "description": "Discover and eliminate shadow SaaS via SSO/CASB telemetry; consolidate duplicative tools into the sanctioned stack.",
+      "category_ids": [
+        "digital_automation_ops",
+        "parent_entity_it_license",
+        "data_privacy_security"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 18.0,
+      "p90_pct": 28.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "FinOps Foundation — State of FinOps 2025 (data.finops.org/2025-report/)",
+        "Gartner — Market Guide for Hyperautomation Service Providers (gartner.com/en/documents/4983531)",
+        "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
+    },
+    {
+      "lever_id": "recruitment_cost_optimisation",
+      "lever_name": "Recruitment Cost Optimisation — Internal Sourcing & Direct Hiring",
+      "description": "Shift hiring mix to internal referrals and direct sourcing, renegotiate agency rate cards, and reduce offer-drop leakage.",
+      "category_ids": [
+        "hr",
+        "captive_talent_development"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 9.0,
+      "p90_pct": 15.0,
+      "implementation_weeks": 18,
+      "brsr_principle": "P3",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Mercer — Total Remuneration Survey, India Edition (imercer.com/products/total-remuneration-surveys)",
+        "Deloitte — 2025 Global Human Capital Trends (deloitte.com/us/en/insights/topics/talent/human-capital-trends/2025.html)",
+        "NASSCOM — GCC Annual Report 2024 (community.nasscom.in)"
+      ],
+      "effort_weeks": {
+        "p10": 13,
+        "p50": 18,
+        "p90": 22
+      }
     }
   ]
 }

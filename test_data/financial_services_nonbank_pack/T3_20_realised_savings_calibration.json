@@ -1,0 +1,38 @@
+[
+  {
+    "engagement_id": "eng-vcpl-fy24",
+    "initiative_id": "INI-1",
+    "lever_id": "market_data_consolidation",
+    "pack_id": "financial_services_nonbank",
+    "planned_p50_cr": 14.0,
+    "realised_cr": 11.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Bloomberg terminal count reduced; FactSet replaced by S&P+in-house."
+  },
+  {
+    "engagement_id": "eng-vcpl-fy24",
+    "initiative_id": "INI-2",
+    "lever_id": "crm_rationalisation",
+    "pack_id": "financial_services_nonbank",
+    "planned_p50_cr": 10.0,
+    "realised_cr": 13.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Salesforce consolidation from 3 CRMs exceeded plan."
+  },
+  {
+    "engagement_id": "eng-vcpl-fy24",
+    "initiative_id": "INI-3",
+    "lever_id": "legal_panel",
+    "pack_id": "financial_services_nonbank",
+    "planned_p50_cr": 8.0,
+    "realised_cr": 6.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "medium",
+    "notes": "Panel reduced from 12 to 5 firms; overseas advisory retained."
+  }
+]

@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 
 from app.opar.agent_runtime import ToolCall, ToolDefinition
 from app.opar.tools.context import ToolSessionContext
+from app.services.spend_schema import spend_schema_description
 
 SEARCH_DOCUMENTS_TOOL = ToolDefinition(
     name="search_documents",
@@ -57,14 +58,72 @@ RUN_SKILL_TOOL = ToolDefinition(
     },
 )
 
-QUERY_SPEND_TOOL = ToolDefinition(
-    name="query_spend",
-    description="Read spend-profiler output: totals, categories, suppliers. Runs profiler if needed.",
+NATURAL_LANGUAGE_QUERY_TOOL = ToolDefinition(
+    name="natural_language_query",
+    description=(
+        "Preferred entry for ad-hoc spend questions in plain English. Routes to "
+        "deterministic skills (benchmarks, profiler, cohort), structured rollups, "
+        "or SQL as needed. " + spend_schema_description()
+    ),
     input_schema={
         "type": "object",
         "properties": {
-            "category": {"type": "string", "description": "Optional category filter."},
+            "question": {
+                "type": "string",
+                "description": "Natural-language spend question.",
+            },
+            "prefer": {
+                "type": "string",
+                "enum": ["auto", "skill", "aggregate", "sql"],
+                "description": "Force a routing tier (default auto).",
+            },
         },
+        "required": ["question"],
+    },
+)
+
+QUERY_SPEND_TOOL = ToolDefinition(
+    name="query_spend",
+    description=(
+        "Run a read-only SQL SELECT when you already have SQL. "
+        + spend_schema_description()
+        + " Provide a full SELECT; omit sql only for a default top-categories summary."
+    ),
+    input_schema={
+        "type": "object",
+        "properties": {
+            "sql": {
+                "type": "string",
+                "description": "Single SELECT or WITH…SELECT against view `spend`.",
+            },
+            "limit": {
+                "type": "integer",
+                "description": "Max rows to return (default 500, cap 10000).",
+            },
+            "category": {
+                "type": "string",
+                "description": "Legacy filter — used only when SQL is omitted and store unavailable.",
+            },
+        },
+    },
+)
+
+SAVE_QUERY_RESULT_TOOL = ToolDefinition(
+    name="save_query_result",
+    description=(
+        "Execute a SELECT and save results as a downloadable CSV under /api/v1/exports/. "
+        "Use after query_spend when the user wants an export artifact."
+    ),
+    input_schema={
+        "type": "object",
+        "properties": {
+            "sql": {"type": "string", "description": "SELECT to export."},
+            "filename": {
+                "type": "string",
+                "description": "Base filename without extension (default: query_export).",
+            },
+        },
+        "required": ["sql"],
     },
 )
 
@@ -99,6 +158,47 @@ MODEL_SAVINGS_TOOL = ToolDefinition(
     },
 )
 
+RUN_SENSITIVITY_TOOL = ToolDefinition(
+    name="run_sensitivity",
+    description=(
+        "Run deterministic NPV/savings what-if scenarios. Supports built-in presets "
+        "(conservative, accelerated, bounce_back, …), macro shocks (fx_stress, "
+        "wage_inflation, commodity_spike), custom scenario specs, or natural_language "
+        "what-if questions. Auto-runs value-bridge prerequisites."
+    ),
+    input_schema={
+        "type": "object",
+        "properties": {
+            "preset": {
+                "type": "string",
+                "description": (
+                    "Built-in or macro preset id, e.g. conservative, accelerated, fx_stress."
+                ),
+            },
+            "natural_language": {
+                "type": "string",
+                "description": "Plain-English what-if to parse into scenarios/drivers.",
+            },
+            "scenarios": {
+                "type": "array",
+                "description": (
+                    "CustomScenarioSpec: savings_pct_delta, timeline_factor, execution_rate, "
+                    "addressable_spend_delta_pct, spend_pool_delta_pct, bounce_back_override, "
+                    "cost_driver_deltas."
+                ),
+                "items": {"type": "object"},
+            },
+            "drivers": {
+                "type": "object",
+                "description": (
+                    "Portfolio drivers: execution_rate_pct, headcount_growth_pct, "
+                    "revenue_growth_pct, timeline_compression_factor."
+                ),
+            },
+        },
+    },
+)
+
 ASSESS_OPPORTUNITIES_TOOL = ToolDefinition(
     name="assess_opportunities",
     description=(
@@ -118,10 +218,13 @@ ALL_TOOLS: List[ToolDefinition] = [
     SEARCH_DOCUMENTS_TOOL,
     FIND_SKILLS_TOOL,
     RUN_SKILL_TOOL,
+    NATURAL_LANGUAGE_QUERY_TOOL,
     QUERY_SPEND_TOOL,
+    SAVE_QUERY_RESULT_TOOL,
     GET_BENCHMARKS_TOOL,
     GET_EVIDENCE_TOOL,
     MODEL_SAVINGS_TOOL,
+    RUN_SENSITIVITY_TOOL,
     ASSESS_OPPORTUNITIES_TOOL,
 ]
 
@@ -138,10 +241,13 @@ def dispatch_tool_call(session: ToolSessionContext, call: ToolCall) -> Any:
         "search_documents": _search_documents,
         "find_skills": _find_skills,
         "run_skill": _run_skill,
+        "natural_language_query": _natural_language_query,
         "query_spend": _query_spend,
+        "save_query_result": _save_query_result,
         "get_benchmarks": _get_benchmarks,
         "get_evidence": _get_evidence,
         "model_savings": _model_savings,
+        "run_sensitivity": _run_sensitivity,
         "assess_opportunities": _assess_opportunities,
     }
     handler = handlers.get(call.name)
@@ -178,7 +284,39 @@ def _run_skill(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str, A
     return session.invoke_skill(name)
 
 
+def _open_agent_store(session: ToolSessionContext):
+    from app.services.spend_base import ensure_spend_store_synced
+
+    return ensure_spend_store_synced(session.session_id)
+
+
+def _natural_language_query(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str, Any]:
+    from app.opar.tools.nl_query import run_natural_language_query
+
+    question = str(args.get("question") or session.user_message).strip()
+    prefer = str(args.get("prefer") or "auto")
+    if prefer not in ("auto", "skill", "aggregate", "sql"):
+        prefer = "auto"
+    return run_natural_language_query(session, question=question, prefer=prefer)  # type: ignore[arg-type]
+
+
 def _query_spend(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str, Any]:
+    sql = (args.get("sql") or "").strip()
+    limit = int(args.get("limit") or 500)
+    store = _open_agent_store(session)
+    if store is not None:
+        if not sql:
+            sql = (
+                "SELECT category_name, SUM(amount) AS spend, COUNT(*) AS lines "
+                "FROM spend GROUP BY category_name ORDER BY spend DESC"
+            )
+        from app.services.spend_store import SpendQueryError
+
+        try:
+            result = store.run_sql(sql, limit=limit)
+            return {"sql": sql, **result.to_dict()}
+        except SpendQueryError as exc:
+            return {"sql": sql, "error": str(exc), "rows": []}
     out = session.invoke_skill("spend-profiler")
     category = (args.get("category") or "").strip()
     if category and isinstance(out.get("top_categories"), list):
@@ -189,7 +327,33 @@ def _query_spend(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str,
             or category.lower() in str(c.get("category_id", "")).lower()
         ]
         out["filtered_categories"] = filtered
+    out["fallback"] = "spend-profiler"
     return out
+
+
+def _save_query_result(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str, Any]:
+    import re
+    import uuid
+
+    from app.config import OUTPUT_DIR
+
+    sql = (args.get("sql") or "").strip()
+    if not sql:
+        raise ValueError("save_query_result requires sql")
+    store = _open_agent_store(session)
+    if store is None:
+        raise RuntimeError("No spend store available for export")
+    base = re.sub(r"[^\w\-]+", "_", (args.get("filename") or "query_export").strip())[:80]
+    filename = f"{base}_{uuid.uuid4().hex[:8]}.csv"
+    path = OUTPUT_DIR / filename
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    row_count = store.export_sql(sql, path, fmt="csv")
+    return {
+        "filename": filename,
+        "download_url": f"/api/v1/exports/{filename}",
+        "row_count": row_count,
+        "format": "csv",
+    }
 
 
 def _get_benchmarks(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str, Any]:
@@ -210,11 +374,31 @@ def _model_savings(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[st
     return session.invoke_skill("savings-modeler")
 
 
+def _run_sensitivity(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str, Any]:
+    from app.opar.tools.sensitivity_runner import run_sensitivity_for_session
+
+    scenarios = args.get("scenarios")
+    if scenarios is not None and not isinstance(scenarios, list):
+        scenarios = None
+    drivers = args.get("drivers")
+    if drivers is not None and not isinstance(drivers, dict):
+        drivers = None
+    return run_sensitivity_for_session(
+        session,
+        scenarios=scenarios,
+        drivers=drivers,
+        preset=args.get("preset"),
+        natural_language=args.get("natural_language"),
+    )
+
+
 def _assess_opportunities(session: ToolSessionContext, args: Dict[str, Any]) -> Dict[str, Any]:
     from app.opar.tools.opportunity_reasoning import assess_opportunities_with_llm
 
     _model_savings(session, args)
     session.invoke_skill("evidence-gatherer")
-    assessment = assess_opportunities_with_llm(session, focus_category=args.get("focus_category"), notes=args.get("notes"))
+    assessment = assess_opportunities_with_llm(
+        session, focus_category=args.get("focus_category"), notes=args.get("notes")
+    )
     session.opportunity_assessment = assessment
     return assessment

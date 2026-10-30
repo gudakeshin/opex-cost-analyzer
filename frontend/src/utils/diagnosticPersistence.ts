@@ -13,7 +13,7 @@ export function urlsToText(urls?: string[]): string {
 }
 
 export function revenueCrFromManifest(annualRevenue?: number): string {
-  if (annualRevenue == null) return '5000';
+  if (annualRevenue == null || annualRevenue <= 0) return '';
   const cr =
     annualRevenue > 1_000_000 ? annualRevenue / 10_000_000 : annualRevenue;
   return String(cr);
@@ -26,17 +26,36 @@ export interface DiagnosticFormState {
   urlsText: string;
 }
 
+export function isSessionEngagementStale(
+  sessionEngagementId?: string,
+  activeEngagementId?: string,
+): boolean {
+  if (!sessionEngagementId || !activeEngagementId) return false;
+  return sessionEngagementId !== activeEngagementId;
+}
+
 export function formStateFromManifest(
   manifest: SessionManifest,
   engagement?: {
     company_name?: string;
     industry?: string;
+    industry_user_set?: boolean;
     annual_revenue_cr?: number;
     detected_company_name?: string;
     detected_industry?: string;
+    detected_annual_revenue_cr?: number;
+  },
+  options?: {
+    sessionEngagementId?: string;
+    activeEngagementId?: string;
   },
 ): DiagnosticFormState {
-  const companyFromManifest = manifest.company_name;
+  const stale = isSessionEngagementStale(
+    options?.sessionEngagementId ?? manifest.engagement_id,
+    options?.activeEngagementId,
+  );
+
+  const companyFromManifest = stale ? undefined : manifest.company_name;
   const companyFromEngagement = engagement?.company_name;
   const companyFromDetected = engagement?.detected_company_name;
   const companyName =
@@ -48,25 +67,56 @@ export function formStateFromManifest(
           ? companyFromDetected
           : '';
 
-  const industry =
-    manifest.industry ||
-    engagement?.detected_industry ||
-    engagement?.industry ||
-    'manufacturing_diversified';
+  const engagementIndustry =
+    engagement?.industry_user_set && engagement?.industry
+      ? engagement.industry
+      : engagement?.detected_industry || engagement?.industry;
 
-  const revenueCr =
-    manifest.annual_revenue != null
+  const industry = stale
+    ? engagementIndustry || 'manufacturing_diversified'
+    : manifest.industry || engagementIndustry || 'manufacturing_diversified';
+
+  const revenueCr = stale
+    ? engagement?.annual_revenue_cr != null && engagement.annual_revenue_cr > 0
+      ? String(engagement.annual_revenue_cr)
+      : engagement?.detected_annual_revenue_cr != null &&
+          engagement.detected_annual_revenue_cr > 0
+        ? String(engagement.detected_annual_revenue_cr)
+        : ''
+    : manifest.annual_revenue != null && manifest.annual_revenue > 0
       ? revenueCrFromManifest(manifest.annual_revenue)
-      : engagement?.annual_revenue_cr != null
+      : engagement?.annual_revenue_cr != null && engagement.annual_revenue_cr > 0
         ? String(engagement.annual_revenue_cr)
-        : '5000';
+        : engagement?.detected_annual_revenue_cr != null &&
+            engagement.detected_annual_revenue_cr > 0
+          ? String(engagement.detected_annual_revenue_cr)
+          : '';
 
   return {
     companyName,
     industry,
     revenueCr,
-    urlsText: urlsToText(manifest.diagnostic_urls),
+    urlsText: stale ? '' : urlsToText(manifest.diagnostic_urls),
   };
+}
+
+export function sessionDiagnosticResult(
+  manifest: SessionManifest,
+  options?: {
+    sessionEngagementId?: string;
+    activeEngagementId?: string;
+  },
+): DiagnosticResponse | null {
+  if (
+    isSessionEngagementStale(
+      options?.sessionEngagementId ?? manifest.engagement_id,
+      options?.activeEngagementId,
+    )
+  ) {
+    return null;
+  }
+  const result = manifest.diagnostic_result;
+  return result && isDiagnosticResponse(result) ? result : null;
 }
 
 export function buildDiagnosticContextPatch(
@@ -80,7 +130,9 @@ export function buildDiagnosticContextPatch(
   const patch: DiagnosticContextPatch = {
     company_name: form.companyName.trim() || undefined,
     industry: form.industry,
-    annual_revenue_cr: parseFloat(form.revenueCr) || 5000,
+    annual_revenue_cr: form.revenueCr.trim()
+      ? parseFloat(form.revenueCr) || undefined
+      : undefined,
     diagnostic_urls: parseUrlsText(form.urlsText),
   };
   if (options?.diagnosticResult) {

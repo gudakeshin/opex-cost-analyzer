@@ -1,0 +1,29 @@
+# Cost Optimization Memo — Aranya Digital Services
+
+## Executive Summary
+
+This memo reviews operating expense across IT, Travel, and Professional Services
+for FY2025. Total addressable spend is estimated at INR 18 crore. The single
+largest opportunity sits in IT software licensing, where contract renewal timing
+creates negotiating leverage.
+
+## Cost Summary by Category
+
+| Category | Annual Spend (INR Lakh) | Addressable % |
+| --- | --- | --- |
+| IT & Technology | 1,200 | 35 |
+| Travel | 800 | 20 |
+| Professional Services | 640 | 28 |
+
+## Contract Notes
+
+The Oracle database maintenance contract renews in March 2027 and carries a
+12 percent auto-escalation clause. The AWS enterprise agreement is up for
+renewal in September 2026. Both contracts should be renegotiated well ahead of
+their expiry dates to avoid the escalation.
+
+## Recommendations
+
+Consolidate the three regional travel desks into a single managed travel program
+and renegotiate Oracle maintenance from Net-30 to Net-60 payment terms to release
+working capital.

@@ -60,5 +60,23 @@
     "target_direction": "higher",
     "p50_benchmark": 20.0,
     "source": "TRAI Annual Report 2023-24: India average data usage 19.5 GB/user/month. Jio: ~27 GB/user. Industry median: ~18-22 GB. GSMA Mobile Economy India 2024."
+  },
+  {
+    "kpi_id": "tower_tenancy_ratio",
+    "kpi_name": "Tower Tenancy Ratio",
+    "unit": "ratio",
+    "formula": "total_tenancies / total_towers",
+    "target_direction": "higher",
+    "p50_benchmark_pct": 1.8,
+    "source": "Indus Towers FY25 factsheet — tenancy ratio ~1.8; sharing economics driver"
+  },
+  {
+    "kpi_id": "energy_cost_pct",
+    "kpi_name": "Network Energy Cost % of Revenue",
+    "unit": "pct",
+    "formula": "network_energy_cost / revenue * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 8.0,
+    "source": "Tower co energy pass-through disclosures; diesel-to-grid/RE transition benchmarks"
   }
 ]

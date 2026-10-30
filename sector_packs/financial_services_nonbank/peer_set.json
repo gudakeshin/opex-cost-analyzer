@@ -1,0 +1,95 @@
+{
+  "sector": "financial_services_nonbank",
+  "currency": "INR",
+  "peers": [
+    {
+      "name": "Bajaj Finance",
+      "ticker": "BAJFINANCE.NS",
+      "exchange": "NSE",
+      "revenue_cr": 52000,
+      "entity_type": "NBFC"
+    },
+    {
+      "name": "HDFC Asset Management",
+      "ticker": "HDFCAMC.NS",
+      "exchange": "NSE",
+      "revenue_cr": 3200,
+      "entity_type": "AMC"
+    },
+    {
+      "name": "ICICI Prudential AMC",
+      "ticker": "ICICIPRULI.NS",
+      "exchange": "NSE",
+      "revenue_cr": 4800,
+      "entity_type": "AMC"
+    },
+    {
+      "name": "Cholamandalam Investment",
+      "ticker": "CHOLAFIN.NS",
+      "exchange": "NSE",
+      "revenue_cr": 22000,
+      "entity_type": "NBFC"
+    },
+    {
+      "name": "Muthoot Finance",
+      "ticker": "MUTHOOTFIN.NS",
+      "exchange": "NSE",
+      "revenue_cr": 38000,
+      "entity_type": "NBFC"
+    },
+    {
+      "name": "Angel One",
+      "ticker": "ANGELONE.NS",
+      "exchange": "NSE",
+      "revenue_cr": 4200,
+      "entity_type": "Broker"
+    },
+    {
+      "name": "Shriram Finance",
+      "ticker": "SHRIRAMFIN.NS",
+      "exchange": "NSE",
+      "entity_type": "NBFC",
+      "revenue_cr": 36000
+    },
+    {
+      "name": "Nippon Life India AMC",
+      "ticker": "NAM-INDIA.NS",
+      "exchange": "NSE",
+      "entity_type": "AMC",
+      "revenue_cr": 2100
+    },
+    {
+      "name": "Motilal Oswal Financial Services",
+      "ticker": "MOTILALOFS.NS",
+      "exchange": "NSE",
+      "entity_type": "Wealth_Manager",
+      "revenue_cr": 7100
+    },
+    {
+      "name": "LIC Housing Finance",
+      "ticker": "LICHSGFIN.NS",
+      "exchange": "NSE",
+      "entity_type": "NBFC",
+      "revenue_cr": 27000
+    }
+  ],
+  "benchmark_metrics": {
+    "cost_to_income_pct": {
+      "p25": 32.0,
+      "p50": 38.0,
+      "p75": 45.0
+    },
+    "employee_cost_to_revenue_pct": {
+      "p25": 18.0,
+      "p50": 24.0,
+      "p75": 30.0
+    },
+    "technology_to_revenue_pct": {
+      "p25": 4.0,
+      "p50": 7.0,
+      "p75": 11.0
+    }
+  },
+  "data_source": "BSE/NSE annual reports FY25",
+  "refresh_date": "2026-04-01"
+}

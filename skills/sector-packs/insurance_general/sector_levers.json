@@ -39,7 +39,8 @@
     "space_utilization_optimization",
     "lease_restructuring",
     "cost_governance",
-    "insurance_premium_optimization"
+    "insurance_premium_optimization",
+    "travel_policy_optimization"
   ],
   "sector_specific_levers": [
     {
@@ -126,7 +127,8 @@
         "FNOL data: channel mix (agent, digital, call centre) and data completeness at intake",
         "Policy admin system and claims management system integration architecture",
         "IRDAI compliance requirements for automated adjudication"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "underwriting_automation",
@@ -212,7 +214,8 @@
         "External data availability for risk enrichment (bureau, geo-risk, IoT sensors)",
         "Policy admin system architecture and API capability",
         "IRDAI compliance requirements for automated underwriting"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "policy_admin_digitization",
@@ -297,7 +300,8 @@
         "PAS landscape and integration architecture",
         "Digital channel adoption rate (app, web portal) by policyholder segment",
         "IRDAI compliance requirements for digital policy issuance and documentation"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "fraud_detection_ai_insurance",
@@ -383,7 +387,8 @@
         "Investigation case outcomes and false-positive rate",
         "Claims management system architecture for scoring integration",
         "IRDAI compliance requirements for AI-based fraud detection"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "channel_mix_optimization",
@@ -469,7 +474,8 @@
         "Persistency data (13th and 25th month) by channel",
         "Claims frequency and loss ratio by channel",
         "Digital channel funnel data (leads, conversion, policy issued)"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "reinsurance_optimization",
@@ -554,7 +560,8 @@
         "Reinsurer credit ratings and panel review history",
         "Gross and net combined ratio by product line (3 years)",
         "IRDAI reinsurance program filing requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "investment_ops_efficiency",
@@ -640,7 +647,8 @@
         "Settlement fail rate and penalty data",
         "OMS and custodian integration architecture",
         "IRDAI investment reporting requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "actuarial_automation",
@@ -726,7 +734,639 @@
         "IRDAI actuarial reporting requirements and schedule",
         "IT infrastructure for actuarial modelling platform",
         "Model validation and governance framework"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
+    },
+    {
+      "lever_id": "claims_automation_ai",
+      "lever_name": "Claims Processing Automation & AI Fraud Detection",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 20.0,
+        "p90": 32.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Claims Processing Automation & AI Fraud Detection"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:HR present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 (irdai.gov.in) — claims settlement efficiency targets; STP claims reducing servicing cost",
+        "ICICI Lombard FY25 Annual Report (BSE 540716) — AI-driven claims: 90%+ motor claims settled within 3 hours via automated surveyor",
+        "INTERNAL_CALIBRATION — claims automation savings calibrated from 3 general insurance transformation engagements"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Claims Processing Automation & AI Fraud Detection: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "direct_digital_channel_growth",
+      "lever_name": "Direct Digital Channel Expansion",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 25.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Direct Digital Channel Expansion"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:HR present",
+        "category:MARKETING present"
+      ],
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — digital channel GWP share growing; web aggregator regulation enabling transparent pricing",
+        "Policybazaar (PB Fintech) FY25 Annual Report (BSE 543390) — aggregator commission 8-12% vs. agency 15-20% for comparable business",
+        "INTERNAL_CALIBRATION — channel shift savings from 2 general insurance distribution strategy mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Direct Digital Channel Expansion: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for MARKETING",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "reinsurance_optimisation",
+      "lever_name": "Reinsurance Programme Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Reinsurance Programme Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 24,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:OUTSOURCED present",
+        "category:FIN_SVCS present"
+      ],
+      "industry_sources": [
+        "GIC Re FY25 Annual Report (BSE 540755) — domestic reinsurance market; cession rates and treaty terms for Indian insurers",
+        "IRDAI Reinsurance Regulations 2018 amended 2022 (irdai.gov.in) — Indian First rule mandating GIC Re as preferred reinsurer",
+        "INTERNAL_CALIBRATION — reinsurance optimisation savings from 2 general insurance actuarial reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Reinsurance Programme Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FIN_SVCS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "branch_agent_network_rationalisation",
+      "lever_name": "Branch & Agency Network Rationalisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 16.0,
+        "p90": 25.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Branch & Agency Network Rationalisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:FACILITIES present",
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "IRDAI Agent Regulation — POSP digital licensing enabling direct policy issuance without branch infrastructure",
+        "New India Assurance FY25 Annual Report (BSE 540769) — branch rationalisation cited as structural cost reduction initiative",
+        "INTERNAL_CALIBRATION — agency network rationalisation savings from 3 general insurance distribution mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Branch & Agency Network Rationalisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "technology_legacy_modernisation",
+      "lever_name": "Policy Administration System (PAS) Modernisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 12.0,
+        "p50": 20.0,
+        "p90": 30.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "mixed",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Policy Administration System (PAS) Modernisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 48,
+        "p50": 52,
+        "p90": 60
+      },
+      "applicable_if": [
+        "category:IT present"
+      ],
+      "industry_sources": [
+        "Gartner — Insurance Core System Modernisation 2024 (gartner.com) — cloud PAS reduces IT maintenance 25-35% vs. on-premise legacy",
+        "ICICI Lombard FY25 Annual Report — technology investments in digital-first model cited as structural advantage in combined ratio management",
+        "INTERNAL_CALIBRATION — PAS modernisation savings from 1 general insurance IT transformation mandate"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Policy Administration System (PAS) Modernisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 26
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for IT",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "telematics_risk_based_pricing",
+      "lever_name": "Telematics & Risk-Based Pricing",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 3.0,
+        "p50": 6.0,
+        "p90": 12.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Telematics & Risk-Based Pricing"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 22,
+        "p50": 26,
+        "p90": 34
+      },
+      "applicable_if": [
+        "category:IT present",
+        "category:MARKETING present"
+      ],
+      "industry_sources": [
+        "IRDAI Sandbox Regulations 2019 amended 2023 (irdai.gov.in) — UBI (usage-based insurance) regulatory sandbox enabling telematics",
+        "ICICI Lombard InstaSpect and telematics programme — improved loss ratio on telematics-priced motor book",
+        "INTERNAL_CALIBRATION — telematics loss ratio improvement calibrated from 2 Indian motor insurer programmes"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Telematics & Risk-Based Pricing: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 13
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for IT",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "shared_services_insurance",
+      "lever_name": "G&A Shared Services & Procurement Consolidation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for G&A Shared Services & Procurement Consolidation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:FACILITIES present",
+        "category:HR present",
+        "category:PROF_SVCS present"
+      ],
+      "industry_sources": [
+        "Hackett Group G&A Benchmarks 2024 (thehackettgroup.com) — world-class G&A at 1.1% of revenue; shared services reduces G&A 20-30%",
+        "IRDAI Annual Report 2023-24 — expense-of-management ratio as regulatory metric; group-level efficiency initiatives",
+        "INTERNAL_CALIBRATION — shared services savings calibrated from 2 insurance group G&A transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for G&A Shared Services & Procurement Consolidation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "travel_policy_optimization",
+      "lever_name": "Travel Policy Compliance & TMC Consolidation",
+      "lever_family": "demand",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.04,
+      "phasing_curve": [
+        0.35,
+        0.45,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.55,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Travel policy updated with cabin-class caps, advance-booking rules, and preferred supplier list",
+        "TMC or self-booking tool configured with in-policy guardrails",
+        "Pre-trip approval workflow enabled for trips above threshold"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.82,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 14
+      },
+      "applicable_if": [
+        "category:TRAVEL present"
+      ],
+      "industry_sources": [
+        "GBTA 2025 Business Travel Index Outlook (gbta.org) — managed travel programmes save 10-25% via policy compliance",
+        "IRDAI Annual Report 2023-24 — insurer T&E as component of expense-of-management ratio",
+        "INTERNAL_CALIBRATION — insurance T&E savings from 2 India general insurance travel mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit T&E spend by category, traveller grade, and booking channel; quantify out-of-policy leakage",
+          "owner_role": "Travel Manager / FP&A",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Consolidate to preferred TMC or corporate booking tool; negotiate airline and hotel programme rates",
+          "owner_role": "Procurement / Travel",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Deploy policy guardrails and pre-trip approval; communicate video-first norms for short engagements",
+          "owner_role": "HR / Travel",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Track compliance rate, average ticket price, and leakage monthly vs baseline",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Policy compliance rate below 80% or >15% spend booked outside managed channel",
+          "evidence_source": "tmc_report",
+          "confirms": "Travel governance gap is material"
+        },
+        {
+          "signal": "Average hotel/airfare rates above GSA or peer benchmark for top routes",
+          "evidence_source": "benchmark",
+          "confirms": "Rate renegotiation and channel consolidation will close price gap"
+        }
+      ],
+      "required_data_fields": [
+        "T&E transaction detail by traveller, category, and booking channel",
+        "Travel policy document and exception log",
+        "TMC or expense system compliance reports"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "Corporate & Reinsurance Premium Optimisation",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.03,
+      "phasing_curve": [
+        0.6,
+        0.3,
+        0.1
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Insurance audit completed — coverage adequacy vs. over-insurance assessed by peril",
+        "Market submissions prepared for competitive renewal (3+ carriers benchmarked)",
+        "Risk management improvements documented as leverage for premium negotiation"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:INSURANCE present"
+      ],
+      "industry_sources": [
+        "GIC Re FY25 Annual Report — reinsurance market benchmarks for Indian insurers",
+        "Marsh Global Risk Report 2024 — corporate insurance RFP savings 10-20%",
+        "INTERNAL_CALIBRATION — insurer corporate insurance savings from 2 India insurance group risk reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Ind AS 116 Lease Reclassification (Operating vs. Finance): validate baseline and stakeholders",
+          "owner_role": "Treasury",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Model supplier financial risk and term scenarios",
+          "owner_role": "Treasury / Procurement",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Negotiate term changes with top suppliers",
+          "owner_role": "Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Update ERP terms and monitor DPO/cash impact",
+          "owner_role": "AP Lead",
+          "duration_weeks": 2
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "DPO below sector benchmark with low supplier risk",
+          "evidence_source": "ap_aging",
+          "confirms": "Term extension is feasible"
+        }
+      ],
+      "required_data_fields": [
+        "AP aging by supplier",
+        "Payment terms master",
+        "Supplier credit/risk ratings"
+      ],
+      "applicability_threshold_pct": 0.02
     }
   ]
 }

@@ -1,0 +1,65 @@
+gl_code,cost_center,vendor,description,amount,currency,fiscal_period,amount_type,business_unit,geo,legal_entity,source_system,source_record_id,gst_treatment,gstin,lease_treatment,related_party
+510010,CC-MEDICA-001,3M India,3M India services — Medical Consumables & Supplies,155882550,INR,2023-Q2,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100001,itc_eligible,27AABCT1234M1Z8,,no
+510010,CC-MEDICA-001,3M India,3M India services — Medical Consumables & Supplies,159000201,INR,2023-Q3,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100002,itc_eligible,27AABCT1234M1Z8,,no
+510010,CC-MEDICA-001,3M India,3M India services — Medical Consumables & Supplies,162117852,INR,2023-Q4,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100003,itc_eligible,27AABCT1234M1Z8,,no
+510010,CC-MEDICA-001,3M India,3M India services — Medical Consumables & Supplies,165235503,INR,2024-Q1,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100004,itc_eligible,27AABCT1234M1Z8,,no
+510010,CC-MEDICA-001,3M India,3M India services — Medical Consumables & Supplies,168353154,INR,2024-Q2,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100005,itc_eligible,27AABCT1234M1Z8,,no
+510010,CC-MEDICA-001,3M India,3M India services — Medical Consumables & Supplies,171470805,INR,2024-Q3,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100006,itc_eligible,27AABCT1234M1Z8,,no
+510010,CC-MEDICA-001,3M India,3M India services — Medical Consumables & Supplies,174588456,INR,2024-Q4,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100007,itc_eligible,27AABCT1234M1Z8,,no
+510010,CC-MEDICA-001,3M India,3M India services — Medical Consumables & Supplies,177706107,INR,2025-Q1,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100008,itc_eligible,27AABCT1234M1Z8,,no
+510010,CC-MEDICA-001,Johnson & Johnson India,Johnson & Johnson India services — Medical Consumables & Supplies,451045669,INR,2023-Q2,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100009,itc_eligible,27AABCJ5621J1Z1,,no
+510010,CC-MEDICA-001,Johnson & Johnson India,Johnson & Johnson India services — Medical Consumables & Supplies,460066582,INR,2023-Q3,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100010,itc_eligible,27AABCJ5621J1Z1,,no
+510010,CC-MEDICA-001,Johnson & Johnson India,Johnson & Johnson India services — Medical Consumables & Supplies,469087495,INR,2023-Q4,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100011,itc_eligible,27AABCJ5621J1Z1,,no
+510010,CC-MEDICA-001,Johnson & Johnson India,Johnson & Johnson India services — Medical Consumables & Supplies,478108409,INR,2024-Q1,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100012,itc_eligible,27AABCJ5621J1Z1,,no
+510010,CC-MEDICA-001,Johnson & Johnson India,Johnson & Johnson India services — Medical Consumables & Supplies,487129322,INR,2024-Q2,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100013,itc_eligible,27AABCJ5621J1Z1,,no
+510010,CC-MEDICA-001,Johnson & Johnson India,Johnson & Johnson India services — Medical Consumables & Supplies,496150235,INR,2024-Q3,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100014,itc_eligible,27AABCJ5621J1Z1,,no
+510010,CC-MEDICA-001,Johnson & Johnson India,Johnson & Johnson India services — Medical Consumables & Supplies,505171149,INR,2024-Q4,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100015,itc_eligible,27AABCJ5621J1Z1,,no
+510010,CC-MEDICA-001,Johnson & Johnson India,Johnson & Johnson India services — Medical Consumables & Supplies,514192062,INR,2025-Q1,actual,Medical,India,AHNL-IN,Oracle,Oracle-AP-100016,itc_eligible,27AABCJ5621J1Z1,,no
+520010,CC-PHARMA-001,Abbott India,Abbott India services — Pharmacy & Drugs,111918903,INR,2023-Q2,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100017,itc_eligible,27AABCA8821A1Z4,,no
+520010,CC-PHARMA-001,Abbott India,Abbott India services — Pharmacy & Drugs,114157281,INR,2023-Q3,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100018,itc_eligible,27AABCA8821A1Z4,,no
+520010,CC-PHARMA-001,Abbott India,Abbott India services — Pharmacy & Drugs,116395659,INR,2023-Q4,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100019,itc_eligible,27AABCA8821A1Z4,,no
+520010,CC-PHARMA-001,Abbott India,Abbott India services — Pharmacy & Drugs,118634037,INR,2024-Q1,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100020,itc_eligible,27AABCA8821A1Z4,,no
+520010,CC-PHARMA-001,Abbott India,Abbott India services — Pharmacy & Drugs,120872415,INR,2024-Q2,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100021,itc_eligible,27AABCA8821A1Z4,,no
+520010,CC-PHARMA-001,Abbott India,Abbott India services — Pharmacy & Drugs,123110793,INR,2024-Q3,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100022,itc_eligible,27AABCA8821A1Z4,,no
+520010,CC-PHARMA-001,Abbott India,Abbott India services — Pharmacy & Drugs,125349171,INR,2024-Q4,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100023,itc_eligible,27AABCA8821A1Z4,,no
+520010,CC-PHARMA-001,Abbott India,Abbott India services — Pharmacy & Drugs,127587549,INR,2025-Q1,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100024,itc_eligible,27AABCA8821A1Z4,,no
+520010,CC-PHARMA-001,Sun Pharma,Sun Pharma services — Pharmacy & Drugs,244784157,INR,2023-Q2,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100025,itc_eligible,27AABCS9921P1Z7,,no
+520010,CC-PHARMA-001,Sun Pharma,Sun Pharma services — Pharmacy & Drugs,249679840,INR,2023-Q3,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100026,itc_eligible,27AABCS9921P1Z7,,no
+520010,CC-PHARMA-001,Sun Pharma,Sun Pharma services — Pharmacy & Drugs,254575523,INR,2023-Q4,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100027,itc_eligible,27AABCS9921P1Z7,,no
+520010,CC-PHARMA-001,Sun Pharma,Sun Pharma services — Pharmacy & Drugs,259471206,INR,2024-Q1,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100028,itc_eligible,27AABCS9921P1Z7,,no
+520010,CC-PHARMA-001,Sun Pharma,Sun Pharma services — Pharmacy & Drugs,264366889,INR,2024-Q2,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100029,itc_eligible,27AABCS9921P1Z7,,no
+520010,CC-PHARMA-001,Sun Pharma,Sun Pharma services — Pharmacy & Drugs,269262572,INR,2024-Q3,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100030,itc_eligible,27AABCS9921P1Z7,,no
+520010,CC-PHARMA-001,Sun Pharma,Sun Pharma services — Pharmacy & Drugs,274158255,INR,2024-Q4,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100031,itc_eligible,27AABCS9921P1Z7,,no
+520010,CC-PHARMA-001,Sun Pharma,Sun Pharma services — Pharmacy & Drugs,279053938,INR,2025-Q1,actual,Pharmacy,India,AHNL-IN,Oracle,Oracle-AP-100032,itc_eligible,27AABCS9921P1Z7,,no
+530010,CC-BIOMED-001,Siemens Healthineers,Siemens Healthineers services — Biomedical Equipment Maintenance,188887484,INR,2023-Q2,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100033,itc_eligible,27AABCS7711H1Z0,,no
+530010,CC-BIOMED-001,Siemens Healthineers,Siemens Healthineers services — Biomedical Equipment Maintenance,192665233,INR,2023-Q3,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100034,itc_eligible,27AABCS7711H1Z0,,no
+530010,CC-BIOMED-001,Siemens Healthineers,Siemens Healthineers services — Biomedical Equipment Maintenance,196442983,INR,2023-Q4,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100035,itc_eligible,27AABCS7711H1Z0,,no
+530010,CC-BIOMED-001,Siemens Healthineers,Siemens Healthineers services — Biomedical Equipment Maintenance,200220733,INR,2024-Q1,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100036,itc_eligible,27AABCS7711H1Z0,,no
+530010,CC-BIOMED-001,Siemens Healthineers,Siemens Healthineers services — Biomedical Equipment Maintenance,203998482,INR,2024-Q2,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100037,itc_eligible,27AABCS7711H1Z0,,no
+530010,CC-BIOMED-001,Siemens Healthineers,Siemens Healthineers services — Biomedical Equipment Maintenance,207776232,INR,2024-Q3,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100038,itc_eligible,27AABCS7711H1Z0,,no
+530010,CC-BIOMED-001,Siemens Healthineers,Siemens Healthineers services — Biomedical Equipment Maintenance,211553982,INR,2024-Q4,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100039,itc_eligible,27AABCS7711H1Z0,,no
+530010,CC-BIOMED-001,Siemens Healthineers,Siemens Healthineers services — Biomedical Equipment Maintenance,215331731,INR,2025-Q1,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100040,itc_eligible,27AABCS7711H1Z0,,no
+530010,CC-BIOMED-001,GE Healthcare India,GE Healthcare India services — Biomedical Equipment Maintenance,464024125,INR,2023-Q2,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100041,itc_eligible,27AABCG6621H1Z3,,no
+530010,CC-BIOMED-001,GE Healthcare India,GE Healthcare India services — Biomedical Equipment Maintenance,473304607,INR,2023-Q3,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100042,itc_eligible,27AABCG6621H1Z3,,no
+530010,CC-BIOMED-001,GE Healthcare India,GE Healthcare India services — Biomedical Equipment Maintenance,482585090,INR,2023-Q4,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100043,itc_eligible,27AABCG6621H1Z3,,no
+530010,CC-BIOMED-001,GE Healthcare India,GE Healthcare India services — Biomedical Equipment Maintenance,491865572,INR,2024-Q1,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100044,itc_eligible,27AABCG6621H1Z3,,no
+530010,CC-BIOMED-001,GE Healthcare India,GE Healthcare India services — Biomedical Equipment Maintenance,501146055,INR,2024-Q2,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100045,itc_eligible,27AABCG6621H1Z3,,no
+530010,CC-BIOMED-001,GE Healthcare India,GE Healthcare India services — Biomedical Equipment Maintenance,510426537,INR,2024-Q3,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100046,itc_eligible,27AABCG6621H1Z3,,no
+530010,CC-BIOMED-001,GE Healthcare India,GE Healthcare India services — Biomedical Equipment Maintenance,519707020,INR,2024-Q4,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100047,itc_eligible,27AABCG6621H1Z3,,no
+530010,CC-BIOMED-001,GE Healthcare India,GE Healthcare India services — Biomedical Equipment Maintenance,528987502,INR,2025-Q1,actual,Biomedical,India,AHNL-IN,Oracle,Oracle-AP-100048,itc_eligible,27AABCG6621H1Z3,,no
+540010,CC-FACILI-001,ISS Facility Services,ISS Facility Services services — Facility Management,323818205,INR,2023-Q2,actual,Facility,India,AHNL-IN,Oracle,Oracle-AP-100049,itc_eligible,27AABCI3321F1Z4,,no
+540010,CC-FACILI-001,ISS Facility Services,ISS Facility Services services — Facility Management,330294569,INR,2023-Q3,actual,Facility,India,AHNL-IN,Oracle,Oracle-AP-100050,itc_eligible,27AABCI3321F1Z4,,no
+540010,CC-FACILI-001,ISS Facility Services,ISS Facility Services services — Facility Management,336770933,INR,2023-Q4,actual,Facility,India,AHNL-IN,Oracle,Oracle-AP-100051,itc_eligible,27AABCI3321F1Z4,,no
+540010,CC-FACILI-001,ISS Facility Services,ISS Facility Services services — Facility Management,343247297,INR,2024-Q1,actual,Facility,India,AHNL-IN,Oracle,Oracle-AP-100052,itc_eligible,27AABCI3321F1Z4,,no
+540010,CC-FACILI-001,ISS Facility Services,ISS Facility Services services — Facility Management,349723661,INR,2024-Q2,actual,Facility,India,AHNL-IN,Oracle,Oracle-AP-100053,itc_eligible,27AABCI3321F1Z4,,no
+540010,CC-FACILI-001,ISS Facility Services,ISS Facility Services services — Facility Management,356200025,INR,2024-Q3,actual,Facility,India,AHNL-IN,Oracle,Oracle-AP-100054,itc_eligible,27AABCI3321F1Z4,,no
+540010,CC-FACILI-001,ISS Facility Services,ISS Facility Services services — Facility Management,362676389,INR,2024-Q4,actual,Facility,India,AHNL-IN,Oracle,Oracle-AP-100055,itc_eligible,27AABCI3321F1Z4,,no
+540010,CC-FACILI-001,ISS Facility Services,ISS Facility Services services — Facility Management,369152753,INR,2025-Q1,actual,Facility,India,AHNL-IN,Oracle,Oracle-AP-100056,itc_eligible,27AABCI3321F1Z4,,no
+550010,CC-CLINIC-001,TeamLease Digital,TeamLease Digital services — Clinical Staffing,187481316,INR,2023-Q2,actual,Clinical,India,AHNL-IN,Oracle,Oracle-AP-100057,itc_eligible,29AABCT5678L1Z9,,no
+550010,CC-CLINIC-001,TeamLease Digital,TeamLease Digital services — Clinical Staffing,191230942,INR,2023-Q3,actual,Clinical,India,AHNL-IN,Oracle,Oracle-AP-100058,itc_eligible,29AABCT5678L1Z9,,no
+550010,CC-CLINIC-001,TeamLease Digital,TeamLease Digital services — Clinical Staffing,194980568,INR,2023-Q4,actual,Clinical,India,AHNL-IN,Oracle,Oracle-AP-100059,itc_eligible,29AABCT5678L1Z9,,no
+550010,CC-CLINIC-001,TeamLease Digital,TeamLease Digital services — Clinical Staffing,198730194,INR,2024-Q1,actual,Clinical,India,AHNL-IN,Oracle,Oracle-AP-100060,itc_eligible,29AABCT5678L1Z9,,no
+550010,CC-CLINIC-001,TeamLease Digital,TeamLease Digital services — Clinical Staffing,202479821,INR,2024-Q2,actual,Clinical,India,AHNL-IN,Oracle,Oracle-AP-100061,itc_eligible,29AABCT5678L1Z9,,no
+550010,CC-CLINIC-001,TeamLease Digital,TeamLease Digital services — Clinical Staffing,206229447,INR,2024-Q3,actual,Clinical,India,AHNL-IN,Oracle,Oracle-AP-100062,itc_eligible,29AABCT5678L1Z9,,no
+550010,CC-CLINIC-001,TeamLease Digital,TeamLease Digital services — Clinical Staffing,209979073,INR,2024-Q4,actual,Clinical,India,AHNL-IN,Oracle,Oracle-AP-100063,itc_eligible,29AABCT5678L1Z9,,no
+550010,CC-CLINIC-001,TeamLease Digital,TeamLease Digital services — Clinical Staffing,213728700,INR,2025-Q1,actual,Clinical,India,AHNL-IN,Oracle,Oracle-AP-100064,itc_eligible,29AABCT5678L1Z9,,no

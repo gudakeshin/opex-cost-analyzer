@@ -1,0 +1,25 @@
+asset_class,fiscal_period,amount,currency,status
+HQ refurbishment,FY23-Q1,296279904,INR,actual
+HQ refurbishment,FY23-Q2,329199894,INR,actual
+HQ refurbishment,FY23-Q3,312739899,INR,actual
+HQ refurbishment,FY23-Q4,355535885,INR,actual
+HQ refurbishment,FY24-Q1,348951887,INR,actual
+HQ refurbishment,FY24-Q2,358827884,INR,actual
+Group data centre,FY23-Q1,199764514,INR,actual
+Group data centre,FY23-Q2,221960572,INR,actual
+Group data centre,FY23-Q3,210862543,INR,actual
+Group data centre,FY23-Q4,239717417,INR,actual
+Group data centre,FY24-Q1,235278206,INR,actual
+Group data centre,FY24-Q2,241937023,INR,actual
+Digital transformation,FY23-Q1,274303039,INR,actual
+Digital transformation,FY23-Q2,304781155,INR,actual
+Digital transformation,FY23-Q3,289542097,INR,actual
+Digital transformation,FY23-Q4,329163647,INR,actual
+Digital transformation,FY24-Q1,323068024,INR,actual
+Digital transformation,FY24-Q2,332211458,INR,actual
+M&A integration,FY23-Q1,264616830,INR,actual
+M&A integration,FY23-Q2,294018700,INR,actual
+M&A integration,FY23-Q3,279317765,INR,actual
+M&A integration,FY23-Q4,317540196,INR,actual
+M&A integration,FY24-Q1,311659822,INR,actual
+M&A integration,FY24-Q2,320480383,INR,actual

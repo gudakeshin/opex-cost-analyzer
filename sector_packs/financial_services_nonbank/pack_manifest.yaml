@@ -1,10 +1,13 @@
 pack_id: financial_services_nonbank
 sector: Financial Services (Non-Bank)
-version: '0.1'
+version: '1.0'
 schema_version: '1.0'
-status: scaffold
-description: Asset managers, insurance brokers, NBFCs, mutual funds, wealth management
-  firms.
+status: full
+description: >
+  Full sector pack for Indian non-bank financial services — NBFCs, AMCs,
+  brokers, and wealth managers. Covers origination and collections cost,
+  distribution commissions, fund administration, market data, KYC
+  onboarding, and compliance operations.
 applicable_entity_types:
 - NBFC
 - AMC

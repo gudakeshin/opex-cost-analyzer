@@ -1,0 +1,7 @@
+Prakrit Consumer Brands Ltd — Diagnostic URLs (synthetic/illustrative)
+
+1. Investor relations: https://www.prakritbrands.example/investors
+2. FSSAI compliance: https://www.fssai.example/operators/pcbl
+3. Annual report: https://www.prakritbrands.example/ir/annual-report-fy25.pdf
+4. NSE: https://www.nseindia.example/get-quotes/equity?symbol=PRAKRITCB
+5. Nielsen India FMCG report: https://www.nielsen.example/india/fmcg-report-2025

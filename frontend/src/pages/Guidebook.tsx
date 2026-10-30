@@ -60,7 +60,7 @@ export const Guidebook: React.FC = () => {
   }, []);
 
   return (
-    <MainLayout title="Guidebook">
+    <MainLayout hideHeader title="Guidebook">
       <PageHeader
         title="Guidebook"
         subtitle="Client data sources for deep OpEx analysis — what to request, why it matters, and how each input adds value"
@@ -75,7 +75,7 @@ export const Guidebook: React.FC = () => {
         <ul className="mt-4 space-y-1.5 text-sm text-brand-muted">
           {GUIDEBOOK_ACCEPTED_FORMATS.map((line) => (
             <li key={line} className="flex gap-2">
-              <span className="text-deloitte-green shrink-0">•</span>
+              <span className="text-brand-primary shrink-0">•</span>
               <span>{line}</span>
             </li>
           ))}
@@ -83,7 +83,7 @@ export const Guidebook: React.FC = () => {
       </Card>
 
       <nav
-        className="sticky top-[4.5rem] z-20 -mx-1 mb-6 flex flex-wrap gap-2 rounded-lg border border-brand-border bg-white/95 backdrop-blur px-3 py-3 shadow-sm"
+        className="sticky top-14 md:top-0 z-20 -mx-1 mb-6 flex flex-wrap gap-2 rounded-lg border border-brand-border bg-white/95 backdrop-blur px-3 py-3 shadow-sm"
         aria-label="Guidebook tiers"
       >
         {TIER_NAV.map((t) => (
@@ -93,7 +93,7 @@ export const Guidebook: React.FC = () => {
             onClick={() => scrollToTier(t.id)}
             className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
               activeTier === t.id
-                ? 'bg-deloitte-green text-white'
+                ? 'bg-deloitte-green text-black'
                 : 'bg-brand-surface-muted text-brand-ink hover:bg-brand-border/40'
             }`}
           >
@@ -134,7 +134,7 @@ export const Guidebook: React.FC = () => {
                       <p className="text-sm text-brand-ink leading-relaxed">{source.whyRequired}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-deloitte-green mb-1">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-brand-primary mb-1">
                         How it adds value
                       </p>
                       <p className="text-sm text-brand-ink leading-relaxed">{source.valueAdded}</p>
@@ -158,6 +158,59 @@ export const Guidebook: React.FC = () => {
           </section>
         ))}
       </div>
+
+      <section className="mt-12 mb-8" id="guidebook-cost-room">
+        <h2 className="text-lg font-bold text-brand-ink mb-2">Cost Room workflow</h2>
+        <p className="text-sm text-brand-muted mb-4">
+          The Live Cost Room is the Week 4+ initiative command center for consultants and executives. It
+          turns analysis outputs into a governable savings portfolio.
+        </p>
+        <Card className="bg-white border-brand-border mb-4">
+          <h3 className="text-sm font-semibold text-brand-ink mb-3">Analysis → Cost Room data flow</h3>
+          <ol className="text-sm text-brand-ink space-y-2 list-decimal list-inside">
+            <li>
+              Upload spend in <strong>Analysis</strong> and run OPAR analysis. Skill outputs (value bridge,
+              savings model, FP&amp;A analyzers) are stored in session memory.
+            </li>
+            <li>
+              When analysis completes, initiatives are <strong>seeded automatically</strong> into the pipeline
+              store from the business-case builder output.
+            </li>
+            <li>
+              Open <strong>Cost Room</strong> to filter the portfolio, toggle P10/P50/P90 bands, stress-test
+              macro scenarios, accept/defer/reject initiatives, and resolve data conflicts.
+            </li>
+            <li>
+              Drill into any initiative to view assumptions, source spend rows, uploaded files, milestones,
+              and record realized savings actuals.
+            </li>
+            <li>
+              Export the current view as a <strong>deck</strong> (business case DOCX) or <strong>Excel</strong>{' '}
+              PMO portfolio workbook from the trust footer.
+            </li>
+          </ol>
+        </Card>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Card className="bg-white border-brand-border">
+            <h3 className="text-sm font-semibold text-brand-ink mb-2">Consultant mode</h3>
+            <ul className="text-sm text-brand-muted space-y-1.5 list-disc list-inside">
+              <li>Accept / defer / reject with audit trail (AQS ≥ 0.65 for Gate-2 accept)</li>
+              <li>Data conflict resolution and exception inbox</li>
+              <li>FP&amp;A detail tabs: Trends, BvA, Payment Terms, Cost-to-Serve</li>
+              <li>Entity consolidation and full trust rail</li>
+            </ul>
+          </Card>
+          <Card className="bg-white border-brand-border">
+            <h3 className="text-sm font-semibold text-brand-ink mb-2">Executive mode</h3>
+            <ul className="text-sm text-brand-muted space-y-1.5 list-disc list-inside">
+              <li>Engagement context bar with company, gate, and audience toggle</li>
+              <li>Read-only portfolio with EBITDA bps, sustainability, and addressability dots</li>
+              <li>Scenario controls and value bridge for Audit Committee walkthroughs</li>
+              <li>Conflicts and FP&amp;A panels hidden for a cleaner C-suite view</li>
+            </ul>
+          </Card>
+        </div>
+      </section>
 
       <section className="mt-12 mb-8">
         <h2 className="text-lg font-bold text-brand-ink mb-2">Impact when data is missing</h2>

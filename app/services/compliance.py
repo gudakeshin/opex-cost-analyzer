@@ -7,11 +7,26 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from app.config import DATA_DIR
+from app.config import DATA_DIR, request_id_var
 
 
 RISK_REGISTER_PATH = DATA_DIR / "risk_register.md"
 _AUDIT_LOCK = threading.Lock()
+
+# Archive the active log when it grows beyond this size (bytes).
+_ROTATE_THRESHOLD_BYTES = 50 * 1024 * 1024  # 50 MB
+
+
+def _rotate_audit_log(audit_path: Path) -> None:
+    """Move audit.log to audit.log.<YYYYMMDD-HHMMSSz> when it exceeds the size threshold."""
+    if not audit_path.exists() or audit_path.stat().st_size < _ROTATE_THRESHOLD_BYTES:
+        return
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S") + "z"
+    archive = audit_path.with_name(f"{audit_path.name}.{stamp}")
+    try:
+        audit_path.rename(archive)
+    except OSError:
+        pass
 
 
 def ensure_risk_register() -> Path:
@@ -69,16 +84,22 @@ def append_audit_event(
     event: str,
     *,
     session_id: Optional[str] = None,
+    engagement_id: Optional[str] = None,
     user_id: Optional[str] = None,
+    request_id: Optional[str] = None,
     data: Any = None,
 ) -> Path:
     """Append a structured NDJSON audit record with tamper-evident chain hash.
 
-    Backward-compatible: callers only need to pass `event`. The optional keyword
-    args add structured context for compliance reporting.
+    Fields in every record: ts, event, request_id, engagement_id, session_id,
+    user_id, data_hash, chain_hash. Pass only the fields that apply; omitted
+    fields are excluded from the record (keeping logs compact).
     """
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     audit_path = DATA_DIR / "audit.log"
+
+    # Auto-populate request_id from the per-request contextvar when not given.
+    rid = request_id or request_id_var.get(None)
 
     data_hash: Optional[str] = None
     if data is not None:
@@ -92,6 +113,10 @@ def append_audit_event(
         "ts": datetime.now(timezone.utc).isoformat(),
         "event": event,
     }
+    if rid is not None and rid not in ("-", ""):
+        record["request_id"] = rid
+    if engagement_id is not None:
+        record["engagement_id"] = engagement_id
     if session_id is not None:
         record["session_id"] = session_id
     if user_id is not None:
@@ -100,6 +125,7 @@ def append_audit_event(
         record["data_hash"] = data_hash
 
     with _AUDIT_LOCK:
+        _rotate_audit_log(audit_path)
         prev_hash = _read_last_chain_hash(audit_path)
         record["chain_hash"] = _compute_chain_hash(prev_hash, record)
         line = json.dumps(record, separators=(",", ":")) + "\n"

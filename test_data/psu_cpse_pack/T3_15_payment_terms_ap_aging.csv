@@ -1,0 +1,6 @@
+vendor,payment_terms_days,invoice_date,payment_date,amount,currency,aging_bucket
+L&T Construction,45,2025-01-10,2025-02-26,560000000,INR,0-30
+Steel Authority of India,60,2025-01-05,2025-03-10,420000000,INR,31-60
+BHEL Forge,30,2025-01-18,2025-02-15,280000000,INR,61-90
+ABB India,30,2025-01-20,2025-02-18,145000000,INR,0-30
+NTPC Power Supply,7,2025-01-01,2025-01-07,105000000,INR,31-60

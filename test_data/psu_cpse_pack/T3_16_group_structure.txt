@@ -1,0 +1,9 @@
+National Engineering Corporation Ltd — Group Structure
+
+NECL-IN: India parent (Navratna CPSE; GoI 51.8% stake; NSE/BSE listed). ERP: SAP S4HANA.
+NECL-EPC: NECL EPC Projects Ltd (India subsidiary; EPC arm for infrastructure). ERP: SAP ECC.
+NECL-INTL: NECL International Ltd (India; overseas project execution vehicle). ERP: SAP S4HANA.
+
+Entity tree: NECL-IN > NECL-EPC (100%), NECL-INTL (100%)
+
+Governance: Board controlled by MoHI (line ministry). DPE MoU annual targets binding. CAG audits all subsidiaries. Related-party transactions require Audit Committee + Board approval per SEBI LODR. IC flagged related_party=yes.

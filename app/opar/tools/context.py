@@ -22,6 +22,18 @@ class ToolSessionContext:
     opportunity_assessment: Dict[str, Any] | None = None
     agent_trace: List[Dict[str, Any]] = field(default_factory=list)
     skills_run: List[str] = field(default_factory=list)
+    _spend_store: Any | None = field(default=None, repr=False)
+
+    def get_spend_store(self) -> Any | None:
+        if self._spend_store is not None:
+            return self._spend_store
+        try:
+            from app.services.spend_base import open_spend_query
+
+            self._spend_store = open_spend_query(self.session_id)
+        except Exception:
+            self._spend_store = None
+        return self._spend_store
 
     @property
     def session_id(self) -> str:
@@ -84,6 +96,7 @@ class ToolSessionContext:
             entity_tree=self.manifest.get("entity_tree"),
             segment_revenue=self.manifest.get("segment_revenue"),
             sector_weights=self.manifest.get("sector_weights"),
+            spend_store=self.get_spend_store(),
         )
         try:
             output, degraded = invoke_skill(skill_name, ctx)
@@ -120,6 +133,14 @@ class ToolSessionContext:
                 "skill": skill_name,
                 "maturity_score": output.get("maturity_score"),
                 "initiatives": (output.get("initiatives") or [])[:6],
+            }
+        if skill_name == "sensitivity-analyzer":
+            scenarios = output.get("scenarios") or []
+            return {
+                "skill": skill_name,
+                "baseline_mid_savings": output.get("baseline_mid_savings"),
+                "scenario_count": len(scenarios),
+                "scenarios": scenarios[:12],
             }
         # Generic truncation
         text = str(output)
@@ -164,4 +185,5 @@ class ToolSessionContext:
             user_summary="Agent-selected analysis path",
             estimated_duration="agent",
             requires_approval=False,
+            source="agent",
         )

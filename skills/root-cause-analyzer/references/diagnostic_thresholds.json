@@ -33,15 +33,81 @@
       "caps_research_url": "https://www.capsresearch.org/benchmarking/",
       "disclaimer": "The 20% threshold is an internal platform design choice. CAPS Research and Hackett are directional references, not the source of this specific threshold."
     },
-    "cost_per_transaction_max": {
-      "value": 1000.0,
-      "currency": "INR",
-      "value_usd": 12.0,
+    "maverick_spend_tiers": {
+      "warning": { "value": 0.15, "label": "Elevated", "narrative": "15–25% maverick — compliance programme recommended" },
+      "elevated": { "value": 0.25, "label": "Significant", "narrative": "25–40% maverick — P2P controls and approval workflow required" },
+      "critical": { "value": 0.40, "label": "Critical", "narrative": ">40% maverick — spend visibility gap; baseline unreliable" },
+      "best_in_class": { "value": 0.05, "label": "World-class target", "source": "Hackett Group AP Benchmarking 2024" },
       "source_type": "internal_calibration",
-      "rationale": "Cost per invoice processed above ₹1,000 (or $12 USD) signals manual-intensive AP operations. Benchmark for automated AP is ₹100-300 ($1.2-3.6) per invoice; semi-automated ₹300-600 ($3.6-7.2); fully manual ₹600-1,500+ ($7.2-18+).",
-      "source": "Ardent Partners AP Metrics That Matter 2024 (ardentpartners.com) reports global cost-per-invoice benchmarks. India-market ₹ values are internal calibrations at ~83x USD/INR FX. Global automated benchmark: ~$3-7 USD per invoice; manual: ~$10-25 USD.",
+      "rationale": "Graduated tiers based on Hackett world-class (<5%), average (15%), and poor (>25%) thresholds. 40% critical flag = baseline integrity risk."
+    },
+    "supplier_fragmentation_min_spend": {
+      "value": 50000000,
+      "currency": "reporting",
+      "note": "₹5 Crore (or equivalent in reporting currency) — categories below this floor are excluded from fragmentation flagging regardless of HHI, to avoid noise initiatives in executive dashboards.",
+      "source_type": "internal_calibration"
+    },
+    "cost_per_transaction_max": {
+      "default": {
+        "value": 1000.0,
+        "value_usd": 12.0,
+        "label": "General enterprise",
+        "rationale": "Cost per invoice processed above ₹1,000 (or $12 USD) signals manual-intensive AP operations. Benchmark for automated AP is ₹100-300; semi-automated ₹300-600; fully manual ₹600-1,500+."
+      },
+      "by_benchmark_industry": {
+        "financial_services": {
+          "value": 3500.0,
+          "value_usd": 42.0,
+          "label": "Financial services",
+          "rationale": "BFSI invoices include high-value treasury, FX, and vendor payments; ₹3,500/transaction reflects treasury-grade complexity, not commodity AP noise."
+        },
+        "healthcare": {
+          "value": 2800.0,
+          "value_usd": 34.0,
+          "label": "Healthcare",
+          "rationale": "Hospital and pharma procurement lines mix clinical consumables with capital equipment; higher per-transaction norm before automation flag fires."
+        },
+        "manufacturing": {
+          "value": 800.0,
+          "value_usd": 10.0,
+          "label": "Manufacturing",
+          "rationale": "High-volume commodity invoices and MRO receipts; lower per-transaction ceiling before process-automation diagnosis."
+        },
+        "technology": {
+          "value": 1200.0,
+          "value_usd": 14.0,
+          "label": "Technology",
+          "rationale": "SaaS/IT services mix of subscription and project invoices; moderate AP complexity versus BFSI treasury flows."
+        },
+        "retail_consumer": {
+          "value": 650.0,
+          "value_usd": 8.0,
+          "label": "Retail & consumer",
+          "rationale": "Store and trade-spend invoices are high-volume, low-value; threshold set below general enterprise default."
+        },
+        "telecom_infra": {
+          "value": 1800.0,
+          "value_usd": 22.0,
+          "label": "Telecom & infrastructure",
+          "rationale": "Network vendor and tower-lease invoices carry higher average ticket size than generic IT AP."
+        },
+        "energy_utilities": {
+          "value": 1500.0,
+          "value_usd": 18.0,
+          "label": "Energy & utilities",
+          "rationale": "Plant maintenance and fuel/procurement invoices; asset-heavy spend profile with moderate transaction values."
+        },
+        "gcc_capability_centers": {
+          "value": 900.0,
+          "value_usd": 11.0,
+          "label": "GCC / capability centers",
+          "rationale": "Shared-services centres with partially automated AP; threshold between retail volume and BFSI complexity."
+        }
+      },
+      "source_type": "internal_calibration",
+      "source": "Ardent Partners AP Metrics That Matter 2024 (ardentpartners.com) — global cost-per-invoice benchmarks, industry-adjusted for India enterprise AP profiles.",
       "ardent_partners_url": "https://ardentpartners.com/ap-metrics-that-matter-in-2025/",
-      "disclaimer": "The ₹1,000 / $12 thresholds are internal calibrations. Ardent Partners reports in USD; the INR equivalent is approximate and should be updated with current FX rates."
+      "disclaimer": "Industry variants are internal calibrations informed by Ardent Partners directional AP benchmarks. INR values approximate at ~83 INR/USD; update with current FX for non-INR engagements."
     }
   },
   "addressable_rates": {

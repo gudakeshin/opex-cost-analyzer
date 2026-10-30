@@ -1,0 +1,7 @@
+legal_entity,parent_entity,business_unit,segment_revenue_inr_cr,geo
+VCPL-IN,,Asset Management,1800,India
+VCPL-IN,,Wealth Management,1125,India
+VCPL-IN,,NBFC Lending,900,India
+VCPL-IN,,Insurance Broking,450,India
+VCPL-IN,,Research,225,India
+VCPL-MU,VCPL-IN,Asset Management,270,Mauritius

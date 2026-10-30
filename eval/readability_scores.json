@@ -1,6 +1,6 @@
 {
   "eval_name": "Diagnostic Readability Eval",
-  "eval_date": "2026-06-05",
+  "eval_date": "2026-06-08",
   "platform_version": "v2.1",
   "overall_score": 10.0,
   "passed": true,
@@ -88,8 +88,8 @@
               "has_horizon_disclosure": true,
               "npv_values": [
                 28.8,
-                9.6,
-                8.6
+                10.3,
+                9.6
               ],
               "searched_in": "key_findings + data_note"
             },
@@ -165,7 +165,7 @@
               "has_proxy_pct_alternative": true,
               "has_proxy_disclaimer_in_data_note": true,
               "is_misnomer": false,
-              "gap_count": 20
+              "gap_count": 22
             },
             "S02": {
               "has_actual_pct_field": false,
@@ -173,7 +173,7 @@
               "has_proxy_pct_alternative": true,
               "has_proxy_disclaimer_in_data_note": true,
               "is_misnomer": false,
-              "gap_count": 20
+              "gap_count": 21
             },
             "S03": {
               "has_actual_pct_field": false,
@@ -181,7 +181,7 @@
               "has_proxy_pct_alternative": true,
               "has_proxy_disclaimer_in_data_note": true,
               "is_misnomer": false,
-              "gap_count": 18
+              "gap_count": 21
             },
             "S04": {
               "skipped": "no benchmark gaps \u2014 unmapped sector"
@@ -192,7 +192,7 @@
               "has_proxy_pct_alternative": true,
               "has_proxy_disclaimer_in_data_note": true,
               "is_misnomer": false,
-              "gap_count": 19
+              "gap_count": 21
             }
           }
         },
@@ -212,21 +212,21 @@
                 "P50 industry benchmark (proxy)"
               ],
               "has_synthetic_P50_jargon": false,
-              "gap_count": 20
+              "gap_count": 22
             },
             "S02": {
               "percentile_band_values": [
                 "P50 industry benchmark (proxy)"
               ],
               "has_synthetic_P50_jargon": false,
-              "gap_count": 20
+              "gap_count": 21
             },
             "S03": {
               "percentile_band_values": [
                 "P50 industry benchmark (proxy)"
               ],
               "has_synthetic_P50_jargon": false,
-              "gap_count": 18
+              "gap_count": 21
             },
             "S04": {
               "skipped": "no benchmark gaps"
@@ -236,7 +236,7 @@
                 "P50 industry benchmark (proxy)"
               ],
               "has_synthetic_P50_jargon": false,
-              "gap_count": 19
+              "gap_count": 21
             }
           }
         },
@@ -377,10 +377,10 @@
             "S03": {
               "has_revenue_pct_framing": true,
               "findings": [
-                "Largest category: Rnd \u2014 \u20b960 Cr (12.0% of revenue) at P50 benchmark; \u20b935 Cr headroom to P25 best-in-class",
+                "Largest category: Clinical Staffing \u2014 \u20b9125 Cr (25.0% of revenue) at P50 benchmark; \u20b935 Cr headroom to P25 best-in-class",
                 "Highest-value lever: Clinical Trial Efficiency & CRO Optimisation (high complexity) \u2014 \u20b912 Cr annual savings; \u20b929 Cr 3-year NPV (P50 estimate)",
-                "Savings range (P10\u2013P90): \u20b917 Cr to \u20b942 Cr across 9 levers",
-                "Total value at table (P50 annual): \u20b929 Cr (5.8% of revenue) across 9 levers"
+                "Savings range (P10\u2013P90): \u20b918 Cr to \u20b945 Cr across 9 levers",
+                "Total value at table (P50 annual): \u20b931 Cr (6.3% of revenue) across 9 levers"
               ],
               "annual_revenue_cr": 500.0
             },
@@ -394,7 +394,7 @@
             "S05": {
               "has_revenue_pct_framing": true,
               "findings": [
-                "Largest category: Facilities \u2014 \u20b9240 Cr (8.0% of revenue) at P50 benchmark; \u20b990 Cr headroom to P25 best-in-class",
+                "Largest category: Store Operations \u2014 \u20b9360 Cr (12.0% of revenue) at P50 benchmark; \u20b9120 Cr headroom to P25 best-in-class",
                 "Highest-value lever: Remote-First Real Estate Optimisation (medium complexity) \u2014 \u20b9115 Cr annual savings; \u20b9277 Cr 3-year NPV (P50 estimate)",
                 "Savings range (P10\u2013P90): \u20b9139 Cr to \u20b9323 Cr across 9 levers",
                 "Total value at table (P50 annual): \u20b9231 Cr (7.7% of revenue) across 9 levers"
@@ -446,7 +446,7 @@
                 "high"
               ],
               "findings_preview": [
-                "Largest category: Rnd \u2014 \u20b960 Cr (12.0% of revenue) at P50 benchmark; \u20b935 Cr headroom to P25 best-in-class",
+                "Largest category: Clinical Staffing \u2014 \u20b9125 Cr (25.0% of revenue) at P50 benchmark; \u20b935 Cr headroom to P25 best-in-class",
                 "Highest-value lever: Clinical Trial Efficiency & CRO Optimisation (high complexity) \u2014 \u20b912 Cr annual savings; \u20b929 Cr 3-year NPV (P50 estimate)"
               ]
             },
@@ -461,7 +461,7 @@
                 "high"
               ],
               "findings_preview": [
-                "Largest category: Facilities \u2014 \u20b9240 Cr (8.0% of revenue) at P50 benchmark; \u20b990 Cr headroom to P25 best-in-class",
+                "Largest category: Store Operations \u2014 \u20b9360 Cr (12.0% of revenue) at P50 benchmark; \u20b9120 Cr headroom to P25 best-in-class",
                 "Highest-value lever: Remote-First Real Estate Optimisation (medium complexity) \u2014 \u20b9115 Cr annual savings; \u20b9277 Cr 3-year NPV (P50 estimate)"
               ]
             }
@@ -494,10 +494,10 @@
             },
             "S03": {
               "has_range_disclosure": true,
-              "total_p10_cr": 17.1,
-              "total_p50_cr": 29.2,
-              "total_p90_cr": 41.7,
-              "p10_to_p90_multiplier": 2.4
+              "total_p10_cr": 18.2,
+              "total_p50_cr": 31.3,
+              "total_p90_cr": 45.4,
+              "p10_to_p90_multiplier": 2.5
             },
             "S04": {
               "skipped": "no levers"

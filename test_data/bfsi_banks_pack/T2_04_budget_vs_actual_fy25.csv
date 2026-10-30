@@ -1,0 +1,97 @@
+category,fiscal_period,amount_type,amount,currency
+IT & Core Banking,2024-01,budget,893688967,INR
+IT & Core Banking,2024-01,actual,938373415,INR
+IT & Core Banking,2024-02,budget,898135181,INR
+IT & Core Banking,2024-02,actual,907116532,INR
+IT & Core Banking,2024-03,budget,902581395,INR
+IT & Core Banking,2024-03,actual,1001865348,INR
+IT & Core Banking,2024-04,budget,907027609,INR
+IT & Core Banking,2024-04,actual,1015870922,INR
+IT & Core Banking,2024-05,budget,911473822,INR
+IT & Core Banking,2024-05,actual,966162251,INR
+IT & Core Banking,2024-06,budget,915920036,INR
+IT & Core Banking,2024-06,actual,1044148841,INR
+IT & Core Banking,2024-07,budget,920366250,INR
+IT & Core Banking,2024-07,actual,1003199212,INR
+IT & Core Banking,2024-08,budget,924812464,INR
+IT & Core Banking,2024-08,actual,1026541835,INR
+IT & Core Banking,2024-09,budget,929258677,INR
+IT & Core Banking,2024-09,actual,1031477131,INR
+IT & Core Banking,2024-10,budget,933704891,INR
+IT & Core Banking,2024-10,actual,933704891,INR
+IT & Core Banking,2024-11,budget,938151105,INR
+IT & Core Banking,2024-11,actual,966295638,INR
+IT & Core Banking,2024-12,budget,942597319,INR
+IT & Core Banking,2024-12,actual,942597319,INR
+ATM & Cash Management,2024-01,budget,665806110,INR
+ATM & Cash Management,2024-01,actual,659148048,INR
+ATM & Cash Management,2024-02,budget,669118578,INR
+ATM & Cash Management,2024-02,actual,682500949,INR
+ATM & Cash Management,2024-03,budget,672431046,INR
+ATM & Cash Management,2024-03,actual,679155356,INR
+ATM & Cash Management,2024-04,budget,675743514,INR
+ATM & Cash Management,2024-04,actual,689258384,INR
+ATM & Cash Management,2024-05,budget,679055983,INR
+ATM & Cash Management,2024-05,actual,665474863,INR
+ATM & Cash Management,2024-06,budget,682368451,INR
+ATM & Cash Management,2024-06,actual,716486873,INR
+ATM & Cash Management,2024-07,budget,685680919,INR
+ATM & Cash Management,2024-07,actual,719964964,INR
+ATM & Cash Management,2024-08,budget,688993387,INR
+ATM & Cash Management,2024-08,actual,654543717,INR
+ATM & Cash Management,2024-09,budget,692305855,INR
+ATM & Cash Management,2024-09,actual,699228913,INR
+ATM & Cash Management,2024-10,budget,695618324,INR
+ATM & Cash Management,2024-10,actual,702574507,INR
+ATM & Cash Management,2024-11,budget,698930792,INR
+ATM & Cash Management,2024-11,actual,775813179,INR
+ATM & Cash Management,2024-12,budget,702243260,INR
+ATM & Cash Management,2024-12,actual,695220827,INR
+Branch Operations,2024-01,budget,421164661,INR
+Branch Operations,2024-01,actual,446434540,INR
+Branch Operations,2024-02,budget,423260008,INR
+Branch Operations,2024-02,actual,431725208,INR
+Branch Operations,2024-03,budget,425355354,INR
+Branch Operations,2024-03,actual,425355354,INR
+Branch Operations,2024-04,budget,427450701,INR
+Branch Operations,2024-04,actual,457372250,INR
+Branch Operations,2024-05,budget,429546047,INR
+Branch Operations,2024-05,actual,425250586,INR
+Branch Operations,2024-06,budget,431641394,INR
+Branch Operations,2024-06,actual,457539877,INR
+Branch Operations,2024-07,budget,433736741,INR
+Branch Operations,2024-07,actual,438074108,INR
+Branch Operations,2024-08,budget,435832087,INR
+Branch Operations,2024-08,actual,461982012,INR
+Branch Operations,2024-09,budget,437927434,INR
+Branch Operations,2024-09,actual,477340903,INR
+Branch Operations,2024-10,budget,440022780,INR
+Branch Operations,2024-10,actual,484025057,INR
+Branch Operations,2024-11,budget,442118127,INR
+Branch Operations,2024-11,actual,481908758,INR
+Branch Operations,2024-12,budget,444213473,INR
+Branch Operations,2024-12,actual,439771338,INR
+Marketing & Customer Acquisition,2024-01,budget,901450999,INR
+Marketing & Customer Acquisition,2024-01,actual,892436489,INR
+Marketing & Customer Acquisition,2024-02,budget,905935830,INR
+Marketing & Customer Acquisition,2024-02,actual,969351338,INR
+Marketing & Customer Acquisition,2024-03,budget,910420661,INR
+Marketing & Customer Acquisition,2024-03,actual,1037879553,INR
+Marketing & Customer Acquisition,2024-04,budget,914905492,INR
+Marketing & Customer Acquisition,2024-04,actual,942352656,INR
+Marketing & Customer Acquisition,2024-05,budget,919390323,INR
+Marketing & Customer Acquisition,2024-05,actual,928584226,INR
+Marketing & Customer Acquisition,2024-06,budget,923875154,INR
+Marketing & Customer Acquisition,2024-06,actual,1053217675,INR
+Marketing & Customer Acquisition,2024-07,budget,928359984,INR
+Marketing & Customer Acquisition,2024-07,actual,946927183,INR
+Marketing & Customer Acquisition,2024-08,budget,932844815,INR
+Marketing & Customer Acquisition,2024-08,actual,923516366,INR
+Marketing & Customer Acquisition,2024-09,budget,937329646,INR
+Marketing & Customer Acquisition,2024-09,actual,909209756,INR
+Marketing & Customer Acquisition,2024-10,budget,941814477,INR
+Marketing & Customer Acquisition,2024-10,actual,988905200,INR
+Marketing & Customer Acquisition,2024-11,budget,946299308,INR
+Marketing & Customer Acquisition,2024-11,actual,1040929238,INR
+Marketing & Customer Acquisition,2024-12,budget,950784139,INR
+Marketing & Customer Acquisition,2024-12,actual,1055370394,INR

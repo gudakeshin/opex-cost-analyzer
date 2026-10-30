@@ -1,0 +1,7 @@
+Pragati General Insurance Ltd — Diagnostic URLs (synthetic/illustrative)
+
+1. Investor relations: https://www.pragatiinsurance.example/investors
+2. IRDAI annual report: https://www.irdai.gov.in/ADMINCMS/cms/annualreports.aspx
+3. Annual report: https://www.pragatiinsurance.example/ir/annual-report-fy25.pdf
+4. NSE: https://www.nseindia.example/get-quotes/equity?symbol=PRAGATIGI
+5. GI Council India: https://www.gicouncil.example/sector-data-fy25

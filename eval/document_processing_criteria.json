@@ -1,0 +1,94 @@
+{
+  "eval_name": "Document Processing Quality",
+  "version": "1.0",
+  "description": "Scores the document ingestion pipeline (parse -> schema inference -> sheet selection -> normalization -> hierarchical chunking -> retrieval) against synthetic golden fixtures. DP-01..06 and DP-08 are deterministic rule-based checks against structured pipeline output; DP-07 uses a provider-agnostic LLM judge (Claude default, Gemini when LLM_PROVIDER=gemini) and is skipped offline.",
+  "fixtures_dir": "tests/eval/golden/document_processing",
+  "retrieval_backend": "LocalDocumentIndex (deterministic keyword scoring; no Qdrant/embeddings)",
+  "domains": [
+    {
+      "name": "parse_normalize",
+      "display_name": "Parse & Normalize",
+      "weight": 0.45,
+      "dimensions": [
+        {
+          "id": "DP-01",
+          "name": "Parse Success Rate",
+          "weight": 0.30,
+          "threshold_pass": 9.0,
+          "scoring_method": "fixtures parsed without exception / total * 10",
+          "applies_to": "all fixtures"
+        },
+        {
+          "id": "DP-02",
+          "name": "Schema Role Accuracy",
+          "weight": 0.30,
+          "threshold_pass": 7.0,
+          "scoring_method": "inferred semantic_role matches golden / expected roles * 10, averaged over tabular fixtures",
+          "applies_to": "csv / xlsx fixtures with expected schema_roles"
+        },
+        {
+          "id": "DP-03",
+          "name": "Sheet Selection Correctness",
+          "weight": 0.15,
+          "threshold_pass": 7.0,
+          "scoring_method": "selected sheet name (4) + transaction_ledger role (3) + header_row match (3)",
+          "applies_to": "multi-sheet xlsx fixtures"
+        },
+        {
+          "id": "DP-04",
+          "name": "Normalization Fidelity",
+          "weight": 0.25,
+          "threshold_pass": 7.0,
+          "scoring_method": "line_count match (4) + total_amount within 1% (4) + currency captured (2)",
+          "applies_to": "tabular fixtures with expected line_count"
+        }
+      ]
+    },
+    {
+      "name": "chunk_retrieve",
+      "display_name": "Chunk & Retrieve",
+      "weight": 0.35,
+      "dimensions": [
+        {
+          "id": "DP-05",
+          "name": "Chunk Structure Integrity",
+          "weight": 0.40,
+          "threshold_pass": 7.0,
+          "scoring_method": "parents>=min, children>=min, no empty children, no orphan children, child size <= 1.5x DOC_CHILD_CHARS, heading_path populated (when expected), table rows split (when expected)",
+          "applies_to": "document fixtures"
+        },
+        {
+          "id": "DP-06",
+          "name": "Retrieval Precision",
+          "weight": 0.40,
+          "threshold_pass": 6.0,
+          "scoring_method": "(0.6 * hit_rate + 0.4 * MRR) * 10 over (query -> expected substring) pairs",
+          "applies_to": "document fixtures with retrieval pairs"
+        },
+        {
+          "id": "DP-07",
+          "name": "Parse Fidelity (LLM judge)",
+          "weight": 0.20,
+          "threshold_pass": 6.0,
+          "scoring_method": "LLM judge rates extraction coherence/completeness 0-10; skipped (not counted) when no provider",
+          "applies_to": "docx / pdf fixtures"
+        }
+      ]
+    },
+    {
+      "name": "quality_signals",
+      "display_name": "Quality Signals",
+      "weight": 0.20,
+      "dimensions": [
+        {
+          "id": "DP-08",
+          "name": "Quality-Flag Capture",
+          "weight": 1.00,
+          "threshold_pass": 7.0,
+          "scoring_method": "ingestion quality flags present (4) + zero_spend_warning matches expectation (4) + warnings raised on malformed input (2)",
+          "applies_to": "tabular fixtures"
+        }
+      ]
+    }
+  ]
+}

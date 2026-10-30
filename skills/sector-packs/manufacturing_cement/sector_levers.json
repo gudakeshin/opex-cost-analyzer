@@ -1,0 +1,1260 @@
+{
+  "pack_id": "manufacturing_cement",
+  "sector": "Cement Manufacturing (India)",
+  "version": "1.0",
+  "source_verification_note": "Runtime lever catalogue generated from the reviewed sector stub. Savings ranges are internal calibrations supported directionally by the cited public sources and require engagement-level validation.",
+  "applicable_entity_types": [
+    "integrated_cement_manufacturer",
+    "clinker_manufacturer",
+    "cement_grinding_unit",
+    "blended_cement_manufacturer"
+  ],
+  "industry_signals": [
+    "cement_keywords",
+    "kiln_or_clinker_present",
+    "power_fuel_gt_12pct_revenue",
+    "freight_gt_15pct_revenue",
+    "plant_maintenance_present"
+  ],
+  "universal_levers": [
+    "contract_renegotiation",
+    "supplier_consolidation",
+    "should_cost_modeling",
+    "demand_management",
+    "payment_terms",
+    "maverick_compliance",
+    "zero_based_rebaseline",
+    "automation",
+    "cost_governance",
+    "energy_procurement_optimization"
+  ],
+  "sector_specific_levers": [
+    {
+      "lever_id": "clinker_factor_optimisation",
+      "lever_name": "Clinker Factor & Blended Cement Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 3.0,
+        "p50": 7.0,
+        "p90": 12.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Clinker Factor & Blended Cement Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 26,
+        "p50": 30,
+        "p90": 38
+      },
+      "applicable_if": [
+        "category:RAW_MATERIALS present",
+        "category:limestone_correctives present",
+        "category:clinker_conversion present",
+        "category:grinding_media_additives present"
+      ],
+      "industry_sources": [
+        "TERI — Decarbonization Roadmap for the Indian Cement Sector",
+        "BIS cement product standards",
+        "INTERNAL_CALIBRATION — savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Clinker Factor & Blended Cement Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 15
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for RAW_MATERIALS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "kiln_thermal_efficiency",
+      "lever_name": "Kiln Thermal Efficiency & Process Control",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 8.0,
+        "p90": 14.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Kiln Thermal Efficiency & Process Control"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 24,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:POWER_ENERGY present",
+        "category:kiln_fuel present",
+        "category:clinker_conversion present"
+      ],
+      "industry_sources": [
+        "BEE PAT cement-sector material",
+        "CMA cement and energy publications",
+        "INTERNAL_CALIBRATION — savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Kiln Thermal Efficiency & Process Control: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for POWER_ENERGY",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "afr_thermal_substitution",
+      "lever_name": "Alternative Fuel Thermal Substitution",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Alternative Fuel Thermal Substitution"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 32,
+        "p50": 36,
+        "p90": 44
+      },
+      "applicable_if": [
+        "category:kiln_fuel present",
+        "category:alternative_fuels_raw_materials present",
+        "category:environment_carbon present"
+      ],
+      "industry_sources": [
+        "CPCB pre- and co-processing guidelines",
+        "GIZ Guidelines on Pre- and Co-processing of Waste in Cement Production",
+        "INTERNAL_CALIBRATION — savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Alternative Fuel Thermal Substitution: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 18
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for kiln_fuel",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "whr_renewable_power",
+      "lever_name": "Waste-Heat Recovery & Renewable Power Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 13.0,
+        "p90": 22.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Waste-Heat Recovery & Renewable Power Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 48,
+        "p50": 52,
+        "p90": 60
+      },
+      "applicable_if": [
+        "category:POWER_ENERGY present",
+        "category:plant_power_whr present",
+        "category:environment_carbon present"
+      ],
+      "industry_sources": [
+        "BEE PAT cement-sector material",
+        "JMK Research — Green Power Procurement: Cement Sector in India",
+        "INTERNAL_CALIBRATION — savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Waste-Heat Recovery & Renewable Power Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 26
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for POWER_ENERGY",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "grinding_efficiency",
+      "lever_name": "Raw & Cement Grinding Efficiency",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 9.0,
+        "p90": 15.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Raw & Cement Grinding Efficiency"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:CONVERSION_COST present",
+        "category:plant_power_whr present",
+        "category:grinding_media_additives present"
+      ],
+      "industry_sources": [
+        "BEE energy benchmarking for cement",
+        "CMA energy publications",
+        "INTERNAL_CALIBRATION — savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Raw & Cement Grinding Efficiency: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for CONVERSION_COST",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "quarry_raw_mix_optimisation",
+      "lever_name": "Quarry, Raw Mix & Corrective Material Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 3.0,
+        "p50": 7.0,
+        "p90": 12.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Quarry, Raw Mix & Corrective Material Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 24,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:RAW_MATERIALS present",
+        "category:limestone_correctives present"
+      ],
+      "industry_sources": [
+        "IBM Indian Minerals Yearbook — Limestone",
+        "MMDR/DMF/NMET statutory framework",
+        "INTERNAL_CALIBRATION — savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Quarry, Raw Mix & Corrective Material Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for RAW_MATERIALS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "kiln_shutdown_refractory",
+      "lever_name": "Kiln Shutdown & Refractory Life Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 11.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Kiln Shutdown & Refractory Life Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 14,
+        "p50": 18,
+        "p90": 26
+      },
+      "applicable_if": [
+        "category:PLANT_MAINTENANCE present",
+        "category:kiln_refractory_mro present",
+        "category:clinker_conversion present"
+      ],
+      "industry_sources": [
+        "CII maintenance-excellence practices",
+        "INTERNAL_CALIBRATION — cement shutdown and refractory range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Kiln Shutdown & Refractory Life Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 9
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for PLANT_MAINTENANCE",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "cement_predictive_maintenance",
+      "lever_name": "Kiln, Mill & Critical Asset Predictive Maintenance",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 13.0,
+        "p90": 22.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Kiln, Mill & Critical Asset Predictive Maintenance"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 24,
+        "p50": 28,
+        "p90": 36
+      },
+      "applicable_if": [
+        "category:PLANT_MAINTENANCE present",
+        "category:kiln_refractory_mro present",
+        "category:CONVERSION_COST present"
+      ],
+      "industry_sources": [
+        "CII maintenance-excellence case studies",
+        "INTERNAL_CALIBRATION — savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Kiln, Mill & Critical Asset Predictive Maintenance: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 14
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for PLANT_MAINTENANCE",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "cement_bag_optimisation",
+      "lever_name": "Cement Bag Specification & Procurement Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 8.0,
+        "p90": 14.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Cement Bag Specification & Procurement Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 14,
+        "p50": 18,
+        "p90": 26
+      },
+      "applicable_if": [
+        "category:PACKAGING present",
+        "category:cement_packaging present"
+      ],
+      "industry_sources": [
+        "BIS packaging and cement handling requirements",
+        "INTERNAL_CALIBRATION — savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Cement Bag Specification & Procurement Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 9
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for PACKAGING",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "rail_road_modal_mix",
+      "lever_name": "Rail/Road Modal Mix & Lead-Distance Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 9.0,
+        "p90": 16.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Rail/Road Modal Mix & Lead-Distance Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 26,
+        "p50": 30,
+        "p90": 38
+      },
+      "applicable_if": [
+        "category:LOGISTICS present",
+        "category:primary_secondary_freight present",
+        "category:rail_siding_depot present"
+      ],
+      "industry_sources": [
+        "Indian Railways freight circulars",
+        "IBEF cement sector logistics context",
+        "INTERNAL_CALIBRATION — savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Rail/Road Modal Mix & Lead-Distance Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 15
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for LOGISTICS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "freight_route_load_optimisation",
+      "lever_name": "Freight Tender, Route & Truck-Load Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 3.0,
+        "p50": 7.0,
+        "p90": 12.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Freight Tender, Route & Truck-Load Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:LOGISTICS present",
+        "category:primary_secondary_freight present"
+      ],
+      "industry_sources": [
+        "DPIIT logistics performance material",
+        "INTERNAL_CALIBRATION — cement lane savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Freight Tender, Route & Truck-Load Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for LOGISTICS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "depot_network_optimisation",
+      "lever_name": "Depot & Terminal Network Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 10.0,
+        "p90": 17.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Depot & Terminal Network Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 22,
+        "p50": 26,
+        "p90": 34
+      },
+      "applicable_if": [
+        "category:LOGISTICS present",
+        "category:rail_siding_depot present",
+        "category:primary_secondary_freight present"
+      ],
+      "industry_sources": [
+        "India logistics network optimisation practices",
+        "INTERNAL_CALIBRATION — savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Depot & Terminal Network Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 13
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for LOGISTICS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "bis_quality_formula_optimisation",
+      "lever_name": "BIS-Compliant Quality & Formula Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 2.0,
+        "p50": 6.0,
+        "p90": 10.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for BIS-Compliant Quality & Formula Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 18,
+        "p50": 22,
+        "p90": 30
+      },
+      "applicable_if": [
+        "category:quality_lab_bis present",
+        "category:grinding_media_additives present",
+        "category:limestone_correctives present"
+      ],
+      "industry_sources": [
+        "BIS IS 269/455/1489/8112/12269",
+        "INTERNAL_CALIBRATION — savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for BIS-Compliant Quality & Formula Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 11
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for quality_lab_bis",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "emissions_cems_optimisation",
+      "lever_name": "Emission-Control & CEMS Operating Cost Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 3.0,
+        "p50": 7.0,
+        "p90": 12.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Emission-Control & CEMS Operating Cost Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:environment_carbon present",
+        "category:kiln_refractory_mro present"
+      ],
+      "industry_sources": [
+        "CPCB cement emission and monitoring requirements",
+        "INTERNAL_CALIBRATION — savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Emission-Control & CEMS Operating Cost Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for environment_carbon",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "kiln_fuel_sourcing_blend",
+      "lever_name": "Coal/Petcoke Sourcing & Fuel-Blend Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 3.0,
+        "p50": 7.0,
+        "p90": 13.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Coal/Petcoke Sourcing & Fuel-Blend Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 14,
+        "p90": 22
+      },
+      "applicable_if": [
+        "category:POWER_ENERGY present",
+        "category:kiln_fuel present"
+      ],
+      "industry_sources": [
+        "Peer annual-report fuel cost disclosures",
+        "INTERNAL_CALIBRATION — savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Coal/Petcoke Sourcing & Fuel-Blend Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 7
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for POWER_ENERGY",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "cement_mro_consolidation",
+      "lever_name": "Cement MRO, Grinding Media & Spares Consolidation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Cement MRO, Grinding Media & Spares Consolidation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:PLANT_MAINTENANCE present",
+        "category:kiln_refractory_mro present",
+        "category:grinding_media_additives present"
+      ],
+      "industry_sources": [
+        "CII procurement and maintenance practices",
+        "INTERNAL_CALIBRATION — savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Cement MRO, Grinding Media & Spares Consolidation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for PLANT_MAINTENANCE",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "kiln_mill_oee",
+      "lever_name": "Kiln/Mill OEE & Capacity Utilisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 9.0,
+        "p90": 16.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Kiln/Mill OEE & Capacity Utilisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 24,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:CONVERSION_COST present",
+        "category:clinker_conversion present"
+      ],
+      "industry_sources": [
+        "CII manufacturing excellence practices",
+        "INTERNAL_CALIBRATION — savings range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Kiln/Mill OEE & Capacity Utilisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for CONVERSION_COST",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "cement_gst_freight_recovery",
+      "lever_name": "GST, Freight & Mining Charge Recovery",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 1.0,
+        "p50": 3.0,
+        "p90": 6.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "mixed",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for GST, Freight & Mining Charge Recovery"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:RAW_MATERIALS present",
+        "category:primary_secondary_freight present",
+        "category:limestone_correctives present"
+      ],
+      "industry_sources": [
+        "CGST Act and rules",
+        "MMDR/DMF/NMET framework",
+        "INTERNAL_CALIBRATION — recovery range"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for GST, Freight & Mining Charge Recovery: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for RAW_MATERIALS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    }
+  ]
+}

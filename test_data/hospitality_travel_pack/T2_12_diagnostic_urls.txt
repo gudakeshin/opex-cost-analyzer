@@ -1,0 +1,7 @@
+Surya Hospitality & Resorts Ltd — Diagnostic URLs (synthetic/illustrative)
+
+1. Investor relations: https://www.suryahotels.example/investors
+2. Ministry of Tourism: https://tourism.gov.in/example/surya
+3. Annual report: https://www.suryahotels.example/ir/annual-report-fy25.pdf
+4. NSE: https://www.nseindia.example/get-quotes/equity?symbol=SURYAHOSP
+5. HVS India hospitality report: https://www.hvs.example/india-hospitality-fy25

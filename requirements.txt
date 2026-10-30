@@ -3,16 +3,17 @@ uvicorn[standard]==0.35.0
 python-multipart==0.0.20
 pydantic==2.11.7
 pandas==2.3.1
+duckdb==1.5.4            # analytical spend store (app/services/spend_store.py) + ad-hoc SQL
+pyarrow==24.0.0          # Parquet read/write for the spend store
 openpyxl==3.1.5
 python-docx==1.2.0
 pypdf==6.7.1
 pytest==8.4.1
 anthropic==0.83.0
-google-generativeai>=0.8  # Gemini provider — optional if using Anthropic only
-google-genai>=1.0        # Google Interactions API for Deep Research feature
+google-genai==2.7.0      # Gemini provider + Deep Research feature (google.genai, not the legacy google-generativeai SDK)
 slowapi==0.1.9
 qdrant-client==1.9.2
 sentence-transformers==3.0.1
-redis>=4.0
-prometheus-client>=0.14
-llama-parse>=0.5.0
+redis==5.2.1
+prometheus-client==0.22.1
+llama-parse==0.6.94

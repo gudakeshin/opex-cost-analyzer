@@ -1,0 +1,38 @@
+[
+  {
+    "engagement_id": "eng-bvgl-fy24",
+    "initiative_id": "INI-1",
+    "lever_id": "insurance_consolidation",
+    "pack_id": "conglomerate",
+    "planned_p50_cr": 24.0,
+    "realised_cr": 21.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Group insurance consolidated to single broker."
+  },
+  {
+    "engagement_id": "eng-bvgl-fy24",
+    "initiative_id": "INI-2",
+    "lever_id": "crm_rationalisation",
+    "pack_id": "conglomerate",
+    "planned_p50_cr": 18.0,
+    "realised_cr": 22.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Duplicate Salesforce instances removed; group licensing deal exceeded plan."
+  },
+  {
+    "engagement_id": "eng-bvgl-fy24",
+    "initiative_id": "INI-3",
+    "lever_id": "legal_panel",
+    "pack_id": "conglomerate",
+    "planned_p50_cr": 20.0,
+    "realised_cr": 16.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "medium",
+    "notes": "Panel reduced but overseas advisory retained; partial savings."
+  }
+]

@@ -1,6 +1,7 @@
 import React from 'react';
 import { FactVsInferenceLabel } from '../../Common/FactVsInferenceLabel';
 import { SpendCharts } from './SpendCharts';
+import { DataCaveats } from './DataCaveats';
 import { formatSpendAmount } from '../../../utils/analysisInsights';
 import type { AnalysisInsightSnapshot } from '../../../types';
 
@@ -35,12 +36,12 @@ export const ChatInsightBlock: React.FC<ChatInsightBlockProps> = ({
 
       {snapshot.total_spend > 0 && (
         <div className="rounded-xl bg-brand-surface-muted border border-brand-border px-3 py-2.5">
-          <p className="text-[10px] uppercase font-semibold text-brand-muted">Total spend (signal)</p>
+          <p className="text-[11px] uppercase font-semibold text-brand-muted">Total spend (signal)</p>
           <p className="text-lg font-bold text-brand-ink tabular-nums">
             {formatSpendAmount(snapshot.total_spend, currency)}
           </p>
           {snapshot.line_count != null && snapshot.line_count > 0 && (
-            <p className="text-[10px] text-brand-muted mt-0.5">
+            <p className="text-[11px] text-brand-muted mt-0.5">
               {snapshot.line_count.toLocaleString()} transaction lines
             </p>
           )}
@@ -51,7 +52,7 @@ export const ChatInsightBlock: React.FC<ChatInsightBlockProps> = ({
         <SpendCharts chartData={snapshot.chart_data} currency={currency} />
       ) : topCategories.length > 0 ? (
         <div>
-          <p className="text-[10px] font-semibold uppercase text-brand-muted mb-1.5">
+          <p className="text-[11px] font-semibold uppercase text-brand-muted mb-1.5">
             Spend concentration
           </p>
           <ul className="text-xs space-y-1.5">
@@ -72,16 +73,18 @@ export const ChatInsightBlock: React.FC<ChatInsightBlockProps> = ({
       ) : null}
 
       {snapshot.ingestion_note && (
-        <p className="text-[10px] text-brand-muted bg-brand-surface-muted rounded-lg px-2 py-1.5 border border-brand-border">
+        <p className="text-[11px] text-brand-muted bg-brand-surface-muted rounded-lg px-2 py-1.5 border border-brand-border">
           {snapshot.ingestion_note}
         </p>
       )}
+
+      <DataCaveats snapshot={snapshot} includeBenchmarks={showPeerSavings} />
 
       {showPeerSavings && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {(snapshot.peer_comparison_count ?? 0) > 0 && (
             <div className="rounded-lg border border-brand-border px-2.5 py-2">
-              <p className="text-[10px] uppercase font-semibold text-brand-muted">Peer gaps (P75+)</p>
+              <p className="text-[11px] uppercase font-semibold text-brand-muted">Peer gaps (P75+)</p>
               <p className="text-sm font-bold text-brand-ink">
                 {snapshot.peer_gap_count ?? 0}
                 <span className="text-xs font-normal text-brand-muted">
@@ -93,8 +96,30 @@ export const ChatInsightBlock: React.FC<ChatInsightBlockProps> = ({
           )}
           {snapshot.savings_headline && (
             <div className="rounded-lg border border-brand-border px-2.5 py-2">
-              <p className="text-[10px] uppercase font-semibold text-brand-muted">Top savings signal</p>
-              <p className="text-sm font-bold text-deloitte-green">{snapshot.savings_headline}</p>
+              <p className="text-[11px] uppercase font-semibold text-brand-muted">Top savings signal</p>
+              <p className="text-sm font-bold text-brand-primary">{snapshot.savings_headline}</p>
+            </div>
+          )}
+          {snapshot.expected_net_3yr != null && (
+            <div className="rounded-lg border border-brand-border px-2.5 py-2 sm:col-span-2">
+              <p className="text-[11px] uppercase font-semibold text-brand-muted">
+                Expected 3-year net savings (after execution risk)
+              </p>
+              <p className="text-sm font-bold text-brand-ink tabular-nums">
+                {formatSpendAmount(snapshot.expected_net_3yr, currency)}
+                {snapshot.full_delivery_net_3yr != null && (
+                  <span className="text-xs font-normal text-brand-muted">
+                    {' '}
+                    vs {formatSpendAmount(snapshot.full_delivery_net_3yr, currency)} if every initiative is delivered in full
+                  </span>
+                )}
+                {snapshot.expected_net_p10_3yr != null && snapshot.expected_net_p90_3yr != null && (
+                  <span className="block text-xs font-normal text-brand-muted">
+                    P10–P90 range {formatSpendAmount(snapshot.expected_net_p10_3yr, currency)} –{' '}
+                    {formatSpendAmount(snapshot.expected_net_p90_3yr, currency)} (assumes initiatives succeed or fail together)
+                  </span>
+                )}
+              </p>
             </div>
           )}
         </div>

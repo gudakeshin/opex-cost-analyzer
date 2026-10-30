@@ -2,16 +2,93 @@
   "sector": "retail_organized",
   "currency": "INR",
   "peers": [
-    {"name": "Avenue Supermarts (DMart)", "ticker": "DMART.NS", "exchange": "NSE", "revenue_cr": 48000},
-    {"name": "Trent (Tata Retail)", "ticker": "TRENT.NS", "exchange": "NSE", "revenue_cr": 12000},
-    {"name": "V-Mart Retail", "ticker": "VMART.NS", "exchange": "NSE", "revenue_cr": 2400},
-    {"name": "Shoppers Stop", "ticker": "SHOPERSTOP.NS", "exchange": "NSE", "revenue_cr": 4200},
-    {"name": "Reliance Retail (unlisted proxy: RELIANCE)", "ticker": "RELIANCE.NS", "exchange": "NSE", "revenue_cr": 300000}
+    {
+      "name": "Avenue Supermarts (DMart)",
+      "ticker": "DMART.NS",
+      "exchange": "NSE",
+      "revenue_cr": 48000,
+      "entity_type": "hypermarket_grocery"
+    },
+    {
+      "name": "Trent (Tata Retail)",
+      "ticker": "TRENT.NS",
+      "exchange": "NSE",
+      "revenue_cr": 12000,
+      "entity_type": "fashion_retail"
+    },
+    {
+      "name": "V-Mart Retail",
+      "ticker": "VMART.NS",
+      "exchange": "NSE",
+      "revenue_cr": 2400,
+      "entity_type": "fashion_retail"
+    },
+    {
+      "name": "Shoppers Stop",
+      "ticker": "SHOPERSTOP.NS",
+      "exchange": "NSE",
+      "revenue_cr": 4200,
+      "entity_type": "fashion_retail"
+    },
+    {
+      "name": "Reliance Retail (unlisted proxy: RELIANCE)",
+      "ticker": "RELIANCE.NS",
+      "exchange": "NSE",
+      "revenue_cr": 300000,
+      "entity_type": "hypermarket_grocery"
+    },
+    {
+      "name": "Vishal Mega Mart",
+      "ticker": "VMM.NS",
+      "exchange": "NSE",
+      "entity_type": "hypermarket_grocery",
+      "revenue_cr": 9000
+    },
+    {
+      "name": "Nykaa (FSN E-Commerce)",
+      "ticker": "NYKAA.NS",
+      "exchange": "NSE",
+      "entity_type": "ecommerce_pure_play",
+      "revenue_cr": 6400
+    },
+    {
+      "name": "Aditya Birla Fashion & Retail",
+      "ticker": "ABFRL.NS",
+      "exchange": "NSE",
+      "entity_type": "fashion_retail",
+      "revenue_cr": 14000
+    },
+    {
+      "name": "Metro Brands",
+      "ticker": "METROBRAND.NS",
+      "exchange": "NSE",
+      "entity_type": "fashion_retail",
+      "revenue_cr": 2400
+    },
+    {
+      "name": "Eternal (Blinkit quick-commerce proxy)",
+      "ticker": "ETERNAL.NS",
+      "exchange": "NSE",
+      "entity_type": "quick_commerce",
+      "revenue_cr": 20000
+    }
   ],
   "benchmark_metrics": {
-    "ebitda_margin_pct": {"p25": 6.0, "p50": 9.0, "p75": 14.0},
-    "sssg_pct": {"p25": 3.0, "p50": 8.0, "p75": 14.0},
-    "store_opex_to_revenue_pct": {"p25": 12.0, "p50": 18.0, "p75": 26.0}
+    "ebitda_margin_pct": {
+      "p25": 6.0,
+      "p50": 9.0,
+      "p75": 14.0
+    },
+    "sssg_pct": {
+      "p25": 3.0,
+      "p50": 8.0,
+      "p75": 14.0
+    },
+    "store_opex_to_revenue_pct": {
+      "p25": 12.0,
+      "p50": 18.0,
+      "p75": 26.0
+    }
   },
   "data_source": "BSE/NSE annual reports FY25",
   "refresh_date": "2026-04-01"

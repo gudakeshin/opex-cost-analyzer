@@ -4,6 +4,7 @@ import json
 from typing import Any, Callable, Dict, List
 
 from app.config import ROOT_DIR
+from app.services.analysis_runs import AnalysisCancelled
 from app.memory import MemoryStore
 from app.models import NormalizedSpendLine, SessionAnalysisState
 from app.services.benchmarks import resolve_benchmark_payload
@@ -41,6 +42,102 @@ def load_taxonomy() -> Dict[str, Any]:
     return _TAXONOMY
 
 
+def _attach_deterministic_advisory(
+    state_dict: Dict[str, Any],
+    *,
+    skill_outputs: Dict[str, Dict[str, Any]],
+    prior_session: Dict[str, Any] | None,
+    company_name: str,
+    reporting_currency: str,
+    session_id: str,
+    engagement_id: str | None,
+    run_id: str | None,
+    industry: str = "",
+    annual_revenue: float = 0.0,
+) -> None:
+    """Compose advisory sections for the batch analyze path (mirrors OPAR reflect).
+
+    Tries live LLM synthesis first (same synthesizer chain the chat path uses);
+    falls back to the deterministic composer when the LLM is unavailable, out of
+    budget, or produces a low-quality result.
+    """
+    from app.opar.models import ObserveContext
+    from app.opar.reflect import _ensure_evidence_appendix_cta
+    from app.opar.reflect_persistence import _compute_run_delta
+    from app.opar.reflect_synthesis import generate_llm_advisory_sections
+    from app.opar.provenance import record_llm_narrative
+    from app.services.llm_selection import get_resolved_llm_model
+    from app.services.narrative_composer import attach_citations, compose_deterministic_advisory
+
+    manifest = {
+        "company_name": company_name,
+        "industry": industry,
+        "annual_revenue": annual_revenue,
+        "currency": reporting_currency,
+    }
+    ctx = ObserveContext(
+        user_message="Run full spend analysis and synthesize executive recommendations.",
+        wants_executive_narrative=True,
+        engagement_id=engagement_id or "",
+        session_id=session_id,
+    )
+
+    llm_skip_reason: str | None = None
+    advisory = None
+    narrative_mode = "deterministic"
+    model_version = "deterministic-composer"
+    try:
+        llm_advisory, _thinking, llm_skip_reason = generate_llm_advisory_sections(
+            ctx, manifest, skill_outputs
+        )
+    except Exception:
+        llm_advisory, llm_skip_reason = None, "provider_failed"
+
+    if llm_advisory is not None:
+        advisory = attach_citations(llm_advisory, skill_outputs, currency=reporting_currency)
+        narrative_mode = "llm"
+        model_version = get_resolved_llm_model()
+    else:
+        advisory = compose_deterministic_advisory(
+            skill_outputs,
+            company_name=company_name,
+            currency=reporting_currency,
+        )
+
+    state_dict["advisory_sections"] = advisory.model_dump()
+    response_metadata: Dict[str, Any] = {"narrative_mode": narrative_mode}
+    if narrative_mode == "deterministic" and llm_skip_reason:
+        response_metadata["llm_skip_reason"] = llm_skip_reason
+    state_dict["response_metadata"] = response_metadata
+    state_dict["used_llm_synthesis"] = narrative_mode == "llm"
+
+    run_delta = _compute_run_delta(prior_session, skill_outputs, reporting_currency)
+    if run_delta:
+        state_dict["run_delta"] = run_delta
+        state_dict["previous_headline"] = run_delta.get("previous_headline") or ""
+
+    suggested = _ensure_evidence_appendix_cta([], session_id, skill_outputs)
+    if suggested:
+        state_dict["suggested_outputs"] = [s.model_dump() for s in suggested]
+
+    prov_eid = engagement_id or session_id
+    if advisory.executive_takeaway and prov_eid and run_id:
+        try:
+            tag = record_llm_narrative(
+                narrative=advisory.executive_takeaway,
+                engagement_id=prov_eid,
+                turn_id=run_id,
+                skill_outputs_used=list(skill_outputs.keys()),
+                prompt_text="run analysis",
+                model_version=model_version,
+                seed=0,
+                metadata={"narrative_mode": narrative_mode},
+            )
+            state_dict["narrative_provenance_tag"] = tag
+        except Exception:
+            pass
+
+
 def run_core_pipeline(
     session_id: str,
     lines: List[NormalizedSpendLine],
@@ -56,9 +153,11 @@ def run_core_pipeline(
     entity_tree: Dict[str, Any] | None = None,
     segment_revenue: Dict[str, float] | None = None,
     sector_weights: Dict[str, float] | None = None,
+    industry_user_set: bool = False,
     ingestion_summary: str | None = None,
     progress_cb: Callable[[str, str], None] | None = None,
     source_files: Dict[str, List[str]] | None = None,
+    run_id: str | None = None,
 ) -> Dict[str, Any]:
     # --- Traceability scaffolding --------------------------------------------
     # Build a human-readable, ordered trace of how the analysis is derived, with
@@ -83,6 +182,8 @@ def run_core_pipeline(
         if progress_cb:
             try:
                 progress_cb("act", f"{title} — {detail}")
+            except AnalysisCancelled:
+                raise  # cooperative cancel: stop between stages
             except Exception:  # pragma: no cover - never let tracing break analysis
                 pass
 
@@ -114,6 +215,10 @@ def run_core_pipeline(
         lines = merge_persisted_line_adjustments(lines, prior_lines)
     conflict_user_actions = dict(existing_session.get("conflict_user_actions") or {}) if existing_session else {}
 
+    from app.services.engagement_sanity import is_placeholder_industry
+    from app.services.sector_packs import resolve_sector_pack_id
+
+    industry = resolve_sector_pack_id(industry) or industry
     resolved = {"industry": industry}
     manifest: Dict[str, Any] = {
         "session_id": session_id,
@@ -176,11 +281,13 @@ def run_core_pipeline(
             # Auto-detect industry (document signals → spend patterns) before any
             # benchmark-dependent skill runs and reads ctx.industry from manifest.
             ind = resolved["industry"]
-            if not ind:
-                ind = str(output.get("inferred_industry") or "")
-            if not ind and lines:
-                total_spend = float(outputs.get("spend-profiler", {}).get("total_spend", 0.0) or 0.0)
-                ind = engine.infer_industry_from_spend(lines, total_spend)
+            if not ind or (is_placeholder_industry(ind) and not industry_user_set):
+                inferred = str(output.get("inferred_industry") or "")
+                if not inferred and lines:
+                    total_spend = float(outputs.get("spend-profiler", {}).get("total_spend", 0.0) or 0.0)
+                    inferred = engine.infer_industry_from_spend(lines, total_spend) or ""
+                if inferred:
+                    ind = resolve_sector_pack_id(inferred) or inferred
             resolved["industry"] = ind
             manifest["industry"] = ind
             if any(t.strip() for t in docs_text):
@@ -370,6 +477,8 @@ def run_core_pipeline(
     has_contracts = any(ln.contract_expiry_date or ln.contract_status for ln in lines)
     has_multi_entity = len({ln.legal_entity_id for ln in lines if ln.legal_entity_id}) >= 2 or entity_tree is not None
 
+    prior_session = _memory.get("session", session_id)
+
     state = SessionAnalysisState(
         session_id=session_id,
         engagement_id=engagement_id,
@@ -386,6 +495,18 @@ def run_core_pipeline(
     if conflict_user_actions:
         state_dict["conflict_user_actions"] = conflict_user_actions
     state_dict = bump_spend_base_revision(state_dict)
+    _attach_deterministic_advisory(
+        state_dict,
+        skill_outputs=skill_outputs,
+        prior_session=prior_session if isinstance(prior_session, dict) else None,
+        company_name=company_name or "Client",
+        reporting_currency=reporting_currency,
+        session_id=session_id,
+        engagement_id=engagement_id,
+        run_id=run_id,
+        industry=industry,
+        annual_revenue=annual_revenue,
+    )
     _memory.put("session", session_id, state_dict)
     # Persist a thin manifest snapshot so get_session_manifest can recover the
     # session directory even if data/uploads/{id}/ is wiped after analysis.
@@ -425,7 +546,7 @@ def run_core_pipeline(
             "conflict_count": conflict_detection.get("conflict_count", 0),
         },
     )
-    return state.model_dump(mode="json")
+    return state_dict
 
 
 def run_incremental_pipeline(

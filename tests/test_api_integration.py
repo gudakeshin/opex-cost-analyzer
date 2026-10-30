@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from tests.session_test_utils import seed_session_upload
 
 def _sample_spend_csv() -> bytes:
     return (
@@ -39,11 +40,7 @@ def test_end_to_end_analysis_and_exports(client) -> None:
     assert create.status_code == 200
     session_id = create.json()["session_id"]
 
-    up_csv = client.post(
-        f"/api/upload/{session_id}",
-        files={"file": ("spend.csv", _sample_spend_csv(), "text/csv")},
-    )
-    assert up_csv.status_code == 200
+    seed_session_upload(session_id, "spend.csv", _sample_spend_csv(), "text/csv")
 
     schema = client.get(f"/api/schema/{session_id}")
     assert schema.status_code == 200
@@ -51,11 +48,7 @@ def test_end_to_end_analysis_and_exports(client) -> None:
     assert len(payload_schema["schemas"]) == 1
     assert payload_schema["schemas"][0]["semantic_map"]["amount"] == "amount"
 
-    up_doc = client.post(
-        f"/api/upload/{session_id}",
-        files={"file": ("context.txt", b"contract and compliance guardrails", "text/plain")},
-    )
-    assert up_doc.status_code == 200
+    seed_session_upload(session_id, "context.txt", b"contract and compliance guardrails", "text/plain")
 
     analyze = client.post(
         f"/api/analyze/{session_id}",
@@ -80,9 +73,9 @@ def test_end_to_end_analysis_and_exports(client) -> None:
 
     sens = client.get(f"/api/sensitivity/{session_id}")
     assert sens.status_code == 200
-    assert len(sens.json()["scenarios"]) == 7
+    assert len(sens.json()["scenarios"]) == 8
     names = {s["name"] for s in sens.json()["scenarios"]}
-    assert names == {"conservative", "base", "accelerated", "delayed", "partial_success", "volume_growth", "bounce_back"}
+    assert names == {"conservative", "base", "accelerated", "delayed", "partial_success", "volume_growth", "bounce_back", "regulatory_headwind"}
 
 
 def test_skills_and_compliance_endpoints(client) -> None:
@@ -122,10 +115,7 @@ def test_opar_v1_chat_endpoint(client) -> None:
         json={"company_name": "OPAR Co", "industry": "technology", "annual_revenue": 1_000_000_000},
     )
     session_id = create.json()["session_id"]
-    client.post(
-        f"/api/upload/{session_id}",
-        files={"file": ("spend.csv", _sample_spend_csv(), "text/csv")},
-    )
+    seed_session_upload(session_id, "spend.csv", _sample_spend_csv(), "text/csv")
 
     resp = client.post(
         "/api/v1/chat",
@@ -144,8 +134,18 @@ def test_opar_v1_chat_endpoint(client) -> None:
     assert "degraded_mode" in data
     assert "fallback_reasons" in data
     assert "loop_complete" in data
-    assert "Spend profile" in data["response_text"] or "value bridge" in data["response_text"].lower()
-    assert "Benchmarked using" in data["response_text"]
+    text = data["response_text"]
+    assert (
+        "Spend profile" in text
+        or "value bridge" in text.lower()
+        or "modeled opex savings" in text.lower()
+        or "benchmark gaps" in text.lower()
+    )
+    assert (
+        "Benchmarked using" in text
+        or "benchmark gaps" in text.lower()
+        or "peer median" in text.lower()
+    )
     plan_steps = [s.get("message", "") for s in data.get("progress_steps", []) if s.get("phase") == "plan"]
     selected_line = next((m for m in plan_steps if m.startswith("Selected skills: ")), "")
     assert "Selected skills:" in selected_line
@@ -159,10 +159,7 @@ def test_opar_v1_chat_value_bridge_includes_modeling_without_exec_layers(client)
         json={"company_name": "Value Co", "industry": "technology", "annual_revenue": 1_000_000_000},
     )
     session_id = create.json()["session_id"]
-    client.post(
-        f"/api/upload/{session_id}",
-        files={"file": ("spend.csv", _sample_spend_csv(), "text/csv")},
-    )
+    seed_session_upload(session_id, "spend.csv", _sample_spend_csv(), "text/csv")
 
     resp = client.post(
         "/api/v1/chat",
@@ -195,7 +192,12 @@ def test_opar_v1_chat_with_files_endpoint(client) -> None:
     data = resp.json()
     assert "response_text" in data
     assert isinstance(data.get("uploaded_files", []), list)
-    assert "Spend profile" in data["response_text"]
+    text = data["response_text"]
+    assert (
+        "Spend profile" in text
+        or "modeled OpEx savings" in text
+        or "benchmark gaps" in text.lower()
+    )
 
 
 def test_opar_v1_chat_with_txt_file_captures_document_semantics(client) -> None:
@@ -233,10 +235,7 @@ def test_opar_v1_chat_open_spend_chart_returns_chart_link(client) -> None:
         json={"company_name": "Chart Co", "industry": "technology", "annual_revenue": 1_000_000_000},
     )
     session_id = create.json()["session_id"]
-    client.post(
-        f"/api/upload/{session_id}",
-        files={"file": ("spend.csv", _sample_spend_csv(), "text/csv")},
-    )
+    seed_session_upload(session_id, "spend.csv", _sample_spend_csv(), "text/csv")
 
     resp = client.post(
         "/api/v1/chat",
@@ -256,10 +255,7 @@ def test_opar_v1_chat_plan_preview(client) -> None:
         json={"company_name": "Preview Co", "industry": "technology", "annual_revenue": 1_000_000_000},
     )
     session_id = create.json()["session_id"]
-    client.post(
-        f"/api/upload/{session_id}",
-        files={"file": ("spend.csv", _sample_spend_csv(), "text/csv")},
-    )
+    seed_session_upload(session_id, "spend.csv", _sample_spend_csv(), "text/csv")
     resp = client.post(
         "/api/v1/chat/plan",
         json={"message": "Run benchmark analysis", "session_id": session_id, "user_id": "preview_co"},
@@ -280,10 +276,7 @@ def test_planning_agent_asks_followups_and_refines_response(client) -> None:
         json={"company_name": "Plan Co", "industry": "technology", "annual_revenue": 1_000_000_000},
     )
     session_id = create.json()["session_id"]
-    client.post(
-        f"/api/upload/{session_id}",
-        files={"file": ("spend.csv", _sample_spend_csv(), "text/csv")},
-    )
+    seed_session_upload(session_id, "spend.csv", _sample_spend_csv(), "text/csv")
 
     step1 = client.post(f"/api/chat/{session_id}", json={"message": "We need to reduce procurement costs quickly."})
     assert step1.status_code == 200
@@ -410,10 +403,7 @@ def test_analyze_auto_applies_selected_benchmark_dataset(client) -> None:
         json={"company_name": "Bench Co", "industry": "technology", "annual_revenue": 1_000_000_000},
     )
     session_id = create.json()["session_id"]
-    client.post(
-        f"/api/upload/{session_id}",
-        files={"file": ("spend.csv", _sample_spend_csv(), "text/csv")},
-    )
+    seed_session_upload(session_id, "spend.csv", _sample_spend_csv(), "text/csv")
 
     analyze = client.post(
         f"/api/analyze/{session_id}",

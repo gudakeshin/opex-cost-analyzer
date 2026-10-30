@@ -21,9 +21,11 @@ No changes to act.py are required.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List
 
+from app.services.cache import MID_CAP_LIMIT
 from app.skills.engine.evidence import evidence_gatherer
 from app.models import NormalizedSpendLine
 from app.opar.transaction_examples import build_transaction_examples_from_lines
@@ -49,6 +51,11 @@ class SkillContext:
     entity_tree: Dict[str, Any] | None = None
     segment_revenue: Dict[str, float] | None = None
     sector_weights: Dict[str, float] | None = None
+    # Analytical spend store (app/services/spend_store.SpendStore) when the
+    # session's engagement has Parquet-indexed spend. Skills that can push
+    # aggregations down to DuckDB should prefer it over scanning `lines`;
+    # None when duckdb/pyarrow are absent or nothing is indexed yet.
+    spend_store: Any | None = None
 
     # ── Convenience accessors ───────────────────────────────────────────────
 
@@ -117,19 +124,71 @@ def invoke_skill(name: str, ctx: SkillContext) -> tuple[Dict[str, Any], str | No
     """Dispatch *name* to its registered handler.
 
     Returns ``(output_dict, degraded_reason | None)``.
+    Falls back to the declarative LLM runtime when SKILL.md declares ``runtime: declarative``.
     Raises ``KeyError`` for unrecognised skill names.
     """
     handler = _REGISTRY.get(name)
-    if handler is None:
-        raise KeyError(
-            f"Unknown skill: '{name}'. Registered skills: {sorted(_REGISTRY)}"
-        )
-    return handler(ctx)
+    if handler is not None:
+        return handler(ctx)
+    from app.skills.registry import get_skill_meta
+
+    meta = get_skill_meta(name)
+    if meta and meta.get("runtime") == "declarative":
+        return _run_declarative_skill(name, ctx, meta)
+    raise KeyError(
+        f"Unknown skill: '{name}'. Registered skills: {sorted(_REGISTRY)}"
+    )
 
 
 def registered_skills() -> List[str]:
     """Return sorted list of all registered skill names."""
     return sorted(_REGISTRY)
+
+
+def _run_declarative_skill(
+    name: str,
+    ctx: SkillContext,
+    meta: Dict[str, Any],
+) -> tuple[Dict[str, Any], str | None]:
+    """Execute a UI-authored declarative skill via the shared LLM client."""
+    from pathlib import Path
+
+    from app.config import SKILLS_DIR
+    from app.opar.claude_client import run_declarative_skill_claude_with_meta
+
+    skill_path = Path(meta.get("path") or SKILLS_DIR / name / "SKILL.md")
+    raw = skill_path.read_text(encoding="utf-8") if skill_path.exists() else ""
+    body = re.sub(r"^---\s*\n.*?\n---\s*\n", "", raw, count=1, flags=re.DOTALL).strip()
+
+    input_names = meta.get("inputs") or []
+    upstream: Dict[str, Any] = {}
+    for inp in input_names:
+        if inp in ctx.prior_results:
+            upstream[inp] = ctx.prior_results[inp]
+    profile = _get_profile(ctx)
+    if profile:
+        upstream.setdefault("spend-profiler", profile)
+
+    try:
+        output, degraded = run_declarative_skill_claude_with_meta(
+            skill_name=name,
+            instruction_prompt=body,
+            user_message=ctx.user_message,
+            manifest=ctx.manifest,
+            upstream_outputs=upstream,
+            docs_text=ctx.docs_text,
+            output_fields=list(meta.get("output_fields") or []),
+        )
+        if degraded:
+            return (output or {}), degraded
+        from app.skills.registry import validate_declarative_output
+
+        schema_err = validate_declarative_output(output, list(meta.get("output_fields") or []))
+        if schema_err:
+            return (output or {}), schema_err
+        return (output or {}), None
+    except Exception:
+        return {}, "provider_unavailable"
 
 
 # ---------------------------------------------------------------------------
@@ -155,10 +214,12 @@ def _get_bench_resolved(ctx: SkillContext) -> Dict[str, Any]:
         for c in profile.get("category_profile", [])
         if c.get("category_id")
     ]
+    peer_set = (ctx.manifest or {}).get("peer_set_name")
     return resolve_benchmark_payload(
         industry=ctx.industry,
         categories=categories,
         annual_revenue=ctx.annual_revenue,
+        peer_set_name=str(peer_set) if peer_set else None,
     )
 
 
@@ -175,16 +236,25 @@ def _build_transaction_examples(
 
 
 # ---------------------------------------------------------------------------
-# Skill handlers — one per skill, decorated with @register
-# ---------------------------------------------------------------------------
+
+
+def _should_use_pushdown(ctx: SkillContext) -> bool:
+    if ctx.spend_store is None:
+        return False
+    n = len(ctx.lines) if ctx.lines else ctx.spend_store.line_count()
+    return n > MID_CAP_LIMIT
+
 
 from app.skills import engine as _engine  # noqa: E402  (after primitives)
+from app.skills.engine import cohort as _cohort  # noqa: E402
 
 
 # ── Tier 0: raw data ingestion ───────────────────────────────────────────────
 
 @register("spend-profiler")
 def _spend_profiler(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    if _should_use_pushdown(ctx):
+        return _engine.spend_profiler_pushdown(ctx.spend_store), None
     return _engine.spend_profiler(ctx.lines), None
 
 
@@ -212,6 +282,16 @@ def _temporal_analyzer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     return _engine.temporal_analyzer(ctx.lines), None
 
 
+@register("cohort-segmenter")
+def _cohort_segmenter(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    if ctx.spend_store is None:
+        return {"cohort_available": False, "reason": "No analytical spend store indexed"}, None
+    group_by = ctx.manifest.get("cohort_group_by")
+    if isinstance(group_by, str):
+        group_by = [group_by]
+    return _cohort.cohort_segmenter(ctx.spend_store, group_by=group_by), None
+
+
 @register("payment-terms-optimizer")
 def _payment_terms_optimizer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     return _engine.payment_terms_optimizer(
@@ -234,6 +314,8 @@ def _heuristic_analyzer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
 
 @register("internal-benchmarker")
 def _internal_benchmarker(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    if _should_use_pushdown(ctx):
+        return _engine.internal_benchmarker_pushdown(ctx.spend_store), None
     return _engine.internal_benchmarker(ctx.lines), None
 
 
@@ -285,11 +367,13 @@ def _savings_modeler(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     raw_rows = _engine.build_raw_rows(peer, internal, heuristic)
     root = ctx.prior("root-cause-analyzer")
     profile = _get_profile(ctx)
+    horizon = ctx.manifest.get("planning_horizon_years")
     return _engine.savings_modeler(
         {"raw_rows": raw_rows},
         root,
         discount_rate=ctx.discount_rate,
         effective_tax_rate=ctx.tax_rate,
+        planning_horizon_years=int(horizon) if horizon else None,
         industry=ctx.industry,
         spend_profile=profile,
         headcount=float(ctx.headcount or 0.0),
@@ -307,12 +391,22 @@ def _value_bridge_calculator(ctx: SkillContext) -> tuple[Dict[str, Any], str | N
     heuristic = ctx.prior("heuristic-analyzer")
     total = profile.get("total_spend", 0.0)
     savings_model = ctx.prior_results.get("savings-modeler")
+    # Feed the resolved benchmark's specificity into the confidence-band width:
+    # seed data (0.55) widens bands, a client/sector-pack benchmark (0.85) tightens them.
+    bench = _get_bench_resolved(ctx)
+    specificity = float((bench.get("selected_dataset") or {}).get("specificity_score", 0.70))
+    # Pull portfolio data quality from savings-modeler summary (0.0–1.0; default 1.0)
+    savings_quality = float(
+        (savings_model or {}).get("summary", {}).get("portfolio_data_quality_score", 1.0)
+    )
     return _engine.value_bridge_calculator(
         peer,
         internal,
         heuristic,
         total,
         savings_model=savings_model,
+        benchmark_specificity=specificity,
+        data_quality_score=savings_quality,
     ), None
 
 
@@ -320,6 +414,12 @@ def _value_bridge_calculator(ctx: SkillContext) -> tuple[Dict[str, Any], str | N
 def _data_validator(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     bridge = ctx.prior("value-bridge-calculator")
     return _engine.data_validator(bridge), None
+
+
+@register("data-quality-gate")
+def _data_quality_gate(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    profile = _get_profile(ctx)
+    return _engine.data_quality_gate(ctx.lines, profile), None
 
 
 @register("evidence-gatherer")
@@ -372,14 +472,23 @@ def _chart_builder(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     from app.services.spend_charts import build_spend_profile_chart_html  # lazy
 
     profile = _get_profile(ctx)
-    chart_plan = _engine.chart_builder(profile, user_message=ctx.user_message or None)
+    chart_plan = _engine.chart_builder(
+        profile,
+        user_message=ctx.user_message or None,
+        reporting_currency=ctx.reporting_currency,
+    )
     session_key = (
         ctx.manifest.get("session_id")
         or ctx.manifest.get("turn_id")
         or "session"
     )
     chart_filename = f"{session_key}_spend_profile_chart.html"
-    chart_path = build_spend_profile_chart_html(profile, chart_plan, filename=chart_filename)
+    chart_path = build_spend_profile_chart_html(
+        profile,
+        chart_plan,
+        filename=chart_filename,
+        reporting_currency=ctx.reporting_currency,
+    )
     return {**chart_plan, "chart_url": f"/api/exports/{chart_path.name}"}, None
 
 
@@ -388,15 +497,21 @@ def _business_case_builder(ctx: SkillContext) -> tuple[Dict[str, Any], str | Non
     from app.services.business_case import build_business_case  # lazy
 
     profile = _get_profile(ctx)
+    skill_outputs = dict(ctx.prior_results)
+    if profile:
+        skill_outputs.setdefault("spend-profiler", profile)
     bridge = ctx.prior("value-bridge-calculator")
+    if bridge:
+        skill_outputs.setdefault("value-bridge-calculator", bridge)
     analysis = {
         "company_name": ctx.company_name,
         "industry": ctx.industry,
         "annual_revenue": ctx.annual_revenue,
-        "skill_outputs": {
-            "value-bridge-calculator": bridge,
-            "spend-profiler": profile,
-        },
+        "reporting_currency": ctx.reporting_currency,
+        "engagement_id": ctx.manifest.get("engagement_id"),
+        "model_manifest": ctx.model_manifest,
+        "manifest": ctx.manifest,
+        "skill_outputs": skill_outputs,
     }
     return {"business_case": build_business_case(analysis)}, None
 
@@ -507,6 +622,22 @@ def _scenario_modeler(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     ), None
 
 
+@register("sensitivity-analyzer")
+def _sensitivity_analyzer(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
+    from app.services.sensitivity import compute_sensitivity
+
+    bridge = ctx.prior("value-bridge-calculator")
+    if not bridge:
+        return {"error": "value-bridge-calculator required"}, None
+    savings = ctx.prior("savings-modeler")
+    return compute_sensitivity(
+        bridge,
+        savings_model=savings,
+        discount_rate=ctx.discount_rate,
+        effective_tax_rate=ctx.tax_rate,
+    ), None
+
+
 @register("value-to-shareholder-bridge")
 def _value_to_shareholder_bridge(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     initiatives, wacc, _tax_rate, _base = _portfolio_inputs(ctx)
@@ -600,7 +731,11 @@ def _dashboard_builder(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
 
 @register("export-formatter")
 def _export_formatter(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
-    from app.services.pmo_export import build_pmo_data, export_pmo_xlsx  # lazy
+    from app.services.pmo_export import (  # lazy
+        _BENCHMARK_DISCLAIMER,
+        build_pmo_data,
+        export_pmo_xlsx,
+    )
     from app.services.pipeline import pipeline_summary as get_pipeline_summary  # lazy
 
     # build_pmo_data(pipeline_summary, initiatives, *, company_name=...): the
@@ -609,7 +744,26 @@ def _export_formatter(ctx: SkillContext) -> tuple[Dict[str, Any], str | None]:
     savings = ctx.prior("savings-modeler")
     initiatives = savings.get("initiatives", []) if isinstance(savings, dict) else []
     summary = get_pipeline_summary()
-    pmo_data = build_pmo_data(summary, initiatives, company_name=ctx.company_name or "Client")
+
+    # Propagate benchmark disclaimer when the peer benchmarker used illustrative data.
+    peer = ctx.prior("peer-benchmarker")
+    uses_illustrative = False
+    if isinstance(peer, dict):
+        src = peer.get("benchmark_dataset", {})
+        if isinstance(src, dict):
+            uses_illustrative = "illustrative" in str(src.get("source_name", "")).lower()
+    benchmark_disclaimer = _BENCHMARK_DISCLAIMER if uses_illustrative else None
+
+    pmo_data = build_pmo_data(
+        summary,
+        initiatives,
+        company_name=ctx.company_name or "Client",
+        benchmark_disclaimer=benchmark_disclaimer,
+    )
     session_key = ctx.manifest.get("session_id") or "session"
     path = export_pmo_xlsx(pmo_data, filename=f"{session_key}_pmo_export.xlsx")
-    return {"export_url": f"/api/v1/exports/{path.name}", "filename": path.name}, None
+    return {
+        "export_url": f"/api/v1/exports/{path.name}",
+        "filename": path.name,
+        "uses_illustrative_benchmarks": uses_illustrative,
+    }, None

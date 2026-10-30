@@ -1,11 +1,15 @@
 pack_id: it_ites
 sector: IT & ITeS — Indian IT Services and BPM
-version: "0.1"
+version: "1.0"
 schema_version: "1"
-status: scaffold
-description: Scaffold pack for Indian IT services, BPM, and engineering R&D companies. Full content deferred.
+status: full
+description: >
+  Full sector pack for Indian IT services, BPM, and engineering R&D companies.
+  Covers delivery pyramid and utilisation economics, subcontracting mix,
+  onsite/offshore leverage, cloud and license spend, bench cost, visa and
+  SEZ/STPI compliance, and GenAI-era productivity levers.
 applicable_entity_types: [it_services, bpm_bpo, engineering_rd, saas_product]
-regulatory_bodies: [SEBI, MeitY, DoT, STPI]
+regulatory_bodies: [SEBI, MeitY, DoT, STPI, RBI]
 fiscal_year_end: "March 31"
 reporting_currency: INR
 default_wacc_pct: 12.0

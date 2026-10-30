@@ -17,7 +17,7 @@ from app.opar.reflect import (
     _layer2_coherence_checks,
 )
 from app.opar.models import AdvisorySections, ExecutionPlan, ObserveContext, SkillTask
-from app.opar.orchestrator import _should_use_cached_qa_fastpath
+from app.opar.chat_routing import should_use_cached_qa_fastpath as _should_use_cached_qa_fastpath
 from app.opar.qa_lookup import answer_general_qa as _answer_general_qa, build_sme_critique_section
 from app.opar.reflect import _advisory_quality_ok, _compose_response_from_advisory
 
@@ -37,6 +37,10 @@ def test_classify_intent_rule_based() -> None:
     assert _classify_intent_rule_based("hello") == ("general_qa", None)
     assert _classify_intent_rule_based("what can you do?") == ("general_qa", None)
     assert _classify_intent_rule_based("tell me about my results") == ("general_qa", None)
+    assert _classify_intent_rule_based("Give me the details of the contract renegotiations") == (
+        "savings_plan",
+        None,
+    )
 
 
 def test_classify_intent_with_meta_returns_confidence() -> None:
@@ -82,11 +86,14 @@ def test_classify_intent_with_meta_falls_back_when_llm_unavailable() -> None:
 def test_classify_intent_claude_with_meta_parses_full_taxonomy() -> None:
     from app.opar import claude_client
 
-    raw = (
-        '{"intent":"savings_plan","explicit_category":null,"confidence":0.9,'
-        '"category_confidence":0.0,"capabilities":["value_modeling","not_a_capability"]}'
-    )
-    with patch.object(claude_client, "_call_claude", return_value=raw):
+    canned = {
+        "intent": "savings_plan",
+        "explicit_category": None,
+        "confidence": 0.9,
+        "category_confidence": 0.0,
+        "capabilities": ["value_modeling", "not_a_capability"],
+    }
+    with patch.object(claude_client, "call_anthropic_structured_json", return_value=canned):
         meta = claude_client.classify_intent_claude_with_meta("create a list of initiatives")
     assert meta is not None
     assert meta["intent_class"] == "savings_plan"
@@ -98,7 +105,11 @@ def test_classify_intent_claude_with_meta_parses_full_taxonomy() -> None:
 def test_classify_intent_claude_with_meta_rejects_unknown_intent() -> None:
     from app.opar import claude_client
 
-    with patch.object(claude_client, "_call_claude", return_value='{"intent":"make_coffee"}'):
+    with patch.object(
+        claude_client,
+        "call_anthropic_structured_json",
+        return_value={"intent": "make_coffee", "explicit_category": None, "confidence": 0.5, "category_confidence": 0.0, "capabilities": []},
+    ):
         meta = claude_client.classify_intent_claude_with_meta("brew something")
     assert meta is not None
     assert meta["intent_class"] == "general_qa"
@@ -107,7 +118,7 @@ def test_classify_intent_claude_with_meta_rejects_unknown_intent() -> None:
 def test_classify_intent_claude_with_meta_returns_none_on_error() -> None:
     from app.opar import claude_client
 
-    with patch.object(claude_client, "_call_claude", side_effect=RuntimeError("provider down")):
+    with patch.object(claude_client, "call_anthropic_structured_json", side_effect=RuntimeError("provider down")):
         meta = claude_client.classify_intent_claude_with_meta("anything")
     assert meta is None
 
@@ -202,6 +213,16 @@ def test_should_use_cached_qa_fastpath_allows_simple_lookup() -> None:
         query_capabilities=[],
     )
     assert _should_use_cached_qa_fastpath(ctx, ctx.user_message) is True
+
+
+def test_should_use_cached_qa_fastpath_blocks_contract_detail_questions() -> None:
+    ctx = ObserveContext(
+        session_id="s1",
+        user_message="Give me the details of the contract renegotiations",
+        intent_class="general_qa",
+        query_capabilities=["document_context", "value_modeling"],
+    )
+    assert _should_use_cached_qa_fastpath(ctx, ctx.user_message) is False
 
 
 def test_answer_general_qa_savings_priorities_includes_sme_critique() -> None:
@@ -392,11 +413,12 @@ def test_plan_rule_based_benchmark() -> None:
         user_id="u1",
     )
     exec_plan = _plan_rule_based(ctx)
-    assert len(exec_plan.tasks) == 3
+    assert len(exec_plan.tasks) == 4
     skill_names = [t.skill_name for t in exec_plan.tasks]
     assert "spend-profiler" in skill_names
     assert "peer-benchmarker" in skill_names
     assert "internal-benchmarker" in skill_names
+    assert "data-quality-gate" in skill_names
     assert "payment-terms-optimizer" not in skill_names
     assert "bva-analyzer" not in skill_names
     assert "temporal-analyzer" not in skill_names

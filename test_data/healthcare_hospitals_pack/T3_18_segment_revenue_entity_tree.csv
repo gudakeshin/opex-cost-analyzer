@@ -1,0 +1,7 @@
+legal_entity,parent_entity,business_unit,segment_revenue_inr_cr,geo
+AHNL-IN,,Multi-Speciality Hospitals,4250,India
+AHNL-IN,,Diagnostics,1700,India
+AHNL-IN,,Pharmacy,1275,India
+AHNL-IN,,Homecare,850,India
+AHNL-IN,,Telemedicine,425,India
+AHNL-DX,AHNL-IN,Multi-Speciality Hospitals,637,India

@@ -1,0 +1,7 @@
+Deep Research Brief — Indian AMC/NBFC cost structure (Vistaar Capital)
+
+AMC industry AUM at 54 lakh Cr (March 2024); cost-to-AUM ratios under pressure from TER caps. Technology is 30-40% of total opex for mid-size AMCs. Distribution cost 45-55bps of AUM for active funds. Market data 8-12% of tech budget; consolidation yields 15-25% reduction. RegTech automation of SEBI reporting: 30-40% reduction in compliance headcount effort.
+
+Constraints: SEBI TER caps limit revenue; AMFI commission structures regulated. Client data localisation per SEBI norms. Overseas fund structures (Mauritius) have FEMA + DTAA implications.
+
+Addressable tech and distribution opex ~55-65% of total non-fund expenses.

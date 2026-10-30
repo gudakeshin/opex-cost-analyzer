@@ -1,0 +1,65 @@
+gl_code,cost_center,vendor,description,amount,currency,fiscal_period,amount_type,business_unit,geo,legal_entity,source_system,source_record_id,gst_treatment,gstin,lease_treatment,related_party
+510010,CC-CORPOR-001,SAP India,SAP India services — Corporate IT & Shared Services,133888527,INR,2023-Q2,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100001,itc_eligible,29AABCS6891K1Z2,,no
+510010,CC-CORPOR-001,SAP India,SAP India services — Corporate IT & Shared Services,136566297,INR,2023-Q3,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100002,itc_eligible,29AABCS6891K1Z2,,no
+510010,CC-CORPOR-001,SAP India,SAP India services — Corporate IT & Shared Services,139244068,INR,2023-Q4,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100003,itc_eligible,29AABCS6891K1Z2,,no
+510010,CC-CORPOR-001,SAP India,SAP India services — Corporate IT & Shared Services,141921838,INR,2024-Q1,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100004,itc_eligible,29AABCS6891K1Z2,,no
+510010,CC-CORPOR-001,SAP India,SAP India services — Corporate IT & Shared Services,144599609,INR,2024-Q2,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100005,itc_eligible,29AABCS6891K1Z2,,no
+510010,CC-CORPOR-001,SAP India,SAP India services — Corporate IT & Shared Services,147277379,INR,2024-Q3,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100006,itc_eligible,29AABCS6891K1Z2,,no
+510010,CC-CORPOR-001,SAP India,SAP India services — Corporate IT & Shared Services,149955150,INR,2024-Q4,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100007,itc_eligible,29AABCS6891K1Z2,,no
+510010,CC-CORPOR-001,SAP India,SAP India services — Corporate IT & Shared Services,152632920,INR,2025-Q1,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100008,itc_eligible,29AABCS6891K1Z2,,no
+540010,CC-LEGAL-001,Deloitte India,Deloitte India services — Legal & Professional Services,261799127,INR,2023-Q2,actual,Legal,India,BVGL-IN,SAP,SAP-AP-100009,itc_eligible,29AABCD4821F1Z5,,no
+540010,CC-LEGAL-001,Deloitte India,Deloitte India services — Legal & Professional Services,267035109,INR,2023-Q3,actual,Legal,India,BVGL-IN,SAP,SAP-AP-100010,itc_eligible,29AABCD4821F1Z5,,no
+540010,CC-LEGAL-001,Deloitte India,Deloitte India services — Legal & Professional Services,272271092,INR,2023-Q4,actual,Legal,India,BVGL-IN,SAP,SAP-AP-100011,itc_eligible,29AABCD4821F1Z5,,no
+540010,CC-LEGAL-001,Deloitte India,Deloitte India services — Legal & Professional Services,277507074,INR,2024-Q1,actual,Legal,India,BVGL-IN,SAP,SAP-AP-100012,itc_eligible,29AABCD4821F1Z5,,no
+540010,CC-LEGAL-001,Deloitte India,Deloitte India services — Legal & Professional Services,282743057,INR,2024-Q2,actual,Legal,India,BVGL-IN,SAP,SAP-AP-100013,itc_eligible,29AABCD4821F1Z5,,no
+540010,CC-LEGAL-001,Deloitte India,Deloitte India services — Legal & Professional Services,287979039,INR,2024-Q3,actual,Legal,India,BVGL-IN,SAP,SAP-AP-100014,itc_eligible,29AABCD4821F1Z5,,no
+540010,CC-LEGAL-001,Deloitte India,Deloitte India services — Legal & Professional Services,293215022,INR,2024-Q4,actual,Legal,India,BVGL-IN,SAP,SAP-AP-100015,itc_eligible,29AABCD4821F1Z5,,no
+540010,CC-LEGAL-001,Deloitte India,Deloitte India services — Legal & Professional Services,298451004,INR,2025-Q1,actual,Legal,India,BVGL-IN,SAP,SAP-AP-100016,itc_eligible,29AABCD4821F1Z5,,no
+530010,CC-CORPOR-001,JLL India,JLL India services — Corporate Real Estate,371911140,INR,2023-Q2,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100017,itc_eligible,27AABCJ3215P1Z8,ind_as_116,no
+530010,CC-CORPOR-001,JLL India,JLL India services — Corporate Real Estate,379349362,INR,2023-Q3,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100018,itc_eligible,27AABCJ3215P1Z8,ind_as_116,no
+530010,CC-CORPOR-001,JLL India,JLL India services — Corporate Real Estate,386787585,INR,2023-Q4,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100019,itc_eligible,27AABCJ3215P1Z8,ind_as_116,no
+530010,CC-CORPOR-001,JLL India,JLL India services — Corporate Real Estate,394225808,INR,2024-Q1,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100020,itc_eligible,27AABCJ3215P1Z8,ind_as_116,no
+530010,CC-CORPOR-001,JLL India,JLL India services — Corporate Real Estate,401664031,INR,2024-Q2,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100021,itc_eligible,27AABCJ3215P1Z8,ind_as_116,no
+530010,CC-CORPOR-001,JLL India,JLL India services — Corporate Real Estate,409102254,INR,2024-Q3,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100022,itc_eligible,27AABCJ3215P1Z8,ind_as_116,no
+530010,CC-CORPOR-001,JLL India,JLL India services — Corporate Real Estate,416540476,INR,2024-Q4,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100023,itc_eligible,27AABCJ3215P1Z8,ind_as_116,no
+530010,CC-CORPOR-001,JLL India,JLL India services — Corporate Real Estate,423978699,INR,2025-Q1,actual,Corporate,India,BVGL-IN,SAP,SAP-AP-100024,itc_eligible,27AABCJ3215P1Z8,ind_as_116,no
+550010,CC-GROUP-001,New India Assurance,New India Assurance services — Group Insurance & Risk,423059915,INR,2023-Q2,actual,Group,India,BVGL-IN,SAP,SAP-AP-100025,itc_eligible,27AABCN1234A1Z1,,no
+550010,CC-GROUP-001,New India Assurance,New India Assurance services — Group Insurance & Risk,431521113,INR,2023-Q3,actual,Group,India,BVGL-IN,SAP,SAP-AP-100026,itc_eligible,27AABCN1234A1Z1,,no
+550010,CC-GROUP-001,New India Assurance,New India Assurance services — Group Insurance & Risk,439982311,INR,2023-Q4,actual,Group,India,BVGL-IN,SAP,SAP-AP-100027,itc_eligible,27AABCN1234A1Z1,,no
+550010,CC-GROUP-001,New India Assurance,New India Assurance services — Group Insurance & Risk,448443509,INR,2024-Q1,actual,Group,India,BVGL-IN,SAP,SAP-AP-100028,itc_eligible,27AABCN1234A1Z1,,no
+550010,CC-GROUP-001,New India Assurance,New India Assurance services — Group Insurance & Risk,456904708,INR,2024-Q2,actual,Group,India,BVGL-IN,SAP,SAP-AP-100029,itc_eligible,27AABCN1234A1Z1,,no
+550010,CC-GROUP-001,New India Assurance,New India Assurance services — Group Insurance & Risk,465365906,INR,2024-Q3,actual,Group,India,BVGL-IN,SAP,SAP-AP-100030,itc_eligible,27AABCN1234A1Z1,,no
+550010,CC-GROUP-001,New India Assurance,New India Assurance services — Group Insurance & Risk,473827104,INR,2024-Q4,actual,Group,India,BVGL-IN,SAP,SAP-AP-100031,itc_eligible,27AABCN1234A1Z1,,no
+550010,CC-GROUP-001,New India Assurance,New India Assurance services — Group Insurance & Risk,482288303,INR,2025-Q1,actual,Group,India,BVGL-IN,SAP,SAP-AP-100032,itc_eligible,27AABCN1234A1Z1,,no
+560010,CC-HR&T-001,Aon Hewitt India,Aon Hewitt India services — HR & Talent Corporate,284430150,INR,2023-Q2,actual,HR,India,BVGL-IN,SAP,SAP-AP-100033,itc_eligible,27AABCA2109H1Z4,,no
+560010,CC-HR&T-001,Aon Hewitt India,Aon Hewitt India services — HR & Talent Corporate,290118753,INR,2023-Q3,actual,HR,India,BVGL-IN,SAP,SAP-AP-100034,itc_eligible,27AABCA2109H1Z4,,no
+560010,CC-HR&T-001,Aon Hewitt India,Aon Hewitt India services — HR & Talent Corporate,295807356,INR,2023-Q4,actual,HR,India,BVGL-IN,SAP,SAP-AP-100035,itc_eligible,27AABCA2109H1Z4,,no
+560010,CC-HR&T-001,Aon Hewitt India,Aon Hewitt India services — HR & Talent Corporate,301495959,INR,2024-Q1,actual,HR,India,BVGL-IN,SAP,SAP-AP-100036,itc_eligible,27AABCA2109H1Z4,,no
+560010,CC-HR&T-001,Aon Hewitt India,Aon Hewitt India services — HR & Talent Corporate,307184562,INR,2024-Q2,actual,HR,India,BVGL-IN,SAP,SAP-AP-100037,itc_eligible,27AABCA2109H1Z4,,no
+560010,CC-HR&T-001,Aon Hewitt India,Aon Hewitt India services — HR & Talent Corporate,312873165,INR,2024-Q3,actual,HR,India,BVGL-IN,SAP,SAP-AP-100038,itc_eligible,27AABCA2109H1Z4,,no
+560010,CC-HR&T-001,Aon Hewitt India,Aon Hewitt India services — HR & Talent Corporate,318561768,INR,2024-Q4,actual,HR,India,BVGL-IN,SAP,SAP-AP-100039,itc_eligible,27AABCA2109H1Z4,,no
+560010,CC-HR&T-001,Aon Hewitt India,Aon Hewitt India services — HR & Talent Corporate,324250371,INR,2025-Q1,actual,HR,India,BVGL-IN,SAP,SAP-AP-100040,itc_eligible,27AABCA2109H1Z4,,no
+510010,CC-CORPOR-001,Salesforce India,Salesforce India services — Corporate IT & Shared Services,275985212,INR,2023-Q2,actual,Corporate,India,BVGL-SG,Oracle,Oracle-AP-100041,not_applicable,,,no
+510010,CC-CORPOR-001,Salesforce India,Salesforce India services — Corporate IT & Shared Services,281504916,INR,2023-Q3,actual,Corporate,India,BVGL-SG,Oracle,Oracle-AP-100042,not_applicable,,,no
+510010,CC-CORPOR-001,Salesforce India,Salesforce India services — Corporate IT & Shared Services,287024620,INR,2023-Q4,actual,Corporate,India,BVGL-SG,Oracle,Oracle-AP-100043,not_applicable,,,no
+510010,CC-CORPOR-001,Salesforce India,Salesforce India services — Corporate IT & Shared Services,292544324,INR,2024-Q1,actual,Corporate,India,BVGL-SG,Oracle,Oracle-AP-100044,not_applicable,,,no
+510010,CC-CORPOR-001,Salesforce India,Salesforce India services — Corporate IT & Shared Services,298064028,INR,2024-Q2,actual,Corporate,India,BVGL-SG,Oracle,Oracle-AP-100045,not_applicable,,,no
+510010,CC-CORPOR-001,Salesforce India,Salesforce India services — Corporate IT & Shared Services,303583733,INR,2024-Q3,actual,Corporate,India,BVGL-SG,Oracle,Oracle-AP-100046,not_applicable,,,no
+510010,CC-CORPOR-001,Salesforce India,Salesforce India services — Corporate IT & Shared Services,309103437,INR,2024-Q4,actual,Corporate,India,BVGL-SG,Oracle,Oracle-AP-100047,not_applicable,,,no
+510010,CC-CORPOR-001,Salesforce India,Salesforce India services — Corporate IT & Shared Services,314623141,INR,2025-Q1,actual,Corporate,India,BVGL-SG,Oracle,Oracle-AP-100048,not_applicable,,,no
+540010,CC-LEGAL-001,PricewaterhouseCoopers,PricewaterhouseCoopers services — Legal & Professional Services,159088516,INR,2023-Q2,actual,Legal,India,BVGL-SG,Oracle,Oracle-AP-100049,not_applicable,,,no
+540010,CC-LEGAL-001,PricewaterhouseCoopers,PricewaterhouseCoopers services — Legal & Professional Services,162270286,INR,2023-Q3,actual,Legal,India,BVGL-SG,Oracle,Oracle-AP-100050,not_applicable,,,no
+540010,CC-LEGAL-001,PricewaterhouseCoopers,PricewaterhouseCoopers services — Legal & Professional Services,165452056,INR,2023-Q4,actual,Legal,India,BVGL-SG,Oracle,Oracle-AP-100051,not_applicable,,,no
+540010,CC-LEGAL-001,PricewaterhouseCoopers,PricewaterhouseCoopers services — Legal & Professional Services,168633826,INR,2024-Q1,actual,Legal,India,BVGL-SG,Oracle,Oracle-AP-100052,not_applicable,,,no
+540010,CC-LEGAL-001,PricewaterhouseCoopers,PricewaterhouseCoopers services — Legal & Professional Services,171815597,INR,2024-Q2,actual,Legal,India,BVGL-SG,Oracle,Oracle-AP-100053,not_applicable,,,no
+540010,CC-LEGAL-001,PricewaterhouseCoopers,PricewaterhouseCoopers services — Legal & Professional Services,174997367,INR,2024-Q3,actual,Legal,India,BVGL-SG,Oracle,Oracle-AP-100054,not_applicable,,,no
+540010,CC-LEGAL-001,PricewaterhouseCoopers,PricewaterhouseCoopers services — Legal & Professional Services,178179137,INR,2024-Q4,actual,Legal,India,BVGL-SG,Oracle,Oracle-AP-100055,not_applicable,,,no
+540010,CC-LEGAL-001,PricewaterhouseCoopers,PricewaterhouseCoopers services — Legal & Professional Services,181360908,INR,2025-Q1,actual,Legal,India,BVGL-SG,Oracle,Oracle-AP-100056,not_applicable,,,no
+510010,CC-TRAVEL-001,Taj Hotels,Taj Hotels services — Travel & Entertainment,351814046,INR,2023-Q2,actual,Travel,India,BVGL-IN,SAP,SAP-AP-100057,itc_eligible,27AABCT9923H1Z0,,no
+510010,CC-TRAVEL-001,Taj Hotels,Taj Hotels services — Travel & Entertainment,358850326,INR,2023-Q3,actual,Travel,India,BVGL-IN,SAP,SAP-AP-100058,itc_eligible,27AABCT9923H1Z0,,no
+510010,CC-TRAVEL-001,Taj Hotels,Taj Hotels services — Travel & Entertainment,365886607,INR,2023-Q4,actual,Travel,India,BVGL-IN,SAP,SAP-AP-100059,itc_eligible,27AABCT9923H1Z0,,no
+510010,CC-TRAVEL-001,Taj Hotels,Taj Hotels services — Travel & Entertainment,372922888,INR,2024-Q1,actual,Travel,India,BVGL-IN,SAP,SAP-AP-100060,itc_eligible,27AABCT9923H1Z0,,no
+510010,CC-TRAVEL-001,Taj Hotels,Taj Hotels services — Travel & Entertainment,379959169,INR,2024-Q2,actual,Travel,India,BVGL-IN,SAP,SAP-AP-100061,itc_eligible,27AABCT9923H1Z0,,no
+510010,CC-TRAVEL-001,Taj Hotels,Taj Hotels services — Travel & Entertainment,386995450,INR,2024-Q3,actual,Travel,India,BVGL-IN,SAP,SAP-AP-100062,itc_eligible,27AABCT9923H1Z0,,no
+510010,CC-TRAVEL-001,Taj Hotels,Taj Hotels services — Travel & Entertainment,394031731,INR,2024-Q4,actual,Travel,India,BVGL-IN,SAP,SAP-AP-100063,itc_eligible,27AABCT9923H1Z0,,no
+510010,CC-TRAVEL-001,Taj Hotels,Taj Hotels services — Travel & Entertainment,401068012,INR,2025-Q1,actual,Travel,India,BVGL-IN,SAP,SAP-AP-100064,itc_eligible,27AABCT9923H1Z0,,no

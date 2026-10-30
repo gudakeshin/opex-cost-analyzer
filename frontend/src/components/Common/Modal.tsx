@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useId } from 'react';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { Button } from './Button';
 
 interface ModalProps {
@@ -28,6 +29,9 @@ export const Modal: React.FC<ModalProps> = ({
   confirmVariant = 'primary',
   size = 'md',
 }) => {
+  const titleId = useId();
+  const dialogRef = useFocusTrap<HTMLDivElement>(open);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -43,13 +47,15 @@ export const Modal: React.FC<ModalProps> = ({
     <>
       <div className="modal-overlay" onClick={onClose} role="presentation">
         <div
-          className={`modal-content p-6 ${MODAL_SIZE_CLASS[size]}`}
+          ref={dialogRef}
+          tabIndex={-1}
+          className={`modal-content p-6 outline-none ${MODAL_SIZE_CLASS[size]}`}
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
-          aria-labelledby="modal-title"
+          aria-labelledby={titleId}
         >
-          <h2 id="modal-title" className="text-lg font-semibold text-gray-900 mb-4">
+          <h2 id={titleId} className="text-lg font-semibold text-gray-900 mb-4">
             {title}
           </h2>
           {children}

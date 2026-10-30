@@ -1,0 +1,10 @@
+Bharat Ventures Group Ltd — Group Structure
+
+BVGL-IN: India parent (BSE/NSE listed). ERP: SAP S4HANA + Coupa.
+BVGL-SG: Singapore HoldCo (investment holding & treasury). ERP: Oracle ERP Cloud.
+BVC-IN: BV Chemicals India Ltd (chemicals subsidiary). ERP: SAP S4HANA.
+BVFS-IN: BV Financial Services Ltd (NBFC subsidiary). ERP: Finacle/Oracle.
+
+Entity tree: BVGL-IN > BVGL-SG (100%) > BVC-IN; BVFS-IN (100%)
+
+Intercompany: management fee and shared-services recharges via GL 640099 (related_party=yes). Eliminate before consolidation. SEBI quarterly consolidated results required.

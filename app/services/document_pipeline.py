@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
@@ -10,6 +11,7 @@ from app.config import logger
 from app.models import NormalizedSpendLine
 from app.services.engagements_store import (
     SUPPORTED_EXTENSIONS,
+    add_document_record,
     document_dir,
     document_parsed_dir,
     get_document_record,
@@ -35,6 +37,83 @@ def _serialize_lines(lines: List[NormalizedSpendLine]) -> List[Dict[str, Any]]:
 
 def _deserialize_lines(payload: List[Dict[str, Any]]) -> List[NormalizedSpendLine]:
     return [NormalizedSpendLine.model_validate(item) for item in payload]
+
+
+# Above this, the per-document JSON cache is skipped: the Parquet store is the
+# only cache, and load_cached_spend_lines reads it back. Below it, both are
+# written so environments without duckdb/pyarrow keep working unchanged.
+_JSON_CACHE_MAX_LINES = 100_000
+
+
+def _should_stream_csv(raw_path: Path) -> bool:
+    """Stream CSVs too big for the in-memory parser, when the store can take them."""
+    from app.services.ingestion import _ROW_MAX, estimate_csv_rows
+    from app.services.spend_store import is_available
+
+    if not is_available():
+        return False
+    try:
+        return estimate_csv_rows(raw_path) > _ROW_MAX
+    except OSError:
+        return False
+
+
+def _stream_csv_document(
+    engagement_id: str,
+    document_id: str,
+    raw_path: Path,
+    *,
+    taxonomy: Dict[str, Any],
+    reporting_currency: str,
+) -> tuple[int, Dict[str, Any]]:
+    """Chunk a large CSV straight into the Parquet spend store.
+
+    Peak memory is one chunk (100k lines); no spend_lines.json is written —
+    load_cached_spend_lines reads the Parquet store instead.
+    """
+    from app.services.ingestion import iter_spend_csv_chunks
+    from app.services.spend_store import SpendStore
+
+    total = SpendStore(engagement_id).write_document_batches(
+        document_id,
+        iter_spend_csv_chunks(
+            raw_path, taxonomy, reporting_currency=reporting_currency
+        ),
+    )
+    report = {
+        "source_file": raw_path.name,
+        "sheets_ingested": [
+            {"sheet": raw_path.stem, "rows": total, "strategy": "csv_streamed"}
+        ],
+        "sheets_skipped": [],
+        "rows_ingested": total,
+        "streamed": True,
+    }
+    return total, report
+
+
+def _cache_spend_lines(
+    engagement_id: str,
+    document_id: str,
+    parsed_dir: Path,
+    lines: List[NormalizedSpendLine],
+) -> None:
+    from app.services.spend_store import write_document_spend_lines
+
+    parquet_ok = write_document_spend_lines(engagement_id, document_id, lines)
+    try:
+        from app.services.cache import CostRoomCache
+
+        CostRoomCache().invalidate(engagement_id)
+    except Exception:
+        pass
+    if len(lines) <= _JSON_CACHE_MAX_LINES or not parquet_ok:
+        (parsed_dir / "spend_lines.json").write_text(
+            json.dumps(_serialize_lines(lines), indent=2),
+            encoding="utf-8",
+        )
+    else:
+        (parsed_dir / "spend_lines.json").unlink(missing_ok=True)
 
 
 def index_document_nodes(
@@ -75,6 +154,48 @@ def reindex_engagement(engagement_id: str) -> Dict[str, Any]:
     return summary
 
 
+def ingest_markdown_document(
+    engagement_id: str,
+    markdown: str,
+    filename: str,
+    *,
+    reporting_currency: str = "INR",
+    content_type: str = "text/markdown",
+) -> str:
+    """Write an in-memory markdown doc into the engagement folder and run the
+    standard parse + index pipeline synchronously. Returns the new document_id.
+
+    Mirrors the upload flow in ``app/routers/engagements.py`` so the document is
+    indistinguishable from a user-uploaded one and is picked up by analysis via
+    ``load_engagement_corpus``.
+    """
+    from app.services.analysis import load_taxonomy
+
+    document_id = str(uuid.uuid4())
+    ddir = document_dir(engagement_id, document_id)
+    raw_path = ddir / "raw.md"
+    payload = markdown.encode("utf-8")
+
+    # Register manifest + meta before raw bytes land on disk (see engagements upload).
+    add_document_record(
+        engagement_id,
+        document_id=document_id,
+        filename=filename,
+        content_type=content_type,
+        size_bytes=len(payload),
+        raw_path=str(raw_path),
+    )
+    raw_path.write_bytes(payload)
+
+    process_engagement_document(
+        engagement_id,
+        document_id,
+        taxonomy=load_taxonomy(),
+        reporting_currency=reporting_currency,
+    )
+    return document_id
+
+
 def process_engagement_document(
     engagement_id: str,
     document_id: str,
@@ -102,6 +223,13 @@ def process_engagement_document(
     )
 
     parsed_dir = document_parsed_dir(engagement_id, document_id)
+    from app.services.gl_mapping import apply_to_taxonomy
+
+    taxonomy = apply_to_taxonomy(taxonomy, engagement_id)  # adds this engagement's GL ranges, if any
+    try:
+        column_overrides = dict(get_document_record(engagement_id, document_id).get("column_overrides") or {})
+    except Exception:
+        column_overrides = {}
     warnings: List[str] = []
     role = "context_doc"
     parse_backend = "native"
@@ -110,17 +238,28 @@ def process_engagement_document(
     parsed_markdown = ""
 
     try:
-        if suffix in (".csv", ".xlsx", ".xls"):
+        if suffix == ".csv" and _should_stream_csv(raw_path):
+            line_count, report = _stream_csv_document(
+                engagement_id, document_id, raw_path,
+                taxonomy=taxonomy, reporting_currency=reporting_currency,
+            )
+            role = "spend_tabular"
+            parse_backend = "native_streamed"
+            (parsed_dir / "ingestion_report.json").write_text(
+                json.dumps(report, indent=2),
+                encoding="utf-8",
+            )
+            text_preview = f"Parsed {line_count} spend lines from {raw_path.name} (streamed)"
+
+        elif suffix in (".csv", ".xlsx", ".xls"):
             lines, report = parse_spend_file_with_report(
-                raw_path, taxonomy, reporting_currency=reporting_currency
+                raw_path, taxonomy, reporting_currency=reporting_currency,
+                column_overrides=column_overrides or None,
             )
             role = "spend_tabular"
             parse_backend = "native"
             line_count = len(lines)
-            (parsed_dir / "spend_lines.json").write_text(
-                json.dumps(_serialize_lines(lines), indent=2),
-                encoding="utf-8",
-            )
+            _cache_spend_lines(engagement_id, document_id, parsed_dir, lines)
             (parsed_dir / "ingestion_report.json").write_text(
                 json.dumps(report, indent=2),
                 encoding="utf-8",
@@ -129,22 +268,20 @@ def process_engagement_document(
 
         elif suffix == ".json":
             lines, report = parse_spend_json_with_report(
-                raw_path, taxonomy, reporting_currency=reporting_currency
+                raw_path, taxonomy, reporting_currency=reporting_currency,
+                column_overrides=column_overrides or None,
             )
             role = "spend_tabular"
             parse_backend = "native"
             line_count = len(lines)
-            (parsed_dir / "spend_lines.json").write_text(
-                json.dumps(_serialize_lines(lines), indent=2),
-                encoding="utf-8",
-            )
+            _cache_spend_lines(engagement_id, document_id, parsed_dir, lines)
             (parsed_dir / "ingestion_report.json").write_text(
                 json.dumps(report, indent=2),
                 encoding="utf-8",
             )
             text_preview = f"Parsed {line_count} spend lines from JSON"
 
-        elif suffix == ".txt":
+        elif suffix in (".txt", ".md"):
             text = raw_path.read_text(encoding="utf-8", errors="ignore")
             (parsed_dir / "markdown.md").write_text(text, encoding="utf-8")
             role = "context_doc"
@@ -260,11 +397,32 @@ def process_engagement_document(
 def load_cached_spend_lines(engagement_id: str, document_id: str) -> List[NormalizedSpendLine]:
     path = document_parsed_dir(engagement_id, document_id) / "spend_lines.json"
     if not path.exists():
+        # Large documents are cached in Parquet only (see _cache_spend_lines).
+        from app.services.spend_store import SpendStore, is_available
+
+        if is_available():
+            try:
+                return SpendStore(engagement_id).document_lines(document_id)
+            except Exception:
+                logger.warning(
+                    '"spend_store_read_failed engagement_id=%s document_id=%s"',
+                    engagement_id, document_id, exc_info=True,
+                )
         return []
     data = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(data, list):
         return []
     return _deserialize_lines(data)
+
+
+def load_cached_ingestion_report(engagement_id: str, document_id: str) -> Dict[str, Any]:
+    """The ingest report written when the document was parsed ({} when absent or unreadable)."""
+    path = document_parsed_dir(engagement_id, document_id) / "ingestion_report.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return data if isinstance(data, dict) else {}
 
 
 def load_cached_markdown(engagement_id: str, document_id: str) -> str:

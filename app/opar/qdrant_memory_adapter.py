@@ -46,8 +46,9 @@ class QdrantMemoryAdapter:
 
             api_key = QDRANT_API_KEY or None
             self._client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT, api_key=api_key, timeout=5)
-            self._encoder = SentenceTransformer(EMBEDDING_MODEL)
+            # Reach Qdrant first; only then pay for loading the embedding model.
             self._ensure_collections()
+            self._encoder = SentenceTransformer(EMBEDDING_MODEL)
             self._qdrant_ok = True
             logger.info('"qdrant_memory_adapter_ready host=%s port=%s"', QDRANT_HOST, QDRANT_PORT)
         except ImportError as exc:

@@ -24,7 +24,7 @@ export const FactVsInferenceLabel: React.FC<FactVsInferenceLabelProps> = ({
   className = '',
 }) => (
   <span
-    className={`inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border-l-4 ${KIND_STYLES[kind]} ${className}`}
+    className={`inline-flex items-center text-[11px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border-l-4 ${KIND_STYLES[kind]} ${className}`}
   >
     {KIND_LABELS[kind]}
   </span>

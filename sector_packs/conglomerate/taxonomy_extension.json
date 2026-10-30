@@ -1,11 +1,61 @@
 {
   "base_taxonomy_version": "1.0",
   "additional_categories": [
-    {"category_id": "group_shared_services", "category_name": "Group Shared Services Allocation", "gl_prefix": "GSS"},
-    {"category_id": "intercompany_eliminations", "category_name": "Intercompany Transactions (Pre-elimination)", "gl_prefix": "ICE"},
-    {"category_id": "holding_co_overhead", "category_name": "Holding Company Management & Overhead", "gl_prefix": "HCO"},
-    {"category_id": "related_party_transactions", "category_name": "Related Party Transactions (Ind AS 24)", "gl_prefix": "RPT"},
-    {"category_id": "group_treasury_funding", "category_name": "Group Treasury & Intra-Group Financing", "gl_prefix": "GTF"}
+    {
+      "category_id": "group_shared_services",
+      "category_name": "Group Shared Services Allocation",
+      "gl_prefix": "GSS"
+    },
+    {
+      "category_id": "intercompany_eliminations",
+      "category_name": "Intercompany Transactions (Pre-elimination)",
+      "gl_prefix": "ICE"
+    },
+    {
+      "category_id": "holding_co_overhead",
+      "category_name": "Holding Company Management & Overhead",
+      "gl_prefix": "HCO"
+    },
+    {
+      "category_id": "related_party_transactions",
+      "category_name": "Related Party Transactions (Ind AS 24)",
+      "gl_prefix": "RPT"
+    },
+    {
+      "category_id": "group_treasury_funding",
+      "category_name": "Group Treasury & Intra-Group Financing",
+      "gl_prefix": "GTF"
+    },
+    {
+      "category_id": "group_brand_royalty",
+      "category_name": "Group Brand Royalty & License Fees",
+      "gl_prefix": "GBR",
+      "cost_nature": "intercompany"
+    },
+    {
+      "category_id": "group_digital_platforms",
+      "category_name": "Group Digital & ERP Platforms",
+      "gl_prefix": "GDP",
+      "cost_nature": "technology"
+    },
+    {
+      "category_id": "listed_entity_compliance",
+      "category_name": "Listed Entity & Secretarial Compliance",
+      "gl_prefix": "LEC",
+      "cost_nature": "compliance"
+    },
+    {
+      "category_id": "group_insurance_programs",
+      "category_name": "Group Insurance Programmes",
+      "gl_prefix": "GIP",
+      "cost_nature": "finance"
+    },
+    {
+      "category_id": "corporate_aviation_travel",
+      "category_name": "Corporate Aviation & Group Travel",
+      "gl_prefix": "CAT",
+      "cost_nature": "operations"
+    }
   ],
   "overrides": []
 }

@@ -107,6 +107,12 @@ class ObserveContext(BaseModel):
     # Deep research context — populated from session manifest when available
     deep_research_summary: str | None = None
 
+    # Analysis Workbench: per-run assumption overrides (merged onto the session
+    # manifest at act time) and seed outputs (prior-run skill_outputs preloaded
+    # into act()'s results for chaining). Empty for the chat path.
+    workbench_overrides: Dict[str, Any] = Field(default_factory=dict)
+    workbench_seed_outputs: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
+
 
 class SkillTask(BaseModel):
     skill_name: str
@@ -117,6 +123,14 @@ class SkillTask(BaseModel):
     estimated_tokens: int = 0
 
 
+class SuggestedOutput(BaseModel):
+    """Heavy export or file artefact surfaced as a one-click CTA (not auto-run)."""
+    skill: str
+    label: str
+    endpoint: str
+    score: float = 0.0
+
+
 class ExecutionPlan(BaseModel):
     tasks: List[SkillTask] = Field(default_factory=list)
     total_skills: int = 0
@@ -124,6 +138,10 @@ class ExecutionPlan(BaseModel):
     user_summary: str = ""
     estimated_duration: str = ""
     requires_approval: bool = False
+    suggested_outputs: List[SuggestedOutput] = Field(default_factory=list)
+    # "planner" (static rule-based) or "agent" (tool-loop selected skills
+    # progressively — synthesis context filtering must not re-filter them).
+    source: str = "planner"
 
 
 class SkillTrace(BaseModel):
@@ -174,12 +192,36 @@ class AdvisoryBusinessLever(BaseModel):
     what_changes: str
     why_it_works: str
     evidence: List[str] = Field(default_factory=list)
+    so_what: str = ""
 
 
 class AdvisoryActionItem(BaseModel):
     timeline: str
     action: str
     expected_impact: str
+
+
+class AdvisoryRecommendation(BaseModel):
+    category_id: str = ""
+    category_name: str = ""
+    lever: str = ""
+    priority: int = 0
+    financials: Dict[str, Any] = Field(default_factory=dict)
+    confidence: Dict[str, Any] = Field(default_factory=dict)
+    evidence: List[Dict[str, Any]] = Field(default_factory=list)
+    examples: List[Dict[str, Any]] = Field(default_factory=list)
+    risks: List[str] = Field(default_factory=list)
+    decisions_required: List[str] = Field(default_factory=list)
+
+
+class AdvisoryCitation(BaseModel):
+    source_skill: str
+    metric: str
+    value: str
+    row_count: int = 0
+    dataset: str = ""
+    vintage: str = ""
+    sample_n: int = 0
 
 
 class AdvisorySections(BaseModel):
@@ -190,6 +232,8 @@ class AdvisorySections(BaseModel):
     executive_callouts: List[str] = Field(default_factory=list)
     priority_actions_30_60_90: List[AdvisoryActionItem] = Field(default_factory=list)
     sme_qualification_narrative: str = ""
+    recommendations: List[AdvisoryRecommendation] = Field(default_factory=list)
+    citations: List[AdvisoryCitation] = Field(default_factory=list)
 
 
 class ReflectOutput(BaseModel):
@@ -208,6 +252,7 @@ class ReflectOutput(BaseModel):
     response_text: str = ""
     response_artefacts: List[str] = Field(default_factory=list)
     advisory_sections: AdvisorySections | None = None
+    presentation: Any = None  # AssistantPayload from app.opar.presentation
     quality_signals: Dict[str, Any] = Field(default_factory=dict)
     used_llm_synthesis: bool = False
     thinking_text: str | None = None
@@ -229,10 +274,17 @@ class ReflectOutput(BaseModel):
     # LLM-suggested, data-backed charts rendered inline in the chat (see visualization.py)
     chart_specs: List[Dict[str, Any]] = Field(default_factory=list)
 
+    # Semantically matched heavy exports — one-click CTAs (not auto-run in pipeline)
+    suggested_outputs: List[SuggestedOutput] = Field(default_factory=list)
+
     # Phase 3: replanner + quality gate + regulatory events
     replanner_log: List[Dict[str, Any]] = Field(default_factory=list)  # decisions made by replanner
+    # When the replanner fires, this carries the revised plan so the orchestrator
+    # can re-enter Act without a second Observe+Plan round-trip (bounded: max 2 cycles).
+    replan_output: Optional["ExecutionPlan"] = None
     gate2_blocked: bool = False
     gate2_narrative: str = ""
     regulatory_events: List[Dict[str, Any]] = Field(default_factory=list)
     forced_regulatory_decision: bool = False
     narrative_provenance_tag: Optional[Dict[str, Any]] = None
+    run_delta: Optional[Dict[str, Any]] = None

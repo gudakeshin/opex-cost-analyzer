@@ -1,0 +1,3 @@
+Pragati Telecom Networks Ltd — Treasury FY25
+
+Primarily INR. USD imports: network equipment (Ericsson, Nokia, Huawei) ~4200 Cr. USD debt: USD 600M external commercial borrowing (ECB) at SOFR+180bps — significant P&L FX exposure. Policy: hedge 60% of USD equipment imports; swap 70% of USD ECB to INR via cross-currency swaps. USD/INR ~83.4. Separate equipment FX from ECB FX in cost analysis; ECB hedge cost is treasury, not opex lever.

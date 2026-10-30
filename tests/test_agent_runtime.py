@@ -51,6 +51,38 @@ def test_tool_loop_runs_dispatch_and_completes() -> None:
     assert len(result.steps) == 2
 
 
+def test_tool_loop_streams_thinking_callback() -> None:
+    chunks: list[str] = []
+
+    class ThinkingTransport(ScriptedTransport):
+        def generate(self, *, system, messages, tools, thinking=True):
+            text, calls = self._script[self._idx] if self._idx < len(self._script) else ("done", [])
+            self._idx += 1
+            return text, calls, f"reasoning-{self._idx}"
+
+    transport = ThinkingTransport([
+        (None, [make_tool_call("find_skills", {"query": "benchmark spend"})]),
+        ("done", []),
+    ])
+
+    run_tool_loop(
+        system="test",
+        messages=[{"role": "user", "content": "benchmark"}],
+        tools=[
+            ToolDefinition(
+                name="find_skills",
+                description="find",
+                input_schema={"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]},
+            ),
+        ],
+        dispatch=lambda call: {"ok": True},
+        transport=transport,
+        thinking_callback=chunks.append,
+        max_iters=3,
+    )
+    assert chunks == ["reasoning-1", "reasoning-2"]
+
+
 def test_tool_loop_caches_identical_calls() -> None:
     counter = {"n": 0}
 

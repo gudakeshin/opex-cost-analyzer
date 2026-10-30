@@ -30,7 +30,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         )}
         {sessionId && <Badge tone="success">Session {sessionId.slice(0, 8)}…</Badge>}
         {phase && (
-          <span className="text-[10px] uppercase tracking-wider font-semibold text-brand-navy bg-brand-surface-muted px-1.5 py-0.5 rounded">
+          <span className="text-[11px] uppercase tracking-wider font-semibold text-brand-navy bg-brand-surface-muted px-1.5 py-0.5 rounded">
             {phase}
           </span>
         )}

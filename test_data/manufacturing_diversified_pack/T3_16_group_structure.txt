@@ -1,0 +1,9 @@
+Uttam Industries Ltd — Group Structure
+
+UIL-IN: India parent (NSE/BSE listed). ERP: SAP S4HANA + Coupa.
+UIL-DE: Uttam Industries GmbH (Germany; auto components sales & engineering). ERP: Oracle ERP.
+UIL-US: Uttam Industries Inc (USA; capital goods sales). ERP: Oracle ERP.
+
+Entity tree: UIL-IN > UIL-DE (100%), UIL-US (100%)
+
+Intercompany: UIL-IN manufactures and exports to UIL-DE/UIL-US at transfer prices per TP policy. IC sales flagged related_party=yes. Eliminate on consolidation. OECD TP documentation required for Germany and US subsidiaries.

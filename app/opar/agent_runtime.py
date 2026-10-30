@@ -92,6 +92,7 @@ def run_tool_loop(
     thinking: bool = True,
     max_iters: int | None = None,
     tool_timeout_s: float | None = None,
+    thinking_callback: Callable[[str], None] | None = None,
 ) -> ToolLoopResult:
     """Run think → tool call → observe → repeat until the model stops calling tools."""
     max_iterations = max_iters if max_iters is not None else AGENT_MAX_TOOL_ITERATIONS
@@ -110,6 +111,8 @@ def run_tool_loop(
         )
         if thinking_text:
             all_thinking.append(thinking_text)
+            if thinking_callback:
+                thinking_callback(thinking_text)
 
         if not tool_calls:
             return ToolLoopResult(

@@ -1,9 +1,13 @@
 pack_id: telecom_infra
 sector: Telecom & Digital Infrastructure (India)
-version: "0.1"
+version: "1.0"
 schema_version: "1"
-status: scaffold
-description: Scaffold for Indian telecom operators, tower companies, and data centres. Full content deferred.
+status: full
+description: >
+  Full sector pack for Indian telecom operators, tower companies, ISPs, and
+  data centres. Covers spectrum and license levies, network and tower energy
+  opex, sharing economics, SAC and churn, backhaul/fibre costs, and BSS/OSS
+  modernisation levers.
 applicable_entity_types: [mobile_operator, tower_company, data_centre, isp]
 regulatory_bodies: [TRAI, DoT, SEBI, MeitY]
 fiscal_year_end: "March 31"

@@ -1,17 +1,18 @@
 """Reflect persistence — session cache merge, analysis trace, memory writes."""
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
 from typing import Any, Dict, List
 
-from app.config import UPLOAD_DIR
 from app.memory import MemoryStore
 from app.opar.memory_adapter import get_memory_adapter
 from app.opar.models import ActResult, AdvisorySections, MemoryUpdate, ObserveContext
 from app.opar.provenance import record_llm_narrative
-from app.storage import read_json, write_json
 
 _memory = MemoryStore()
+
+logger = logging.getLogger(__name__)
 
 _CONFLICT_TYPE_LABELS: Dict[str, str] = {
     "tds_mismatch": "TDS mismatch",
@@ -44,6 +45,12 @@ def _merge_with_session_cache(
 
         return apply_probe_answers_to_skill_outputs(merged, session_id)
     except Exception:
+        # Degraded, not fatal: the analysis proceeds without the consultant's
+        # probe answers, so make the omission visible instead of silent.
+        logger.exception(
+            '"probe_answer_merge_failed session_id=%s — proceeding without probe answers"',
+            session_id,
+        )
         return merged
 
 
@@ -110,6 +117,41 @@ def apply_memory_updates(
     return user_updates, agent_updates
 
 
+def _compute_run_delta(
+    prior: Dict[str, Any] | None,
+    merged_outputs: Dict[str, Any],
+    currency: str,
+) -> Dict[str, Any] | None:
+    if not prior or not isinstance(prior, dict):
+        return None
+    prior_outputs = prior.get("skill_outputs") or {}
+    if not isinstance(prior_outputs, dict) or not prior_outputs:
+        return None
+
+    def _mid(outputs: Dict[str, Any]) -> float:
+        bridge = outputs.get("value-bridge-calculator") or {}
+        conf = bridge.get("confidence_bands") or {}
+        return float(conf.get("mid") or 0)
+
+    prior_mid = _mid(prior_outputs)
+    new_mid = _mid(merged_outputs)
+    if prior_mid <= 0 and new_mid <= 0:
+        return None
+
+    prior_adv = prior.get("advisory_sections") or {}
+    prior_headline = ""
+    if isinstance(prior_adv, dict):
+        prior_headline = str(prior_adv.get("executive_takeaway") or "")[:240]
+
+    return {
+        "previous_headline": prior_headline,
+        "prior_mid_savings": prior_mid,
+        "current_mid_savings": new_mid,
+        "delta_mid_savings": new_mid - prior_mid,
+        "currency": currency,
+    }
+
+
 def persist_session_analysis(
     *,
     ctx: ObserveContext,
@@ -118,9 +160,10 @@ def persist_session_analysis(
     manifest: Dict[str, Any],
     reporting_currency: str,
     advisory_sections: AdvisorySections | None,
-) -> None:
+    regulatory_events: List[Dict[str, Any]] | None = None,
+) -> Dict[str, Any] | None:
     if not validated:
-        return
+        return None
     existing_analysis = _memory.get("session", ctx.session_id)
     analysis_snapshot: Dict[str, Any] = dict(existing_analysis) if isinstance(existing_analysis, dict) else {}
     merged_outputs: Dict[str, Any] = {}
@@ -153,48 +196,116 @@ def persist_session_analysis(
         "skills_run_this_turn": list(validated.keys()),
         "updated_at": datetime.now(timezone.utc).isoformat(),
     })
+    if regulatory_events is not None:
+        analysis_snapshot["regulatory_events"] = regulatory_events
+    run_delta = _compute_run_delta(
+        existing_analysis if isinstance(existing_analysis, dict) else None,
+        merged_outputs,
+        reporting_currency,
+    )
+    if run_delta:
+        analysis_snapshot["run_delta"] = run_delta
+        analysis_snapshot["previous_headline"] = run_delta.get("previous_headline") or ""
     if "spend-profiler" in validated:
         from app.services.spend_base import repair_spend_base_if_needed
 
         analysis_snapshot = repair_spend_base_if_needed(ctx.session_id, analysis_snapshot)
     _memory.put("session", ctx.session_id, analysis_snapshot)
+    _maybe_seed_pipeline(ctx, manifest, analysis_snapshot, merged_outputs, validated, advisory_sections)
+    return run_delta
+
+
+def _maybe_seed_pipeline(
+    ctx: ObserveContext,
+    manifest: Dict[str, Any],
+    analysis_snapshot: Dict[str, Any],
+    merged_outputs: Dict[str, Any],
+    validated: Dict[str, Dict[str, Any]],
+    advisory: AdvisorySections | None,
+) -> None:
+    """Seed Cost Room pipeline initiatives from chat-driven analysis.
+
+    The batch ``/api/analyze`` path seeds in its router; conversational turns
+    funnel through here instead, so without this the Cost Room never populates
+    from chat analysis. Reuse the advisory already computed this turn to avoid a
+    second LLM call. Seed only when savings were (re)modeled this turn, or when
+    the pipeline has nothing yet for this session. Seeding dedupes by
+    (category, lever), so re-running is safe.
+    """
+    savings_model = merged_outputs.get("savings-modeler", {}) or {}
+    if not (isinstance(savings_model, dict) and savings_model.get("initiatives")):
+        return
+    try:
+        from app.services.compliance import append_audit_event
+        from app.services.pipeline import list_initiatives
+        from app.services.pipeline_seed import seed_initiatives_from_analysis
+
+        ran_this_turn = "savings-modeler" in validated
+        if not ran_this_turn and list_initiatives(session_id=ctx.session_id):
+            return  # already seeded for this session; nothing new to model
+        uid = (manifest.get("company_name") or "default").lower().replace(" ", "_").replace(".", "_")
+        created = seed_initiatives_from_analysis(
+            analysis_snapshot, ctx.session_id, user_id=uid, advisory=advisory
+        )
+        if created:
+            append_audit_event(
+                f"pipeline_seeded session_id={ctx.session_id} initiatives={created}"
+            )
+    except Exception:
+        logger.warning("pipeline_seed_failed session_id=%s", ctx.session_id, exc_info=True)
 
 
 def persist_conflict_manifest(session_id: str, validated: Dict[str, Dict[str, Any]]) -> None:
-    manifest_path = UPLOAD_DIR / session_id / "manifest.json"
-    if "conflict-detector" not in validated or not manifest_path.parent.exists():
+    from app.routers._shared import read_manifest, session_dir, write_manifest
+
+    if "conflict-detector" not in validated or not session_dir(session_id).exists():
         return
     cd = validated["conflict-detector"]
     if not isinstance(cd, dict):
         return
-    manifest = read_json(manifest_path, {})
+    manifest = read_manifest(session_id, {})
     manifest["conflict_state"] = {
         "total": int(cd.get("conflict_count") or cd.get("total") or 0),
         "unresolved": int(cd.get("unresolved") or 0),
         "by_type": cd.get("by_type") or {},
         "has_intercompany": bool((cd.get("by_type") or {}).get("intercompany_inflation")),
     }
-    write_json(manifest_path, manifest)
+    write_manifest(session_id, manifest)
 
 
 def record_advisory_provenance(
     ctx: ObserveContext,
     validated: Dict[str, Dict[str, Any]],
     advisory_sections: AdvisorySections | None,
+    *,
+    narrative_mode: str = "llm",
 ) -> Dict[str, Any] | None:
     if not advisory_sections or not advisory_sections.executive_takeaway:
         return None
     try:
+        from app.llm.prompts import prompt_version_map
+
+        model_version = (
+            "deterministic-composer" if narrative_mode == "deterministic" else "claude-sonnet-4-6"
+        )
+        metadata: Dict[str, Any] = {"narrative_mode": narrative_mode}
+        if narrative_mode == "llm":
+            metadata["prompt_versions"] = prompt_version_map()
+
         return record_llm_narrative(
             narrative=advisory_sections.executive_takeaway,
             engagement_id=getattr(ctx, "engagement_id", ctx.session_id),
             turn_id=ctx.turn_id,
             skill_outputs_used=list(validated.keys()),
             prompt_text=ctx.user_message,
-            model_version="claude-sonnet-4-6",
+            model_version=model_version,
             seed=0,
+            metadata=metadata,
         )
     except Exception:
+        # Provenance is the audit trail for LLM narratives; losing a record
+        # silently would make the trail look complete when it isn't.
+        logger.exception('"llm_narrative_provenance_write_failed session_id=%s turn_id=%s"', ctx.session_id, ctx.turn_id)
         return None
 
 

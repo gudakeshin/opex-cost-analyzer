@@ -1,0 +1,7 @@
+Uttam Industries Ltd — Diagnostic URLs (synthetic/illustrative)
+
+1. Investor relations: https://www.uttamindustries.example/investors
+2. DPIIT PLI filing: https://www.dpiit.gov.in/example/uil-pli
+3. Annual report: https://www.uttamindustries.example/ir/annual-report-fy25.pdf
+4. NSE: https://www.nseindia.example/get-quotes/equity?symbol=UTTAMIND
+5. ACMA auto sector: https://www.acma.example/industry-data-fy25

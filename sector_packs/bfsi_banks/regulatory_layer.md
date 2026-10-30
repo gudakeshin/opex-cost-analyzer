@@ -34,3 +34,5 @@ Reserve Bank of India (RBI) — Banking Regulation Act 1949; RBI Act 1934.
 | KYC deadline | kyc_aml_ops | HIGH |
 | BRSR filing deadline | all | HIGH |
 | Basel-III phase-in | cre_credit_risk_infra | MEDIUM |
+| Contact centre SLA breach | contact_center_ops | MEDIUM |
+| SSC / GPO mandate (group banks) | banking_shared_services | MEDIUM |

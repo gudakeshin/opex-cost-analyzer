@@ -1,0 +1,25 @@
+asset_class,fiscal_period,amount,currency,status
+US FDA inspection-ready facility upgrade,FY23-Q1,296730512,INR,actual
+US FDA inspection-ready facility upgrade,FY23-Q2,329700569,INR,actual
+US FDA inspection-ready facility upgrade,FY23-Q3,313215540,INR,actual
+US FDA inspection-ready facility upgrade,FY23-Q4,356076614,INR,actual
+US FDA inspection-ready facility upgrade,FY24-Q1,349482603,INR,actual
+US FDA inspection-ready facility upgrade,FY24-Q2,359373620,INR,actual
+Continuous manufacturing line,FY23-Q1,281690067,INR,actual
+Continuous manufacturing line,FY23-Q2,312988964,INR,actual
+Continuous manufacturing line,FY23-Q3,297339515,INR,actual
+Continuous manufacturing line,FY23-Q4,338028081,INR,actual
+Continuous manufacturing line,FY24-Q1,331768301,INR,actual
+Continuous manufacturing line,FY24-Q2,341157970,INR,actual
+R&D centre expansion,FY23-Q1,115534606,INR,actual
+R&D centre expansion,FY23-Q2,128371785,INR,actual
+R&D centre expansion,FY23-Q3,121953195,INR,actual
+R&D centre expansion,FY23-Q4,138641527,INR,actual
+R&D centre expansion,FY24-Q1,136074092,INR,actual
+R&D centre expansion,FY24-Q2,139925245,INR,actual
+Cold chain warehouse,FY23-Q1,294346260,INR,actual
+Cold chain warehouse,FY23-Q2,327051401,INR,actual
+Cold chain warehouse,FY23-Q3,310698830,INR,actual
+Cold chain warehouse,FY23-Q4,353215513,INR,actual
+Cold chain warehouse,FY24-Q1,346674485,INR,actual
+Cold chain warehouse,FY24-Q2,356486027,INR,actual

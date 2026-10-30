@@ -1,0 +1,143 @@
+{
+  "dimensions": [
+    {
+      "id": "CM-01",
+      "name": "Slimming Efficiency & Whitelist Integrity",
+      "domain": "synthesis_budget",
+      "weight": 0.22,
+      "threshold": 7.0,
+      "scoring": "deterministic rule-based against golden fixtures",
+      "known_gap_probe": false
+    },
+    {
+      "id": "CM-02",
+      "name": "Budget Gate Degradation",
+      "domain": "synthesis_budget",
+      "weight": 0.2,
+      "threshold": 8.0,
+      "scoring": "deterministic rule-based against golden fixtures",
+      "known_gap_probe": false
+    },
+    {
+      "id": "CM-03",
+      "name": "Core-Skill Survival Under Degradation",
+      "domain": "synthesis_budget",
+      "weight": 0.12,
+      "threshold": 6.0,
+      "scoring": "deterministic rule-based against golden fixtures",
+      "known_gap_probe": true
+    },
+    {
+      "id": "CM-04",
+      "name": "Budget Estimate Completeness",
+      "domain": "synthesis_budget",
+      "weight": 0.16,
+      "threshold": 6.0,
+      "scoring": "deterministic rule-based against golden fixtures",
+      "known_gap_probe": true
+    },
+    {
+      "id": "CM-05",
+      "name": "End-to-End Oversized Chain",
+      "domain": "synthesis_budget",
+      "weight": 0.2,
+      "threshold": 8.0,
+      "scoring": "deterministic rule-based against golden fixtures",
+      "known_gap_probe": false
+    },
+    {
+      "id": "CM-13",
+      "name": "Token Estimate vs Real API Count",
+      "domain": "synthesis_budget",
+      "weight": 0.1,
+      "threshold": 6.0,
+      "scoring": "real Anthropic count_tokens vs chars/4 estimate; skipped offline",
+      "known_gap_probe": false
+    },
+    {
+      "id": "CM-06",
+      "name": "Capability Detection Accuracy",
+      "domain": "relevance_filtering",
+      "weight": 0.3,
+      "threshold": 7.0,
+      "scoring": "deterministic rule-based against golden fixtures",
+      "known_gap_probe": false
+    },
+    {
+      "id": "CM-07",
+      "name": "Relevance Selection Precision/Recall",
+      "domain": "relevance_filtering",
+      "weight": 0.4,
+      "threshold": 7.0,
+      "scoring": "deterministic rule-based against golden fixtures",
+      "known_gap_probe": false
+    },
+    {
+      "id": "CM-08",
+      "name": "Manifest Completeness & Bypass Correctness",
+      "domain": "relevance_filtering",
+      "weight": 0.3,
+      "threshold": 8.0,
+      "scoring": "deterministic rule-based against golden fixtures",
+      "known_gap_probe": false
+    },
+    {
+      "id": "CM-09",
+      "name": "Chat Window & Field Caps",
+      "domain": "conversational_context",
+      "weight": 0.55,
+      "threshold": 7.0,
+      "scoring": "deterministic rule-based against golden fixtures",
+      "known_gap_probe": false
+    },
+    {
+      "id": "CM-10",
+      "name": "Chat Context Boundedness",
+      "domain": "conversational_context",
+      "weight": 0.45,
+      "threshold": 7.5,
+      "scoring": "deterministic rule-based against golden fixtures",
+      "known_gap_probe": true
+    },
+    {
+      "id": "CM-11",
+      "name": "RAG Packing, Auto-Merge & Fallback",
+      "domain": "retrieval_context",
+      "weight": 0.55,
+      "threshold": 7.0,
+      "scoring": "deterministic rule-based against golden fixtures",
+      "known_gap_probe": false
+    },
+    {
+      "id": "CM-12",
+      "name": "Retrieval Relevance",
+      "domain": "retrieval_context",
+      "weight": 0.45,
+      "threshold": 6.0,
+      "scoring": "deterministic rule-based against golden fixtures",
+      "known_gap_probe": false
+    }
+  ],
+  "domains": [
+    {
+      "name": "synthesis_budget",
+      "display": "Synthesis Token Budget",
+      "weight": 0.35
+    },
+    {
+      "name": "relevance_filtering",
+      "display": "Relevance Filtering",
+      "weight": 0.25
+    },
+    {
+      "name": "retrieval_context",
+      "display": "Retrieval Context (RAG)",
+      "weight": 0.25
+    },
+    {
+      "name": "conversational_context",
+      "display": "Conversational Context",
+      "weight": 0.15
+    }
+  ]
+}

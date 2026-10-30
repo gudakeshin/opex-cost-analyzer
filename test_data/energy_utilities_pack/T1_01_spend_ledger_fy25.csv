@@ -1,0 +1,11 @@
+supplier,description,amount,currency,category,gl_code,spend_date,business_unit,country
+GE Power India,Turbine O&M Nashik thermal plant units 1-4,1540000000,INR,O&M Services,510010,2024-12-10,Generation Thermal,India
+Siemens India,Switchgear O&M transmission substations,1120000000,INR,O&M Services,510011,2024-11-20,Transmission,India
+ABB India,SCADA & energy management system group-wide,680000000,INR,IT & SCADA Systems,510020,2025-01-15,Generation Thermal,India
+Quippo Energy,Contract operations staff Nashik plant,520000000,INR,Contract Labour,510030,2024-10-05,Generation Thermal,India
+Tata Projects,Boiler & auxiliary O&M Ratnagiri unit,890000000,INR,O&M Services,510012,2025-02-01,Generation Thermal,India
+Schneider Electric,DMS & grid automation distribution network,580000000,INR,IT & SCADA Systems,510021,2024-09-12,Distribution,India
+RITES Ltd,Third-party safety audit & statutory inspections,310000000,INR,Safety & Compliance,510040,2024-08-20,Generation Thermal,India
+Ultratech Logistics,Ash handling & by-product transport,280000000,INR,Logistics & Transport,510050,2025-01-08,Generation Thermal,India
+L&T Electrical,Transmission line O&M Vidarbha region,480000000,INR,O&M Services,510013,2024-07-15,Transmission,India
+KPMG India,Regulatory advisory & tariff petitions,180000000,INR,Corporate & Admin,510060,2024-06-15,Corporate,India

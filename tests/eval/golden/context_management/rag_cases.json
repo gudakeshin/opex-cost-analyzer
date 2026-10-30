@@ -1,0 +1,39 @@
+{
+ "merge_query": "kavetail rebate provisions interim statements",
+ "broad_query": "INR crore contract renewal percent savings",
+ "format_query": "oracle auto-escalation clause",
+ "pairs": [
+  {
+   "query": "oracle auto-escalation clause percentage",
+   "expect_contains": "12 percent"
+  },
+  {
+   "query": "zenmark net-60 working capital release",
+   "expect_contains": "4.2 crore"
+  },
+  {
+   "query": "trifecta travel desk consolidation airfare saving",
+   "expect_contains": "18 percent"
+  },
+  {
+   "query": "when does the cloudspire enterprise agreement renew",
+   "expect_contains": "September 2026"
+  },
+  {
+   "query": "velmora msme payment rule",
+   "expect_contains": "45-day"
+  },
+  {
+   "query": "harbourline insurance premium increase",
+   "expect_contains": "22 percent"
+  },
+  {
+   "query": "northgate lease break clause date",
+   "expect_contains": "March 2027"
+  },
+  {
+   "query": "unclaimed kavetail rebates value",
+   "expect_contains": "2.1 crore"
+  }
+ ]
+}

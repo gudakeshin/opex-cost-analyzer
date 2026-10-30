@@ -4,92 +4,476 @@
   "source_verification_note": "Savings ranges (p10/p50/p90) are internal consulting estimates. industry_sources entries indicate real published works that directionally support each lever's savings thesis. Specific percentages are not directly quoted from these sources.",
   "levers": [
     {
-      "lever_id": "branch_rationalisation",
-      "lever_name": "Branch Network Rationalisation",
-      "description": "Consolidate sub-optimal branches; migrate footfall to digital + BC network.",
-      "category_ids": ["branch_network_ops", "facilities"],
-      "p10_pct": 3.0, "p50_pct": 8.0, "p90_pct": 14.0,
-      "implementation_weeks": 26,
+      "lever_id": "bank_workforce_productivity",
+      "lever_name": "Bank Workforce Productivity & Staffing Optimisation",
+      "description": "Right-size branch staffing ratios, improve sales FTE productivity, and reduce agency/contract dependency in collections and operations.",
+      "category_ids": [
+        "HR",
+        "branch_network_ops"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 8.0,
+      "p90_pct": 14.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P3",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI — Report on Trend and Progress of Banking in India 2023-24 — employee cost as largest opex component for Indian banks",
+        "HDFC Bank FY25 Annual Report — workforce productivity cited as operational efficiency lever",
+        "McKinsey — The Future of Work in Banking (mckinsey.com/industries/financial-services) — branch staffing model optimisation benchmarks",
+        "INTERNAL_CALIBRATION — savings range from 4 India retail bank workforce transformation mandates"
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
+    },
+    {
+      "lever_id": "banking_shared_services",
+      "lever_name": "Banking Shared Services & GPO Centralisation",
+      "description": "Establish SSC for HR ops, finance ops, and procurement GPO; redesign span/layer and eliminate duplicate overhead across entities.",
+      "category_ids": [
+        "banking_shared_services",
+        "HR",
+        "PROF_SERVICES"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
+      "implementation_weeks": 32,
+      "brsr_principle": "P3",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Hackett Group — World-Class Finance & HR Benchmarks 2024 (thehackettgroup.com/research/) — SSC models reduce G&A 15-25%",
+        "RBI — Guidelines on Consolidated Supervision — multi-entity overhead rationalisation for banking groups",
+        "INTERNAL_CALIBRATION — shared services savings from 3 India banking group SSC mandates"
+      ],
+      "effort_weeks": {
+        "p10": 24,
+        "p50": 32,
+        "p90": 40
+      }
+    },
+    {
+      "lever_id": "contingent_staffing_governance",
+      "lever_name": "Contingent Staffing Governance & VMS",
+      "description": "Implement vendor management system for contract tellers, collections agents, and IT contractors; standardise rates and reduce rogue spend.",
+      "category_ids": [
+        "CONTINGENT",
+        "HR"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P3",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM BPM Report 2024 — contract workforce 10-15% of bank operations headcount",
+        "Gartner 2024 — VMS implementation reduces contingent spend 10-20% through rate standardisation",
+        "INTERNAL_CALIBRATION — contingent workforce governance savings from 2 India banking HR mandates"
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
+    },
+    {
+      "lever_id": "branch_network_optimization",
+      "lever_name": "Branch Network Rationalisation & Format Optimisation",
+      "description": "Consolidate sub-optimal branches; migrate footfall to digital + BC network; optimise branch formats (full-service, lite, digital-only).",
+      "category_ids": [
+        "branch_network_ops",
+        "FACILITIES"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
+      "implementation_weeks": 44,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
       "industry_sources": [
-        "RBI — Report on Trend and Progress of Banking in India 2023-24 (rbi.org.in/Scripts/AnnualReportPublications.aspx) — branch digitisation and BC network expansion data",
-        "IBA — Banking Technology Survey 2024 (iba.org.in/publications) — digital transaction share vs. branch transactions",
-        "McKinsey & Company — The Future of Bank Branches (mckinsey.com/industries/financial-services) — branch rationalisation savings benchmarks"
-      ]
+        "RBI — Report on Trend and Progress of Banking in India 2023-24 — branch digitisation and BC network expansion data",
+        "IBA — Banking Technology Survey 2024 — digital transaction share vs. branch transactions",
+        "McKinsey & Company — The Future of Bank Branches — branch rationalisation savings benchmarks"
+      ],
+      "effort_weeks": {
+        "p10": 33,
+        "p50": 44,
+        "p90": 55
+      }
     },
     {
-      "lever_id": "kyc_aml_automation",
-      "lever_name": "KYC/AML Process Automation (RPA + AI)",
-      "description": "Automate customer due-diligence and transaction monitoring using RPA + ML models.",
-      "category_ids": ["kyc_aml_ops", "professional_services"],
-      "p10_pct": 12.0, "p50_pct": 22.0, "p90_pct": 35.0,
+      "lever_id": "contact_center_optimization",
+      "lever_name": "Contact Center Optimisation & IVR Deflection",
+      "description": "Deploy IVR deflection, workforce management, and offshore/nearshore rationalisation for inbound customer service operations.",
+      "category_ids": [
+        "contact_center_ops",
+        "OUTSOURCED"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 25.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IBA — Banking Technology Survey 2024 — digital channel deflection reducing call centre volumes 20-35%",
+        "Gartner Contact Center 2024 — WFM and IVR optimisation reduce cost-per-contact 15-25%",
+        "INTERNAL_CALIBRATION — contact centre savings from 3 India retail bank CX transformation mandates"
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
+    },
+    {
+      "lever_id": "ops_process_digitization",
+      "lever_name": "Back-Office Operations Digitisation (Front-to-Back STP)",
+      "description": "Process mining and CBS API automation for loan processing, account opening, and back-office STP; RPA waves with RBI cyber/ops risk review.",
+      "category_ids": [
+        "loan_processing_ops",
+        "OUTSOURCED"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 17.0,
+      "p90_pct": 28.0,
+      "implementation_weeks": 28,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "IBA — Banking Technology Survey 2024 — STP adoption rates in loan origination and account servicing",
+        "RBI — IT Framework for Banks — operational risk controls for automated processing",
+        "INTERNAL_CALIBRATION — back-office digitisation savings from 4 India banking process automation mandates"
+      ],
+      "effort_weeks": {
+        "p10": 21,
+        "p50": 28,
+        "p90": 35
+      }
+    },
+    {
+      "lever_id": "treasury_ops_efficiency",
+      "lever_name": "Treasury Operations & ALM Cost Efficiency",
+      "description": "Upgrade TMS (Murex/Kondor), rationalise correspondent banking relationships, and automate SLR/CRR reporting workflows.",
+      "category_ids": [
+        "treasury_ops",
+        "FIN_SVCS"
+      ],
+      "p10_pct": 3.0,
+      "p50_pct": 7.0,
+      "p90_pct": 12.0,
+      "implementation_weeks": 24,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI — Annual Report 2024 — treasury operations cost benchmarks for scheduled commercial banks",
+        "Ardent Partners — AP Metrics That Matter 2024 — treasury process automation cost reduction",
+        "INTERNAL_CALIBRATION — treasury ops savings from 2 India banking treasury transformation mandates"
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
+    },
+    {
+      "lever_id": "payment_ops_efficiency",
+      "lever_name": "Payment Operations & Banking Fee Optimisation",
+      "description": "Optimise NEFT/RTGS/UPI operations cost; renegotiate payment gateway and correspondent banking fees.",
+      "category_ids": [
+        "FIN_SVCS",
+        "digital_banking_infra"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 9.0,
+      "p90_pct": 15.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI — Payment Systems Vision 2025 — UPI and digital payment infrastructure cost trends",
+        "NPCI Annual Report 2024 — payment rail fee structures and volume discounts",
+        "INTERNAL_CALIBRATION — payment ops savings from 2 India banking treasury fee reviews"
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
+    },
+    {
+      "lever_id": "npa_provisioning_process_efficiency",
+      "lever_name": "NPA Provisioning Process & IRACP Workflow Efficiency",
+      "description": "Automate IRACP classification workflows, early-warning systems, and provision modelling to reduce process/compliance cost (not provision amounts).",
+      "category_ids": [
+        "npa_provisioning_cost"
+      ],
+      "p10_pct": 5.0,
+      "p50_pct": 10.0,
+      "p90_pct": 18.0,
       "implementation_weeks": 20,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
       "industry_sources": [
-        "RBI — Master Direction on Know Your Customer (KYC) 2016, updated 2024 (rbi.org.in) — V-KYC regulatory framework",
-        "NASSCOM — AI in Banking: India Perspectives 2024 (nasscom.in/knowledge-center/publications) — automation adoption in KYC/AML",
+        "RBI — IRACP Norms (RBI/2021-22/125) — ECL-aligned provisioning workflow requirements",
+        "RBI — CRILC Reporting guidelines — large-borrower credit monitoring automation",
+        "INTERNAL_CALIBRATION — NPA process efficiency savings from 2 India banking credit risk mandates; excludes provision reduction"
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
+    },
+    {
+      "lever_id": "credit_risk_infra_rationalisation",
+      "lever_name": "Credit Risk Infrastructure Rationalisation",
+      "description": "Consolidate CRILC, rating agency, bureau query, and risk analytics platforms; eliminate duplicate credit-risk system instances.",
+      "category_ids": [
+        "cre_credit_risk_infra",
+        "IT_SOFTWARE"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 24.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI — CRILC Reporting (RBI/DBOD.No.BP.BC.15/21.04.048/2014-15) — mandatory credit reporting infrastructure",
+        "Gartner — Financial Services Risk Technology 2024 — platform consolidation savings 15-25%",
+        "INTERNAL_CALIBRATION — credit risk infra savings from 2 India banking risk technology reviews"
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
+    },
+    {
+      "lever_id": "kyc_aml_automation",
+      "lever_name": "KYC/AML Process Automation (RPA + AI)",
+      "description": "Automate customer due-diligence and transaction monitoring using V-KYC, RPA, and ML models.",
+      "category_ids": [
+        "kyc_aml_ops",
+        "PROF_SERVICES"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 22.0,
+      "p90_pct": 35.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI — Master Direction on Know Your Customer (KYC) 2016, updated 2024 — V-KYC regulatory framework",
+        "NASSCOM — AI in Banking: India Perspectives 2024 — automation adoption in KYC/AML",
         "INTERNAL_CALIBRATION — specific KYC automation savings range is an internal consulting estimate"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "core_banking_consolidation",
-      "lever_name": "Core Banking Platform Consolidation",
-      "description": "Eliminate legacy CBS instances; migrate to single-instance cloud CBS.",
-      "category_ids": ["core_banking_platform", "it_software"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "lever_name": "Core Banking Platform & IT Vendor Consolidation",
+      "description": "Eliminate legacy CBS instances; consolidate IT vendors; migrate to single-instance cloud CBS.",
+      "category_ids": [
+        "core_banking_platform",
+        "IT_SOFTWARE"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 18.0,
+      "p90_pct": 28.0,
       "implementation_weeks": 52,
       "brsr_principle": "P6",
       "savings_type": "mixed",
       "industry_sources": [
-        "IBA — Banking Technology Survey 2024 (iba.org.in/publications) — core banking modernisation adoption rates",
-        "Gartner — IT Key Metrics Data: Banking Sector IT Spend 2024 (gartner.com/en/information-technology/insights/it-budget) — IT spend benchmarks for banks",
-        "INTERNAL_CALIBRATION — CBS consolidation savings range is an internal consulting estimate; actual savings depend on legacy footprint size"
-      ]
+        "IBA — Banking Technology Survey 2024 — core banking modernisation adoption rates",
+        "Gartner — IT Key Metrics Data: Banking Sector IT Spend 2024 — IT spend benchmarks for banks",
+        "INTERNAL_CALIBRATION — CBS and IT vendor consolidation savings range is an internal consulting estimate"
+      ],
+      "effort_weeks": {
+        "p10": 39,
+        "p50": 52,
+        "p90": 65
+      }
     },
     {
       "lever_id": "vendor_renegotiation_fintech",
-      "lever_name": "Fintech & Software Vendor Renegotiation",
-      "description": "Consolidate overlapping fintech contracts; renegotiate multi-year terms.",
-      "category_ids": ["it_software", "digital_banking_infra"],
-      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 18.0,
+      "lever_name": "Fintech & Digital Banking Vendor Renegotiation",
+      "description": "Consolidate overlapping fintech and digital channel contracts; renegotiate multi-year terms.",
+      "category_ids": [
+        "IT_SOFTWARE",
+        "digital_banking_infra"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 18.0,
       "implementation_weeks": 8,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
       "industry_sources": [
-        "Hackett Group — World-Class Performance Study Finance & Procurement Benchmarks 2024 (thehackettgroup.com/research/) — vendor consolidation savings ranges",
-        "INTERNAL_CALIBRATION — fintech vendor renegotiation savings range is an internal consulting estimate calibrated to Indian banking sector"
-      ]
+        "Hackett Group — World-Class Performance Study Finance & Procurement Benchmarks 2024 — vendor consolidation savings ranges",
+        "INTERNAL_CALIBRATION — fintech vendor renegotiation savings range calibrated to Indian banking sector"
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
+    },
+    {
+      "lever_id": "fraud_detection_ai_banking",
+      "lever_name": "AI-Driven Fraud Detection & Prevention",
+      "description": "Deploy ML fraud scoring on CBS/payment switch with parallel validation vs. rules engine to reduce fraud ops cost.",
+      "category_ids": [
+        "digital_banking_infra",
+        "IT_SOFTWARE"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI — Master Direction on Fraud Risk Management 2024 — fraud monitoring system requirements",
+        "NASSCOM — AI in Banking: India Perspectives 2024 — ML fraud detection adoption",
+        "INTERNAL_CALIBRATION — fraud AI savings from 2 India banking fraud prevention mandates"
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "atm_managed_services",
       "lever_name": "ATM Managed Services Outsourcing",
       "description": "Shift ATM ops to managed-service model; eliminate in-house cash replenishment.",
-      "category_ids": ["atm_cash_mgmt"],
-      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "category_ids": [
+        "atm_cash_mgmt",
+        "OUTSOURCED"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 18.0,
+      "p90_pct": 28.0,
       "implementation_weeks": 16,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
       "industry_sources": [
-        "RBI — Annual Report 2023-24 (rbi.org.in/Scripts/AnnualReportPublications.aspx) — ATM network data and managed services adoption trends in Indian banking",
+        "RBI — Annual Report 2023-24 — ATM network data and managed services adoption trends in Indian banking",
         "INTERNAL_CALIBRATION — ATM managed services savings range is an internal consulting estimate"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "regulatory_reporting_automation",
       "lever_name": "Regulatory Reporting Automation",
-      "description": "Automate RBI/SEBI statutory returns; reduce manual effort in compliance teams.",
-      "category_ids": ["rbi_audit_compliance"],
-      "p10_pct": 15.0, "p50_pct": 25.0, "p90_pct": 40.0,
+      "description": "Automate RBI/SEBI statutory returns; reduce manual effort in compliance teams via XBRL and data warehouse SSOT.",
+      "category_ids": [
+        "rbi_audit_compliance",
+        "PROF_SERVICES"
+      ],
+      "p10_pct": 15.0,
+      "p50_pct": 25.0,
+      "p90_pct": 40.0,
       "implementation_weeks": 12,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
       "industry_sources": [
-        "RBI — Master Circular on Returns Submitted by Banks 2024 (rbi.org.in) — statutory reporting requirements",
-        "Ardent Partners — AP Metrics That Matter 2024 (ardentpartners.com/ap-metrics-that-matter-in-2025/) — process automation cost reduction benchmarks",
-        "INTERNAL_CALIBRATION — specific regulatory reporting automation savings range is an internal consulting estimate for Indian banks"
-      ]
+        "RBI — Master Circular on Returns Submitted by Banks 2024 — statutory reporting requirements",
+        "Ardent Partners — AP Metrics That Matter 2024 — process automation cost reduction benchmarks",
+        "INTERNAL_CALIBRATION — regulatory reporting automation savings range for Indian banks"
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
+    },
+    {
+      "lever_id": "collections_efficiency",
+      "lever_name": "Collections & Recovery Process Optimisation",
+      "description": "Predictive scoring, agency panel rationalisation, outcome-based BPO pricing, and IBC/SARFAESI workflow automation.",
+      "category_ids": [
+        "loan_processing_ops",
+        "OUTSOURCED"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 18.0,
+      "p90_pct": 28.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM BPM Report 2024 — banking BPO rate benchmarks and outcome-based contracting",
+        "RBI — Report on Trend and Progress of Banking 2023-24 — collections cost benchmarks",
+        "INTERNAL_CALIBRATION — collections optimisation savings from 4 India banking mandates"
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
+    },
+    {
+      "lever_id": "travel_policy_optimization",
+      "lever_name": "Travel Policy Compliance & TMC Consolidation",
+      "description": "Implement travel management company consolidation, policy compliance enforcement, and video-first norms.",
+      "category_ids": [
+        "TRAVEL"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 18.0,
+      "p90_pct": 28.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P4",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "GBTA 2025 Business Travel Index Outlook — managed travel programmes save 10-25% via policy compliance",
+        "Deloitte 2024 Corporate Travel Study — centralized travel function 12-18% lower average ticket prices",
+        "INTERNAL_CALIBRATION — savings range calibrated from India banking T&E engagements"
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
+    },
+    {
+      "lever_id": "digital_marketing_roi",
+      "lever_name": "Digital Marketing & Customer Acquisition ROI",
+      "description": "Shift branch-led acquisition to digital channels; renegotiate agency fees; eliminate low-ROI sponsorship spend.",
+      "category_ids": [
+        "MARKETING"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
+      "implementation_weeks": 12,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "RBI — Report on Trend and Progress of Banking in India 2023-24 — digital channel share of retail liabilities",
+        "Gartner CMO Survey 2024 — digital marketing delivers 40-60% better cost-per-lead vs. events",
+        "INTERNAL_CALIBRATION — banking marketing efficiency savings from 2 India retail bank mandates"
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
     }
   ]
 }

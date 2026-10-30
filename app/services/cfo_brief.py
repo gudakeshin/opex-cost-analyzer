@@ -15,6 +15,8 @@ from docx import Document
 from docx.shared import Pt
 
 from app.config import OUTPUT_DIR
+from app.services.figure_basis import basis_lines, basis_of_figures
+from app.services.narrative_composer import compose_deterministic_advisory, provenance_banner_text
 from app.utils.inr_format import fmt_inr_cr
 
 
@@ -54,12 +56,25 @@ def build_cfo_brief(
     engagement_week: int = 1,
     pack_id: Optional[str] = None,
     company_name: str = "Client",
+    advisory: Any | None = None,
+    narrative_provenance: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Build a structured CFO brief dict from OPAR analysis outputs.
     Returns a dict with sections suitable for DOCX export or JSON.
     """
     outputs = analysis.get("skill_outputs", {})
+    currency = str(analysis.get("reporting_currency") or "INR")
+    if advisory is None:
+        advisory = compose_deterministic_advisory(
+            outputs,
+            company_name=company_name,
+            currency=currency,
+            category_focused=True,
+        )
+    provenance = narrative_provenance or {"mode": "deterministic", "llm_skip_reason": "export_no_llm"}
+    banner = provenance_banner_text(provenance)
+    exec_takeaway = (getattr(advisory, "executive_takeaway", "") or "").strip()
     bridge = outputs.get("value-bridge-calculator", {})
     conf = bridge.get("confidence_bands", {})
 
@@ -108,6 +123,9 @@ def build_cfo_brief(
                 "p50_cr": round(float(i.get("p50") or 0) / 1e7, 1),
                 "irr_pct": i.get("irr_pct"),
                 "payback_months": i.get("payback_months"),
+                # Business perspective (Layer A enrichment).
+                "owner": i.get("owner_role") or "TBD",
+                "top_risk": (i.get("risks") or [{}])[0].get("risk") if i.get("risks") else None,
             }
             for i in initiatives
         ],
@@ -116,12 +134,16 @@ def build_cfo_brief(
         "brsr_cobenefits": {"delta_scope2_tco2e": scope2, "delta_scope3_tco2e": scope3},
         "regulatory_alerts": [r.get("title", r.get("event_id", "?")) for r in reg_flags[:3]],
         "next_decision_gate": f"Gate-{min(4, (engagement_week // 3) + 1)} (Week {min(12, engagement_week + 3 - (engagement_week % 3) or 3)})",
+        "executive_takeaway": exec_takeaway[:600] if exec_takeaway else None,
+        "narrative_provenance_banner": banner,
+        "basis_of_figures": basis_lines(basis_of_figures(analysis)),
     }
 
     return {
         "type": "cfo_brief",
         "template": "one_page",
         "generated_on": str(date.today()),
+        "narrative_provenance": provenance,
         "sections": sections,
     }
 
@@ -133,6 +155,12 @@ def export_cfo_brief_docx(brief: Dict[str, Any], filename: str) -> Path:
 
     headline = brief["sections"]["headline"]
     doc.add_heading(f"OpEx CFO Brief — {headline['company']}", level=0)
+    banner = brief["sections"].get("narrative_provenance_banner") or provenance_banner_text(
+        brief.get("narrative_provenance")
+    )
+    if banner:
+        p = doc.add_paragraph(banner)
+        p.italic = True
     doc.add_paragraph(
         f"As of {headline['as_of']}  |  Engagement Week {headline['engagement_week']}  |  Pack: {headline['pack']}"
     )
@@ -143,6 +171,11 @@ def export_cfo_brief_docx(brief: Dict[str, Any], filename: str) -> Path:
     run.bold = True
     run.font.size = Pt(18)
     p.add_run(f"(Range: {headline['range_display']})")
+    basis = brief["sections"].get("basis_of_figures") or []
+    if basis:
+        doc.add_heading("Basis of figures", level=2)
+        for line in basis:
+            doc.add_paragraph(line, style="List Bullet")
 
     bridge = brief["sections"]["shareholder_bridge"]
     doc.add_heading("Shareholder Value Bridge", level=1)
@@ -164,16 +197,21 @@ def export_cfo_brief_docx(brief: Dict[str, Any], filename: str) -> Path:
     doc.add_heading("Top Initiatives", level=1)
     inits = brief["sections"]["top_initiatives"]
     if inits:
-        tbl = doc.add_table(rows=1 + len(inits), cols=4)
+        tbl = doc.add_table(rows=1 + len(inits), cols=5)
         tbl.style = "Table Grid"
-        for j, h in enumerate(["Initiative", "P50 Savings (₹ Cr)", "IRR %", "Payback (mo)"]):
+        for j, h in enumerate(["Initiative", "Owner", "P50 Savings (₹ Cr)", "IRR %", "Payback (mo)"]):
             tbl.rows[0].cells[j].text = h
         for i, row in enumerate(inits):
             tbl.rows[i + 1].cells[0].text = row["name"]
-            tbl.rows[i + 1].cells[1].text = str(row["p50_cr"])
-            tbl.rows[i + 1].cells[2].text = str(row.get("irr_pct") or "—")
-            tbl.rows[i + 1].cells[3].text = str(row.get("payback_months") or "—")
+            tbl.rows[i + 1].cells[1].text = str(row.get("owner") or "TBD")
+            tbl.rows[i + 1].cells[2].text = str(row["p50_cr"])
+            tbl.rows[i + 1].cells[3].text = str(row.get("irr_pct") or "—")
+            tbl.rows[i + 1].cells[4].text = str(row.get("payback_months") or "—")
         doc.add_paragraph("")
+        # Key execution risk per initiative (business perspective).
+        risk_bits = [f"{r['name']}: {r['top_risk']}" for r in inits if r.get("top_risk")]
+        if risk_bits:
+            doc.add_paragraph("Key risks: " + "  |  ".join(risk_bits[:3]))
 
     doc.add_heading("Risk & Quality Signals", level=1)
     floor = brief["sections"].get("scenario_floor_cr")

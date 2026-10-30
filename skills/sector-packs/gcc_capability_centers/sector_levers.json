@@ -44,7 +44,9 @@
     "lease_restructuring",
     "cost_governance",
     "insurance_premium_optimization",
-    "p2p_o2c_automation"
+    "p2p_o2c_automation",
+    "travel_policy_optimization",
+    "telecom_expense_management"
   ],
   "sector_specific_levers": [
     {
@@ -133,7 +135,8 @@
         "CoE governance model and bot ownership framework",
         "Security and data-privacy requirements for automated processes",
         "FTE cost by function and process to calculate automation ROI"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "attrition_reduction_retention",
@@ -221,7 +224,8 @@
         "Compensation benchmarking data (NASSCOM, Aon Hewitt, or equivalent)",
         "Recruitment and onboarding cost per hire by band",
         "Productivity ramp curve by role (time to full contribution)"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "seat_utilization_optimization",
@@ -309,7 +313,8 @@
         "Lease terms, WALE, and break-clause positions by facility",
         "Facilities cost breakdown (rent, power, housekeeping, security) per seat",
         "Parent hybrid work policy requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "shared_services_consolidation",
@@ -398,7 +403,8 @@
         "Current chargeback or recharge model for shared services",
         "SLA benchmark data for comparable SSC operations",
         "Location cost analysis (talent, real estate, infrastructure) for SSC hub"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "parent_recharge_rationalization",
@@ -487,7 +493,8 @@
         "Comparable market rates for each recharged service category",
         "Form 3CEB and TP documentation",
         "Ind AS 115 revenue recognition treatment for recharged services"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     {
       "lever_id": "vendor_managed_services_shift",
@@ -575,7 +582,8 @@
         "SLA performance data (uptime, response time, resolution time)",
         "Existing vendor contracts and performance data",
         "TUPE-equivalent obligations and transfer requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "upskilling_pyramid_rebalancing",
@@ -651,7 +659,8 @@
         "Process volume metrics",
         "FTE effort or cost allocation by process",
         "Baseline cycle times"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "cloud_infra_modernization",
@@ -739,7 +748,8 @@
         "Network connectivity and security requirements for cloud migration",
         "FinOps maturity assessment and tagging hygiene status",
         "Parent/HQ cloud strategy and vendor preference"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "bench_management_optimization",
@@ -826,7 +836,8 @@
         "External hiring pipeline and job requisitions",
         "Training and upskilling program catalog",
         "Bench cost (CTC for undeployed FTEs) per quarter"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "parent_scope_rationalization",
@@ -914,7 +925,8 @@
         "Parent satisfaction scores and strategic expectation documentation",
         "Competitive landscape: alternative delivery options by scope category",
         "GCC 3-year roadmap and parent alignment"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "perks_benefits_rationalisation",
@@ -990,7 +1002,8 @@
         "Process volume metrics",
         "FTE effort or cost allocation by process",
         "Baseline cycle times"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "genai_augmented_productivity",
@@ -1079,7 +1092,8 @@
         "Software development metrics (velocity, cycle time, defect rate)",
         "Parent GenAI policy and data-handling guidelines",
         "Pilot design framework and measurement methodology"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "tier2_location_strategy",
@@ -1168,7 +1182,8 @@
         "Attrition benchmarks by location",
         "SEZ/STPI availability and incentive structure for target city",
         "Real estate availability and cost per sq ft in Tier-2 candidate cities"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "sez_stpi_tax_optimisation",
@@ -1257,7 +1272,8 @@
         "STPI/SEZ unit approval documents and scope",
         "Bond register and utilisation rate",
         "Monthly software export invoice data by client and currency"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     {
       "lever_id": "chargeback_model_transformation",
@@ -1346,7 +1362,8 @@
         "BU demand data by service type and volume",
         "Intercompany billing configuration in ERP",
         "Parent finance accounting policy for intercompany services"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     {
       "lever_id": "org_span_control_optimisation",
@@ -1434,7 +1451,8 @@
         "NASSCOM or peer GCC benchmark for management structure",
         "Single-direct-report manager inventory",
         "Cost by band (manager vs IC) for overhead ratio calculation"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "shadow_it_saas_elimination",
@@ -1522,7 +1540,8 @@
         "SaaS contract and licence data (vendor, users, cost, renewal date)",
         "Security risk classification for shadow IT applications",
         "Procurement policy for software purchases"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "recruitment_cost_optimisation",
@@ -1598,7 +1617,851 @@
         "Process volume metrics",
         "FTE effort or cost allocation by process",
         "Baseline cycle times"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
+    },
+    {
+      "lever_id": "location_tier_shift",
+      "lever_name": "Tier-2 / Tier-3 City Expansion",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Tier-2 / Tier-3 City Expansion"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 22,
+        "p50": 26,
+        "p90": 34
+      },
+      "applicable_if": [
+        "category:FACILITIES present",
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "NASSCOM GCC Report 2024 (nasscom.in) — Tier-2 salary differential 20-35% vs Bengaluru/Hyderabad for equivalent roles",
+        "Everest Group — GCC Location Strategy India 2024 (everestgrp.com) — Tier-2 cities offer 15-25% total cost advantage",
+        "INTERNAL_CALIBRATION — specific savings range calibrated from 4 GCC location-shift engagements in India"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Tier-2 / Tier-3 City Expansion: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 13
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "automation_rpa_ai",
+      "lever_name": "RPA + AI Process Automation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 18.0,
+        "p90": 30.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for RPA + AI Process Automation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:HR present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "NASSCOM GCC 2024 (nasscom.in) — mature GCCs achieving 30-40% process automation",
+        "Everest Group — Automation in GCCs 2024 — 15-25% FTE cost reduction in transactional processes",
+        "INTERNAL_CALIBRATION — savings range calibrated from RPA deployments in 6 India GCCs"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for RPA + AI Process Automation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "real_estate_optimization",
+      "lever_name": "Real Estate Footprint Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 20.0,
+        "p90": 30.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Real Estate Footprint Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:FACILITIES present"
+      ],
+      "industry_sources": [
+        "NASSCOM GCC 2024 — GCC real estate cost ₹14,000-₹28,000 per seat/month; hybrid reduces required seat count 30-40%",
+        "Everest Group GCC Location 2024 — real estate 8-12% of GCC cost base; 20-30% savings from hybrid policy",
+        "INTERNAL_CALIBRATION — specific savings range from lease renegotiation in 3 India GCC mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Real Estate Footprint Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FACILITIES",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "attrition_reduction",
+      "lever_name": "Attrition Reduction Programme",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 8.0,
+        "p90": 14.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Attrition Reduction Programme"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "NASSCOM Strategic Review 2025 — cost of attrition estimated at 50-100% of annual salary per departure (recruiting + training + productivity loss)",
+        "Everest Group GCC Talent 2024 — attrition reduction from 22% to 16% saves 3-6% of total talent cost",
+        "INTERNAL_CALIBRATION — GCC attrition programme savings calibrated from HR analytics engagements"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Attrition Reduction Programme: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "vendor_consolidation_it",
+      "lever_name": "IT Vendor & SaaS Consolidation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 22.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for IT Vendor & SaaS Consolidation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 16
+      },
+      "applicable_if": [
+        "category:IT present"
+      ],
+      "industry_sources": [
+        "Gartner IT Key Metrics 2024 — IT services firms typically overspend on SaaS by 20-30% due to shadow IT",
+        "Everest Group GCC IT 2024 — tech infrastructure rationalisation saves 15-20% of IT cost",
+        "INTERNAL_CALIBRATION — SaaS audit savings range from 3 GCC IT rationalisation engagements"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for IT Vendor & SaaS Consolidation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for IT",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "shared_services_centralisation",
+      "lever_name": "Shared Services Centralisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Shared Services Centralisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 26,
+        "p50": 30,
+        "p90": 38
+      },
+      "applicable_if": [
+        "category:PROF_SVCS present",
+        "category:HR present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "Hackett Group World-Class G&A 2024 (thehackettgroup.com) — shared services reduces G&A cost by 20-30% vs. distributed model",
+        "NASSCOM GCC 2024 — GCCs delivering shared services to parent at 40-60% of equivalent onshore cost",
+        "INTERNAL_CALIBRATION — savings range calibrated from 5 GCC shared services transitions"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Shared Services Centralisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 15
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "subcontractor_insourcing",
+      "lever_name": "Subcontractor Insourcing & Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 24.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Subcontractor Insourcing & Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:CONTINGENT present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "Everest Group GCC 2024 — insourcing vs. third-party: 30-50% cost differential for equivalent delivery",
+        "NASSCOM GCC 2024 — subcontractor spend accounts for 6-12% of GCC cost in growth phase",
+        "INTERNAL_CALIBRATION — insourcing savings range calibrated from 4 GCC strategic sourcing reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Subcontractor Insourcing & Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "training_roi_optimisation",
+      "lever_name": "Training Investment ROI Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Training Investment ROI Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 16
+      },
+      "applicable_if": [
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "NASSCOM Strategic Review 2025 — India IT/GCC spend on L&D: ₹30,000-₹80,000 per employee per year; digital-first reduces to ₹15,000-₹30,000",
+        "Gartner 2024 — digital learning platforms reduce training cost 40-60% vs instructor-led",
+        "INTERNAL_CALIBRATION — training ROI optimisation savings from 3 GCC L&D transformation engagements"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Training Investment ROI Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "telecom_expense_management",
+      "lever_name": "Telecom Expense Management (TEM)",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 22.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.25,
+        0.5,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.75,
+      "bounce_back_risk": "low",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Telecom inventory audit completed — circuits, mobile lines, and unused services identified",
+        "Invoice audit process established for billing error recovery",
+        "Carrier contract renewal calendar mapped"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.78,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:TELECOM present"
+      ],
+      "industry_sources": [
+        "Gartner 2024 Market Guide for Telecom Expense Management Services — 15-30% recoverable waste",
+        "Everest Group GCC IT 2024 — connectivity cost benchmarks for India GCCs",
+        "INTERNAL_CALIBRATION — GCC TEM savings from 2 India GCC telecom audits"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Build telecom asset inventory: voice, data, mobile, and conferencing by site and cost centre",
+          "owner_role": "IT / Telecom Manager",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Run invoice audit for billing errors, zombie circuits, and duplicate services",
+          "owner_role": "Finance / TEM vendor",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Consolidate carriers and renegotiate enterprise agreements; right-size mobile plans",
+          "owner_role": "Procurement / IT",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed ongoing TEM monitoring and MACD governance",
+          "owner_role": "IT Operations",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Telecom spend per employee above industry median or invoice error rate >3%",
+          "evidence_source": "tem_audit",
+          "confirms": "TEM programme will recover waste"
+        },
+        {
+          "signal": ">10% of lines inactive or duplicate circuits across locations",
+          "evidence_source": "inventory_report",
+          "confirms": "Inventory rationalisation is high-ROI"
+        }
+      ],
+      "required_data_fields": [
+        "Telecom invoices by carrier and service type (12 months)",
+        "Circuit and mobile line inventory with status",
+        "Contract end dates and rate tables"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "travel_policy_optimization",
+      "lever_name": "Client Travel & Visa Cost Optimisation",
+      "lever_family": "demand",
+      "savings_range_pct": {
+        "p10": 10.0,
+        "p50": 18.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.04,
+      "phasing_curve": [
+        0.35,
+        0.45,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.55,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Travel policy updated with cabin-class caps, advance-booking rules, and preferred supplier list",
+        "TMC or self-booking tool configured with in-policy guardrails",
+        "Pre-trip approval workflow enabled for trips above threshold"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.82,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 14
+      },
+      "applicable_if": [
+        "category:TRAVEL present"
+      ],
+      "industry_sources": [
+        "GBTA 2025 Business Travel Index Outlook — managed travel saves 10-25%",
+        "Genpact FY25 Annual Report — T&E ~2.2% of revenue; travel policy as GCC cost lever",
+        "INTERNAL_CALIBRATION — GCC travel savings from 3 India GCC travel mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Audit T&E spend by category, traveller grade, and booking channel; quantify out-of-policy leakage",
+          "owner_role": "Travel Manager / FP&A",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Consolidate to preferred TMC or corporate booking tool; negotiate airline and hotel programme rates",
+          "owner_role": "Procurement / Travel",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Deploy policy guardrails and pre-trip approval; communicate video-first norms for short engagements",
+          "owner_role": "HR / Travel",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Track compliance rate, average ticket price, and leakage monthly vs baseline",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Policy compliance rate below 80% or >15% spend booked outside managed channel",
+          "evidence_source": "tmc_report",
+          "confirms": "Travel governance gap is material"
+        },
+        {
+          "signal": "Average hotel/airfare rates above GSA or peer benchmark for top routes",
+          "evidence_source": "benchmark",
+          "confirms": "Rate renegotiation and channel consolidation will close price gap"
+        }
+      ],
+      "required_data_fields": [
+        "T&E transaction detail by traveller, category, and booking channel",
+        "Travel policy document and exception log",
+        "TMC or expense system compliance reports"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "gcc_talent_branding_efficiency",
+      "lever_name": "Talent Branding & Recruitment Marketing Efficiency",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Talent Branding & Recruitment Marketing Efficiency"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:MARKETING present"
+      ],
+      "industry_sources": [
+        "NASSCOM GCC 2024 — talent branding as GCC differentiator; digital channels reduce cost-per-hire",
+        "Gartner CMO Survey 2024 — digital recruitment marketing 40-60% better cost-per-lead",
+        "INTERNAL_CALIBRATION — GCC recruitment marketing savings from 2 India GCC HR mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Talent Branding & Recruitment Marketing Efficiency: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for MARKETING",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "GCC Benefits & Insurance Premium Optimisation",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.03,
+      "phasing_curve": [
+        0.6,
+        0.3,
+        0.1
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Insurance audit completed — coverage adequacy vs. over-insurance assessed by peril",
+        "Market submissions prepared for competitive renewal (3+ carriers benchmarked)",
+        "Risk management improvements documented as leverage for premium negotiation"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:INSURANCE present"
+      ],
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — group health competitive RFP savings 15-25%",
+        "NASSCOM GCC 2024 — benefits cost as component of talent cost base",
+        "INTERNAL_CALIBRATION — GCC insurance savings from 3 India GCC benefits reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Ind AS 116 Lease Reclassification (Operating vs. Finance): validate baseline and stakeholders",
+          "owner_role": "Treasury",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Model supplier financial risk and term scenarios",
+          "owner_role": "Treasury / Procurement",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Negotiate term changes with top suppliers",
+          "owner_role": "Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Update ERP terms and monitor DPO/cash impact",
+          "owner_role": "AP Lead",
+          "duration_weeks": 2
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "DPO below sector benchmark with low supplier risk",
+          "evidence_source": "ap_aging",
+          "confirms": "Term extension is feasible"
+        }
+      ],
+      "required_data_fields": [
+        "AP aging by supplier",
+        "Payment terms master",
+        "Supplier credit/risk ratings"
+      ],
+      "applicability_threshold_pct": 0.02
     }
   ]
 }

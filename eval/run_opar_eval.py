@@ -766,6 +766,9 @@ def generate_md_report(
         f"**Overall score:** {overall_score:.3f} / 10  ",
         f"**Status:** {_fmt_status(overall_passed)}",
         "",
+        "> ⚠️ **SCORE TYPE: STRUCTURAL** — OPAR loop wiring and intent routing coverage. "
+        "Does NOT validate analytical content quality. See `run_llm_judge_eval.py`.",
+        "",
         "## Summary",
         "",
         "| ID | Dimension | Domain | Score | Threshold | Status | Cases |",
@@ -863,6 +866,11 @@ def main() -> int:
         "overall_score": round(overall_score, 3),
         "passed": overall_passed,
         "eval_date": run_date,
+        "score_type": "structural",
+        "scope": (
+            "OPAR loop structural correctness: observe/plan/act/reflect wiring, intent routing "
+            "coverage, skill dispatch. Does NOT validate analytical content quality."
+        ),
         "dimensions": [
             {
                 "dimension_id": d.dimension_id,

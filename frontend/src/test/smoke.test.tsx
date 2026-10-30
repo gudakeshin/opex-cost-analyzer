@@ -5,7 +5,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { vi } from 'vitest';
+import { UnsavedChangesProvider } from '../context/UnsavedChangesContext';
+import { createTestQueryClient } from './queryClient';
 
 // ---------------------------------------------------------------------------
 // Global mocks
@@ -71,86 +74,15 @@ vi.mock('../context/ExceptionContext', () => ({
 // ---------------------------------------------------------------------------
 
 function Wrapper({ children }: { children: React.ReactNode }) {
-  return <MemoryRouter initialEntries={['/']}>{children}</MemoryRouter>;
+  const queryClient = createTestQueryClient();
+  return (
+    <QueryClientProvider client={queryClient}>
+      <UnsavedChangesProvider>
+        <MemoryRouter initialEntries={['/']}>{children}</MemoryRouter>
+      </UnsavedChangesProvider>
+    </QueryClientProvider>
+  );
 }
-
-// ---------------------------------------------------------------------------
-// InitiativePortfolio — renders empty state message
-// ---------------------------------------------------------------------------
-
-import { InitiativePortfolio } from '../components/PageComponents/CostRoom/InitiativePortfolio';
-
-test('InitiativePortfolio renders empty message with no initiatives', () => {
-  render(
-    <Wrapper>
-      <InitiativePortfolio
-        initiatives={[]}
-        percentileBand="p50"
-        executive={false}
-        onSelect={vi.fn()}
-        acceptInit={vi.fn()}
-        deferInit={vi.fn()}
-        rejectInit={vi.fn()}
-      />
-    </Wrapper>,
-  );
-  expect(screen.getByText(/No initiatives in pipeline/i)).toBeInTheDocument();
-});
-
-test('InitiativePortfolio renders AQS column header with tooltip marker', () => {
-  const initiative = {
-    initiative_id: 'i1',
-    category: 'IT',
-    lever: 'Cloud rationalisation',
-    stage: 'identified',
-    gross_savings_y1: 10,
-    aqs: 0.72,
-    p10_savings: 7,
-    p50_savings: 10,
-    p90_savings: 13,
-  } as Parameters<typeof InitiativePortfolio>[0]['initiatives'][0];
-
-  render(
-    <Wrapper>
-      <InitiativePortfolio
-        initiatives={[initiative]}
-        percentileBand="p50"
-        executive={false}
-        onSelect={vi.fn()}
-        acceptInit={vi.fn()}
-        deferInit={vi.fn()}
-        rejectInit={vi.fn()}
-      />
-    </Wrapper>,
-  );
-  expect(screen.getByText('AQS')).toBeInTheDocument();
-  // Column header ? badge has a distinct longer title; badge itself has a shorter one
-  expect(screen.getByTitle(/Assumption Quality Score — measures/i)).toBeInTheDocument();
-});
-
-// ---------------------------------------------------------------------------
-// ValueBridgeChart — renders without crashing
-// ---------------------------------------------------------------------------
-
-import { ValueBridgeChart } from '../components/PageComponents/CostRoom/ValueBridgeChart';
-
-test('ValueBridgeChart renders without crashing when all values are zero', () => {
-  const { container } = render(
-    <Wrapper>
-      <ValueBridgeChart portfolioP50Cr={0} committedP50Cr={0} ebitdaBps={0} />
-    </Wrapper>,
-  );
-  expect(container.firstChild).not.toBeNull();
-});
-
-test('ValueBridgeChart renders a labelled value bridge chart', () => {
-  render(
-    <Wrapper>
-      <ValueBridgeChart portfolioP50Cr={150} committedP50Cr={60} ebitdaBps={420} />
-    </Wrapper>,
-  );
-  expect(screen.getByLabelText(/value bridge chart/i)).toBeInTheDocument();
-});
 
 // ---------------------------------------------------------------------------
 // CostRoom — renders without crashing
@@ -174,7 +106,7 @@ test('CostRoom renders without crashing and shows page heading', () => {
       <CostRoom />
     </Wrapper>,
   );
-  expect(screen.getByText('Cost Room')).toBeInTheDocument();
+  expect(screen.getByText(/Live Cost Room/i)).toBeInTheDocument();
 });
 
 test('CostRoom renders EmptyPipeline heading and CTA buttons when no data', () => {

@@ -1,0 +1,9 @@
+Pragati General Insurance Ltd — Material Contracts FY25
+
+1) GIC Re — Reinsurance treaty: annual renewal; IRDAI-mandated 20% cession; non-addressable.
+2) Munich Re India — Treaty: annual renewal; ~980 Cr; renegotiable at renewal Jan 2026.
+3) TCS Insurance — Policy admin: to 2027-09-30; 2040 Cr committed; 120-day notice; 18% exit. Locked.
+4) PolicyBazaar — Aggregator: to 2026-03-31; commission-based (no min commitment); renegotiable on volume.
+5) Xceltrait — Motor claims: rolling 30-day notice; no penalty — primary rate lever.
+
+Addressability: GIC Re statutory. TCS locked. Munich Re and PolicyBazaar renegotiable at renewal. Xceltrait immediately actionable.

@@ -1,9 +1,9 @@
 """Pydantic request/response schemas for all API routers."""
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class _FinancialParamsMixin(BaseModel):
@@ -54,6 +54,50 @@ class EngagementPatchRequest(BaseModel):
     headcount: float | None = None
 
 
+class EngagementDocumentRecord(BaseModel):
+    """On-disk document registry entry stored inside engagement manifest.json."""
+
+    model_config = {"extra": "allow"}
+
+    document_id: str
+    filename: str
+    content_type: str = "application/octet-stream"
+    size_bytes: int = 0
+    raw_path: str = ""
+    role: str = "context_doc"
+    status: str = "pending"
+    parse_backend: str | None = None
+    error: str | None = None
+    uploaded_at: str | None = None
+    processed_at: str | None = None
+    text_preview: str | None = None
+    line_count: int = 0
+
+
+class EngagementManifest(BaseModel):
+    """Validated engagement manifest payload before atomic write."""
+
+    model_config = {"extra": "allow"}
+
+    engagement_id: str
+    company_name: str = "New engagement"
+    industry: str = ""
+    industry_user_set: bool = False
+    annual_revenue: float = 0.0
+    currency: str = "INR"
+    headcount: float | None = None
+    detected_company_name: str = ""
+    detected_industry: str = ""
+    detected_industry_label: str = ""
+    detected_annual_revenue_cr: float | None = None
+    detection_signals: Dict[str, Any] = {}
+    context_text_hash: str = ""
+    created_at: str = ""
+    updated_at: str = ""
+    session_ids: List[str] = []
+    documents: List[EngagementDocumentRecord] = []
+
+
 class SessionCreateRequest(_FinancialParamsMixin):
     company_name: str | None = None
     industry: str | None = None
@@ -77,6 +121,9 @@ class AnalyzeRequest(_FinancialParamsMixin):
     # Optional client-generated run id; when present, the analysis streams live
     # progress steps to GET /api/v1/chat/progress/{run_id} as it executes.
     run_id: str | None = None
+    # True = start the analysis in the background and return immediately with the run_id
+    # (poll GET /api/v1/analyze/runs/{run_id}); False = wait for the result in this request.
+    background: bool = False
 
 
 class SessionManifestPatch(BaseModel):
@@ -85,6 +132,86 @@ class SessionManifestPatch(BaseModel):
     annual_revenue: float | None = None
     currency: str | None = None
     audience: str | None = None
+    peer_set_name: str | None = None
+
+
+class SessionManifestResponse(BaseModel):
+    """Response shape for session manifest reads/writes and session creation.
+
+    `extra="allow"` is load-bearing: the on-disk manifest carries ad-hoc
+    fields (owner, wacc, headcount, etc.) beyond what's modelled here, and
+    FastAPI's response_model filtering would otherwise silently drop them.
+    """
+
+    model_config = {"extra": "allow"}
+
+    session_id: str
+    engagement_id: str | None = None
+    company_name: str | None = None
+    industry: str | None = None
+    annual_revenue: float | None = None
+    currency: str | None = None
+    audience: str | None = None
+    engagement_week: int | None = None
+    engagement_weeks_total: int | None = None
+    gate_label: str | None = None
+    created_at: str | None = None
+    files: List[Dict[str, Any]] | None = None
+    model_manifest: Dict[str, Any] | None = None
+    ingestion_report: Dict[str, Any] | None = None
+    diagnostic_urls: List[str] | None = None
+    diagnostic_result: Dict[str, Any] | None = None
+    diagnostic_completed_at: str | None = None
+    deep_research_interaction_id: str | None = None
+    deep_research_prompt: str | None = None
+    deep_research_summary: str | None = None
+    deep_research_full_report: str | None = None
+    deep_research_completed_at: str | None = None
+    engagement_sanity: Dict[str, Any] | None = None
+    probe_answers: List[Dict[str, Any]] | None = None
+
+
+class SessionStatusResponse(BaseModel):
+    model_config = {"extra": "allow"}
+
+    session_id: str
+    session_exists: bool
+    has_manifest: bool
+    has_analysis: bool
+    file_count: int
+
+
+class SessionAnalysisResponse(BaseModel):
+    """Loose response shape for the full session analysis blob.
+
+    This payload is intentionally open-ended (skill_outputs, per-skill
+    trace data, etc.); only the handful of fields consumers actually read
+    are modelled explicitly, and `extra="allow"` passes the rest through
+    unchanged.
+    """
+
+    model_config = {"extra": "allow"}
+
+    session_id: str
+    company_name: str | None = None
+    industry: str | None = None
+    annual_revenue: float | None = None
+    files: List[Any] | None = None
+    skill_outputs: Dict[str, Any] | None = None
+    last_analysis_run: Dict[str, Any] | None = None
+
+
+class SessionSummaryResponse(BaseModel):
+    session_id: str
+    engagement_id: str | None = None
+    company_name: str
+    industry: str
+    currency: str
+    annual_revenue: float | None = None
+    created_at: str | None = None
+    file_count: int
+    has_analysis: bool
+    top_savings_estimate: float | None = None
 
 
 class SkillEditRequest(BaseModel):
@@ -94,6 +221,41 @@ class SkillEditRequest(BaseModel):
 class SkillCreateRequest(BaseModel):
     name: str
     content: str
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str) -> str:
+        from app.skills.validation import validate_skill_slug
+
+        return validate_skill_slug(v)
+
+
+class SkillStructuredCreateRequest(BaseModel):
+    """No-code declarative skill authoring — composes SKILL.md on the server."""
+    name: str
+    description: str = ""
+    kind: str = "analysis"
+    runtime: str = "declarative"
+    discoverable: bool = True
+    weight: str = "light"
+    inputs: List[str] = Field(default_factory=list)
+    instruction_prompt: str = ""
+    output_fields: List[str] = Field(default_factory=list)
+    parallel_group: int = 8
+    depends_on: List[str] = Field(default_factory=list)
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str) -> str:
+        from app.skills.validation import validate_skill_slug
+
+        return validate_skill_slug(v)
+
+
+class SkillDiscoverRequest(BaseModel):
+    query: str
+    k: int = 8
+    kind: str | None = None
 
 
 class ChatRequest(BaseModel):
@@ -117,6 +279,7 @@ class V1ChatRequest(BaseModel):
     audience: str | None = None
     headcount: float | None = None
     thinking_mode: str | None = None  # "standard" | "extended"
+    llm_model: str | None = None  # e.g. claude-sonnet-4-6, gemini-2.5-flash
     chat_history: List[ChatHistoryTurn] | None = None
 
 
@@ -144,6 +307,7 @@ class ClarificationResumeRequest(BaseModel):
     free_text: str | None = None
     run_id: str | None = None
     thinking_mode: str | None = None  # "standard" | "extended"
+    llm_model: str | None = None
     company_name: str | None = None
     industry: str | None = None
     annual_revenue: float | None = None
@@ -167,6 +331,7 @@ class ClarificationResumeRequest(BaseModel):
 class InitiativeCreateRequest(BaseModel):
     user_id: str | None = None
     session_id: str | None = None
+    engagement_id: str | None = None
     analysis_id: str | None = None
     category: str
     lever: str
@@ -185,6 +350,22 @@ class InitiativeCreateRequest(BaseModel):
     owner_email: str | None = None
     committed_date: str | None = None
     target_realization_date: str | None = None
+    # Business-perspective detail (optional — populated by the business-case builder).
+    business_rationale: str | None = None
+    affected_vendors: list = []
+    contract_levers: list = []
+    owner_role: str | None = None
+    business_sponsor: str | None = None
+    risks: list = []
+    kpis: list = []
+    change_management: dict = {}
+    execution_playbook: list = []
+    phasing_narrative: str | None = None
+    evidence: list = []
+    p50_savings: float | None = None
+    ebitda_bps: float | None = None
+    payback_months: float | None = None
+    irr_pct: float | None = None
 
 
 class InitiativeStageRequest(BaseModel):
@@ -264,10 +445,33 @@ class SectorPackOverrideRequest(BaseModel):
     engagement_id: Optional[str] = None
 
 
+class SectorPackCreateRequest(BaseModel):
+    pack_id: str
+    sector: str
+    description: str = ""
+
+    @field_validator("pack_id")
+    @classmethod
+    def validate_pack_id(cls, v: str) -> str:
+        from app.services.sector_pack_authoring import validate_pack_id
+
+        return validate_pack_id(v)
+
+
+class SectorPackComponentUpdateRequest(BaseModel):
+    payload: Any
+
+
+class SectorPackPublishRequest(BaseModel):
+    bump: str = "minor"
+    target_status: str | None = None
+
+
 class CostToServeRequest(BaseModel):
     session_id: str
     segment_revenue: Optional[Dict[str, float]] = None
     headcount: Optional[float] = None
+    allocation_method: Literal["revenue", "equal"] = "revenue"
 
 
 class CompanyResearchRequest(BaseModel):
@@ -295,6 +499,7 @@ class DeepResearchStartResponse(BaseModel):
 
 class DeepResearchStatusResponse(BaseModel):
     status: str  # "in_progress" | "completed" | "failed"
+    error: str | None = None        # human-readable reason when status == "failed"
     summary: str | None = None      # LLM-condensed ≤400 words
     full_report: str | None = None  # raw output_text
     sources: List[Any] = []
@@ -318,3 +523,88 @@ class ConnectorIngestRequest(BaseModel):
     credentials: Dict[str, str] = {}
     fetch_kwargs: Dict[str, Any] = {}
     run_analysis: bool = False
+    delta_sync: bool = False
+    async_mode: bool = False
+
+
+# ---------------------------------------------------------------------------
+# Analysis Workbench
+# ---------------------------------------------------------------------------
+
+class WorkbenchValidateRequest(BaseModel):
+    session_id: str
+    selected_skills: List[str] = []
+    overrides: Dict[str, Any] = {}
+
+
+class WorkbenchRunRequest(BaseModel):
+    session_id: str
+    name: str | None = None
+    selected_skills: List[str] = []
+    overrides: Dict[str, Any] = {}
+    seed_from_run_id: str | None = None
+    parent_run_id: str | None = None
+    engagement_id: str | None = None
+    user_id: str | None = None
+    run_id: str | None = None
+    include_quality_gates: bool = False
+    include_light_reflect: bool = False
+
+
+class WorkbenchBranchRequest(BaseModel):
+    name: str | None = None
+
+
+class SpendQueryRequest(BaseModel):
+    """Ad-hoc SQL over the session's analytical spend store."""
+
+    sql: str
+    limit: int | None = None
+
+
+class SavedQueryRequest(BaseModel):
+    name: str
+    sql: str
+    description: str | None = None
+
+
+class NlQueryRequest(BaseModel):
+    """Natural-language question to translate into read-only spend SQL."""
+
+    question: str
+    execute: bool = False
+
+
+class CustomScenarioSpec(BaseModel):
+    name: str
+    target: str = "portfolio"  # portfolio | category | lever
+    id: str | None = None
+    savings_pct_delta: float = 0.0
+    timeline_factor: float = 1.0
+    execution_rate: float | None = None
+    addressable_spend_delta_pct: float = 0.0
+    spend_pool_delta_pct: float = 0.0
+    bounce_back_override: str | None = None  # high | medium | low
+    cost_driver_deltas: Dict[str, float] = Field(default_factory=dict)
+
+
+class CustomSensitivityRequest(BaseModel):
+    session_id: str
+    scenarios: List[CustomScenarioSpec]
+    discount_rate: float | None = None
+    effective_tax_rate: float | None = None
+    drivers: Dict[str, float] | None = None
+
+
+class SavedScenarioSetRequest(BaseModel):
+    name: str
+    scenarios: List[CustomScenarioSpec]
+    drivers: Dict[str, float] | None = None
+    description: str | None = None
+
+
+class ScenarioParseRequest(BaseModel):
+    """Natural-language what-if question to parse into scenario specs."""
+
+    session_id: str
+    question: str

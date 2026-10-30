@@ -13,8 +13,10 @@ from app.schemas import (
     MilestoneCreateRequest,
     RealisedSavingsIngestRequest,
 )
+from app.routers._shared import _memory
 from app.services.calibration import generate_calibration_report, ingest_realised_savings
 from app.services.compliance import append_audit_event
+from app.services.initiative_provenance import build_initiative_provenance
 from app.services.pipeline import (
     add_actual,
     add_milestone,
@@ -63,11 +65,22 @@ def _forward_actual_to_calibration(initiative_id: str, actual: Dict[str, Any]) -
 @router.get("/api/v1/initiatives")
 def get_initiatives(
     user_id: str | None = None,
+    engagement_id: str | None = None,
+    qualified_only: bool = False,
     stage: str | None = None,
     category: str | None = None,
     lever: str | None = None,
 ) -> Dict[str, Any]:
-    return {"initiatives": list_initiatives(user_id=user_id, stage=stage, category=category, lever=lever)}
+    return {
+        "initiatives": list_initiatives(
+            user_id=user_id,
+            engagement_id=engagement_id,
+            qualified_only=qualified_only,
+            stage=stage,
+            category=category,
+            lever=lever,
+        )
+    }
 
 
 @router.post("/api/v1/initiatives")
@@ -95,6 +108,16 @@ def reject_pipeline_initiative(initiative_id: str, payload: InitiativeRejectRequ
         raise HTTPException(status_code=404, detail="Initiative not found")
     append_audit_event(f"initiative_rejected id={initiative_id}")
     return initiative
+
+
+@router.get("/api/v1/initiatives/{initiative_id}/provenance")
+def get_initiative_provenance(initiative_id: str) -> Dict[str, Any]:
+    match = next((i for i in list_initiatives() if i.get("initiative_id") == initiative_id), None)
+    if not match:
+        raise HTTPException(status_code=404, detail="Initiative not found")
+    session_id = match.get("session_id") or match.get("analysis_id") or ""
+    analysis = _memory.get("session", session_id) if session_id else None
+    return build_initiative_provenance(match, analysis, session_id)
 
 
 @router.get("/api/v1/initiatives/{initiative_id}/milestones")
@@ -134,8 +157,16 @@ def get_calibration_report(engagement_id: str) -> Dict[str, Any]:
 
 
 @router.get("/api/v1/pipeline/summary")
-def get_pipeline_summary(user_id: str | None = None) -> Dict[str, Any]:
-    return pipeline_summary(user_id=user_id)
+def get_pipeline_summary(
+    user_id: str | None = None,
+    engagement_id: str | None = None,
+    qualified_only: bool = False,
+) -> Dict[str, Any]:
+    return pipeline_summary(
+        user_id=user_id,
+        engagement_id=engagement_id,
+        qualified_only=qualified_only,
+    )
 
 
 @router.get("/api/v1/pipeline/at-risk")

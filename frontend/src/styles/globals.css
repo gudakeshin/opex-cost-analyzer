@@ -87,3 +87,163 @@
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-gray-500 dark:bg-gray-500;
 }
+
+/* App-wide toasts (Workbench Query / What-If, etc.) */
+.app-toast-wrap {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.app-toast {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 11px 16px;
+  border-radius: 8px;
+  box-shadow: 0 8px 28px -10px rgba(16, 24, 40, 0.22);
+  animation: app-toast-rise 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-toast--success {
+  background: #1a1a1a;
+}
+
+.app-toast--error {
+  background: #b91c1c;
+}
+
+.app-toast--info {
+  background: #0563c1;
+}
+
+@keyframes app-toast-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect the OS "reduce motion" setting: no animated transitions, spinners or smooth scrolling. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* A visible keyboard focus ring wherever a control does not define its own. */
+:focus-visible {
+  outline: 2px solid #4d7c0f;
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   Dark mode. Much of the UI uses fixed light utility classes (bg-white, border-gray-200 …);
+   this layer re-maps the common ones when <html class="dark"> so pages stay readable.
+   --------------------------------------------------------------------------- */
+.dark body,
+.dark .bg-brand-surface {
+  background-color: #0b1220;
+  color: #e2e8f0;
+}
+.dark .bg-white,
+.dark .bg-white\/95 {
+  background-color: #111827;
+}
+.dark .bg-brand-surface-muted,
+.dark .bg-brand-surface-elevated,
+.dark .bg-gray-50,
+.dark .bg-gray-100,
+.dark .bg-slate-50 {
+  background-color: #1e293b;
+}
+.dark .border-brand-border,
+.dark .border-gray-200,
+.dark .border-slate-200 {
+  border-color: #334155;
+}
+.dark .text-brand-ink,
+.dark .text-brand-text,
+.dark .text-gray-900,
+.dark .text-black {
+  color: #f1f5f9;
+}
+.dark .text-brand-muted,
+.dark .text-gray-600,
+.dark .text-gray-700,
+.dark .text-slate-600,
+.dark .text-slate-700 {
+  color: #a8b5c8;
+}
+.dark .text-brand-primary {
+  color: #a3d65c;
+}
+.dark .border-brand-primary {
+  border-color: #a3d65c;
+}
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #0f172a;
+  color: #f1f5f9;
+  border-color: #334155;
+}
+.dark ::placeholder {
+  color: #7c8aa0;
+}
+/* tinted status panels: dark tint, light text */
+.dark .bg-amber-50 { background-color: #3a2f0f; }
+.dark .bg-red-50 { background-color: #3b1717; }
+.dark .bg-green-50,
+.dark .bg-emerald-50 { background-color: #12301f; }
+.dark .bg-blue-50 { background-color: #14274a; }
+.dark .text-amber-900,
+.dark .text-amber-800,
+.dark .text-amber-700 { color: #fde68a; }
+.dark .text-red-900,
+.dark .text-red-700 { color: #fecaca; }
+.dark .text-green-900,
+.dark .text-green-700,
+.dark .text-emerald-800,
+.dark .text-emerald-700 { color: #bbf7d0; }
+.dark .text-blue-900,
+.dark .text-blue-800 { color: #bfdbfe; }
+.dark .border-amber-200 { border-color: #6b5314; }
+.dark .border-red-200 { border-color: #6b2323; }
+.dark .border-green-200,
+.dark .border-emerald-200 { border-color: #1f5a37; }
+.dark .border-blue-200 { border-color: #24427a; }
+.dark .modal-content {
+  background-color: #111827;
+  color: #f1f5f9;
+}
+
+/* arbitrary-colour utilities used by the sidebar and a few badges */
+.dark .bg-\[\#f7f7f5\],
+.dark .hover\:bg-\[\#f7f7f5\]:hover {
+  background-color: #1e293b;
+}
+.dark .text-\[\#53565a\] {
+  color: #a8b5c8;
+}
+.dark .group:hover .group-hover\:text-black {
+  color: #f1f5f9;
+}
+.dark .text-\[\#2f6a1e\] {
+  color: #a3d65c;
+}

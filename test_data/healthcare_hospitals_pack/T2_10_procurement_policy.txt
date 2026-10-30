@@ -1,0 +1,8 @@
+Aarogya Health Network Ltd — Procurement Policy
+
+1) Three bids above 50 Lakh for consumables and equipment. NABH-approved vendors mandatory for clinical categories.
+2) Generic substitution: clinical committee approval for each therapeutic category. Physician sign-off for oncology and cardiac.
+3) Biomedical equipment AMC: minimum uptime SLA 96% in contract; OEM or OEM-authorised service provider only.
+4) No PO no pay above 1 Lakh. MSME suppliers: payment within 45 days.
+5) CPCB-authorised biomedical waste vendor only; cannot be changed for cost.
+6) FY26 target: central procurement for top 50 SKUs across all 18 hospitals; reduce tail vendors from 180 to 80.

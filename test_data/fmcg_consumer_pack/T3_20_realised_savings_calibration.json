@@ -1,0 +1,38 @@
+[
+  {
+    "engagement_id": "eng-pcbl-fy24",
+    "initiative_id": "INI-1",
+    "lever_id": "digital_media_reallocation",
+    "pack_id": "fmcg_consumer",
+    "planned_p50_cr": 28.0,
+    "realised_cr": 24.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "medium",
+    "notes": "TV to digital shift yields efficiency but measurement lag delayed realisation confirmation."
+  },
+  {
+    "engagement_id": "eng-pcbl-fy24",
+    "initiative_id": "INI-2",
+    "lever_id": "agency_consolidation",
+    "pack_id": "fmcg_consumer",
+    "planned_p50_cr": 18.0,
+    "realised_cr": 21.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "8 agencies to 3; volume discounts and reduced duplication exceeded plan."
+  },
+  {
+    "engagement_id": "eng-pcbl-fy24",
+    "initiative_id": "INI-3",
+    "lever_id": "market_research_renegotiation",
+    "pack_id": "fmcg_consumer",
+    "planned_p50_cr": 8.0,
+    "realised_cr": 7.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Nielsen audit renegotiated; IRI replaced for secondary data."
+  }
+]

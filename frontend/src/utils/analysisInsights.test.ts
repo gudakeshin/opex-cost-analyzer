@@ -3,6 +3,7 @@ import {
   answeredProbeKeysFromMessages,
   buildDataRootedPrompts,
   collectUnansweredProbeQuestions,
+  extractAnomalyFlags,
   extractInsightSnapshot,
   probeAnswerKey,
   wantsPeerSavingsInsight,
@@ -141,6 +142,7 @@ describe('analysisInsights', () => {
     const session: SessionResponse = {
       session_id: 'x',
       skill_outputs: {
+        'spend-profiler': { total_spend: 1000, category_profile: [] },
         'sme-critique': {
           portfolio_probes: [
             {
@@ -196,5 +198,30 @@ describe('analysisInsights', () => {
     };
     const answered = new Set(['transaction_volume']);
     expect(collectUnansweredProbeQuestions(snapshot, answered, 5)).toHaveLength(0);
+  });
+
+  it('extractAnomalyFlags sorts by severity then saving', () => {
+    const flags = extractAnomalyFlags({
+      'heuristic-analyzer': {
+        heuristic_findings: [
+          {
+            category_id: 'LOW',
+            category_name: 'Low severity',
+            actual_pct_of_revenue: 5,
+            heuristic_target_pct: 4,
+            estimated_saving_amount: 9_000_000,
+          },
+          {
+            category_id: 'HIGH',
+            category_name: 'High severity',
+            actual_pct_of_revenue: 10,
+            heuristic_target_pct: 4,
+            estimated_saving_amount: 1_000_000,
+          },
+        ],
+      },
+    });
+    expect(flags[0].severity).toBe('high');
+    expect(flags[0].category_id).toBe('HIGH');
   });
 });

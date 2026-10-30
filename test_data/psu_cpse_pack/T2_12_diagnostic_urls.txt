@@ -1,0 +1,7 @@
+National Engineering Corporation Ltd — Diagnostic URLs (synthetic/illustrative)
+
+1. Investor relations: https://www.neclindia.example/investors
+2. DPE MoU: https://dpe.gov.in/example/necl-mou-fy25
+3. Annual report: https://www.neclindia.example/ir/annual-report-fy25.pdf
+4. NSE: https://www.nseindia.example/get-quotes/equity?symbol=NECLINDIA
+5. GeM portal: https://gem.gov.in/example/necl-procurement

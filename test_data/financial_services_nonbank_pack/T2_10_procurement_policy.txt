@@ -1,0 +1,8 @@
+Vistaar Capital Partners Ltd — Procurement Policy
+
+1) Three bids above 75 Lakh. Single-source above 75 Lakh: CTO + CPO approval.
+2) All tech vendor changes above 1 Cr: CISO security assessment and SEBI notification if client data involved.
+3) Distribution agreements: CPO + Chief Distribution Officer approval; AMFI compliance check mandatory.
+4) No PO no pay above 2 Lakh. MSME payment 45 days.
+5) Auto-renewals reviewed 60 days before deadline.
+6) FY26 target: reduce tail tech vendors (< 25 Lakh annual) from 38 to 15.

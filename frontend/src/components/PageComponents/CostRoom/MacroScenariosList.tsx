@@ -19,9 +19,9 @@ export const MacroScenariosList: React.FC<MacroScenariosListProps> = ({
   activeId,
   baseBps,
 }) => (
-  <div className="space-y-2">
+  <div className="space-y-2 min-w-0">
     <h4 className="text-xs font-semibold uppercase tracking-wide text-brand-muted">Macro scenarios</h4>
-    <ul className="space-y-1.5">
+    <ul className="space-y-1.5 max-h-72 overflow-y-auto pr-1">
       {scenarios.map((s) => {
         const active = s.id === activeId;
         return (
@@ -33,18 +33,18 @@ export const MacroScenariosList: React.FC<MacroScenariosListProps> = ({
                 : 'border-brand-border bg-brand-surface-muted/50'
             }`}
           >
-            <span className="text-brand-ink">
+            <span className="text-brand-ink min-w-0 pr-2 leading-snug">
               {s.label}
               {s.illustrative && (
-                <span className="ml-1 text-[10px] text-brand-muted">(illustrative)</span>
+                <span className="ml-1 text-[11px] text-brand-muted">(illustrative)</span>
               )}
             </span>
-            <span className="tabular-nums text-brand-navy">{formatBps(s.ebitdaBps)}</span>
+            <span className="tabular-nums text-brand-navy shrink-0">{formatBps(s.ebitdaBps)}</span>
           </li>
         );
       })}
     </ul>
-    <p className="text-[10px] text-brand-muted">Base scenario: {formatBps(baseBps)} EBITDA impact</p>
+    <p className="text-[11px] text-brand-muted">Base scenario: {formatBps(baseBps)} EBITDA impact</p>
   </div>
 );
 

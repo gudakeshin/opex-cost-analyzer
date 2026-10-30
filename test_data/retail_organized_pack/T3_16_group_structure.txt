@@ -1,0 +1,9 @@
+Bharat Bazaar Retail Ltd — Group Structure
+
+BBRL-IN: India parent (NSE/BSE listed; promoter 54.2% stake). ERP: SAP S4HANA.
+BBRL-ECOMM: Bharat Bazaar E-Commerce Pvt Ltd (India; online retail arm). ERP: SAP ECC.
+BBRL-SUPPLY: Bharat Bazaar Supply Chain Ltd (India; warehousing & logistics subsidiary). ERP: SAP S4HANA.
+
+Entity tree: BBRL-IN > BBRL-ECOMM (100%), BBRL-SUPPLY (100%)
+
+Governance: SEBI LODR. Related-party transactions (BBRL-ECOMM fulfilment charges to BBRL-IN) require Audit Committee approval. Ind AS 116 lease liability on BBRL-IN balance sheet. IC flagged related_party=yes for intra-group transactions.

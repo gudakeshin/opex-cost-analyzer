@@ -1,11 +1,61 @@
 {
   "base_taxonomy_version": "1.0",
   "additional_categories": [
-    {"category_id": "csr_mandatory_spend", "category_name": "CSR Mandatory Spend (Sec 135 Companies Act)", "gl_prefix": "CSR"},
-    {"category_id": "govt_levy_dividends", "category_name": "Government Levies, Cess & Mandatory Dividends", "gl_prefix": "GLD"},
-    {"category_id": "dpe_hr_perquisites", "category_name": "DPE-Mandated HR Perquisites & Allowances", "gl_prefix": "DPE"},
-    {"category_id": "cag_audit_costs", "category_name": "CAG Audit & Statutory Compliance", "gl_prefix": "CAG"},
-    {"category_id": "township_welfare_ops", "category_name": "Township, Welfare & Social Infrastructure", "gl_prefix": "TWF"}
+    {
+      "category_id": "csr_mandatory_spend",
+      "category_name": "CSR Mandatory Spend (Sec 135 Companies Act)",
+      "gl_prefix": "CSR"
+    },
+    {
+      "category_id": "govt_levy_dividends",
+      "category_name": "Government Levies, Cess & Mandatory Dividends",
+      "gl_prefix": "GLD"
+    },
+    {
+      "category_id": "dpe_hr_perquisites",
+      "category_name": "DPE-Mandated HR Perquisites & Allowances",
+      "gl_prefix": "DPE"
+    },
+    {
+      "category_id": "cag_audit_costs",
+      "category_name": "CAG Audit & Statutory Compliance",
+      "gl_prefix": "CAG"
+    },
+    {
+      "category_id": "township_welfare_ops",
+      "category_name": "Township, Welfare & Social Infrastructure",
+      "gl_prefix": "TWF"
+    },
+    {
+      "category_id": "contract_labour_costs",
+      "category_name": "Contract Labour & Outsourced Manpower",
+      "gl_prefix": "CLC",
+      "cost_nature": "operations"
+    },
+    {
+      "category_id": "project_epc_overheads",
+      "category_name": "Project & EPC Overheads",
+      "gl_prefix": "EPC",
+      "cost_nature": "capex_linked"
+    },
+    {
+      "category_id": "security_services_cisf",
+      "category_name": "Security Services (CISF/Private)",
+      "gl_prefix": "SEC",
+      "cost_nature": "operations"
+    },
+    {
+      "category_id": "legal_arbitration_claims",
+      "category_name": "Legal, Arbitration & Claims Management",
+      "gl_prefix": "LAC",
+      "cost_nature": "compliance"
+    },
+    {
+      "category_id": "vigilance_compliance_ops",
+      "category_name": "Vigilance & CVC Compliance Operations",
+      "gl_prefix": "VIG",
+      "cost_nature": "compliance"
+    }
   ],
   "overrides": []
 }

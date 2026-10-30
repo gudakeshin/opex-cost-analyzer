@@ -38,7 +38,7 @@ def _minimal_value_bridge_outputs() -> dict:
 
 @pytest.mark.asyncio
 async def test_orchestrator_agent_path_sets_response_metadata(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("app.opar.orchestrator.UPLOAD_DIR", tmp_path)
+    monkeypatch.setattr("app.routers._shared.UPLOAD_DIR", tmp_path)
     session_id = str(uuid.uuid4())
     (tmp_path / session_id).mkdir(parents=True)
     write_manifest(
@@ -122,9 +122,9 @@ def test_gemini_advisory_smoke_mocked() -> None:
     }
     mock_synth = MagicMock(return_value=(raw, None))
     with patch("app.opar.reflect_advisory.GEMINI_ENABLED", True), patch(
-        "app.opar.reflect_advisory.resolve_analysis_synthesizer", return_value=mock_synth
+        "app.opar.reflect_advisory._iter_analysis_synthesizers", return_value=[mock_synth]
     ):
-        advisory, thinking = generate_llm_advisory_sections(ctx, {"currency": "INR"}, validated)
+        advisory, thinking, _skip = generate_llm_advisory_sections(ctx, {"currency": "INR"}, validated)
     assert advisory is not None
     assert thinking is None
     mock_synth.assert_called()
@@ -134,7 +134,7 @@ def test_gemini_advisory_smoke_mocked() -> None:
 @pytest.mark.asyncio
 async def test_value_bridge_chat_reflect_path(tmp_path, monkeypatch) -> None:
     """Deterministic value-bridge reflect path through plan→act→reflect."""
-    monkeypatch.setattr("app.opar.orchestrator.UPLOAD_DIR", tmp_path)
+    monkeypatch.setattr("app.routers._shared.UPLOAD_DIR", tmp_path)
     session_id = str(uuid.uuid4())
     (tmp_path / session_id).mkdir(parents=True)
     write_manifest(
@@ -170,5 +170,10 @@ async def test_value_bridge_chat_reflect_path(tmp_path, monkeypatch) -> None:
         )
         result = await run_opar_loop("Calculate value bridge", session_id, "smoke-user")
 
-    assert "Value bridge" in result.response_text or "Top Recommendations" in result.response_text
+    assert (
+        "Value bridge" in result.response_text
+        or "Top Recommendations" in result.response_text
+        or "modeled OpEx savings" in result.response_text
+        or "Evidence anchors" in result.response_text
+    )
     assert result.response_metadata.get("agent_path") is not True

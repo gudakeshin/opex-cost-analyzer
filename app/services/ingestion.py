@@ -17,9 +17,14 @@ from app.config import logger
 from app.models import NormalizedSpendLine
 
 # Row-count guardrails — enforced in parse_spend_file before any processing.
+# _ROW_MAX bounds the fully-in-memory path only: CSVs above it are ingested by
+# iter_spend_csv_chunks (streamed straight into the Parquet spend store, hard
+# wall at _ROW_ABSOLUTE_MAX). XLSX has no streaming path — convert to CSV.
 _ROW_WARN = 100_000
 _ROW_CHUNK = 200_000
 _ROW_MAX = 500_000
+_ROW_ABSOLUTE_MAX = 20_000_000  # conglomerate tier ceiling (app/services/cache.py)
+_STREAM_CHUNK_ROWS = 100_000
 
 # ---------------------------------------------------------------------------
 # Optional: regional language OCR (pytesseract + Tesseract system binary)
@@ -138,7 +143,7 @@ def score_workbook_sheets(file_path: Path) -> List[SheetScore]:
     suffix = file_path.suffix.lower()
     if suffix == ".csv":
         try:
-            frame = pd.read_csv(file_path, nrows=5)
+            frame = pd.read_csv(file_path, nrows=5, **_csv_read_kwargs(file_path))
             cols = [str(c) for c in frame.columns]
             hscore, has_amount, has_supplier = _header_match_score(cols)
             return [
@@ -239,6 +244,61 @@ def workbook_schema_hints(file_path: Path) -> Dict[str, Any]:
     }
 
 
+def _csv_read_kwargs(file_path: Path) -> Dict[str, Any]:
+    """Delimiter and encoding for a CSV, sniffed from its head.
+
+    ERP/Tally exports are often semicolon- or tab-separated and cp1252-encoded;
+    pandas' defaults (comma, UTF-8) would fail or collapse them into one column.
+    """
+    import csv
+
+    try:
+        with file_path.open("rb") as fh:
+            head = fh.read(1 << 20)
+    except OSError:
+        return {}
+    encoding = "utf-8-sig"
+    try:
+        head.decode(encoding)
+    except UnicodeDecodeError as exc:
+        # A multi-byte character cut by the 1 MB boundary is not an encoding problem.
+        if exc.start < len(head) - 4:
+            encoding = "cp1252"
+    text = head.decode(encoding, errors="replace")
+    first_line = text.splitlines()[0] if text else ""
+    best_sep, best_fields = ",", 1
+    for sep in (",", ";", "\t", "|"):
+        try:
+            fields = len(next(csv.reader([first_line], delimiter=sep)))
+        except (csv.Error, StopIteration):
+            continue
+        if fields > best_fields:
+            best_sep, best_fields = sep, fields
+    return {"sep": best_sep, "encoding": encoding}
+
+
+def _guard_excel_rows(file_path: Path, sheet_name: str | None) -> None:
+    """Cheaply check an .xlsx sheet's size (read-only mode) before pandas loads it all into memory."""
+    if file_path.suffix.lower() != ".xlsx":
+        return
+    try:
+        import openpyxl
+
+        wb = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
+        try:
+            ws = wb[sheet_name] if sheet_name in wb.sheetnames else wb.worksheets[0]
+            rows = int(ws.max_row or 0)
+        finally:
+            wb.close()
+    except Exception:
+        return  # unreadable here; the normal reader will raise its own, clearer error
+    if rows > _ROW_MAX:
+        raise ValueError(
+            f"{file_path.name} has about {rows:,} rows (limit: {_ROW_MAX:,}). "
+            "Export it to CSV (CSVs are streamed) or split it by entity or fiscal year."
+        )
+
+
 def _read_tabular(
     file_path: Path,
     sheet_name: str | None = None,
@@ -246,7 +306,8 @@ def _read_tabular(
 ) -> pd.DataFrame:
     suffix = file_path.suffix.lower()
     if suffix == ".csv":
-        return pd.read_csv(file_path)
+        return pd.read_csv(file_path, **_csv_read_kwargs(file_path))
+    _guard_excel_rows(file_path, sheet_name)
     if sheet_name is not None:
         return pd.read_excel(file_path, sheet_name=sheet_name, header=header_row)
     ranked = score_workbook_sheets(file_path)
@@ -299,10 +360,9 @@ def _numeric_valid_ratio(series: pd.Series) -> float:
     """Share of cells that coerce to a finite number."""
     if series is None or len(series) == 0:
         return 0.0
-    numeric = pd.to_numeric(
-        series.astype(str).str.replace(",", "", regex=False), errors="coerce"
-    )
-    return float(numeric.notna().sum()) / max(len(series), 1)
+    sample = series.head(500).reset_index(drop=True)
+    _, unparseable, blank = _parse_amount_series(sample)
+    return float((~unparseable & ~blank).sum()) / max(len(sample), 1)
 
 
 def _column_has_negative_amount_token(col: str, has_amount_token: bool) -> bool:
@@ -428,10 +488,9 @@ def _column_amount_score(col: str, series: Optional[pd.Series] = None) -> float:
             score += 4.0
         elif valid_ratio > 0.25:
             score += 2.0
-        numeric = pd.to_numeric(
-            series.astype(str).str.replace(",", "", regex=False), errors="coerce"
-        )
-        if numeric.notna().any() and float(numeric.fillna(0).median()) > 0:
+        numeric, unparseable, blank = _parse_amount_series(series.head(500).reset_index(drop=True))
+        parsed = numeric[~unparseable & ~blank]
+        if len(parsed) and float(parsed.median()) > 0:
             score += 2.0
     return score
 
@@ -465,11 +524,40 @@ def _infer_currency_from_column_name(col_name: str) -> Optional[str]:
     return None
 
 
+_KEYWORD_PATTERN_CACHE: Dict[int, Tuple[Dict, List[Tuple[Dict, Optional["re.Pattern[str]"]]]]] = {}
+
+
+def _compiled_category_patterns(taxonomy: Dict) -> List[Tuple[Dict, Optional["re.Pattern[str]"]]]:
+    """One alternation regex per category, matching whole words (plural-tolerant).
+
+    Substring matching let short keywords fire inside unrelated words
+    ("gas" in "Vegas", "tax" in "syntax", "lab" in "elaborate").
+    """
+    cached = _KEYWORD_PATTERN_CACHE.get(id(taxonomy))
+    if cached is not None and cached[0] is taxonomy:
+        return cached[1]
+    compiled: List[Tuple[Dict, Optional["re.Pattern[str]"]]] = []
+    for cat in taxonomy.get("categories", []):
+        kws = sorted({str(k).lower().strip() for k in cat.get("keywords", []) if str(k).strip()}, key=len, reverse=True)
+        pattern = (
+            re.compile(r"(?<![a-z0-9])(?:" + "|".join(re.escape(k) for k in kws) + r")(?:s|es)?(?![a-z0-9])")
+            if kws
+            else None
+        )
+        compiled.append((cat, pattern))
+    if len(_KEYWORD_PATTERN_CACHE) >= 8:
+        _KEYWORD_PATTERN_CACHE.clear()
+    _KEYWORD_PATTERN_CACHE[id(taxonomy)] = (taxonomy, compiled)
+    return compiled
+
+
 def _classify(description: str, supplier: str, taxonomy: Dict) -> Tuple[str, str]:
     content = f"{description} {supplier}".lower()
     best = ("OTHER", "Other / Unclassified", 0)
-    for cat in taxonomy.get("categories", []):
-        hits = sum(1 for kw in cat.get("keywords", []) if kw.lower() in content)
+    for cat, pattern in _compiled_category_patterns(taxonomy):
+        if pattern is None:
+            continue
+        hits = len({m.group(0) for m in pattern.finditer(content)})
         if hits > best[2]:
             best = (cat.get("id", "OTHER"), cat.get("name", "Other / Unclassified"), hits)
     return best[0], best[1]
@@ -498,28 +586,65 @@ def _classify_by_gl(gl_code: str, taxonomy: Dict) -> Tuple[str, str] | None:
     return None
 
 
-def _derive_fiscal_period(date_str: str) -> Tuple[int | None, str | None]:
+_SLASH_DATE = re.compile(r"^\s*(\d{1,2})/(\d{1,2})/(\d{4})")
+
+
+def _infer_dayfirst(raw_dates: "pd.Series") -> Tuple[bool, int]:
+    """Decide day/month vs month/day for slash dates from the whole column.
+
+    One date with a first part above 12 proves day-first, a second part above 12 proves
+    month-first. Returns (dayfirst, ambiguous_count); when nothing proves it, day-first (the
+    Indian convention) is used and the ambiguous dates are counted so the report can say so.
+    """
+    first_gt12 = second_gt12 = ambiguous = 0
+    for v in raw_dates.dropna().astype(str).head(5000):
+        m = _SLASH_DATE.match(v)
+        if not m:
+            continue
+        a, b = int(m.group(1)), int(m.group(2))
+        if a > 12:
+            first_gt12 += 1
+        elif b > 12:
+            second_gt12 += 1
+        elif a != b:
+            ambiguous += 1
+    if first_gt12 and not second_gt12:
+        return True, 0
+    if second_gt12 and not first_gt12:
+        return False, 0
+    return True, ambiguous if not (first_gt12 or second_gt12) else 0
+
+
+def _derive_fiscal_period(date_str: str, dayfirst: bool = True) -> Tuple[int | None, str | None]:
     """Return (fiscal_year, fiscal_period) from a date string.
 
-    fiscal_period format: "YYYY-Qn" for quarterly or "YYYY-MM" for monthly.
-    We prefer monthly precision when available.
+    fiscal_period format is calendar "YYYY-MM". fiscal_year follows the Indian
+    April-March year, labelled by the year it ends in (Apr 2024 - Mar 2025 = 2025,
+    i.e. "FY25").
     """
     if not date_str or date_str in ("", "nan", "NaT", "None"):
         return None, None
-    for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%d/%m/%Y", "%m/%d/%Y", "%Y-%m", "%m/%Y", "%b %Y", "%B %Y"):
+
+    def _result(dt: datetime) -> Tuple[int, str]:
+        fy = dt.year + 1 if dt.month >= 4 else dt.year
+        return fy, f"{dt.year}-{dt.month:02d}"
+
+    text = str(date_str).strip()
+    # Whole-string formats first so "September 2025" is not truncated to 10 chars.
+    for fmt in ("%b %Y", "%B %Y", "%Y-%m", "%m/%Y"):
         try:
-            dt = datetime.strptime(str(date_str).strip()[:10], fmt)
-            fy = dt.year
-            fp = f"{dt.year}-{dt.month:02d}"
-            return fy, fp
+            return _result(datetime.strptime(text, fmt))
+        except ValueError:
+            continue
+    slash_formats = ("%d/%m/%Y", "%m/%d/%Y") if dayfirst else ("%m/%d/%Y", "%d/%m/%Y")
+    for fmt in ("%Y-%m-%d", "%Y/%m/%d", *slash_formats):
+        try:
+            return _result(datetime.strptime(text[:10], fmt))
         except ValueError:
             continue
     # Try pandas as fallback for exotic formats
     try:
-        dt = pd.to_datetime(date_str)
-        fy = dt.year
-        fp = f"{dt.year}-{dt.month:02d}"
-        return fy, fp
+        return _result(pd.to_datetime(date_str))
     except Exception:
         return None, None
 
@@ -700,13 +825,76 @@ def _parse_msme_flag(value: Any) -> Optional[bool]:
     return None
 
 
+# Keyed by (path, mtime_ns, size): chunked ingestion calls
+# _dataframe_to_spend_lines once per chunk, and re-hashing a multi-hundred-MB
+# file per 100k-row chunk would turn ingestion O(N²) in file size.
+_file_hash_cache: Dict[Tuple[str, int, int], str] = {}
+
+
 def _compute_file_hash(file_path: Path) -> str:
     """SHA-256 of the file bytes — used for source dedup."""
+    try:
+        stat = file_path.stat()
+        cache_key = (str(file_path), stat.st_mtime_ns, stat.st_size)
+    except OSError:
+        cache_key = None
+    if cache_key is not None and cache_key in _file_hash_cache:
+        return _file_hash_cache[cache_key]
     h = hashlib.sha256()
     with open(file_path, "rb") as fh:
         for chunk in iter(lambda: fh.read(65_536), b""):
             h.update(chunk)
-    return h.hexdigest()
+    digest = h.hexdigest()
+    if cache_key is not None:
+        _file_hash_cache.clear()  # keep at most one entry — same file repeats per chunk
+        _file_hash_cache[cache_key] = digest
+    return digest
+
+
+# ---------------------------------------------------------------------------
+# Data-quality helpers (v2.3)
+# ---------------------------------------------------------------------------
+
+_CREDIT_TOKENS: frozenset = frozenset([
+    "credit", "reversal", "refund", "rebate", "return", "adjustment",
+    "clawback", "write-back", "writeback", "contra",
+])
+
+
+def _compute_line_quality_score(
+    supplier: str,
+    description: str,
+    category_id: str,
+    gl_code: Optional[str],
+    cost_center: Optional[str],
+    spend_date: Optional[str],
+) -> float:
+    """Return 0.0–1.0: fraction of key fields populated for a spend line.
+
+    Weights: supplier 0.25 | description 0.20 | category 0.25 | gl 0.10 | cc 0.10 | date 0.10
+    """
+    score = 0.0
+    if supplier and supplier not in ("Unknown", ""):
+        score += 0.25
+    if description and description not in ("N/A", ""):
+        score += 0.20
+    if category_id and category_id.lower() not in ("uncategorized", "other", ""):
+        score += 0.25
+    if gl_code:
+        score += 0.10
+    if cost_center:
+        score += 0.10
+    if spend_date:
+        score += 0.10
+    return round(min(1.0, score), 3)
+
+
+def _is_credit_or_reversal(amount: float, description: str) -> bool:
+    """True when the line is a credit memo, reversal, or refund."""
+    if amount < 0:
+        return True
+    desc_lower = description.lower()
+    return any(token in desc_lower for token in _CREDIT_TOKENS)
 
 
 def infer_tabular_schema(file_path: Path) -> Dict[str, Any]:
@@ -929,6 +1117,97 @@ def _parse_planning_workbook(
     return out
 
 
+_AMOUNT_SCALE_WORDS = {"crore": 1e7, "crores": 1e7, "lakh": 1e5, "lakhs": 1e5, "lac": 1e5, "lacs": 1e5}
+_AMOUNT_CURRENCY_NOISE = re.compile(r"(?i)(₹|\$|€|£|\binr\b|\busd\b|\brs\.?(?=\s|\d|$))")
+_AMOUNT_BLANKS = {"", "nan", "none", "null", "nat", "-", "--", "n/a", "na"}
+
+
+def _parse_amount_text(raw: Any) -> Tuple[Optional[float], bool]:
+    """Parse one amount cell. Returns (value, is_blank).
+
+    value is None when the cell has text that cannot be read as a number.
+    Handles currency symbols, Indian/Western grouping, parenthesised and
+    trailing-minus negatives, and the words lakh/crore. Bare "Cr"/"Dr"
+    suffixes are deliberately NOT guessed (crore vs credit is ambiguous);
+    they surface as unparseable instead.
+    """
+    if raw is None:
+        return None, True
+    if isinstance(raw, (int, float)):
+        if raw != raw:  # NaN
+            return None, True
+        return float(raw), False
+    text = str(raw).strip()
+    if text.lower() in _AMOUNT_BLANKS:
+        return None, True
+    text = _AMOUNT_CURRENCY_NOISE.sub("", text).replace(",", "").replace("\u00a0", " ").strip()
+    negative = False
+    if text.startswith("(") and text.endswith(")"):
+        negative, text = True, text[1:-1].strip()
+    if text.endswith("-"):
+        negative, text = True, text[:-1].strip()
+    scale = 1.0
+    m = re.fullmatch(r"([+-]?\d*\.?\d+)\s*([A-Za-z]+)", text)
+    if m and m.group(2).lower() in _AMOUNT_SCALE_WORDS:
+        text, scale = m.group(1), _AMOUNT_SCALE_WORDS[m.group(2).lower()]
+    try:
+        value = float(text) * scale
+    except ValueError:
+        return None, False
+    return (-value if negative else value), False
+
+
+def _parse_amount_series(series: "pd.Series") -> Tuple["pd.Series", "pd.Series", "pd.Series"]:
+    """Vectorised-where-possible amount parsing.
+
+    Returns (numeric values with failures as 0.0, unparseable mask, blank mask).
+    """
+    fast = pd.to_numeric(series, errors="coerce")
+    values = fast.copy()
+    unparseable = pd.Series(False, index=series.index)
+    blank = pd.Series(False, index=series.index)
+    for idx in fast.index[fast.isna()]:
+        value, is_blank = _parse_amount_text(series.at[idx])
+        if is_blank:
+            blank.at[idx] = True
+        elif value is None:
+            unparseable.at[idx] = True
+        else:
+            values.at[idx] = value
+    return values.fillna(0.0), unparseable, blank
+
+
+# Header names each field is matched against (lower-case). Shared by matching and by the
+# exact-vs-partial classification shown to the user in the column-mapping report.
+_FIELD_CANDIDATES: Dict[str, List[str]] = {
+    "supplier": ['supplier', 'vendor', 'payee'],
+    "business_unit": ['bu', 'business unit', 'department'],
+    "geography": ['country', 'geo', 'region', 'location'],
+    "date": ['date', 'invoice date', 'month'],
+    "gl_code": ['gl code', 'gl_code', 'account', 'account code', 'gl account'],
+    "cost_center": ['cost center', 'cost_center', 'cc', 'cost centre'],
+    "currency": ['currency', 'ccy', 'curr'],
+    "fx_rate": ['fx rate', 'fx_rate', 'exchange rate'],
+    "amount_type": ['type', 'amount type', 'data type', 'scenario'],
+    "payment_terms": ['payment terms', 'payment_terms', 'terms', 'net days', 'dpo'],
+    "gst_treatment": ['gst treatment', 'gst_treatment', 'itc', 'gst type', 'tax treatment'],
+    "gstin": ['gstin', 'gst number', 'gst no', 'vendor gstin', 'supplier gstin'],
+    "lease_treatment": ['lease treatment', 'lease_treatment', 'lease type', 'ind as 116'],
+    "related_party": ['related party', 'related_party', 'intercompany', 'intra group', 'intragroup'],
+    "legal_entity": ['legal entity', 'legal_entity', 'entity', 'company code', 'co code'],
+    "source_system": ['source system', 'source_system', 'source', 'erp', 'system name'],
+    "source_record_id": ['source record id', 'source record', 'record id', 'source id', 'pk'],
+    "vendor_pan": ['vendor pan', 'pan', 'pan number', 'pan no', 'supplier pan'],
+    "msme_flag": ['msme', 'msme flag', 'vendor msme', 'sme', 'is msme'],
+    "vendor_category": ['vendor category', 'vendor_category', 'supplier category', 'vendor type'],
+    "spend_type": ['spend type', 'spend_type', 'cost type', 'opex capex', 'expenditure type'],
+}
+
+
+# Fields a user may re-map by hand (the keys of the column-mapping report).
+MAPPABLE_FIELDS = tuple(sorted({*_FIELD_CANDIDATES, "amount", "description"}))
+
+
 def _dataframe_to_spend_lines(
     frame: pd.DataFrame,
     file_path: Path,
@@ -937,6 +1216,8 @@ def _dataframe_to_spend_lines(
     reporting_currency: str = "INR",
     source_system_id: Optional[str] = None,
     row_id_start: int = 1,
+    stats: Optional[Dict[str, Any]] = None,
+    column_overrides: Optional[Dict[str, str]] = None,
 ) -> Tuple[List[NormalizedSpendLine], Optional[str]]:
     file_hash = _compute_file_hash(file_path)
 
@@ -958,7 +1239,7 @@ def _dataframe_to_spend_lines(
 
     cols = [str(c) for c in frame.columns]
     amount_col = _best_amount_column_match(cols, frame)
-    supplier_col = _best_column_match(cols, ["supplier", "vendor", "payee"], "")
+    supplier_col = _best_column_match(cols, _FIELD_CANDIDATES["supplier"], "")
     desc_col = _best_column_match(cols, ["description", "memo", "line item", "item"], "")
     amount_col, desc_col, pl_note = _apply_hierarchical_expense_column_mapping(
         cols, frame, amount_col, desc_col
@@ -987,31 +1268,82 @@ def _dataframe_to_spend_lines(
             if not mapping_note:
                 mapping_note = f"Hierarchical expense layout: line items from '{label_col}'."
     amount_currency_hint = _infer_currency_from_column_name(amount_col) if amount_col else None
-    bu_col = _best_column_match(cols, ["bu", "business unit", "department"], "")
-    geo_col = _best_column_match(cols, ["country", "geo", "region", "location"], "")
-    date_col = _best_column_match(cols, ["date", "invoice date", "month"], "")
+    bu_col = _best_column_match(cols, _FIELD_CANDIDATES["business_unit"], "")
+    geo_col = _best_column_match(cols, _FIELD_CANDIDATES["geography"], "")
+    date_col = _best_column_match(cols, _FIELD_CANDIDATES["date"], "")
     # FP&A columns
-    gl_col = _best_column_match(cols, ["gl code", "gl_code", "account", "account code", "gl account"], "")
-    cc_col = _best_column_match(cols, ["cost center", "cost_center", "cc", "cost centre"], "")
-    currency_col = _best_column_match(cols, ["currency", "ccy", "curr"], "")
-    fx_col = _best_column_match(cols, ["fx rate", "fx_rate", "exchange rate"], "")
-    type_col = _best_column_match(cols, ["type", "amount type", "data type", "scenario"], "")
-    terms_col = _best_column_match(cols, ["payment terms", "payment_terms", "terms", "net days", "dpo"], "")
+    gl_col = _best_column_match(cols, _FIELD_CANDIDATES["gl_code"], "")
+    cc_col = _best_column_match(cols, _FIELD_CANDIDATES["cost_center"], "")
+    currency_col = _best_column_match(cols, _FIELD_CANDIDATES["currency"], "")
+    fx_col = _best_column_match(cols, _FIELD_CANDIDATES["fx_rate"], "")
+    type_col = _best_column_match(cols, _FIELD_CANDIDATES["amount_type"], "")
+    terms_col = _best_column_match(cols, _FIELD_CANDIDATES["payment_terms"], "")
     # India columns (v2.0)
-    gst_col = _best_column_match(cols, ["gst treatment", "gst_treatment", "itc", "gst type", "tax treatment"], "")
-    gstin_col = _best_column_match(cols, ["gstin", "gst number", "gst no", "vendor gstin", "supplier gstin"], "")
-    lease_col = _best_column_match(cols, ["lease treatment", "lease_treatment", "lease type", "ind as 116"], "")
-    rp_col = _best_column_match(cols, ["related party", "related_party", "intercompany", "intra group", "intragroup"], "")
-    entity_col = _best_column_match(cols, ["legal entity", "legal_entity", "entity", "company code", "co code"], "")
+    gst_col = _best_column_match(cols, _FIELD_CANDIDATES["gst_treatment"], "")
+    gstin_col = _best_column_match(cols, _FIELD_CANDIDATES["gstin"], "")
+    lease_col = _best_column_match(cols, _FIELD_CANDIDATES["lease_treatment"], "")
+    rp_col = _best_column_match(cols, _FIELD_CANDIDATES["related_party"], "")
+    entity_col = _best_column_match(cols, _FIELD_CANDIDATES["legal_entity"], "")
     # Source lineage columns (v2.2)
-    src_sys_col = _best_column_match(cols, ["source system", "source_system", "source", "erp", "system name"], "")
-    src_rec_col = _best_column_match(cols, ["source record id", "source record", "record id", "source id", "pk"], "")
+    src_sys_col = _best_column_match(cols, _FIELD_CANDIDATES["source_system"], "")
+    src_rec_col = _best_column_match(cols, _FIELD_CANDIDATES["source_record_id"], "")
     # Vendor master columns (v2.2)
-    pan_col = _best_column_match(cols, ["vendor pan", "pan", "pan number", "pan no", "supplier pan"], "")
-    msme_col = _best_column_match(cols, ["msme", "msme flag", "vendor msme", "sme", "is msme"], "")
-    vcat_col = _best_column_match(cols, ["vendor category", "vendor_category", "supplier category", "vendor type"], "")
+    pan_col = _best_column_match(cols, _FIELD_CANDIDATES["vendor_pan"], "")
+    msme_col = _best_column_match(cols, _FIELD_CANDIDATES["msme_flag"], "")
+    vcat_col = _best_column_match(cols, _FIELD_CANDIDATES["vendor_category"], "")
     # Spend classification column (v2.2)
-    stype_col = _best_column_match(cols, ["spend type", "spend_type", "cost type", "opex capex", "expenditure type"], "")
+    stype_col = _best_column_match(cols, _FIELD_CANDIDATES["spend_type"], "")
+
+    # Let the user correct any automatic guess (field -> column name, or "" to ignore the field),
+    # then record the final mapping so the report can show how each column was matched.
+    _auto = {
+        "amount": amount_col, "supplier": supplier_col, "description": desc_col,
+        "business_unit": bu_col, "geography": geo_col, "date": date_col, "gl_code": gl_col,
+        "cost_center": cc_col, "currency": currency_col, "fx_rate": fx_col, "amount_type": type_col,
+        "payment_terms": terms_col, "gst_treatment": gst_col, "gstin": gstin_col,
+        "lease_treatment": lease_col, "related_party": rp_col, "legal_entity": entity_col,
+        "source_system": src_sys_col, "source_record_id": src_rec_col, "vendor_pan": pan_col,
+        "msme_flag": msme_col, "vendor_category": vcat_col, "spend_type": stype_col,
+    }
+    _resolved = dict(_auto)
+    _manual: set[str] = set()
+    for _field, _target in (column_overrides or {}).items():
+        if _field in _resolved and (_target == "" or _target in cols):
+            _resolved[_field] = _target
+            _manual.add(_field)
+    amount_col, supplier_col, desc_col = _resolved["amount"], _resolved["supplier"], _resolved["description"]
+    bu_col, geo_col, date_col, gl_col = (
+        _resolved["business_unit"], _resolved["geography"], _resolved["date"], _resolved["gl_code"]
+    )
+    cc_col, currency_col, fx_col, type_col = (
+        _resolved["cost_center"], _resolved["currency"], _resolved["fx_rate"], _resolved["amount_type"]
+    )
+    terms_col, gst_col, gstin_col, lease_col = (
+        _resolved["payment_terms"], _resolved["gst_treatment"], _resolved["gstin"], _resolved["lease_treatment"]
+    )
+    rp_col, entity_col, src_sys_col, src_rec_col = (
+        _resolved["related_party"], _resolved["legal_entity"], _resolved["source_system"], _resolved["source_record_id"]
+    )
+    pan_col, msme_col, vcat_col, stype_col = (
+        _resolved["vendor_pan"], _resolved["msme_flag"], _resolved["vendor_category"], _resolved["spend_type"]
+    )
+    amount_currency_hint = _infer_currency_from_column_name(amount_col) if amount_col else None
+    if stats is not None and "_column_mapping" not in stats:
+        mapping: Dict[str, Dict[str, str]] = {}
+        for _field, _col_name in _resolved.items():
+            if not _col_name:
+                continue
+            if _field in _manual:
+                kind = "manual"
+            elif _field in ("amount", "description"):
+                kind = "inferred"
+            else:
+                kind = "exact" if _col_name.lower().strip() in _FIELD_CANDIDATES.get(_field, []) else "partial"
+            mapping[_field] = {"column": _col_name, "match": kind}
+        used = {m["column"] for m in mapping.values()}
+        stats["_column_mapping"] = mapping
+        stats["_available_columns"] = cols
+        stats["_unmapped_columns"] = [c for c in cols if c not in used]
 
     def _col(name: str, fill: str = "") -> "pd.Series":
         return frame[name].fillna(fill) if name else pd.Series([""] * len(frame))
@@ -1044,9 +1376,21 @@ def _dataframe_to_spend_lines(
 
     # --- Vectorized pre-computation (avoids per-row Python overhead on hot paths) ---
     # Amount: pandas coerce-to-numeric is ~10x faster than per-row float() in a loop.
-    _amount_numeric = pd.to_numeric(
-        amount_s.astype(str).str.replace(",", "", regex=False), errors="coerce"
-    ).fillna(0.0)
+    _amount_numeric, _amount_unparseable, _amount_blank = _parse_amount_series(
+        amount_s.reset_index(drop=True)
+    )
+    if stats is not None:
+        stats["_rows_input"] = stats.get("_rows_input", 0) + len(frame)
+        stats["_rows_unparseable"] = stats.get("_rows_unparseable", 0) + int(_amount_unparseable.sum())
+        stats["_rows_blank"] = stats.get("_rows_blank", 0) + int(_amount_blank.sum())
+        samples = stats.setdefault("_unparseable_samples", [])
+        if len(samples) < 5 and _amount_unparseable.any():
+            for raw in amount_s.reset_index(drop=True)[_amount_unparseable].head(5 - len(samples)):
+                samples.append(str(raw)[:40])
+
+    _dayfirst, _ambiguous_dates = _infer_dayfirst(date_s) if date_col else (True, 0)
+    if stats is not None and _ambiguous_dates:
+        stats["_ambiguous_dates"] = stats.get("_ambiguous_dates", 0) + _ambiguous_dates
 
     out: List[NormalizedSpendLine] = []
     for i in range(len(frame)):
@@ -1078,11 +1422,14 @@ def _dataframe_to_spend_lines(
         else:
             category_id, category_name = _classify(description, supplier, taxonomy)
 
-        fiscal_year, fiscal_period = _derive_fiscal_period(date_raw)
+        fiscal_year, fiscal_period = _derive_fiscal_period(date_raw, _dayfirst)
 
         # Compute reporting amount (apply FX only when currency differs)
         if currency.upper() != reporting_currency.upper():
             amount_reporting = amount * fx_rate
+            if fx_rate == 1.0 and stats is not None:
+                # A foreign-currency line at 1:1 almost always means the rate was missing.
+                stats["_fx_defaulted_rows"] = stats.get("_fx_defaulted_rows", 0) + 1
         else:
             amount_reporting = amount
 
@@ -1109,6 +1456,16 @@ def _dataframe_to_spend_lines(
             spend_type = _classify_spend_type(description, supplier, gl_code, related_party_flag, lease_treatment)
         is_addressable = _compute_addressable(spend_type, related_party_flag)
         is_intercompany = True if related_party_flag or spend_type == "intercompany" else None
+
+        line_quality = _compute_line_quality_score(
+            supplier or "Unknown",
+            description or "N/A",
+            category_id,
+            gl_code,
+            cost_center,
+            date_raw,
+        )
+        credit_flag = _is_credit_or_reversal(amount, description or "")
 
         out.append(
             NormalizedSpendLine(
@@ -1148,6 +1505,9 @@ def _dataframe_to_spend_lines(
                 # Classification
                 spend_type=cast(Literal["opex", "capex", "lease", "statutory", "intercompany"], spend_type),
                 is_addressable=is_addressable,
+                # Data quality (v2.3)
+                data_quality_score=line_quality,
+                is_credit_or_reversal=credit_flag,
             )
         )
     return out, mapping_note
@@ -1161,21 +1521,86 @@ def _enrich_ingestion_report(
     """Attach spend-quality flags so the UI can warn on zero-total ingests."""
     total_amount = sum(float(line.amount) for line in lines)
     rows_with_amount = sum(1 for line in lines if float(line.amount) != 0.0)
+    credit_count = sum(1 for line in lines if line.is_credit_or_reversal)
+    avg_quality = (
+        round(sum(line.data_quality_score for line in lines) / len(lines), 3)
+        if lines else 0.0
+    )
     quality: Dict[str, Any] = {
         "rows_parsed": len(lines),
         "rows_with_amount": rows_with_amount,
         "total_amount": round(total_amount, 2),
         "zero_spend_warning": total_amount == 0.0
         and (len(lines) > 0 or int(report.pop("_empty_parse_rows", 0) or 0) > 0),
+        "avg_line_quality_score": avg_quality,
+        "credit_or_reversal_count": credit_count,
+        "data_quality_note": (
+            "Low field-coverage detected — confidence bands will be widened."
+            if avg_quality < 0.60 else None
+        ),
     }
     if mapping_note:
         quality["column_mapping_note"] = mapping_note
-    report["quality"] = quality
+    rows_input = int(report.pop("_rows_input", 0) or 0)
+    rows_unparseable = int(report.pop("_rows_unparseable", 0) or 0)
+    rows_blank = int(report.pop("_rows_blank", 0) or 0)
+    samples = report.pop("_unparseable_samples", [])
+    fx_defaulted = int(report.pop("_fx_defaulted_rows", 0) or 0)
+    ambiguous_dates = int(report.pop("_ambiguous_dates", 0) or 0)
+    column_mapping = report.pop("_column_mapping", None)
+    available_columns = report.pop("_available_columns", None)
+    unmapped_columns = report.pop("_unmapped_columns", None)
+    warnings: List[str] = []
+    if column_mapping:
+        quality["column_mapping"] = column_mapping
+        quality["available_columns"] = available_columns or []
+        quality["unmapped_columns"] = unmapped_columns or []
+        weak = [
+            f"{info['column']!r} → {field.replace('_', ' ')}"
+            for field, info in column_mapping.items()
+            if info["match"] == "partial" and field in ("supplier", "date", "cost_center", "gl_code", "currency")
+        ]
+        if weak:
+            warnings.append(
+                "Some columns were matched by partial name — confirm them under Documents → Column mapping: "
+                + "; ".join(weak[:4])
+                + "."
+            )
+    if rows_input:
+        quality["rows_input"] = rows_input
+        quality["rows_dropped"] = max(rows_input - len(lines), 0)
+        quality["rows_dropped_unparseable_amount"] = rows_unparseable
+        quality["rows_dropped_blank_amount"] = rows_blank
+        quality["rows_dropped_zero_amount"] = max(
+            quality["rows_dropped"] - rows_unparseable - rows_blank, 0
+        )
+    if ambiguous_dates:
+        quality["ambiguous_dates"] = ambiguous_dates
+        warnings.append(
+            f"{ambiguous_dates:,} dates such as 03/04/2025 could be day/month or month/day and nothing in "
+            "the file settles it; they were read as day/month (Indian convention). Check the fiscal periods."
+        )
+    if fx_defaulted:
+        quality["rows_fx_defaulted"] = fx_defaulted
+        warnings.append(
+            f"{fx_defaulted:,} rows are in a currency other than the reporting currency but have no usable "
+            "FX rate; they were converted 1:1. Add an FX-rate column or correct the currency."
+        )
+    if rows_unparseable:
+        quality["unparseable_amount_samples"] = samples
+        warnings.append(
+            f"{rows_unparseable:,} of {rows_input:,} rows were dropped because the amount "
+            f"could not be read as a number (e.g. {', '.join(repr(x) for x in samples)}). "
+            "Totals exclude these rows."
+        )
     if quality["zero_spend_warning"]:
-        report["warnings"] = [
+        warnings.append(
             "Rows were read from the file but all parsed amounts are zero. "
             "Check that amount columns contain numbers (not only line-item labels)."
-        ]
+        )
+    report["quality"] = quality
+    if warnings:
+        report["warnings"] = warnings
     return report
 
 
@@ -1216,6 +1641,7 @@ def parse_spend_file_with_report(
     reporting_currency: str = "INR",
     workbook_manifest: Dict[str, Any] | None = None,
     source_system_id: Optional[str] = None,
+    column_overrides: Optional[Dict[str, str]] = None,
 ) -> Tuple[List[NormalizedSpendLine], Dict[str, Any]]:
     """Parse spend file and return normalized lines plus ingestion diagnostics."""
     report: Dict[str, Any] = {
@@ -1269,7 +1695,9 @@ def parse_spend_file_with_report(
         n_rows = len(frame)
         if n_rows > _ROW_MAX:
             raise ValueError(
-                f"{file_path.name} sheet '{sheet_name}' has {n_rows:,} rows (limit: {_ROW_MAX:,})."
+                f"{file_path.name} sheet '{sheet_name}' has {n_rows:,} rows "
+                f"(in-memory limit: {_ROW_MAX:,}). Export the sheet to CSV — "
+                f"CSVs up to {_ROW_ABSOLUTE_MAX:,} rows are ingested via streaming."
             )
         sid = source_system_id or sheet_name
         lines, mapping_note = _dataframe_to_spend_lines(
@@ -1280,6 +1708,8 @@ def parse_spend_file_with_report(
             reporting_currency=reporting_currency,
             source_system_id=sid,
             row_id_start=len(all_lines) + 1,
+            stats=report,
+            column_overrides=column_overrides,
         )
         if mapping_note:
             mapping_notes.append(mapping_note)
@@ -1324,8 +1754,10 @@ def parse_spend_file_with_report(
         n_rows = len(frame)
         if n_rows > _ROW_MAX:
             raise ValueError(
-                f"{file_path.name} has {n_rows:,} rows (limit: {_ROW_MAX:,}). "
-                "Split by entity or fiscal year and upload each part separately."
+                f"{file_path.name} has {n_rows:,} rows (in-memory limit: {_ROW_MAX:,}). "
+                "Large CSVs are normally streamed automatically — this fallback "
+                "requires the duckdb/pyarrow spend store. Install those, or split "
+                "the file by entity or fiscal year."
             )
         lines, mapping_note = _dataframe_to_spend_lines(
             frame,
@@ -1334,6 +1766,8 @@ def parse_spend_file_with_report(
             default_amount_type=default_amount_type,
             reporting_currency=reporting_currency,
             source_system_id=source_system_id,
+            stats=report,
+            column_overrides=column_overrides,
         )
         if mapping_note:
             mapping_notes.append(mapping_note)
@@ -1373,6 +1807,55 @@ def parse_spend_file(
     return lines
 
 
+def estimate_csv_rows(file_path: Path) -> int:
+    """Fast newline count (minus header) — decides in-memory vs streamed path."""
+    count = 0
+    with open(file_path, "rb") as fh:
+        for block in iter(lambda: fh.read(1 << 20), b""):
+            count += block.count(b"\n")
+    return max(count - 1, 0)
+
+
+def iter_spend_csv_chunks(
+    file_path: Path,
+    taxonomy: Dict,
+    *,
+    default_amount_type: str = "actual",
+    reporting_currency: str = "INR",
+    source_system_id: Optional[str] = None,
+    chunk_rows: Optional[int] = None,
+):
+    """Yield List[NormalizedSpendLine] per CSV chunk without materializing the file.
+
+    The column-mapping heuristics run per chunk over an identical column set,
+    so the mapping is stable for homogeneous files; row_ids stay contiguous
+    across chunks. Cumulative rows are capped at _ROW_ABSOLUTE_MAX.
+    """
+    chunk_rows = chunk_rows or _STREAM_CHUNK_ROWS  # resolved at call time
+    total_rows = 0
+    row_start = 1
+    for frame in pd.read_csv(
+        file_path, chunksize=chunk_rows, encoding_errors="replace", **_csv_read_kwargs(file_path)
+    ):
+        total_rows += len(frame)
+        if total_rows > _ROW_ABSOLUTE_MAX:
+            raise ValueError(
+                f"{file_path.name} exceeds {_ROW_ABSOLUTE_MAX:,} rows. "
+                "Split by entity or fiscal year and upload each part separately."
+            )
+        lines, _note = _dataframe_to_spend_lines(
+            frame,
+            file_path,
+            taxonomy,
+            default_amount_type=default_amount_type,
+            reporting_currency=reporting_currency,
+            source_system_id=source_system_id,
+            row_id_start=row_start,
+        )
+        row_start += len(lines)
+        yield lines
+
+
 def _load_json_records(file_path: Path) -> List[Dict[str, Any]]:
     raw = json.loads(file_path.read_text(encoding="utf-8"))
     if isinstance(raw, list):
@@ -1393,11 +1876,13 @@ def parse_spend_json_with_report(
     default_amount_type: str = "actual",
     reporting_currency: str = "INR",
     source_system_id: Optional[str] = None,
+    column_overrides: Optional[Dict[str, str]] = None,
 ) -> Tuple[List[NormalizedSpendLine], Dict[str, Any]]:
     records = _load_json_records(file_path)
     if not records:
         raise ValueError(f"{file_path.name}: no spend records found in JSON")
     frame = pd.DataFrame(records)
+    report: Dict[str, Any] = {"source_file": file_path.name, "format": "json"}
     lines, note = _dataframe_to_spend_lines(
         frame,
         file_path,
@@ -1405,14 +1890,16 @@ def parse_spend_json_with_report(
         default_amount_type=default_amount_type,
         reporting_currency=reporting_currency,
         source_system_id=source_system_id,
+        stats=report,
+        column_overrides=column_overrides,
     )
-    report: Dict[str, Any] = {
-        "source_file": file_path.name,
-        "format": "json",
-        "rows_parsed": len(lines),
-        "column_mapping_note": note,
-        "_empty_parse_rows": len(frame) - len(lines),
-    }
+    report.update(
+        {
+            "rows_parsed": len(lines),
+            "column_mapping_note": note,
+            "_empty_parse_rows": len(frame) - len(lines),
+        }
+    )
     return lines, _enrich_ingestion_report(report, lines, note)
 
 
@@ -1495,7 +1982,7 @@ def parse_document(file_path: Path, ocr_lang: str = "eng") -> str:
     Falls back to text extraction (no OCR) when pytesseract is not installed.
     """
     suffix = file_path.suffix.lower()
-    if suffix == ".txt":
+    if suffix in (".txt", ".md"):
         return file_path.read_text(encoding="utf-8", errors="ignore")
     if suffix == ".docx":
         doc = Document(file_path)
@@ -1517,7 +2004,7 @@ def parse_document(file_path: Path, ocr_lang: str = "eng") -> str:
         return ""
     if suffix in (".csv", ".xlsx", ".xls"):
         if suffix == ".csv":
-            frame = pd.read_csv(file_path)
+            frame = pd.read_csv(file_path, **_csv_read_kwargs(file_path))
         else:
             frame = pd.read_excel(file_path)
         return frame.head(10).to_csv(index=False)

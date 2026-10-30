@@ -1,0 +1,64 @@
+{
+  "scenario_id": "P01",
+  "description": "Portfolio-wide benchmark gap question should yield multiple category_insight blocks, not one prose blob.",
+  "observe_context": {
+    "user_message": "Which categories have the largest peer benchmark gaps?",
+    "intent_class": "value_bridge"
+  },
+  "expected_min_category_blocks": 2,
+  "validated": {
+    "spend-profiler": {
+      "total_spend": 8500000,
+      "category_profile": [
+        {
+          "category_id": "IT",
+          "category_name": "IT & Technology",
+          "spend": 3200000,
+          "spend_pct": 2.8,
+          "addressable_spend": 640000,
+          "hhi": 0.31,
+          "top_suppliers": [
+            {"supplier": "Infosys", "spend": 1400000, "share_of_category": 0.44},
+            {"supplier": "TCS", "spend": 900000, "share_of_category": 0.28}
+          ]
+        },
+        {
+          "category_id": "FAC",
+          "category_name": "Facilities",
+          "spend": 1800000,
+          "spend_pct": 1.6,
+          "addressable_spend": 270000,
+          "hhi": 0.18,
+          "top_suppliers": [
+            {"supplier": "CBRE", "spend": 1100000, "share_of_category": 0.61}
+          ]
+        },
+        {
+          "category_id": "TRAVEL",
+          "category_name": "Travel",
+          "spend": 950000,
+          "spend_pct": 0.8,
+          "addressable_spend": 190000,
+          "hhi": 0.12,
+          "top_suppliers": []
+        }
+      ]
+    },
+    "peer-benchmarker": {
+      "comparisons": [
+        {
+          "category_id": "IT",
+          "actual_pct_of_revenue": 2.8,
+          "benchmark_p50_pct": 1.9,
+          "benchmark_gap_pct": 0.9
+        },
+        {
+          "category_id": "FAC",
+          "actual_pct_of_revenue": 1.6,
+          "benchmark_p50_pct": 1.0,
+          "benchmark_gap_pct": 0.6
+        }
+      ]
+    }
+  }
+}

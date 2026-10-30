@@ -1,17 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Drawer } from '../Common/Drawer';
 import { Tabs } from '../Common/Tabs';
 import { AuditLogPanel } from '../PageComponents/CostRoom/AuditLogPanel';
 import { LogicTrace } from './LogicTrace';
 import { ProvenanceList } from './ProvenanceList';
 import { ConfidenceBadge } from './ConfidenceBadge';
-import { apiGet } from '../../hooks/useApi';
-import type {
-  AuditLogEntry,
-  ComplianceAuditResponse,
-  ProgressStep,
-  QualitySignals,
-} from '../../types';
+import { useAuditLogQuery } from '../../api/hooks/useCostRoomQueries';
+import type { AuditLogEntry, ProgressStep, QualitySignals } from '../../types';
 
 const TRUST_TABS = [
   { id: 'audit', label: 'Audit' },
@@ -44,24 +39,13 @@ export const TrustRail: React.FC<TrustRailProps> = ({
   narrativeTag,
 }) => {
   const [tab, setTab] = useState('audit');
-  const [serverAudit, setServerAudit] = useState<AuditLogEntry[]>([]);
-  const [integrity, setIntegrity] = useState<ComplianceAuditResponse['integrity'] | null>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    apiGet<ComplianceAuditResponse>('/api/v1/compliance/audit-log?limit=40')
-      .then((res) => {
-        setIntegrity(res.integrity);
-        setServerAudit(
-          res.entries.map((e) => ({
-            ts: String(e.ts ?? ''),
-            message: String(e.event ?? e.message ?? JSON.stringify(e)),
-            source: 'server' as const,
-          })),
-        );
-      })
-      .catch(() => setServerAudit([]));
-  }, [open]);
+  const auditQuery = useAuditLogQuery(40, open);
+  const integrity = auditQuery.data?.integrity ?? null;
+  const serverAudit: AuditLogEntry[] = (auditQuery.data?.entries ?? []).map((e) => ({
+    ts: String(e.ts ?? ''),
+    message: String(e.event ?? e.message ?? JSON.stringify(e)),
+    source: 'server' as const,
+  }));
 
   const merged: AuditLogEntry[] = [
     ...localAudit.map((e) => ({ ...e, source: 'local' as const })),
@@ -118,6 +102,20 @@ export const TrustRail: React.FC<TrustRailProps> = ({
                   </div>
                 )}
               </dl>
+            )}
+            {(qualitySignals?.unverified_figures?.length ?? 0) > 0 && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                <p className="font-semibold">Unverified figures in the narrative</p>
+                <p className="mt-1">
+                  These amounts match no value in the analysis outputs. They may be sums or ratios the model derived, or
+                  they may be wrong — check them before quoting.
+                </p>
+                <ul className="mt-1.5 list-disc pl-4 font-mono">
+                  {qualitySignals!.unverified_figures!.map((f) => (
+                    <li key={f}>{f}</li>
+                  ))}
+                </ul>
+              </div>
             )}
             <p className="text-xs text-brand-muted">
               Deterministic ledger data is tagged Fact; model outputs are tagged AI inference.

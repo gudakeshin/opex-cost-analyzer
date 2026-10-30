@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "description": "Golden what-if phrasing → parsed drivers/scenarios (regex fast-path, LLM mocked empty).",
+  "cases": [
+    {"id": "exec_50", "question": "What if execution drops to 50%?", "expect_drivers": {"execution_rate_pct": 0.5}},
+    {"id": "exec_75_pct", "question": "What if we run at 75% execution?", "expect_drivers": {"execution_rate_pct": 0.75}},
+    {"id": "headcount_10", "question": "What if headcount grows 10%?", "expect_drivers": {"headcount_growth_pct": 0.1}},
+    {"id": "revenue_15", "question": "What if revenue growth 15%?", "expect_drivers": {"revenue_growth_pct": 0.15}},
+    {"id": "timeline_slip", "question": "What if the timeline slips?", "expect_drivers": {"timeline_compression_factor": 1.25}},
+    {"id": "timeline_delay", "question": "What if initiatives are delayed?", "expect_drivers": {"timeline_compression_factor": 1.25}},
+    {"id": "supplier_price_8", "question": "What if supplier prices rise 8%?", "expect_drivers": {"supplier_price_inflation_pct": 0.08}},
+    {"id": "savings_drop_20", "question": "What if savings drop 20%?", "expect_scenario_fields": {"savings_pct_delta": -0.2}},
+    {"id": "savings_15_lower", "question": "What if we realize 15% lower savings?", "expect_scenario_fields": {"savings_pct_delta": -0.15}},
+    {"id": "it_category_savings", "question": "What if IT & Technology savings drop 10%?", "expect_scenario_fields": {"savings_pct_delta": -0.1, "target": "category"}},
+    {"id": "facilities_timeline", "question": "What if Facilities initiatives are delayed?", "expect_scenario_fields": {"timeline_factor": 1.5, "target": "category"}},
+    {"id": "high_bounce", "question": "What if high bounce-back risk?", "expect_scenario_fields": {"bounce_back_override": "high"}},
+    {"id": "low_bounce", "question": "What if low bounce back?", "expect_scenario_fields": {"bounce_back_override": "low"}},
+    {"id": "exec_and_slip", "question": "What if execution drops to 60% and timeline slips?", "expect_drivers": {"execution_rate_pct": 0.6, "timeline_compression_factor": 1.25}},
+    {"id": "spend_pool_rise", "question": "What if supplier prices rise 12%?", "expect_scenario_fields": {"spend_pool_delta_pct": 0.12}},
+    {"id": "timeline_factor_2", "question": "What if timeline factor 2?", "expect_scenario_fields": {"timeline_factor": 2.0}},
+    {"id": "portfolio_savings_5", "question": "What if portfolio savings fall 5%?", "expect_scenario_fields": {"savings_pct_delta": -0.05}},
+    {"id": "cat_it_exec", "question": "What if 40% execution on IT & Technology?", "expect_drivers": {"execution_rate_pct": 0.4}},
+    {"id": "revenue_and_exec", "question": "What if revenue grows 5% and execution at 80%?", "expect_drivers": {"revenue_growth_pct": 0.05, "execution_rate_pct": 0.8}},
+    {"id": "exec_25", "question": "What if 25% execution rate?", "expect_drivers": {"execution_rate_pct": 0.25}}
+  ]
+}

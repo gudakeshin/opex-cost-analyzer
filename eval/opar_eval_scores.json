@@ -1,7 +1,9 @@
 {
   "overall_score": 9.864,
   "passed": true,
-  "eval_date": "2026-06-06",
+  "eval_date": "2026-10-30",
+  "score_type": "structural",
+  "scope": "OPAR loop structural correctness: observe/plan/act/reflect wiring, intent routing coverage, skill dispatch. Does NOT validate analytical content quality.",
   "dimensions": [
     {
       "dimension_id": "OB_01",
@@ -130,6 +132,7 @@
       "evidence": {
         "skills_with_tabular": [
           "data-classifier",
+          "data-quality-gate",
           "heuristic-analyzer",
           "internal-benchmarker",
           "llm-context-builder",

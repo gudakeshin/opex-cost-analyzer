@@ -1,0 +1,65 @@
+gl_code,cost_center,vendor,description,amount,currency,fiscal_period,amount_type,business_unit,geo,legal_entity,source_system,source_record_id,gst_treatment,gstin,lease_treatment,related_party
+510010,CC-TECHNO-001,FIS Global India,FIS Global India services — Technology & Analytics Platform,158593697,INR,2023-Q2,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100001,itc_eligible,27AABCF3421G1Z8,,no
+510010,CC-TECHNO-001,FIS Global India,FIS Global India services — Technology & Analytics Platform,161765570,INR,2023-Q3,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100002,itc_eligible,27AABCF3421G1Z8,,no
+510010,CC-TECHNO-001,FIS Global India,FIS Global India services — Technology & Analytics Platform,164937444,INR,2023-Q4,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100003,itc_eligible,27AABCF3421G1Z8,,no
+510010,CC-TECHNO-001,FIS Global India,FIS Global India services — Technology & Analytics Platform,168109318,INR,2024-Q1,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100004,itc_eligible,27AABCF3421G1Z8,,no
+510010,CC-TECHNO-001,FIS Global India,FIS Global India services — Technology & Analytics Platform,171281192,INR,2024-Q2,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100005,itc_eligible,27AABCF3421G1Z8,,no
+510010,CC-TECHNO-001,FIS Global India,FIS Global India services — Technology & Analytics Platform,174453066,INR,2024-Q3,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100006,itc_eligible,27AABCF3421G1Z8,,no
+510010,CC-TECHNO-001,FIS Global India,FIS Global India services — Technology & Analytics Platform,177624940,INR,2024-Q4,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100007,itc_eligible,27AABCF3421G1Z8,,no
+510010,CC-TECHNO-001,FIS Global India,FIS Global India services — Technology & Analytics Platform,180796814,INR,2025-Q1,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100008,itc_eligible,27AABCF3421G1Z8,,no
+510010,CC-TECHNO-001,Salesforce India,Salesforce India services — Technology & Analytics Platform,275985212,INR,2023-Q2,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100009,not_applicable,,,no
+510010,CC-TECHNO-001,Salesforce India,Salesforce India services — Technology & Analytics Platform,281504916,INR,2023-Q3,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100010,not_applicable,,,no
+510010,CC-TECHNO-001,Salesforce India,Salesforce India services — Technology & Analytics Platform,287024620,INR,2023-Q4,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100011,not_applicable,,,no
+510010,CC-TECHNO-001,Salesforce India,Salesforce India services — Technology & Analytics Platform,292544324,INR,2024-Q1,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100012,not_applicable,,,no
+510010,CC-TECHNO-001,Salesforce India,Salesforce India services — Technology & Analytics Platform,298064028,INR,2024-Q2,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100013,not_applicable,,,no
+510010,CC-TECHNO-001,Salesforce India,Salesforce India services — Technology & Analytics Platform,303583733,INR,2024-Q3,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100014,not_applicable,,,no
+510010,CC-TECHNO-001,Salesforce India,Salesforce India services — Technology & Analytics Platform,309103437,INR,2024-Q4,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100015,not_applicable,,,no
+510010,CC-TECHNO-001,Salesforce India,Salesforce India services — Technology & Analytics Platform,314623141,INR,2025-Q1,actual,Technology,India,VCPL-IN,SAP,SAP-AP-100016,not_applicable,,,no
+540010,CC-COMPLI-001,KPMG India,KPMG India services — Compliance & Legal,398768199,INR,2023-Q2,actual,Compliance,India,VCPL-IN,SAP,SAP-AP-100017,itc_eligible,29AABCK3201F1Z9,,no
+540010,CC-COMPLI-001,KPMG India,KPMG India services — Compliance & Legal,406743562,INR,2023-Q3,actual,Compliance,India,VCPL-IN,SAP,SAP-AP-100018,itc_eligible,29AABCK3201F1Z9,,no
+540010,CC-COMPLI-001,KPMG India,KPMG India services — Compliance & Legal,414718926,INR,2023-Q4,actual,Compliance,India,VCPL-IN,SAP,SAP-AP-100019,itc_eligible,29AABCK3201F1Z9,,no
+540010,CC-COMPLI-001,KPMG India,KPMG India services — Compliance & Legal,422694290,INR,2024-Q1,actual,Compliance,India,VCPL-IN,SAP,SAP-AP-100020,itc_eligible,29AABCK3201F1Z9,,no
+540010,CC-COMPLI-001,KPMG India,KPMG India services — Compliance & Legal,430669654,INR,2024-Q2,actual,Compliance,India,VCPL-IN,SAP,SAP-AP-100021,itc_eligible,29AABCK3201F1Z9,,no
+540010,CC-COMPLI-001,KPMG India,KPMG India services — Compliance & Legal,438645018,INR,2024-Q3,actual,Compliance,India,VCPL-IN,SAP,SAP-AP-100022,itc_eligible,29AABCK3201F1Z9,,no
+540010,CC-COMPLI-001,KPMG India,KPMG India services — Compliance & Legal,446620382,INR,2024-Q4,actual,Compliance,India,VCPL-IN,SAP,SAP-AP-100023,itc_eligible,29AABCK3201F1Z9,,no
+540010,CC-COMPLI-001,KPMG India,KPMG India services — Compliance & Legal,454595746,INR,2025-Q1,actual,Compliance,India,VCPL-IN,SAP,SAP-AP-100024,itc_eligible,29AABCK3201F1Z9,,no
+520010,CC-DISTRI-001,DSP Group,DSP Group services — Distribution & Agency,203974154,INR,2023-Q2,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100025,itc_eligible,27AABCD8821G1Z2,,no
+520010,CC-DISTRI-001,DSP Group,DSP Group services — Distribution & Agency,208053637,INR,2023-Q3,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100026,itc_eligible,27AABCD8821G1Z2,,no
+520010,CC-DISTRI-001,DSP Group,DSP Group services — Distribution & Agency,212133120,INR,2023-Q4,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100027,itc_eligible,27AABCD8821G1Z2,,no
+520010,CC-DISTRI-001,DSP Group,DSP Group services — Distribution & Agency,216212603,INR,2024-Q1,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100028,itc_eligible,27AABCD8821G1Z2,,no
+520010,CC-DISTRI-001,DSP Group,DSP Group services — Distribution & Agency,220292086,INR,2024-Q2,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100029,itc_eligible,27AABCD8821G1Z2,,no
+520010,CC-DISTRI-001,DSP Group,DSP Group services — Distribution & Agency,224371569,INR,2024-Q3,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100030,itc_eligible,27AABCD8821G1Z2,,no
+520010,CC-DISTRI-001,DSP Group,DSP Group services — Distribution & Agency,228451052,INR,2024-Q4,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100031,itc_eligible,27AABCD8821G1Z2,,no
+520010,CC-DISTRI-001,DSP Group,DSP Group services — Distribution & Agency,232530535,INR,2025-Q1,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100032,itc_eligible,27AABCD8821G1Z2,,no
+520010,CC-DISTRI-001,NJ Wealth,NJ Wealth services — Distribution & Agency,422656554,INR,2023-Q2,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100033,itc_eligible,27AABCN4411W1Z5,,no
+520010,CC-DISTRI-001,NJ Wealth,NJ Wealth services — Distribution & Agency,431109685,INR,2023-Q3,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100034,itc_eligible,27AABCN4411W1Z5,,no
+520010,CC-DISTRI-001,NJ Wealth,NJ Wealth services — Distribution & Agency,439562816,INR,2023-Q4,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100035,itc_eligible,27AABCN4411W1Z5,,no
+520010,CC-DISTRI-001,NJ Wealth,NJ Wealth services — Distribution & Agency,448015947,INR,2024-Q1,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100036,itc_eligible,27AABCN4411W1Z5,,no
+520010,CC-DISTRI-001,NJ Wealth,NJ Wealth services — Distribution & Agency,456469078,INR,2024-Q2,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100037,itc_eligible,27AABCN4411W1Z5,,no
+520010,CC-DISTRI-001,NJ Wealth,NJ Wealth services — Distribution & Agency,464922209,INR,2024-Q3,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100038,itc_eligible,27AABCN4411W1Z5,,no
+520010,CC-DISTRI-001,NJ Wealth,NJ Wealth services — Distribution & Agency,473375340,INR,2024-Q4,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100039,itc_eligible,27AABCN4411W1Z5,,no
+520010,CC-DISTRI-001,NJ Wealth,NJ Wealth services — Distribution & Agency,481828471,INR,2025-Q1,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100040,itc_eligible,27AABCN4411W1Z5,,no
+550010,CC-MARKET-001,FCB India,FCB India services — Marketing & Branding,127303975,INR,2023-Q2,actual,Marketing,India,VCPL-IN,SAP,SAP-AP-100041,itc_eligible,27AABCF9921B1Z1,,no
+550010,CC-MARKET-001,FCB India,FCB India services — Marketing & Branding,129850054,INR,2023-Q3,actual,Marketing,India,VCPL-IN,SAP,SAP-AP-100042,itc_eligible,27AABCF9921B1Z1,,no
+550010,CC-MARKET-001,FCB India,FCB India services — Marketing & Branding,132396134,INR,2023-Q4,actual,Marketing,India,VCPL-IN,SAP,SAP-AP-100043,itc_eligible,27AABCF9921B1Z1,,no
+550010,CC-MARKET-001,FCB India,FCB India services — Marketing & Branding,134942213,INR,2024-Q1,actual,Marketing,India,VCPL-IN,SAP,SAP-AP-100044,itc_eligible,27AABCF9921B1Z1,,no
+550010,CC-MARKET-001,FCB India,FCB India services — Marketing & Branding,137488293,INR,2024-Q2,actual,Marketing,India,VCPL-IN,SAP,SAP-AP-100045,itc_eligible,27AABCF9921B1Z1,,no
+550010,CC-MARKET-001,FCB India,FCB India services — Marketing & Branding,140034372,INR,2024-Q3,actual,Marketing,India,VCPL-IN,SAP,SAP-AP-100046,itc_eligible,27AABCF9921B1Z1,,no
+550010,CC-MARKET-001,FCB India,FCB India services — Marketing & Branding,142580452,INR,2024-Q4,actual,Marketing,India,VCPL-IN,SAP,SAP-AP-100047,itc_eligible,27AABCF9921B1Z1,,no
+550010,CC-MARKET-001,FCB India,FCB India services — Marketing & Branding,145126531,INR,2025-Q1,actual,Marketing,India,VCPL-IN,SAP,SAP-AP-100048,itc_eligible,27AABCF9921B1Z1,,no
+520010,CC-DISTRI-001,AxisDirect,AxisDirect services — Distribution & Agency,284456062,INR,2023-Q2,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100049,itc_eligible,27AABCA7711D1Z4,,no
+520010,CC-DISTRI-001,AxisDirect,AxisDirect services — Distribution & Agency,290145183,INR,2023-Q3,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100050,itc_eligible,27AABCA7711D1Z4,,no
+520010,CC-DISTRI-001,AxisDirect,AxisDirect services — Distribution & Agency,295834304,INR,2023-Q4,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100051,itc_eligible,27AABCA7711D1Z4,,no
+520010,CC-DISTRI-001,AxisDirect,AxisDirect services — Distribution & Agency,301523425,INR,2024-Q1,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100052,itc_eligible,27AABCA7711D1Z4,,no
+520010,CC-DISTRI-001,AxisDirect,AxisDirect services — Distribution & Agency,307212546,INR,2024-Q2,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100053,itc_eligible,27AABCA7711D1Z4,,no
+520010,CC-DISTRI-001,AxisDirect,AxisDirect services — Distribution & Agency,312901668,INR,2024-Q3,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100054,itc_eligible,27AABCA7711D1Z4,,no
+520010,CC-DISTRI-001,AxisDirect,AxisDirect services — Distribution & Agency,318590789,INR,2024-Q4,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100055,itc_eligible,27AABCA7711D1Z4,,no
+520010,CC-DISTRI-001,AxisDirect,AxisDirect services — Distribution & Agency,324279910,INR,2025-Q1,actual,Distribution,India,VCPL-IN,SAP,SAP-AP-100056,itc_eligible,27AABCA7711D1Z4,,no
+510010,CC-TECHNO-001,S&P Global India,S&P Global India services — Technology & Analytics Platform,459164314,INR,2023-Q2,actual,Technology,India,VCPL-MU,Oracle,Oracle-AP-100057,not_applicable,,,no
+510010,CC-TECHNO-001,S&P Global India,S&P Global India services — Technology & Analytics Platform,468347600,INR,2023-Q3,actual,Technology,India,VCPL-MU,Oracle,Oracle-AP-100058,not_applicable,,,no
+510010,CC-TECHNO-001,S&P Global India,S&P Global India services — Technology & Analytics Platform,477530886,INR,2023-Q4,actual,Technology,India,VCPL-MU,Oracle,Oracle-AP-100059,not_applicable,,,no
+510010,CC-TECHNO-001,S&P Global India,S&P Global India services — Technology & Analytics Platform,486714172,INR,2024-Q1,actual,Technology,India,VCPL-MU,Oracle,Oracle-AP-100060,not_applicable,,,no
+510010,CC-TECHNO-001,S&P Global India,S&P Global India services — Technology & Analytics Platform,495897459,INR,2024-Q2,actual,Technology,India,VCPL-MU,Oracle,Oracle-AP-100061,not_applicable,,,no
+510010,CC-TECHNO-001,S&P Global India,S&P Global India services — Technology & Analytics Platform,505080745,INR,2024-Q3,actual,Technology,India,VCPL-MU,Oracle,Oracle-AP-100062,not_applicable,,,no
+510010,CC-TECHNO-001,S&P Global India,S&P Global India services — Technology & Analytics Platform,514264031,INR,2024-Q4,actual,Technology,India,VCPL-MU,Oracle,Oracle-AP-100063,not_applicable,,,no
+510010,CC-TECHNO-001,S&P Global India,S&P Global India services — Technology & Analytics Platform,523447317,INR,2025-Q1,actual,Technology,India,VCPL-MU,Oracle,Oracle-AP-100064,not_applicable,,,no

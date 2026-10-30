@@ -1,21 +1,35 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import { useGuardedNavigate } from '../hooks/useGuardedNavigate';
+import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { PageHeader } from '../components/Common/PageHeader';
 import { Card } from '../components/Common/Card';
 import { Alert } from '../components/Common/Alert';
 import { Loader } from '../components/Common/Loader';
+import { Modal } from '../components/Common/Modal';
 import { Button } from '../components/Common/Button';
 import { Input } from '../components/Common/Input';
 import { Select } from '../components/Common/Select';
 import { useSession } from '../context/SessionContext';
-import { apiDelete, apiGet, apiPost, apiUpload, getApiErrorMessage } from '../hooks/useApi';
+import { apiDelete, apiPost, apiUpload, getApiErrorMessage } from '../hooks/useApi';
+import {
+  fetchEngagementsList,
+  useEngagementDocumentsFull,
+  useEngagementsList,
+} from '../api/hooks/useEngagementQueries';
+import { engagementKeys, procurementKeys } from '../api/queryKeys';
 import { formatFileSize } from '../utils/sessionFiles';
-import { SECTOR_OPTIONS } from '../constants/sectors';
-import type { EngagementDocument, EngagementSummary } from '../types';
+import { useSectorOptions } from '../api/hooks/useBenchmarksQueries';
+import type { EngagementSummary } from '../types';
+import { useConfirm } from '../hooks/useConfirm';
+import { useDialogA11y } from '../hooks/useDialogA11y';
+import { ColumnMappingModal } from '../components/PageComponents/Documents/ColumnMappingModal';
+import type { EngagementDocument } from '../types';
 
 const ACCEPT =
-  '.csv,.xlsx,.xls,.json,.pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json';
+  '.csv,.xlsx,.xls,.json,.pdf,.docx,.txt,.md,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json';
 
 const CURRENCY_OPTIONS = [
   { value: 'INR', label: 'INR (₹)' },
@@ -36,99 +50,92 @@ function truncateId(id: string): string {
 }
 
 export const EngagementDocuments: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useGuardedNavigate();
+  const queryClient = useQueryClient();
   const {
     engagementId,
     setEngagementId,
+    setSessionId,
     ensureEngagement,
-    listEngagements,
+    deleteEngagement,
     createEngagement,
     engagement,
   } = useSession();
-  const [engagements, setEngagements] = useState<EngagementSummary[]>([]);
-  const [documents, setDocuments] = useState<EngagementDocument[]>([]);
-  const [llamaparseConfigured, setLlamaparseConfigured] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const sectorOptions = useSectorOptions();
+  const engagementsQuery = useEngagementsList();
+  const engagements = engagementsQuery.data ?? [];
+  const [engagementSearch, setEngagementSearch] = useState('');
+  const [noDocsOnly, setNoDocsOnly] = useState(false);
+  const [selectedEngagementIds, setSelectedEngagementIds] = useState<Set<string>>(new Set());
+  const [pendingDelete, setPendingDelete] = useState<EngagementSummary[]>([]);
+  const [deletingEngagement, setDeletingEngagement] = useState(false);
+  const documentsQuery = useEngagementDocumentsFull(engagementId);
+  const documents = documentsQuery.data?.documents ?? [];
+  const llamaparseConfigured = !!documentsQuery.data?.llamaparse_configured;
+  const [resolvingEngagement, setResolvingEngagement] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const uploadSectionRef = useRef<HTMLDivElement>(null);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // New engagement modal state
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [mappingDoc, setMappingDoc] = useState<EngagementDocument | null>(null);
   const [newName, setNewName] = useState('');
   const [newIndustry, setNewIndustry] = useState('manufacturing_diversified');
   const [newRevenueCr, setNewRevenueCr] = useState('5000');
   const [newCurrency, setNewCurrency] = useState('INR');
   const [creating, setCreating] = useState(false);
   const [justCreatedId, setJustCreatedId] = useState<string | null>(null);
+  // Uploads in flight and half-filled create forms are lost on navigation.
+  useUnsavedGuard('engagement-documents', uploading || (showCreateModal && newName.trim().length > 0));
+  const createDialogRef = useDialogA11y<HTMLDivElement>(showCreateModal, () => {
+    if (!creating) setShowCreateModal(false);
+  });
 
-  const loadEngagements = useCallback(async () => {
-    const list = await listEngagements();
-    setEngagements(list);
-    return list;
-  }, [listEngagements]);
-
-  const loadDocuments = useCallback(async (eid: string) => {
-    const res = await apiGet<{
-      documents: EngagementDocument[];
-      llamaparse_configured?: boolean;
-    }>(`/api/v1/engagements/${eid}/documents`);
-    setDocuments(res.documents ?? []);
-    setLlamaparseConfigured(!!res.llamaparse_configured);
-  }, []);
-
-  const refresh = useCallback(async () => {
-    setError(null);
-    try {
-      const list = await loadEngagements();
-      let eid = engagementId;
-      if (!eid && list.length > 0) {
-        eid = list[0].engagement_id;
-        setEngagementId(eid);
-      }
-      if (!eid) {
-        eid = await ensureEngagement();
-      }
-      if (eid) await loadDocuments(eid);
-    } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [engagementId, ensureEngagement, loadDocuments, loadEngagements, setEngagementId]);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  const hasPending = documents.some(
-    (d) => d.status === 'pending' || d.status === 'processing',
+  const invalidateDocuments = useCallback(
+    (eid: string) => queryClient.invalidateQueries({ queryKey: procurementKeys.engagementDocuments(eid) }),
+    [queryClient],
   );
 
-  useEffect(() => {
-    if (pollRef.current) clearInterval(pollRef.current);
-    if (!engagementId || !hasPending) return;
-    pollRef.current = setInterval(() => {
-      loadDocuments(engagementId).catch(() => undefined);
-    }, 2500);
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
-  }, [hasPending, engagementId, loadDocuments]);
+  const invalidateEngagements = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: engagementKeys.list() }),
+    [queryClient],
+  );
 
-  const handleSelectEngagement = async (eid: string) => {
+  const loading = resolvingEngagement || (!!engagementId && documentsQuery.isLoading);
+
+  // Resolve which engagement is active once the engagement list has loaded:
+  // reuse the first one if none is selected yet, otherwise create one.
+  useEffect(() => {
+    if (!engagementsQuery.isSuccess || engagementId) {
+      if (engagementId) setResolvingEngagement(false);
+      return;
+    }
+    (async () => {
+      setError(null);
+      try {
+        if (engagementsQuery.data.length > 0) {
+          setEngagementId(engagementsQuery.data[0].engagement_id);
+        } else {
+          await ensureEngagement();
+        }
+      } catch (err) {
+        setError(getApiErrorMessage(err));
+      } finally {
+        setResolvingEngagement(false);
+      }
+    })();
+  }, [engagementsQuery.isSuccess, engagementsQuery.data, engagementId, ensureEngagement, setEngagementId]);
+
+  useEffect(() => {
+    if (documentsQuery.isError) setError(getApiErrorMessage(documentsQuery.error));
+  }, [documentsQuery.isError, documentsQuery.error]);
+
+  const handleSelectEngagement = (eid: string) => {
+    setSessionId(null);
     setEngagementId(eid);
     setJustCreatedId(null);
-    setLoading(true);
-    try {
-      await loadDocuments(eid);
-    } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
   };
 
   const openCreateModal = () => {
@@ -150,8 +157,7 @@ export const EngagementDocuments: React.FC = () => {
         annual_revenue: parseFloat(newRevenueCr) * 1e7,
         currency: newCurrency,
       });
-      await loadEngagements();
-      await loadDocuments(eid);
+      await invalidateEngagements();
       setJustCreatedId(eid);
       setShowCreateModal(false);
     } catch (err) {
@@ -172,7 +178,7 @@ export const EngagementDocuments: React.FC = () => {
         fd.append('file', file);
         await apiUpload(`/api/v1/engagements/${engagementId}/documents`, fd);
       }
-      await loadDocuments(engagementId);
+      await invalidateDocuments(engagementId);
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {
@@ -181,13 +187,65 @@ export const EngagementDocuments: React.FC = () => {
     }
   };
 
+  const [confirm, confirmDialog] = useConfirm();
+
   const handleDelete = async (docId: string) => {
     if (!engagementId) return;
+    const doc = documents.find((d) => d.document_id === docId);
+    const ok = await confirm({
+      title: 'Delete document?',
+      message: `${doc?.filename ? `“${doc.filename}”` : 'This document'} will be permanently removed from the engagement. Analyses that used it will not update until you re-run them.`,
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await apiDelete(`/api/v1/engagements/${engagementId}/documents/${docId}`);
-      await loadDocuments(engagementId);
+      await invalidateDocuments(engagementId);
     } catch (err) {
       setError(getApiErrorMessage(err));
+    }
+  };
+
+  const toggleEngagementSelection = (eid: string) => {
+    setSelectedEngagementIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(eid)) next.delete(eid);
+      else next.add(eid);
+      return next;
+    });
+  };
+
+  const handleConfirmDeleteEngagement = async () => {
+    if (pendingDelete.length === 0) return;
+    setDeletingEngagement(true);
+    try {
+      const targetIds = pendingDelete.map((e) => e.engagement_id);
+      const wasActiveDeleted = !!engagementId && targetIds.includes(engagementId);
+      const failures: string[] = [];
+      for (const target of pendingDelete) {
+        try {
+          await deleteEngagement(target.engagement_id);
+        } catch (err) {
+          failures.push(`${target.company_name}: ${getApiErrorMessage(err)}`);
+        }
+      }
+      setPendingDelete([]);
+      setSelectedEngagementIds((prev) => {
+        const next = new Set(prev);
+        targetIds.forEach((id) => next.delete(id));
+        return next;
+      });
+      const list = await fetchEngagementsList(queryClient);
+      invalidateEngagements();
+      if (wasActiveDeleted) {
+        setEngagementId(list[0]?.engagement_id ?? null);
+      }
+      if (failures.length > 0) {
+        setError(`Some engagements could not be deleted — ${failures.join('; ')}`);
+      }
+    } finally {
+      setDeletingEngagement(false);
     }
   };
 
@@ -195,7 +253,7 @@ export const EngagementDocuments: React.FC = () => {
     if (!engagementId) return;
     try {
       await apiPost(`/api/v1/engagements/${engagementId}/documents/${docId}/reprocess`, {});
-      await loadDocuments(engagementId);
+      await invalidateDocuments(engagementId);
     } catch (err) {
       setError(getApiErrorMessage(err));
     }
@@ -203,16 +261,22 @@ export const EngagementDocuments: React.FC = () => {
 
   const activeEngagement = engagements.find((e) => e.engagement_id === engagementId);
   const readyDocCount = documents.filter((d) => d.status === 'ready').length;
+  const filteredEngagements = engagements.filter((e) =>
+    e.company_name.toLowerCase().includes(engagementSearch.trim().toLowerCase())
+    && (!noDocsOnly || e.document_count === 0),
+  );
+  const noDocEngagements = engagements.filter((e) => e.document_count === 0);
 
   return (
-    <MainLayout>
+    <MainLayout hideHeader title="Documents">
+      {confirmDialog}
       <PageHeader
         title="Documents"
         subtitle="Upload and manage engagement data sources — shared across all analysis sessions"
         extra={
           <Link
             to="/guidebook"
-            className="text-xs font-medium text-deloitte-green hover:underline"
+            className="text-xs font-medium text-brand-primary hover:underline"
           >
             Data guidebook
           </Link>
@@ -260,7 +324,7 @@ export const EngagementDocuments: React.FC = () => {
             </button>
             <button
               type="button"
-              className="px-3 py-1.5 rounded-lg bg-deloitte-green text-white text-xs font-medium hover:bg-[#6fa31e] transition-colors"
+              className="px-3 py-1.5 rounded-lg bg-deloitte-green text-black text-xs font-medium hover:bg-[#6fa31e] transition-colors"
               onClick={() => navigate('/diagnostic')}
             >
               Diagnostic →
@@ -278,31 +342,113 @@ export const EngagementDocuments: React.FC = () => {
           {activeEngagement && (
             <div className="mb-3 p-2.5 bg-brand-surface-muted rounded-lg border border-brand-border">
               <p className="text-xs font-semibold text-brand-ink">{activeEngagement.company_name}</p>
-              <p className="text-[10px] font-mono text-brand-muted mt-0.5">{engagementId}</p>
+              <p className="text-[11px] font-mono text-brand-muted mt-0.5">{engagementId}</p>
               {readyDocCount > 0 && (
-                <p className="text-[10px] text-emerald-700 mt-1 font-medium">
+                <p className="text-[11px] text-emerald-700 mt-1 font-medium">
                   {readyDocCount} document{readyDocCount !== 1 ? 's' : ''} ready
                 </p>
               )}
             </div>
           )}
+          {engagements.length > 0 && (
+            <>
+              <Input
+                placeholder="Search engagements…"
+                value={engagementSearch}
+                onChange={(e) => setEngagementSearch(e.target.value)}
+                className="mb-2"
+              />
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <label className="flex items-center gap-2 text-xs text-brand-muted cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={noDocsOnly}
+                    onChange={(e) => setNoDocsOnly(e.target.checked)}
+                  />
+                  Show only engagements with no documents
+                </label>
+                {noDocEngagements.length > 0 && (
+                  <button
+                    type="button"
+                    className="text-xs font-medium text-red-700 hover:underline shrink-0"
+                    onClick={() => setPendingDelete(noDocEngagements)}
+                  >
+                    Delete all with no documents ({noDocEngagements.length})
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+          {selectedEngagementIds.size > 0 && (
+            <div className="mb-2 flex items-center justify-between gap-2 px-1">
+              <span className="text-xs text-brand-muted">
+                {selectedEngagementIds.size} selected
+              </span>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  className="text-xs text-brand-muted hover:text-brand-ink hover:underline"
+                  onClick={() => setSelectedEngagementIds(new Set())}
+                >
+                  Clear
+                </button>
+                <button
+                  type="button"
+                  className="text-xs font-medium text-red-700 hover:underline"
+                  onClick={() => setPendingDelete(
+                    engagements.filter((eng) => selectedEngagementIds.has(eng.engagement_id)),
+                  )}
+                >
+                  Delete selected ({selectedEngagementIds.size})
+                </button>
+              </div>
+            </div>
+          )}
           <div className="space-y-2 max-h-64 overflow-y-auto">
-            {engagements.map((e) => (
-              <button
+            {filteredEngagements.length === 0 && engagements.length > 0 && (
+              <p className="text-xs text-brand-muted text-center py-3">
+                {noDocsOnly && !engagementSearch.trim()
+                  ? 'No engagements without documents.'
+                  : 'No engagements match your filters.'}
+              </p>
+            )}
+            {filteredEngagements.map((e) => (
+              <div
                 key={e.engagement_id}
-                type="button"
-                onClick={() => handleSelectEngagement(e.engagement_id)}
-                className={`w-full text-left px-3 py-2 rounded-lg border text-sm transition-colors ${
+                className={`w-full flex items-start gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
                   e.engagement_id === engagementId
                     ? 'border-deloitte-green bg-emerald-50/50'
                     : 'border-brand-border hover:bg-brand-surface-muted'
                 }`}
               >
-                <p className="font-medium text-brand-ink">{e.company_name}</p>
-                <p className="text-xs text-brand-muted mt-0.5">
-                  {e.document_count} docs · {e.session_count} sessions
-                </p>
-              </button>
+                <input
+                  type="checkbox"
+                  className="mt-1.5 shrink-0"
+                  checked={selectedEngagementIds.has(e.engagement_id)}
+                  onChange={() => toggleEngagementSelection(e.engagement_id)}
+                  aria-label={`Select ${e.company_name}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => handleSelectEngagement(e.engagement_id)}
+                  className="flex-1 text-left"
+                >
+                  <p className="font-medium text-brand-ink">{e.company_name}</p>
+                  <p className="text-xs text-brand-muted mt-0.5">
+                    {e.document_count} docs · {e.session_count} sessions
+                  </p>
+                </button>
+                <button
+                  type="button"
+                  className="text-xs text-red-700 hover:underline shrink-0 mt-0.5"
+                  onClick={(ev) => {
+                    ev.stopPropagation();
+                    setPendingDelete([e]);
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
             ))}
           </div>
           <Button type="button" variant="secondary" className="mt-4 w-full" onClick={openCreateModal}>
@@ -331,7 +477,7 @@ export const EngagementDocuments: React.FC = () => {
         <div ref={uploadSectionRef} className="lg:col-span-2">
           <Card title="Upload files" className="bg-white border-brand-border h-full">
             <p className="text-sm text-brand-muted mb-4">
-              Supported: CSV, Excel (.xlsx, .xls), JSON, PDF, DOCX, TXT. Tabular files feed spend
+              Supported: CSV, Excel (.xlsx, .xls), JSON, PDF, DOCX, TXT, MD. Tabular files feed spend
               analysis; documents enrich context via LlamaParse when configured.
             </p>
             <div
@@ -406,7 +552,7 @@ export const EngagementDocuments: React.FC = () => {
                     </td>
                     <td className="py-3 pr-4 align-top">
                       <span
-                        className={`text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded border ${
+                        className={`text-[11px] font-semibold uppercase px-1.5 py-0.5 rounded border ${
                           STATUS_STYLES[doc.status || 'pending'] ?? STATUS_STYLES.pending
                         }`}
                       >
@@ -421,6 +567,15 @@ export const EngagementDocuments: React.FC = () => {
                     </td>
                     <td className="py-3 align-top">
                       <div className="flex flex-wrap gap-2">
+                        {doc.role === 'spend_tabular' && doc.status === 'ready' && (
+                          <button
+                            type="button"
+                            className="text-xs text-brand-primary hover:underline"
+                            onClick={() => setMappingDoc(doc)}
+                          >
+                            Column mapping
+                          </button>
+                        )}
                         <button
                           type="button"
                           className="text-xs text-brand-muted hover:text-brand-ink"
@@ -447,15 +602,24 @@ export const EngagementDocuments: React.FC = () => {
 
       <p className="text-xs text-brand-muted mt-4">
         Open{' '}
-        <Link to="/" className="text-deloitte-green hover:underline">
+        <Link to="/" className="text-brand-primary hover:underline">
           Analysis
         </Link>{' '}
         or{' '}
-        <Link to="/diagnostic" className="text-deloitte-green hover:underline">
+        <Link to="/diagnostic" className="text-brand-primary hover:underline">
           Diagnostic
         </Link>{' '}
         — both use documents from this engagement.
       </p>
+
+      {mappingDoc && engagementId && (
+        <ColumnMappingModal
+          engagementId={engagementId}
+          document={mappingDoc}
+          onClose={() => setMappingDoc(null)}
+          onReprocessed={() => void invalidateDocuments(engagementId)}
+        />
+      )}
 
       {/* New engagement modal */}
       {showCreateModal && (
@@ -463,8 +627,15 @@ export const EngagementDocuments: React.FC = () => {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
           onClick={(e) => { if (e.target === e.currentTarget) setShowCreateModal(false); }}
         >
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
-            <h2 className="text-lg font-semibold text-brand-ink mb-1">New engagement</h2>
+          <div
+            ref={createDialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="create-engagement-title"
+            tabIndex={-1}
+            className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6 outline-none"
+          >
+            <h2 id="create-engagement-title" className="text-lg font-semibold text-brand-ink mb-1">New engagement</h2>
             <p className="text-xs text-brand-muted mb-5">
               Enter company details. You can upload documents once the engagement is created.
             </p>
@@ -480,7 +651,7 @@ export const EngagementDocuments: React.FC = () => {
                 label="Industry"
                 value={newIndustry}
                 onChange={(e) => setNewIndustry(e.target.value)}
-                options={SECTOR_OPTIONS as unknown as { value: string; label: string }[]}
+                options={sectorOptions}
               />
               <Input
                 label="Annual Revenue (₹ Cr)"
@@ -513,6 +684,41 @@ export const EngagementDocuments: React.FC = () => {
           </div>
         </div>
       )}
+
+      <Modal
+        open={pendingDelete.length > 0}
+        title={pendingDelete.length > 1 ? `Delete ${pendingDelete.length} engagements` : 'Delete engagement'}
+        onClose={() => { if (!deletingEngagement) setPendingDelete([]); }}
+        onConfirm={handleConfirmDeleteEngagement}
+        confirmLabel={
+          deletingEngagement
+            ? 'Deleting…'
+            : pendingDelete.length > 1
+              ? `Delete ${pendingDelete.length} engagements`
+              : 'Delete engagement'
+        }
+        confirmVariant="danger"
+      >
+        {pendingDelete.length > 1 ? (
+          <div className="text-sm text-brand-ink">
+            <p className="mb-2">
+              This permanently deletes the following {pendingDelete.length} engagements, along with
+              all of their documents and analysis sessions. This action cannot be undone.
+            </p>
+            <ul className="list-disc list-inside text-xs text-brand-muted max-h-32 overflow-y-auto space-y-0.5">
+              {pendingDelete.map((e) => (
+                <li key={e.engagement_id}>{e.company_name}</li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <p className="text-sm text-brand-ink">
+            This permanently deletes{' '}
+            <span className="font-semibold">{pendingDelete[0]?.company_name}</span>, along with all
+            of its documents and analysis sessions. This action cannot be undone.
+          </p>
+        )}
+      </Modal>
     </MainLayout>
   );
 };

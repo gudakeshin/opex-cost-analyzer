@@ -1,0 +1,11 @@
+supplier,description,amount,currency,category,gl_code,spend_date,business_unit,country
+SAP India,Group ERP S4HANA licences support & hosting,2250000000,INR,Corporate IT & Shared Services,510010,2024-12-01,Corporate,India
+Deloitte India,Group audit & tax advisory,920000000,INR,Legal & Professional Services,540010,2024-11-01,Corporate,India
+JLL India,HQ & regional office facility management,780000000,INR,Corporate Real Estate,530010,2025-01-15,Corporate,India
+New India Assurance,Group property & liability insurance,650000000,INR,Group Insurance & Risk,550010,2024-07-01,Corporate,India
+Aon Hewitt India,Group HR advisory & talent analytics,480000000,INR,HR & Talent Corporate,560010,2024-09-10,Corporate,India
+Salesforce India,CRM platform group-wide licences,620000000,INR,Corporate IT & Shared Services,510011,2025-01-20,Corporate,Singapore
+PricewaterhouseCoopers,IFRS/Ind AS advisory overseas entities,290000000,INR,Legal & Professional Services,540011,2024-10-15,Corporate,Singapore
+Taj Hotels,Corporate travel & entertainment group conferences,340000000,INR,Travel & Entertainment,580010,2024-06-20,Corporate,India
+Bharti Airtel,Group MPLS network India offices,280000000,INR,Corporate IT & Shared Services,510012,2025-02-10,Corporate,India
+Lemon Yellow,Group brand & communications retainer,380000000,INR,Marketing & Communications,570010,2024-08-05,Corporate,India

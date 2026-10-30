@@ -1,0 +1,40 @@
+{
+  "sector": "manufacturing_cement",
+  "version": "1.0",
+  "vintage_date": "2026-07-16",
+  "confidence_overall": "public_disclosure_directional",
+  "source_metadata": {
+    "primary_sources": [
+      {"source_name": "Indian cement company annual reports and BRSR filings FY2024-25", "url": "https://www.bseindia.com/corporates/ann.html", "publication_year": 2025, "source_type": "public_disclosure"},
+      {"source_name": "BEE PAT cement-sector material", "url": "https://beeindia.gov.in/en/programmes/perform-achieve-and-trade-pat", "publication_year": 2025, "source_type": "government_publication"},
+      {"source_name": "TERI Decarbonization Roadmap for the Indian Cement Sector", "url": "https://teriin.org/files/Decarbonisation-Roadmap-for-the-Indian-Cement-Sector.pdf", "publication_year": 2023, "source_type": "published_research"},
+      {"source_name": "IBEF Cement Industry in India", "url": "https://www.ibef.org/industry/cement-india", "publication_year": 2026, "source_type": "published_research"}
+    ],
+    "methodology": "Percentiles are directional ratios calibrated from public annual-report cost disclosures and operating KPIs for major listed Indian cement producers. Category overlaps must not be summed. Plant configuration, regional freight radius, fuel mix and clinker-versus-grinding mix materially affect comparability.",
+    "sample_size": 10
+  },
+  "benchmarks": {
+    "manufacturing_cement": {
+      "categories": {
+        "RAW_MATERIALS": {"P25": 8.0, "P50": 11.0, "P75": 14.0, "P90": 17.0, "unit": "% of revenue", "confidence": "public_disclosure_directional", "source_note": "Limestone, gypsum, fly ash, slag, corrective materials and other inputs; derived from peer material-cost disclosures."},
+        "POWER_ENERGY": {"P25": 15.0, "P50": 19.0, "P75": 23.0, "P90": 27.0, "unit": "% of revenue", "confidence": "public_disclosure", "source_note": "Power and fuel is commonly one of the two largest cement cost pools; peer annual-report calibration."},
+        "LOGISTICS": {"P25": 18.0, "P50": 22.0, "P75": 26.0, "P90": 30.0, "unit": "% of revenue", "confidence": "public_disclosure", "source_note": "Primary and secondary freight, handling and depot cost; highly dependent on lead distance and modal mix."},
+        "PLANT_MAINTENANCE": {"P25": 2.0, "P50": 3.0, "P75": 4.2, "P90": 5.5, "unit": "% of revenue", "confidence": "internal_calibration", "source_note": "Repairs, refractory, shutdown services and critical spares for asset-intensive continuous-process plants."},
+        "PACKAGING": {"P25": 2.0, "P50": 2.8, "P75": 3.6, "P90": 4.5, "unit": "% of revenue", "confidence": "public_disclosure_directional", "source_note": "PP/HDPE bags and packing operations; varies with bulk-sales share and resin prices."},
+        "CONVERSION_COST": {"P25": 7.0, "P50": 10.0, "P75": 13.0, "P90": 16.0, "unit": "% of revenue", "confidence": "internal_calibration", "source_note": "Plant labour and conversion overhead excluding raw materials, energy, freight, packing and depreciation."},
+        "limestone_correctives": {"P25": 4.0, "P50": 6.0, "P75": 8.0, "P90": 10.0, "unit": "% of revenue", "confidence": "public_disclosure_directional", "source_note": "Quarry extraction, royalty/DMF/NMET, purchased limestone, gypsum and corrective materials."},
+        "kiln_fuel": {"P25": 11.0, "P50": 15.0, "P75": 19.0, "P90": 23.0, "unit": "% of revenue", "confidence": "public_disclosure_directional", "source_note": "Coal, petcoke and conventional kiln fuel; sensitive to landed fuel price and specific heat consumption."},
+        "alternative_fuels_raw_materials": {"P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5, "unit": "% of revenue", "confidence": "internal_calibration", "source_note": "AFR sourcing, pre-processing, quality control and handling net of gate-fee economics."},
+        "clinker_conversion": {"P25": 4.0, "P50": 6.0, "P75": 8.5, "P90": 11.0, "unit": "% of revenue", "confidence": "internal_calibration", "source_note": "Kiln and mill conversion overhead excluding separately benchmarked fuel and power."},
+        "plant_power_whr": {"P25": 4.0, "P50": 6.0, "P75": 8.0, "P90": 10.5, "unit": "% of revenue", "confidence": "public_disclosure_directional", "source_note": "Purchased power, captive generation O&M and WHR operations excluding kiln fuel."},
+        "kiln_refractory_mro": {"P25": 1.3, "P50": 2.2, "P75": 3.3, "P90": 4.5, "unit": "% of revenue", "confidence": "internal_calibration", "source_note": "Refractory, shutdown contractors, mechanical/electrical MRO and critical spares."},
+        "grinding_media_additives": {"P25": 0.8, "P50": 1.4, "P75": 2.1, "P90": 3.0, "unit": "% of revenue", "confidence": "internal_calibration", "source_note": "Grinding media, grinding aids, performance enhancers and selected cement additives."},
+        "cement_packaging": {"P25": 1.8, "P50": 2.6, "P75": 3.5, "P90": 4.4, "unit": "% of revenue", "confidence": "public_disclosure_directional", "source_note": "Bag procurement, packer consumables and loading; affected by packed-versus-bulk mix."},
+        "primary_secondary_freight": {"P25": 15.0, "P50": 19.0, "P75": 23.0, "P90": 27.0, "unit": "% of revenue", "confidence": "public_disclosure", "source_note": "Road and rail freight from plant to depot/customer and secondary distribution."},
+        "rail_siding_depot": {"P25": 1.0, "P50": 1.8, "P75": 2.8, "P90": 4.0, "unit": "% of revenue", "confidence": "internal_calibration", "source_note": "Rail siding operations, terminal handling, depot rent and warehouse operations."},
+        "quality_lab_bis": {"P25": 0.2, "P50": 0.4, "P75": 0.7, "P90": 1.0, "unit": "% of revenue", "confidence": "internal_calibration", "source_note": "Physical/chemical labs, calibration, sampling and BIS licensing/testing controls."},
+        "environment_carbon": {"P25": 0.5, "P50": 0.9, "P75": 1.5, "P90": 2.3, "unit": "% of revenue", "confidence": "internal_calibration", "source_note": "Pollution-control O&M, CEMS, water, waste, carbon data and environmental compliance; excludes major capex."}
+      }
+    }
+  }
+}

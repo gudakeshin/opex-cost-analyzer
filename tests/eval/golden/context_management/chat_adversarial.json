@@ -1,0 +1,71 @@
+{
+ "history": {
+  "well_formed_turns": 44,
+  "turn_char_len": 60,
+  "tail": [
+   {
+    "kind": "valid_long",
+    "label": "t44",
+    "content_chars": 10000
+   },
+   {
+    "kind": "missing_role",
+    "label": "t45"
+   },
+   {
+    "kind": "valid",
+    "label": "t46",
+    "content_chars": 200
+   },
+   {
+    "kind": "none_content",
+    "label": "t47"
+   },
+   {
+    "kind": "valid_long",
+    "label": "t48",
+    "content_chars": 10000
+   },
+   {
+    "kind": "empty_content",
+    "label": "t49"
+   }
+  ],
+  "expected_window_labels": [
+   "t44",
+   "t46",
+   "t48"
+  ]
+ },
+ "slice_caps": {
+  "categories_in": 15,
+  "categories_max": 12,
+  "pt_opportunities_in": 9,
+  "pt_opportunities_max": 5,
+  "initiatives_in": 20,
+  "initiatives_max": 12,
+  "value_matrix_in": 20,
+  "value_matrix_max": 12,
+  "root_findings_in": 12,
+  "root_findings_max": 8,
+  "renewals_in": 12,
+  "renewals_max": 8,
+  "context_summary_chars_in": 5000,
+  "context_summary_max": 1200
+ },
+ "boundedness": {
+  "fat_chars": 200000,
+  "many_items": 500,
+  "bounded_contribution_chars": 5000,
+  "fields": [
+   "recent_turns",
+   "categories",
+   "payment_terms_opportunities",
+   "document_context",
+   "deep_research_summary",
+   "business_override_note",
+   "probe_answers",
+   "portfolio_probes"
+  ]
+ }
+}

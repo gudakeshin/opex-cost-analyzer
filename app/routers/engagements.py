@@ -1,14 +1,18 @@
 """Engagement-scoped document management API."""
-from __future__ import annotations
-
+# NOTE: no `from __future__ import annotations` here — slowapi's @limiter.limit
+# wrapper cannot resolve postponed annotations (UploadFile etc.) because
+# FastAPI evaluates them against the wrapper's __globals__, not this module's.
+import hashlib
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List
 
-from fastapi import APIRouter, BackgroundTasks, File, HTTPException, Request, UploadFile
+from fastapi import APIRouter, BackgroundTasks, File, HTTPException, Query, Request, Response, UploadFile
 from fastapi.responses import FileResponse
+from pydantic import BaseModel, Field
 
 from app.config import MAX_UPLOAD_MB, logger
+from app.ratelimit import RATE_LIMIT_UPLOAD, limiter
 from app.routers._shared import (
     engagement_lock,
     utc_now_iso,
@@ -16,22 +20,31 @@ from app.routers._shared import (
     validate_engagement_id,
 )
 from app.schemas import EngagementCreateRequest, EngagementPatchRequest
+from app.security.auth import check_owner, current_principal, visible_to_principal
 from app.services.analysis import load_taxonomy
 from app.services.compliance import append_audit_event
 from app.services.document_pipeline import (
+    _should_stream_csv,
+    load_cached_ingestion_report,
     process_engagement_document,
     validate_upload_suffix,
 )
+from app.errors import ApiError
+from app.services.ingestion import MAPPABLE_FIELDS
+from app.services.jobs import enqueue_job
 from app.services.engagements_store import (
     SUPPORTED_EXTENSIONS,
     add_document_record,
     create_engagement_manifest,
     delete_document,
+    delete_engagement,
     document_dir,
+    engagement_dir,
     ensure_engagement_exists,
     get_document_record,
     list_engagements,
-    read_engagement_manifest,
+    repair_engagement_manifest,
+    search_engagements,
     update_document_record,
     write_engagement_manifest,
 )
@@ -47,7 +60,7 @@ def _run_document_pipeline(engagement_id: str, document_id: str, currency: str) 
             taxonomy=load_taxonomy(),
             reporting_currency=currency,
         )
-        append_audit_event(f"document_parsed engagement_id={engagement_id} document_id={document_id}")
+        append_audit_event("document_parsed", engagement_id=engagement_id, data={"document_id": document_id})
         # Refresh the engagement's auto-detected company/industry recommendation
         # from everything parsed so far. Off the request path (background task);
         # the LLM contextualizer is cached by content hash inside detection.
@@ -62,32 +75,52 @@ def _run_document_pipeline(engagement_id: str, document_id: str, currency: str) 
     except Exception as exc:
         logger.warning("background document pipeline failed: %s", exc)
         append_audit_event(
-            f"document_failed engagement_id={engagement_id} document_id={document_id} error={exc}"
+            "document_failed",
+            engagement_id=engagement_id,
+            data={"document_id": document_id, "error": str(exc)},
         )
 
 
 @router.post("/api/v1/engagements")
-def create_engagement(payload: EngagementCreateRequest) -> Dict[str, Any]:
+def create_engagement(request: Request, payload: EngagementCreateRequest) -> Dict[str, Any]:
     manifest = create_engagement_manifest(
         company_name=payload.company_name,
         industry=payload.industry,
         annual_revenue=payload.annual_revenue,
         currency=payload.currency or "INR",
         headcount=payload.headcount,
+        owner=current_principal(request),
     )
-    append_audit_event(f"engagement_created engagement_id={manifest['engagement_id']}")
+    append_audit_event("engagement_created", engagement_id=manifest["engagement_id"])
     return manifest
 
 
 @router.get("/api/v1/engagements")
-def get_engagements() -> List[Dict[str, Any]]:
-    return list_engagements()
+def get_engagements(
+    request: Request,
+    response: Response,
+    q: str | None = None,
+    limit: int | None = Query(None, ge=1, le=1000, description="Max rows to return (default: all)"),
+    offset: int = Query(0, ge=0),
+) -> List[Dict[str, Any]]:
+    rows = search_engagements(q) if q else list_engagements()
+    visible = [m for m in rows if visible_to_principal(request, m.get("owner"))]
+    response.headers["X-Total-Count"] = str(len(visible))
+    return visible[offset : offset + limit] if limit else visible[offset:]
+
+
+@router.get("/api/engagements")
+def get_engagements_legacy(request: Request, response: Response, q: str | None = None) -> List[Dict[str, Any]]:
+    return get_engagements(request, response, q=q, limit=None, offset=0)
 
 
 @router.get("/api/v1/engagements/{engagement_id}")
 def get_engagement(engagement_id: str) -> Dict[str, Any]:
     validate_engagement_id(engagement_id)
-    return ensure_engagement_exists(engagement_id)
+    from app.services.engagement_detection import reconcile_detection_view
+
+    manifest = ensure_engagement_exists(engagement_id)
+    return reconcile_detection_view(manifest)
 
 
 @router.patch("/api/v1/engagements/{engagement_id}")
@@ -97,7 +130,10 @@ def patch_engagement(engagement_id: str, payload: EngagementPatchRequest) -> Dic
     if payload.company_name is not None:
         manifest["company_name"] = payload.company_name
     if payload.industry is not None:
-        manifest["industry"] = payload.industry
+        from app.services.sector_packs import normalize_industry_selection
+
+        manifest["industry"] = normalize_industry_selection(payload.industry) or payload.industry
+        manifest["industry_user_set"] = bool(manifest["industry"])
     if payload.annual_revenue is not None:
         manifest["annual_revenue"] = max(float(payload.annual_revenue), 0.0)
     if payload.currency is not None:
@@ -108,6 +144,38 @@ def patch_engagement(engagement_id: str, payload: EngagementPatchRequest) -> Dic
     manifest["updated_at"] = utc_now_iso()
     write_engagement_manifest(engagement_id, manifest)
     return manifest
+
+
+@router.delete("/api/v1/engagements/{engagement_id}")
+def remove_engagement(request: Request, engagement_id: str) -> Dict[str, Any]:
+    validate_engagement_id(engagement_id)
+    manifest = ensure_engagement_exists(engagement_id)
+    check_owner(request, manifest.get("owner"))
+    delete_engagement(engagement_id)
+    append_audit_event("engagement_deleted", engagement_id=engagement_id)
+    return {"deleted": engagement_id, "status": "removed"}
+
+
+@router.delete("/api/engagements/{engagement_id}")
+def remove_engagement_legacy(request: Request, engagement_id: str) -> Dict[str, Any]:
+    return remove_engagement(request, engagement_id)
+
+
+@router.post("/api/v1/engagements/{engagement_id}/repair-manifest")
+def repair_manifest(engagement_id: str) -> Dict[str, Any]:
+    """Rebuild manifest.json from salvageable JSON and on-disk document folders."""
+    validate_engagement_id(engagement_id)
+    if not engagement_dir(engagement_id).exists():
+        raise HTTPException(status_code=404, detail="Engagement not found")
+    manifest = repair_engagement_manifest(engagement_id)
+    append_audit_event("manifest_repaired", engagement_id=engagement_id)
+    docs = manifest.get("documents") or []
+    return {
+        "repaired": True,
+        "engagement_id": engagement_id,
+        "document_count": len(docs),
+        "manifest_status": "ok",
+    }
 
 
 @router.get("/api/v1/engagements/{engagement_id}/documents")
@@ -154,14 +222,17 @@ def download_raw_document(engagement_id: str, document_id: str) -> FileResponse:
 
 
 @router.post("/api/v1/engagements/{engagement_id}/documents")
+@limiter.limit(RATE_LIMIT_UPLOAD)
 async def upload_document(
     engagement_id: str,
     request: Request,
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
+    allow_duplicate: bool = False,
 ) -> Dict[str, Any]:
     validate_engagement_id(engagement_id)
-    ensure_engagement_exists(engagement_id)
+    manifest = ensure_engagement_exists(engagement_id)
+    currency = str(manifest.get("currency") or "INR")
     _max_bytes = MAX_UPLOAD_MB * 1024 * 1024
     cl = request.headers.get("content-length")
     if cl and int(cl) > _max_bytes:
@@ -175,33 +246,75 @@ async def upload_document(
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    content = await file.read()
-    if len(content) > _max_bytes:
-        raise HTTPException(status_code=413, detail=f"File exceeds {MAX_UPLOAD_MB} MB limit")
-
     document_id = str(uuid.uuid4())
     ddir = document_dir(engagement_id, document_id)
-    ddir.mkdir(parents=True, exist_ok=True)
     raw_path = ddir / f"raw{suffix}"
 
-    # Write file and update manifest inside the same lock so they're atomic.
-    # Also re-read the manifest inside the lock to get the current currency (P0-2, P0-3).
-    async with engagement_lock(engagement_id):
-        raw_path.write_bytes(content)
-        record = add_document_record(
-            engagement_id,
-            document_id=document_id,
-            filename=safe_filename,
-            content_type=file.content_type or "application/octet-stream",
-            size_bytes=len(content),
-            raw_path=str(raw_path),
-        )
-        fresh_manifest = read_engagement_manifest(engagement_id)
-        currency = str(fresh_manifest.get("currency") or "INR")
+    # Spool the body to disk in chunks — a 500MB CSV must never be buffered
+    # whole in memory. Size is enforced as bytes arrive.
+    tmp_path = ddir.parent / f".upload-{document_id}{suffix}"
+    tmp_path.parent.mkdir(parents=True, exist_ok=True)
+    size_bytes = 0
+    digest = hashlib.sha256()
+    try:
+        with tmp_path.open("wb") as spool:
+            while chunk := await file.read(1 << 20):
+                digest.update(chunk)
+                size_bytes += len(chunk)
+                if size_bytes > _max_bytes:
+                    raise HTTPException(
+                        status_code=413, detail=f"File exceeds {MAX_UPLOAD_MB} MB limit"
+                    )
+                spool.write(chunk)
+
+        # Register manifest + sidecar meta before writing raw bytes so orphan-folder
+        # repair cannot synthesize a duplicate upload.* row for the same document_id.
+        content_sha256 = digest.hexdigest()
+        async with engagement_lock(engagement_id):
+            if not allow_duplicate:
+                for existing in ensure_engagement_exists(engagement_id).get("documents") or []:
+                    if existing.get("content_sha256") == content_sha256:
+                        raise ApiError(
+                            409,
+                            (
+                                f"This file was already uploaded as '{existing.get('filename')}'. "
+                                "Uploading it again would double-count its spend."
+                            ),
+                            "duplicate_upload",
+                        )
+            record = add_document_record(
+                engagement_id,
+                document_id=document_id,
+                filename=safe_filename,
+                content_type=file.content_type or "application/octet-stream",
+                size_bytes=size_bytes,
+                raw_path=str(raw_path),
+                _already_locked=True,
+                content_sha256=content_sha256,
+            )
+            ddir.mkdir(parents=True, exist_ok=True)
+            tmp_path.replace(raw_path)
+    finally:
+        tmp_path.unlink(missing_ok=True)
 
     append_audit_event(
-        f"document_uploaded engagement_id={engagement_id} document_id={document_id} file={safe_filename}"
+        "document_uploaded",
+        engagement_id=engagement_id,
+        data={"document_id": document_id, "file": safe_filename},
     )
+    use_job = (
+        suffix.lower() == ".csv" and _should_stream_csv(raw_path)
+    ) or size_bytes > 100 * 1024 * 1024
+    if use_job:
+        job_id = enqueue_job(
+            "document_parse",
+            {
+                "engagement_id": engagement_id,
+                "document_id": document_id,
+                "currency": currency,
+            },
+        )
+        return {"document": record, "status": "pending", "job_id": job_id}
     background_tasks.add_task(_run_document_pipeline, engagement_id, document_id, currency)
     return {"document": record, "status": "pending"}
 
@@ -211,21 +324,105 @@ def remove_document(engagement_id: str, document_id: str) -> Dict[str, Any]:
     validate_engagement_id(engagement_id)
     validate_document_id(document_id)
     delete_document(engagement_id, document_id)
-    append_audit_event(f"document_deleted engagement_id={engagement_id} document_id={document_id}")
+    append_audit_event("document_deleted", engagement_id=engagement_id, data={"document_id": document_id})
     return {"deleted": document_id}
 
 
+@router.get("/api/v1/engagements/{engagement_id}/llm-usage")
+def get_engagement_llm_usage(engagement_id: str) -> Dict[str, Any]:
+    """Estimated LLM spend for this engagement against the optional cap (LLM_MAX_COST_USD_PER_ENGAGEMENT)."""
+    validate_engagement_id(engagement_id)
+    ensure_engagement_exists(engagement_id)
+    from app.services.llm_budget import status
+
+    return status(engagement_id)
+
+
+class GLRange(BaseModel):
+    # inclusive account-number range -> taxonomy category id (see GET /api/v1/skills taxonomy ids)
+    from_: int = Field(alias="from")
+    to: int
+    category_id: str
+
+    model_config = {"populate_by_name": True}
+
+
+class GLMappingRequest(BaseModel):
+    ranges: List[GLRange]
+
+
+@router.get("/api/v1/engagements/{engagement_id}/gl-mapping")
+def get_gl_mapping(engagement_id: str) -> Dict[str, Any]:
+    """This engagement's GL-code ranges (empty = classify by keywords only)."""
+    validate_engagement_id(engagement_id)
+    ensure_engagement_exists(engagement_id)
+    from app.services.gl_mapping import load_ranges
+
+    return {"ranges": load_ranges(engagement_id)}
+
+
+@router.put("/api/v1/engagements/{engagement_id}/gl-mapping")
+def put_gl_mapping(engagement_id: str, payload: GLMappingRequest) -> Dict[str, Any]:
+    """Set the GL-code ranges used to classify this engagement's spend.
+
+    Applies to documents parsed from now on; re-process existing documents to apply it to them.
+    """
+    validate_engagement_id(engagement_id)
+    ensure_engagement_exists(engagement_id)
+    from app.services.analysis import load_taxonomy
+    from app.services.gl_mapping import GLMappingError, save_ranges, validate_ranges
+
+    try:
+        cleaned = validate_ranges(
+            [{"from": r.from_, "to": r.to, "category_id": r.category_id} for r in payload.ranges], load_taxonomy()
+        )
+    except GLMappingError as exc:
+        raise ApiError(422, str(exc), "invalid_gl_mapping") from exc
+    save_ranges(engagement_id, cleaned)
+    return {"ranges": cleaned, "note": "Re-process documents to apply this mapping to spend already ingested."}
+
+
+class ReprocessRequest(BaseModel):
+    # field -> source column name ("" ignores the field). Omit to keep the current mapping;
+    # send {} to clear manual overrides and return to automatic matching.
+    column_overrides: Dict[str, str] | None = None
+
+
+@router.get("/api/v1/engagements/{engagement_id}/documents/{document_id}/ingestion-report")
+def get_document_ingestion_report(engagement_id: str, document_id: str) -> Dict[str, Any]:
+    """Parse-time report for a spend document: rows dropped, warnings and the column mapping."""
+    validate_engagement_id(engagement_id)
+    validate_document_id(document_id)
+    ensure_engagement_exists(engagement_id)
+    record = get_document_record(engagement_id, document_id)
+    return {
+        "document_id": document_id,
+        "filename": record.get("filename"),
+        "report": load_cached_ingestion_report(engagement_id, document_id),
+        "column_overrides": record.get("column_overrides") or {},
+    }
+
+
 @router.post("/api/v1/engagements/{engagement_id}/documents/{document_id}/reprocess")
+@limiter.limit(RATE_LIMIT_UPLOAD)
 async def reprocess_document(
+    request: Request,
     engagement_id: str,
     document_id: str,
     background_tasks: BackgroundTasks,
+    payload: ReprocessRequest | None = None,
 ) -> Dict[str, Any]:
     validate_engagement_id(engagement_id)
     validate_document_id(document_id)
     manifest = ensure_engagement_exists(engagement_id)
     get_document_record(engagement_id, document_id)
-    update_document_record(engagement_id, document_id, {"status": "pending", "error": None})
+    patch: Dict[str, Any] = {"status": "pending", "error": None}
+    if payload is not None and payload.column_overrides is not None:
+        unknown = sorted(set(payload.column_overrides) - set(MAPPABLE_FIELDS))
+        if unknown:
+            raise HTTPException(status_code=422, detail=f"Unknown field(s) to map: {', '.join(unknown)}")
+        patch["column_overrides"] = payload.column_overrides
+    update_document_record(engagement_id, document_id, patch)
     currency = str(manifest.get("currency") or "INR")
     background_tasks.add_task(_run_document_pipeline, engagement_id, document_id, currency)
     return {"document_id": document_id, "status": "pending"}

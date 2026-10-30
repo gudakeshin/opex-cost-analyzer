@@ -1,0 +1,7 @@
+legal_entity,parent_entity,business_unit,segment_revenue_inr_cr,geo
+BBRL-IN,,Food & Grocery,18900,India
+BBRL-IN,,General Merchandise,10080,India
+BBRL-IN,,Fashion & Lifestyle,7560,India
+BBRL-IN,,Electronics,4200,India
+BBRL-IN,,E-Commerce,1260,India
+BBRL-ECOMM,BBRL-IN,Food & Grocery,2835,India

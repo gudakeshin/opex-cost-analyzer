@@ -1,12 +1,13 @@
 """Reflect phase — thin orchestrator over validation, synthesis, and persistence."""
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
-from app.config import UPLOAD_DIR
 from app.memory import MemoryStore
 from app.opar.chat_synthesis import synthesize_chat_response
+from app.opar.presentation import assemble_assistant_payload
 from app.opar.visualization import build_chart_specs
+from app.services.narrative_composer import attach_citations, compose_from_context
 from app.opar.models import (
     ActResult,
     AdvisorySections,
@@ -14,6 +15,7 @@ from app.opar.models import (
     ExecutionPlan,
     ObserveContext,
     ReflectOutput,
+    SuggestedOutput,
 )
 from app.opar.reflect_persistence import (
     apply_memory_updates,
@@ -23,6 +25,7 @@ from app.opar.reflect_persistence import (
     record_advisory_provenance,
     _merge_with_session_cache,
 )
+from app.opar.figure_check import find_unverified_figures
 from app.opar.reflect_synthesis import (
     advisory_quality_ok,
     build_response_text,
@@ -48,9 +51,36 @@ from app.opar.reflect_validation import (
     _run_gate2_check,
     _run_reg_watcher,
 )
-from app.storage import read_json
 
 _memory = MemoryStore()
+
+
+def _ensure_evidence_appendix_cta(
+    suggested: List[SuggestedOutput],
+    session_id: str | None,
+    validated: Dict[str, Dict[str, Any]],
+) -> List[SuggestedOutput]:
+    if not session_id or "value-bridge-calculator" not in validated:
+        return suggested
+    if any(s.skill == "evidence-appendix" for s in suggested):
+        return suggested
+    return [
+        *suggested,
+        SuggestedOutput(
+            skill="evidence-appendix",
+            label="Evidence appendix (DOCX)",
+            endpoint=f"/api/v1/evidence-appendix/{session_id}",
+            score=0.85,
+        ),
+    ]
+
+# Reflect-phase LLM paths — not deterministic skill fallbacks.
+_SYNTHESIS_DEGRADATION_KEYS = frozenset({"llm_advisory", "chat_synthesis"})
+
+
+def _skill_degradation_reasons(degradation_reasons: Dict[str, str]) -> Dict[str, str]:
+    return {k: v for k, v in degradation_reasons.items() if k not in _SYNTHESIS_DEGRADATION_KEYS}
+
 
 # Backward-compatible re-exports for tests and callers
 _advisory_quality_ok = advisory_quality_ok
@@ -64,6 +94,8 @@ def reflect(
     thinking_enabled: bool = False,
     thinking_budget_tokens: int = 8000,
     chat_history: list[dict[str, str]] | None = None,
+    thinking_callback: Callable[[str], None] | None = None,
+    token_callback: Callable[[str], None] | None = None,
 ) -> ReflectOutput:
     """Validate outputs (3-layer), compose response, persist memory, return ReflectOutput."""
     validated: Dict[str, Dict[str, Any]] = {}
@@ -109,6 +141,7 @@ def reflect(
 
     loop_complete, next_trigger = _determine_loop_control(validated, failed, ctx, plan)
     replanner_log: List[Dict[str, Any]] = []
+    replan_output = None
     replannable_skills = {"peer-benchmarker", "root-cause-analyzer", "savings-modeler", "value-bridge-calculator"}
     replannable_intents = {"benchmark", "value_bridge", "business_case", "drill_down", "savings_plan", "sensitivity"}
     if ctx.intent_class in replannable_intents and any(t.skill_name in replannable_skills for t in plan.tasks):
@@ -116,13 +149,16 @@ def reflect(
             from app.opar.plan import replan
 
             _new_plan, replanner_log = replan(ctx, validated, plan)
-            if replanner_log and not next_trigger:
-                next_trigger = "Additional analysis steps are available based on reflect-gate quality checks."
+            if replanner_log:
+                replan_output = _new_plan
+                if not next_trigger:
+                    next_trigger = "Additional analysis steps are available based on reflect-gate quality checks."
         except Exception:
             replanner_log = []
 
-    manifest_path = UPLOAD_DIR / ctx.session_id / "manifest.json"
-    manifest = read_json(manifest_path, {}) if manifest_path.exists() else {}
+    from app.routers._shared import read_manifest
+
+    manifest = read_manifest(ctx.session_id, {})
 
     early_analysis = _memory.get("session", ctx.session_id)
     reporting_currency = str(
@@ -136,6 +172,7 @@ def reflect(
     response_metadata: Dict[str, Any] = {}
     qa_used_llm = False
     advisory_sections: AdvisorySections | None = None
+    presentation = None
     thinking_text: str | None = None
 
     if is_qa_lookup(ctx, validated, composition_validated):
@@ -146,36 +183,98 @@ def reflect(
             chat_history=chat_history,
             currency=reporting_currency,
             thinking_enabled=thinking_enabled,
+            thinking_callback=thinking_callback,
+            token_callback=token_callback,
         )
         response = synthesis.response_text
         response_metadata = synthesis.response_metadata
         qa_used_llm = synthesis.used_llm
+        if getattr(synthesis, "presentation", None):
+            presentation = synthesis.presentation
+        if not qa_used_llm:
+            degradation_reasons = {**degradation_reasons, "chat_synthesis": "provider_failed"}
         if synthesis.thinking_text:
             thinking_text = synthesis.thinking_text
     else:
-        if needs_llm_advisory(ctx, composition_validated, category_focused=category_focused):
-            advisory_sections, thinking_text = generate_llm_advisory_sections(
+        advisory_was_needed = needs_llm_advisory(ctx, composition_validated, category_focused=category_focused)
+        advisory_skip_reason: str | None = None
+        if advisory_was_needed:
+            advisory_sections, thinking_text, advisory_skip_reason = generate_llm_advisory_sections(
                 ctx,
                 manifest,
                 composition_validated,
                 thinking_enabled=thinking_enabled,
                 thinking_budget_tokens=thinking_budget_tokens,
                 category_focused=category_focused,
+                thinking_callback=thinking_callback,
+                agent_path=getattr(plan, "source", "planner") == "agent",
             )
+            if advisory_skip_reason:
+                degradation_reasons = {
+                    **degradation_reasons,
+                    "llm_advisory": advisory_skip_reason,
+                }
         if advisory_sections is not None:
-            response = compose_response_from_advisory(
+            advisory_sections = attach_citations(
                 advisory_sections,
                 composition_validated,
-                include_executive_takeaway=bool(ctx.wants_executive_narrative),
-                include_business_case_metrics=bool(ctx.intent_class == "business_case"),
-                category_focused=category_focused,
+                currency=reporting_currency,
             )
+            response_metadata = {**response_metadata, "narrative_mode": "llm"}
+            presentation = assemble_assistant_payload(
+                advisory_sections, composition_validated, ctx
+            )
+            response = presentation.narrative_markdown
+            if not response.strip():
+                response = compose_response_from_advisory(
+                    advisory_sections,
+                    composition_validated,
+                    include_executive_takeaway=bool(ctx.wants_executive_narrative),
+                    include_business_case_metrics=bool(ctx.intent_class == "business_case"),
+                    category_focused=category_focused,
+                )
+            elif not presentation.blocks:
+                bands_only = compose_response_from_advisory(
+                    advisory_sections,
+                    composition_validated,
+                    include_executive_takeaway=bool(ctx.wants_executive_narrative),
+                    include_business_case_metrics=bool(ctx.intent_class == "business_case"),
+                    category_focused=category_focused,
+                )
+                if bands_only and bands_only != response:
+                    response = f"{response}\n\n{bands_only}".strip()
+        elif advisory_was_needed:
+            advisory_sections = compose_from_context(ctx, composition_validated, manifest)
+            advisory_sections = attach_citations(
+                advisory_sections,
+                composition_validated,
+                currency=reporting_currency,
+            )
+            response_metadata = {**response_metadata, "narrative_mode": "deterministic"}
+            presentation = assemble_assistant_payload(
+                advisory_sections, composition_validated, ctx
+            )
+            response = presentation.narrative_markdown
+            if not response.strip():
+                response = compose_response_from_advisory(
+                    advisory_sections,
+                    composition_validated,
+                    include_executive_takeaway=bool(ctx.wants_executive_narrative),
+                    include_business_case_metrics=bool(ctx.intent_class == "business_case"),
+                    category_focused=category_focused,
+                )
         else:
             response = build_response_text(composition_validated, failed, plan, ctx)
 
     quality_signals = _compute_quality_signals(validated, failed, ctx, degradation_reasons=degradation_reasons)
     grounding_coverage = _compute_grounding_coverage(response, validated)
     quality_signals["grounding_coverage"] = grounding_coverage
+    try:
+        unverified = find_unverified_figures(response, validated)
+    except Exception:  # never let an informational check break the response
+        unverified = []
+    if unverified:
+        quality_signals["unverified_figures"] = unverified
     if grounding_coverage < 0.2 and validated:
         recs = recommendation_rows(validated, max_items=2)
         if recs:
@@ -186,18 +285,19 @@ def reflect(
                 )
             response = (response + "\n" + "\n".join(evidence_lines)).strip()
 
-    persist_session_analysis(
+    gate2_blocked, gate2_narrative = _run_gate2_check(validated, ctx)
+    forced_reg_decision, reg_events, _reg_prompt = _run_reg_watcher(validated, ctx, manifest=manifest)
+
+    run_delta = persist_session_analysis(
         ctx=ctx,
         act_result=act_result,
         validated=validated,
         manifest=manifest,
         reporting_currency=reporting_currency,
         advisory_sections=advisory_sections,
+        regulatory_events=reg_events,
     )
     persist_conflict_manifest(ctx.session_id, validated)
-
-    gate2_blocked, gate2_narrative = _run_gate2_check(validated, ctx)
-    forced_reg_decision, reg_events, _reg_prompt = _run_reg_watcher(validated, ctx)
     artefacts, next_options = build_next_options(
         ctx,
         validated,
@@ -205,7 +305,12 @@ def reflect(
         gate2_blocked=gate2_blocked,
         forced_reg_decision=forced_reg_decision,
     )
-    provenance_tag = record_advisory_provenance(ctx, validated, advisory_sections)
+    provenance_tag = record_advisory_provenance(
+        ctx,
+        validated,
+        advisory_sections,
+        narrative_mode=str(response_metadata.get("narrative_mode") or "llm"),
+    )
 
     # LLM suggests the most relevant chart(s); numbers come from skill outputs.
     chart_specs = build_chart_specs(ctx.user_message, composition_validated)
@@ -237,13 +342,21 @@ def reflect(
         thinking_text=thinking_text,
         response_metadata=response_metadata,
         chart_specs=chart_specs,
-        degraded_mode=bool(degradation_reasons),
+        degraded_mode=bool(_skill_degradation_reasons(degradation_reasons)),
         fallback_reasons=degradation_reasons,
         next_options=next_options,
         replanner_log=replanner_log,
+        replan_output=replan_output,
         gate2_blocked=gate2_blocked,
         gate2_narrative=gate2_narrative,
         regulatory_events=reg_events,
         forced_regulatory_decision=forced_reg_decision,
         narrative_provenance_tag=provenance_tag,
+        run_delta=run_delta,
+        presentation=presentation.model_dump() if presentation else None,
+        suggested_outputs=_ensure_evidence_appendix_cta(
+            list(plan.suggested_outputs or []),
+            ctx.session_id,
+            validated,
+        ),
     )

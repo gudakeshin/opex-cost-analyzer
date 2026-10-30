@@ -1,0 +1,65 @@
+gl_code,cost_center,vendor,description,amount,currency,fiscal_period,amount_type,business_unit,geo,legal_entity,source_system,source_record_id,gst_treatment,gstin,lease_treatment,related_party
+510010,CC-NETWOR-001,Ericsson India,Ericsson India services — Network Operations & Energy,445627346,INR,2023-Q2,actual,Network,India,PTNL-IN,SAP,SAP-AP-100001,itc_eligible,07AABCE1234E1Z8,,no
+510010,CC-NETWOR-001,Ericsson India,Ericsson India services — Network Operations & Energy,454539892,INR,2023-Q3,actual,Network,India,PTNL-IN,SAP,SAP-AP-100002,itc_eligible,07AABCE1234E1Z8,,no
+510010,CC-NETWOR-001,Ericsson India,Ericsson India services — Network Operations & Energy,463452439,INR,2023-Q4,actual,Network,India,PTNL-IN,SAP,SAP-AP-100003,itc_eligible,07AABCE1234E1Z8,,no
+510010,CC-NETWOR-001,Ericsson India,Ericsson India services — Network Operations & Energy,472364986,INR,2024-Q1,actual,Network,India,PTNL-IN,SAP,SAP-AP-100004,itc_eligible,07AABCE1234E1Z8,,no
+510010,CC-NETWOR-001,Ericsson India,Ericsson India services — Network Operations & Energy,481277533,INR,2024-Q2,actual,Network,India,PTNL-IN,SAP,SAP-AP-100005,itc_eligible,07AABCE1234E1Z8,,no
+510010,CC-NETWOR-001,Ericsson India,Ericsson India services — Network Operations & Energy,490190080,INR,2024-Q3,actual,Network,India,PTNL-IN,SAP,SAP-AP-100006,itc_eligible,07AABCE1234E1Z8,,no
+510010,CC-NETWOR-001,Ericsson India,Ericsson India services — Network Operations & Energy,499102627,INR,2024-Q4,actual,Network,India,PTNL-IN,SAP,SAP-AP-100007,itc_eligible,07AABCE1234E1Z8,,no
+510010,CC-NETWOR-001,Ericsson India,Ericsson India services — Network Operations & Energy,508015174,INR,2025-Q1,actual,Network,India,PTNL-IN,SAP,SAP-AP-100008,itc_eligible,07AABCE1234E1Z8,,no
+510010,CC-NETWOR-001,Nokia Solutions India,Nokia Solutions India services — Network Operations & Energy,268435415,INR,2023-Q2,actual,Network,India,PTNL-IN,SAP,SAP-AP-100009,itc_eligible,07AABCN5678N1Z1,,no
+510010,CC-NETWOR-001,Nokia Solutions India,Nokia Solutions India services — Network Operations & Energy,273804123,INR,2023-Q3,actual,Network,India,PTNL-IN,SAP,SAP-AP-100010,itc_eligible,07AABCN5678N1Z1,,no
+510010,CC-NETWOR-001,Nokia Solutions India,Nokia Solutions India services — Network Operations & Energy,279172831,INR,2023-Q4,actual,Network,India,PTNL-IN,SAP,SAP-AP-100011,itc_eligible,07AABCN5678N1Z1,,no
+510010,CC-NETWOR-001,Nokia Solutions India,Nokia Solutions India services — Network Operations & Energy,284541539,INR,2024-Q1,actual,Network,India,PTNL-IN,SAP,SAP-AP-100012,itc_eligible,07AABCN5678N1Z1,,no
+510010,CC-NETWOR-001,Nokia Solutions India,Nokia Solutions India services — Network Operations & Energy,289910248,INR,2024-Q2,actual,Network,India,PTNL-IN,SAP,SAP-AP-100013,itc_eligible,07AABCN5678N1Z1,,no
+510010,CC-NETWOR-001,Nokia Solutions India,Nokia Solutions India services — Network Operations & Energy,295278956,INR,2024-Q3,actual,Network,India,PTNL-IN,SAP,SAP-AP-100014,itc_eligible,07AABCN5678N1Z1,,no
+510010,CC-NETWOR-001,Nokia Solutions India,Nokia Solutions India services — Network Operations & Energy,300647664,INR,2024-Q4,actual,Network,India,PTNL-IN,SAP,SAP-AP-100015,itc_eligible,07AABCN5678N1Z1,,no
+510010,CC-NETWOR-001,Nokia Solutions India,Nokia Solutions India services — Network Operations & Energy,306016373,INR,2025-Q1,actual,Network,India,PTNL-IN,SAP,SAP-AP-100016,itc_eligible,07AABCN5678N1Z1,,no
+510010,CC-NETWOR-001,Huawei Telecom India,Huawei Telecom India services — Network Operations & Energy,325327728,INR,2023-Q2,actual,Network,India,PTNL-IN,SAP,SAP-AP-100017,itc_eligible,07AABCH9012H1Z4,,no
+510010,CC-NETWOR-001,Huawei Telecom India,Huawei Telecom India services — Network Operations & Energy,331834282,INR,2023-Q3,actual,Network,India,PTNL-IN,SAP,SAP-AP-100018,itc_eligible,07AABCH9012H1Z4,,no
+510010,CC-NETWOR-001,Huawei Telecom India,Huawei Telecom India services — Network Operations & Energy,338340837,INR,2023-Q4,actual,Network,India,PTNL-IN,SAP,SAP-AP-100019,itc_eligible,07AABCH9012H1Z4,,no
+510010,CC-NETWOR-001,Huawei Telecom India,Huawei Telecom India services — Network Operations & Energy,344847391,INR,2024-Q1,actual,Network,India,PTNL-IN,SAP,SAP-AP-100020,itc_eligible,07AABCH9012H1Z4,,no
+510010,CC-NETWOR-001,Huawei Telecom India,Huawei Telecom India services — Network Operations & Energy,351353946,INR,2024-Q2,actual,Network,India,PTNL-IN,SAP,SAP-AP-100021,itc_eligible,07AABCH9012H1Z4,,no
+510010,CC-NETWOR-001,Huawei Telecom India,Huawei Telecom India services — Network Operations & Energy,357860500,INR,2024-Q3,actual,Network,India,PTNL-IN,SAP,SAP-AP-100022,itc_eligible,07AABCH9012H1Z4,,no
+510010,CC-NETWOR-001,Huawei Telecom India,Huawei Telecom India services — Network Operations & Energy,364367055,INR,2024-Q4,actual,Network,India,PTNL-IN,SAP,SAP-AP-100023,itc_eligible,07AABCH9012H1Z4,,no
+510010,CC-NETWOR-001,Huawei Telecom India,Huawei Telecom India services — Network Operations & Energy,370873609,INR,2025-Q1,actual,Network,India,PTNL-IN,SAP,SAP-AP-100024,itc_eligible,07AABCH9012H1Z4,,no
+510010,CC-NETWOR-001,Tata Power (Tower Energy),Tata Power (Tower Energy) services — Network Operations & Energy,305765257,INR,2023-Q2,actual,Network,India,PTNL-IN,SAP,SAP-AP-100025,itc_eligible,27AABCT3456T1Z7,,no
+510010,CC-NETWOR-001,Tata Power (Tower Energy),Tata Power (Tower Energy) services — Network Operations & Energy,311880562,INR,2023-Q3,actual,Network,India,PTNL-IN,SAP,SAP-AP-100026,itc_eligible,27AABCT3456T1Z7,,no
+510010,CC-NETWOR-001,Tata Power (Tower Energy),Tata Power (Tower Energy) services — Network Operations & Energy,317995867,INR,2023-Q4,actual,Network,India,PTNL-IN,SAP,SAP-AP-100027,itc_eligible,27AABCT3456T1Z7,,no
+510010,CC-NETWOR-001,Tata Power (Tower Energy),Tata Power (Tower Energy) services — Network Operations & Energy,324111172,INR,2024-Q1,actual,Network,India,PTNL-IN,SAP,SAP-AP-100028,itc_eligible,27AABCT3456T1Z7,,no
+510010,CC-NETWOR-001,Tata Power (Tower Energy),Tata Power (Tower Energy) services — Network Operations & Energy,330226477,INR,2024-Q2,actual,Network,India,PTNL-IN,SAP,SAP-AP-100029,itc_eligible,27AABCT3456T1Z7,,no
+510010,CC-NETWOR-001,Tata Power (Tower Energy),Tata Power (Tower Energy) services — Network Operations & Energy,336341782,INR,2024-Q3,actual,Network,India,PTNL-IN,SAP,SAP-AP-100030,itc_eligible,27AABCT3456T1Z7,,no
+510010,CC-NETWOR-001,Tata Power (Tower Energy),Tata Power (Tower Energy) services — Network Operations & Energy,342457087,INR,2024-Q4,actual,Network,India,PTNL-IN,SAP,SAP-AP-100031,itc_eligible,27AABCT3456T1Z7,,no
+510010,CC-NETWOR-001,Tata Power (Tower Energy),Tata Power (Tower Energy) services — Network Operations & Energy,348572392,INR,2025-Q1,actual,Network,India,PTNL-IN,SAP,SAP-AP-100032,itc_eligible,27AABCT3456T1Z7,,no
+520010,CC-ROAMIN-001,BSNL (Interconnect),BSNL (Interconnect) services — Roaming & Interconnect,118838303,INR,2023-Q2,actual,Roaming,India,PTNL-IN,SAP,SAP-AP-100033,itc_eligible,07AABCB7890B1Z0,,no
+520010,CC-ROAMIN-001,BSNL (Interconnect),BSNL (Interconnect) services — Roaming & Interconnect,121215069,INR,2023-Q3,actual,Roaming,India,PTNL-IN,SAP,SAP-AP-100034,itc_eligible,07AABCB7890B1Z0,,no
+520010,CC-ROAMIN-001,BSNL (Interconnect),BSNL (Interconnect) services — Roaming & Interconnect,123591835,INR,2023-Q4,actual,Roaming,India,PTNL-IN,SAP,SAP-AP-100035,itc_eligible,07AABCB7890B1Z0,,no
+520010,CC-ROAMIN-001,BSNL (Interconnect),BSNL (Interconnect) services — Roaming & Interconnect,125968601,INR,2024-Q1,actual,Roaming,India,PTNL-IN,SAP,SAP-AP-100036,itc_eligible,07AABCB7890B1Z0,,no
+520010,CC-ROAMIN-001,BSNL (Interconnect),BSNL (Interconnect) services — Roaming & Interconnect,128345367,INR,2024-Q2,actual,Roaming,India,PTNL-IN,SAP,SAP-AP-100037,itc_eligible,07AABCB7890B1Z0,,no
+520010,CC-ROAMIN-001,BSNL (Interconnect),BSNL (Interconnect) services — Roaming & Interconnect,130722133,INR,2024-Q3,actual,Roaming,India,PTNL-IN,SAP,SAP-AP-100038,itc_eligible,07AABCB7890B1Z0,,no
+520010,CC-ROAMIN-001,BSNL (Interconnect),BSNL (Interconnect) services — Roaming & Interconnect,133098899,INR,2024-Q4,actual,Roaming,India,PTNL-IN,SAP,SAP-AP-100039,itc_eligible,07AABCB7890B1Z0,,no
+520010,CC-ROAMIN-001,BSNL (Interconnect),BSNL (Interconnect) services — Roaming & Interconnect,135475665,INR,2025-Q1,actual,Roaming,India,PTNL-IN,SAP,SAP-AP-100040,itc_eligible,07AABCB7890B1Z0,,no
+510010,CC-NETWOR-001,MSME Tower Maintenance,MSME Tower Maintenance services — Network Operations & Energy,265496683,INR,2023-Q2,actual,Network,India,PTNL-IN,SAP,SAP-AP-100041,itc_eligible,07AABCM1111T1Z3,,no
+510010,CC-NETWOR-001,MSME Tower Maintenance,MSME Tower Maintenance services — Network Operations & Energy,270806616,INR,2023-Q3,actual,Network,India,PTNL-IN,SAP,SAP-AP-100042,itc_eligible,07AABCM1111T1Z3,,no
+510010,CC-NETWOR-001,MSME Tower Maintenance,MSME Tower Maintenance services — Network Operations & Energy,276116550,INR,2023-Q4,actual,Network,India,PTNL-IN,SAP,SAP-AP-100043,itc_eligible,07AABCM1111T1Z3,,no
+510010,CC-NETWOR-001,MSME Tower Maintenance,MSME Tower Maintenance services — Network Operations & Energy,281426483,INR,2024-Q1,actual,Network,India,PTNL-IN,SAP,SAP-AP-100044,itc_eligible,07AABCM1111T1Z3,,no
+510010,CC-NETWOR-001,MSME Tower Maintenance,MSME Tower Maintenance services — Network Operations & Energy,286736417,INR,2024-Q2,actual,Network,India,PTNL-IN,SAP,SAP-AP-100045,itc_eligible,07AABCM1111T1Z3,,no
+510010,CC-NETWOR-001,MSME Tower Maintenance,MSME Tower Maintenance services — Network Operations & Energy,292046351,INR,2024-Q3,actual,Network,India,PTNL-IN,SAP,SAP-AP-100046,itc_eligible,07AABCM1111T1Z3,,no
+510010,CC-NETWOR-001,MSME Tower Maintenance,MSME Tower Maintenance services — Network Operations & Energy,297356284,INR,2024-Q4,actual,Network,India,PTNL-IN,SAP,SAP-AP-100047,itc_eligible,07AABCM1111T1Z3,,no
+510010,CC-NETWOR-001,MSME Tower Maintenance,MSME Tower Maintenance services — Network Operations & Energy,302666218,INR,2025-Q1,actual,Network,India,PTNL-IN,SAP,SAP-AP-100048,itc_eligible,07AABCM1111T1Z3,,no
+530010,CC-IT&D-001,Amdocs India,Amdocs India services — IT & Digital Infrastructure,416804457,INR,2023-Q2,actual,IT,India,PTNL-IN,SAP,SAP-AP-100049,itc_eligible,27AABCA2222A1Z6,,no
+530010,CC-IT&D-001,Amdocs India,Amdocs India services — IT & Digital Infrastructure,425140546,INR,2023-Q3,actual,IT,India,PTNL-IN,SAP,SAP-AP-100050,itc_eligible,27AABCA2222A1Z6,,no
+530010,CC-IT&D-001,Amdocs India,Amdocs India services — IT & Digital Infrastructure,433476635,INR,2023-Q4,actual,IT,India,PTNL-IN,SAP,SAP-AP-100051,itc_eligible,27AABCA2222A1Z6,,no
+530010,CC-IT&D-001,Amdocs India,Amdocs India services — IT & Digital Infrastructure,441812724,INR,2024-Q1,actual,IT,India,PTNL-IN,SAP,SAP-AP-100052,itc_eligible,27AABCA2222A1Z6,,no
+530010,CC-IT&D-001,Amdocs India,Amdocs India services — IT & Digital Infrastructure,450148813,INR,2024-Q2,actual,IT,India,PTNL-IN,SAP,SAP-AP-100053,itc_eligible,27AABCA2222A1Z6,,no
+530010,CC-IT&D-001,Amdocs India,Amdocs India services — IT & Digital Infrastructure,458484902,INR,2024-Q3,actual,IT,India,PTNL-IN,SAP,SAP-AP-100054,itc_eligible,27AABCA2222A1Z6,,no
+530010,CC-IT&D-001,Amdocs India,Amdocs India services — IT & Digital Infrastructure,466820991,INR,2024-Q4,actual,IT,India,PTNL-IN,SAP,SAP-AP-100055,itc_eligible,27AABCA2222A1Z6,,no
+530010,CC-IT&D-001,Amdocs India,Amdocs India services — IT & Digital Infrastructure,475157080,INR,2025-Q1,actual,IT,India,PTNL-IN,SAP,SAP-AP-100056,itc_eligible,27AABCA2222A1Z6,,no
+530010,CC-IT&D-001,AWS India,AWS India services — IT & Digital Infrastructure,441512652,INR,2023-Q2,actual,IT,India,PTNL-IN,SAP,SAP-AP-100057,itc_eligible,07AABCA3333C1Z9,,no
+530010,CC-IT&D-001,AWS India,AWS India services — IT & Digital Infrastructure,450342905,INR,2023-Q3,actual,IT,India,PTNL-IN,SAP,SAP-AP-100058,itc_eligible,07AABCA3333C1Z9,,no
+530010,CC-IT&D-001,AWS India,AWS India services — IT & Digital Infrastructure,459173158,INR,2023-Q4,actual,IT,India,PTNL-IN,SAP,SAP-AP-100059,itc_eligible,07AABCA3333C1Z9,,no
+530010,CC-IT&D-001,AWS India,AWS India services — IT & Digital Infrastructure,468003411,INR,2024-Q1,actual,IT,India,PTNL-IN,SAP,SAP-AP-100060,itc_eligible,07AABCA3333C1Z9,,no
+530010,CC-IT&D-001,AWS India,AWS India services — IT & Digital Infrastructure,476833664,INR,2024-Q2,actual,IT,India,PTNL-IN,SAP,SAP-AP-100061,itc_eligible,07AABCA3333C1Z9,,no
+530010,CC-IT&D-001,AWS India,AWS India services — IT & Digital Infrastructure,485663917,INR,2024-Q3,actual,IT,India,PTNL-IN,SAP,SAP-AP-100062,itc_eligible,07AABCA3333C1Z9,,no
+530010,CC-IT&D-001,AWS India,AWS India services — IT & Digital Infrastructure,494494170,INR,2024-Q4,actual,IT,India,PTNL-IN,SAP,SAP-AP-100063,itc_eligible,07AABCA3333C1Z9,,no
+530010,CC-IT&D-001,AWS India,AWS India services — IT & Digital Infrastructure,503324423,INR,2025-Q1,actual,IT,India,PTNL-IN,SAP,SAP-AP-100064,itc_eligible,07AABCA3333C1Z9,,no

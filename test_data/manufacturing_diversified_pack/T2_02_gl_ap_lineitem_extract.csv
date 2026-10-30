@@ -1,0 +1,65 @@
+gl_code,cost_center,vendor,description,amount,currency,fiscal_period,amount_type,business_unit,geo,legal_entity,source_system,source_record_id,gst_treatment,gstin,lease_treatment,related_party
+510010,CC-LOGIST-001,Mahindra Logistics,Mahindra Logistics services — Logistics & Freight,414255411,INR,2023-Q2,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100001,itc_eligible,27AABCM4421L1Z8,,no
+510010,CC-LOGIST-001,Mahindra Logistics,Mahindra Logistics services — Logistics & Freight,422540519,INR,2023-Q3,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100002,itc_eligible,27AABCM4421L1Z8,,no
+510010,CC-LOGIST-001,Mahindra Logistics,Mahindra Logistics services — Logistics & Freight,430825627,INR,2023-Q4,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100003,itc_eligible,27AABCM4421L1Z8,,no
+510010,CC-LOGIST-001,Mahindra Logistics,Mahindra Logistics services — Logistics & Freight,439110735,INR,2024-Q1,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100004,itc_eligible,27AABCM4421L1Z8,,no
+510010,CC-LOGIST-001,Mahindra Logistics,Mahindra Logistics services — Logistics & Freight,447395843,INR,2024-Q2,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100005,itc_eligible,27AABCM4421L1Z8,,no
+510010,CC-LOGIST-001,Mahindra Logistics,Mahindra Logistics services — Logistics & Freight,455680952,INR,2024-Q3,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100006,itc_eligible,27AABCM4421L1Z8,,no
+510010,CC-LOGIST-001,Mahindra Logistics,Mahindra Logistics services — Logistics & Freight,463966060,INR,2024-Q4,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100007,itc_eligible,27AABCM4421L1Z8,,no
+510010,CC-LOGIST-001,Mahindra Logistics,Mahindra Logistics services — Logistics & Freight,472251168,INR,2025-Q1,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100008,itc_eligible,27AABCM4421L1Z8,,no
+510010,CC-LOGIST-001,Blue Dart Express,Blue Dart Express services — Logistics & Freight,409087968,INR,2023-Q2,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100009,itc_eligible,27AABCB5531D1Z1,,no
+510010,CC-LOGIST-001,Blue Dart Express,Blue Dart Express services — Logistics & Freight,417269727,INR,2023-Q3,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100010,itc_eligible,27AABCB5531D1Z1,,no
+510010,CC-LOGIST-001,Blue Dart Express,Blue Dart Express services — Logistics & Freight,425451486,INR,2023-Q4,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100011,itc_eligible,27AABCB5531D1Z1,,no
+510010,CC-LOGIST-001,Blue Dart Express,Blue Dart Express services — Logistics & Freight,433633246,INR,2024-Q1,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100012,itc_eligible,27AABCB5531D1Z1,,no
+510010,CC-LOGIST-001,Blue Dart Express,Blue Dart Express services — Logistics & Freight,441815005,INR,2024-Q2,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100013,itc_eligible,27AABCB5531D1Z1,,no
+510010,CC-LOGIST-001,Blue Dart Express,Blue Dart Express services — Logistics & Freight,449996764,INR,2024-Q3,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100014,itc_eligible,27AABCB5531D1Z1,,no
+510010,CC-LOGIST-001,Blue Dart Express,Blue Dart Express services — Logistics & Freight,458178524,INR,2024-Q4,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100015,itc_eligible,27AABCB5531D1Z1,,no
+510010,CC-LOGIST-001,Blue Dart Express,Blue Dart Express services — Logistics & Freight,466360283,INR,2025-Q1,actual,Logistics,India,UIL-IN,SAP,SAP-AP-100016,itc_eligible,27AABCB5531D1Z1,,no
+520010,CC-ENERGY-001,Tata Power,Tata Power services — Energy & Utilities,211009245,INR,2023-Q2,actual,Energy,India,UIL-IN,SAP,SAP-AP-100017,itc_eligible,27AABCT6641P1Z4,,no
+520010,CC-ENERGY-001,Tata Power,Tata Power services — Energy & Utilities,215229429,INR,2023-Q3,actual,Energy,India,UIL-IN,SAP,SAP-AP-100018,itc_eligible,27AABCT6641P1Z4,,no
+520010,CC-ENERGY-001,Tata Power,Tata Power services — Energy & Utilities,219449614,INR,2023-Q4,actual,Energy,India,UIL-IN,SAP,SAP-AP-100019,itc_eligible,27AABCT6641P1Z4,,no
+520010,CC-ENERGY-001,Tata Power,Tata Power services — Energy & Utilities,223669799,INR,2024-Q1,actual,Energy,India,UIL-IN,SAP,SAP-AP-100020,itc_eligible,27AABCT6641P1Z4,,no
+520010,CC-ENERGY-001,Tata Power,Tata Power services — Energy & Utilities,227889984,INR,2024-Q2,actual,Energy,India,UIL-IN,SAP,SAP-AP-100021,itc_eligible,27AABCT6641P1Z4,,no
+520010,CC-ENERGY-001,Tata Power,Tata Power services — Energy & Utilities,232110169,INR,2024-Q3,actual,Energy,India,UIL-IN,SAP,SAP-AP-100022,itc_eligible,27AABCT6641P1Z4,,no
+520010,CC-ENERGY-001,Tata Power,Tata Power services — Energy & Utilities,236330354,INR,2024-Q4,actual,Energy,India,UIL-IN,SAP,SAP-AP-100023,itc_eligible,27AABCT6641P1Z4,,no
+520010,CC-ENERGY-001,Tata Power,Tata Power services — Energy & Utilities,240550539,INR,2025-Q1,actual,Energy,India,UIL-IN,SAP,SAP-AP-100024,itc_eligible,27AABCT6641P1Z4,,no
+520010,CC-ENERGY-001,Adani Electricity,Adani Electricity services — Energy & Utilities,387377963,INR,2023-Q2,actual,Energy,India,UIL-IN,SAP,SAP-AP-100025,itc_eligible,27AABCA7751E1Z7,,no
+520010,CC-ENERGY-001,Adani Electricity,Adani Electricity services — Energy & Utilities,395125522,INR,2023-Q3,actual,Energy,India,UIL-IN,SAP,SAP-AP-100026,itc_eligible,27AABCA7751E1Z7,,no
+520010,CC-ENERGY-001,Adani Electricity,Adani Electricity services — Energy & Utilities,402873081,INR,2023-Q4,actual,Energy,India,UIL-IN,SAP,SAP-AP-100027,itc_eligible,27AABCA7751E1Z7,,no
+520010,CC-ENERGY-001,Adani Electricity,Adani Electricity services — Energy & Utilities,410620640,INR,2024-Q1,actual,Energy,India,UIL-IN,SAP,SAP-AP-100028,itc_eligible,27AABCA7751E1Z7,,no
+520010,CC-ENERGY-001,Adani Electricity,Adani Electricity services — Energy & Utilities,418368200,INR,2024-Q2,actual,Energy,India,UIL-IN,SAP,SAP-AP-100029,itc_eligible,27AABCA7751E1Z7,,no
+520010,CC-ENERGY-001,Adani Electricity,Adani Electricity services — Energy & Utilities,426115759,INR,2024-Q3,actual,Energy,India,UIL-IN,SAP,SAP-AP-100030,itc_eligible,27AABCA7751E1Z7,,no
+520010,CC-ENERGY-001,Adani Electricity,Adani Electricity services — Energy & Utilities,433863318,INR,2024-Q4,actual,Energy,India,UIL-IN,SAP,SAP-AP-100031,itc_eligible,27AABCA7751E1Z7,,no
+520010,CC-ENERGY-001,Adani Electricity,Adani Electricity services — Energy & Utilities,441610877,INR,2025-Q1,actual,Energy,India,UIL-IN,SAP,SAP-AP-100032,itc_eligible,27AABCA7751E1Z7,,no
+530010,CC-MAINTE-001,SKF India,SKF India services — Maintenance & Spares,269231140,INR,2023-Q2,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100033,itc_eligible,27AABCS8861S1Z0,,no
+530010,CC-MAINTE-001,SKF India,SKF India services — Maintenance & Spares,274615762,INR,2023-Q3,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100034,itc_eligible,27AABCS8861S1Z0,,no
+530010,CC-MAINTE-001,SKF India,SKF India services — Maintenance & Spares,280000385,INR,2023-Q4,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100035,itc_eligible,27AABCS8861S1Z0,,no
+530010,CC-MAINTE-001,SKF India,SKF India services — Maintenance & Spares,285385008,INR,2024-Q1,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100036,itc_eligible,27AABCS8861S1Z0,,no
+530010,CC-MAINTE-001,SKF India,SKF India services — Maintenance & Spares,290769631,INR,2024-Q2,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100037,itc_eligible,27AABCS8861S1Z0,,no
+530010,CC-MAINTE-001,SKF India,SKF India services — Maintenance & Spares,296154254,INR,2024-Q3,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100038,itc_eligible,27AABCS8861S1Z0,,no
+530010,CC-MAINTE-001,SKF India,SKF India services — Maintenance & Spares,301538876,INR,2024-Q4,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100039,itc_eligible,27AABCS8861S1Z0,,no
+530010,CC-MAINTE-001,SKF India,SKF India services — Maintenance & Spares,306923499,INR,2025-Q1,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100040,itc_eligible,27AABCS8861S1Z0,,no
+530010,CC-MAINTE-001,Bosch India,Bosch India services — Maintenance & Spares,337922419,INR,2023-Q2,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100041,itc_eligible,27AABCB9971B1Z3,,no
+530010,CC-MAINTE-001,Bosch India,Bosch India services — Maintenance & Spares,344680867,INR,2023-Q3,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100042,itc_eligible,27AABCB9971B1Z3,,no
+530010,CC-MAINTE-001,Bosch India,Bosch India services — Maintenance & Spares,351439315,INR,2023-Q4,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100043,itc_eligible,27AABCB9971B1Z3,,no
+530010,CC-MAINTE-001,Bosch India,Bosch India services — Maintenance & Spares,358197764,INR,2024-Q1,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100044,itc_eligible,27AABCB9971B1Z3,,no
+530010,CC-MAINTE-001,Bosch India,Bosch India services — Maintenance & Spares,364956212,INR,2024-Q2,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100045,itc_eligible,27AABCB9971B1Z3,,no
+530010,CC-MAINTE-001,Bosch India,Bosch India services — Maintenance & Spares,371714660,INR,2024-Q3,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100046,itc_eligible,27AABCB9971B1Z3,,no
+530010,CC-MAINTE-001,Bosch India,Bosch India services — Maintenance & Spares,378473109,INR,2024-Q4,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100047,itc_eligible,27AABCB9971B1Z3,,no
+530010,CC-MAINTE-001,Bosch India,Bosch India services — Maintenance & Spares,385231557,INR,2025-Q1,actual,Maintenance,India,UIL-IN,SAP,SAP-AP-100048,itc_eligible,27AABCB9971B1Z3,,no
+540010,CC-CONTRA-001,Quippo Industrial,Quippo Industrial services — Contract Manufacturing & Subcontracting,370153384,INR,2023-Q2,actual,Contract,India,UIL-IN,SAP,SAP-AP-100049,itc_eligible,27AABCQ3211Q1Z6,,no
+540010,CC-CONTRA-001,Quippo Industrial,Quippo Industrial services — Contract Manufacturing & Subcontracting,377556451,INR,2023-Q3,actual,Contract,India,UIL-IN,SAP,SAP-AP-100050,itc_eligible,27AABCQ3211Q1Z6,,no
+540010,CC-CONTRA-001,Quippo Industrial,Quippo Industrial services — Contract Manufacturing & Subcontracting,384959519,INR,2023-Q4,actual,Contract,India,UIL-IN,SAP,SAP-AP-100051,itc_eligible,27AABCQ3211Q1Z6,,no
+540010,CC-CONTRA-001,Quippo Industrial,Quippo Industrial services — Contract Manufacturing & Subcontracting,392362587,INR,2024-Q1,actual,Contract,India,UIL-IN,SAP,SAP-AP-100052,itc_eligible,27AABCQ3211Q1Z6,,no
+540010,CC-CONTRA-001,Quippo Industrial,Quippo Industrial services — Contract Manufacturing & Subcontracting,399765654,INR,2024-Q2,actual,Contract,India,UIL-IN,SAP,SAP-AP-100053,itc_eligible,27AABCQ3211Q1Z6,,no
+540010,CC-CONTRA-001,Quippo Industrial,Quippo Industrial services — Contract Manufacturing & Subcontracting,407168722,INR,2024-Q3,actual,Contract,India,UIL-IN,SAP,SAP-AP-100054,itc_eligible,27AABCQ3211Q1Z6,,no
+540010,CC-CONTRA-001,Quippo Industrial,Quippo Industrial services — Contract Manufacturing & Subcontracting,414571790,INR,2024-Q4,actual,Contract,India,UIL-IN,SAP,SAP-AP-100055,itc_eligible,27AABCQ3211Q1Z6,,no
+540010,CC-CONTRA-001,Quippo Industrial,Quippo Industrial services — Contract Manufacturing & Subcontracting,421974857,INR,2025-Q1,actual,Contract,India,UIL-IN,SAP,SAP-AP-100056,itc_eligible,27AABCQ3211Q1Z6,,no
+550010,CC-PROFES-001,EY India,EY India services — Professional Services,358128897,INR,2023-Q2,actual,Professional,India,UIL-IN,SAP,SAP-AP-100057,itc_eligible,27AABCE5521Y1Z0,,no
+550010,CC-PROFES-001,EY India,EY India services — Professional Services,365291474,INR,2023-Q3,actual,Professional,India,UIL-IN,SAP,SAP-AP-100058,itc_eligible,27AABCE5521Y1Z0,,no
+550010,CC-PROFES-001,EY India,EY India services — Professional Services,372454052,INR,2023-Q4,actual,Professional,India,UIL-IN,SAP,SAP-AP-100059,itc_eligible,27AABCE5521Y1Z0,,no
+550010,CC-PROFES-001,EY India,EY India services — Professional Services,379616630,INR,2024-Q1,actual,Professional,India,UIL-IN,SAP,SAP-AP-100060,itc_eligible,27AABCE5521Y1Z0,,no
+550010,CC-PROFES-001,EY India,EY India services — Professional Services,386779208,INR,2024-Q2,actual,Professional,India,UIL-IN,SAP,SAP-AP-100061,itc_eligible,27AABCE5521Y1Z0,,no
+550010,CC-PROFES-001,EY India,EY India services — Professional Services,393941786,INR,2024-Q3,actual,Professional,India,UIL-IN,SAP,SAP-AP-100062,itc_eligible,27AABCE5521Y1Z0,,no
+550010,CC-PROFES-001,EY India,EY India services — Professional Services,401104364,INR,2024-Q4,actual,Professional,India,UIL-IN,SAP,SAP-AP-100063,itc_eligible,27AABCE5521Y1Z0,,no
+550010,CC-PROFES-001,EY India,EY India services — Professional Services,408266942,INR,2025-Q1,actual,Professional,India,UIL-IN,SAP,SAP-AP-100064,itc_eligible,27AABCE5521Y1Z0,,no

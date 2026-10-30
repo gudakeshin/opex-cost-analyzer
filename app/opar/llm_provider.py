@@ -22,6 +22,7 @@ import os
 from typing import Any, Dict, Optional
 
 from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED, LLM_PROVIDER, ROOT_DIR, logger
+from app.services.llm_selection import get_resolved_llm_model
 
 # ---------------------------------------------------------------------------
 # Mode resolution
@@ -136,6 +137,57 @@ def call_llm(
     return None
 
 
+def call_llm_structured(
+    system: str,
+    user_content: str,
+    schema: dict,
+    *,
+    max_tokens: int = 512,
+    mode: Optional[str] = None,
+    skill_name: str = "unknown",
+    model: str | None = None,
+) -> Optional[dict | list]:
+    """Structured JSON LLM call — Anthropic json_schema; Gemini falls back to text parse."""
+    active_mode = (mode or get_active_mode()).upper()
+    if active_mode == "M1" or os.getenv("PYTEST_CURRENT_TEST"):
+        return None
+
+    if LLM_PROVIDER == "gemini" and GEMINI_ENABLED:
+        raw = call_llm(
+            system=f"{system}\n\nRespond with valid JSON matching the required schema.",
+            user_content=user_content,
+            max_tokens=max_tokens,
+            mode=active_mode,
+            skill_name=skill_name,
+        )
+        if not raw:
+            return None
+        try:
+            from app.opar.claude_client import _extract_json
+
+            parsed = _extract_json(raw)
+            return parsed if isinstance(parsed, (dict, list)) else None
+        except Exception:
+            logger.warning('"llm_provider structured Gemini parse failed skill=%s"', skill_name)
+            return None
+
+    if not ANTHROPIC_ENABLED or not ANTHROPIC_API_KEY:
+        return None
+    try:
+        from app.opar.anthropic_api import call_anthropic_structured_json
+
+        return call_anthropic_structured_json(
+            system,
+            user_content,
+            schema,
+            max_tokens=max_tokens,
+            model=model,
+        )
+    except Exception as exc:
+        logger.warning('"llm_provider structured Anthropic call failed skill=%s: %s"', skill_name, exc)
+        return None
+
+
 def _call_m2(
     system: str,
     user_content: str,
@@ -162,14 +214,20 @@ def _call_m2(
     except ImportError:
         logger.warning('"llm_provider: anthropic package not installed"')
         return None
+    active_model = get_resolved_llm_model(provider="anthropic")
     try:
         client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
         response = client.messages.create(
-            model="claude-sonnet-4-6",
+            model=active_model,
             max_tokens=max_tokens,
             system=system,
             messages=[{"role": "user", "content": user_content}],
         )
+        usage = getattr(response, "usage", None)
+        if usage is not None:
+            from app.opar.anthropic_api import record_anthropic_usage
+
+            record_anthropic_usage(usage, active_model)
         return getattr(response.content[0], "text", "").strip() if response.content else None
     except Exception as exc:
         logger.warning('"llm_provider M2 call failed: %s"', exc)

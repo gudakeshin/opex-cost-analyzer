@@ -1,0 +1,7 @@
+Supplier,Description,Amount,Category,Invoice Date,Currency
+Infosys,IT managed services Q1,3200000,IT,2025-01-15,INR
+AWS,Cloud hosting,2100000,IT,2025-02-10,INR
+Deloitte,Advisory engagement,1800000,Professional Services,2025-02-20,INR
+MakeMyTrip,Air travel bookings,950000,Travel,2025-03-05,INR
+WeWork,Office space lease,1400000,Facilities,2025-03-12,INR
+Staples,Office supplies,250000,Procurement,2025-03-18,INR

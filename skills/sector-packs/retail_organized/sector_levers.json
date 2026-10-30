@@ -40,7 +40,8 @@
     "lease_restructuring",
     "cost_governance",
     "agency_fee_optimization",
-    "martech_rationalization"
+    "martech_rationalization",
+    "insurance_premium_optimization"
   ],
   "sector_specific_levers": [
     {
@@ -127,7 +128,8 @@
         "Labour cost per store (permanent, part-time, casual)",
         "Transactions per hour by department and store format",
         "Union contract terms and flexibility provisions"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "category_management",
@@ -213,7 +215,8 @@
         "Supplier co-investment and trade terms by category",
         "In-stock (OSA) data by category and SKU",
         "Planogram compliance monitoring data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "shrinkage_reduction",
@@ -246,7 +249,9 @@
         "p90": 36
       },
       "applicable_if": [
-        "retail_keywords detected"
+        "category:IT present",
+        "retail_keywords detected",
+        "category:OUTSOURCED present"
       ],
       "industry_sources": [
         "RAI — India Retail Report 2024 (rai.net.in/) — shrinkage rates for Indian organised retail",
@@ -298,7 +303,8 @@
         "POS exception data (voids, refunds, no-sales by cashier)",
         "RFID and EAS coverage map by store",
         "Historical LP investment vs shrinkage reduction correlation"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "private_label",
@@ -383,7 +389,8 @@
         "Consumer research on PL acceptance by category",
         "Manufacturer shortlist with production capacity and compliance data",
         "Competitor PL pricing and ranging data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "omnichannel_fulfillment",
@@ -468,7 +475,8 @@
         "Customer geography and order density by pin code",
         "OMS capability assessment for real-time routing",
         "Dark store operational model and capex/opex estimate"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "markdown_optimization",
@@ -552,7 +560,8 @@
         "Demand forecast accuracy for seasonal categories",
         "Category margin (with and without markdown) by season",
         "Clearance deadline requirements by category"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "loyalty_program_efficiency",
@@ -637,7 +646,8 @@
         "Points earn/burn ratio and breakage rate",
         "Member segmentation by spend tier and redemption behaviour",
         "Basket size uplift data: member vs non-member by category"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "supply_chain_direct_sourcing",
@@ -670,8 +680,9 @@
         "p90": 60
       },
       "applicable_if": [
-        "supplier_count > 20",
-        "retail_keywords detected"
+        "category:LOGISTICS_INDIA present",
+        "retail_keywords detected",
+        "supplier_count > 20"
       ],
       "industry_sources": [
         "FICCI — India Retail Supply Chain Report 2024 (ficci.in) — direct sourcing penetration and margin improvement",
@@ -722,7 +733,8 @@
         "Quality specifications and cold chain requirements by category",
         "DC logistics connectivity to potential direct sourcing locations",
         "Contract farming regulatory requirements and templates"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "store_network_optimization",
@@ -808,7 +820,419 @@
         "Lease terms: WALE, break-clause dates, and exit cost by store",
         "Store age and format classification",
         "New store investment return hurdles and pipeline"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
+    },
+    {
+      "lever_id": "real_estate_portfolio_optimisation",
+      "lever_name": "Store Network & Real Estate Portfolio Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 16.0,
+        "p90": 28.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Store Network & Real Estate Portfolio Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:FACILITIES present"
+      ],
+      "industry_sources": [
+        "RAI India Retail 2024 (rai.net.in) — occupancy 6-12% of revenue; lease renegotiation at renewal saves 15-25%",
+        "Shoppers Stop FY25 Annual Report (BSE 532638) — store portfolio rationalisation cited as margin lever; closed underperforming stores",
+        "INTERNAL_CALIBRATION — real estate optimisation savings from 3 India organised retail mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Store Network & Real Estate Portfolio Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FACILITIES",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "private_label_expansion",
+      "lever_name": "Private Label Programme Expansion",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 25.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Private Label Programme Expansion"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 24,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:OUTSOURCED present",
+        "category:MARKETING present"
+      ],
+      "industry_sources": [
+        "RAI India Retail 2024 — private label penetration 8-20% of modern trade revenue; 15-20pp higher margin than branded",
+        "Trent FY25 Annual Report (BSE 500251) — Zudio private label strategy as key gross margin driver (>38% gross margin)",
+        "INTERNAL_CALIBRATION — private label margin uplift savings from 3 India organised retail mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Private Label Programme Expansion: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for MARKETING",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "workforce_scheduling_optimisation",
+      "lever_name": "Workforce Scheduling & Productivity Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Workforce Scheduling & Productivity Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "RAI India Retail 2024 — workforce productivity: revenue per employee ₹35,000-₹55,000/month; scheduling tools improve by 15-20%",
+        "Gartner Retail Workforce 2024 — AI scheduling reduces excess staffing 12-18% without service level impact",
+        "INTERNAL_CALIBRATION — workforce scheduling savings from 2 India retail operations mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Workforce Scheduling & Productivity Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "omnichannel_digital_integration",
+      "lever_name": "Omnichannel & Digital Integration",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 24.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "mixed",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Omnichannel & Digital Integration"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 24,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:IT present"
+      ],
+      "industry_sources": [
+        "Gartner Retail IT 2024 — omnichannel IT stack consolidation reduces technology spend 15-20% vs. siloed systems",
+        "Shoppers Stop FY25 Annual Report — omnichannel investments as growth and efficiency enabler",
+        "INTERNAL_CALIBRATION — omnichannel IT savings from 2 India organised retail technology mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Omnichannel & Digital Integration: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for IT",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "Retail Property & Inventory Insurance Optimisation",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.03,
+      "phasing_curve": [
+        0.6,
+        0.3,
+        0.1
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Insurance audit completed — coverage adequacy vs. over-insurance assessed by peril",
+        "Market submissions prepared for competitive renewal (3+ carriers benchmarked)",
+        "Risk management improvements documented as leverage for premium negotiation"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:INSURANCE present"
+      ],
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — property and inventory insurance competitive RFP savings 12-22%",
+        "RAI India Retail 2024 — shrinkage and inventory insurance as material cost for organised retail",
+        "INTERNAL_CALIBRATION — retail insurance optimisation savings from 2 India retail risk reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Ind AS 116 Lease Reclassification (Operating vs. Finance): validate baseline and stakeholders",
+          "owner_role": "Treasury",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Model supplier financial risk and term scenarios",
+          "owner_role": "Treasury / Procurement",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Negotiate term changes with top suppliers",
+          "owner_role": "Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Update ERP terms and monitor DPO/cash impact",
+          "owner_role": "AP Lead",
+          "duration_weeks": 2
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "DPO below sector benchmark with low supplier risk",
+          "evidence_source": "ap_aging",
+          "confirms": "Term extension is feasible"
+        }
+      ],
+      "required_data_fields": [
+        "AP aging by supplier",
+        "Payment terms master",
+        "Supplier credit/risk ratings"
+      ],
+      "applicability_threshold_pct": 0.02
+    },
+    {
+      "lever_id": "retail_compliance_audit_efficiency",
+      "lever_name": "Audit, Legal & Compliance Advisory Efficiency",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 16.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Audit, Legal & Compliance Advisory Efficiency"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 6,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:PROF_SVCS present"
+      ],
+      "industry_sources": [
+        "SEBI LODR — listed retailer audit rotation and compliance cost disclosure",
+        "Hackett Group G&A Benchmarks 2024 — advisory spend governance 10-18% savings",
+        "INTERNAL_CALIBRATION — retail compliance advisory savings from 2 India organised retail mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Audit, Legal & Compliance Advisory Efficiency: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 5
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for PROF_SVCS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

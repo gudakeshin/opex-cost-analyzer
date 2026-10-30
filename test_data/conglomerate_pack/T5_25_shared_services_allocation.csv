@@ -1,0 +1,9 @@
+business_unit,shared_service_type,allocation_method,allocated_cost_inr_cr,headcount_served,cost_per_head_inr,offshore_pct
+Chemicals,Finance & Accounting,headcount,185,12000,154167,65
+Chemicals,IT Helpdesk,usage,90,12000,75000,80
+Infrastructure,Finance & Accounting,headcount,142,9200,154348,60
+Infrastructure,Legal & Compliance,revenue,88,9200,95652,40
+Consumer Goods,Finance & Accounting,headcount,116,7500,154667,65
+Consumer Goods,HR Shared Services,headcount,68,7500,90667,55
+Financial Services,Legal & Compliance,revenue,124,5500,225455,45
+Media & Retail,IT Helpdesk,usage,54,4800,112500,70

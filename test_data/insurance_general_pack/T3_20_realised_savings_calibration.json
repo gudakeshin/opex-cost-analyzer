@@ -1,0 +1,38 @@
+[
+  {
+    "engagement_id": "eng-pgil-fy24",
+    "initiative_id": "INI-1",
+    "lever_id": "policy_admin_migration",
+    "pack_id": "insurance_general",
+    "planned_p50_cr": 28.0,
+    "realised_cr": 20.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "medium",
+    "notes": "TCS InsureCraft migration 6 months late; partial savings on retired legacy licences."
+  },
+  {
+    "engagement_id": "eng-pgil-fy24",
+    "initiative_id": "INI-2",
+    "lever_id": "aggregator_renegotiation",
+    "pack_id": "insurance_general",
+    "planned_p50_cr": 18.0,
+    "realised_cr": 24.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "PolicyBazaar volume leverage used to reduce commission rate; exceeded plan."
+  },
+  {
+    "engagement_id": "eng-pgil-fy24",
+    "initiative_id": "INI-3",
+    "lever_id": "reinsurance_optimisation",
+    "pack_id": "insurance_general",
+    "planned_p50_cr": 16.0,
+    "realised_cr": 11.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "low",
+    "notes": "GIC Re treaty minimum cession rates constrained optimisation; partial retrocession savings."
+  }
+]

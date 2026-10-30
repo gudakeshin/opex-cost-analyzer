@@ -2,6 +2,7 @@
   "base_taxonomy_version": "1.0",
   "additional_categories": [
     {"category_id": "raw_material_procurement", "category_name": "Raw Material & Input Procurement", "gl_prefix": "RMP", "cost_nature": "cogs"},
+    {"category_id": "conversion_cost", "category_name": "Conversion Cost (Labour + Overhead + Depreciation)", "gl_prefix": "CCV", "cost_nature": "cogs"},
     {"category_id": "energy_utilities_plant", "category_name": "Plant Energy, Utilities & Steam", "gl_prefix": "EUP", "cost_nature": "operations"},
     {"category_id": "maintenance_spares", "category_name": "Maintenance, Repair & Spares", "gl_prefix": "MRO", "cost_nature": "operations"},
     {"category_id": "quality_testing", "category_name": "Quality Control & Testing", "gl_prefix": "QCT", "cost_nature": "operations"},

@@ -1,0 +1,7 @@
+Bharat Ventures Group Ltd — Diagnostic URLs (synthetic/illustrative)
+
+1. Investor relations: https://www.bharatventures.example/investors
+2. BSE: https://www.bseindia.example/stockinfo/annreport.aspx?scripcd=BVGL
+3. Annual report: https://www.bharatventures.example/ir/annual-report-fy25.pdf
+4. SEBI LODR: https://www.sebi.example/disclosures/lodr/bvgl
+5. Analyst note: https://research.example/indian-conglomerates-cost-fy25

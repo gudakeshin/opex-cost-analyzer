@@ -104,7 +104,12 @@ def _try_qdrant_upsert(catalog: List[Dict[str, Any]], vectors: List[List[float]]
         logger.debug('"skill_catalog qdrant upsert skipped: %s"', exc)
 
 
-def discover_relevant_skills(query: str, k: int = 5) -> List[Dict[str, Any]]:
+def discover_relevant_skills(
+    query: str,
+    k: int = 5,
+    *,
+    kind: str | None = None,
+) -> List[Dict[str, Any]]:
     """Return top-k skills ranked by semantic similarity with keyword fallback."""
     query = (query or "").strip()
     if not query:
@@ -112,9 +117,11 @@ def discover_relevant_skills(query: str, k: int = 5) -> List[Dict[str, Any]]:
 
     _ensure_index()
     catalog = discover_skills_rich()
+    if kind:
+        catalog = [m for m in catalog if m.get("kind") == kind]
 
     # Try Qdrant search first
-    qdrant_hits = _qdrant_search(query, k=k)
+    qdrant_hits = _qdrant_search(query, k=k, kind=kind)
     if qdrant_hits:
         return qdrant_hits
 
@@ -124,6 +131,8 @@ def discover_relevant_skills(query: str, k: int = 5) -> List[Dict[str, Any]]:
         if q_vec:
             scored = []
             for name, vec, meta in _VECTORS:
+                if kind and meta.get("kind") != kind:
+                    continue
                 score = _cosine(q_vec[0], vec)
                 scored.append((score, meta))
             scored.sort(key=lambda x: x[0], reverse=True)
@@ -154,7 +163,7 @@ def discover_relevant_skills(query: str, k: int = 5) -> List[Dict[str, Any]]:
     ]
 
 
-def _qdrant_search(query: str, k: int) -> List[Dict[str, Any]]:
+def _qdrant_search(query: str, k: int, kind: str | None = None) -> List[Dict[str, Any]]:
     if not QDRANT_ENABLED:
         return []
     try:
@@ -172,9 +181,9 @@ def _qdrant_search(query: str, k: int) -> List[Dict[str, Any]]:
         hits = client.search(
             collection_name=SKILL_CATALOG_COLLECTION,
             query_vector=q_vec[0],
-            limit=k,
+            limit=k * 3 if kind else k,
         )
-        return [
+        out = [
             {
                 "name": h.payload.get("name", ""),
                 "description": h.payload.get("description", ""),
@@ -182,5 +191,33 @@ def _qdrant_search(query: str, k: int) -> List[Dict[str, Any]]:
             }
             for h in hits
         ]
+        if kind:
+            kind_names = {m["name"] for m in discover_skills_rich() if m.get("kind") == kind}
+            out = [h for h in out if h["name"] in kind_names]
+        return out[:k]
     except Exception:
         return []
+
+
+def clear_discovery_index() -> None:
+    """Clear in-memory vectors so the next query re-indexes from disk."""
+    global _VECTORS, _INDEX
+    _VECTORS = None
+    _INDEX = None
+    _embedder.cache_clear()
+    if QDRANT_ENABLED:
+        _try_qdrant_clear()
+
+
+def _try_qdrant_clear() -> None:
+    try:
+        from qdrant_client import QdrantClient
+
+        from app.config import QDRANT_API_KEY, QDRANT_HOST, QDRANT_PORT
+
+        client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT, api_key=QDRANT_API_KEY or None)
+        collections = {c.name for c in client.get_collections().collections}
+        if SKILL_CATALOG_COLLECTION in collections:
+            client.delete_collection(collection_name=SKILL_CATALOG_COLLECTION)
+    except Exception as exc:
+        logger.debug('"skill_catalog qdrant clear skipped: %s"', exc)

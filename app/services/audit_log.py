@@ -22,9 +22,9 @@ import threading
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
-from app.config import ROOT_DIR, logger
+from app.config import DATA_DIR, logger
 
-_LOG_PATH = ROOT_DIR / "data" / "audit" / "audit.jsonl"
+_LOG_PATH = DATA_DIR / "audit" / "audit.jsonl"
 _LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 _lock = threading.Lock()

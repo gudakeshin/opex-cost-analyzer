@@ -38,7 +38,9 @@
     "ld_rationalization",
     "space_utilization_optimization",
     "lease_restructuring",
-    "cost_governance"
+    "cost_governance",
+    "rnd_portfolio_rationalization",
+    "insurance_premium_optimization"
   ],
   "sector_specific_levers": [
     {
@@ -125,7 +127,8 @@
         "CRO performance data (enrolment rate, protocol deviations, budget adherence)",
         "CTMS data: site performance, screen fail rates, and enrolment milestones",
         "DCT technology readiness assessment"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "manufacturing_cogs",
@@ -211,7 +214,8 @@
         "API price trends and supplier concentration data",
         "ANDA/NDA site and supplier qualification status",
         "Regulatory filing requirements for alternate supplier qualification"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "sales_force_sizing",
@@ -296,7 +300,8 @@
         "Rep cost by grade and territory (salary, travel, allowances)",
         "Coverage index and call frequency benchmarks by specialty",
         "Market share data by product and territory"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "digital_rep_model",
@@ -381,7 +386,8 @@
         "Cost per interaction by channel (in-person vs digital vs virtual)",
         "TRx correlation data by engagement channel for comparable HCP segments",
         "Rep utilisation and call frequency data from SFA system"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "market_access_rebate_mgmt",
@@ -466,7 +472,8 @@
         "Rebate contract terms and accrual data by customer",
         "Contract management system capability assessment",
         "Competitor pricing and formulary access data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "tech_platform_consolidation",
@@ -550,7 +557,8 @@
         "Veeva or alternative enterprise platform capability map",
         "Integration architecture and cost for current system-to-system feeds",
         "Regulatory validation requirements (21 CFR Part 11, GAMP5) for platform changes"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "expiry_risk_reduction",
@@ -634,7 +642,8 @@
         "Historical write-off data by SKU and reason code",
         "Production schedule and build-to-stock vs make-to-order split",
         "Shelf-life extension regulatory feasibility by product"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "regulatory_submission_efficiency",
@@ -707,7 +716,8 @@
         "Process volume metrics",
         "FTE effort or cost allocation by process",
         "Baseline cycle times"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "pharmacovigilance_automation",
@@ -792,7 +802,703 @@
         "CDSCO and ICH E2B compliance requirements for electronic submission",
         "PV database (Argus/ArisG) and E2B gateway capability assessment",
         "AI medical coding tool options and validation requirements"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
+    },
+    {
+      "lever_id": "salesforce_effectiveness_pharma",
+      "lever_name": "Medical Representative Salesforce Effectiveness",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 14.0,
+        "p90": 22.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Medical Representative Salesforce Effectiveness"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:HR present",
+        "category:MARKETING present"
+      ],
+      "industry_sources": [
+        "IQVIA India Pharma Market 2024 (iqvia.com) — prescription data analytics improving MR targeting: 20-30% reduction in cost per call while maintaining market share",
+        "OPPI India Pharma Review 2024 (oppi.in) — field force productivity: visits per MR per day 8-12 for best-in-class vs. 5-7 for average",
+        "INTERNAL_CALIBRATION — salesforce effectiveness savings calibrated from 4 India pharma go-to-market mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Medical Representative Salesforce Effectiveness: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for MARKETING",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "procurement_api_rm_consolidation",
+      "lever_name": "API & Raw Material Procurement Consolidation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 16.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for API & Raw Material Procurement Consolidation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "NPPA (National Pharmaceutical Pricing Authority) drug pricing data (nppa.gov.in) — API cost as % of drug price published for scheduled formulations",
+        "Cipla FY25 Annual Report (BSE 500087) — API backward integration and supplier rationalisation as strategic priority",
+        "INTERNAL_CALIBRATION — API procurement savings calibrated from 3 India pharma raw material sourcing mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for API & Raw Material Procurement Consolidation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "manufacturing_efficiency_oee",
+      "lever_name": "Manufacturing OEE & Lean Transformation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 25.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Manufacturing OEE & Lean Transformation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 24,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:HR present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "Dr. Reddy's FY25 Annual Report (BSE 500124) — manufacturing excellence programme: OEE improvement at Hyderabad plants",
+        "CII Manufacturing Excellence Awards 2024 (cii.in) — pharma lean transformation case studies",
+        "INTERNAL_CALIBRATION — OEE improvement savings calibrated from 3 India pharma plant efficiency mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Manufacturing OEE & Lean Transformation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "regulatory_compliance_cost_reduction",
+      "lever_name": "Regulatory Compliance Cost Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 24.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Regulatory Compliance Cost Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:PROF_SVCS present",
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "USFDA Generic Drug User Fee Amendments (GDUFA) rate schedule 2024 — ANDA filing fees $231,440 per application; prioritisation saves significant cost",
+        "Sun Pharma FY25 Annual Report — regulatory excellence investment cited; USFDA warning letter remediation costs disclosed",
+        "INTERNAL_CALIBRATION — regulatory compliance savings from 3 India pharma regulatory affairs mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Regulatory Compliance Cost Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for PROF_SVCS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "cold_chain_logistics_optimisation",
+      "lever_name": "Cold Chain & Distribution Logistics Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 16.0,
+        "p90": 26.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Cold Chain & Distribution Logistics Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:LOGISTICS_INDIA present"
+      ],
+      "industry_sources": [
+        "CII Pharma Logistics India 2024 (cii.in) — cold chain logistics 3-6% of pharma revenue; hub-and-spoke reduces cost 15-25% vs. direct shipment",
+        "Cipla FY25 Annual Report — distribution efficiency and trade receivables management as working capital priority",
+        "INTERNAL_CALIBRATION — logistics optimisation savings from 3 India pharma distribution mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Cold Chain & Distribution Logistics Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for LOGISTICS_INDIA",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "digital_marketing_hcp",
+      "lever_name": "Digital & Omnichannel HCP Engagement",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 14.0,
+        "p90": 22.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Digital & Omnichannel HCP Engagement"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:MARKETING present"
+      ],
+      "industry_sources": [
+        "IQVIA India HCP Engagement 2024 — digital detailing cost per contact 70-80% lower than in-person MR visit; HCP digital receptivity growing post-COVID",
+        "OPPI India Pharma 2024 (oppi.in) — omnichannel HCP engagement adoption by top 10 India pharma companies",
+        "INTERNAL_CALIBRATION — digital HCP engagement savings from 4 India pharma commercial transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Digital & Omnichannel HCP Engagement: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for MARKETING",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "tech_regulatory_it_modernisation",
+      "lever_name": "Quality & Regulatory IT Systems Modernisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 15.0,
+        "p90": 24.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "mixed",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Quality & Regulatory IT Systems Modernisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 20,
+        "p50": 24,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:IT present",
+        "category:PROF_SVCS present"
+      ],
+      "industry_sources": [
+        "Gartner Life Sciences IT 2024 (gartner.com) — pharma quality systems modernisation: 20-30% reduction in compliance IT cost + audit preparation time",
+        "USFDA 21 CFR Part 11 / EU Annex 11 requirements — electronic records and audit trail mandates driving IT consolidation",
+        "INTERNAL_CALIBRATION — QMS IT modernisation savings from 2 India pharma GxP technology mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Quality & Regulatory IT Systems Modernisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 12
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for IT",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "rnd_portfolio_rationalization",
+      "lever_name": "R&D Portfolio Rationalisation & CRO Governance",
+      "lever_family": "demand",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.07,
+      "phasing_curve": [
+        0.3,
+        0.45,
+        0.25
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.6,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "medium",
+      "condition_precedents": [
+        "R&D project portfolio reviewed against strategic priorities and ROI gates",
+        "CRO/vendor spend consolidated under preferred supplier framework",
+        "Stage-gate criteria updated to kill low-ROI projects early"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.7,
+      "implementation_weeks": {
+        "p10": 10,
+        "p50": 20,
+        "p90": 32
+      },
+      "applicable_if": [
+        "category:RND present"
+      ],
+      "industry_sources": [
+        "Gartner Life Sciences R&D Portfolio Management 2024 — tail project rationalisation saves 10-18% of R&D spend",
+        "Dr. Reddy's FY25 Annual Report — R&D productivity and portfolio focus cited as strategic priority",
+        "INTERNAL_CALIBRATION — pharma R&D portfolio savings from 3 India pharma R&D mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Inventory R&D spend by project, vendor, and stage; classify strategic vs discretionary",
+          "owner_role": "R&D Finance / CTO office",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Apply portfolio prioritisation; exit or pause tail projects below ROI threshold",
+          "owner_role": "R&D Leadership",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Consolidate CRO, lab, and tooling vendors; renegotiate framework agreements",
+          "owner_role": "R&D Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed stage-gate ROI reviews in annual planning cycle",
+          "owner_role": "FP&A / R&D",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": ">30% of R&D projects in late stage with no defined commercialisation path",
+          "evidence_source": "project_portfolio",
+          "confirms": "Portfolio rationalisation will release spend"
+        },
+        {
+          "signal": "CRO and lab vendor fragmentation with >10 suppliers for similar services",
+          "evidence_source": "spend_profile",
+          "confirms": "Vendor consolidation is addressable"
+        }
+      ],
+      "required_data_fields": [
+        "R&D project register with spend and stage",
+        "Vendor spend by CRO, lab, and tooling category",
+        "Stage-gate criteria and historical project ROI"
+      ],
+      "applicability_threshold_pct": 0.04
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "Pharma Corporate & Product Liability Insurance Optimisation",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 16.0
+      },
+      "cta_rate": 0.03,
+      "phasing_curve": [
+        0.6,
+        0.3,
+        0.1
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Insurance audit completed — coverage adequacy vs. over-insurance assessed by peril",
+        "Market submissions prepared for competitive renewal (3+ carriers benchmarked)",
+        "Risk management improvements documented as leverage for premium negotiation"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:INSURANCE present"
+      ],
+      "industry_sources": [
+        "Marsh Life Sciences Risk Report 2024 — pharma insurance RFP savings 8-15%",
+        "IRDAI Annual Report 2023-24 — commercial insurance market benchmarks",
+        "INTERNAL_CALIBRATION — pharma insurance savings from 2 India pharma risk reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Ind AS 116 Lease Reclassification (Operating vs. Finance): validate baseline and stakeholders",
+          "owner_role": "Treasury",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Model supplier financial risk and term scenarios",
+          "owner_role": "Treasury / Procurement",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Negotiate term changes with top suppliers",
+          "owner_role": "Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Update ERP terms and monitor DPO/cash impact",
+          "owner_role": "AP Lead",
+          "duration_weeks": 2
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "DPO below sector benchmark with low supplier risk",
+          "evidence_source": "ap_aging",
+          "confirms": "Term extension is feasible"
+        }
+      ],
+      "required_data_fields": [
+        "AP aging by supplier",
+        "Payment terms master",
+        "Supplier credit/risk ratings"
+      ],
+      "applicability_threshold_pct": 0.02
+    },
+    {
+      "lever_id": "qc_lab_facilities_optimisation",
+      "lever_name": "QC Lab & GMP Facilities Cost Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 8.0,
+        "p90": 14.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for QC Lab & GMP Facilities Cost Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:FACILITIES present"
+      ],
+      "industry_sources": [
+        "BEE PAT Scheme — pharma designated consumers energy efficiency benchmarks",
+        "CII Pharma Manufacturing Excellence 2024 — GMP facility cost optimisation case studies",
+        "INTERNAL_CALIBRATION — pharma facilities savings from 2 India pharma plant mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for QC Lab & GMP Facilities Cost Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FACILITIES",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

@@ -1,0 +1,46 @@
+business_unit,function,location,band,headcount
+Motor Insurance,Operations,India,Entry (B1-B2),360
+Motor Insurance,Operations,India,Mid (B3-B4),280
+Motor Insurance,Operations,India,Senior (B5-B6),120
+Motor Insurance,Finance,India,Entry (B1-B2),360
+Motor Insurance,Finance,India,Mid (B3-B4),280
+Motor Insurance,Finance,India,Senior (B5-B6),120
+Motor Insurance,HR,India,Entry (B1-B2),360
+Motor Insurance,HR,India,Mid (B3-B4),280
+Motor Insurance,HR,India,Senior (B5-B6),120
+Health Insurance,Operations,India,Entry (B1-B2),450
+Health Insurance,Operations,India,Mid (B3-B4),350
+Health Insurance,Operations,India,Senior (B5-B6),150
+Health Insurance,Finance,India,Entry (B1-B2),450
+Health Insurance,Finance,India,Mid (B3-B4),350
+Health Insurance,Finance,India,Senior (B5-B6),150
+Health Insurance,HR,India,Entry (B1-B2),450
+Health Insurance,HR,India,Mid (B3-B4),350
+Health Insurance,HR,India,Senior (B5-B6),150
+Property & Casualty,Operations,India,Entry (B1-B2),540
+Property & Casualty,Operations,India,Mid (B3-B4),420
+Property & Casualty,Operations,India,Senior (B5-B6),180
+Property & Casualty,Finance,India,Entry (B1-B2),540
+Property & Casualty,Finance,India,Mid (B3-B4),420
+Property & Casualty,Finance,India,Senior (B5-B6),180
+Property & Casualty,HR,India,Entry (B1-B2),540
+Property & Casualty,HR,India,Mid (B3-B4),420
+Property & Casualty,HR,India,Senior (B5-B6),180
+Marine & Cargo,Operations,India,Entry (B1-B2),630
+Marine & Cargo,Operations,India,Mid (B3-B4),489
+Marine & Cargo,Operations,India,Senior (B5-B6),210
+Marine & Cargo,Finance,India,Entry (B1-B2),630
+Marine & Cargo,Finance,India,Mid (B3-B4),489
+Marine & Cargo,Finance,India,Senior (B5-B6),210
+Marine & Cargo,HR,India,Entry (B1-B2),630
+Marine & Cargo,HR,India,Mid (B3-B4),489
+Marine & Cargo,HR,India,Senior (B5-B6),210
+Crop Insurance,Operations,India,Entry (B1-B2),720
+Crop Insurance,Operations,India,Mid (B3-B4),560
+Crop Insurance,Operations,India,Senior (B5-B6),240
+Crop Insurance,Finance,India,Entry (B1-B2),720
+Crop Insurance,Finance,India,Mid (B3-B4),560
+Crop Insurance,Finance,India,Senior (B5-B6),240
+Crop Insurance,HR,India,Entry (B1-B2),720
+Crop Insurance,HR,India,Mid (B3-B4),560
+Crop Insurance,HR,India,Senior (B5-B6),240

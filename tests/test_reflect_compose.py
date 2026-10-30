@@ -1,9 +1,12 @@
 """Tests for reflect response composition and recommendation formatters."""
 from __future__ import annotations
 
+import uuid
 from unittest.mock import MagicMock, patch
 
-from app.opar.models import ExecutionPlan, ObserveContext, SkillTask
+from app.memory import MemoryStore
+from app.opar.models import ActResult, ExecutionPlan, ObserveContext, SkillTask
+from app.opar.reflect import reflect
 from app.opar.reflect_advisory import generate_llm_advisory_sections
 from app.opar.reflect_compose import build_response_text
 from app.opar.reflect_currency import set_reflect_currency
@@ -158,9 +161,9 @@ def test_generate_llm_advisory_uses_configured_synthesizer() -> None:
     }
     mock_synth = MagicMock(return_value=(raw_advisory, "thinking trace"))
     with patch("app.opar.reflect_advisory.GEMINI_ENABLED", True), patch(
-        "app.opar.reflect_advisory.resolve_analysis_synthesizer", return_value=mock_synth
+        "app.opar.reflect_advisory._iter_analysis_synthesizers", return_value=[mock_synth]
     ):
-        advisory, thinking = generate_llm_advisory_sections(ctx, {"currency": "INR"}, validated)
+        advisory, thinking, _skip = generate_llm_advisory_sections(ctx, {"currency": "INR"}, validated)
     assert advisory is not None
     assert thinking == "thinking trace"
     mock_synth.assert_called()
@@ -194,3 +197,37 @@ def test_build_data_backed_recommendation_lines_focus_category() -> None:
     joined = "\n".join(lines)
     assert "Focused category actions" in joined
     assert "primary focus" in joined.lower() or "IT" in joined
+
+
+def test_reflect_uses_composer_when_advisory_fails_for_category_question() -> None:
+    """Category-focused questions should get deterministic composer narrative, not chat LLM."""
+    session_id = str(uuid.uuid4())
+    MemoryStore().put(
+        "session",
+        session_id,
+        {"session_id": session_id, "skill_outputs": {}, "normalized_spend": []},
+    )
+
+    ctx = ObserveContext(
+        user_message="What drives spend in HR & Recruitment?",
+        intent_class="value_bridge",
+        explicit_category="HR & Recruitment",
+        query_capabilities=["root_cause", "value_modeling"],
+        session_id=session_id,
+        user_id="user-1",
+    )
+    validated = _value_bridge_validated()
+    act_result = ActResult(skill_outputs=validated, errors={})
+    plan = ExecutionPlan(tasks=[SkillTask(skill_name=name) for name in validated])
+
+    with patch(
+        "app.opar.reflect.needs_llm_advisory", return_value=True
+    ), patch("app.opar.reflect.generate_llm_advisory_sections", return_value=(None, None, "token_budget_exceeded")), patch(
+        "app.opar.reflect.synthesize_chat_response"
+    ) as mock_chat_synth:
+        result = reflect(act_result, plan, ctx)
+
+    mock_chat_synth.assert_not_called()
+    assert result.response_metadata.get("narrative_mode") == "deterministic"
+    assert result.advisory_sections is not None
+    assert "HR & Recruitment" in result.response_text or "IT" in result.response_text

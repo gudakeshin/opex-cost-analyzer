@@ -1,0 +1,25 @@
+asset_class,fiscal_period,amount,currency,status
+Solar plant expansion 500MW,FY23-Q1,291539198,INR,actual
+Solar plant expansion 500MW,FY23-Q2,323932443,INR,actual
+Solar plant expansion 500MW,FY23-Q3,307735820,INR,actual
+Solar plant expansion 500MW,FY23-Q4,349847038,INR,actual
+Solar plant expansion 500MW,FY24-Q1,343368389,INR,actual
+Solar plant expansion 500MW,FY24-Q2,353086362,INR,actual
+Substation upgrades,FY23-Q1,254925193,INR,actual
+Substation upgrades,FY23-Q2,283250215,INR,actual
+Substation upgrades,FY23-Q3,269087704,INR,actual
+Substation upgrades,FY23-Q4,305910232,INR,actual
+Substation upgrades,FY24-Q1,300245227,INR,actual
+Substation upgrades,FY24-Q2,308742734,INR,actual
+Smart metering rollout,FY23-Q1,165419801,INR,actual
+Smart metering rollout,FY23-Q2,183799779,INR,actual
+Smart metering rollout,FY23-Q3,174609790,INR,actual
+Smart metering rollout,FY23-Q4,198503761,INR,actual
+Smart metering rollout,FY24-Q1,194827765,INR,actual
+Smart metering rollout,FY24-Q2,200341759,INR,actual
+Transmission line stringing,FY23-Q1,271907146,INR,actual
+Transmission line stringing,FY23-Q2,302119052,INR,actual
+Transmission line stringing,FY23-Q3,287013099,INR,actual
+Transmission line stringing,FY23-Q4,326288576,INR,actual
+Transmission line stringing,FY24-Q1,320246195,INR,actual
+Transmission line stringing,FY24-Q2,329309766,INR,actual

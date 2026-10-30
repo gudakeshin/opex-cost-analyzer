@@ -27,6 +27,7 @@ def build_mor_pack(
     company_name: str = "Client",
     review_month: Optional[str] = None,
     engagement_week: int = 1,
+    basis_of_figures: Optional[list] = None,
 ) -> Dict[str, Any]:
     """
     Build a monthly operating review pack from pipeline and BvA data.
@@ -80,6 +81,7 @@ def build_mor_pack(
                 for v in top_variances
             ],
         },
+        "basis_of_figures": list(basis_of_figures or []),
         "action_items": _generate_action_items(pipeline_summary, bva_outputs),
         "next_gate": f"Week {min(12, engagement_week + 1)} — {'Gate ' + str(min(4, (engagement_week // 3) + 1))}",
     }
@@ -122,6 +124,12 @@ def export_mor_docx(mor: Dict[str, Any], filename: str) -> Path:
     doc.add_paragraph(
         f"{hdr['review_month']}  |  Engagement Week {hdr['engagement_week']}  |  Generated {hdr['generated_on']}"
     )
+
+    basis = mor["sections"].get("basis_of_figures") or []
+    if basis:
+        doc.add_heading("Basis of figures", level=1)
+        for line in basis:
+            doc.add_paragraph(line, style="List Bullet")
 
     doc.add_heading("Pipeline KPIs", level=1)
     kpis = mor["sections"]["pipeline_kpis"]

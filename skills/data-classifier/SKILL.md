@@ -1,6 +1,7 @@
 ---
 name: data-classifier
 description: "Classify every spend line and every skill-output aggregate with a B1–B4 data band. Attach inference-risk scores to aggregates. Run as Group 0 skill before any LLM context assembly."
+discoverable: false
 version: "1.0"
 status: active
 llm_required: false

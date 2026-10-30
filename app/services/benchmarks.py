@@ -32,17 +32,28 @@ SECTOR_PACK_TO_BENCHMARK: Dict[str, str] = {
     "hospitality_travel": "retail_consumer",
     "pharma_lifesciences": "healthcare",
     "healthcare_hospitals": "healthcare",
-    "energy_utilities": "manufacturing",
-    "telecom_infra": "technology",
+    "energy_utilities": "energy_utilities",
+    "telecom_infra": "telecom_infra",
     "manufacturing_diversified": "manufacturing",
+    "manufacturing_cement": "manufacturing",
     "psu_cpse": "manufacturing",
     "conglomerate": "manufacturing",
+}
+
+# Packs that still borrow a coarser industry's percentiles (no dedicated benchmark
+# key of their own). Resolution surfaces a benchmark_confidence_note for these so
+# downstream readers know the peer comparison is approximate. telecom_infra,
+# energy_utilities and gcc_capability_centers now map to themselves and are excluded.
+FALLBACK_MAPPINGS: Dict[str, str] = {
+    pack: bench for pack, bench in SECTOR_PACK_TO_BENCHMARK.items() if pack != bench
 }
 
 
 def benchmark_industry_for(industry: str) -> str:
     """Resolve a sector-pack id (or raw industry) to a benchmark-registry key."""
-    key = (industry or "").strip()
+    from app.services.sector_packs import resolve_sector_pack_id
+
+    key = resolve_sector_pack_id(industry) or (industry or "").strip()
     result = SECTOR_PACK_TO_BENCHMARK.get(key, key)
     if result == key and key and key not in SECTOR_PACK_TO_BENCHMARK.values():
         from app.config import logger
@@ -109,8 +120,21 @@ def _save_store(store: Dict[str, Any]) -> None:
     write_json(BENCHMARK_STORE_PATH, store)
 
 
-def list_datasets() -> List[Dict[str, Any]]:
-    return _load_store().get("datasets", [])
+def list_datasets(include_sector_packs: bool = True) -> List[Dict[str, Any]]:
+    datasets = list(_load_store().get("datasets", []))
+    if not include_sector_packs:
+        return datasets
+    from app.services.sector_packs import list_available_packs
+
+    existing_ids = {d.get("dataset_id") for d in datasets}
+    for pack_id in list_available_packs():
+        meta_id = f"sector-pack-{pack_id}"
+        if meta_id in existing_ids:
+            continue
+        pack_data = _load_sector_pack_benchmarks(pack_id)
+        if pack_data:
+            datasets.append(_sector_pack_dataset_meta(pack_id, pack_data))
+    return datasets
 
 
 def create_dataset(payload: Dict[str, Any]) -> Dict[str, Any]:
@@ -138,10 +162,232 @@ def create_dataset(payload: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def get_dataset(dataset_id: str) -> Dict[str, Any] | None:
+    if dataset_id.startswith("sector-pack-"):
+        pack_id = dataset_id[len("sector-pack-") :]
+        pack_data = _load_sector_pack_benchmarks(pack_id)
+        if pack_data:
+            return _sector_pack_dataset_meta(pack_id, pack_data)
+        return None
     for row in _load_store().get("datasets", []):
         if row.get("dataset_id") == dataset_id:
             return row
     return None
+
+
+def _sector_pack_category_detail(pack_id: str, pack_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Build rich coverage payload from sector-pack percentiles file."""
+    industry_block = (pack_data.get("benchmarks") or {}).get(pack_id) or {}
+    categories = industry_block.get("categories") or {}
+    detail: Dict[str, Any] = {}
+    for cat_id, cat in categories.items():
+        if not isinstance(cat, dict):
+            continue
+        detail[cat_id] = {
+            "P25": cat.get("P25"),
+            "P50": cat.get("P50"),
+            "P75": cat.get("P75"),
+            "P90": cat.get("P90"),
+            "unit": cat.get("unit", "% of revenue"),
+            "confidence": cat.get("confidence"),
+            "source_note": cat.get("source_note"),
+        }
+    return detail
+
+
+def _norm_cat_id(cat: str) -> str:
+    return (cat or "").strip().lower().replace(" ", "_")
+
+
+def _normalize_lever_row(lv: Dict[str, Any]) -> Dict[str, Any]:
+    sr = lv.get("savings_range_pct") or {}
+    p10 = lv.get("p10_pct") if lv.get("p10_pct") is not None else sr.get("p10")
+    p50 = lv.get("p50_pct") if lv.get("p50_pct") is not None else sr.get("p50")
+    p90 = lv.get("p90_pct") if lv.get("p90_pct") is not None else sr.get("p90")
+    impl = lv.get("implementation_weeks")
+    if isinstance(impl, dict):
+        impl_weeks = impl.get("p50") or impl.get("median")
+    else:
+        impl_weeks = impl
+    return {
+        "lever_id": lv.get("lever_id"),
+        "lever_name": lv.get("lever_name"),
+        "description": lv.get("description"),
+        "category_ids": list(lv.get("category_ids") or []),
+        "p10_pct": p10,
+        "p50_pct": p50,
+        "p90_pct": p90,
+        "implementation_weeks": impl_weeks,
+        "savings_type": lv.get("savings_type"),
+        "industry_sources": lv.get("industry_sources") or [],
+    }
+
+
+def _load_sector_pack_levers_raw(pack_id: str) -> Dict[str, Any]:
+    path = ROOT_DIR / "sector_packs" / pack_id / "sector_levers.json"
+    if not path.exists():
+        return {}
+    return read_json(path, {})
+
+
+def _lever_detail_for_pack(pack_id: str) -> List[Dict[str, Any]]:
+    from app.services.sector_packs import pack_levers_list
+
+    raw = _load_sector_pack_levers_raw(pack_id)
+    return [_normalize_lever_row(lv) for lv in pack_levers_list(raw)]
+
+
+def _build_category_lever_map(
+    lever_detail: List[Dict[str, Any]],
+    category_ids: List[str],
+) -> Dict[str, List[str]]:
+    cat_norm_to_canonical = {_norm_cat_id(c): c for c in category_ids}
+    result: Dict[str, List[str]] = {c: [] for c in category_ids}
+    for lev in lever_detail:
+        lid = lev.get("lever_id")
+        if not lid:
+            continue
+        for cat in lev.get("category_ids") or []:
+            norm = _norm_cat_id(str(cat))
+            canonical = cat_norm_to_canonical.get(norm)
+            if canonical and lid not in result[canonical]:
+                result[canonical].append(lid)
+    return result
+
+
+def _attach_linked_levers(
+    category_detail: Dict[str, Any],
+    category_lever_map: Dict[str, List[str]],
+) -> Dict[str, Any]:
+    out: Dict[str, Any] = {}
+    for cat_id, cat in category_detail.items():
+        entry = dict(cat)
+        entry["linked_levers"] = category_lever_map.get(cat_id, [])
+        out[cat_id] = entry
+    return out
+
+
+def sector_pack_detail_payload(pack_id: str) -> Dict[str, Any] | None:
+    """Full browsable sector pack payload (benchmarks, levers, KPIs, peers, etc.)."""
+    from app.services.sector_packs import pack_dir, pack_file_counts
+
+    d = pack_dir(pack_id)
+    if not d.is_dir():
+        return None
+
+    pack_data = _load_sector_pack_benchmarks(pack_id)
+    categories = _sector_pack_category_detail(pack_id, pack_data) if pack_data else {}
+    lever_detail = _lever_detail_for_pack(pack_id)
+    category_lever_map = _build_category_lever_map(lever_detail, list(categories.keys()))
+    if categories:
+        categories = _attach_linked_levers(categories, category_lever_map)
+
+    manifest: Dict[str, Any] = {}
+    manifest_path = d / "pack_manifest.yaml"
+    if manifest_path.exists():
+        import yaml
+
+        with open(manifest_path, encoding="utf-8") as f:
+            manifest = yaml.safe_load(f) or {}
+
+    peer_set: Dict[str, Any] = {}
+    peer_path = d / "peer_set.json"
+    if peer_path.exists():
+        peer_set = read_json(peer_path, {})
+
+    taxonomy: Dict[str, Any] = {}
+    tax_path = d / "taxonomy_extension.json"
+    if tax_path.exists():
+        taxonomy = read_json(tax_path, {})
+
+    kpi_pack: List[Any] = []
+    kpi_path = d / "kpi_pack.json"
+    if kpi_path.exists():
+        raw_kpis = read_json(kpi_path, [])
+        kpi_pack = raw_kpis if isinstance(raw_kpis, list) else []
+
+    benchmark_sources: Dict[str, Any] = {}
+    src_path = d / "benchmark_sources.yaml"
+    if src_path.exists():
+        import yaml
+
+        with open(src_path, encoding="utf-8") as f:
+            benchmark_sources = yaml.safe_load(f) or {}
+
+    regulatory_layer = ""
+    reg_path = d / "regulatory_layer.md"
+    if reg_path.exists():
+        regulatory_layer = reg_path.read_text(encoding="utf-8")
+
+    levers_document = _load_sector_pack_levers_raw(pack_id)
+    benchmarks_document = read_json(d / "benchmarks_percentiles.json", {}) if (d / "benchmarks_percentiles.json").exists() else {}
+
+    counts = pack_file_counts(pack_id)
+    pack_error: str | None = None
+    try:
+        from app.services.sector_packs import load_pack
+
+        load_pack(pack_id)
+    except Exception as exc:
+        pack_error = str(exc)
+
+    meta = _sector_pack_dataset_meta(pack_id, pack_data) if pack_data else {
+        "dataset_id": f"sector-pack-{pack_id}",
+    }
+
+    return {
+        "pack_id": pack_id,
+        "dataset_id": meta.get("dataset_id"),
+        "sector": (pack_data or {}).get("sector") or manifest.get("sector") or pack_id,
+        "version": (pack_data or {}).get("version") or manifest.get("version"),
+        "vintage_date": (pack_data or {}).get("vintage_date"),
+        "confidence_overall": (pack_data or {}).get("confidence_overall"),
+        "source_metadata": (pack_data or {}).get("source_metadata", {}),
+        "manifest": manifest,
+        "pack_error": pack_error,
+        "categories": categories,
+        "levers": lever_detail,
+        "levers_document": levers_document,
+        "benchmarks_document": benchmarks_document,
+        "category_lever_map": category_lever_map,
+        "kpi_pack": kpi_pack,
+        "peer_set": peer_set,
+        "peers": peer_set.get("peers", []),
+        "peer_benchmark_metrics": peer_set.get("benchmark_metrics", {}),
+        "taxonomy_extension": taxonomy,
+        "benchmark_sources": benchmark_sources,
+        "regulatory_layer": regulatory_layer,
+        "counts": counts,
+    }
+
+
+def sector_pack_benchmarks_payload(pack_id: str) -> Dict[str, Any] | None:
+    """Return browsable benchmark detail for a sector pack (subset of detail payload)."""
+    detail = sector_pack_detail_payload(pack_id)
+    if not detail:
+        return None
+    counts = detail.get("counts") or {}
+    return {
+        "pack_id": detail["pack_id"],
+        "dataset_id": detail.get("dataset_id"),
+        "sector": detail.get("sector"),
+        "version": detail.get("version"),
+        "vintage_date": detail.get("vintage_date"),
+        "confidence_overall": detail.get("confidence_overall"),
+        "source_metadata": detail.get("source_metadata", {}),
+        "manifest": {
+            "sector": detail.get("manifest", {}).get("sector"),
+            "version": detail.get("version"),
+            "status": detail.get("manifest", {}).get("status"),
+            "effective_from": detail.get("manifest", {}).get("effective_from", ""),
+            "peer_count": counts.get("peer_count", 0),
+            "sector_levers_count": counts.get("lever_count", 0),
+        },
+        "pack_error": detail.get("pack_error"),
+        "categories": detail.get("categories", {}),
+        "levers": detail.get("levers", []),
+        "category_lever_map": detail.get("category_lever_map", {}),
+        "category_count": counts.get("category_count", 0),
+    }
 
 
 def dataset_coverage(dataset_id: str) -> Dict[str, Any] | None:
@@ -151,11 +397,32 @@ def dataset_coverage(dataset_id: str) -> Dict[str, Any] | None:
     coverage = ds.get("category_coverage") or {}
     industry_count = len(coverage.keys()) if isinstance(coverage, dict) else 0
     category_count = 0
+    category_detail: Dict[str, Any] | None = None
+    lever_detail: List[Dict[str, Any]] | None = None
+    category_lever_map: Dict[str, List[str]] | None = None
+    lever_count = 0
+    kpi_count = 0
+    peer_count = 0
+    pack_id: str | None = None
     if isinstance(coverage, dict):
         for cats in coverage.values():
             if isinstance(cats, list):
                 category_count += len(cats)
-    return {
+    if dataset_id.startswith("sector-pack-"):
+        pack_id = dataset_id[len("sector-pack-") :]
+        pack_data = _load_sector_pack_benchmarks(pack_id)
+        if pack_data:
+            raw_categories = _sector_pack_category_detail(pack_id, pack_data)
+            lever_detail = _lever_detail_for_pack(pack_id)
+            category_lever_map = _build_category_lever_map(lever_detail, list(raw_categories.keys()))
+            category_detail = _attach_linked_levers(raw_categories, category_lever_map)
+            from app.services.sector_packs import pack_file_counts
+
+            counts = pack_file_counts(pack_id)
+            lever_count = counts.get("lever_count", 0)
+            kpi_count = counts.get("kpi_count", 0)
+            peer_count = counts.get("peer_count", 0)
+    result = {
         "dataset_id": ds.get("dataset_id"),
         "source": ds.get("source"),
         "industry_name": ds.get("industry_name"),
@@ -164,7 +431,18 @@ def dataset_coverage(dataset_id: str) -> Dict[str, Any] | None:
         "coverage": coverage,
         "industry_count": industry_count,
         "category_count": category_count,
+        "pack_id": pack_id,
+        "lever_count": lever_count,
+        "kpi_count": kpi_count,
+        "peer_count": peer_count,
     }
+    if category_detail is not None:
+        result["category_detail"] = category_detail
+    if lever_detail is not None:
+        result["lever_detail"] = lever_detail
+    if category_lever_map is not None:
+        result["category_lever_map"] = category_lever_map
+    return result
 
 
 def select_best_dataset(industry: str, categories: List[str], annual_revenue: float | None = None) -> Dict[str, Any]:
@@ -217,6 +495,49 @@ def select_best_dataset(industry: str, categories: List[str], annual_revenue: fl
     }
 
 
+BENCHMARK_CSV_HEADERS = (
+    "industry_code,industry_label,category_id,category_label,size_band,"
+    "revenue_band_min_cr,revenue_band_max_cr,geography,unit,"
+    "p25,p50,p75,p90,sample_size,confidence,source_type,source_citation,"
+    "methodology_notes,vintage_date"
+)
+
+
+def benchmark_csv_template() -> str:
+    """Return a professional benchmark CSV template with example rows."""
+    comment = (
+        "# OpEx benchmark upload — APQC-style peer percentiles. "
+        "Values are typically % of revenue; set unit column for alternatives. "
+        "size_band: small | mid | large | mega. "
+        "confidence: illustrative | public_disclosure | licensed.\n"
+    )
+    examples = [
+        (
+            "bfsi_banks,BFSI Banks,IT_SOFTWARE,IT Software & Licenses,large,1000,,India,"
+            "% of revenue,4.0,7.0,10.0,14.0,5,public_disclosure,published_research,"
+            "RBI Annual Report / BSE bank annual reports FY25,"
+            "Scheduled commercial bank IT spend as % of revenue,2025-04-01"
+        ),
+        (
+            "bfsi_banks,BFSI Banks,PROF_SERVICES,Professional Services,large,1000,,India,"
+            "% of revenue,1.0,2.2,3.5,5.0,5,public_disclosure,published_research,"
+            "Listed bank annual reports — audit and consulting fees,2025-04-01"
+        ),
+        (
+            "bfsi_banks,BFSI Banks,TRAVEL,Travel & Entertainment,large,1000,,India,"
+            "% of revenue,0.3,0.6,1.0,1.5,5,public_disclosure,published_research,"
+            "Employee T&E for listed banks,2025-04-01"
+        ),
+        (
+            "manufacturing_diversified,Diversified Manufacturing,FACILITIES,Facilities & Rent,mid,500,5000,India,"
+            "% of revenue,1.5,2.8,4.2,6.0,8,illustrative,internal_calibration,"
+            "Cross-engagement India manufacturing OpEx synthesis,"
+            "Plant rent and premises as % of revenue,2025-04-01"
+        ),
+    ]
+    return comment + BENCHMARK_CSV_HEADERS + "\n" + "\n".join(examples) + "\n"
+
+
 def ingest_benchmark_csv(
     file_bytes: bytes,
     source: str,
@@ -226,47 +547,54 @@ def ingest_benchmark_csv(
     sample_size: int = 0,
     geography: str = "India",
     specificity_score: float = 0.7,
+    revenue_band_min: Optional[float] = None,
+    revenue_band_max: Optional[float] = None,
+    license_expiry: Optional[str] = None,
     data_dir: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """Parse a client-supplied benchmark CSV and register it as a dataset.
 
-    Expected CSV columns (flexible, case-insensitive):
-      industry, category_id, p25, p50, p75, p90  (p* are % of revenue)
-    At minimum: industry + category_id + one of (p50 | benchmark_pct_of_revenue).
-
-    Saves the parsed benchmark data as a JSON file and registers the dataset.
-    Returns the created dataset registry entry.
+    Supports legacy columns (industry, category_id, p25-p90) and the full
+    APQC-style schema from benchmark_csv_template().
     """
     store_dir = data_dir or (DATA_DIR / "benchmarks" / "uploads")
     store_dir.mkdir(parents=True, exist_ok=True)
 
-    # Parse CSV bytes
     try:
-        text = file_bytes.decode("utf-8-sig")  # strip BOM if present
+        text = file_bytes.decode("utf-8-sig")
     except UnicodeDecodeError:
         text = file_bytes.decode("latin-1")
 
-    reader = csv.DictReader(io.StringIO(text))
-    rows = [row for row in reader]
+    lines = [ln for ln in text.splitlines() if ln.strip() and not ln.strip().startswith("#")]
+    if not lines:
+        raise ValueError("Uploaded benchmark CSV is empty or has no data rows")
 
+    reader = csv.DictReader(io.StringIO("\n".join(lines)))
+    rows = [row for row in reader]
     if not rows:
         raise ValueError("Uploaded benchmark CSV is empty or has no data rows")
 
-    # Normalize column names (lowercase, strip spaces/underscores)
     def _norm_col(name: str) -> str:
         return name.strip().lower().replace(" ", "_")
 
     normalized_rows = [{_norm_col(k): v for k, v in r.items()} for r in rows]
 
-    # Build benchmark_data JSON in the same shape as industry_benchmarks.json:
-    # { "benchmarks": { industry: { "categories": { cat_id: { P25, P50, P75, P90 } } } } }
     benchmarks: Dict[str, Any] = {}
     category_coverage: Dict[str, List[str]] = {}
+    source_notes: List[Dict[str, Any]] = []
+    row_sample_sizes: List[int] = []
+    row_vintage_dates: List[str] = []
+    methodology_notes: List[str] = []
 
     for row in normalized_rows:
-        ind = (row.get("industry") or industry_code or "custom").strip()
+        ind = (
+            row.get("industry_code")
+            or row.get("industry")
+            or industry_code
+            or "custom"
+        ).strip()
         cat = (row.get("category_id") or row.get("category") or "").strip()
-        if not cat:
+        if not ind or not cat:
             continue
 
         def _pct(key: str) -> float:
@@ -276,39 +604,105 @@ def ingest_benchmark_csv(
                 return 0.0
 
         p50 = _pct("p50") or _pct("benchmark_pct_of_revenue") or _pct("median")
+        if p50 <= 0:
+            continue
         p25 = _pct("p25") or round(p50 * 0.8, 4)
         p75 = _pct("p75") or round(p50 * 1.2, 4)
         p90 = _pct("p90") or round(p50 * 1.4, 4)
+        ordered = [p25, p50, p75, p90]
+        if ordered != sorted(ordered):
+            raise ValueError(
+                f"Percentiles must be monotonic (P25≤P50≤P75≤P90) for {ind}/{cat}: "
+                f"{p25}, {p50}, {p75}, {p90}"
+            )
 
-        benchmarks.setdefault(ind, {"categories": {}})
+        unit = (row.get("unit") or "% of revenue").strip()
+        confidence = (row.get("confidence") or "illustrative").strip()
+        citation = (row.get("source_citation") or row.get("source_note") or "").strip()
+        source_type = (row.get("source_type") or "published_research").strip()
+        cat_label = (row.get("category_label") or "").strip()
+        ind_label = (row.get("industry_label") or industry_name or "").strip()
+
+        benchmarks.setdefault(ind, {"label": ind_label or ind, "categories": {}})
+        if ind_label:
+            benchmarks[ind]["label"] = ind_label
         benchmarks[ind]["categories"][cat] = {
             "P25": p25,
             "P50": p50,
             "P75": p75,
             "P90": p90,
+            "unit": unit,
+            "confidence": confidence,
+            "source_note": citation or None,
         }
+        if cat_label:
+            benchmarks[ind]["categories"][cat]["category_label"] = cat_label
+
         category_coverage.setdefault(ind, [])
         if cat not in category_coverage[ind]:
             category_coverage[ind].append(cat)
 
+        if citation:
+            source_notes.append(
+                {
+                    "source_name": citation[:120],
+                    "source_type": source_type,
+                    "notes": f"{ind}/{cat}: {citation}"[:500],
+                }
+            )
+        try:
+            n = int(float(row.get("sample_size") or 0))
+            if n > 0:
+                row_sample_sizes.append(n)
+        except (TypeError, ValueError):
+            pass
+        vdate = (row.get("vintage_date") or "").strip()
+        if vdate:
+            row_vintage_dates.append(vdate)
+        mnote = (row.get("methodology_notes") or "").strip()
+        if mnote and mnote not in methodology_notes:
+            methodology_notes.append(mnote)
+
     if not benchmarks:
         raise ValueError("No parseable benchmark rows found — check CSV column names")
 
-    # Persist benchmark data JSON
+    effective_sample = sample_size or (max(row_sample_sizes) if row_sample_sizes else 0)
+    effective_vintage = vintage_date or (row_vintage_dates[0] if row_vintage_dates else _today_iso())
+    source_metadata: Dict[str, Any] = {
+        "primary_sources": source_notes[:10] if source_notes else [
+            {"source_name": source, "source_type": "published_research", "notes": "Uploaded benchmark dataset"}
+        ],
+        "methodology": " · ".join(methodology_notes) if methodology_notes else (
+            "Client-uploaded benchmark percentiles; values expressed per unit column (default % of revenue)."
+        ),
+        "sample_size": effective_sample,
+    }
+
     file_id = str(uuid.uuid4())
     data_path = store_dir / f"{file_id}.json"
-    write_json(data_path, {"benchmarks": benchmarks})
+    write_json(
+        data_path,
+        {
+            "version": "1.1",
+            "vintage_date": effective_vintage,
+            "source_metadata": source_metadata,
+            "benchmarks": benchmarks,
+        },
+    )
 
     dataset = create_dataset(
         {
             "source": source,
-            "industry_code": industry_code,
+            "industry_code": industry_code or next(iter(benchmarks.keys()), None),
             "industry_name": industry_name or industry_code,
             "category_coverage": category_coverage,
-            "vintage_date": vintage_date or _today_iso(),
-            "sample_size": sample_size,
+            "vintage_date": effective_vintage,
+            "sample_size": effective_sample,
+            "revenue_band_min": revenue_band_min,
+            "revenue_band_max": revenue_band_max,
             "geography": geography,
             "specificity_score": specificity_score,
+            "license_expiry": license_expiry or "2099-12-31",
             "data_file_ref": str(data_path),
         }
     )
@@ -453,37 +847,83 @@ def resolve_benchmark_payload(
     industry: str,
     categories: List[str],
     annual_revenue: float | None = None,
+    peer_set_name: str | None = None,
 ) -> Dict[str, Any]:
     """
     Select the best dataset for a run and resolve the actual benchmark payload.
 
     Resolution order:
-    1. Sector-pack-specific benchmarks_percentiles.json (highest priority — public_disclosure data)
-    2. Best uploaded/registered dataset from registry
-    3. Global seed (industry_benchmarks.json) — fallback
+    0. Named peer set (manifest ``peer_set_name``) when configured
+    1. Registered dataset from registry with specificity_score > 0.85 (licensed/custom data wins)
+    2. Sector-pack-specific benchmarks_percentiles.json (public-disclosure defaults)
+    3. Best uploaded/registered dataset (lower specificity)
+    4. Global seed (industry_benchmarks.json) — fallback
+
+    A deliberately-registered external dataset (specificity > 0.85) overrides sector-pack defaults
+    so that clients who upload licensed benchmark data get it honoured.
 
     Falls back to seed benchmarks if the selected dataset has no readable data file.
     """
-    # 1. Sector-pack-specific percentile file (takes priority over registry + seed)
-    if industry and industry in SECTOR_PACK_TO_BENCHMARK:
-        pack_data = _load_sector_pack_benchmarks(industry)
-        if pack_data:
-            selected_meta = _sector_pack_dataset_meta(industry, pack_data)
+    if peer_set_name:
+        try:
+            ps_result = resolve_peer_set_payload(peer_set_name, categories, annual_revenue)
+            bench_key = benchmark_industry_for(industry)
+            payload = ps_result.get("benchmark_data") or {}
+            benchmarks = payload.get("benchmarks", {})
+            if industry and industry != bench_key and industry not in benchmarks and bench_key in benchmarks:
+                benchmarks = dict(benchmarks)
+                benchmarks[industry] = benchmarks[bench_key]
+                payload = {**payload, "benchmarks": benchmarks}
+            rationale = dict(ps_result.get("selection_rationale") or {})
+            rationale["peer_set"] = peer_set_name
+            if industry in FALLBACK_MAPPINGS:
+                rationale["benchmark_confidence_note"] = (
+                    f"'{industry}' has no dedicated benchmark set; comparison uses "
+                    f"'{FALLBACK_MAPPINGS[industry]}' percentiles as an approximation."
+                )
             return {
-                "benchmark_data": pack_data,
-                "selected_dataset": selected_meta,
-                "selection_rationale": {
-                    "source": "sector_pack_percentiles",
-                    "pack_id": industry,
-                    "specificity_score": 0.85,
-                    "confidence": pack_data.get("confidence_overall", "public_disclosure"),
-                },
-                "candidates": [{"dataset_id": selected_meta["dataset_id"], "source": selected_meta["source"], "score": 0.85}],
+                "benchmark_data": payload,
+                "selected_dataset": ps_result.get("selected_dataset") or {},
+                "selection_rationale": rationale,
+                "candidates": ps_result.get("candidates", []),
             }
+        except ValueError:
+            pass
 
     bench_key = benchmark_industry_for(industry)
     selection = select_best_dataset(industry=bench_key, categories=categories, annual_revenue=annual_revenue)
-    selected = selection.get("selected") or _load_seed_dataset()
+
+    # Check whether the best registered dataset has high enough specificity to
+    # override the sector-pack default. specificity > 0.85 indicates a licensed
+    # or deliberately-uploaded external dataset — honour it over the public-disclosure
+    # sector-pack percentiles (which sit at 0.85).
+    best_registered = selection.get("selected")
+    best_spec = float((best_registered or {}).get("specificity_score") or 0.0)
+    use_sector_pack = best_spec <= 0.85 and industry and industry in SECTOR_PACK_TO_BENCHMARK
+
+    if use_sector_pack:
+        pack_data = _load_sector_pack_benchmarks(industry)
+        if pack_data:
+            selected_meta = _sector_pack_dataset_meta(industry, pack_data)
+            sector_pack_rationale: Dict[str, Any] = {
+                "source": "sector_pack_percentiles",
+                "pack_id": industry,
+                "specificity_score": 0.85,
+                "confidence": pack_data.get("confidence_overall", "public_disclosure"),
+            }
+            if industry in FALLBACK_MAPPINGS:
+                sector_pack_rationale["benchmark_confidence_note"] = (
+                    f"'{industry}' has no dedicated benchmark set; comparison uses "
+                    f"'{FALLBACK_MAPPINGS[industry]}' percentiles as an approximation."
+                )
+            return {
+                "benchmark_data": pack_data,
+                "selected_dataset": selected_meta,
+                "selection_rationale": sector_pack_rationale,
+                "candidates": [{"dataset_id": selected_meta["dataset_id"], "source": selected_meta["source"], "score": 0.85}],
+            }
+
+    selected = best_registered or _load_seed_dataset()
     payload = read_json(SEED_PATH, {})
     data_ref = selected.get("data_file_ref")
     if data_ref:
@@ -501,9 +941,15 @@ def resolve_benchmark_payload(
         benchmarks = dict(benchmarks)
         benchmarks[industry] = benchmarks[bench_key]
         payload = {**payload, "benchmarks": benchmarks}
+    selection_rationale = dict(selection.get("selection_rationale", {}))
+    if industry in FALLBACK_MAPPINGS:
+        selection_rationale["benchmark_confidence_note"] = (
+            f"'{industry}' has no dedicated benchmark set; comparison uses "
+            f"'{FALLBACK_MAPPINGS[industry]}' percentiles as an approximation."
+        )
     return {
         "benchmark_data": payload,
         "selected_dataset": selected,
-        "selection_rationale": selection.get("selection_rationale", {}),
+        "selection_rationale": selection_rationale,
         "candidates": selection.get("candidates", []),
     }

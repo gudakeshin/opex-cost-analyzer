@@ -33,7 +33,7 @@
 
 ### What industries does the platform cover?
 
-**11 Complete Sector Packs:**
+**16 Complete Sector Packs:**
 1. BFSI (Banking, Financial Services, Insurance)
 2. Manufacturing (Diversified, automotive, heavy equipment)
 3. IT/ITeS (IT services, IT-enabled services, software)
@@ -45,6 +45,11 @@
 9. Telecom & Infrastructure (Telecom, tower companies)
 10. PSU/CPSE (Public sector, state enterprises)
 11. Conglomerate (Multi-business groups)
+12. Global Capability Centers (Captive shared services in India)
+13. Healthcare & Hospitals (Hospital chains, diagnostics)
+14. Hospitality & Travel (Hotels, QSR, travel)
+15. Financial Services — Non-Bank (NBFCs, AMCs, brokers)
+16. Cement Manufacturing (Integrated plants, clinker and grinding units)
 
 **Plus 30+ universal levers** applicable across all industries.
 

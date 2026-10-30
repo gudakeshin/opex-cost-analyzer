@@ -1,0 +1,9 @@
+Indus Apex Bank Ltd — Group Structure
+
+IABL-IN: India parent (RBI SCB; NSE/BSE listed). ERP: Finacle + Oracle.
+IABL-GB: UK subsidiary (FCA regulated). ERP: Oracle FLEXCUBE.
+IABL-GIFT: GIFT City IBU (IFSCA regulated). ERP: Oracle FLEXCUBE.
+
+Entity tree: IABL-IN > IABL-GB (100%), IABL-GIFT (100%)
+
+Intercompany: management fee and IT allocations from IABL-IN to subs (GL 640099, related_party=yes). Eliminate before consolidation.

@@ -39,7 +39,9 @@
     "ld_rationalization",
     "space_utilization_optimization",
     "lease_restructuring",
-    "cost_governance"
+    "cost_governance",
+    "brsr_reporting_efficiency",
+    "insurance_premium_optimization"
   ],
   "sector_specific_levers": [
     {
@@ -127,7 +129,8 @@
         "Vendor GSTIN compliance status and filing history",
         "ERP GST configuration and tax code mapping",
         "Prior-year tax authority ITC mismatch notices if any"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     {
       "lever_id": "ind_as_116_lease",
@@ -213,7 +216,8 @@
         "Incremental borrowing rate by tenure for lease liability discounting",
         "ERP lease accounting module capability",
         "DPE reporting requirements for lease disclosures"
-      ]
+      ],
+      "applicability_threshold_pct": 0.02
     },
     {
       "lever_id": "csr_efficiency",
@@ -298,7 +302,8 @@
         "Implementing agency contracts and performance data",
         "Impact measurement reports by project",
         "CSR committee composition and decision-making process"
-      ]
+      ],
+      "applicability_threshold_pct": 0.03
     },
     {
       "lever_id": "public_procurement_reform",
@@ -383,7 +388,8 @@
         "DGS&D/GeM rate contract prices for common items",
         "CVC audit observations on procurement compliance",
         "GFR 2017 requirements applicable to the entity"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "mro_consolidation",
@@ -469,7 +475,8 @@
         "Price data for common items across sites",
         "Current VMI and consignment arrangements",
         "Critical vs non-critical spares classification"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "energy_audit_compliance",
@@ -555,7 +562,8 @@
         "Energy audit report with top-10 efficiency recommendations and investment estimates",
         "Electricity tariff structure and peak demand charges",
         "Motor inventory with load factor and age data"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
     },
     {
       "lever_id": "manpower_rationalisation",
@@ -641,7 +649,8 @@
         "DPE benchmark: employee cost ratios for comparable CPSEs",
         "VRS eligibility rules and DPE approval requirements",
         "5-year payroll forecast with and without rationalisation"
-      ]
+      ],
+      "applicability_threshold_pct": 0.1
     },
     {
       "lever_id": "project_cost_overrun_control",
@@ -714,7 +723,702 @@
         "Process volume metrics",
         "FTE effort or cost allocation by process",
         "Baseline cycle times"
-      ]
+      ],
+      "applicability_threshold_pct": 0.05
+    },
+    {
+      "lever_id": "manpower_rationalisation_vrs",
+      "lever_name": "Manpower Rationalisation & VRS",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 14.0,
+        "p90": 24.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Manpower Rationalisation & VRS"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 22,
+        "p50": 26,
+        "p90": 34
+      },
+      "applicable_if": [
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "DPE Annual Survey 2022-23 (dpe.gov.in) — VRS cited as key manpower cost reduction tool for loss-making CPSEs; BHEL VRS 2019-20 reduced headcount 10,000",
+        "Ministry of Heavy Industries — BHEL revival plan 2022: workforce rationalisation as strategic pillar",
+        "INTERNAL_CALIBRATION — manpower rationalisation savings from 2 India PSU turnaround mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Manpower Rationalisation & VRS: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 13
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "procurement_gem_portal",
+      "lever_name": "GeM Portal & Centralised Procurement",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for GeM Portal & Centralised Procurement"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 8,
+        "p90": 16
+      },
+      "applicable_if": [
+        "category:PLANT_MAINTENANCE present",
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "GeM Annual Report 2023-24 (gem.gov.in) — ₹2.5 Lakh Cr in transactions; CPSEs mandated to procure via GeM; competitive pricing 8-15% below traditional procurement",
+        "CVC (Central Vigilance Commission) Procurement Guidelines — GeM adoption saves procurement time and reduces corruption risk",
+        "INTERNAL_CALIBRATION — GeM-based procurement savings from 3 India CPSE procurement transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for GeM Portal & Centralised Procurement: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 4
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "inventory_rationalisation",
+      "lever_name": "Inventory Rationalisation & Stores Management",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 8.0,
+        "p50": 16.0,
+        "p90": 26.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Inventory Rationalisation & Stores Management"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:OUTSOURCED present"
+      ],
+      "industry_sources": [
+        "CAG Reports on CPSEs 2023-24 (cag.gov.in) — excess inventory is recurring finding; BHEL stores blocking ₹3,000+ Cr in excess inventory cited",
+        "DPE Survey 2022-23 — inventory days 90-180 for manufacturing CPSEs vs. private sector median 45-60 days",
+        "INTERNAL_CALIBRATION — inventory rationalisation savings from 3 India PSU supply chain mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Inventory Rationalisation & Stores Management: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for OUTSOURCED",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "technology_erp_modernisation",
+      "lever_name": "ERP & Digital Transformation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "mixed",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for ERP & Digital Transformation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 48,
+        "p50": 52,
+        "p90": 60
+      },
+      "applicable_if": [
+        "category:IT present"
+      ],
+      "industry_sources": [
+        "MeitY Digital India programme — ERP adoption in CPSEs mandated for transparency; CIL SAP implementation cited as modernisation benchmark",
+        "Gartner ERP 2024 — S/4HANA migration reduces IT maintenance 20-30% vs. legacy ERP + process efficiency gains 10-15%",
+        "INTERNAL_CALIBRATION — ERP modernisation savings from 2 India PSU digital transformation mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for ERP & Digital Transformation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 26
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for IT",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "energy_efficiency_plants",
+      "lever_name": "Energy Efficiency in Manufacturing Plants",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 6.0,
+        "p50": 12.0,
+        "p90": 20.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Energy Efficiency in Manufacturing Plants"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:PLANT_MAINTENANCE present",
+        "category:POWER_ENERGY present"
+      ],
+      "industry_sources": [
+        "BEE (Bureau of Energy Efficiency) PAT Scheme Cycle VI 2023-24 (beeindia.gov.in) — designated consumers (DCs) including CPSEs must achieve specific energy reduction targets",
+        "BHEL FY25 Annual Report — energy efficiency investments under PAT scheme at manufacturing plants",
+        "INTERNAL_CALIBRATION — energy efficiency savings from 3 India manufacturing PSU energy mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Energy Efficiency in Manufacturing Plants: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for POWER_ENERGY",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "commercial_recovery_ndues",
+      "lever_name": "Commercial Recovery & Dues Realisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 3.0,
+        "p50": 8.0,
+        "p90": 15.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "one_time",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Commercial Recovery & Dues Realisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 24
+      },
+      "applicable_if": [
+        "category:PROF_SVCS present",
+        "category:HR present"
+      ],
+      "industry_sources": [
+        "CAG Reports on CPSEs 2023-24 — excess receivables: BHEL outstanding dues from government utilities cited; debtors >180 days flagged",
+        "DPE CPSE Survey 2022-23 — working capital management improvement as key recommendation for Miniratna CPSEs",
+        "INTERNAL_CALIBRATION — receivables recovery savings from 2 India PSU commercial excellence mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Commercial Recovery & Dues Realisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for HR",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "brsr_reporting_efficiency",
+      "lever_name": "BRSR / ESG Reporting & Assurance Efficiency",
+      "lever_family": "process",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 18.0
+      },
+      "cta_rate": 0.06,
+      "phasing_curve": [
+        0.4,
+        0.4,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "low",
+      "org_change_risk": "medium",
+      "condition_precedents": [
+        "ESG data inventory mapped to BRSR Core KPI requirements",
+        "Group-level ESG data platform or shared service model evaluated",
+        "Assurance vs assessment route selected per SEBI glide path"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.72,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 16,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:BRSR_ESG present"
+      ],
+      "industry_sources": [
+        "SEBI BRSR Core Circular Jul 2023 (sebi.gov.in) — integrated ESG platform reduces per-entity assurance cost",
+        "SEBI Expert Committee May 2024 — assessment vs assurance simplification for ease of compliance",
+        "INTERNAL_CALIBRATION — PSU ESG reporting efficiency savings from 2 India CPSE sustainability mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Map BRSR Core KPI data sources across entities; identify duplication and manual collection effort",
+          "owner_role": "Sustainability / Finance",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Implement integrated ESG data platform or group reporting hub",
+          "owner_role": "IT / ESG",
+          "duration_weeks": 8
+        },
+        {
+          "step": "Consolidate assurance providers and align to SEBI assessment standards where applicable",
+          "owner_role": "Company Secretary / ESG",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Track cost per entity for BRSR preparation and assurance vs prior year",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "BRSR preparation cost rising faster than entity count; duplicate data collection across BUs",
+          "evidence_source": "esg_cost_tracker",
+          "confirms": "Integrated reporting platform will reduce per-entity cost"
+        },
+        {
+          "signal": "Multiple assurance providers across group entities without coordinated scope",
+          "evidence_source": "audit_register",
+          "confirms": "Assurance consolidation will reduce fees"
+        }
+      ],
+      "required_data_fields": [
+        "BRSR preparation and assurance cost by entity",
+        "ESG KPI data source inventory",
+        "SEBI applicability and glide-path status"
+      ],
+      "applicability_threshold_pct": 0.02
+    },
+    {
+      "lever_id": "insurance_premium_optimization",
+      "lever_name": "CPSE Insurance Pooling & Premium Optimisation",
+      "lever_family": "finance",
+      "savings_range_pct": {
+        "p10": 5.0,
+        "p50": 10.0,
+        "p90": 16.0
+      },
+      "cta_rate": 0.03,
+      "phasing_curve": [
+        0.6,
+        0.3,
+        0.1
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.72,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Insurance audit completed — coverage adequacy vs. over-insurance assessed by peril",
+        "Market submissions prepared for competitive renewal (3+ carriers benchmarked)",
+        "Risk management improvements documented as leverage for premium negotiation"
+      ],
+      "complexity_tier": "low",
+      "base_execution_probability": 0.8,
+      "implementation_weeks": {
+        "p10": 4,
+        "p50": 10,
+        "p90": 18
+      },
+      "applicable_if": [
+        "category:INSURANCE present"
+      ],
+      "industry_sources": [
+        "IRDAI Annual Report 2023-24 — public sector insurer market; competitive tendering benchmarks",
+        "DPE CPSE Survey 2022-23 — insurance cost as component of establishment charges",
+        "INTERNAL_CALIBRATION — CPSE insurance pooling savings from 2 India PSU risk reviews"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Ind AS 116 Lease Reclassification (Operating vs. Finance): validate baseline and stakeholders",
+          "owner_role": "Treasury",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Model supplier financial risk and term scenarios",
+          "owner_role": "Treasury / Procurement",
+          "duration_weeks": 3
+        },
+        {
+          "step": "Negotiate term changes with top suppliers",
+          "owner_role": "Procurement",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Update ERP terms and monitor DPO/cash impact",
+          "owner_role": "AP Lead",
+          "duration_weeks": 2
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "DPO below sector benchmark with low supplier risk",
+          "evidence_source": "ap_aging",
+          "confirms": "Term extension is feasible"
+        }
+      ],
+      "required_data_fields": [
+        "AP aging by supplier",
+        "Payment terms master",
+        "Supplier credit/risk ratings"
+      ],
+      "applicability_threshold_pct": 0.02
+    },
+    {
+      "lever_id": "township_cost_optimisation",
+      "lever_name": "Township & Establishment Cost Optimisation",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 8.0,
+        "p90": 14.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for Township & Establishment Cost Optimisation"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 16,
+        "p50": 20,
+        "p90": 28
+      },
+      "applicable_if": [
+        "category:FACILITIES present"
+      ],
+      "industry_sources": [
+        "DPE CPSE Survey 2022-23 — township and establishment charges significant for manufacturing CPSEs",
+        "CAG Reports on CPSEs 2023-24 — excess establishment cost recurring finding",
+        "INTERNAL_CALIBRATION — township optimisation savings from 2 India PSU facilities mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for Township & Establishment Cost Optimisation: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 10
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for FACILITIES",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
+    },
+    {
+      "lever_id": "cag_audit_readiness",
+      "lever_name": "CAG Audit Readiness & Advisory Cost Control",
+      "lever_family": "supply",
+      "savings_range_pct": {
+        "p10": 4.0,
+        "p50": 8.0,
+        "p90": 14.0
+      },
+      "cta_rate": 0.05,
+      "phasing_curve": [
+        0.3,
+        0.5,
+        0.2
+      ],
+      "savings_type": "run_rate",
+      "sustainability_score": 0.7,
+      "bounce_back_risk": "medium",
+      "org_change_risk": "low",
+      "condition_precedents": [
+        "Baseline validated for CAG Audit Readiness & Advisory Cost Control"
+      ],
+      "complexity_tier": "medium",
+      "base_execution_probability": 0.75,
+      "implementation_weeks": {
+        "p10": 8,
+        "p50": 12,
+        "p90": 20
+      },
+      "applicable_if": [
+        "category:PROF_SVCS present"
+      ],
+      "industry_sources": [
+        "CAG Reports on CPSEs 2023-24 (cag.gov.in) — recurring audit observations drive advisory spend",
+        "DPE Guidelines on CPSE governance — audit remediation and compliance cost benchmarks",
+        "INTERNAL_CALIBRATION — CAG readiness savings from 2 India PSU governance mandates"
+      ],
+      "execution_playbook": [
+        {
+          "step": "Confirm scope for CAG Audit Readiness & Advisory Cost Control: validate baseline",
+          "owner_role": "Category Manager",
+          "duration_weeks": 2
+        },
+        {
+          "step": "Execute initiative and capture signed savings",
+          "owner_role": "Procurement Lead",
+          "duration_weeks": 6
+        },
+        {
+          "step": "Embed controls and track run-rate vs plan",
+          "owner_role": "FP&A",
+          "duration_weeks": 4
+        }
+      ],
+      "diagnostic_signals": [
+        {
+          "signal": "Category spend elevated vs peer benchmark for PROF_SVCS",
+          "evidence_source": "spend_profile",
+          "confirms": "Category-specific lever is applicable"
+        }
+      ],
+      "required_data_fields": [
+        "Category spend baseline",
+        "Supplier and contract inventory"
+      ],
+      "applicability_threshold_pct": 0.03
     }
   ],
   "source_verification_note": "industry_sources entries indicate the published works that directionally support each lever's savings thesis. Where no external benchmark was found, INTERNAL_CALIBRATION is noted. All cited sources are real publications; specific savings percentages remain internal calibrations unless the source directly cites a matching range."

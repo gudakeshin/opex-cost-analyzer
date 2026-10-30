@@ -1,0 +1,38 @@
+[
+  {
+    "engagement_id": "eng-ahnl-fy24",
+    "initiative_id": "INI-1",
+    "lever_id": "generic_substitution",
+    "pack_id": "healthcare_hospitals",
+    "planned_p50_cr": 22.0,
+    "realised_cr": 18.0,
+    "realised_date": "2025-03-31",
+    "data_source": "self_reported",
+    "confidence": "medium",
+    "notes": "Physician resistance slowed substitution in oncology and cardiac categories."
+  },
+  {
+    "engagement_id": "eng-ahnl-fy24",
+    "initiative_id": "INI-2",
+    "lever_id": "biomedical_amc_consolidation",
+    "pack_id": "healthcare_hospitals",
+    "planned_p50_cr": 16.0,
+    "realised_cr": 19.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "high",
+    "notes": "Volume discount from 3-OEM panel exceeded plan; response time SLAs maintained."
+  },
+  {
+    "engagement_id": "eng-ahnl-fy24",
+    "initiative_id": "INI-3",
+    "lever_id": "contract_nursing_rate",
+    "pack_id": "healthcare_hospitals",
+    "planned_p50_cr": 12.0,
+    "realised_cr": 9.0,
+    "realised_date": "2025-03-31",
+    "data_source": "finance_sign_off",
+    "confidence": "medium",
+    "notes": "ICU nurse shortage constrained rate cuts; partial savings on general ward staff."
+  }
+]

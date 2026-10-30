@@ -30,6 +30,10 @@ from typing import Any, Dict, List, Optional, Tuple
 ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
 
+# TestClient sends all requests from one IP; per-IP rate limits would trip.
+# Must be set before app.main (-> app.ratelimit) is imported.
+os.environ.setdefault("RATE_LIMIT_ENABLED", "false")
+
 # ── Smoke test must NOT set PYTEST_CURRENT_TEST itself, but we check for it
 # ── so that accidental pytest runs don't silently pass with no LLM calls.
 if "PYTEST_CURRENT_TEST" in os.environ:

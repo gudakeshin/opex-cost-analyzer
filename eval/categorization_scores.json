@@ -1,0 +1,187 @@
+{
+  "eval_date": "2026-10-30",
+  "score_type": "categorical_accuracy",
+  "scope": "keyword-classifier accuracy only \u2014 measures whether ingestion.py::_classify maps spend descriptions to taxonomy categories correctly. Does NOT validate savings recommendations or analytical quality.",
+  "pass_threshold_micro_f1": 0.8,
+  "total": 77,
+  "correct": 72,
+  "accuracy": 0.9351,
+  "micro_f1": 0.9351,
+  "macro_f1": 0.9438,
+  "edge_case_accuracy": 0.625,
+  "passed": true,
+  "per_category": {
+    "CONTINGENT": {
+      "precision": 1.0,
+      "recall": 0.75,
+      "f1": 0.857,
+      "support": 4,
+      "tp": 3,
+      "fp": 0,
+      "fn": 1
+    },
+    "FACILITIES": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 6,
+      "tp": 6,
+      "fp": 0,
+      "fn": 0
+    },
+    "HR": {
+      "precision": 0.667,
+      "recall": 0.8,
+      "f1": 0.727,
+      "support": 5,
+      "tp": 4,
+      "fp": 2,
+      "fn": 1
+    },
+    "INSURANCE": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 4,
+      "tp": 4,
+      "fp": 0,
+      "fn": 0
+    },
+    "IT": {
+      "precision": 0.9,
+      "recall": 0.9,
+      "f1": 0.9,
+      "support": 10,
+      "tp": 9,
+      "fp": 1,
+      "fn": 1
+    },
+    "LOGISTICS": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 5,
+      "tp": 5,
+      "fp": 0,
+      "fn": 0
+    },
+    "MARKETING": {
+      "precision": 1.0,
+      "recall": 0.778,
+      "f1": 0.875,
+      "support": 9,
+      "tp": 7,
+      "fp": 0,
+      "fn": 2
+    },
+    "OFFICE": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 5,
+      "tp": 5,
+      "fp": 0,
+      "fn": 0
+    },
+    "OTHER": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 2,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0
+    },
+    "OUTSOURCED": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 3,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0
+    },
+    "POWER_ENERGY": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 4,
+      "tp": 4,
+      "fp": 0,
+      "fn": 0
+    },
+    "PROF_SVCS": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 6,
+      "tp": 6,
+      "fp": 0,
+      "fn": 0
+    },
+    "RND": {
+      "precision": 0.8,
+      "recall": 1.0,
+      "f1": 0.889,
+      "support": 4,
+      "tp": 4,
+      "fp": 1,
+      "fn": 0
+    },
+    "TELECOM": {
+      "precision": 0.833,
+      "recall": 1.0,
+      "f1": 0.909,
+      "support": 5,
+      "tp": 5,
+      "fp": 1,
+      "fn": 0
+    },
+    "TRAVEL": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 5,
+      "tp": 5,
+      "fp": 0,
+      "fn": 0
+    }
+  },
+  "false_positives": [
+    {
+      "description": "LinkedIn Recruiter license",
+      "supplier": "LinkedIn India",
+      "expected": "HR",
+      "predicted": "IT",
+      "note": "clear"
+    },
+    {
+      "description": "Temporary staffing \u2014 peak season",
+      "supplier": "Manpower India",
+      "expected": "CONTINGENT",
+      "predicted": "HR",
+      "note": "clear"
+    },
+    {
+      "description": "Voice of customer research study",
+      "supplier": "Kantar India",
+      "expected": "MARKETING",
+      "predicted": "TELECOM",
+      "note": "false+"
+    },
+    {
+      "description": "Mobile application development",
+      "supplier": "ThoughtWorks India",
+      "expected": "IT",
+      "predicted": "HR",
+      "note": "false+"
+    },
+    {
+      "description": "Consumer market research report",
+      "supplier": "Nielsen India",
+      "expected": "MARKETING",
+      "predicted": "RND",
+      "note": "false+"
+    }
+  ]
+}

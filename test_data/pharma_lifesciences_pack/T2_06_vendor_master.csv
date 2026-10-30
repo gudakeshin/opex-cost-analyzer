@@ -1,0 +1,11 @@
+vendor,vendor_category,gstin,vendor_pan,msme_flag,spend_category,legal_entity,related_party
+Divi Laboratories,large,27AABCD3421D1Z8,AABCD3421D,no,API & Raw Materials,ZPL-IN,no
+Laurus Labs,large,27AABCL4531L1Z1,AABCL4531L,no,API & Raw Materials,ZPL-IN,no
+Jubilant Biosys,large,27AABCJ5641J1Z4,AABCJ5641J,no,Contract Research & Manufacturing,ZPL-IN,no
+Syngene International,large,27AABCS6751S1Z7,AABCS6751S,no,Contract Research & Manufacturing,ZPL-IN,no
+IQVIA India,large,27AABCI7861I1Z0,AABCI7861I,no,Regulatory & Quality,ZPL-IN,no
+SGS India,large,27AABCS8971S1Z3,AABCS8971S,no,Regulatory & Quality,ZPL-IN,no
+Ogilvy Health,large,27AABCO9081O1Z6,AABCO9081O,no,Marketing & Medical Affairs,ZPL-IN,no
+DHL Supply Chain,large,,,no,Logistics & Cold Chain,ZPL-US,no
+FedEx India,large,27AABCF0191F1Z9,AABCF0191F,no,Logistics & Cold Chain,ZPL-IN,no
+KPMG India,large,29AABCK3201F1Z9,AABCK3201F,no,Professional Services,ZPL-IN,no

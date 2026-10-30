@@ -1,0 +1,11 @@
+supplier,description,amount,currency,category,gl_code,spend_date,business_unit,country
+Metro Cash & Carry,F&B raw materials & housekeeping supplies — luxury hotels,680000000,INR,F&B & Housekeeping Supplies,510010,2024-12-01,Luxury Hotels,India
+ITC Hotels Supply,Premium linen uniform & amenities,420000000,INR,F&B & Housekeeping Supplies,510011,2024-11-15,Luxury Hotels,India
+Siemens Building Tech,HVAC BMS & fire safety AMC — all properties,480000000,INR,Property Maintenance & Utilities,520010,2025-01-10,Luxury Hotels,India
+Johnson Controls,Chiller & building automation maintenance,320000000,INR,Property Maintenance & Utilities,520011,2024-10-05,Business Hotels,India
+ISS Facility Services,Housekeeping & stewarding contract staff,580000000,INR,Staffing,530010,2024-09-12,Luxury Hotels,India
+Booking.com,OTA commissions — room bookings,780000000,INR,Marketing & Distribution,540010,2024-08-01,Luxury Hotels,Maldives
+Expedia Group,OTA commissions — international bookings,540000000,INR,Marketing & Distribution,540011,2024-07-01,Resorts & Spa,UAE
+Oracle Hospitality,Property management system licences & support,280000000,INR,Technology & PMS,550010,2024-06-15,Corporate,India
+Amadeus India,Central reservation system & channel manager,220000000,INR,Technology & PMS,550011,2025-02-01,Corporate,India
+Adani Green Energy,Renewable energy supply — resort properties,180000000,INR,Property Maintenance & Utilities,520012,2025-01-08,Resorts & Spa,India

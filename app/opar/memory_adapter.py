@@ -164,7 +164,12 @@ def get_memory_adapter() -> MemoryAdapterInterface:
     return _ADAPTER_SINGLETON
 
 
-def get_memory_adapter_status() -> Dict[str, Any]:
-    """Expose backend status for diagnostics/health endpoint."""
-    get_memory_adapter()
-    return dict(_ADAPTER_META)
+def get_memory_adapter_status(initialize: bool = True) -> Dict[str, Any]:
+    """Expose backend status for diagnostics/health endpoint.
+
+    ``initialize=False`` never builds the adapter (cheap liveness probes).
+    """
+    if initialize or _ADAPTER_SINGLETON is not None:
+        get_memory_adapter()
+        return dict(_ADAPTER_META)
+    return {**_ADAPTER_META, "reason": "not_initialized_yet"}

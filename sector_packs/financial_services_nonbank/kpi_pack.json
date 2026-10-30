@@ -58,5 +58,23 @@
     "p50_benchmark_lakh": 45.0,
     "p75_benchmark_lakh": 25.0,
     "source": "HDFC AMC FY25: ~₹180L/emp (high; asset-light AMC). Bajaj Finance FY25: ~₹50L/emp. Mid-tier NBFC: ₹25-40L/emp."
+  },
+  {
+    "kpi_id": "distribution_commission_pct",
+    "kpi_name": "Distribution Commission % of Revenue",
+    "unit": "pct",
+    "formula": "distribution_commissions / total_revenue * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 10.0,
+    "source": "AMFI commission disclosures + AMC annual report scheme expense notes"
+  },
+  {
+    "kpi_id": "compliance_cost_pct",
+    "kpi_name": "Compliance Cost % of Revenue",
+    "unit": "pct",
+    "formula": "compliance_cost / total_revenue * 100",
+    "target_direction": "lower",
+    "p50_benchmark_pct": 0.5,
+    "source": "SEBI/RBI-NBFC compliance staffing and filing cost estimates for mid-size players"
   }
 ]

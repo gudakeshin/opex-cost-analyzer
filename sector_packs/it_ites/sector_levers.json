@@ -7,8 +7,13 @@
       "lever_id": "subcontractor_rationalisation",
       "lever_name": "Subcontractor & Third-Party Vendor Rationalisation",
       "description": "Reduce reliance on high-cost subcontractors by insourcing roles into lower-cost India delivery centres; renegotiate retained subcontracts.",
-      "category_ids": ["OUTSOURCED"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 24.0,
+      "category_ids": [
+        "OUTSOURCED",
+        "subcontracting_associates"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 24.0,
       "implementation_weeks": 12,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -16,14 +21,24 @@
         "NASSCOM Strategic Review 2025 (nasscom.in) — subcontracting 6-10% of IT services revenue; insourcing saves 30-50% per FTE equivalent",
         "TCS FY25 Annual Report (BSE 532540) — subcontracting at 5% of revenue represents best-in-class benchmark vs sector median 8-9%",
         "INTERNAL_CALIBRATION — savings range calibrated from 5 IT services sourcing reviews in India"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
     },
     {
       "lever_id": "pyramid_optimisation",
       "lever_name": "Talent Pyramid Optimisation",
       "description": "Rebalance workforce pyramid: increase fresher/entry-level ratio, implement structured upskilling to reduce dependence on lateral hires at senior grades.",
-      "category_ids": ["HR"],
-      "p10_pct": 4.0, "p50_pct": 8.0, "p90_pct": 14.0,
+      "category_ids": [
+        "HR",
+        "bench_capacity_cost"
+      ],
+      "p10_pct": 4.0,
+      "p50_pct": 8.0,
+      "p90_pct": 14.0,
       "implementation_weeks": 24,
       "brsr_principle": "P5",
       "savings_type": "run_rate",
@@ -31,14 +46,24 @@
         "NASSCOM Strategic Review 2025 — fresher intake 50-60% of annual hiring in tier-1 IT; cost 30-40% lower than lateral equivalent",
         "Infosys FY25 Annual Report (BSE 500209) — fresher onboarding and pyramid management cited as key margin lever",
         "INTERNAL_CALIBRATION — pyramid rebalancing savings calibrated from 6 India IT workforce transformation engagements"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 18,
+        "p50": 24,
+        "p90": 30
+      }
     },
     {
       "lever_id": "attrition_reduction_it",
       "lever_name": "Voluntary Attrition Reduction",
       "description": "Structured interventions: manager quality scoring, career pathing, competitive compensation benchmarking, targeted retention bonus for critical skills.",
-      "category_ids": ["HR"],
-      "p10_pct": 3.0, "p50_pct": 7.0, "p90_pct": 12.0,
+      "category_ids": [
+        "HR",
+        "talent_acquisition_costs"
+      ],
+      "p10_pct": 3.0,
+      "p50_pct": 7.0,
+      "p90_pct": 12.0,
       "implementation_weeks": 16,
       "brsr_principle": "P5",
       "savings_type": "run_rate",
@@ -46,14 +71,24 @@
         "NASSCOM Strategic Review 2025 — cost of attrition in IT: 6-12 months salary per departure including recruitment, ramp-up, lost revenue",
         "TCS FY25 Annual Report — attrition at 13.3% cited as best-in-class; every 1pp reduction saves ~0.5% of revenue",
         "INTERNAL_CALIBRATION — attrition savings range from HR analytics engagements at 4 Indian IT firms"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
     },
     {
       "lever_id": "cloud_infra_rationalisation",
       "lever_name": "Internal Cloud & IT Infrastructure Rationalisation",
       "description": "Consolidate internal data centres to public cloud; eliminate redundant software licences; implement FinOps discipline for cloud cost management.",
-      "category_ids": ["IT"],
-      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "category_ids": [
+        "IT",
+        "cloud_saas_infra"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 18.0,
+      "p90_pct": 28.0,
       "implementation_weeks": 20,
       "brsr_principle": "P6",
       "savings_type": "run_rate",
@@ -61,14 +96,24 @@
         "Gartner IT Key Metrics 2024 (gartner.com) — IT services firms reducing internal infra cost 20-30% via cloud migration + FinOps",
         "Infosys FY25 Annual Report — internal cloud transformation cited as cost driver; similar programmes at TCS, HCL",
         "INTERNAL_CALIBRATION — cloud rationalisation savings calibrated from 5 IT services IT modernisation engagements"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "real_estate_hybrid_work",
       "lever_name": "Real Estate Rationalisation via Hybrid Work",
       "description": "Implement seat-sharing and hybrid work policy (50-60% seat utilisation target). Exit high-cost leases in CBD; consolidate to campus model.",
-      "category_ids": ["FACILITIES"],
-      "p10_pct": 12.0, "p50_pct": 22.0, "p90_pct": 35.0,
+      "category_ids": [
+        "FACILITIES",
+        "offshore_delivery_infra"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 22.0,
+      "p90_pct": 35.0,
       "implementation_weeks": 20,
       "brsr_principle": "P4",
       "savings_type": "run_rate",
@@ -76,14 +121,25 @@
         "NASSCOM 2025 — post-COVID hybrid work in IT: 60-70% of employees in hybrid; seat utilisation 45-55% reducing space needs",
         "Wipro FY25 Annual Report (BSE 507685) — facilities rationalisation contributing to margin improvement",
         "INTERNAL_CALIBRATION — real estate savings calibrated from 4 IT sector lease restructuring mandates"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
     },
     {
       "lever_id": "travel_policy_optimisation",
       "lever_name": "Travel & Visa Cost Optimisation",
       "description": "Implement self-booking tools, policy compliance enforcement, preferred supplier agreements for hotels/flights, video-first for short-duration client engagements.",
-      "category_ids": ["TRAVEL"],
-      "p10_pct": 10.0, "p50_pct": 18.0, "p90_pct": 28.0,
+      "category_ids": [
+        "TRAVEL",
+        "visa_immigration",
+        "client_site_onsite_costs"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 18.0,
+      "p90_pct": 28.0,
       "implementation_weeks": 8,
       "brsr_principle": "P4",
       "savings_type": "run_rate",
@@ -91,14 +147,23 @@
         "Infosys FY25 Annual Report — T&E at 1.8% of revenue; best-in-class IT firms 1.5% (TCS)",
         "Gartner 2024 — travel policy compliance programmes reduce T&E 15-25% without service delivery impact",
         "INTERNAL_CALIBRATION — T&E optimisation savings from 5 India IT travel management engagements"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
     },
     {
       "lever_id": "marketing_spend_effectiveness",
       "lever_name": "Marketing Spend Effectiveness",
       "description": "Shift from events/analyst relations spend to digital marketing. Introduce marketing attribution to eliminate low-ROI spend. AI-assisted content at scale.",
-      "category_ids": ["MARKETING"],
-      "p10_pct": 8.0, "p50_pct": 15.0, "p90_pct": 25.0,
+      "category_ids": [
+        "MARKETING"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 25.0,
       "implementation_weeks": 12,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -106,14 +171,23 @@
         "NASSCOM 2025 — India IT firms allocating 1-2.5% of revenue to S&M; digital-first approaches reduce cost while maintaining pipeline",
         "Gartner CMO Survey 2024 — digital marketing delivers 40-60% better cost-per-lead vs. events/trade shows",
         "INTERNAL_CALIBRATION — marketing efficiency savings calibrated from 3 IT sector marketing transformation engagements"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 9,
+        "p50": 12,
+        "p90": 15
+      }
     },
     {
       "lever_id": "insurance_benefit_rationalisation",
       "lever_name": "Employee Benefits & Insurance Rationalisation",
       "description": "Benchmark and rationalise group health insurance premiums via competitive RFP; introduce wellness programmes to reduce claims; review D&O and E&O coverage limits.",
-      "category_ids": ["INSURANCE"],
-      "p10_pct": 8.0, "p50_pct": 14.0, "p90_pct": 22.0,
+      "category_ids": [
+        "INSURANCE"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 14.0,
+      "p90_pct": 22.0,
       "implementation_weeks": 8,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -121,14 +195,23 @@
         "IRDAI Annual Report 2023-24 (irdai.gov.in) — group health insurance competitive market; 15-25% premium reduction achievable via RFP",
         "NASSCOM 2025 — IT sector health insurance claims ratio 80-95%; wellness programmes reduce claims 10-15%",
         "INTERNAL_CALIBRATION — benefits rationalisation savings from 4 IT sector HR benefits reviews"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
     },
     {
       "lever_id": "contingent_workforce_governance",
       "lever_name": "Contingent Workforce Governance & Cost Control",
       "description": "Implement Vendor Management System (VMS) for contract staff; standardise rates; reduce rogue spend on contract labour outside preferred supplier list.",
-      "category_ids": ["CONTINGENT"],
-      "p10_pct": 6.0, "p50_pct": 12.0, "p90_pct": 20.0,
+      "category_ids": [
+        "CONTINGENT"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
       "implementation_weeks": 10,
       "brsr_principle": "P1",
       "savings_type": "run_rate",
@@ -136,7 +219,329 @@
         "NASSCOM Strategic Review 2025 — contract workforce 15-25% of IT headcount; fragmented contracting leads to 15-20% rate premium vs. structured MSA",
         "Gartner 2024 — VMS implementation reduces contingent spend 10-20% through rate standardisation and reduced agency mark-ups",
         "INTERNAL_CALIBRATION — contingent workforce governance savings from 3 IT sector workforce management engagements"
-      ]
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
+    },
+    {
+      "lever_id": "telecom_expense_management",
+      "lever_name": "Telecom Expense Management (TEM)",
+      "description": "Audit mobile, data, and conferencing spend; eliminate zombie lines; renegotiate enterprise telecom agreements.",
+      "category_ids": [
+        "TELECOM"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 15.0,
+      "p90_pct": 22.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Gartner 2024 Market Guide for Telecom Expense Management Services — 15-30% recoverable waste",
+        "Nemertes Research — enterprise telecom benchmarks; invoice audit recovers 7-12%",
+        "INTERNAL_CALIBRATION — IT sector TEM savings from 3 India IT telecom audits"
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
+    },
+    {
+      "lever_id": "office_supplies_consolidation",
+      "lever_name": "Office Supplies & Workplace Consumables Consolidation",
+      "description": "Consolidate office supplies, pantry, and print services to preferred suppliers with e-catalog integration.",
+      "category_ids": [
+        "OFFICE"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 18.0,
+      "implementation_weeks": 8,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Hackett Group Supplier Consolidation research — indirect purchased-cost savings scale with supplier reduction",
+        "Hackett/Ivalua P2P Study 2019 — office supplies as e-catalog category with 37% digital transaction potential",
+        "INTERNAL_CALIBRATION — office supplies consolidation savings from 2 India IT workplace mandates"
+      ],
+      "effort_weeks": {
+        "p10": 6,
+        "p50": 8,
+        "p90": 10
+      }
+    },
+    {
+      "lever_id": "consulting_spend_governance",
+      "lever_name": "Consulting & Advisory Spend Governance",
+      "description": "Implement consulting engagement ROI gates, panel-firm governance, and competitive sourcing for strategy and audit advisory.",
+      "category_ids": [
+        "PROF_SVCS"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 12.0,
+      "p90_pct": 20.0,
+      "implementation_weeks": 10,
+      "brsr_principle": "P1",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Hackett Group G&A Benchmarks 2024 — consulting spend governance reduces advisory fees 10-20%",
+        "NASSCOM 2025 — IT services firms professional fees 0.5-1.5% of revenue",
+        "INTERNAL_CALIBRATION — consulting governance savings from 4 India IT advisory mandates"
+      ],
+      "effort_weeks": {
+        "p10": 7,
+        "p50": 10,
+        "p90": 12
+      }
+    },
+    {
+      "lever_id": "license_rightsizing",
+      "lever_name": "Software License Right-Sizing",
+      "description": "Reclaim unused software entitlements, rightsize license tiers to actual usage telemetry, and consolidate overlapping tools at renewal.",
+      "category_ids": [
+        "IT",
+        "cloud_saas_infra"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 22.0,
+      "p90_pct": 32.0,
+      "implementation_weeks": 14,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Gartner — IT Key Metrics Data: Software Asset Management 2024 (gartner.com/en/information-technology/insights/it-budget) — licence utilisation and right-sizing savings 12-30%",
+        "FinOps Foundation — State of FinOps 2025 (data.finops.org/2025-report/) — software licence cost management benchmarks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "effort_weeks": {
+        "p10": 10,
+        "p50": 14,
+        "p90": 17
+      }
+    },
+    {
+      "lever_id": "cloud_finops",
+      "lever_name": "Cloud FinOps / Reserved Instance Optimisation",
+      "description": "Stand up a FinOps practice — rightsize instances, purchase commitments/savings plans, eliminate orphaned resources, and enforce tagging-based showback.",
+      "category_ids": [
+        "IT",
+        "cloud_saas_infra"
+      ],
+      "p10_pct": 18.0,
+      "p50_pct": 28.0,
+      "p90_pct": 40.0,
+      "implementation_weeks": 16,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "FinOps Foundation — State of FinOps 2025 (data.finops.org/2025-report/) — cloud cost optimisation: reserved instances and savings plans 18-40%",
+        "NASSCOM — Cloud Adoption in India Report 2024 (nasscom.in/knowledge-center/publications) — cloud spend benchmarks for Indian IT/ITES",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "effort_weeks": {
+        "p10": 12,
+        "p50": 16,
+        "p90": 20
+      }
+    },
+    {
+      "lever_id": "subcontractor_optimization",
+      "lever_name": "Subcontractor / Delivery Cost Optimisation",
+      "description": "Rationalise subcontractor panel, enforce rate cards and margin floors, and convert recurring subcon roles to direct hires where cheaper.",
+      "category_ids": [
+        "CONTINGENT",
+        "subcontracting_associates"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 12.0,
+      "p90_pct": 18.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM — Annual Report 2024 (nasscom.in/knowledge-center/publications) — subcontracting and delivery cost structure in India IT services",
+        "Everest Group — IT Services Pricing Trends 2024 (everestgrp.com) — rate card benchmarks for India-based delivery",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
+    },
+    {
+      "lever_id": "tech_debt_payoff",
+      "lever_name": "Technical Debt Payoff (BAU Cost Reduction)",
+      "description": "Retire legacy applications and re-platform high-maintenance systems to cut run cost and release capacity from keep-the-lights-on work.",
+      "category_ids": [
+        "IT"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 14.0,
+      "p90_pct": 22.0,
+      "implementation_weeks": 48,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "McKinsey & Company — Demystifying the Real Cost of Technical Debt (mckinsey.com/capabilities/mckinsey-digital) — tech debt productivity drag and remediation ROI",
+        "Gartner — Technical Debt Management 2024 (gartner.com) — BAU cost reduction from tech debt reduction 15-40%",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "effort_weeks": {
+        "p10": 36,
+        "p50": 48,
+        "p90": 60
+      }
+    },
+    {
+      "lever_id": "platform_consolidation",
+      "lever_name": "Platform & Tool Consolidation (Shadow IT Elimination)",
+      "description": "Consolidate overlapping delivery platforms, tools, and environments after growth/M&A; decommission redundant licenses and infrastructure.",
+      "category_ids": [
+        "IT"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 20.0,
+      "p90_pct": 28.0,
+      "implementation_weeks": 22,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Gartner — Market Guide for SaaS Management Platforms 2024 (gartner.com) — shadow IT elimination and SaaS consolidation savings",
+        "FinOps Foundation — State of FinOps 2025 (data.finops.org/2025-report/) — platform rationalisation benchmarks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "effort_weeks": {
+        "p10": 16,
+        "p50": 22,
+        "p90": 27
+      }
+    },
+    {
+      "lever_id": "genai_productivity",
+      "lever_name": "GenAI / Copilot Engineering Productivity",
+      "description": "Roll out GenAI-assisted delivery (code generation, test automation, documentation) with productivity gain-share targets baked into account plans.",
+      "category_ids": [
+        "IT",
+        "genai_tooling_platforms"
+      ],
+      "p10_pct": 8.0,
+      "p50_pct": 13.0,
+      "p90_pct": 18.0,
+      "implementation_weeks": 20,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "WEF — Future of Jobs Report 2025 (weforum.org/publications/the-future-of-jobs-report-2025/) — AI productivity gains in technology roles",
+        "McKinsey & Company — The Economic Potential of Generative AI (mckinsey.com/capabilities/mckinsey-digital) — 10-30% developer productivity improvement from AI coding assistants",
+        "NASSCOM — Generative AI Readiness in Indian IT 2024 (nasscom.in/knowledge-center/publications)"
+      ],
+      "effort_weeks": {
+        "p10": 15,
+        "p50": 20,
+        "p90": 25
+      }
+    },
+    {
+      "lever_id": "remote_first_realestate",
+      "lever_name": "Remote-First Real Estate Optimisation",
+      "description": "Adopt remote-first workplace policy with hub-and-spoke offices and hot-desking ratios, exiting surplus leases at break points.",
+      "category_ids": [
+        "FACILITIES",
+        "offshore_delivery_infra"
+      ],
+      "p10_pct": 30.0,
+      "p50_pct": 48.0,
+      "p90_pct": 65.0,
+      "implementation_weeks": 18,
+      "brsr_principle": "P6",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "JLL India — India Office Market Report 2024 (jll.com/en-in/research/india-office-market-report) — office space utilisation rates post-pandemic",
+        "NASSCOM — IT/ITES Work-from-Home Policy Benchmarks 2024 (nasscom.in/knowledge-center/publications) — remote work adoption in Indian IT sector",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "effort_weeks": {
+        "p10": 13,
+        "p50": 18,
+        "p90": 22
+      }
+    },
+    {
+      "lever_id": "build_vs_buy_optimization",
+      "lever_name": "Build vs. Buy Rationalisation",
+      "description": "Institute build-vs-buy gates for new platform investments comparing internal delivery cost against SaaS/COTS alternatives over a 5-year TCO.",
+      "category_ids": [
+        "IT"
+      ],
+      "p10_pct": 12.0,
+      "p50_pct": 22.0,
+      "p90_pct": 32.0,
+      "implementation_weeks": 40,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "Gartner — Build vs. Buy Decision Framework 2024 (gartner.com/en/information-technology) — TCO analysis for build vs. buy in enterprise software",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "effort_weeks": {
+        "p10": 30,
+        "p50": 40,
+        "p90": 50
+      }
+    },
+    {
+      "lever_id": "devops_automation",
+      "lever_name": "DevOps / CI-CD Pipeline Automation",
+      "description": "Automate build-test-deploy toolchains and environment provisioning to reduce release engineering effort and non-production infrastructure spend.",
+      "category_ids": [
+        "IT",
+        "delivery_excellence_quality"
+      ],
+      "p10_pct": 10.0,
+      "p50_pct": 18.0,
+      "p90_pct": 26.0,
+      "implementation_weeks": 32,
+      "brsr_principle": "P2",
+      "savings_type": "run_rate",
+      "industry_sources": [
+        "NASSCOM — DevOps Maturity in India IT 2024 (nasscom.in/knowledge-center/publications) — CI/CD automation adoption benchmarks",
+        "Gartner — DevOps Platform Market Guide 2024 (gartner.com) — deployment frequency and cost reduction benchmarks",
+        "INTERNAL_CALIBRATION — no verified external benchmark found. Savings range is internal consulting estimate."
+      ],
+      "effort_weeks": {
+        "p10": 24,
+        "p50": 32,
+        "p90": 40
+      }
+    },
+    {
+      "lever_id": "sez_stpi_tax_optimisation",
+      "lever_name": "SEZ / STPI Tax Benefit Optimisation (Section 10AA / 10B)",
+      "description": "Optimise SEZ/STPI unit structure, safe-harbour elections, and state incentive claims to reduce effective tax and compliance cost.",
+      "category_ids": [
+        "stpi_see_compliance"
+      ],
+      "p10_pct": 6.0,
+      "p50_pct": 14.0,
+      "p90_pct": 25.0,
+      "implementation_weeks": 32,
+      "brsr_principle": "P1",
+      "savings_type": "mixed",
+      "industry_sources": [
+        "EY — Driving Transfer Pricing Certainty in Uncertain Times: 2024 International Tax and Transfer Pricing Survey (ey.com/en_in/insights/tax/international-tax-and-transfer-pricing-survey)",
+        "KPMG — Global Transfer Pricing Review (kpmg.com/us/en/articles/2023/global-transfer-pricing-review.html)",
+        "Deloitte — Transfer Pricing Controversy Trends: 2024 Global Survey (internationaltaxreview.com)"
+      ],
+      "effort_weeks": {
+        "p10": 24,
+        "p50": 32,
+        "p90": 40
+      }
     }
   ]
 }

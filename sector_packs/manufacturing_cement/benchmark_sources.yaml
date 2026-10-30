@@ -1,0 +1,69 @@
+source_validation_date: "2026-07-16"
+source_validation_note: >
+  Free-source URLs were checked during pack creation. Percentiles are
+  directional calibrations from public disclosures and sector studies, not
+  audited peer facts. Licensed sources require credentials and contain no
+  fabricated data.
+sector: manufacturing_cement
+free_sources:
+  - id: company_annual_reports
+    name: NSE/BSE company annual reports and BRSR disclosures
+    url: "https://www.bseindia.com/corporates/ann.html"
+    data_available: [revenue, ebitda, cement_volume, power_fuel_cost, freight_cost, emissions, water, alternative_fuel_share]
+    refresh_frequency: annual
+    parser: bse_pdf_parser
+    sample_metric: "Peer cost ratios and operating KPIs are derived from FY2024-25 public filings where consistently disclosed."
+  - id: bee_pat_cement
+    name: Bureau of Energy Efficiency — PAT and cement-sector material
+    url: "https://beeindia.gov.in/en/programmes/perform-achieve-and-trade-pat"
+    data_available: [specific_energy_consumption, designated_consumer_targets, escer_results]
+    refresh_frequency: PAT_cycle
+    parser: bee_pat_parser
+    sample_metric: "Best-practice Indian cement plants report approximately 670 kcal/kg clinker and 68 kWh/t cement."
+  - id: cma_india
+    name: Cement Manufacturers' Association of India
+    url: "https://www.cmaindia.org/"
+    data_available: [industry_capacity, energy, sustainability, alternative_fuels]
+    refresh_frequency: annual
+    parser: cma_report_parser
+    sample_metric: "Sector publications cover energy, environment, AFR and production trends."
+  - id: ibef_cement
+    name: India Brand Equity Foundation — Cement Industry
+    url: "https://www.ibef.org/industry/cement-india"
+    data_available: [market_volume, demand_growth, capacity_additions, major_players]
+    refresh_frequency: quarterly
+    parser: ibef_html_parser
+    sample_metric: "IBEF identified UltraTech, ACC-Ambuja, Shree and Dalmia among major FY25 capacity additions."
+  - id: teri_decarbonisation
+    name: TERI — Decarbonization Roadmap for the Indian Cement Sector
+    url: "https://teriin.org/files/Decarbonisation-Roadmap-for-the-Indian-Cement-Sector.pdf"
+    data_available: [clinker_factor, alternative_fuels, carbon_intensity, technology_pathways]
+    refresh_frequency: ad_hoc
+    parser: pdf_table_parser
+    sample_metric: "Roadmap covers clinker substitution, energy efficiency, renewable power and carbon-reduction pathways."
+  - id: cpcb_coprocessing
+    name: CPCB guidelines for pre- and co-processing waste in cement plants
+    url: "https://cpcb.nic.in/"
+    data_available: [emission_limits, continuous_monitoring, waste_coprocessing_requirements]
+    refresh_frequency: regulatory_event
+    parser: cpcb_notification_parser
+    sample_metric: "CPCB guidance governs waste acceptance, pre-processing, co-processing and emissions monitoring."
+licensed_sources_stubs:
+  - id: cmie_prowess_iq
+    name: CMIE Prowess IQ
+    credential_env: CMIE_API_KEY
+    data_available: [peer_cost_lines, ten_year_financials, segment_metrics]
+    adapter_class: app.services.benchmarks_india.CmieAdapter
+    data_available_note: "pending_credentials — contact provider for licensed access"
+  - id: icra_cement_research
+    name: ICRA Cement Sector Research
+    credential_env: ICRA_API_KEY
+    data_available: [regional_prices, volumes, capacity, operating_cost_per_tonne]
+    adapter_class: app.services.benchmarks_india.IcraAdapter
+    data_available_note: "pending_credentials — adapter stub only"
+  - id: crisil_cement_research
+    name: CRISIL Cement Industry Research
+    credential_env: CRISIL_API_KEY
+    data_available: [cost_curve, regional_demand, freight, fuel_mix]
+    adapter_class: app.services.benchmarks_india.CrisilAdapter
+    data_available_note: "pending_credentials — contact provider for licensed access"

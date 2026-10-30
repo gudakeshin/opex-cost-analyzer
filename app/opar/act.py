@@ -46,6 +46,7 @@ def _invoke_skill(
     manifest: dict,
     user_message: str = "",
     headcount: float | None = None,
+    spend_store: Any | None = None,
 ) -> tuple[Dict[str, Any], str | None]:
     """Dispatch *task_name* to its registered handler via the skill dispatch registry.
 
@@ -68,6 +69,7 @@ def _invoke_skill(
         entity_tree=manifest.get("entity_tree"),
         segment_revenue=manifest.get("segment_revenue"),
         sector_weights=manifest.get("sector_weights"),
+        spend_store=spend_store,
     )
     _t0 = time.time()
     try:
@@ -124,6 +126,7 @@ def _invoke_skill_sync(
     manifest: dict,
     user_message: str = "",
     headcount: float | None = None,
+    spend_store: Any | None = None,
 ) -> tuple[str, Dict[str, Any] | None, str | None, str | None]:
     """Run a single skill. Returns (skill_name, output, error, degraded_reason)."""
     deps_met = all(dep in prior_results for dep in task.depends_on)
@@ -133,7 +136,7 @@ def _invoke_skill_sync(
     try:
         out, degraded_reason = _invoke_skill(
             task.skill_name, prior_results, lines, docs_text, manifest,
-            user_message, headcount=headcount,
+            user_message, headcount=headcount, spend_store=spend_store,
         )
         # T2-4: Validate LLM synthesis outputs against Pydantic contracts.
         out = _validate_llm_output(task.skill_name, out or {})
@@ -182,6 +185,32 @@ async def _act_async(
     from app.skills.engine import infer_industry_from_spend  # lazy — avoids circular import
 
     lines, docs_text, manifest = _load_session_data(ctx.session_id)
+
+    from app.services.spend_base import open_spend_query
+
+    try:
+        spend_store = open_spend_query(ctx.session_id)
+    except Exception:
+        spend_store = None
+
+    # Analysis Workbench: merge per-run assumption overrides onto a manifest copy
+    # before any skill reads it (wacc, effective_tax_rate, headcount, industry,
+    # segment_revenue, etc.). Control keys that are not manifest fields are skipped.
+    overrides = getattr(ctx, "workbench_overrides", None) or {}
+    if overrides:
+        manifest = dict(manifest)
+        for key, value in overrides.items():
+            if value is None or key in ("waive_spend_requirement", "business_override_note"):
+                continue
+            manifest[key] = value
+
+    # Analysis Workbench: preload a prior run's outputs so a chained run can build
+    # on them without re-executing upstream skills.
+    seed_outputs = getattr(ctx, "workbench_seed_outputs", None) or {}
+    for skill_name, output in seed_outputs.items():
+        if isinstance(output, dict) and skill_name not in results:
+            results[skill_name] = output
+
     headcount = float(manifest.get("headcount") or 0) or None
 
     # Auto-detect industry from spend patterns when not explicitly supplied
@@ -218,6 +247,7 @@ async def _act_async(
                     manifest,
                     ctx.user_message,
                     headcount,
+                    spend_store,
                 ),
                 timeout=PER_SKILL_TIMEOUT_SECONDS,
             )

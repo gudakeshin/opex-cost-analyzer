@@ -22,6 +22,12 @@ from .profiler import resolve_eligible_levers
 _PO_TOKEN_RE = re.compile(r"\b(?:po|p\.?\s?o\.?|purchase order)\b")
 
 
+def _fmt_money(amount: float, currency: str) -> str:
+    from app.utils.inr_format import format_money
+
+    return format_money(float(amount or 0.0), currency)
+
+
 def _category_pct_of_revenue(category_spend: float, revenue: float) -> float:
     if revenue <= 0:
         return 0.0
@@ -35,6 +41,31 @@ def _threshold_val(raw: Any, default: Any) -> Any:
     if isinstance(raw, dict):
         return raw.get("value", default)
     return raw
+
+
+def _resolve_cost_per_transaction_max(
+    cpt_cfg: Any,
+    industry: str,
+    reporting_currency: str,
+) -> Tuple[float, str, str]:
+    """Return (threshold amount, benchmark industry key, client-facing industry label)."""
+    from app.services.benchmarks import benchmark_industry_for
+
+    bench_key = benchmark_industry_for(industry) if industry else "default"
+    default_cfg: Dict[str, Any] = cpt_cfg if isinstance(cpt_cfg, dict) else {"value": cpt_cfg}
+    by_industry: Dict[str, Any] = {}
+    if isinstance(cpt_cfg, dict) and ("default" in cpt_cfg or "by_benchmark_industry" in cpt_cfg):
+        default_cfg = cpt_cfg.get("default") or {}
+        by_industry = cpt_cfg.get("by_benchmark_industry") or cpt_cfg.get("by_industry") or {}
+
+    chosen = by_industry.get(bench_key) or by_industry.get(industry) or default_cfg
+    if not isinstance(chosen, dict):
+        chosen = {"value": float(chosen or 1000.0)}
+
+    use_usd = reporting_currency.upper() != "INR" and chosen.get("value_usd") is not None
+    amount = float(chosen["value_usd"] if use_usd else _threshold_val(chosen, 1000.0))
+    label = str(chosen.get("label") or bench_key.replace("_", " ").title())
+    return amount, bench_key, label
 
 
 def peer_benchmarker(
@@ -86,35 +117,65 @@ def peer_benchmarker(
     vintage_date = (selected_dataset or {}).get("vintage_date")
     specificity = float((selected_dataset or {}).get("specificity_score") or 0.5)
 
-    _ci_half = max(0.05, 0.20 / math.sqrt(max(sample_n, 1))) * (1.0 - 0.5 * specificity)
+    # A confidence interval needs a real sample. Seed/illustrative datasets carry
+    # sample_size 0, so computing one from a floor of n=1 would be false precision.
+    _ci_half: float | None = (
+        max(0.05, 0.20 / math.sqrt(sample_n)) * (1.0 - 0.5 * specificity) if sample_n > 0 else None
+    )
 
     for row in rows:
         target = row["benchmark_target_pct"]
         row["benchmark_sample_n"] = sample_n
         row["benchmark_vintage"] = vintage_date
-        row["benchmark_ci"] = {
-            "lower": round(max(target * (1 - _ci_half), 0.0), 4),
-            "upper": round(target * (1 + _ci_half), 4),
-            "half_width_pct": round(_ci_half * 100, 2),
-        }
+        row["benchmark_ci"] = (
+            {
+                "lower": round(max(target * (1 - _ci_half), 0.0), 4),
+                "upper": round(target * (1 + _ci_half), 4),
+                "half_width_pct": round(_ci_half * 100, 2),
+            }
+            if _ci_half is not None
+            else None
+        )
 
     benchmark_metadata: Dict[str, Any] = {}
     if selected_dataset:
-        is_seed = selected_dataset.get("source") == "platform_seed"
+        src = str(selected_dataset.get("source") or "")
+        is_seed = (
+            src == "platform_seed"
+            or selected_dataset.get("dataset_id") == "seed-industry-benchmarks"
+            or sample_n == 0
+        )
         benchmark_metadata = {
-            "source_name": f"{source_name} (illustrative)" if is_seed else source_name,
+            "source_name": (
+                f"{source_name} (illustrative)"
+                if is_seed and "illustrative" not in source_name.lower()
+                else source_name
+            ),
+            "is_illustrative": is_seed,
             "vintage_date": vintage_date,
             "specificity_score": specificity,
             "sample_n": sample_n,
             "data_quality_note": selected_dataset.get("data_quality_note", ""),
-            "ci_half_width_pct": round(_ci_half * 100, 2),
+            "ci_half_width_pct": round(_ci_half * 100, 2) if _ci_half is not None else None,
         }
+    warnings: List[str] = []
+    if revenue <= 0:
+        warnings.append(
+            "Annual revenue is missing or zero, so category spend cannot be expressed as % of revenue "
+            "and peer-benchmark savings are not computed. Provide revenue to enable the peer lens."
+        )
+    if benchmark_metadata.get("is_illustrative"):
+        warnings.append(
+            "Peer benchmarks are illustrative (no sample behind them); do not present peer gaps as "
+            "statistically grounded."
+        )
     return {
         "industry": industry,
         "comparisons": rows,
         "benchmark_dataset": selected_dataset or {},
         "selection_rationale": selection_rationale or {},
         "benchmark_metadata": benchmark_metadata,
+        "warnings": warnings,
     }
 
 
@@ -147,6 +208,41 @@ def internal_benchmarker(lines: List[NormalizedSpendLine]) -> Dict[str, Any]:
             }
         )
     return {"internal_variance": variances}
+
+
+def internal_benchmarker_pushdown(store: Any) -> Dict[str, Any]:
+    """DuckDB pushdown for BU × category internal spread analysis."""
+    agg = store.aggregate(
+        group_by=["business_unit", "category_id"],
+        metrics={"spend": "SUM(amount)"},
+        limit=50_000,
+    )
+    col_idx = {name: i for i, name in enumerate(agg.columns)}
+    categories: Dict[str, List[Tuple[str, float]]] = defaultdict(list)
+    for row in agg.rows:
+        bu = str(row[col_idx["business_unit"]] or "Unknown BU")
+        cat = str(row[col_idx["category_id"]])
+        categories[cat].append((bu, float(row[col_idx["spend"]] or 0.0)))
+
+    variances = []
+    for cat, pairs in categories.items():
+        values = [x[1] for x in pairs]
+        if len(values) < 2:
+            continue
+        max_v, min_v = max(values), min(values)
+        spread = ((max_v - min_v) / max_v) if max_v else 0.0
+        variances.append(
+            {
+                "category_id": cat,
+                "max_spend": max_v,
+                "min_spend": min_v,
+                "median_spend": median(values),
+                "internal_spread": spread,
+                "flagged_gt_20pct": spread > 0.2,
+                "segments": [{"segment": bu, "spend": amount} for bu, amount in pairs],
+            }
+        )
+    return {"internal_variance": variances, "pushdown": True}
 
 
 def heuristic_analyzer(
@@ -201,11 +297,31 @@ def root_cause_analyzer(
     # the 0.15 fragmentation floor, which is the "unconcentrated" boundary).
     conc_min = float(_threshold_val(th.get("supplier_concentration_hhi_min"), 0.25))
     maverick_min = float(_threshold_val(th.get("maverick_spend_ratio_min"), 0.2))
+    # P1-B: graduated maverick tiers. When present, the trigger drops to the warning
+    # tier (catches the 15–25% "elevated" band the flat 0.20 floor missed) and every
+    # finding carries a severity label + narrative.
+    maverick_tiers = th.get("maverick_spend_tiers", {}) or {}
+    _warning_tier = maverick_tiers.get("warning") or {}
+    maverick_trigger = float(_warning_tier.get("value", maverick_min)) if maverick_tiers else maverick_min
+    # P1-C: minimum addressable spend before a fragmentation flag is worth raising.
+    # Value is in reporting currency (₹5 Cr default); non-INR runs should FX-adjust it.
+    frag_min_spend = float(_threshold_val(th.get("supplier_fragmentation_min_spend"), 0.0))
+
+    def _maverick_severity(ratio: float) -> Optional[Dict[str, str]]:
+        """Map a maverick ratio onto the highest tier it clears (critical→warning)."""
+        if not maverick_tiers:
+            return None
+        for key in ("critical", "elevated", "warning"):
+            tier = maverick_tiers.get(key) or {}
+            val = tier.get("value")
+            if val is not None and ratio >= float(val):
+                return {"tier": key, "label": tier.get("label", ""), "narrative": tier.get("narrative", "")}
+        return None
+
     cpt_cfg = th.get("cost_per_transaction_max", {})
-    if reporting_currency.upper() != "INR" and isinstance(cpt_cfg, dict) and "value_usd" in cpt_cfg:
-        cpt_max = float(cpt_cfg["value_usd"])
-    else:
-        cpt_max = float(_threshold_val(cpt_cfg, 1000.0))
+    cpt_max, cpt_industry_key, cpt_industry_label = _resolve_cost_per_transaction_max(
+        cpt_cfg, industry, reporting_currency
+    )
 
     spend_by_cat = {c["category_id"]: c for c in profile.get("category_profile", [])}
     suppliers_by_cat: Dict[str, Dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -250,7 +366,7 @@ def root_cause_analyzer(
         maverick = off_po_spend_by_cat.get(cid, 0.0) / total if total else 0.0
 
         root_causes: List[Dict[str, Any]] = []
-        if hhi < hhi_max and len(supplier_map) >= min_suppliers:
+        if hhi < hhi_max and len(supplier_map) >= min_suppliers and total >= frag_min_spend:
             root_causes.append(
                 {
                     "diagnosis": f"Supplier fragmentation with {len(supplier_map)} active suppliers (HHI {hhi:.2f})",
@@ -279,29 +395,43 @@ def root_cause_analyzer(
                 }
             )
 
-        if has_po_signal and maverick > maverick_min:
-            root_causes.append(
-                {
-                    "diagnosis": f"High maverick buying ({maverick:.0%} off-PO spend)",
-                    "confidence": "medium",
-                    "addressable_spend": total * float(_threshold_val(rates.get("maverick_compliance"), 0.1)),
-                    "recommended_lever": "maverick_compliance",
-                    "implementation_approach": "Enforce PO-first buying and renegotiate non-compliant contracts.",
-                    "implementation_complexity": "low",
-                    "estimated_timeline_months": 6,
-                }
-            )
+        if has_po_signal and maverick > maverick_trigger:
+            maverick_rc = {
+                "diagnosis": f"High maverick buying ({maverick:.0%} off-PO spend)",
+                "confidence": "medium",
+                "addressable_spend": total * float(_threshold_val(rates.get("maverick_compliance"), 0.1)),
+                "recommended_lever": "maverick_compliance",
+                "implementation_approach": "Enforce PO-first buying and renegotiate non-compliant contracts.",
+                "implementation_complexity": "low",
+                "estimated_timeline_months": 6,
+            }
+            severity = _maverick_severity(maverick)
+            if severity:
+                maverick_rc["maverick_severity"] = severity
+            root_causes.append(maverick_rc)
 
         if transaction_count and transaction_count > 0 and (total / transaction_count) > cpt_max:
+            cpt_actual = total / transaction_count
             root_causes.append(
                 {
-                    "diagnosis": "Cost per transaction above expected norm",
+                    "diagnosis": (
+                        f"Cost per transaction {_fmt_money(cpt_actual, reporting_currency)} exceeds "
+                        f"{cpt_industry_label} norm "
+                        f"({_fmt_money(cpt_max, reporting_currency)}/txn)"
+                    ),
                     "confidence": "medium",
                     "addressable_spend": total * float(_threshold_val(rates.get("demand_management"), 0.08)),
                     "recommended_lever": "demand_management",
                     "implementation_approach": "Tighten demand policies and approvals for low-value requests.",
                     "implementation_complexity": "medium",
                     "estimated_timeline_months": 9,
+                    "cost_per_transaction": {
+                        "actual": round(cpt_actual, 2),
+                        "threshold": cpt_max,
+                        "industry_key": cpt_industry_key,
+                        "industry_label": cpt_industry_label,
+                        "currency": reporting_currency.upper(),
+                    },
                 }
             )
 

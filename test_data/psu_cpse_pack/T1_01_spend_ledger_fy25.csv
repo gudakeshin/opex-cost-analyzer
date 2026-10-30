@@ -1,0 +1,11 @@
+supplier,description,amount,currency,category,gl_code,spend_date,business_unit,country
+L&T Construction,Civil & structural subcontracting — power projects FY25,2240000000,INR,Contract Labour & Subcontracting,510010,2024-12-01,Power Projects,India
+Steel Authority of India,Structural steel & plates for industrial systems,1680000000,INR,Materials & Components,520010,2024-11-15,Industrial Systems,India
+BHEL Forge,Forgings & castings — turbine & boiler components,1120000000,INR,Materials & Components,520011,2024-10-05,Power Projects,India
+Voltas Ltd,HVAC & building systems — infrastructure projects,840000000,INR,Materials & Components,520012,2024-09-12,Infrastructure,India
+MSME Fabricators Consortium,Sheet metal fabrication & welding subcontracting,680000000,INR,Contract Labour & Subcontracting,510011,2024-08-20,Industrial Systems,India
+ABB India,Switchgear & drives — plant maintenance,580000000,INR,Maintenance & Repair,530010,2024-07-01,Power Projects,India
+NTPC Power Supply,Industrial electricity — manufacturing facilities,420000000,INR,Energy & Utilities,540010,2024-06-15,Corporate,India
+Siemens India,Instrumentation & automation components,620000000,INR,Materials & Components,520013,2025-01-10,Industrial Systems,India
+Quess Corp,Contract operations & security staff,480000000,INR,Contract Labour & Subcontracting,510012,2025-02-01,Corporate,India
+KPMG India,CAG audit support & statutory compliance,280000000,INR,Administrative & Corporate,550010,2024-05-01,Corporate,India

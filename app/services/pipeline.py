@@ -10,7 +10,16 @@ from app.storage import read_json, write_json
 
 PIPELINE_PATH = DATA_DIR / "pipeline" / "store.json"
 
-ALLOWED_STAGES = {"identified", "committed", "in_flight", "realized", "rejected", "deferred"}
+ALLOWED_STAGES = {
+    "identified",
+    "proposed",
+    "validated",
+    "committed",
+    "in_flight",
+    "realized",
+    "rejected",
+    "deferred",
+}
 TRACKED_STAGES = {"committed", "in_flight", "realized"}
 
 # Lock protecting all read-modify-write operations on the pipeline store.
@@ -38,20 +47,83 @@ def _safe_date(value: str | None) -> date | None:
         return None
 
 
+def _positive_savings(row: Dict[str, Any]) -> bool:
+    """True when the initiative has at least one positive modeled savings field."""
+    for key in ("p50_savings", "gross_savings_y1", "net_npv"):
+        val = row.get(key)
+        if val is not None:
+            try:
+                if float(val) > 0:
+                    return True
+            except (TypeError, ValueError):
+                pass
+    deduped = row.get("deduped_mid_savings")
+    if deduped is not None:
+        try:
+            return float(deduped) > 0
+        except (TypeError, ValueError):
+            pass
+    return False
+
+
+def _engagement_session_ids(engagement_id: str) -> set[str]:
+    from app.services.engagements_store import read_engagement_manifest
+
+    try:
+        manifest = read_engagement_manifest(engagement_id, auto_repair=False)
+    except Exception:
+        return set()
+    return {str(s) for s in (manifest.get("session_ids") or []) if s}
+
+
+def _resolve_engagement_id(payload: Dict[str, Any]) -> str | None:
+    explicit = (payload.get("engagement_id") or "").strip()
+    if explicit:
+        return explicit
+    session_id = (payload.get("session_id") or "").strip()
+    if not session_id:
+        return None
+    try:
+        from app.memory import MemoryStore
+
+        manifest = MemoryStore().get("session", session_id) or {}
+        eid = (manifest.get("engagement_id") or "").strip()
+        if eid:
+            return eid
+    except Exception:
+        pass
+    return None
+
+
 def list_initiatives(
     user_id: str | None = None,
     session_id: str | None = None,
+    engagement_id: str | None = None,
+    qualified_only: bool = False,
     stage: str | None = None,
     category: str | None = None,
     lever: str | None = None,
 ) -> List[Dict[str, Any]]:
     store = _load_store()
     rows = store.get("initiatives", [])
+    engagement_sessions: set[str] | None = None
+    if engagement_id:
+        engagement_sessions = _engagement_session_ids(engagement_id)
     out = []
     for row in rows:
         if user_id and row.get("user_id") != user_id:
             continue
         if session_id and row.get("session_id") != session_id:
+            continue
+        if engagement_id:
+            row_eid = (row.get("engagement_id") or "").strip()
+            row_sid = (row.get("session_id") or "").strip()
+            in_engagement = row_eid == engagement_id or (
+                engagement_sessions is not None and row_sid in engagement_sessions
+            )
+            if not in_engagement:
+                continue
+        if qualified_only and not _positive_savings(row):
             continue
         if stage and row.get("stage") != stage:
             continue
@@ -63,12 +135,31 @@ def list_initiatives(
     return out
 
 
+_CHANGE_LOG_CAP = 100
+
+
+def _append_change(row: Dict[str, Any], action: str, detail: Dict[str, Any] | None = None) -> None:
+    log = row.setdefault("change_log", [])
+    log.append({"ts": _now_iso(), "action": action, "detail": detail or {}})
+    if len(log) > _CHANGE_LOG_CAP:
+        del log[:-_CHANGE_LOG_CAP]
+
+
+def _find_initiative(store: Dict[str, Any], initiative_id: str) -> Dict[str, Any] | None:
+    return next(
+        (i for i in store.get("initiatives", []) if i.get("initiative_id") == initiative_id),
+        None,
+    )
+
+
 def create_initiative(payload: Dict[str, Any]) -> Dict[str, Any]:
+    engagement_id = _resolve_engagement_id(payload)
     row = {
         "initiative_id": str(uuid.uuid4()),
         "analysis_id": payload.get("analysis_id"),
         "user_id": payload.get("user_id"),
         "session_id": payload.get("session_id"),
+        "engagement_id": engagement_id,
         "category": payload.get("category"),
         "lever": payload.get("lever"),
         "root_cause": payload.get("root_cause"),
@@ -85,15 +176,36 @@ def create_initiative(payload: Dict[str, Any]) -> Dict[str, Any]:
         "forecast_to_complete": payload.get("forecast_to_complete"),  # computed from actuals pace
         "stage": payload.get("stage", "identified"),
         "rejection_reason": payload.get("rejection_reason"),
-        "owner_name": payload.get("owner_name"),
+        "owner_name": payload.get("owner_name") or payload.get("owner_role"),
         "owner_email": payload.get("owner_email"),
         "committed_date": payload.get("committed_date"),
         "target_realization_date": payload.get("target_realization_date"),
+        # Business-perspective detail (Layer A/B enrichment). All optional so
+        # manually-created initiatives and older callers stay valid.
+        "business_rationale": payload.get("business_rationale"),
+        "affected_vendors": payload.get("affected_vendors", []),
+        "contract_levers": payload.get("contract_levers", []),
+        "owner_role": payload.get("owner_role"),
+        "business_sponsor": payload.get("business_sponsor"),
+        "risks": payload.get("risks", []),
+        "kpis": payload.get("kpis", []),
+        "change_management": payload.get("change_management", {}),
+        "execution_playbook": payload.get("execution_playbook", []),
+        "phasing_narrative": payload.get("phasing_narrative"),
+        "evidence": payload.get("evidence", []),
+        # Display financials surfaced from the value bridge for the portfolio.
+        "p10_savings": payload.get("p10_savings"),
+        "p50_savings": payload.get("p50_savings"),
+        "p90_savings": payload.get("p90_savings"),
+        "ebitda_bps": payload.get("ebitda_bps"),
+        "payback_months": payload.get("payback_months"),
+        "irr_pct": payload.get("irr_pct"),
         "created_at": _now_iso(),
         "updated_at": _now_iso(),
     }
     if row["stage"] not in ALLOWED_STAGES:
         row["stage"] = "identified"
+    _append_change(row, "created", {"stage": row["stage"], "session_id": row.get("session_id")})
     with _LOCK:
         store = _load_store()
         store.setdefault("initiatives", []).append(row)
@@ -109,6 +221,7 @@ def update_initiative_stage(initiative_id: str, stage: str) -> Dict[str, Any] | 
         for row in store.get("initiatives", []):
             if row.get("initiative_id") != initiative_id:
                 continue
+            _append_change(row, "stage_change", {"from": row.get("stage"), "to": stage})
             row["stage"] = stage
             if stage == "committed" and not row.get("committed_date"):
                 row["committed_date"] = date.today().isoformat()
@@ -124,6 +237,7 @@ def reject_initiative(initiative_id: str, reason: str) -> Dict[str, Any] | None:
         for row in store.get("initiatives", []):
             if row.get("initiative_id") != initiative_id:
                 continue
+            _append_change(row, "rejected", {"from": row.get("stage"), "reason": reason})
             row["stage"] = "rejected"
             row["rejection_reason"] = reason
             row["updated_at"] = _now_iso()
@@ -151,6 +265,13 @@ def add_milestone(initiative_id: str, payload: Dict[str, Any]) -> Dict[str, Any]
     with _LOCK:
         store = _load_store()
         store.setdefault("milestones", []).append(row)
+        initiative = _find_initiative(store, initiative_id)
+        if initiative is not None:
+            _append_change(
+                initiative,
+                "milestone_added",
+                {"description": row["description"], "due_date": row.get("due_date")},
+            )
         _save_store(store)
     return row
 
@@ -158,10 +279,10 @@ def add_milestone(initiative_id: str, payload: Dict[str, Any]) -> Dict[str, Any]
 def add_actual(initiative_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
     with _LOCK:
         store = _load_store()
+        initiative = _find_initiative(store, initiative_id)
         committed = payload.get("committed_savings")
         if committed is None:
-            match: Dict[str, Any] = next((i for i in store.get("initiatives", []) if i.get("initiative_id") == initiative_id), {})
-            committed = float(match.get("committed_savings") or 0.0)
+            committed = float((initiative or {}).get("committed_savings") or 0.0)
         row = {
             "actuals_id": str(uuid.uuid4()),
             "initiative_id": initiative_id,
@@ -174,14 +295,28 @@ def add_actual(initiative_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
             "created_at": _now_iso(),
         }
         store.setdefault("actuals", []).append(row)
+        if initiative is not None:
+            _append_change(
+                initiative,
+                "actuals_recorded",
+                {"period": row["period"], "actual_savings": row["actual_savings"]},
+            )
         _save_store(store)
     return row
 
 
-def pipeline_summary(user_id: str | None = None) -> Dict[str, Any]:
+def pipeline_summary(
+    user_id: str | None = None,
+    engagement_id: str | None = None,
+    qualified_only: bool = False,
+) -> Dict[str, Any]:
     # Load store once; derive both initiatives and actuals from the same snapshot.
+    all_initiatives = list_initiatives(
+        user_id=user_id,
+        engagement_id=engagement_id,
+        qualified_only=qualified_only,
+    )
     store = _load_store()
-    all_initiatives = store.get("initiatives", [])
     actuals = store.get("actuals", [])
 
     stage_totals: Dict[str, Dict[str, float]] = {
@@ -192,8 +327,6 @@ def pipeline_summary(user_id: str | None = None) -> Dict[str, Any]:
     one_time_committed = 0.0
     ids: set[str] = set()
     for row in all_initiatives:
-        if user_id and row.get("user_id") != user_id:
-            continue
         stage = row.get("stage", "identified")
         if stage not in stage_totals:
             continue

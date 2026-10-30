@@ -1,0 +1,11 @@
+supplier,description,amount,currency,category,gl_code,spend_date,business_unit,country
+Ogilvy India,Brand advertising & digital media — Foods & PC FY25,1960000000,INR,Marketing & Advertising,510010,2024-12-01,Foods & Beverages,India
+DDB Mudra,Creative & media buying — Home Care & Baby,1120000000,INR,Marketing & Advertising,510011,2024-11-15,Home Care,India
+Maersk India,Primary logistics — plant to warehouse network,1680000000,INR,Logistics & Distribution,520010,2025-01-10,Foods & Beverages,India
+Delhivery,Last-mile & e-commerce fulfilment,980000000,INR,Logistics & Distribution,520011,2024-10-20,Modern Trade,India
+Nippon Paint India,Contract manufacturing — home care formulations,840000000,INR,Contract Manufacturing,530010,2024-09-05,Home Care,India
+Haldirams,Contract manufacturing — snacks & foods range,620000000,INR,Contract Manufacturing,530011,2024-08-12,Foods & Beverages,India
+Reliance Retail,In-store promotions & shelf space fees,720000000,INR,Sales Force & Field,540010,2024-07-01,Modern Trade,India
+Blue Star Infotech,SAP maintenance & digital analytics platform,380000000,INR,Technology & Analytics,550010,2024-06-15,Corporate,India
+Nielsen India,Market research & retail audit,280000000,INR,Technology & Analytics,550011,2025-02-01,Corporate,India
+Amazon India,E-commerce listing fees & fulfilment charges,540000000,INR,Modern Trade,540011,2025-01-25,Modern Trade,India

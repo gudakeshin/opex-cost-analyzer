@@ -1,0 +1,65 @@
+gl_code,cost_center,vendor,description,amount,currency,fiscal_period,amount_type,business_unit,geo,legal_entity,source_system,source_record_id,gst_treatment,gstin,lease_treatment,related_party
+510010,CC-O&MSE-001,GE Power India,GE Power India services — O&M Services,342370602,INR,2023-Q2,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100001,itc_eligible,27AABCG8821P1Z3,,no
+510010,CC-O&MSE-001,GE Power India,GE Power India services — O&M Services,349218014,INR,2023-Q3,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100002,itc_eligible,27AABCG8821P1Z3,,no
+510010,CC-O&MSE-001,GE Power India,GE Power India services — O&M Services,356065426,INR,2023-Q4,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100003,itc_eligible,27AABCG8821P1Z3,,no
+510010,CC-O&MSE-001,GE Power India,GE Power India services — O&M Services,362912838,INR,2024-Q1,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100004,itc_eligible,27AABCG8821P1Z3,,no
+510010,CC-O&MSE-001,GE Power India,GE Power India services — O&M Services,369760250,INR,2024-Q2,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100005,itc_eligible,27AABCG8821P1Z3,,no
+510010,CC-O&MSE-001,GE Power India,GE Power India services — O&M Services,376607662,INR,2024-Q3,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100006,itc_eligible,27AABCG8821P1Z3,,no
+510010,CC-O&MSE-001,GE Power India,GE Power India services — O&M Services,383455074,INR,2024-Q4,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100007,itc_eligible,27AABCG8821P1Z3,,no
+510010,CC-O&MSE-001,GE Power India,GE Power India services — O&M Services,390302486,INR,2025-Q1,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100008,itc_eligible,27AABCG8821P1Z3,,no
+510010,CC-O&MSE-001,Siemens India,Siemens India services — O&M Services,170674182,INR,2023-Q2,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100009,itc_eligible,27AABCS9921L1Z0,,no
+510010,CC-O&MSE-001,Siemens India,Siemens India services — O&M Services,174087665,INR,2023-Q3,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100010,itc_eligible,27AABCS9921L1Z0,,no
+510010,CC-O&MSE-001,Siemens India,Siemens India services — O&M Services,177501149,INR,2023-Q4,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100011,itc_eligible,27AABCS9921L1Z0,,no
+510010,CC-O&MSE-001,Siemens India,Siemens India services — O&M Services,180914632,INR,2024-Q1,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100012,itc_eligible,27AABCS9921L1Z0,,no
+510010,CC-O&MSE-001,Siemens India,Siemens India services — O&M Services,184328116,INR,2024-Q2,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100013,itc_eligible,27AABCS9921L1Z0,,no
+510010,CC-O&MSE-001,Siemens India,Siemens India services — O&M Services,187741600,INR,2024-Q3,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100014,itc_eligible,27AABCS9921L1Z0,,no
+510010,CC-O&MSE-001,Siemens India,Siemens India services — O&M Services,191155083,INR,2024-Q4,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100015,itc_eligible,27AABCS9921L1Z0,,no
+510010,CC-O&MSE-001,Siemens India,Siemens India services — O&M Services,194568567,INR,2025-Q1,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100016,itc_eligible,27AABCS9921L1Z0,,no
+510020,CC-IT&S-001,ABB India,ABB India services — IT & SCADA Systems,172526876,INR,2023-Q2,actual,IT,India,SPUL-IN,SAP,SAP-AP-100017,itc_eligible,27AABCA4321B1Z7,,no
+510020,CC-IT&S-001,ABB India,ABB India services — IT & SCADA Systems,175977413,INR,2023-Q3,actual,IT,India,SPUL-IN,SAP,SAP-AP-100018,itc_eligible,27AABCA4321B1Z7,,no
+510020,CC-IT&S-001,ABB India,ABB India services — IT & SCADA Systems,179427951,INR,2023-Q4,actual,IT,India,SPUL-IN,SAP,SAP-AP-100019,itc_eligible,27AABCA4321B1Z7,,no
+510020,CC-IT&S-001,ABB India,ABB India services — IT & SCADA Systems,182878488,INR,2024-Q1,actual,IT,India,SPUL-IN,SAP,SAP-AP-100020,itc_eligible,27AABCA4321B1Z7,,no
+510020,CC-IT&S-001,ABB India,ABB India services — IT & SCADA Systems,186329026,INR,2024-Q2,actual,IT,India,SPUL-IN,SAP,SAP-AP-100021,itc_eligible,27AABCA4321B1Z7,,no
+510020,CC-IT&S-001,ABB India,ABB India services — IT & SCADA Systems,189779563,INR,2024-Q3,actual,IT,India,SPUL-IN,SAP,SAP-AP-100022,itc_eligible,27AABCA4321B1Z7,,no
+510020,CC-IT&S-001,ABB India,ABB India services — IT & SCADA Systems,193230101,INR,2024-Q4,actual,IT,India,SPUL-IN,SAP,SAP-AP-100023,itc_eligible,27AABCA4321B1Z7,,no
+510020,CC-IT&S-001,ABB India,ABB India services — IT & SCADA Systems,196680638,INR,2025-Q1,actual,IT,India,SPUL-IN,SAP,SAP-AP-100024,itc_eligible,27AABCA4321B1Z7,,no
+510030,CC-CONTRA-001,Quippo Energy,Quippo Energy services — Contract Labour,364091343,INR,2023-Q2,actual,Contract,India,SPUL-IN,SAP,SAP-AP-100025,itc_eligible,29AABCQ3211E1Z5,,no
+510030,CC-CONTRA-001,Quippo Energy,Quippo Energy services — Contract Labour,371373169,INR,2023-Q3,actual,Contract,India,SPUL-IN,SAP,SAP-AP-100026,itc_eligible,29AABCQ3211E1Z5,,no
+510030,CC-CONTRA-001,Quippo Energy,Quippo Energy services — Contract Labour,378654996,INR,2023-Q4,actual,Contract,India,SPUL-IN,SAP,SAP-AP-100027,itc_eligible,29AABCQ3211E1Z5,,no
+510030,CC-CONTRA-001,Quippo Energy,Quippo Energy services — Contract Labour,385936823,INR,2024-Q1,actual,Contract,India,SPUL-IN,SAP,SAP-AP-100028,itc_eligible,29AABCQ3211E1Z5,,no
+510030,CC-CONTRA-001,Quippo Energy,Quippo Energy services — Contract Labour,393218650,INR,2024-Q2,actual,Contract,India,SPUL-IN,SAP,SAP-AP-100029,itc_eligible,29AABCQ3211E1Z5,,no
+510030,CC-CONTRA-001,Quippo Energy,Quippo Energy services — Contract Labour,400500477,INR,2024-Q3,actual,Contract,India,SPUL-IN,SAP,SAP-AP-100030,itc_eligible,29AABCQ3211E1Z5,,no
+510030,CC-CONTRA-001,Quippo Energy,Quippo Energy services — Contract Labour,407782304,INR,2024-Q4,actual,Contract,India,SPUL-IN,SAP,SAP-AP-100031,itc_eligible,29AABCQ3211E1Z5,,no
+510030,CC-CONTRA-001,Quippo Energy,Quippo Energy services — Contract Labour,415064131,INR,2025-Q1,actual,Contract,India,SPUL-IN,SAP,SAP-AP-100032,itc_eligible,29AABCQ3211E1Z5,,no
+510010,CC-O&MSE-001,Tata Projects,Tata Projects services — O&M Services,90713261,INR,2023-Q2,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100033,itc_eligible,27AABCT6521P1Z1,,no
+510010,CC-O&MSE-001,Tata Projects,Tata Projects services — O&M Services,92527526,INR,2023-Q3,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100034,itc_eligible,27AABCT6521P1Z1,,no
+510010,CC-O&MSE-001,Tata Projects,Tata Projects services — O&M Services,94341791,INR,2023-Q4,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100035,itc_eligible,27AABCT6521P1Z1,,no
+510010,CC-O&MSE-001,Tata Projects,Tata Projects services — O&M Services,96156056,INR,2024-Q1,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100036,itc_eligible,27AABCT6521P1Z1,,no
+510010,CC-O&MSE-001,Tata Projects,Tata Projects services — O&M Services,97970321,INR,2024-Q2,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100037,itc_eligible,27AABCT6521P1Z1,,no
+510010,CC-O&MSE-001,Tata Projects,Tata Projects services — O&M Services,99784587,INR,2024-Q3,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100038,itc_eligible,27AABCT6521P1Z1,,no
+510010,CC-O&MSE-001,Tata Projects,Tata Projects services — O&M Services,101598852,INR,2024-Q4,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100039,itc_eligible,27AABCT6521P1Z1,,no
+510010,CC-O&MSE-001,Tata Projects,Tata Projects services — O&M Services,103413117,INR,2025-Q1,actual,O&M,India,SPUL-IN,SAP,SAP-AP-100040,itc_eligible,27AABCT6521P1Z1,,no
+510020,CC-IT&S-001,Schneider Electric,Schneider Electric services — IT & SCADA Systems,416983061,INR,2023-Q2,actual,IT,India,SPUL-IN,SAP,SAP-AP-100041,itc_eligible,27AABCS7711S1Z4,,no
+510020,CC-IT&S-001,Schneider Electric,Schneider Electric services — IT & SCADA Systems,425322722,INR,2023-Q3,actual,IT,India,SPUL-IN,SAP,SAP-AP-100042,itc_eligible,27AABCS7711S1Z4,,no
+510020,CC-IT&S-001,Schneider Electric,Schneider Electric services — IT & SCADA Systems,433662383,INR,2023-Q4,actual,IT,India,SPUL-IN,SAP,SAP-AP-100043,itc_eligible,27AABCS7711S1Z4,,no
+510020,CC-IT&S-001,Schneider Electric,Schneider Electric services — IT & SCADA Systems,442002044,INR,2024-Q1,actual,IT,India,SPUL-IN,SAP,SAP-AP-100044,itc_eligible,27AABCS7711S1Z4,,no
+510020,CC-IT&S-001,Schneider Electric,Schneider Electric services — IT & SCADA Systems,450341705,INR,2024-Q2,actual,IT,India,SPUL-IN,SAP,SAP-AP-100045,itc_eligible,27AABCS7711S1Z4,,no
+510020,CC-IT&S-001,Schneider Electric,Schneider Electric services — IT & SCADA Systems,458681367,INR,2024-Q3,actual,IT,India,SPUL-IN,SAP,SAP-AP-100046,itc_eligible,27AABCS7711S1Z4,,no
+510020,CC-IT&S-001,Schneider Electric,Schneider Electric services — IT & SCADA Systems,467021028,INR,2024-Q4,actual,IT,India,SPUL-IN,SAP,SAP-AP-100047,itc_eligible,27AABCS7711S1Z4,,no
+510020,CC-IT&S-001,Schneider Electric,Schneider Electric services — IT & SCADA Systems,475360689,INR,2025-Q1,actual,IT,India,SPUL-IN,SAP,SAP-AP-100048,itc_eligible,27AABCS7711S1Z4,,no
+510040,CC-SAFETY-001,RITES Ltd,RITES Ltd services — Safety & Compliance,199025503,INR,2023-Q2,actual,Safety,India,SPUL-IN,SAP,SAP-AP-100049,itc_eligible,27AABCR4421L1Z8,,no
+510040,CC-SAFETY-001,RITES Ltd,RITES Ltd services — Safety & Compliance,203006013,INR,2023-Q3,actual,Safety,India,SPUL-IN,SAP,SAP-AP-100050,itc_eligible,27AABCR4421L1Z8,,no
+510040,CC-SAFETY-001,RITES Ltd,RITES Ltd services — Safety & Compliance,206986523,INR,2023-Q4,actual,Safety,India,SPUL-IN,SAP,SAP-AP-100051,itc_eligible,27AABCR4421L1Z8,,no
+510040,CC-SAFETY-001,RITES Ltd,RITES Ltd services — Safety & Compliance,210967033,INR,2024-Q1,actual,Safety,India,SPUL-IN,SAP,SAP-AP-100052,itc_eligible,27AABCR4421L1Z8,,no
+510040,CC-SAFETY-001,RITES Ltd,RITES Ltd services — Safety & Compliance,214947543,INR,2024-Q2,actual,Safety,India,SPUL-IN,SAP,SAP-AP-100053,itc_eligible,27AABCR4421L1Z8,,no
+510040,CC-SAFETY-001,RITES Ltd,RITES Ltd services — Safety & Compliance,218928053,INR,2024-Q3,actual,Safety,India,SPUL-IN,SAP,SAP-AP-100054,itc_eligible,27AABCR4421L1Z8,,no
+510040,CC-SAFETY-001,RITES Ltd,RITES Ltd services — Safety & Compliance,222908563,INR,2024-Q4,actual,Safety,India,SPUL-IN,SAP,SAP-AP-100055,itc_eligible,27AABCR4421L1Z8,,no
+510040,CC-SAFETY-001,RITES Ltd,RITES Ltd services — Safety & Compliance,226889073,INR,2025-Q1,actual,Safety,India,SPUL-IN,SAP,SAP-AP-100056,itc_eligible,27AABCR4421L1Z8,,no
+510050,CC-LOGIST-001,Ultratech Logistics,Ultratech Logistics services — Logistics & Transport,130844674,INR,2023-Q2,actual,Logistics,India,SPUL-IN,SAP,SAP-AP-100057,itc_eligible,27AABCU2211L1Z2,,no
+510050,CC-LOGIST-001,Ultratech Logistics,Ultratech Logistics services — Logistics & Transport,133461567,INR,2023-Q3,actual,Logistics,India,SPUL-IN,SAP,SAP-AP-100058,itc_eligible,27AABCU2211L1Z2,,no
+510050,CC-LOGIST-001,Ultratech Logistics,Ultratech Logistics services — Logistics & Transport,136078460,INR,2023-Q4,actual,Logistics,India,SPUL-IN,SAP,SAP-AP-100059,itc_eligible,27AABCU2211L1Z2,,no
+510050,CC-LOGIST-001,Ultratech Logistics,Ultratech Logistics services — Logistics & Transport,138695354,INR,2024-Q1,actual,Logistics,India,SPUL-IN,SAP,SAP-AP-100060,itc_eligible,27AABCU2211L1Z2,,no
+510050,CC-LOGIST-001,Ultratech Logistics,Ultratech Logistics services — Logistics & Transport,141312247,INR,2024-Q2,actual,Logistics,India,SPUL-IN,SAP,SAP-AP-100061,itc_eligible,27AABCU2211L1Z2,,no
+510050,CC-LOGIST-001,Ultratech Logistics,Ultratech Logistics services — Logistics & Transport,143929141,INR,2024-Q3,actual,Logistics,India,SPUL-IN,SAP,SAP-AP-100062,itc_eligible,27AABCU2211L1Z2,,no
+510050,CC-LOGIST-001,Ultratech Logistics,Ultratech Logistics services — Logistics & Transport,146546034,INR,2024-Q4,actual,Logistics,India,SPUL-IN,SAP,SAP-AP-100063,itc_eligible,27AABCU2211L1Z2,,no
+510050,CC-LOGIST-001,Ultratech Logistics,Ultratech Logistics services — Logistics & Transport,149162928,INR,2025-Q1,actual,Logistics,India,SPUL-IN,SAP,SAP-AP-100064,itc_eligible,27AABCU2211L1Z2,,no

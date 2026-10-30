@@ -1,0 +1,46 @@
+business_unit,function,location,band,headcount
+Luxury Hotels,Operations,India,Entry (B1-B2),360
+Luxury Hotels,Operations,India,Mid (B3-B4),280
+Luxury Hotels,Operations,India,Senior (B5-B6),120
+Luxury Hotels,Finance,India,Entry (B1-B2),360
+Luxury Hotels,Finance,India,Mid (B3-B4),280
+Luxury Hotels,Finance,India,Senior (B5-B6),120
+Luxury Hotels,HR,India,Entry (B1-B2),360
+Luxury Hotels,HR,India,Mid (B3-B4),280
+Luxury Hotels,HR,India,Senior (B5-B6),120
+Business Hotels,Operations,India,Entry (B1-B2),450
+Business Hotels,Operations,India,Mid (B3-B4),350
+Business Hotels,Operations,India,Senior (B5-B6),150
+Business Hotels,Finance,India,Entry (B1-B2),450
+Business Hotels,Finance,India,Mid (B3-B4),350
+Business Hotels,Finance,India,Senior (B5-B6),150
+Business Hotels,HR,India,Entry (B1-B2),450
+Business Hotels,HR,India,Mid (B3-B4),350
+Business Hotels,HR,India,Senior (B5-B6),150
+Resorts & Spa,Operations,India,Entry (B1-B2),540
+Resorts & Spa,Operations,India,Mid (B3-B4),420
+Resorts & Spa,Operations,India,Senior (B5-B6),180
+Resorts & Spa,Finance,India,Entry (B1-B2),540
+Resorts & Spa,Finance,India,Mid (B3-B4),420
+Resorts & Spa,Finance,India,Senior (B5-B6),180
+Resorts & Spa,HR,India,Entry (B1-B2),540
+Resorts & Spa,HR,India,Mid (B3-B4),420
+Resorts & Spa,HR,India,Senior (B5-B6),180
+QSR Chain,Operations,India,Entry (B1-B2),630
+QSR Chain,Operations,India,Mid (B3-B4),489
+QSR Chain,Operations,India,Senior (B5-B6),210
+QSR Chain,Finance,India,Entry (B1-B2),630
+QSR Chain,Finance,India,Mid (B3-B4),489
+QSR Chain,Finance,India,Senior (B5-B6),210
+QSR Chain,HR,India,Entry (B1-B2),630
+QSR Chain,HR,India,Mid (B3-B4),489
+QSR Chain,HR,India,Senior (B5-B6),210
+Travel Management,Operations,India,Entry (B1-B2),720
+Travel Management,Operations,India,Mid (B3-B4),560
+Travel Management,Operations,India,Senior (B5-B6),240
+Travel Management,Finance,India,Entry (B1-B2),720
+Travel Management,Finance,India,Mid (B3-B4),560
+Travel Management,Finance,India,Senior (B5-B6),240
+Travel Management,HR,India,Entry (B1-B2),720
+Travel Management,HR,India,Mid (B3-B4),560
+Travel Management,HR,India,Senior (B5-B6),240

@@ -6,6 +6,31 @@ from typing import Any, Dict, List
 
 from app.config import OUTPUT_DIR
 
+_CURRENCY_SYMBOLS = {"USD": "$", "EUR": "€", "GBP": "£", "INR": "₹", "JPY": "¥", "AUD": "A$", "SGD": "S$"}
+
+
+def _js_format_money_fn(currency: str) -> str:
+    """Return a JS formatMoney(v) helper matching frontend formatSpendAmount."""
+    cur = (currency or "INR").upper()
+    if cur == "INR":
+        return """
+    function formatMoney(v) {
+      const n = Number(v);
+      if (Math.abs(n) >= 10000000) return '₹' + (n / 10000000).toFixed(1) + ' Cr';
+      if (Math.abs(n) >= 100000) return '₹' + (n / 100000).toFixed(1) + ' L';
+      return '₹' + n.toLocaleString('en-IN');
+    }"""
+    sym = _CURRENCY_SYMBOLS.get(cur, f"{cur} ")
+    sym_js = sym.replace("\\", "\\\\").replace("'", "\\'")
+    return f"""
+    function formatMoney(v) {{
+      const n = Number(v);
+      const sym = '{sym_js}';
+      if (Math.abs(n) >= 1000000) return sym + (n / 1000000).toFixed(2) + 'M';
+      if (Math.abs(n) >= 1000) return sym + (n / 1000).toFixed(1) + 'K';
+      return sym + n.toLocaleString('en-US', {{ maximumFractionDigits: 0 }});
+    }}"""
+
 
 def _safe_filename(name: str) -> str:
     # Preserve extension so exported HTML is served/rendered correctly by browsers.
@@ -22,6 +47,7 @@ def build_spend_profile_chart_html(
     profile: Dict[str, Any],
     chart_plan: Dict[str, Any],
     filename: str = "spend_profile_chart.html",
+    reporting_currency: str = "INR",
 ) -> Path:
     """Render themed spend-profile chart view for chat/download."""
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -45,6 +71,7 @@ def build_spend_profile_chart_html(
     trend_labels = sorted(period_totals.keys())
     trend_vals = [float(period_totals[p]) for p in trend_labels]
 
+    currency = (reporting_currency or "INR").upper()
     chart_payload = json.dumps(
         {
             "labels": labels,
@@ -55,8 +82,10 @@ def build_spend_profile_chart_html(
             "trend_labels": trend_labels,
             "trend_values": trend_vals,
             "selected_charts": chart_plan.get("selected_charts", []),
+            "currency": currency,
         }
     )
+    format_money_js = _js_format_money_fn(currency)
     commentary = chart_plan.get("commentary_points", [])
     commentary_html = "".join(f"<li>{str(x)}</li>" for x in commentary[:6])
 
@@ -127,6 +156,7 @@ def build_spend_profile_chart_html(
 
   <script>
     const d = {chart_payload};
+    {format_money_js}
     new Chart(document.getElementById('paretoChart'), {{
       data: {{
         labels: d.labels,
@@ -138,7 +168,7 @@ def build_spend_profile_chart_html(
       options: {{
         responsive: true,
         scales: {{
-          y: {{ ticks: {{ callback: v => '$' + Number(v).toLocaleString() }} }},
+          y: {{ ticks: {{ callback: v => formatMoney(v) }} }},
           y2: {{
             position: 'right',
             grid: {{ drawOnChartArea: false }},
@@ -163,7 +193,7 @@ def build_spend_profile_chart_html(
         responsive: true,
         scales: {{
           x: {{ stacked: true }},
-          y: {{ stacked: true, ticks: {{ callback: v => '$' + Number(v).toLocaleString() }} }}
+          y: {{ stacked: true, ticks: {{ callback: v => formatMoney(v) }} }}
         }}
       }}
     }});
@@ -179,7 +209,7 @@ def build_spend_profile_chart_html(
         options: {{
           responsive: true,
           scales: {{
-            y: {{ ticks: {{ callback: v => '$' + Number(v).toLocaleString() }} }}
+            y: {{ ticks: {{ callback: v => formatMoney(v) }} }}
           }}
         }}
       }});

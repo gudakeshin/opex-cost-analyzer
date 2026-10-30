@@ -1,7 +1,11 @@
+import type { components } from '../api/schema';
+
 export interface QualitySignals {
   faithfulness_score?: number;
   relevance_score?: number;
   grounding_coverage?: number;
+  /** Money figures in the narrative that match no skill output; informational, may be derived values. */
+  unverified_figures?: string[];
 }
 
 export interface ProgressStep {
@@ -13,6 +17,13 @@ export interface ProgressStep {
 export interface ChatNextOption {
   label: string;
   message: string;
+}
+
+export interface SuggestedOutput {
+  skill: string;
+  label: string;
+  endpoint: string;
+  score?: number;
 }
 
 export interface CategoryInsightRow {
@@ -147,6 +158,18 @@ export interface AnalysisInsightSnapshot {
   modelled_savings?: string;
   modelled_savings_raw?: number;
   savings_opportunity_count?: number;
+  /** Probability-weighted 3-year net savings across initiatives (execution risk applied). */
+  expected_net_3yr?: number;
+  /** Same portfolio assuming every initiative is delivered in full. */
+  full_delivery_net_3yr?: number;
+  /** Per-initiative P10/P90 delivery range, summed across the portfolio. */
+  expected_net_p10_3yr?: number;
+  expected_net_p90_3yr?: number;
+  /** True when peer benchmarks have no sample behind them (seed / public-disclosure data). */
+  benchmarks_illustrative?: boolean;
+  benchmark_warnings?: string[];
+  /** Warnings from the ingest report (rows dropped, FX rate missing, …). */
+  ingestion_warnings?: string[];
   ingestion_note?: string;
   chart_data?: SpendChartData;
   sme_qualification?: SmeQualificationSummary;
@@ -163,21 +186,65 @@ export interface AnalysisTraceStep {
   metrics?: Record<string, unknown>;
 }
 
+export interface SupplierRow {
+  supplier: string;
+  spend?: number | null;
+  share_of_category?: number | null;
+  note?: string | null;
+}
+
+export interface CategoryInsightData {
+  category_id: string;
+  category_name: string;
+  spend?: number | null;
+  spend_pct_revenue?: number | null;
+  benchmark_gap?: string | null;
+  addressable_gap?: number | null;
+  top_suppliers?: SupplierRow[];
+  concentration_hhi?: number | null;
+  suggested_actions?: string[];
+}
+
+export interface PresentationBlock {
+  kind: string;
+  title?: string;
+  data: Record<string, unknown>;
+}
+
+export interface AssistantPayload {
+  blocks: PresentationBlock[];
+  narrative_markdown?: string;
+}
+
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   thinking?: string;
   advisory_sections?: Record<string, unknown>;
+  presentation?: AssistantPayload;
   quality_signals?: QualitySignals;
   next_options?: ChatNextOption[];
   run_id?: string;
   progress_steps?: ProgressStep[];
   degraded_mode?: boolean;
+  used_llm_synthesis?: boolean;
+  fallback_reasons?: Record<string, unknown>;
   artefacts?: Record<string, unknown> | string[];
   insight_snapshot?: AnalysisInsightSnapshot;
   analysis_trace?: AnalysisTraceStep[];
   show_peer_savings?: boolean;
   charts?: ChartSpec[];
+  suggested_outputs?: SuggestedOutput[];
+  response_metadata?: ChatResponseMetadata;
+  run_delta?: RunDelta;
+}
+
+export interface RunDelta {
+  previous_headline?: string;
+  prior_mid_savings?: number;
+  current_mid_savings?: number;
+  delta_mid_savings?: number;
+  currency?: string;
 }
 
 export interface SessionCreatePayload {
@@ -195,6 +262,17 @@ export interface SessionResponse {
   annual_revenue?: number;
   files?: unknown[];
   skill_outputs?: Record<string, unknown>;
+  last_analysis_run?: {
+    run_id?: string | null;
+    status?: string;
+    completed_at?: string;
+    pipeline_seeded?: number;
+    trace_step_count?: number;
+    progress_steps?: ProgressStep[];
+    total_spend?: number;
+    modelled_initiatives?: number;
+    reporting_currency?: string;
+  };
   [key: string]: unknown;
 }
 
@@ -303,6 +381,12 @@ export interface EngagementSanityConflict {
   engagement_company?: string;
   detected_company?: string;
   detected_companies?: string[];
+  engagement_industry?: string;
+  engagement_industry_label?: string;
+  detected_industry?: string;
+  detected_industry_label?: string;
+  industry_spend?: string | null;
+  detected_industries?: string[];
   source?: string;
   signal_source?: string;
   message?: string;
@@ -320,32 +404,24 @@ export interface ChatProgressResponse {
   run_id: string;
   status: string;
   steps?: Array<{ phase?: string; message?: string; timestamp?: string }>;
+  thinking_text?: string | null;
   error?: string | null;
 }
 
-export interface SessionManifestPatch {
-  industry?: string;
-  company_name?: string;
-  annual_revenue?: number;
-  currency?: string;
-}
+// Generated from the backend's Pydantic request model (app/schemas.py) —
+// see Phase 0/1 of the react-query migration. Kept as a re-export so the
+// frontend catches drift (e.g. new patchable fields) at compile time.
+export type SessionManifestPatch = components['schemas']['SessionManifestPatch'];
 
-export interface SessionSummary {
-  session_id: string;
+// Generated from the backend's Pydantic response model (app/schemas.py) —
+// see Phase 0/1 of the react-query migration.
+export type SessionSummary = components['schemas']['SessionSummaryResponse'];
+
+export interface EngagementMeta {
   engagement_id?: string;
   company_name: string;
   industry: string;
-  currency: string;
-  annual_revenue?: number;
-  created_at?: string;
-  file_count: number;
-  has_analysis: boolean;
-  top_savings_estimate?: number;
-}
-
-export interface EngagementMeta {
-  company_name: string;
-  industry: string;
+  industry_user_set?: boolean;
   currency: string;
   audience?: string;
   engagement_week: number;
@@ -356,6 +432,7 @@ export interface EngagementMeta {
   detected_company_name?: string;
   detected_industry?: string;
   detected_industry_label?: string;
+  detected_annual_revenue_cr?: number;
 }
 
 export interface ChatHistoryTurn {
@@ -363,9 +440,16 @@ export interface ChatHistoryTurn {
   content: string;
 }
 
+export interface NarrativeProvenance {
+  mode?: 'llm' | 'deterministic' | string;
+  llm_skip_reason?: string | null;
+}
+
 export interface ChatResponseMetadata {
   insight_dimension?: string;
   focus_category?: string;
+  narrative_mode?: 'llm' | 'deterministic' | string;
+  narrative_provenance?: NarrativeProvenance;
 }
 
 export interface V1ChatPayload {
@@ -379,7 +463,21 @@ export interface V1ChatPayload {
   currency?: string;
   audience?: string;
   thinking_mode?: 'standard' | 'extended';
+  llm_model?: string;
   chat_history?: ChatHistoryTurn[];
+}
+
+export interface LlmModelOption {
+  id: string;
+  label: string;
+  provider: string;
+  description?: string;
+}
+
+export interface LlmModelsResponse {
+  models: LlmModelOption[];
+  default_model_id: string;
+  default_provider: string;
 }
 
 export interface BusinessClarification {
@@ -393,8 +491,10 @@ export interface V1ChatResponse {
   thinking?: string;
   artefacts?: Record<string, unknown>;
   advisory_sections?: Record<string, unknown>;
+  presentation?: AssistantPayload;
   quality_signals?: QualitySignals;
   degraded_mode?: boolean;
+  used_llm_synthesis?: boolean;
   fallback_reasons?: Record<string, unknown>;
   loop_complete?: boolean;
   next_loop_trigger?: string;
@@ -407,6 +507,9 @@ export interface V1ChatResponse {
   clarification?: BusinessClarification;
   response_metadata?: ChatResponseMetadata;
   charts?: ChartSpec[];
+  suggested_outputs?: SuggestedOutput[];
+  narrative_provenance_tag?: Record<string, unknown>;
+  run_delta?: RunDelta;
 }
 
 export interface ChatPlanPreview {
@@ -418,6 +521,8 @@ export interface ChatPlanPreview {
   clarification?: BusinessClarification;
   clarification_required?: boolean;
   clarification_prompt?: string;
+  /** "agentic" when the agent tool-loop will select skills at runtime; "deterministic" for static planner. */
+  execution_mode?: string;
   [key: string]: unknown;
 }
 
@@ -558,16 +663,159 @@ export interface SkillMeta {
   name: string;
   path?: string;
   description?: string;
+  kind?: string;
+  runtime?: string;
+  discoverable?: boolean;
+  weight?: string;
+  tier?: string;
+  execution_status?: string;
+  version?: string;
+  status?: string;
 }
 
 export interface SkillDetail {
   name: string;
   path: string;
   content: string;
+  kind?: string;
+  runtime?: string;
+  discoverable?: boolean;
+  weight?: string;
+  tier?: string;
+  inputs?: string[];
+}
+
+export interface InitiativeProvenance {
+  initiative_id?: string;
+  category?: string;
+  lever?: string;
+  session_id?: string;
+  trace_steps?: Array<{ step: number; label: string; count?: number; value?: unknown; source?: string }>;
+  assumptions?: Array<Record<string, unknown>>;
+  source_spend_rows?: Array<Record<string, unknown>>;
+  source_files?: Array<{ filename?: string; path?: string; uploaded_at?: string; size_bytes?: number }>;
+  ingestion_summary?: unknown;
+  analysis_revision?: number;
+}
+
+// FP&A detail tab responses (Cost Room). Skill outputs are loosely shaped
+// dicts, so every field is optional with an index-signature escape hatch.
+export interface TrendPeriodPoint {
+  period?: string;
+  total_spend?: number;
+  spend?: number;
+  [key: string]: unknown;
+}
+
+export interface CategoryTrend {
+  category_id?: string;
+  category_name?: string;
+  trend_direction?: string;
+  change_pct?: number;
+  total_change?: number;
+  cagr_pct?: number;
+  annualized_run_rate?: number;
+  [key: string]: unknown;
+}
+
+export interface TrendsResponse {
+  temporal_available?: boolean;
+  reason?: string;
+  period_count?: number;
+  arr_basis?: string;
+  annualized_run_rate?: number;
+  cagr_pct?: number;
+  period_trends?: TrendPeriodPoint[];
+  category_trends?: CategoryTrend[];
+  [key: string]: unknown;
+}
+
+export interface BvaVariance {
+  category_id?: string;
+  category_name?: string;
+  actual_spend?: number;
+  budget_spend?: number;
+  total_variance?: number;
+  flag?: string;
+  [key: string]: unknown;
+}
+
+export interface BvaResponse {
+  bva_available?: boolean;
+  reason?: string;
+  total_actual?: number;
+  total_budget?: number;
+  total_variance?: number;
+  categories_over_budget?: number;
+  variances?: BvaVariance[];
+  decomposition_note?: string;
+  [key: string]: unknown;
+}
+
+export interface PaymentTermsOpportunity {
+  category_id?: string;
+  category_name?: string;
+  current_dpo_days?: number;
+  target_dpo_days?: number;
+  working_capital_release?: number;
+  annual_cash_value_at_wacc?: number;
+  [key: string]: unknown;
+}
+
+export interface PaymentTermsResponse {
+  payment_terms_available?: boolean;
+  reason?: string;
+  note?: string;
+  coverage_pct?: number;
+  total_working_capital_release?: number;
+  total_annual_cash_value?: number;
+  opportunity_count?: number;
+  opportunities?: PaymentTermsOpportunity[];
+  [key: string]: unknown;
+}
+
+export interface CostToServeDriver {
+  category_id?: string;
+  category_name?: string;
+  spend?: number;
+  pct_of_opex?: number;
+  [key: string]: unknown;
+}
+
+export interface CostToServeSegment {
+  segment?: string;
+  revenue?: number;
+  total_cost?: number;
+  direct_cost?: number;
+  indirect_cost_allocated?: number;
+  cost_pct_of_revenue?: number | null;
+  is_unprofitable?: boolean;
+  [key: string]: unknown;
+}
+
+export interface CostToServeResponse {
+  cost_to_serve_available?: boolean;
+  segment_revenue_provided?: boolean;
+  reason?: string;
+  cost_per_employee?: { total?: number; by_category?: Record<string, number> } | null;
+  top_cost_drivers?: CostToServeDriver[];
+  segments?: CostToServeSegment[];
+  unprofitable_segments?: string[];
+  total_opex_allocated?: number;
+  total_opex_unallocated?: number;
+  [key: string]: unknown;
+}
+
+export interface InitiativeChangeEntry {
+  ts?: string;
+  action?: string;
+  detail?: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 export interface Initiative {
   initiative_id: string;
+  change_log?: InitiativeChangeEntry[];
   category: string;
   lever: string;
   stage: string;
@@ -594,6 +842,29 @@ export interface Initiative {
   cost_behaviour?: number;
   condition_precedents?: string[];
   assumptions?: Array<Record<string, unknown>>;
+  // Business-perspective detail (Layer A/B enrichment from the business case builder).
+  business_rationale?: string;
+  owner_role?: string;
+  business_sponsor?: string;
+  affected_vendors?: Array<{
+    supplier: string;
+    spend?: number;
+    share_of_category_pct?: number;
+    avg_payment_terms_days?: number | null;
+  }>;
+  contract_levers?: string[];
+  risks?: Array<{ risk: string; severity?: string; mitigation?: string }>;
+  kpis?: Array<{ metric: string; cadence?: string }>;
+  change_management?: {
+    stakeholders?: string[];
+    comms_cadence?: string;
+    resistance_points?: string[];
+  };
+  execution_playbook?: Array<Record<string, unknown>>;
+  phasing_narrative?: string;
+  evidence?: string[];
+  payback_months?: number;
+  irr_pct?: number;
   [key: string]: unknown;
 }
 
@@ -608,6 +879,8 @@ export interface SensitivityScenario {
 export interface SensitivityResponse {
   scenarios?: SensitivityScenario[];
   confidence_bands?: { low?: number; mid?: number; high?: number };
+  baseline_mid_savings?: number;
+  methodology_note?: string;
 }
 
 export interface PipelineSummary {
@@ -638,6 +911,7 @@ export interface DeepResearchSource {
 
 export interface DeepResearchStatusResponse {
   status: 'in_progress' | 'completed' | 'failed';
+  error?: string;
   summary?: string;
   full_report?: string;
   sources?: DeepResearchSource[];
@@ -652,4 +926,83 @@ export interface DiagnosticContextPatch {
   diagnostic_urls?: string[];
   diagnostic_result?: DiagnosticResponse;
   diagnostic_completed_at?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Analysis Workbench
+// ---------------------------------------------------------------------------
+
+export interface WorkbenchSkill {
+  name: string;
+  tier: string;
+  description: string;
+  parallel_group: number;
+  depends_on: string[];
+  params: string[];
+  data_requirements: string[];
+  degrades_without: string[];
+}
+
+export interface WorkbenchAssumptionField {
+  key: string;
+  label: string;
+  type: 'percent' | 'number' | 'int' | 'text';
+  default?: number | string;
+}
+
+export interface WorkbenchCatalog {
+  skills: WorkbenchSkill[];
+  tiers: string[];
+  assumptions: WorkbenchAssumptionField[];
+}
+
+export interface WorkbenchValidationIssue {
+  skill: string;
+  code: string;
+  message: string;
+  fixable_with?: string;
+}
+
+export interface WorkbenchValidation {
+  selected_skills: string[];
+  resolved_skills: string[];
+  added_deps: string[];
+  warnings: WorkbenchValidationIssue[];
+  blocking_errors: WorkbenchValidationIssue[];
+  blocked: boolean;
+  total_skills?: number;
+  estimated_duration?: string;
+}
+
+export interface WorkbenchHeadline {
+  total_spend?: number;
+  savings_low?: number;
+  savings_mid?: number;
+  savings_high?: number;
+  npv?: number;
+  initiative_count?: number;
+  ebitda_bps?: number;
+}
+
+export interface WorkbenchRun {
+  run_id: string;
+  engagement_id: string;
+  session_id: string;
+  user_id: string;
+  name: string;
+  selected_skills: string[];
+  resolved_skills: string[];
+  overrides: Record<string, unknown>;
+  seed_from_run_id: string | null;
+  parent_run_id: string | null;
+  status: 'draft' | 'running' | 'complete' | 'failed';
+  skill_outputs: Record<string, Record<string, unknown>>;
+  errors: Record<string, string>;
+  degradation_reasons?: Record<string, string>;
+  validation: WorkbenchValidation | Record<string, never>;
+  headline: WorkbenchHeadline;
+  reflect_summary?: string;
+  promoted_initiative_ids?: string[];
+  created_at: string;
+  completed_at: string | null;
 }

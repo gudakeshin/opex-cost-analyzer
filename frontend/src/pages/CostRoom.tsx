@@ -1,97 +1,81 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useConfirm } from '../hooks/useConfirm';
+import '../styles/costRoom.css';
+import { useGuardedNavigate } from '../hooks/useGuardedNavigate';
+import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
 import { MainLayout } from '../components/Layout/MainLayout';
 import { Card } from '../components/Common/Card';
-import { Tabs } from '../components/Common/Tabs';
 import { Modal } from '../components/Common/Modal';
 import { Input } from '../components/Common/Input';
 import { Loader } from '../components/Common/Loader';
-import { EngagementContextBar } from '../components/PageComponents/CostRoom/EngagementContextBar';
+import { CostRoomTopbar } from '../components/PageComponents/CostRoom/CostRoomTopbar';
+import { CostRoomHero } from '../components/PageComponents/CostRoom/CostRoomHero';
+import { SignalStrip } from '../components/PageComponents/CostRoom/SignalStrip';
 import {
-  ScenarioControls,
-  type ScenarioPreset,
-} from '../components/PageComponents/CostRoom/ScenarioControls';
-import { KpiStrip } from '../components/PageComponents/CostRoom/KpiStrip';
-import { FilterBar, applyPortfolioFilters, defaultFilters } from '../components/PageComponents/CostRoom/FilterBar';
+  FilterBar,
+  applyPortfolioFilters,
+  defaultFilters,
+  type LayoutMode,
+} from '../components/PageComponents/CostRoom/FilterBar';
 import type { PortfolioFilters } from '../components/PageComponents/CostRoom/FilterBar';
-import { InitiativePortfolio } from '../components/PageComponents/CostRoom/InitiativePortfolio';
-import { InitiativeDrawer } from '../components/PageComponents/CostRoom/InitiativeDrawer';
-import { ValueBridgePanel } from '../components/PageComponents/CostRoom/ValueBridgePanel';
-import {
-  MacroScenariosList,
-  DEFAULT_MACRO_SCENARIOS,
-  macroScenarioBps,
-} from '../components/PageComponents/CostRoom/MacroScenariosList';
+import { WorkArea } from '../components/PageComponents/CostRoom/work/WorkArea';
 import { TrustFooter } from '../components/PageComponents/CostRoom/TrustFooter';
 import { ConflictsPanel } from '../components/PageComponents/CostRoom/ConflictsPanel';
 import { TrustRail } from '../components/Trust/TrustRail';
 import { ExceptionInbox } from '../components/Trust/ExceptionInbox';
 import { Alert } from '../components/Common/Alert';
-import { PageHeader } from '../components/Common/PageHeader';
-import { useExceptions } from '../context/ExceptionContext';
+import { ToastStack, type ToastItem } from '../components/PageComponents/CostRoom/primitives/ToastStack';
+import { macroScenarioBps } from '../components/PageComponents/CostRoom/MacroScenariosList';
+import type { ScenarioPreset } from '../components/PageComponents/CostRoom/ScenarioControls';
 import { friendlyErrorMessage } from '../utils/errorMessages';
 import {
   buildConflictExceptionItems,
   buildInitiativeExceptionItems,
-  countInitiativeExceptions,
   mergeExceptionItems,
   type ExceptionItem,
 } from '../utils/exceptions';
-import type {
-  ComplianceAuditResponse,
-  ConflictSpendImpact,
-  ConflictSummary,
-  DataConflict,
-} from '../types';
-import { formatCr } from '../utils/formatInr';
+import { toCr } from '../utils/formatInr';
 import { TrendsTab } from '../components/PageComponents/CostRoom/TrendsTab';
 import { BvaTab } from '../components/PageComponents/CostRoom/BvaTab';
 import { PaymentTermsTab } from '../components/PageComponents/CostRoom/PaymentTermsTab';
+import { CostToServeTab } from '../components/PageComponents/CostRoom/CostToServeTab';
 import { useSession } from '../context/SessionContext';
 import { useAudience } from '../context/AudienceContext';
-import { apiGet, apiPost, apiPut, getApiErrorMessage } from '../hooks/useApi';
-import { getBandSavings } from '../utils/initiativeHelpers';
-import type {
-  AuditLogEntry,
-  Initiative,
-  PercentileBand,
-  PipelineSummary,
-  SensitivityResponse,
-} from '../types';
+import { getApiErrorMessage } from '../hooks/useApi';
+import {
+  useAddActualsMutation,
+  useAuditLogLatestQuery,
+  useConflictsQuery,
+  useConsolidateMutation,
+  useExportBusinessCaseMutation,
+  useExportExcelMutation,
+  useFpaTabQuery,
+  useInitiativeRejectMutation,
+  useInitiativeStageMutation,
+  useInitiativesQuery,
+  useMilestonesQuery,
+  usePipelineSummaryQuery,
+  useProvenanceQuery,
+  useResolveConflictMutation,
+  useSensitivityQuery,
+} from '../api/hooks/useCostRoomQueries';
+import {
+  getBandSavings,
+  isNeedsActionInitiative,
+  scenarioFactorFromSensitivity,
+} from '../utils/initiativeHelpers';
+import { useExceptions } from '../context/ExceptionContext';
+import type { AuditLogEntry, DataConflict, PercentileBand } from '../types';
 
-function EmptyPipeline({ onGoToAnalysis }: { onGoToAnalysis: () => void }) {
-  return (
-    <Card className="!p-12 text-center bg-white border-brand-border">
-      <div className="max-w-md mx-auto">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-50 border border-brand-border flex items-center justify-center">
-          <svg className="w-8 h-8 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-        </div>
-        <h3 className="text-lg font-semibold text-brand-ink mb-2">No initiatives yet</h3>
-        <p className="text-sm text-brand-muted mb-6">
-          Upload spend data in the Analysis tab and run OPAR analysis to generate your first initiative pipeline.
-        </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <button
-            type="button"
-            onClick={onGoToAnalysis}
-            className="px-5 py-2.5 rounded-xl bg-deloitte-green text-white text-sm font-medium hover:bg-[#6fa31e] transition-colors"
-          >
-            Go to Analysis →
-          </button>
-          <a
-            href="/api/v1/template/spend-csv"
-            download="opex_spend_template.csv"
-            className="px-5 py-2.5 rounded-xl border border-brand-border text-brand-ink text-sm hover:bg-brand-surface-muted transition-colors"
-          >
-            Download spend template ↓
-          </a>
-        </div>
-      </div>
-    </Card>
-  );
+function triggerDownload(exportPath: string, filename?: string) {
+  const url = exportPath.startsWith('/api') ? exportPath : `/api/v1/exports/${exportPath.split('/').pop()}`;
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename ?? url.split('/').pop() ?? 'export';
+  anchor.rel = 'noopener';
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
 }
 
 const FPA_TABS = [
@@ -101,232 +85,267 @@ const FPA_TABS = [
   { id: 'cost-to-serve', label: 'Cost to Serve' },
 ];
 
-function scenarioExecutionRate(scenario: ScenarioPreset): number | undefined {
-  if (scenario === 'conservative') return 0.6;
-  if (scenario === 'accelerated') return 0.9;
-  return undefined;
+function EmptyPipeline({ onGoToAnalysis }: { onGoToAnalysis: () => void }) {
+  return (
+    <Card className="!p-12 text-center bg-white border-brand-border">
+      <div className="max-w-md mx-auto">
+        <h3 className="text-lg font-semibold text-brand-ink mb-2">No initiatives yet</h3>
+        <p className="text-sm text-brand-muted mb-6">
+          Upload spend data in the Analysis tab and run OPAR analysis. Initiatives are seeded
+          automatically when analysis completes.
+        </p>
+        <button
+          type="button"
+          onClick={onGoToAnalysis}
+          className="px-5 py-2.5 rounded-xl bg-deloitte-green text-black text-sm font-medium"
+        >
+          Go to Analysis →
+        </button>
+      </div>
+    </Card>
+  );
 }
 
 export default function CostRoom() {
-  const { sessionId, engagement, ensureSession, syncEngagementFromAnalysis, refreshSessionAnalysis } = useSession();
+  const { sessionId, engagementId, engagement, ensureSession, syncEngagementFromAnalysis, refreshSessionAnalysis, sessionAnalysis } =
+    useSession();
   const { isExecutive } = useAudience();
-  const navigate = useNavigate();
+  const navigate = useGuardedNavigate();
 
-  const [activeTab, setActiveTab] = useState('portfolio');
-  const [fpaOpen, setFpaOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('trends');
+  const [fpaOpen, setFpaOpen] = useState(!isExecutive);
   const [percentileBand, setPercentileBand] = useState<PercentileBand>('p50');
   const [scenario, setScenario] = useState<ScenarioPreset>('base');
-  const [filters, setFilters] = useState<PortfolioFilters>(defaultFilters);
-  const [initiatives, setInitiatives] = useState<Initiative[]>([]);
-  const [summary, setSummary] = useState<PipelineSummary | null>(null);
-  const [sensitivity, setSensitivity] = useState<SensitivityResponse | null>(null);
-  const [selected, setSelected] = useState<Initiative | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('split');
+  const [filters, setFilters] = useState<PortfolioFilters>(() => ({
+    ...defaultFilters,
+    needsActionOnly: !isExecutive,
+  }));
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
   const [auditLog, setAuditLog] = useState<AuditLogEntry[]>([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirm, confirmDialog] = useConfirm();
+
+  // The Cost Room has its own light colour system (--cr-* tokens); the generic dark layer would clash
+  // with it, so it stays light here and the user's theme choice is restored on leaving.
+  useEffect(() => {
+    const root = document.documentElement;
+    const wasDark = root.classList.contains('dark');
+    root.classList.remove('dark');
+    return () => {
+      if (wasDark) root.classList.add('dark');
+    };
+  }, []);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [rejectTargetId, setRejectTargetId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
-  const [trends, setTrends] = useState<Record<string, unknown> | null>(null);
-  const [bva, setBva] = useState<Record<string, unknown> | null>(null);
-  const [paymentTerms, setPaymentTerms] = useState<Record<string, unknown> | null>(null);
-  const [costToServe, setCostToServe] = useState<Record<string, unknown> | null>(null);
-  const [milestones, setMilestones] = useState<Record<string, unknown>[] | null>(null);
-  const [businessCaseLoading, setBusinessCaseLoading] = useState(false);
-  const [tabLoading, setTabLoading] = useState(false);
-  const [tabError, setTabError] = useState<string | null>(null);
-  const [lastSync, setLastSync] = useState(() => new Date().toISOString());
+  const [rejectReasonMissing, setRejectReasonMissing] = useState(false);
+  useUnsavedGuard('cost-room-reject', rejectModalOpen && rejectReason.trim().length > 0);
+  const [exportNotice, setExportNotice] = useState<string | null>(null);
   const [trustOpen, setTrustOpen] = useState(false);
-  const [serverAuditCount, setServerAuditCount] = useState(0);
-  const [chainValid, setChainValid] = useState<boolean | undefined>(undefined);
-  const [conflicts, setConflicts] = useState<ConflictSummary | null>(null);
-  const [conflictsLoading, setConflictsLoading] = useState(false);
-  const [conflictsError, setConflictsError] = useState<string | null>(null);
-  const [actingConflictId, setActingConflictId] = useState<string | null>(null);
   const [conflictNotice, setConflictNotice] = useState<string | null>(null);
   const [highlightConflicts, setHighlightConflicts] = useState(false);
+  const [inboxDismissed, setInboxDismissed] = useState(false);
   const conflictsSectionRef = useRef<HTMLDivElement>(null);
-  const portfolioSectionRef = useRef<HTMLDivElement>(null);
-  const { setItems: setExceptionItems } = useExceptions();
+  const workSectionRef = useRef<HTMLDivElement>(null);
+  const { setItems: setExceptionItems, items: exceptionItems } = useExceptions();
 
-  const exceptionCount = useMemo(() => countInitiativeExceptions(initiatives), [initiatives]);
+  const initiativesQuery = useInitiativesQuery(engagementId);
+  const summaryQuery = usePipelineSummaryQuery(engagementId);
+  const sensitivityQuery = useSensitivityQuery(sessionId, scenario);
+  const conflictsQuery = useConflictsQuery(sessionId, !isExecutive);
+  const trendsQuery = useFpaTabQuery('trends', sessionId, fpaOpen && !isExecutive && activeTab === 'trends');
+  const bvaQuery = useFpaTabQuery('bva', sessionId, fpaOpen && !isExecutive && activeTab === 'bva');
+  const paymentTermsQuery = useFpaTabQuery(
+    'payment-terms',
+    sessionId,
+    fpaOpen && !isExecutive && activeTab === 'payment-terms',
+  );
+  const costToServeQuery = useFpaTabQuery(
+    'cost-to-serve',
+    sessionId,
+    fpaOpen && !isExecutive && activeTab === 'cost-to-serve',
+  );
+  const fpaTabQueries: Record<string, { isFetching: boolean; refetch: () => unknown }> = {
+    trends: trendsQuery,
+    bva: bvaQuery,
+    'payment-terms': paymentTermsQuery,
+    'cost-to-serve': costToServeQuery,
+  };
+  const activeFpaQuery = fpaTabQueries[activeTab];
+  const milestonesQuery = useMilestonesQuery(selectedId);
+  const provenanceQuery = useProvenanceQuery(selectedId);
+  const auditLogQuery = useAuditLogLatestQuery(initiativesQuery.dataUpdatedAt);
+
+  const initiativeStageMutation = useInitiativeStageMutation(engagementId);
+  const initiativeRejectMutation = useInitiativeRejectMutation(engagementId);
+  const addActualsMutation = useAddActualsMutation(engagementId);
+  const consolidateMutation = useConsolidateMutation(engagementId, sessionId);
+  const resolveConflictMutation = useResolveConflictMutation(engagementId, sessionId);
+  const exportBusinessCaseMutation = useExportBusinessCaseMutation(sessionId);
+  const exportExcelMutation = useExportExcelMutation(sessionId);
+
+  const initiatives = useMemo(() => initiativesQuery.data ?? [], [initiativesQuery.data]);
+  const summary = summaryQuery.data ?? null;
+  const sensitivity = sensitivityQuery.data ?? null;
+  const loading = initiativesQuery.isFetching || summaryQuery.isFetching;
+  const milestones = milestonesQuery.data ?? null;
+  const milestonesLoading = milestonesQuery.isFetching;
+  const provenance = provenanceQuery.data ?? null;
+  const provenanceLoading = provenanceQuery.isFetching;
+  const conflicts = conflictsQuery.data ?? null;
+  const conflictsLoading = conflictsQuery.isFetching;
+  const conflictsError = conflictsQuery.error ? getApiErrorMessage(conflictsQuery.error) : null;
+  const actualsSaving = addActualsMutation.isPending;
+  const businessCaseLoading = exportBusinessCaseMutation.isPending;
+  const excelExportLoading = exportExcelMutation.isPending;
+  const tabLoading = activeFpaQuery?.isFetching ? activeTab : null;
+  const tabErrors: Record<string, string | null> = {
+    trends: trendsQuery.error ? getApiErrorMessage(trendsQuery.error) : null,
+    bva: bvaQuery.error ? getApiErrorMessage(bvaQuery.error) : null,
+    'payment-terms': paymentTermsQuery.error ? getApiErrorMessage(paymentTermsQuery.error) : null,
+    'cost-to-serve': costToServeQuery.error ? getApiErrorMessage(costToServeQuery.error) : null,
+  };
+  const serverAuditCount = auditLogQuery.data
+    ? auditLogQuery.data.integrity?.records ?? auditLogQuery.data.entries?.length ?? 0
+    : 0;
+  const chainValid = auditLogQuery.data?.integrity?.chain_valid;
+  const actingConflictId = resolveConflictMutation.isPending
+    ? resolveConflictMutation.variables?.conflictId ?? null
+    : null;
+  const lastSync = initiativesQuery.dataUpdatedAt
+    ? new Date(initiativesQuery.dataUpdatedAt).toISOString()
+    : new Date().toISOString();
+
+  const factor = useMemo(
+    () => scenarioFactorFromSensitivity(scenario, sensitivity),
+    [scenario, sensitivity],
+  );
 
   const filteredInitiatives = useMemo(
-    () => applyPortfolioFilters(initiatives, filters, (r) => getBandSavings(r, 'p50')),
+    () => applyPortfolioFilters(initiatives, filters),
     [initiatives, filters],
   );
 
-  const portfolioP50Cr = useMemo(
-    () => filteredInitiatives.reduce((sum, r) => sum + getBandSavings(r, 'p50'), 0),
-    [filteredInitiatives],
+  const liveInitiatives = useMemo(
+    () => initiatives.filter((x) => x.stage !== 'rejected' && x.stage !== 'deferred'),
+    [initiatives],
   );
 
-  const committedP50Cr = useMemo(
-    () =>
-      filteredInitiatives
-        .filter((r) => ['committed', 'in_flight', 'realized'].includes(r.stage))
-        .reduce((sum, r) => sum + getBandSavings(r, 'p50'), 0),
-    [filteredInitiatives],
+  const needsActionCount = useMemo(
+    () => liveInitiatives.filter(isNeedsActionInitiative).length,
+    [liveInitiatives],
+  );
+
+  // Tracks the topbar P10/P50/P90 toggle so the hero EBITDA-bps metric stays
+  // consistent with the per-initiative figures shown elsewhere on the page.
+  const portfolioBandCr = useMemo(
+    () => filteredInitiatives.reduce((sum, r) => sum + getBandSavings(r, percentileBand), 0),
+    [filteredInitiatives, percentileBand],
   );
 
   const baseEbitdaBps = useMemo(() => {
     const revenueCr = engagement.annual_revenue_cr ?? 25000;
     if (revenueCr <= 0) return 0;
-    return Math.round((portfolioP50Cr / revenueCr) * 10000);
-  }, [portfolioP50Cr, engagement.annual_revenue_cr]);
+    const portfolioCr = toCr(portfolioBandCr, engagement.currency);
+    return Math.round((portfolioCr / revenueCr) * 10000);
+  }, [portfolioBandCr, engagement.annual_revenue_cr, engagement.currency]);
 
   const ebitdaBps = useMemo(() => macroScenarioBps(baseEbitdaBps, scenario), [baseEbitdaBps, scenario]);
 
-  const gateProgressPct = useMemo(
-    () => (portfolioP50Cr > 0 ? Math.round((committedP50Cr / portfolioP50Cr) * 100) : 0),
-    [portfolioP50Cr, committedP50Cr],
-  );
-
-  const macroScenarios = useMemo(
-    () =>
-      DEFAULT_MACRO_SCENARIOS.map((s) => ({
-        ...s,
-        ebitdaBps: macroScenarioBps(baseEbitdaBps, s.id),
-        illustrative: !sensitivity?.scenarios?.length,
-      })),
-    [baseEbitdaBps, sensitivity],
-  );
+  const toast = useCallback((msg: string) => {
+    const id = Math.random().toString(36).slice(2);
+    setToasts((ts) => [...ts, { id, message: msg }]);
+    setTimeout(() => setToasts((ts) => ts.filter((x) => x.id !== id)), 2600);
+  }, []);
 
   const appendAudit = useCallback((message: string) => {
-    setAuditLog((log) => [
-      { ts: new Date().toISOString(), message },
-      ...log.slice(0, 49),
-    ]);
+    setAuditLog((log) => [{ ts: new Date().toISOString(), message }, ...log.slice(0, 49)]);
   }, []);
-
-  const enrichInitiative = (row: Initiative): Initiative => ({
-    ...row,
-    aqs: row.aqs ?? row.assumption_quality_score ?? 0.72,
-    p10_savings: row.p10_savings ?? (row.gross_savings_y1 ?? 0) * 0.7,
-    p50_savings: row.p50_savings ?? row.gross_savings_y1 ?? 0,
-    p90_savings: row.p90_savings ?? (row.gross_savings_y1 ?? 0) * 1.3,
-    ebitda_bps: row.ebitda_bps,
-    owner_name: row.owner_name ?? '—',
-    sustainability_score: row.sustainability_score,
-    bounce_back_risk: row.bounce_back_risk,
-  });
-
-  const loadPipeline = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [initRes, sumRes] = await Promise.all([
-        apiGet<{ initiatives: Initiative[] }>('/api/v1/initiatives'),
-        apiGet<PipelineSummary>('/api/v1/pipeline/summary'),
-      ]);
-      setInitiatives(initRes.initiatives.map(enrichInitiative));
-      setSummary(sumRes);
-      setLastSync(new Date().toISOString());
-    } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const loadSensitivity = useCallback(async () => {
-    if (!sessionId) return;
-    try {
-      const execRate = scenarioExecutionRate(scenario);
-      const qs = execRate != null ? `?execution_rate_pct=${execRate}` : '';
-      const data = await apiGet<SensitivityResponse>(`/api/v1/sensitivity/${sessionId}${qs}`);
-      setSensitivity(data);
-    } catch {
-      setSensitivity(null);
-    }
-  }, [sessionId, scenario]);
 
   useEffect(() => {
     ensureSession().catch(() => undefined);
-    loadPipeline();
     syncEngagementFromAnalysis().catch(() => undefined);
-  }, [ensureSession, loadPipeline, syncEngagementFromAnalysis]);
+    refreshSessionAnalysis().catch(() => undefined);
+  }, [ensureSession, syncEngagementFromAnalysis, refreshSessionAnalysis]);
 
   useEffect(() => {
-    loadSensitivity();
-  }, [loadSensitivity]);
+    setSelectedId((prev) => prev ?? initiatives[0]?.initiative_id ?? null);
+  }, [initiatives]);
 
   useEffect(() => {
-    apiGet<ComplianceAuditResponse>('/api/v1/compliance/audit-log?limit=1')
-      .then((res) => {
-        setServerAuditCount(res.integrity?.records ?? res.entries?.length ?? 0);
-        setChainValid(res.integrity?.chain_valid);
-      })
-      .catch(() => setServerAuditCount(0));
-  }, [lastSync]);
+    const err = initiativesQuery.error ?? summaryQuery.error;
+    if (err) setError(getApiErrorMessage(err));
+  }, [initiativesQuery.error, summaryQuery.error]);
 
-  const loadConflicts = useCallback(async () => {
-    if (!sessionId || isExecutive) return;
-    setConflictsLoading(true);
-    setConflictsError(null);
-    try {
-      const summary = await apiGet<ConflictSummary>(`/api/v1/conflicts/${sessionId}`);
-      setConflicts(summary);
-    } catch (err) {
-      setConflicts(null);
-      setConflictsError(getApiErrorMessage(err));
-    } finally {
-      setConflictsLoading(false);
+  useEffect(() => {
+    if (isExecutive) {
+      setFilters((f) => ({ ...f, needsActionOnly: false }));
     }
-  }, [sessionId, isExecutive]);
+  }, [isExecutive]);
 
   useEffect(() => {
-    loadConflicts();
-  }, [loadConflicts]);
-
-  useEffect(() => {
-    const items = mergeExceptionItems(
-      buildInitiativeExceptionItems(initiatives),
-      buildConflictExceptionItems(conflicts),
+    setExceptionItems(
+      mergeExceptionItems(
+        buildInitiativeExceptionItems(initiatives),
+        buildConflictExceptionItems(conflicts),
+      ),
     );
-    setExceptionItems(items);
   }, [initiatives, conflicts, setExceptionItems]);
 
-  useEffect(() => {
-    if (!sessionId || !fpaOpen || isExecutive) return;
-    const loadTab = async () => {
-      setTabLoading(true);
-      setTabError(null);
-      try {
-        if (activeTab === 'trends') {
-          setTrends(await apiGet(`/api/v1/trends/${sessionId}`));
-        } else if (activeTab === 'bva') {
-          setBva(await apiGet(`/api/v1/bva/${sessionId}`));
-        } else if (activeTab === 'payment-terms') {
-          setPaymentTerms(await apiGet(`/api/v1/payment-terms/${sessionId}`));
-        } else if (activeTab === 'cost-to-serve') {
-          setCostToServe(await apiPost('/api/v1/cost-to-serve', { session_id: sessionId }));
-        }
-      } catch (err) {
-        setTabError(getApiErrorMessage(err));
-      } finally {
-        setTabLoading(false);
-      }
-    };
-    if (activeTab !== 'portfolio') loadTab();
-  }, [activeTab, sessionId, fpaOpen, isExecutive]);
+  const selectInitiative = useCallback((id: string) => {
+    setSelectedId(id);
+  }, []);
+
+  const handleExceptionAction = useCallback((item: ExceptionItem) => {
+    setInboxDismissed(false);
+    if (item.action === 'conflicts') {
+      setHighlightConflicts(true);
+      conflictsSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+      window.setTimeout(() => setHighlightConflicts(false), 4000);
+    } else if (item.action === 'portfolio') {
+      workSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+      if (item.id) selectInitiative(item.id);
+      // Drill-through from the exception inbox into an initiative's detail panel
+      // (which surfaces its AqsBadge) — record it like every other page action
+      // so a low-AQS review is traceable in the audit log.
+      appendAudit(`exception_drill_through: ${item.title} — ${item.detail}`);
+    }
+  }, [selectInitiative, appendAudit]);
 
   const acceptInit = async (initiativeId: string) => {
+    const target = initiatives.find((x) => x.initiative_id === initiativeId);
+    const ok = await confirm({
+      title: 'Commit this initiative?',
+      message: `“${target?.lever ?? initiativeId}” will count toward committed savings and be tracked against actuals. You can move it back to another stage later.`,
+      confirmLabel: 'Commit',
+    });
+    if (!ok) return;
     try {
-      await apiPut(`/api/v1/initiatives/${initiativeId}/stage`, { stage: 'committed' });
+      await initiativeStageMutation.mutateAsync({ initiativeId, stage: 'committed' });
+      const init = initiatives.find((x) => x.initiative_id === initiativeId);
+      toast(`Committed · ${init?.lever ?? initiativeId}`);
       appendAudit(`acceptInit: ${initiativeId} → committed`);
-      await loadPipeline();
     } catch (err) {
       setError(getApiErrorMessage(err));
     }
   };
 
   const deferInit = async (initiativeId: string) => {
+    const target = initiatives.find((x) => x.initiative_id === initiativeId);
+    const ok = await confirm({
+      title: 'Defer this initiative?',
+      message: `“${target?.lever ?? initiativeId}” will leave the active pipeline until you bring it back.`,
+      confirmLabel: 'Defer',
+    });
+    if (!ok) return;
     try {
-      await apiPut(`/api/v1/initiatives/${initiativeId}/stage`, { stage: 'deferred' });
+      await initiativeStageMutation.mutateAsync({ initiativeId, stage: 'deferred' });
+      const init = initiatives.find((x) => x.initiative_id === initiativeId);
+      toast(`Deferred · ${init?.lever ?? initiativeId}`);
       appendAudit(`deferInit: ${initiativeId} → deferred`);
-      await loadPipeline();
     } catch (err) {
       setError(getApiErrorMessage(err));
     }
@@ -335,165 +354,103 @@ export default function CostRoom() {
   const rejectInit = (initiativeId: string) => {
     setRejectTargetId(initiativeId);
     setRejectReason('');
+    setRejectReasonMissing(false);
     setRejectModalOpen(true);
   };
 
   const confirmReject = async () => {
-    if (!rejectTargetId || !rejectReason.trim()) return;
+    if (!rejectTargetId) return;
+    if (!rejectReason.trim()) {
+      setRejectReasonMissing(true);
+      return;
+    }
     try {
-      await apiPut(`/api/v1/initiatives/${rejectTargetId}/reject`, { reason: rejectReason.trim() });
-      appendAudit(`rejectInit: ${rejectTargetId} — ${rejectReason.trim()}`);
+      await initiativeRejectMutation.mutateAsync({
+        initiativeId: rejectTargetId,
+        reason: rejectReason.trim(),
+      });
+      const init = initiatives.find((x) => x.initiative_id === rejectTargetId);
+      toast(`Rejected · ${init?.lever ?? rejectTargetId}`);
+      appendAudit(`rejectInit: ${rejectTargetId}`);
       setRejectModalOpen(false);
-      await loadPipeline();
     } catch (err) {
       setError(getApiErrorMessage(err));
     }
   };
 
-  const handleSelectInitiative = (init: Initiative) => {
-    setSelected(init);
-    setDrawerOpen(true);
-    appendAudit(`Opened initiative ${init.initiative_id} (${percentileBand} view)`);
-    setMilestones(null);
-    loadMilestones(init.initiative_id);
+  const handleDecision = (id: string, stage: string) => {
+    if (stage === 'committed') void acceptInit(id);
+    else if (stage === 'deferred') void deferInit(id);
+    else if (stage === 'rejected') rejectInit(id);
   };
 
-  const scrollToSection = useCallback((ref: React.RefObject<HTMLDivElement | null>) => {
-    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, []);
-
-  const handleExceptionAction = useCallback(
-    (item: ExceptionItem) => {
-      if (item.action === 'conflicts') {
-        scrollToSection(conflictsSectionRef);
-        setHighlightConflicts(true);
-        window.setTimeout(() => setHighlightConflicts(false), 2400);
-        return;
-      }
-      if (item.action === 'portfolio') {
-        setFilters((prev) => ({ ...prev, needsActionOnly: true }));
-        scrollToSection(portfolioSectionRef);
+  const addActuals = useCallback(
+    async (initiativeId: string, amount: number) => {
+      try {
+        await addActualsMutation.mutateAsync({ initiativeId, amount });
+        const init = initiatives.find((x) => x.initiative_id === initiativeId);
+        toast(`Actuals updated · ${init?.lever ?? initiativeId}`);
+        appendAudit(`actuals_recorded: ${initiativeId}`);
+      } catch (err) {
+        setError(getApiErrorMessage(err));
       }
     },
-    [scrollToSection],
+    [appendAudit, initiatives, addActualsMutation, toast],
   );
 
-  const actOnConflict = async (
-    conflict: DataConflict,
-    strategy: string,
-    auditLabel: string,
-  ) => {
-    if (!sessionId) {
-      setError('No active session — refresh the page and try again.');
-      return;
-    }
-    if (!conflict.conflict_id) {
-      setError('Conflict identity missing — refresh the page and try again.');
-      return;
-    }
-    setActingConflictId(conflict.conflict_id);
+  const actOnConflict = async (conflict: DataConflict, strategy: string, auditLabel: string) => {
+    if (!sessionId || !conflict.conflict_id) return;
     setConflictNotice(null);
     try {
-      const result = await apiPost<{
-        resolved_count?: number;
-        escalated_count?: number;
-        spend_impact?: ConflictSpendImpact | null;
-      }>(`/api/v1/conflicts/resolve?session_id=${sessionId}`, {
-        conflict_ids: [conflict.conflict_id],
-        strategy,
-      });
-      const acted = (result.resolved_count ?? 0) + (result.escalated_count ?? 0);
-      if (acted === 0) {
-        setError('No conflict was updated — refresh the page and try again.');
-        return;
-      }
+      await resolveConflictMutation.mutateAsync({ conflictId: conflict.conflict_id, strategy });
+      toast(`Conflict resolved · ${conflict.title ?? conflict.conflict_id}`);
       appendAudit(`${auditLabel}: ${conflict.conflict_id}`);
-      const impact = result.spend_impact;
-      if (impact && (impact.spend_delta ?? 0) !== 0) {
-        const prior = formatCr(impact.prior_total_spend ?? 0, { currency: engagement.currency });
-        const next = formatCr(impact.new_total_spend ?? 0, { currency: engagement.currency });
-        const delta = formatCr(Math.abs(impact.spend_delta ?? 0), { currency: engagement.currency });
-        const direction = (impact.spend_delta ?? 0) < 0 ? 'reduced' : 'increased';
-        setConflictNotice(
-          `Spend base ${direction} by ${delta} (${prior} → ${next}).` +
-            (impact.initiatives_refresh_required
-              ? ' Re-run analysis in the Analysis tab if initiative savings should reflect this.'
-              : ''),
-        );
-        await loadPipeline();
-        await syncEngagementFromAnalysis();
-        await refreshSessionAnalysis();
-      } else if (result.escalated_count) {
-        setConflictNotice(
-          'Flagged for manual review — spend base unchanged until Finance confirms a source.',
-        );
-      }
-      await loadConflicts();
     } catch (err) {
       setError(getApiErrorMessage(err));
-    } finally {
-      setActingConflictId(null);
     }
-  };
-
-  const applyConflictRecommendation = (conflict: DataConflict) => {
-    const strategy = conflict.resolution_strategy;
-    if (!strategy || strategy === 'escalate') return;
-    void actOnConflict(conflict, strategy, 'conflict_apply_recommendation');
-  };
-
-  const flagConflictForReview = (conflict: DataConflict) => {
-    void actOnConflict(conflict, 'escalate', 'conflict_flag_manual_review');
   };
 
   const exportBusinessCase = useCallback(async () => {
     if (!sessionId) return;
-    setBusinessCaseLoading(true);
     try {
-      await apiPost(`/api/v1/business-case/${sessionId}`, { format: 'pptx' });
+      const res = await exportBusinessCaseMutation.mutateAsync();
       appendAudit('business_case_export_requested');
+      if (res.exports?.docx) {
+        triggerDownload(res.exports.docx, `${sessionId}_business_case.docx`);
+        setExportNotice('Business case downloaded.');
+      }
     } catch (err) {
       setError(getApiErrorMessage(err));
-    } finally {
-      setBusinessCaseLoading(false);
     }
-  }, [sessionId, appendAudit]);
+  }, [sessionId, appendAudit, exportBusinessCaseMutation]);
+
+  const exportExcel = useCallback(async () => {
+    if (!sessionId) return;
+    try {
+      const res = await exportExcelMutation.mutateAsync();
+      appendAudit('export_excel_requested');
+      if (res.export_url) {
+        triggerDownload(res.export_url, res.filename);
+        setExportNotice('Portfolio Excel export downloaded.');
+      }
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    }
+  }, [sessionId, appendAudit, exportExcelMutation]);
 
   const handleConsolidate = useCallback(async () => {
     if (!sessionId) return;
     try {
-      await apiPost(`/api/v1/consolidate/${sessionId}`, {});
+      await consolidateMutation.mutateAsync();
+      toast('Entities consolidated');
       appendAudit('consolidation_run');
-      await loadPipeline();
     } catch (err) {
       setError(getApiErrorMessage(err));
     }
-  }, [sessionId, appendAudit, loadPipeline]);
-
-  const loadMilestones = useCallback(async (initiativeId: string) => {
-    try {
-      const res = await apiGet<{ milestones: unknown[] }>(
-        `/api/v1/initiatives/${initiativeId}/milestones`,
-      );
-      setMilestones((res.milestones ?? []) as Record<string, unknown>[]);
-    } catch {
-      setMilestones([]);
-    }
-  }, []);
-
-  const addActuals = useCallback(async (initiativeId: string, amount: number) => {
-    try {
-      await apiPost(`/api/v1/initiatives/${initiativeId}/actuals`, { amount_cr: amount });
-      appendAudit(`actuals_recorded: ${initiativeId}`);
-      await loadPipeline();
-    } catch (err) {
-      setError(getApiErrorMessage(err));
-    }
-  }, [appendAudit, loadPipeline]);
+  }, [sessionId, appendAudit, consolidateMutation, toast]);
 
   const auditCountTotal = serverAuditCount + auditLog.length;
   const friendlyError = error ? friendlyErrorMessage(error) : null;
-
   const lastSyncLabel = new Date(lastSync).toLocaleString('en-IN', {
     day: 'numeric',
     month: 'short',
@@ -502,65 +459,79 @@ export default function CostRoom() {
     minute: '2-digit',
   });
 
+  const realizedCr = summary?.stage_totals?.realized?.net_npv
+    ? toCr(summary.stage_totals.realized.net_npv, engagement.currency)
+    : undefined;
+
+  const trustProgressSteps = useMemo(() => {
+    const outputs = sessionAnalysis?.skill_outputs;
+    if (!outputs || typeof outputs !== 'object') return undefined;
+    return Object.keys(outputs).map((skill) => ({
+      phase: 'skill',
+      message: skill,
+      status: 'complete',
+    }));
+  }, [sessionAnalysis]);
+
+  const trustQualitySignals = useMemo(() => {
+    const synth = sessionAnalysis?.skill_outputs?.['analysis-synthesizer'] as
+      | { quality_signals?: import('../types').QualitySignals }
+      | undefined;
+    return synth?.quality_signals ?? null;
+  }, [sessionAnalysis]);
+
+  const trustDegraded = useMemo(() => {
+    const outputs = sessionAnalysis?.skill_outputs;
+    if (!outputs || typeof outputs !== 'object') return false;
+    return Object.values(outputs).some(
+      (o) =>
+        o &&
+        typeof o === 'object' &&
+        (o as { degraded_reason?: string }).degraded_reason === 'provider_unavailable',
+    );
+  }, [sessionAnalysis]);
+
+  const trustProvenance = useMemo(
+    () => [
+      { label: engagement.company_name, detail: 'Engagement manifest', kind: 'fact' as const },
+      {
+        label: 'Spend & pipeline',
+        detail: sessionAnalysis ? 'OPAR analysis + initiative model' : 'Awaiting analysis',
+        kind: 'inference' as const,
+      },
+      ...(sensitivity?.methodology_note
+        ? [{ label: 'Sensitivity model', detail: String(sensitivity.methodology_note).slice(0, 120), kind: 'inference' as const }]
+        : []),
+    ],
+    [engagement.company_name, sessionAnalysis, sensitivity],
+  );
+
   return (
     <MainLayout variant={isExecutive ? 'executive' : 'default'} hideHeader>
-      {isExecutive && <EngagementContextBar />}
-
-      <div className="space-y-6">
-        {!isExecutive && (
-          <PageHeader
-            title="Cost Room"
-            subtitle="Initiative pipeline command center"
-            sessionId={sessionId}
-          />
-        )}
-
-        {friendlyError && (
-          <Alert
-            variant="error"
-            title={friendlyError.title}
-            recovery={friendlyError.recovery}
-            onDismiss={() => setError(null)}
-          >
-            {friendlyError.detail}
-          </Alert>
-        )}
-
-        {conflictNotice && (
-          <Alert
-            variant="success"
-            title="Conflict action recorded"
-            onDismiss={() => setConflictNotice(null)}
-          >
-            {conflictNotice}
-          </Alert>
-        )}
-
-        {!isExecutive && (
-          <ExceptionInbox
-            items={mergeExceptionItems(
-              buildInitiativeExceptionItems(initiatives),
-              buildConflictExceptionItems(conflicts),
-            )}
-            onItemAction={handleExceptionAction}
-          />
-        )}
-
-        <ScenarioControls
+      {confirmDialog}
+      <div className="cost-room-page space-y-[var(--cr-gap)] min-w-0">
+        <CostRoomTopbar
           percentileBand={percentileBand}
           onBandChange={setPercentileBand}
           scenario={scenario}
           onScenarioChange={setScenario}
         />
 
-        <FilterBar
-          initiatives={initiatives}
-          filters={filters}
-          onChange={setFilters}
-          filteredCount={filteredInitiatives.length}
-          exceptionCount={exceptionCount}
-          currency={engagement.currency}
-        />
+        {friendlyError && (
+          <Alert variant="error" title={friendlyError.title} onDismiss={() => setError(null)}>
+            {friendlyError.detail}
+          </Alert>
+        )}
+        {conflictNotice && (
+          <Alert variant="success" title="Conflict action recorded" onDismiss={() => setConflictNotice(null)}>
+            {conflictNotice}
+          </Alert>
+        )}
+        {exportNotice && (
+          <Alert variant="success" title="Export ready" onDismiss={() => setExportNotice(null)}>
+            {exportNotice}
+          </Alert>
+        )}
 
         {!loading && initiatives.length === 0 ? (
           <EmptyPipeline onGoToAnalysis={() => navigate('/')} />
@@ -569,63 +540,78 @@ export default function CostRoom() {
             {loading ? (
               <Loader label="Loading pipeline…" />
             ) : (
-              <KpiStrip
-                portfolioP50Cr={portfolioP50Cr}
-                committedP50Cr={committedP50Cr}
-                ebitdaBps={ebitdaBps}
-                initiativeCount={filteredInitiatives.length}
-                gateProgressPct={gateProgressPct}
-                currency={engagement.currency}
+              <>
+                <div
+                  title="Percentile band: p10 = conservative case, p50 = base case, p90 = stretch case. Toggle in the topbar changes the hero metrics and per-initiative figures together."
+                >
+                  <CostRoomHero
+                    initiatives={filteredInitiatives}
+                    percentileBand={percentileBand}
+                    scenario={scenario}
+                    scenarioFactor={factor}
+                    ebitdaBps={ebitdaBps}
+                    currency={engagement.currency}
+                    revenueCr={engagement.annual_revenue_cr}
+                  />
+                </div>
+                <SignalStrip
+                  initiatives={initiatives}
+                  currency={engagement.currency}
+                  realizedCr={realizedCr}
+                  onNeedsActionClick={() => {
+                    setFilters((f) => ({ ...f, needsActionOnly: true }));
+                    workSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                />
+              </>
+            )}
+
+            <FilterBar
+              initiatives={initiatives}
+              filters={filters}
+              onChange={setFilters}
+              filteredCount={filteredInitiatives.length}
+              needsActionCount={needsActionCount}
+              layoutMode={layoutMode}
+              onLayoutModeChange={setLayoutMode}
+              executive={isExecutive}
+            />
+
+            {!isExecutive && !inboxDismissed && exceptionItems.length > 0 && (
+              <ExceptionInbox
+                items={exceptionItems}
+                onDismiss={() => setInboxDismissed(true)}
+                onItemAction={handleExceptionAction}
+                compact
               />
             )}
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              <div ref={portfolioSectionRef} id="initiative-portfolio" className="xl:col-span-2 scroll-mt-24">
-              <Card className="!p-0 overflow-hidden bg-white border-brand-border">
-                <div className="px-6 pt-4 pb-2 border-b border-brand-border flex items-center justify-between">
-                  <h2 className="font-semibold text-brand-ink">Initiative portfolio</h2>
-                  {!isExecutive && sessionId && (
-                    <button
-                      type="button"
-                      onClick={handleConsolidate}
-                      className="text-xs px-2.5 py-1.5 rounded-lg border border-brand-border hover:bg-brand-surface-muted text-brand-muted"
-                    >
-                      Consolidate entities
-                    </button>
-                  )}
-                </div>
-                <div className="p-4 md:p-6 overflow-x-auto">
-                  <InitiativePortfolio
-                    initiatives={filteredInitiatives}
-                    percentileBand={percentileBand}
-                    executive={isExecutive}
-                    currency={engagement.currency}
-                    onSelect={handleSelectInitiative}
-                    acceptInit={acceptInit}
-                    deferInit={deferInit}
-                    rejectInit={rejectInit}
-                  />
-                </div>
-              </Card>
-              </div>
-
-              <div className="space-y-4">
-                <ValueBridgePanel
-                  initiatives={filteredInitiatives}
-                  summary={summary}
-                  engagement={engagement}
-                  portfolioP50Cr={portfolioP50Cr}
-                  committedP50Cr={committedP50Cr}
-                  ebitdaBps={ebitdaBps}
+            <div ref={workSectionRef} id="initiative-portfolio" className="scroll-mt-24 min-w-0">
+              {!loading && (
+                <WorkArea
+                  list={filteredInitiatives}
+                  layoutMode={isExecutive ? 'split' : layoutMode}
+                  band={percentileBand}
+                  factor={factor}
+                  currency={engagement.currency}
+                  executive={isExecutive}
+                  selectedId={selectedId}
+                  expandedId={expandedId}
+                  onSelect={selectInitiative}
+                  onToggleExpand={(id) => setExpandedId((e) => (e === id ? null : id))}
+                  onDecision={handleDecision}
+                  provenance={provenance}
+                  provenanceLoading={provenanceLoading}
+                  milestones={milestones}
+                  milestonesLoading={milestonesLoading}
+                  onRecordActuals={
+                    selectedId ? (amount) => addActuals(selectedId, amount) : undefined
+                  }
+                  actualsSaving={actualsSaving}
+                  onConsolidate={handleConsolidate}
+                  showConsolidate={!isExecutive && Boolean(sessionId)}
                 />
-                <Card className="!p-4 bg-white border-brand-border">
-                  <MacroScenariosList
-                    scenarios={macroScenarios}
-                    activeId={scenario}
-                    baseBps={baseEbitdaBps}
-                  />
-                </Card>
-              </div>
+              )}
             </div>
           </>
         )}
@@ -634,64 +620,80 @@ export default function CostRoom() {
           <div
             ref={conflictsSectionRef}
             id="data-conflicts"
-            className={`scroll-mt-24 rounded-xl transition-shadow duration-500 ${
-              highlightConflicts ? 'ring-2 ring-amber-400 ring-offset-2' : ''
+            className={`scroll-mt-24 transition-shadow duration-500 ${
+              highlightConflicts ? 'ring-2 ring-amber-400 ring-offset-2 rounded-[var(--cr-r)]' : ''
             }`}
           >
             <ConflictsPanel
               summary={conflicts}
               loading={conflictsLoading}
               error={conflictsError}
-              onApplyRecommendation={applyConflictRecommendation}
-              onFlagForReview={flagConflictForReview}
+              onRetry={() => void conflictsQuery.refetch()}
+              onApplyRecommendation={(c) =>
+                c.resolution_strategy &&
+                c.resolution_strategy !== 'escalate' &&
+                void actOnConflict(c, c.resolution_strategy, 'conflict_apply')
+              }
+              onFlagForReview={(c) => void actOnConflict(c, 'escalate', 'conflict_flag')}
               actingConflictId={actingConflictId}
             />
           </div>
         )}
 
         {!isExecutive && (
-          <Card className="!p-0 overflow-hidden">
-            <button
-              type="button"
-              className="w-full flex items-center justify-between px-6 py-4 text-left font-medium text-brand-ink hover:bg-brand-surface-muted"
-              onClick={() => setFpaOpen((o) => !o)}
-            >
-              FP&A detail
-              {(conflicts?.unresolved ?? 0) > 0 && (
-                <span className="mr-2 text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
-                  {conflicts?.unresolved} conflicts
-                </span>
-              )}
-              <span className="text-brand-muted text-sm">{fpaOpen ? 'Hide' : 'Show'}</span>
-            </button>
+          <div className="cr-card overflow-hidden min-w-0">
+            <div className="cr-card-h">
+              <h2 className="text-sm font-bold">FP&amp;A detail</h2>
+              <button
+                type="button"
+                className="text-xs text-[var(--cr-gray)] hover:text-[var(--cr-ink)]"
+                onClick={() => {
+                  setFpaOpen((o) => {
+                    if (!o) setActiveTab('trends');
+                    return !o;
+                  });
+                }}
+              >
+                {fpaOpen ? 'Hide' : 'Show'}
+              </button>
+            </div>
             {fpaOpen && (
-              <>
-                <Tabs tabs={FPA_TABS} activeId={activeTab} onChange={setActiveTab} />
-                <div className="p-6">
-                  {activeTab === 'trends' && (
-                    <TrendsTab data={trends} loading={tabLoading} error={tabError} />
-                  )}
-                  {activeTab === 'bva' && <BvaTab data={bva} loading={tabLoading} error={tabError} />}
-                  {activeTab === 'payment-terms' && (
-                    <PaymentTermsTab data={paymentTerms} loading={tabLoading} error={tabError} />
-                  )}
-                  {activeTab === 'cost-to-serve' && (
-                    tabLoading ? (
-                      <Loader label="Computing cost-to-serve…" />
-                    ) : tabError ? (
-                      <p className="text-sm text-red-600">{tabError}</p>
-                    ) : costToServe ? (
-                      <pre className="text-xs font-mono bg-brand-surface rounded p-4 overflow-x-auto">
-                        {JSON.stringify(costToServe, null, 2)}
-                      </pre>
-                    ) : (
-                      <p className="text-sm text-brand-muted">No cost-to-serve data. Run full analysis first.</p>
-                    )
-                  )}
+              <div className="p-5 min-w-0">
+                <div className="cr-fpa-tabs mb-4">
+                  {FPA_TABS.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      className={activeTab === t.id ? 'cr-on' : ''}
+                      onClick={() => setActiveTab(t.id)}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
                 </div>
-              </>
+                <button
+                  type="button"
+                  onClick={() => activeFpaQuery?.refetch()}
+                  disabled={tabLoading === activeTab}
+                  className="mb-4 text-xs border border-[var(--cr-line)] rounded-[var(--cr-r-sm)] px-3 py-1.5 bg-white disabled:opacity-50"
+                >
+                  {tabLoading === activeTab ? 'Refreshing…' : 'Refresh'}
+                </button>
+                {activeTab === 'trends' && (
+                  <TrendsTab data={trendsQuery.data ?? null} loading={tabLoading === 'trends'} error={tabErrors.trends ?? null} currency={engagement.currency} />
+                )}
+                {activeTab === 'bva' && (
+                  <BvaTab data={bvaQuery.data ?? null} loading={tabLoading === 'bva'} error={tabErrors.bva ?? null} currency={engagement.currency} />
+                )}
+                {activeTab === 'payment-terms' && (
+                  <PaymentTermsTab data={paymentTermsQuery.data ?? null} loading={tabLoading === 'payment-terms'} error={tabErrors['payment-terms'] ?? null} currency={engagement.currency} />
+                )}
+                {activeTab === 'cost-to-serve' && (
+                  <CostToServeTab data={costToServeQuery.data ?? null} loading={tabLoading === 'cost-to-serve'} error={tabErrors['cost-to-serve'] ?? null} currency={engagement.currency} />
+                )}
+              </div>
             )}
-          </Card>
+          </div>
         )}
 
         <TrustFooter
@@ -700,49 +702,24 @@ export default function CostRoom() {
           chainValid={chainValid}
           onOpenAudit={() => setTrustOpen(true)}
           onExportDeck={exportBusinessCase}
-          onExportExcel={() => appendAudit('export_excel_requested')}
+          onExportExcel={exportExcel}
+          deckLoading={businessCaseLoading}
+          excelLoading={excelExportLoading}
         />
       </div>
+
+      <ToastStack toasts={toasts} />
 
       <TrustRail
         open={trustOpen}
         onClose={() => setTrustOpen(false)}
         localAudit={auditLog}
-        provenanceSources={[
-          { label: engagement.company_name, detail: 'Engagement manifest', kind: 'fact' },
-          { label: 'Initiative model', detail: 'Sector pack + spend signals', kind: 'inference' },
-        ]}
+        progressSteps={trustProgressSteps}
+        runId={sessionId ?? undefined}
+        degradedMode={trustDegraded}
+        qualitySignals={trustQualitySignals}
+        provenanceSources={trustProvenance}
       />
-
-      {businessCaseLoading && (
-        <div className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50">
-          <div className="bg-white border border-brand-border rounded-xl px-4 py-2 shadow-lg flex items-center gap-2 text-sm text-brand-ink">
-            <Loader />
-            Generating business case…
-          </div>
-        </div>
-      )}
-
-      <InitiativeDrawer
-        initiative={selected}
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        percentileBand={percentileBand}
-        currency={engagement.currency}
-      />
-
-      {selected && milestones !== null && drawerOpen && (
-        <div className="fixed bottom-4 right-4 z-50 bg-white border border-brand-border rounded-xl px-4 py-2 shadow text-xs text-brand-muted flex items-center gap-3">
-          <span>{milestones.length} milestone{milestones.length !== 1 ? 's' : ''}</span>
-          <button
-            type="button"
-            className="underline hover:text-deloitte-green"
-            onClick={() => addActuals(selected.initiative_id, 0)}
-          >
-            Record actuals
-          </button>
-        </div>
-      )}
 
       <Modal
         open={rejectModalOpen}
@@ -755,9 +732,17 @@ export default function CostRoom() {
         <Input
           label="Reason (required)"
           value={rejectReason}
-          onChange={(e) => setRejectReason(e.target.value)}
+          onChange={(e) => {
+            setRejectReason(e.target.value);
+            setRejectReasonMissing(false);
+          }}
           placeholder="Why is this initiative rejected?"
         />
+        {rejectReasonMissing && (
+          <p role="alert" className="mt-2 text-sm text-error">
+            Enter a reason to reject this initiative.
+          </p>
+        )}
       </Modal>
     </MainLayout>
   );

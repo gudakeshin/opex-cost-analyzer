@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from app.opar.models import ExecutionPlan, ObserveContext, SkillTask
+from app.opar.models import ExecutionPlan, ObserveContext, SkillTask, SuggestedOutput
+from app.skills.registry import discover_skills_rich
 
 # ---------------------------------------------------------------------------
 # Group 0 security skill definitions (always prepended when spend lines exist)
@@ -79,33 +80,192 @@ def _add_evidence_gatherer_if_value_modeled(tasks: list[SkillTask]) -> None:
     )
 
 
-def _add_sme_critique_if_value_modeled(tasks: list[SkillTask]) -> None:
-    """Attach evidence-qualification after savings modeling when available."""
+def _attach_quality_gates(tasks: list[SkillTask]) -> None:
+    """Auto-append quality_gate skills whose _DEP_MAP prerequisites are satisfied."""
     _add_evidence_gatherer_if_value_modeled(tasks)
     names = {t.skill_name for t in tasks}
-    if "savings-modeler" not in names or "sme-critique" in names:
-        return
-    deps = [
-        skill
-        for skill in (
-            "savings-modeler",
-            "spend-profiler",
-            "peer-benchmarker",
-            "root-cause-analyzer",
-            "contract-lifecycle-manager",
-            "evidence-gatherer",
-        )
-        if skill in names
+    gate_meta = [
+        m for m in discover_skills_rich()
+        if m.get("kind") == "quality_gate" and m.get("name") not in names
     ]
-    tasks.append(
-        SkillTask(
-            skill_name="sme-critique",
-            inputs={},
-            depends_on=deps,
-            parallel_group=max((t.parallel_group for t in tasks), default=0) + 1,
-            estimated_tokens=300,
+    for meta in gate_meta:
+        skill = str(meta.get("name") or "")
+        if skill not in _DEP_MAP:
+            continue
+        _, deps, tokens = _DEP_MAP[skill]
+        if not all(d in names for d in deps):
+            continue
+        tasks.append(
+            SkillTask(
+                skill_name=skill,
+                inputs={},
+                depends_on=[d for d in deps if d in names],
+                parallel_group=max((t.parallel_group for t in tasks), default=0) + 1,
+                estimated_tokens=tokens,
+            )
         )
+        names.add(skill)
+
+
+_HEAVY_EXPORT_CTAS: list[dict[str, object]] = [
+    {
+        "skill": "board-deck",
+        "label": "Board deck (PPTX)",
+        "endpoint": "/api/v1/board-deck/{session_id}",
+        "keywords": ("board", "board-ready", "pptx", "presentation", "directors"),
+    },
+    {
+        "skill": "cfo-brief",
+        "label": "CFO brief (DOCX)",
+        "endpoint": "/api/v1/cfo-brief/{session_id}",
+        "keywords": ("cfo", "brief", "finance leadership"),
+    },
+    {
+        "skill": "mor-pack",
+        "label": "MOR pack (DOCX)",
+        "endpoint": "/api/v1/mor-pack/{session_id}",
+        "keywords": ("mor", "management operating review", "monthly review"),
+    },
+    {
+        "skill": "pmo-export",
+        "label": "PMO portfolio (XLSX)",
+        "endpoint": "/api/v1/pmo-export/{session_id}",
+        "keywords": ("pmo", "excel", "xlsx", "portfolio export", "tracker"),
+    },
+    {
+        "skill": "evidence-appendix",
+        "label": "Evidence appendix (DOCX)",
+        "endpoint": "/api/v1/evidence-appendix/{session_id}",
+        "keywords": ("evidence", "appendix", "citation", "provenance", "audit trail"),
+    },
+]
+
+_SKILL_HEAVY_ENDPOINTS: dict[str, dict[str, str]] = {
+    "export-formatter": {
+        "label": "PMO Excel export",
+        "endpoint": "/api/v1/pmo-export/{session_id}",
+    },
+}
+
+
+def _wants_output_discovery(ctx: ObserveContext) -> bool:
+    """Gate semantic output attachment — avoid polluting bare benchmark/diagnostic runs."""
+    if ctx.intent_class in ("business_case", "export_business_case"):
+        return True
+    if ctx.wants_executive_narrative or ctx.wants_spend_visualization:
+        return True
+    msg = (ctx.user_message or "").lower()
+    hints = (
+        "summary", "report", "deck", "brief", "export", "dashboard", "synthesize",
+        "executive", "board", "communicate", "presentation", "package", "narrative",
     )
+    return any(h in msg for h in hints)
+
+
+def _dedupe_tasks(tasks: list[SkillTask]) -> None:
+    seen: set[str] = set()
+    out: list[SkillTask] = []
+    for t in tasks:
+        if t.skill_name in seen:
+            continue
+        seen.add(t.skill_name)
+        out.append(t)
+    tasks[:] = out
+
+
+def _attach_discovered_outputs(
+    tasks: list[SkillTask],
+    ctx: ObserveContext,
+) -> list[SuggestedOutput]:
+    """Semantically match output skills; auto-run light, defer heavy to CTAs."""
+    from app.skills.discovery import discover_relevant_skills
+
+    suggestions: list[SuggestedOutput] = []
+    names = {t.skill_name for t in tasks}
+    session_id = ctx.session_id or "{session_id}"
+
+    try:
+        matches = discover_relevant_skills(ctx.user_message, k=6, kind="output")
+    except Exception:
+        matches = []
+
+    for hit in matches:
+        skill = str(hit.get("name") or "")
+        if not skill or skill in names:
+            continue
+        # Value-bridge / benchmark narratives are composed in reflect — not act-phase synthesis.
+        if skill in ("analysis-synthesizer", "executive-communication") and ctx.intent_class in (
+            "value_bridge", "benchmark", "general_qa",
+        ):
+            continue
+        meta = next((m for m in discover_skills_rich() if m.get("name") == skill), {})
+        weight = meta.get("weight") or "light"
+        score = float(hit.get("score") or 0.0)
+        if score < 0.25:
+            continue
+
+        if weight == "heavy":
+            ep = _SKILL_HEAVY_ENDPOINTS.get(skill, {})
+            suggestions.append(
+                SuggestedOutput(
+                    skill=skill,
+                    label=ep.get("label") or skill.replace("-", " ").title(),
+                    endpoint=(ep.get("endpoint") or f"/api/v1/skills/{skill}/test").format(
+                        session_id=session_id
+                    ),
+                    score=score,
+                )
+            )
+            continue
+
+        if skill not in _DEP_MAP:
+            continue
+        resolved = resolve_skill_dependencies([skill])
+        for dep_name in resolved:
+            if dep_name in names:
+                continue
+            if dep_name not in _DEP_MAP:
+                continue
+            group, deps, tokens = _DEP_MAP[dep_name]
+            tasks.append(
+                SkillTask(
+                    skill_name=dep_name,
+                    inputs={},
+                    depends_on=[d for d in deps if d in names],
+                    parallel_group=group,
+                    estimated_tokens=tokens,
+                )
+            )
+            names.add(dep_name)
+        group, deps, tokens = _DEP_MAP[skill]
+        tasks.append(
+            SkillTask(
+                skill_name=skill,
+                inputs={},
+                depends_on=[d for d in deps if d in names],
+                parallel_group=group,
+                estimated_tokens=tokens,
+            )
+        )
+        names.add(skill)
+
+    # Keyword-matched heavy file exports (not skills in the DAG)
+    msg = (ctx.user_message or "").lower()
+    for cta in _HEAVY_EXPORT_CTAS:
+        skill = str(cta["skill"])
+        keywords = cta["keywords"]
+        if isinstance(keywords, tuple) and any(kw in msg for kw in keywords):
+            if not any(s.skill == skill for s in suggestions):
+                suggestions.append(
+                    SuggestedOutput(
+                        skill=skill,
+                        label=str(cta["label"]),
+                        endpoint=str(cta["endpoint"]).format(session_id=session_id),
+                        score=0.75,
+                    )
+                )
+
+    return suggestions
 
 
 def _has_capability(ctx: ObserveContext, capability: str) -> bool:
@@ -127,6 +287,7 @@ _DEP_MAP: Dict[str, tuple[int, List[str], int]] = {
     # Group 0 — no upstream deps
     "spend-profiler":            (0, [], 500),
     "document-contextualizer":   (0, [], 300),
+    "data-quality-gate":         (1, ["spend-profiler"], 200),
     # Group 1 — depend on spend-profiler
     "peer-benchmarker":          (1, ["spend-profiler"], 800),
     "internal-benchmarker":      (1, ["spend-profiler"], 600),
@@ -134,6 +295,7 @@ _DEP_MAP: Dict[str, tuple[int, List[str], int]] = {
     "payment-terms-optimizer":   (1, ["spend-profiler"], 450),
     "bva-analyzer":              (1, ["spend-profiler"], 500),
     "temporal-analyzer":         (1, ["spend-profiler"], 500),
+    "cohort-segmenter":          (1, ["spend-profiler"], 450),
     "chart-builder":             (1, ["spend-profiler"], 300),
     "contract-lifecycle-manager":(1, ["spend-profiler"], 500),
     "dashboard-builder":         (1, ["spend-profiler"], 300),
@@ -155,6 +317,7 @@ _DEP_MAP: Dict[str, tuple[int, List[str], int]] = {
     "value-bridge-calculator":   (4, ["peer-benchmarker", "internal-benchmarker", "savings-modeler", "heuristic-analyzer"], 700),
     "evidence-gatherer":         (4, ["savings-modeler", "spend-profiler", "root-cause-analyzer", "peer-benchmarker"], 400),
     "scenario-modeler":          (4, ["savings-modeler"], 600),
+    "sensitivity-analyzer":      (5, ["value-bridge-calculator"], 400),
     # Group 5 — depend on group 4
     "data-validator":            (5, ["value-bridge-calculator"], 200),
     "business-case-builder":     (5, ["value-bridge-calculator"], 1500),
@@ -169,7 +332,7 @@ _DEP_MAP: Dict[str, tuple[int, List[str], int]] = {
 }
 
 
-def _expand(selected: List[str]) -> List[SkillTask]:
+def _expand(selected: List[str], dep_map: Dict[str, tuple[int, List[str], int]] | None = None) -> List[SkillTask]:
     """Build SkillTasks for ``selected`` skills using the canonical _DEP_MAP.
 
     Each skill's declared dependencies are filtered to those actually selected,
@@ -177,6 +340,7 @@ def _expand(selected: List[str]) -> List[SkillTask]:
     Parallel groups come from the map, guaranteeing deps precede dependents.
     Input order is preserved; duplicates are dropped.
     """
+    dm = dep_map or _DEP_MAP
     seen: set[str] = set()
     ordered: List[str] = []
     for name in selected:
@@ -186,7 +350,7 @@ def _expand(selected: List[str]) -> List[SkillTask]:
     sel = set(ordered)
     tasks: List[SkillTask] = []
     for name in ordered:
-        group, deps, tokens = _DEP_MAP[name]
+        group, deps, tokens = dm[name]
         tasks.append(SkillTask(
             skill_name=name,
             inputs={},
@@ -202,22 +366,78 @@ def get_skill_dep_map() -> Dict[str, tuple[int, List[str], int]]:
     return dict(_DEP_MAP)
 
 
-def resolve_skill_dependencies(skill_names: List[str]) -> List[str]:
+def _manifest_declarative_entries() -> Dict[str, tuple[int, List[str], int]]:
+    """Declarative skills registered via manifest.yaml but not yet in _DEP_MAP."""
+    try:
+        from app.skills.manifest import manifest_skills
+    except Exception:
+        return {}
+    extra: Dict[str, tuple[int, List[str], int]] = {}
+    for row in manifest_skills():
+        if str(row.get("status") or "active") != "active":
+            continue
+        name = str(row.get("name") or "")
+        if not name or name in _DEP_MAP:
+            continue
+        if str(row.get("runtime") or "") != "declarative":
+            continue
+        extra[name] = (
+            int(row.get("parallel_group") or 8),
+            list(row.get("depends_on") or []),
+            int(row.get("estimated_tokens") or 400),
+        )
+    return extra
+
+
+def get_extended_skill_dep_map() -> Dict[str, tuple[int, List[str], int]]:
+    """_DEP_MAP plus declarative skills from manifest.yaml."""
+    merged = dict(_DEP_MAP)
+    merged.update(_manifest_declarative_entries())
+    return merged
+
+
+def resolve_skill_dependencies(skill_names: List[str], *, extended: bool = False) -> List[str]:
     """Return skill_names plus transitive deps from _DEP_MAP in dependency order."""
+    dep_map = get_extended_skill_dep_map() if extended else _DEP_MAP
     needed: set[str] = set()
     queue = list(skill_names)
     while queue:
         name = queue.pop(0)
-        if name in needed or name not in _DEP_MAP:
+        if name in needed or name not in dep_map:
             continue
         needed.add(name)
-        _, deps, _ = _DEP_MAP[name]
+        _, deps, _ = dep_map[name]
         queue.extend(deps)
-    return sorted(needed, key=lambda n: (_DEP_MAP[n][0], n))
+    return sorted(needed, key=lambda n: (dep_map[n][0], n))
 
 
-def _finalize_plan(tasks: list[SkillTask], user_summary: str, estimated_duration: str, requires_approval: bool) -> ExecutionPlan:
-    _add_sme_critique_if_value_modeled(tasks)
+def build_plan_from_skills(
+    skill_names: List[str],
+    ctx: ObserveContext,
+    *,
+    user_summary: str = "Workbench analysis run",
+    estimated_duration: str = "",
+    requires_approval: bool = False,
+    include_quality_gates: bool = False,
+) -> ExecutionPlan:
+    """Build an ExecutionPlan from an explicit, user-composed skill list.
+
+    Used by the Analysis Workbench to run an à-la-carte set of analyses. Resolves
+    transitive dependencies (``resolve_skill_dependencies``), wires them via the
+    canonical ``_DEP_MAP`` (``_expand``), and injects the Group-0 security skills
+    when tabular spend is present — mirroring ``plan()`` so workbench runs and chat
+    runs execute through the identical DAG machinery.
+
+    When ``include_quality_gates`` is True, auto-appends data-quality-gate and
+    sme-critique when prerequisites are satisfied (chat parity).
+    """
+    resolved = resolve_skill_dependencies(list(skill_names), extended=True)
+    dep_map = get_extended_skill_dep_map()
+    tasks = _expand(resolved, dep_map)
+    tasks = _inject_group0(tasks, ctx)
+    if include_quality_gates:
+        _attach_quality_gates(tasks)
+        _dedupe_tasks(tasks)
     parallel_groups = max((t.parallel_group for t in tasks), default=-1) + 1 if tasks else 0
     return ExecutionPlan(
         tasks=tasks,
@@ -226,6 +446,31 @@ def _finalize_plan(tasks: list[SkillTask], user_summary: str, estimated_duration
         user_summary=user_summary,
         estimated_duration=estimated_duration,
         requires_approval=requires_approval,
+        source="planner",
+    )
+
+
+def _finalize_plan(
+    tasks: list[SkillTask],
+    user_summary: str,
+    estimated_duration: str,
+    requires_approval: bool,
+    ctx: ObserveContext | None = None,
+) -> ExecutionPlan:
+    _attach_quality_gates(tasks)
+    suggested: list[SuggestedOutput] = []
+    if ctx is not None and _wants_output_discovery(ctx):
+        suggested = _attach_discovered_outputs(tasks, ctx)
+    _dedupe_tasks(tasks)
+    parallel_groups = max((t.parallel_group for t in tasks), default=-1) + 1 if tasks else 0
+    return ExecutionPlan(
+        tasks=tasks,
+        total_skills=len(tasks),
+        parallel_groups=parallel_groups,
+        user_summary=user_summary,
+        estimated_duration=estimated_duration,
+        requires_approval=requires_approval,
+        suggested_outputs=suggested,
     )
 
 
@@ -239,13 +484,15 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
     # If spend data is already loaded, run spend-profiler lightly to refresh
     # the profile so the response can quote current numbers.
     if intent == "general_qa":
+        # A diagnostic ask ("what drives/causes spend in <category>?") is a
+        # legitimate request for deep analysis even without "savings"/"optimize"
+        # language — gating it behind value_modeling meant such questions only
+        # ran spend-profiler and fell through to a generic chat response.
         wants_deep_category_analysis = (
             _has_capability(ctx, "value_modeling")
-            and (
-                bool((ctx.explicit_category or "").strip())
-                or _has_capability(ctx, "root_cause")
-                or _has_capability(ctx, "working_capital")
-            )
+            or bool((ctx.explicit_category or "").strip())
+            or _has_capability(ctx, "root_cause")
+            or _has_capability(ctx, "working_capital")
         )
         if (ctx.spend_profile_ready or ctx.has_tabular_spend) and ctx.data_quality_score > 0:
             if wants_deep_category_analysis:
@@ -264,7 +511,11 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
                 tasks = _expand(["spend-profiler", "chart-builder"])
             else:
                 tasks = _expand(["spend-profiler"])
-            _add_sme_critique_if_value_modeled(tasks)
+            _attach_quality_gates(tasks)
+            suggested: list[SuggestedOutput] = []
+            if _wants_output_discovery(ctx):
+                suggested = _attach_discovered_outputs(tasks, ctx)
+            _dedupe_tasks(tasks)
             return ExecutionPlan(
                 tasks=tasks,
                 total_skills=len(tasks),
@@ -276,6 +527,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
                 ),
                 estimated_duration="~65 seconds" if wants_deep_category_analysis else "~10 seconds",
                 requires_approval=False,
+                suggested_outputs=suggested,
             )
         if ctx.uploaded_file_ids:
             return ExecutionPlan(
@@ -377,7 +629,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
             summary = "I'll run full value modeling and produce a business case package with executive-ready outputs."
             eta = "~95 seconds"
             requires_approval = True
-        return _finalize_plan(tasks, summary, eta, requires_approval)
+        return _finalize_plan(tasks, summary, eta, requires_approval, ctx)
 
     # -----------------------------------------------------------------------
     # Phase 3: Enterprise intent handlers
@@ -396,6 +648,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
             "I'll run period-over-period trend analysis (YoY / QoQ / MoM) and surface annualised run-rate changes.",
             "~20 seconds",
             False,
+            ctx,
         )
 
     if intent == "bva":
@@ -406,6 +659,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
             "I'll compute budget-vs-actual variances with price / volume / mix decomposition.",
             "~20 seconds",
             False,
+            ctx,
         )
 
     if intent == "payment_terms":
@@ -416,18 +670,25 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
             "I'll identify DPO improvement opportunities and model the working-capital release potential.",
             "~20 seconds",
             False,
+            ctx,
         )
 
     if intent == "sensitivity":
         selected = ["spend-profiler", "peer-benchmarker", "internal-benchmarker"]
         if ctx.has_annual_revenue:
             selected.append("heuristic-analyzer")
-        selected += ["savings-modeler", "value-bridge-calculator"]
+        selected += [
+            "savings-modeler",
+            "value-bridge-calculator",
+            "scenario-modeler",
+            "sensitivity-analyzer",
+        ]
         return _finalize_plan(
             _expand(selected),
-            "I'll model NPV sensitivity across discount rate, tax rate, execution rate, headcount growth, and revenue growth scenarios.",
+            "I'll model NPV sensitivity across discount rate, tax rate, execution rate, headcount growth, revenue growth, and built-in what-if scenarios.",
             "~50 seconds",
             False,
+            ctx,
         )
 
     if intent == "drill_down":
@@ -440,6 +701,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
             "I'll drill into the specific category, surface root causes, and model the targeted value-release opportunity.",
             "~55 seconds",
             False,
+            ctx,
         )
 
     if intent == "savings_plan":
@@ -452,6 +714,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
             "I'll build a prioritised 3-year savings plan with lever-level phasing, NPV, and implementation assumptions.",
             "~65 seconds",
             True,
+            ctx,
         )
 
     if intent == "export_business_case":
@@ -464,6 +727,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
             "I'll build the full business case and package it as a downloadable Excel / DOCX export ready for client delivery.",
             "~90 seconds",
             True,
+            ctx,
         )
 
     # -----------------------------------------------------------------------
@@ -483,6 +747,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
             "intercompany inflation, and other conflicts — then surface resolution options.",
             "~25 seconds",
             False,
+            ctx,
         )
 
     if intent == "consolidate":
@@ -504,6 +769,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
             "and produce a consolidated group spend view with completeness check.",
             "~40 seconds",
             False,
+            ctx,
         )
 
     if intent == "vendor_master":
@@ -522,6 +788,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
             "and flag MSME compliance risks.",
             "~25 seconds",
             False,
+            ctx,
         )
 
     if intent == "contract_review":
@@ -540,6 +807,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
             "and spend blocked by current contract lock-ins.",
             "~20 seconds",
             False,
+            ctx,
         )
 
     if intent == "gstr_reconcile":
@@ -555,6 +823,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
             "and quantify the GST recovery opportunity.",
             "~25 seconds",
             False,
+            ctx,
         )
 
     if intent == "zbb":
@@ -574,6 +843,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
             "the gap between current spend and zero-based targets by category.",
             "~30 seconds",
             False,
+            ctx,
         )
 
     if intent == "cost_to_serve":
@@ -586,6 +856,7 @@ def _plan_rule_based(ctx: ObserveContext) -> ExecutionPlan:
             "and identify unprofitable segments where OpEx exceeds segment revenue.",
             "~25 seconds",
             False,
+            ctx,
         )
 
     return ExecutionPlan(

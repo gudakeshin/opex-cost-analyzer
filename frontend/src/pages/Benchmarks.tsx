@@ -1,111 +1,118 @@
 import React, { useEffect, useState } from 'react';
 import { MainLayout } from '../components/Layout/MainLayout';
-import { Card } from '../components/Common/Card';
-import { Loader } from '../components/Common/Loader';
 import { Alert } from '../components/Common/Alert';
 import { PageHeader } from '../components/Common/PageHeader';
-import { apiGet, getApiErrorMessage } from '../hooks/useApi';
-
-interface BenchmarkDataset {
-  dataset_id: string;
-  name: string;
-  industry?: string;
-  year?: number;
-}
-
-interface SectorPack {
-  pack_id: string;
-  name: string;
-  industry?: string;
-  version?: string;
-}
+import { useSession } from '../context/SessionContext';
+import { SectorPackGrid } from '../components/PageComponents/Benchmarks/SectorPackGrid';
+import { BenchmarkToolsPanel } from '../components/PageComponents/Benchmarks/BenchmarkToolsPanel';
+import {
+  SectorPackDetailDrawer,
+  type SectorPackRow,
+} from '../components/PageComponents/Benchmarks/SectorPackDetailDrawer';
+import { useQueryClient } from '@tanstack/react-query';
+import { apiPatch, getApiErrorMessage } from '../hooks/useApi';
+import {
+  fetchSessionManifest,
+  setSessionManifestData,
+  type SessionManifestResult,
+} from '../api/hooks/useSessionQueries';
+import {
+  useInvalidateBenchmarkReferenceData,
+  usePeerSets,
+  useSectorPacks,
+} from '../api/hooks/useBenchmarksQueries';
 
 export const Benchmarks: React.FC = () => {
-  const [datasets, setDatasets] = useState<BenchmarkDataset[]>([]);
-  const [sectorPacks, setSectorPacks] = useState<SectorPack[]>([]);
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+  const { sessionId, ensureSession } = useSession();
+  const sectorPacksQuery = useSectorPacks();
+  const peerSetsQuery = usePeerSets();
+  const invalidateReferenceData = useInvalidateBenchmarkReferenceData();
+  const sectorPacks = sectorPacksQuery.data?.packs ?? [];
+  const peerSets = peerSetsQuery.data?.peer_sets ?? [];
+  const loading = sectorPacksQuery.isLoading || peerSetsQuery.isLoading;
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [detailPack, setDetailPack] = useState<SectorPackRow | null>(null);
+  const [activePeerSet, setActivePeerSet] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    Promise.all([
-      apiGet<{ datasets: BenchmarkDataset[] } | BenchmarkDataset[]>('/api/v1/benchmarks'),
-      apiGet<{ packs: SectorPack[] } | SectorPack[]>('/api/v1/sector-packs'),
-    ])
-      .then(([bmRes, spRes]) => {
-        const bm = Array.isArray(bmRes) ? bmRes : (bmRes as { datasets: BenchmarkDataset[] }).datasets ?? [];
-        const sp = Array.isArray(spRes) ? spRes : (spRes as { packs: SectorPack[] }).packs ?? [];
-        setDatasets(bm);
-        setSectorPacks(sp);
-      })
-      .catch((err) => setError(getApiErrorMessage(err)))
-      .finally(() => setLoading(false));
-  }, []);
+    const spFailed = sectorPacksQuery.isError;
+    const psFailed = peerSetsQuery.isError;
+    if (spFailed && psFailed) {
+      setError(getApiErrorMessage(sectorPacksQuery.error));
+    } else if (spFailed || psFailed) {
+      const message = getApiErrorMessage(spFailed ? sectorPacksQuery.error : peerSetsQuery.error);
+      setNotice(`Some reference data could not be loaded: ${message}`);
+    }
+  }, [sectorPacksQuery.isError, sectorPacksQuery.error, peerSetsQuery.isError, peerSetsQuery.error]);
+
+  useEffect(() => {
+    (async () => {
+      const sid = sessionId || (await ensureSession());
+      if (!sid) return;
+      try {
+        const manifest = await fetchSessionManifest(queryClient, sid);
+        if (manifest.peer_set_name) setActivePeerSet(manifest.peer_set_name);
+      } catch {
+        /* optional */
+      }
+    })();
+  }, [sessionId, ensureSession, queryClient]);
+
+  const setEngagementPeerSet = async (name: string | null) => {
+    const sid = sessionId || (await ensureSession());
+    if (!sid) return;
+    try {
+      const updated = await apiPatch<SessionManifestResult>(`/api/v1/sessions/${sid}/manifest`, {
+        peer_set_name: name,
+      });
+      setSessionManifestData(queryClient, sid, updated);
+      setActivePeerSet(name);
+      setNotice(name ? `Peer set “${name}” set as session default.` : 'Peer set default cleared.');
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    }
+  };
 
   return (
-    <MainLayout>
+    <MainLayout hideHeader title="Benchmarks">
       <PageHeader
-        title="Benchmarks & Sector Packs"
-        subtitle="Reference datasets for peer comparison and sector modelling"
+        title="Sector Packs"
+        subtitle="Sector reference data for peer comparison, lever modelling, and diagnostics"
       />
 
       {error && (
-        <Alert variant="error" title="Load error" onDismiss={() => setError(null)}>
+        <Alert variant="error" title="Error" onDismiss={() => setError(null)}>
           {error}
         </Alert>
       )}
-
-      {loading ? (
-        <div className="mt-12">
-          <Loader label="Loading reference data…" />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-          <Card title="Benchmark Datasets" className="bg-white border-brand-border">
-            {datasets.length === 0 ? (
-              <p className="text-sm text-brand-muted py-4">
-                No benchmark datasets loaded. Upload a benchmark file to get started.
-              </p>
-            ) : (
-              <ul className="divide-y divide-brand-border">
-                {datasets.map((d) => (
-                  <li key={d.dataset_id} className="py-3">
-                    <p className="text-sm font-medium text-brand-ink">{d.name}</p>
-                    {(d.industry ?? d.year) && (
-                      <p className="text-xs text-brand-muted mt-0.5">
-                        {[d.industry, d.year].filter(Boolean).join(' · ')}
-                      </p>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
-
-          <Card title="Sector Packs" className="bg-white border-brand-border">
-            {sectorPacks.length === 0 ? (
-              <p className="text-sm text-brand-muted py-4">
-                No sector packs available. Contact your engagement manager to load a sector pack.
-              </p>
-            ) : (
-              <ul className="divide-y divide-brand-border">
-                {sectorPacks.map((p) => (
-                  <li key={p.pack_id} className="py-3">
-                    <p className="text-sm font-medium text-brand-ink">{p.name}</p>
-                    {(p.industry ?? p.version) && (
-                      <p className="text-xs text-brand-muted mt-0.5">
-                        {[p.industry, p.version ? `v${p.version}` : undefined]
-                          .filter(Boolean)
-                          .join(' · ')}
-                      </p>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
-        </div>
+      {notice && (
+        <Alert variant="success" title="Done" onDismiss={() => setNotice(null)}>
+          {notice}
+        </Alert>
       )}
+
+      <SectorPackGrid
+        packs={sectorPacks}
+        loading={loading}
+        activePeerSet={activePeerSet}
+        onSelectPack={setDetailPack}
+        onClearPeerSet={() => setEngagementPeerSet(null)}
+      />
+
+      <BenchmarkToolsPanel
+        peerSets={peerSets}
+        sectorPacks={sectorPacks}
+        onError={setError}
+        onNotice={setNotice}
+        onPeerSetsChanged={invalidateReferenceData}
+        onDatasetsChanged={invalidateReferenceData}
+        onOpenSectorPack={setDetailPack}
+        onSetEngagementPeerSet={(name) => setEngagementPeerSet(name)}
+      />
+
+      <SectorPackDetailDrawer pack={detailPack} onClose={() => setDetailPack(null)} />
     </MainLayout>
   );
 };

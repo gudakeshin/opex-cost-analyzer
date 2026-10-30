@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MainLayout } from '../components/Layout/MainLayout';
-import { Loader } from '../components/Common/Loader';
 import { Alert } from '../components/Common/Alert';
 import { PageHeader } from '../components/Common/PageHeader';
 import { Select } from '../components/Common/Select';
 import { RecommendedBadge } from '../components/Common/RecommendedBadge';
 import { StructuredChatMessage } from '../components/PageComponents/Procurement/StructuredChatMessage';
+import { ThinkingBlock } from '../components/PageComponents/Procurement/ThinkingBlock';
 import { InsightCards } from '../components/PageComponents/Procurement/InsightCards';
 import {
   BusinessClarificationModal,
@@ -16,11 +16,18 @@ import { PlanApprovalModal } from '../components/PageComponents/Procurement/Plan
 import { ChatComposer } from '../components/PageComponents/Analysis/ChatComposer';
 import { TrustRail } from '../components/Trust/TrustRail';
 import { DeloitteLogo } from '../components/Brand/DeloitteLogo';
-import { SECTOR_OPTIONS } from '../constants/sectors';
+import { sectorLabel } from '../constants/sectors';
+import { useSectorOptions } from '../api/hooks/useBenchmarksQueries';
 import { useSession } from '../context/SessionContext';
-import { apiGet, apiPatch, apiPost, apiUpload, getApiErrorMessage } from '../hooks/useApi';
+import { useUnsavedGuard } from '../hooks/useUnsavedGuard';
+import { useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { apiGet, apiPatch, apiPost, apiUpload, getApiErrorMessage, streamChatPost } from '../hooks/useApi';
+import { fetchSessionManifest, fetchSessionStatus } from '../api/hooks/useSessionQueries';
+import { useEngagementDocuments, useLlmModels } from '../api/hooks/useProcurementQueries';
+import { procurementKeys } from '../api/queryKeys';
 import { friendlyErrorMessage } from '../utils/errorMessages';
-import { clearChatMessages, loadChatMessages, saveChatMessages } from '../utils/chatStorage';
+import { loadChatMessages, saveChatMessages } from '../utils/chatStorage';
+import { latestAnalyzedSessionId } from '../utils/sessionResolve';
 import { effectiveAnalysisIndustry } from '../utils/engagementContext';
 import {
   buildAnalyzeCompleteContent,
@@ -44,6 +51,7 @@ import {
   wantsPeerSavingsInsight,
   type TopProbeQuestion,
 } from '../utils/analysisInsights';
+import { deriveProvenanceFromSession, deriveRunProvenance, type ProvenanceSource } from '../utils/provenance';
 import { VerticalResizeHandle } from '../components/Common/VerticalResizeHandle';
 import { EngagementConflictBanner } from '../components/PageComponents/Procurement/EngagementConflictBanner';
 import { useResizableWidth } from '../hooks/useResizableWidth';
@@ -53,9 +61,14 @@ import {
   engagementSanityFromManifest,
 } from '../utils/engagementConflict';
 import type { EngagementSanityConflict } from '../types';
+import { useConfirm } from '../hooks/useConfirm';
+import { useDialogA11y } from '../hooks/useDialogA11y';
+import { useEngagementsList } from '../api/hooks/useEngagementQueries';
+import { RunStatus } from '../components/PageComponents/Analysis/RunStatus';
 import type { ManifestFileEntry } from '../utils/sessionFiles';
 import type {
   AnalysisTraceStep,
+  AuditLogEntry,
   ChatMessage,
   ChatPlanPreview,
   ChatProgressResponse,
@@ -70,7 +83,10 @@ import type {
   ProbeAnswerResponse,
 } from '../types';
 
+const LLM_MODEL_STORAGE_KEY = 'opex_llm_model';
+
 const CONFLICT_DISMISS_PREFIX = 'opex_conflict_dismiss_';
+const DEEP_RESEARCH_DISMISS_PREFIX = 'opex_deep_research_dismiss_';
 const INSIGHTS_PANEL_WIDTH_KEY = 'opex_analysis_insights_width';
 const INSIGHTS_PANEL_DEFAULT_WIDTH = 320;
 const INSIGHTS_PANEL_MIN_WIDTH = 260;
@@ -92,16 +108,41 @@ function saveDismissedConflictKeys(sessionId: string | null, keys: Set<string>):
   localStorage.setItem(`${CONFLICT_DISMISS_PREFIX}${sessionId}`, JSON.stringify([...keys]));
 }
 
+function loadDeepResearchDismissed(sessionId: string | null): boolean {
+  if (!sessionId) return false;
+  return localStorage.getItem(`${DEEP_RESEARCH_DISMISS_PREFIX}${sessionId}`) === '1';
+}
+
+function saveDeepResearchDismissed(sessionId: string) {
+  localStorage.setItem(`${DEEP_RESEARCH_DISMISS_PREFIX}${sessionId}`, '1');
+}
+
+const PRE_RUN_PROVENANCE: ProvenanceSource[] = [
+  { label: 'Uploaded spend', detail: 'Session files — run analysis for skill citations', kind: 'fact' },
+  { label: 'OPAR synthesis', detail: 'Awaiting first run', kind: 'inference' },
+];
+
 const DeepResearchBanner: React.FC<{ companyName: string; onDismiss: () => void }> = ({
   companyName,
+  onDismiss,
 }) => (
-  <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border-b border-blue-200 text-xs text-blue-800">
-    <span className="font-semibold">Deep research context loaded</span>
-    <span className="text-blue-600">·</span>
-    <span>
-      Google Deep Research findings for{' '}
-      <span className="font-medium">{companyName}</span> are active as analysis context.
-    </span>
+  <div className="flex items-center justify-between gap-2 px-4 py-2 bg-blue-50 border-b border-blue-200 text-xs text-blue-800">
+    <div className="flex items-center gap-2 min-w-0">
+      <span className="font-semibold shrink-0">Deep research context loaded</span>
+      <span className="text-blue-600">·</span>
+      <span className="truncate">
+        Google Deep Research findings for{' '}
+        <span className="font-medium">{companyName}</span> are active as analysis context.
+      </span>
+    </div>
+    <button
+      type="button"
+      onClick={onDismiss}
+      className="shrink-0 text-blue-700 hover:text-blue-900 font-bold px-1"
+      aria-label="Dismiss deep research banner"
+    >
+      ×
+    </button>
   </div>
 );
 
@@ -146,15 +187,40 @@ function progressStepsFromPoll(entry: ChatProgressResponse): ProgressStep[] {
   }));
 }
 
+function progressStepsFromTrace(trace?: AnalysisTraceStep[]): ProgressStep[] {
+  if (!trace?.length) {
+    return [{ phase: 'reflect', message: 'Analysis complete.' }];
+  }
+  const steps = trace.slice(0, 8).map((row) => ({
+    phase: row.phase || 'act',
+    message: row.detail ? `${row.title} — ${row.detail}` : row.title,
+  }));
+  if (!steps.some((s) => s.phase === 'reflect')) {
+    steps.push({ phase: 'reflect', message: 'Analysis complete.' });
+  }
+  return steps;
+}
+
 async function pollChatProgress(
   runId: string,
   onSteps: (steps: ProgressStep[]) => void,
+  onThinking: (thinking: string) => void,
   signal: AbortSignal,
+  queryClient: QueryClient,
+  onStall?: () => void,
 ): Promise<void> {
+  let failures = 0;
   while (!signal.aborted) {
     try {
-      const entry = await apiGet<ChatProgressResponse>(`/api/v1/chat/progress/${runId}`);
+      const entry = await queryClient.fetchQuery({
+        queryKey: procurementKeys.chatProgress(runId),
+        queryFn: () => apiGet<ChatProgressResponse>(`/api/v1/chat/progress/${runId}`),
+        staleTime: 0,
+      });
+      failures = 0;
       if (entry.steps?.length) onSteps(progressStepsFromPoll(entry));
+      const thinking = String(entry.thinking_text ?? '').trim();
+      if (thinking) onThinking(thinking);
       if (
         entry.status === 'completed' ||
         entry.status === 'failed' ||
@@ -163,19 +229,79 @@ async function pollChatProgress(
         break;
       }
     } catch {
-      break;
+      // Tolerate transient errors; only give up (and say so) after repeated failures.
+      failures += 1;
+      if (failures >= 5) {
+        if (!signal.aborted) onStall?.();
+        break;
+      }
     }
     await new Promise((r) => setTimeout(r, 500));
   }
 }
 
+function safeLocalStorageGet(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function isDesktopViewport(): boolean {
+  return typeof window === 'undefined' || !window.matchMedia || window.matchMedia('(min-width: 1024px)').matches;
+}
+
+const STOPPED_MESSAGE =
+  'Stopped waiting for this run. The server may still finish it in the background — check History or re-run if results look incomplete.';
+
+const CANCELLED_MESSAGE =
+  'Analysis stopped. It ended between steps, so no partial results were saved. Run it again when ready.';
+
+interface AnalysisRunStatus {
+  run_id: string;
+  status: 'running' | 'cancelling' | 'completed' | 'failed' | 'cancelled';
+  error?: string | null;
+}
+
+/** Poll a background analysis run until it reaches a terminal state. */
+async function waitForAnalysisRun(runId: string, signal: AbortSignal): Promise<AnalysisRunStatus> {
+  let failures = 0;
+  for (;;) {
+    if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+    try {
+      const run = await apiGet<AnalysisRunStatus>(`/api/v1/analyze/runs/${runId}`);
+      failures = 0;
+      if (run.status === 'completed' || run.status === 'failed' || run.status === 'cancelled') return run;
+    } catch (err) {
+      failures += 1;
+      const status = (err as { response?: { status?: number } }).response?.status;
+      if (status === 404) {
+        throw new Error('The analysis run was lost (the server may have restarted). Run it again.');
+      }
+      if (failures >= 8) throw err;
+    }
+    await new Promise((r) => setTimeout(r, 1000));
+  }
+}
+
+const STALL_STEP: ProgressStep = {
+  phase: 'observe',
+  message: 'Live progress is unavailable — still waiting on the server…',
+};
+
 export const ProcurementAnalysis: React.FC = () => {
+  const queryClient = useQueryClient();
   const {
     sessionId,
     engagementId,
     setSessionId,
     ensureSession,
+    ensureSessionForEngagement,
     ensureEngagement,
+    createEngagement,
+    setEngagementId,
+    hasAnalysis,
     engagement,
     refreshEngagement,
     syncEngagementFromAnalysis,
@@ -184,14 +310,27 @@ export const ProcurementAnalysis: React.FC = () => {
     refreshSessionAnalysis,
     deepResearchSummary,
   } = useSession();
+  const sectorOptions = useSectorOptions();
+  const engagementsQuery = useEngagementsList();
+  const engagementList = engagementsQuery.data ?? [];
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
+  // A typed-but-unsent chat message is lost on navigation.
+  useUnsavedGuard('procurement-chat-draft', input.trim().length > 0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const analysis = sessionAnalysis;
   const [manifest, setManifest] = useState<SessionManifest | null>(null);
-  const [engagementDocCount, setEngagementDocCount] = useState<number | null>(null);
-  const [insightsOpen, setInsightsOpen] = useState(true);
+  // On narrow screens the insights panel is a full-screen sheet; start closed there.
+  const [insightsOpen, setInsightsOpen] = useState(isDesktopViewport);
+  // Below 1024px the insights panel is a modal sheet: trap focus and close on Escape.
+  const insightsSheetRef = useDialogA11y<HTMLDivElement>(
+    insightsOpen && !isDesktopViewport(),
+    () => setInsightsOpen(false),
+  );
+  const openInsightsOnDesktop = () => {
+    if (isDesktopViewport()) setInsightsOpen(true);
+  };
   const {
     width: insightsPanelWidth,
     isDragging: insightsResizing,
@@ -222,41 +361,115 @@ export const ProcurementAnalysis: React.FC = () => {
   const [lastRunId, setLastRunId] = useState<string | undefined>();
   const [lastSignals, setLastSignals] = useState<V1ChatResponse['quality_signals']>();
   const [lastSteps, setLastSteps] = useState<V1ChatResponse['progress_steps']>();
+  const [provenanceSources, setProvenanceSources] = useState<ProvenanceSource[]>(PRE_RUN_PROVENANCE);
+  const [narrativeTag, setNarrativeTag] = useState<Record<string, unknown> | null>(null);
+  const [localAudit, setLocalAudit] = useState<AuditLogEntry[]>([]);
+  const [deepResearchDismissed, setDeepResearchDismissed] = useState(() =>
+    loadDeepResearchDismissed(sessionId),
+  );
   const [agentSteps, setAgentSteps] = useState<ProgressStep[] | undefined>();
   const [agentDegraded, setAgentDegraded] = useState(false);
+  const [agentFallbackReasons, setAgentFallbackReasons] = useState<
+    Record<string, unknown> | undefined
+  >();
   const [pipelineLabel, setPipelineLabel] = useState<string | undefined>();
   const [sectorUpdating, setSectorUpdating] = useState(false);
   const [thinkingMode, setThinkingMode] = useState(false);
+  const [liveThinking, setLiveThinking] = useState('');
+  const [recoveryNotice, setRecoveryNotice] = useState<string | null>(null);
+  const [selectedLlmModel, setSelectedLlmModel] = useState('');
   const [conflictResolving, setConflictResolving] = useState(false);
   const [dismissedConflictKeys, setDismissedConflictKeys] = useState<Set<string>>(
     () => loadDismissedConflictKeys(sessionId),
   );
   const fileRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const stickToBottomRef = useRef(true);
   const pollAbortRef = useRef<AbortController | null>(null);
+  const runAbortRef = useRef<AbortController | null>(null);
+  // The background analysis run being followed (target of the server-side cancel).
+  const analysisRunIdRef = useRef<string | null>(null);
+  const analysisStopRequestedRef = useRef(false);
+
+  // Resume: if this session already has an analysis running (page reload, second tab), follow it.
+  useEffect(() => {
+    if (!sessionId) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await apiGet<{ run: AnalysisRunStatus | null }>(`/api/v1/sessions/${sessionId}/analysis-run`);
+        if (cancelled || !res.run || analysisRunIdRef.current) return;
+        setAgentSteps([{ phase: 'observe', message: 'Resuming the analysis already in progress…' }]);
+        setPipelineLabel('Core analysis pipeline');
+        openInsightsOnDesktop();
+        await followAnalysisRun(sessionId, res.run.run_id);
+      } catch {
+        /* no active run, or the check failed: nothing to resume */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId]);
 
   const refreshManifest = useCallback(async (sid: string) => {
-    const m = await apiGet<SessionManifest>(`/api/v1/sessions/${sid}/manifest`);
+    const m = await fetchSessionManifest(queryClient, sid);
     setManifest(m);
     return m;
-  }, []);
+  }, [queryClient]);
 
   useEffect(() => {
     setDismissedConflictKeys(loadDismissedConflictKeys(sessionId));
+    setDeepResearchDismissed(loadDeepResearchDismissed(sessionId));
   }, [sessionId]);
 
-  useEffect(() => {
-    if (!engagementId) { setEngagementDocCount(null); return; }
-    apiGet<{ documents: { status: string }[] }>(`/api/v1/engagements/${engagementId}/documents`)
-      .then((res) => {
-        const ready = (res.documents ?? []).filter((d) => d.status === 'ready').length;
-        setEngagementDocCount(ready);
-      })
-      .catch(() => setEngagementDocCount(null));
-  }, [engagementId]);
+  const applyRunProvenance = useCallback(
+    (chat: V1ChatResponse, runId?: string) => {
+      const prov = deriveRunProvenance({ chat, manifest, runId });
+      setProvenanceSources(prov.sources.length > 0 ? prov.sources : PRE_RUN_PROVENANCE);
+      setNarrativeTag(prov.narrativeTag);
+      if (prov.localAudit.length > 0) {
+        setLocalAudit((prev) => [...prov.localAudit, ...prev].slice(0, 40));
+      }
+    },
+    [manifest],
+  );
+
+  const llmModelsQuery = useLlmModels();
+  const llmModels = useMemo(() => llmModelsQuery.data?.models ?? [], [llmModelsQuery.data]);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const res = llmModelsQuery.data;
+    if (!res) return;
+    const stored = localStorage.getItem(LLM_MODEL_STORAGE_KEY);
+    const validStored = res.models?.some((m) => m.id === stored) ? stored : null;
+    setSelectedLlmModel(validStored || res.default_model_id || res.models?.[0]?.id || '');
+  }, [llmModelsQuery.data]);
+
+  const handleLlmModelChange = (modelId: string) => {
+    setSelectedLlmModel(modelId);
+    if (modelId) {
+      localStorage.setItem(LLM_MODEL_STORAGE_KEY, modelId);
+    } else {
+      localStorage.removeItem(LLM_MODEL_STORAGE_KEY);
+    }
+  };
+
+  const engagementDocumentsQuery = useEngagementDocuments(engagementId);
+  const engagementDocCount = engagementId
+    ? engagementDocumentsQuery.data
+      ? engagementDocumentsQuery.data.documents.filter((d) => d.status === 'ready').length
+      : null
+    : null;
+
+  useEffect(() => {
+    // Follow new content only while the reader is at the bottom; do not yank them away from
+    // something they scrolled up to read.
+    if (stickToBottomRef.current) {
+      const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      chatEndRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+    }
   }, [messages, loading]);
 
   useEffect(() => {
@@ -270,10 +483,20 @@ export const ProcurementAnalysis: React.FC = () => {
 
     (async () => {
       try {
-        const status = await apiGet<{
-          session_exists?: boolean;
-          has_analysis?: boolean;
-        }>(`/api/v1/sessions/${sessionId}/status`);
+        const status = await fetchSessionStatus(queryClient, sessionId);
+        // When the active session has no analysis, prefer the engagement's most
+        // recent analyzed session. An engagement can hold several sessions and
+        // the active id may point at an empty sibling — without this, returning
+        // to Analysis shows the blank welcome screen even though a completed
+        // analysis exists for this engagement.
+        if (!status.has_analysis && engagementId) {
+          const analyzedId = await latestAnalyzedSessionId(engagementId);
+          if (cancelled) return;
+          if (analyzedId && analyzedId !== sessionId) {
+            setSessionId(analyzedId);
+            return; // effect re-runs with the adopted analyzed session
+          }
+        }
         if (!status.session_exists) {
           if (!cancelled) {
             setManifest(null);
@@ -282,9 +505,10 @@ export const ProcurementAnalysis: React.FC = () => {
           return;
         }
 
-        const m = await apiGet<SessionManifest>(`/api/v1/sessions/${sessionId}/manifest`);
+        const m = await fetchSessionManifest(queryClient, sessionId);
         if (cancelled) return;
         setManifest(m);
+        setRecoveryNotice(null);
 
         const stored = loadChatMessages(sessionId);
         if (stored.length > 0) {
@@ -301,12 +525,41 @@ export const ProcurementAnalysis: React.FC = () => {
           }
           const sess = await refreshSessionAnalysis();
           if (!cancelled && sess) {
+            const runSummary = (sess as SessionResponse).last_analysis_run;
+            if (runSummary?.run_id) {
+              setLastRunId(runSummary.run_id);
+            }
+            const advisorySections =
+              sess && typeof sess.advisory_sections === 'object'
+                ? (sess.advisory_sections as Record<string, unknown>)
+                : undefined;
+            if (advisorySections && Object.keys(advisorySections).length > 0) {
+              const restoredProv = deriveProvenanceFromSession({
+                manifest: m,
+                advisorySections,
+                runId: runSummary?.run_id ?? undefined,
+              });
+              setProvenanceSources(
+                restoredProv.sources.length > 0 ? restoredProv.sources : PRE_RUN_PROVENANCE,
+              );
+              setNarrativeTag(restoredProv.narrativeTag);
+            }
+            const fallbackSteps = runSummary?.progress_steps;
+            if ((!agentSteps || agentSteps.length === 0) && fallbackSteps?.length) {
+              setAgentSteps(fallbackSteps);
+              setLastSteps(fallbackSteps);
+            }
             const snapshot = extractInsightSnapshot(sess, m);
             if (snapshot && snapshot.total_spend > 0) {
               setMessages((prev) => {
                 if (chatHasInsightSnapshot(prev)) return prev;
                 const rawTrace = (sess as { analysis_trace?: unknown }).analysis_trace;
                 const trace = Array.isArray(rawTrace) ? (rawTrace as AnalysisTraceStep[]) : undefined;
+                if ((!trace || trace.length === 0) && fallbackSteps?.length) {
+                  setRecoveryNotice(
+                    'Recovered this analysis from saved session history. Detailed step trace was unavailable, so a summary timeline is shown.',
+                  );
+                }
                 const restored = buildRestoredInsightMessage(snapshot, m, trace);
                 return prev.length > 0 ? [restored, ...prev] : [restored];
               });
@@ -325,7 +578,9 @@ export const ProcurementAnalysis: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [sessionId, refreshSessionAnalysis]);
+    // agentSteps is read once to decide whether to seed fallback steps; re-running on every step would loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, engagementId, setSessionId, refreshSessionAnalysis, queryClient]);
 
   useEffect(() => {
     const onVisible = () => {
@@ -391,9 +646,32 @@ export const ProcurementAnalysis: React.FC = () => {
 
   const startPolling = (runId: string) => {
     stopPolling();
+    setLiveThinking('');
     const ac = new AbortController();
     pollAbortRef.current = ac;
-    void pollChatProgress(runId, setAgentSteps, ac.signal);
+    void pollChatProgress(runId, setAgentSteps, setLiveThinking, ac.signal, queryClient, () =>
+      setAgentSteps((prev) => [...(prev ?? []), STALL_STEP]),
+    );
+  };
+
+  const stopRun = () => {
+    const analysisRunId = analysisRunIdRef.current;
+    if (analysisRunId) {
+      // Cooperative cancel: the server stops the run between stages (the current stage finishes first).
+      analysisStopRequestedRef.current = true;
+      setAgentSteps((prev) => [
+        ...(prev ?? []),
+        { phase: 'observe', message: 'Stopping after the current step…' },
+      ]);
+      void apiPost(`/api/v1/analyze/runs/${analysisRunId}/cancel`).catch(() => runAbortRef.current?.abort());
+      // Safety net: if the server never confirms, stop waiting rather than hang.
+      window.setTimeout(() => {
+        if (analysisRunIdRef.current === analysisRunId) runAbortRef.current?.abort();
+      }, 30000);
+      return;
+    }
+    runAbortRef.current?.abort();
+    stopPolling();
   };
 
   const resetSmeProbeState = () => {
@@ -431,6 +709,10 @@ export const ProcurementAnalysis: React.FC = () => {
         skipNextProbeAutoOpen.current = false;
         return;
       }
+      // Probes are offered (the "Open probe dialog" link under results, and the Insights panel)
+      // rather than forced open after every analysis, which interrupted people mid-task.
+      // Set localStorage opex_auto_open_probes=1 to restore the old auto-open behaviour.
+      if (safeLocalStorageGet('opex_auto_open_probes') !== '1') return;
       if (!snapshot || !hasUnansweredProbeQuestions(snapshot, answered)) return;
       const unanswered = collectUnansweredProbeQuestions(snapshot, answered, 5);
       const key =
@@ -458,21 +740,161 @@ export const ProcurementAnalysis: React.FC = () => {
   const runChat = async (text: string) => {
     const sid = await ensureSession();
     const runId = crypto.randomUUID();
+    const runController = runAbortRef.current ?? new AbortController();
+    runAbortRef.current = runController;
     setLastRunId(runId);
-    setInsightsOpen(true);
+    openInsightsOnDesktop();
     setPipelineLabel(undefined);
     setAgentSteps([{ phase: 'observe', message: 'Starting OPAR agent…' }]);
-    startPolling(runId);
+    let streamedText = '';
+    setMessages((m) => [...m, { role: 'assistant', content: '', run_id: runId }]);
 
     try {
-      const res = await apiPost<V1ChatResponse>('/api/v1/chat', {
-        message: text,
-        session_id: sid,
-        run_id: runId,
-        thinking_mode: thinkingMode ? 'extended' : 'standard',
-        chat_history: chatHistoryPayload(messages),
-        ...contextPayload(engagement, manifest),
+      const res = await streamChatPost(
+        '/api/v1/chat/stream',
+        {
+          message: text,
+          session_id: sid,
+          run_id: runId,
+          thinking_mode: thinkingMode ? 'extended' : 'standard',
+          llm_model: selectedLlmModel || undefined,
+          chat_history: chatHistoryPayload(messages),
+          ...contextPayload(engagement, manifest),
+        },
+        (ev) => {
+          if (ev.event === 'progress') {
+            setAgentSteps((prev) => [
+              ...(prev ?? []),
+              { phase: ev.data.phase, message: ev.data.message },
+            ]);
+          }
+          if (ev.event === 'thinking' && ev.data.chunk) {
+            setMessages((m) =>
+              m.map((msg) =>
+                msg.run_id === runId && msg.role === 'assistant'
+                  ? { ...msg, thinking: `${msg.thinking ?? ''}${ev.data.chunk}` }
+                  : msg,
+              ),
+            );
+          }
+          if (ev.event === 'token' && ev.data.delta) {
+            streamedText += ev.data.delta;
+            setMessages((m) =>
+              m.map((msg) =>
+                msg.run_id === runId && msg.role === 'assistant'
+                  ? { ...msg, content: streamedText }
+                  : msg,
+              ),
+            );
+          }
+        },
+        runController.signal,
+      );
+      if (!res) return;
+      const chat = res as unknown as V1ChatResponse;
+      if (chat.hitl_required && chat.clarification && chat.checkpoint_id) {
+        setMessages((m) => m.filter((msg) => msg.run_id !== runId));
+        openClarificationProbe({
+          clarification: chat.clarification,
+          checkpoint_id: chat.checkpoint_id,
+        });
+        return;
+      }
+      setLastSignals(chat.quality_signals);
+      setLastSteps(chat.progress_steps);
+      setAgentSteps(chat.progress_steps);
+      setAgentDegraded(!!chat.degraded_mode);
+      setAgentFallbackReasons(chat.fallback_reasons);
+      applyRunProvenance(chat, chat.run_id ?? runId);
+      let session: SessionResponse | null = null;
+      let latestManifest = manifest;
+      try {
+        session = await refreshSessionAnalysis();
+        await refreshAnalysisStatus();
+      } catch {
+        /* analysis not run yet */
+      }
+      try {
+        latestManifest = await refreshManifest(sid);
+      } catch {
+        /* manifest optional */
+      }
+      const snapshot = extractInsightSnapshot(session, latestManifest);
+      const showPeer = wantsPeerSavingsInsight(text);
+      const suppressCategoryInsight = chat.response_metadata?.insight_dimension === 'supplier';
+      const nextOptions = buildAssistantNextOptions(
+        snapshot,
+        latestManifest,
+        chat.next_options,
+        showPeer,
+        currentAnsweredProbeFamilies(),
+      );
+      const insightSnap =
+        !suppressCategoryInsight && snapshot && (snapshot.total_spend > 0 || showPeer)
+          ? snapshot
+          : undefined;
+      setMessages((m) =>
+        m.map((msg) =>
+          msg.run_id === runId && msg.role === 'assistant'
+            ? {
+                role: 'assistant',
+                content: chat.response_text || streamedText || 'No response',
+                thinking: chat.thinking,
+                advisory_sections: chat.advisory_sections,
+                presentation: chat.presentation,
+                quality_signals: chat.quality_signals,
+                next_options: nextOptions,
+                run_id: chat.run_id,
+                progress_steps: chat.progress_steps,
+                degraded_mode: chat.degraded_mode,
+                used_llm_synthesis: chat.used_llm_synthesis,
+                fallback_reasons: chat.fallback_reasons,
+                artefacts: chat.artefacts,
+                insight_snapshot: insightSnap,
+                show_peer_savings: showPeer,
+                charts: chat.charts,
+                suggested_outputs: chat.suggested_outputs,
+                response_metadata: chat.response_metadata,
+                run_delta: chat.run_delta,
+              }
+            : msg,
+        ),
+      );
+      maybeAutoOpenProbeModal(insightSnap, currentAnsweredProbeFamilies(), chat.run_id);
+    } catch (streamErr) {
+      if (runController.signal.aborted) {
+        setMessages((m) => [
+          ...m.filter((msg) => msg.run_id !== runId),
+          { role: 'assistant', content: STOPPED_MESSAGE },
+        ]);
+        return;
+      }
+      setMessages((m) => m.filter((msg) => msg.run_id !== runId));
+      // Tell the user instead of silently re-sending: the fallback can repeat server work.
+      setAgentSteps((prev) => [
+        ...(prev ?? []),
+        { phase: 'observe', message: 'Live streaming was interrupted — retrying without live updates…' },
+      ]);
+      const res = await apiPost<V1ChatResponse>(
+        '/api/v1/chat',
+        {
+          message: text,
+          session_id: sid,
+          run_id: runId,
+          thinking_mode: thinkingMode ? 'extended' : 'standard',
+          llm_model: selectedLlmModel || undefined,
+          chat_history: chatHistoryPayload(messages),
+          ...contextPayload(engagement, manifest),
+        },
+        runController.signal,
+      ).catch((err) => {
+        if (runController.signal.aborted) return null;
+        throw err;
       });
+      if (!res) {
+        setMessages((m) => [...m, { role: 'assistant', content: STOPPED_MESSAGE }]);
+        return;
+      }
       if (res.hitl_required && res.clarification && res.checkpoint_id) {
         openClarificationProbe({
           clarification: res.clarification,
@@ -484,6 +906,8 @@ export const ProcurementAnalysis: React.FC = () => {
       setLastSteps(res.progress_steps);
       setAgentSteps(res.progress_steps);
       setAgentDegraded(!!res.degraded_mode);
+      setAgentFallbackReasons(res.fallback_reasons);
+      applyRunProvenance(res, res.run_id ?? runId);
       let session: SessionResponse | null = null;
       let latestManifest = manifest;
       try {
@@ -518,20 +942,27 @@ export const ProcurementAnalysis: React.FC = () => {
           content: res.response_text || 'No response',
           thinking: res.thinking,
           advisory_sections: res.advisory_sections,
+          presentation: res.presentation,
           quality_signals: res.quality_signals,
           next_options: nextOptions,
           run_id: res.run_id,
           progress_steps: res.progress_steps,
           degraded_mode: res.degraded_mode,
+          used_llm_synthesis: res.used_llm_synthesis,
+          fallback_reasons: res.fallback_reasons,
           artefacts: res.artefacts,
           insight_snapshot: insightSnap,
           show_peer_savings: showPeer,
           charts: res.charts,
+          suggested_outputs: res.suggested_outputs,
+          response_metadata: res.response_metadata,
+          run_delta: res.run_delta,
         },
       ]);
       maybeAutoOpenProbeModal(insightSnap, currentAnsweredProbeFamilies(), res.run_id);
-    } finally {
-      stopPolling();
+      if (streamErr instanceof Error && !res.response_text) {
+        throw streamErr;
+      }
     }
   };
 
@@ -566,21 +997,51 @@ export const ProcurementAnalysis: React.FC = () => {
     }
   };
 
+  const handleApplySector = async (industry: string) => {
+    setConflictResolving(true);
+    setError(null);
+    try {
+      const sid = await ensureSession();
+      const patch: SessionManifestPatch = { industry };
+      const updated = await apiPatch<SessionManifest>(
+        `/api/v1/sessions/${sid}/manifest`,
+        patch,
+      );
+      setManifest(updated);
+      const eid = engagementId ?? engagement.engagement_id;
+      if (eid && industry) {
+        await apiPatch(`/api/v1/engagements/${eid}`, { industry });
+      }
+      await refreshEngagement();
+      setDismissedConflictKeys(new Set());
+      saveDismissedConflictKeys(sid, new Set());
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setConflictResolving(false);
+    }
+  };
+
   const handleKeepEngagementCompany = () => {
     const sanity = engagementSanityFromManifest(manifest);
     sanity?.conflicts?.forEach((c) => handleDismissConflict(c));
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
+    await uploadFiles(Array.from(e.target.files ?? []));
+  };
+
+  const uploadFiles = async (files: File[], targetEngagementId?: string) => {
     if (files.length === 0) return;
     setLoading(true);
     setError(null);
-    setInsightsOpen(true);
+    openInsightsOnDesktop();
 
     let sid: string;
+    let eid: string;
     try {
-      sid = await ensureSession();
+      eid = targetEngagementId ?? engagementId ?? (await ensureEngagement());
+      sid = await ensureSessionForEngagement(eid);
     } catch (err) {
       setError(getApiErrorMessage(err));
       setLoading(false);
@@ -615,16 +1076,16 @@ export const ProcurementAnalysis: React.FC = () => {
       try {
         const fd = new FormData();
         fd.append('file', files[i]);
-        const res = await apiUpload<{
-          uploaded?: string;
-          engagement_sanity?: SessionManifest['engagement_sanity'];
-        }>(`/api/v1/upload/${sid}`, fd);
+        await apiUpload(`/api/v1/engagements/${eid}/documents`, fd);
         succeeded.push(files[i].name);
-        if (res.engagement_sanity) latestSanity = res.engagement_sanity;
       } catch {
         failed.push(files[i].name);
       }
     }
+
+    // Keep the header's document count and the engagement switcher current.
+    void queryClient.invalidateQueries({ queryKey: procurementKeys.engagementDocuments(eid) });
+    void engagementsQuery.refetch();
 
     try {
       const m = await refreshManifest(sid);
@@ -662,6 +1123,28 @@ export const ProcurementAnalysis: React.FC = () => {
     if (fileRef.current) fileRef.current.value = '';
   };
 
+  // First-run: a ready-made engagement so a new user can see a full analysis without their own data.
+  const handleLoadDemo = async () => {
+    setError(null);
+    try {
+      const res = await fetch('/api/v1/samples/spend-ledger.csv');
+      if (!res.ok) throw new Error(`Sample ledger unavailable (${res.status})`);
+      const file = new File([await res.blob()], 'spend_ledger_sample.csv', { type: 'text/csv' });
+      const eid = await createEngagement({
+        company_name: 'Demo engagement (sample ledger)',
+        // The bundled ledger is IT/cloud/services-heavy, so use the matching sector pack.
+        industry: 'it_ites',
+        annual_revenue: 5000 * 1e7,
+        currency: 'INR',
+      });
+      setMessages([]);
+      await engagementsQuery.refetch();
+      await uploadFiles([file], eid);
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    }
+  };
+
   const openClarificationProbe = (probe: {
     clarification: BusinessClarification;
     checkpoint_id: string;
@@ -677,11 +1160,15 @@ export const ProcurementAnalysis: React.FC = () => {
     const sid = await ensureSession();
     setPendingMessage(text);
     try {
-      const plan = await apiPost<ChatPlanPreview>('/api/v1/chat/plan', {
-        message: text,
-        session_id: sid,
-        ...contextPayload(engagement, manifest),
-      });
+      const plan = await apiPost<ChatPlanPreview>(
+        '/api/v1/chat/plan',
+        {
+          message: text,
+          session_id: sid,
+          ...contextPayload(engagement, manifest),
+        },
+        runAbortRef.current?.signal,
+      );
       if (plan.hitl_required && plan.clarification && plan.checkpoint_id) {
         openClarificationProbe({
           clarification: plan.clarification,
@@ -695,6 +1182,10 @@ export const ProcurementAnalysis: React.FC = () => {
         return;
       }
     } catch {
+      if (runAbortRef.current?.signal.aborted) {
+        setMessages((m) => [...m, { role: 'assistant', content: STOPPED_MESSAGE }]);
+        return;
+      }
       /* fall through */
     }
     await runChat(text);
@@ -713,6 +1204,9 @@ export const ProcurementAnalysis: React.FC = () => {
     setMessages((m) => [...m, { role: 'user', content: trimmed }]);
     setLoading(true);
     setError(null);
+    runAbortRef.current = new AbortController();
+    // Clear the previous run's steps so the status bar does not show stale progress while planning.
+    setAgentSteps([{ phase: 'observe', message: 'Understanding your question…' }]);
     try {
       await requestPlanThenChat(trimmed);
     } catch (err) {
@@ -735,6 +1229,7 @@ export const ProcurementAnalysis: React.FC = () => {
     if (!pendingMessage) return;
     setLoading(true);
     setError(null);
+    runAbortRef.current = new AbortController();
     try {
       await runChat(pendingMessage);
     } catch (err) {
@@ -829,7 +1324,7 @@ export const ProcurementAnalysis: React.FC = () => {
     setClarificationOpen(false);
     setLoading(true);
     setError(null);
-    setInsightsOpen(true);
+    openInsightsOnDesktop();
     setPipelineLabel(undefined);
     const runId = crypto.randomUUID();
     setLastRunId(runId);
@@ -843,6 +1338,7 @@ export const ProcurementAnalysis: React.FC = () => {
         free_text: freeText || undefined,
         run_id: runId,
         thinking_mode: thinkingMode ? 'extended' : 'standard',
+        llm_model: selectedLlmModel || undefined,
         chat_history: chatHistoryPayload(messages),
         ...contextPayload(engagement, manifest),
       });
@@ -857,6 +1353,8 @@ export const ProcurementAnalysis: React.FC = () => {
       setLastSteps(res.progress_steps);
       setAgentSteps(res.progress_steps);
       setAgentDegraded(!!res.degraded_mode);
+      setAgentFallbackReasons(res.fallback_reasons);
+      applyRunProvenance(res, res.run_id ?? runId);
       const sid = await ensureSession();
       let session: SessionResponse | null = null;
       let latestManifest = manifest;
@@ -892,15 +1390,21 @@ export const ProcurementAnalysis: React.FC = () => {
           content: res.response_text || 'No response',
           thinking: res.thinking,
           advisory_sections: res.advisory_sections,
+          presentation: res.presentation,
           quality_signals: res.quality_signals,
           next_options: nextOptions,
           run_id: res.run_id,
           progress_steps: res.progress_steps,
           degraded_mode: res.degraded_mode,
+          used_llm_synthesis: res.used_llm_synthesis,
+          fallback_reasons: res.fallback_reasons,
           artefacts: res.artefacts,
           insight_snapshot: insightSnap,
           show_peer_savings: showPeer,
           charts: res.charts,
+          suggested_outputs: res.suggested_outputs,
+          response_metadata: res.response_metadata,
+          run_delta: res.run_delta,
         },
       ]);
       maybeAutoOpenProbeModal(insightSnap, answeredProbeFamilies, res.run_id);
@@ -919,7 +1423,7 @@ export const ProcurementAnalysis: React.FC = () => {
   const handleAnalyze = async () => {
     setLoading(true);
     setError(null);
-    setInsightsOpen(true);
+    openInsightsOnDesktop();
     setPipelineLabel('Core analysis pipeline');
     // Real steps stream in via progress polling; seed with a single "starting"
     // line so the panel isn't empty for the first poll interval.
@@ -928,17 +1432,52 @@ export const ProcurementAnalysis: React.FC = () => {
       typeof crypto !== 'undefined' && 'randomUUID' in crypto
         ? crypto.randomUUID()
         : `run-${Date.now()}`;
-    setLastRunId(runId);
-    const controller = new AbortController();
-    const pollPromise = pollChatProgress(runId, setAgentSteps, controller.signal);
     try {
       const sid = await ensureSession();
-      const analysisResult = await apiPost<SessionResponse>(`/api/v1/analyze/${sid}`, {
+      // Background run: returns at once with a run id, so the run survives a page reload
+      // and can be cancelled server-side. If one is already running for this session we join it.
+      const started = await apiPost<{ run_id: string }>(`/api/v1/analyze/${sid}`, {
         ...contextPayload(engagement, manifest),
         run_id: runId,
+        background: true,
       });
+      await followAnalysisRun(sid, started.run_id);
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+      setAgentSteps([{ phase: 'reflect', message: 'Analysis failed. See error above.' }]);
+      setLoading(false);
+    }
+  };
+
+  /** Follow a background analysis run to its end, then load and present the result. */
+  const followAnalysisRun = async (sid: string, runId: string) => {
+    setLoading(true);
+    setLastRunId(runId);
+    analysisRunIdRef.current = runId;
+    analysisStopRequestedRef.current = false;
+    const controller = new AbortController();
+    runAbortRef.current = controller;
+    const pollPromise = pollChatProgress(
+      runId,
+      setAgentSteps,
+      setLiveThinking,
+      controller.signal,
+      queryClient,
+      () => setAgentSteps((prev) => [...(prev ?? []), STALL_STEP]),
+    );
+    try {
+      const run = await waitForAnalysisRun(runId, controller.signal);
       controller.abort();
       await pollPromise.catch(() => undefined);
+      if (run.status === 'cancelled') {
+        setAgentSteps([{ phase: 'reflect', message: 'Stopped.' }]);
+        setMessages((prev) => [...prev, { role: 'assistant', content: CANCELLED_MESSAGE }]);
+        return;
+      }
+      if (run.status === 'failed') {
+        throw new Error(run.error || 'Analysis failed.');
+      }
+      const analysisResult = await apiGet<SessionResponse>(`/api/v1/sessions/${sid}`);
       const rawTrace = (analysisResult as { analysis_trace?: unknown }).analysis_trace;
       const trace = Array.isArray(rawTrace) ? (rawTrace as AnalysisTraceStep[]) : undefined;
       await syncEngagementFromAnalysis();
@@ -949,8 +1488,40 @@ export const ProcurementAnalysis: React.FC = () => {
         ...(prev ?? []),
         { phase: 'reflect', message: 'Analysis complete.' },
       ]);
+      const fallbackSteps = progressStepsFromTrace(trace);
+      setLastSteps(fallbackSteps);
       setPipelineLabel(undefined);
+      const advisorySections =
+        session && typeof session.advisory_sections === 'object'
+          ? (session.advisory_sections as Record<string, unknown>)
+          : undefined;
+      const analyzeProv = deriveProvenanceFromSession({
+        manifest: m,
+        advisorySections,
+        runId,
+      });
+      setProvenanceSources(analyzeProv.sources.length > 0 ? analyzeProv.sources : PRE_RUN_PROVENANCE);
+      setNarrativeTag(analyzeProv.narrativeTag);
+      if (analyzeProv.localAudit.length > 0) {
+        setLocalAudit((prev) => [...analyzeProv.localAudit, ...prev].slice(0, 40));
+      }
       if (snapshot) {
+        const sessionExtras: Partial<ChatMessage> = {};
+        if (advisorySections && Object.keys(advisorySections).length > 0) {
+          sessionExtras.advisory_sections = advisorySections;
+        }
+        if (session?.response_metadata && typeof session.response_metadata === 'object') {
+          sessionExtras.response_metadata = session.response_metadata as ChatMessage['response_metadata'];
+        }
+        if (session?.used_llm_synthesis === false) {
+          sessionExtras.used_llm_synthesis = false;
+        }
+        if (Array.isArray(session?.suggested_outputs) && session!.suggested_outputs!.length > 0) {
+          sessionExtras.suggested_outputs = session!.suggested_outputs as ChatMessage['suggested_outputs'];
+        }
+        if (session?.run_delta && typeof session.run_delta === 'object') {
+          sessionExtras.run_delta = session.run_delta as ChatMessage['run_delta'];
+        }
         setMessages((prev) => [
           ...prev,
           {
@@ -966,6 +1537,7 @@ export const ProcurementAnalysis: React.FC = () => {
               snapshot,
               answeredProbeFamilies,
             ),
+            ...sessionExtras,
           },
         ]);
         maybeAutoOpenProbeModal(snapshot, answeredProbeFamilies, runId);
@@ -984,10 +1556,18 @@ export const ProcurementAnalysis: React.FC = () => {
         ]);
       }
     } catch (err) {
+      const userStopped = analysisStopRequestedRef.current;
       controller.abort();
+      if (userStopped) {
+        setAgentSteps([{ phase: 'reflect', message: 'Stopped.' }]);
+        setMessages((prev) => [...prev, { role: 'assistant', content: STOPPED_MESSAGE }]);
+        return;
+      }
       setError(getApiErrorMessage(err));
       setAgentSteps([{ phase: 'reflect', message: 'Analysis failed. See error above.' }]);
+      setLastSteps([{ phase: 'reflect', message: 'Analysis failed. See error above.' }]);
     } finally {
+      analysisRunIdRef.current = null;
       setLoading(false);
     }
   };
@@ -1030,6 +1610,7 @@ export const ProcurementAnalysis: React.FC = () => {
   };
 
   const handleSectorChange = async (industry: string) => {
+    if (!industry) return;
     setSectorUpdating(true);
     setError(null);
     try {
@@ -1040,6 +1621,10 @@ export const ProcurementAnalysis: React.FC = () => {
         patch,
       );
       setManifest(updated);
+      const eid = engagementId ?? engagement.engagement_id;
+      if (eid) {
+        await apiPatch(`/api/v1/engagements/${eid}`, { industry });
+      }
       await refreshEngagement();
     } catch (err) {
       setError(getApiErrorMessage(err));
@@ -1048,7 +1633,18 @@ export const ProcurementAnalysis: React.FC = () => {
     }
   };
 
+  const [confirm, confirmDialog] = useConfirm();
+
   const handleNewSession = async () => {
+    if (messages.length > 0) {
+      const ok = await confirm({
+        title: 'Start a new session?',
+        message:
+          'The current conversation will be cleared from this view. Your uploaded data and earlier analyses stay saved on the engagement.',
+        confirmLabel: 'New session',
+      });
+      if (!ok) return;
+    }
     setLoading(true);
     setError(null);
     stopPolling();
@@ -1061,12 +1657,13 @@ export const ProcurementAnalysis: React.FC = () => {
         audience: 'consultant',
         engagement_id: eid,
       });
-      if (sessionId) clearChatMessages(sessionId);
       setSessionId(res.session_id);
       setMessages([]);
       setManifest(res);
       setAgentSteps(undefined);
+      setLastSteps(undefined);
       setPipelineLabel(undefined);
+      setRecoveryNotice(null);
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {
@@ -1078,6 +1675,7 @@ export const ProcurementAnalysis: React.FC = () => {
 
   return (
     <MainLayout hideHeader>
+      {confirmDialog}
       <div className="flex flex-col h-[calc(100vh-2rem)] -m-4 md:-m-6">
         <header className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 md:px-6 py-2 border-b border-brand-border bg-white shrink-0">
           <PageHeader
@@ -1086,6 +1684,26 @@ export const ProcurementAnalysis: React.FC = () => {
             sessionId={sessionId}
             compact
           />
+          {engagementList.length > 1 && (
+            <select
+              aria-label="Switch engagement"
+              value={engagementId ?? ''}
+              disabled={loading}
+              onChange={(e) => {
+                if (!e.target.value || e.target.value === engagementId) return;
+                setMessages([]);
+                setSessionId(null);
+                setEngagementId(e.target.value);
+              }}
+              className="text-xs border border-brand-border rounded-lg px-2 py-1 bg-white text-brand-ink max-w-[14rem]"
+            >
+              {engagementList.map((en) => (
+                <option key={en.engagement_id} value={en.engagement_id}>
+                  {en.company_name || 'Untitled'} · {en.engagement_id.slice(0, 6)}
+                </option>
+              ))}
+            </select>
+          )}
           {engagementId && (
             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-brand-muted min-w-0">
               {engagement.company_name && engagement.company_name !== 'New engagement' ? (
@@ -1100,7 +1718,7 @@ export const ProcurementAnalysis: React.FC = () => {
                   · {engagementDocCount > 0 ? `${engagementDocCount} doc${engagementDocCount !== 1 ? 's' : ''}` : 'no docs'}
                 </span>
               )}
-              <Link to="/documents" className="text-deloitte-green hover:underline shrink-0">
+              <Link to="/documents" className="text-brand-primary hover:underline shrink-0">
                 Manage docs
               </Link>
               {engagement.detected_company_name && (
@@ -1120,14 +1738,19 @@ export const ProcurementAnalysis: React.FC = () => {
             <div className="flex items-center gap-1.5">
               <div className="w-36 min-w-[8.5rem]">
                 <Select
-                  label=""
+                  aria-label="Sector"
                   value={currentIndustry}
                   onChange={(e) => void handleSectorChange(e.target.value)}
                   disabled={sectorUpdating || loading}
                   className="py-1.5 px-2.5 text-xs"
                   options={[
                     { value: '', label: 'Select sector…' },
-                    ...SECTOR_OPTIONS.map((o) => ({ value: o.value, label: o.label })),
+                    ...sectorOptions.map((o) => ({ value: o.value, label: o.label })),
+                    // Reflect an industry that is not a sector pack (e.g. a free-text or legacy value)
+                    // instead of silently showing "Select sector…".
+                    ...(currentIndustry && !sectorOptions.some((o) => o.value === currentIndustry)
+                      ? [{ value: currentIndustry, label: `${currentIndustry.replace(/_/g, ' ')} (no sector pack)` }]
+                      : []),
                   ]}
                 />
               </div>
@@ -1136,7 +1759,7 @@ export const ProcurementAnalysis: React.FC = () => {
                   variant="compact"
                   label={
                     engagement.detected_industry_label ||
-                    SECTOR_OPTIONS.find((o) => o.value === engagement.detected_industry)?.label ||
+                    sectorLabel(engagement.detected_industry) ||
                     engagement.detected_industry
                   }
                   matches={currentIndustry === engagement.detected_industry}
@@ -1156,28 +1779,46 @@ export const ProcurementAnalysis: React.FC = () => {
               type="button"
               onClick={handleIncrementalAnalyze}
               disabled={loading}
+              title="Merge newly uploaded files into the current analysis without re-running everything"
               className="text-xs px-2 py-1 rounded-md border border-brand-border hover:bg-brand-surface-muted disabled:opacity-50"
             >
-              Incremental update
+              Merge new data
             </button>
             <button
               type="button"
               onClick={() => setTrustOpen(true)}
+              title="Audit log, logic trace, data sources and confidence scores for this analysis"
               className="text-xs px-2 py-1 rounded-md border border-brand-border hover:bg-brand-surface-muted"
             >
-              Trust rail
+              Sources & confidence
             </button>
+            {llmModels.length > 0 && (
+              <div className="w-44 min-w-[10rem]">
+                <Select
+                  aria-label="AI model"
+                  value={selectedLlmModel}
+                  onChange={(e) => handleLlmModelChange(e.target.value)}
+                  disabled={loading}
+                  className="py-1.5 px-2.5 text-xs"
+                  options={llmModels.map((m) => ({
+                    value: m.id,
+                    label: m.label,
+                  }))}
+                />
+              </div>
+            )}
             <button
               type="button"
               onClick={() => setThinkingMode((v) => !v)}
               className={`text-xs px-2 py-1 rounded-md border transition-colors ${
                 thinkingMode
-                  ? 'border-deloitte-green text-deloitte-green bg-deloitte-green/5'
+                  ? 'border-deloitte-green text-brand-primary bg-deloitte-green/5'
                   : 'border-brand-border hover:bg-brand-surface-muted'
               }`}
-              title="Enable extended chain-of-thought reasoning for deeper analysis"
+              aria-pressed={thinkingMode}
+              title="Deep reasoning: the model thinks step by step before answering. Slower and costs more, useful for hard questions."
             >
-              {thinkingMode ? 'Thinking: on' : 'Thinking: off'}
+              {thinkingMode ? 'Deep reasoning: on' : 'Deep reasoning: off'}
             </button>
           </div>
         </header>
@@ -1194,26 +1835,48 @@ export const ProcurementAnalysis: React.FC = () => {
             </Alert>
           </div>
         )}
+        {recoveryNotice && (
+          <div className="px-4 md:px-6 pt-3 shrink-0">
+            <Alert
+              variant="info"
+              title="Recovered analysis context"
+              onDismiss={() => setRecoveryNotice(null)}
+            >
+              {recoveryNotice}
+            </Alert>
+          </div>
+        )}
 
         <EngagementConflictBanner
           manifest={manifest}
+          engagement={engagement}
           sessionId={sessionId}
           dismissedKeys={dismissedConflictKeys}
           onDismiss={handleDismissConflict}
           onUseDetectedCompany={handleUseDetectedCompany}
+          onApplySector={handleApplySector}
           onKeepEngagementCompany={handleKeepEngagementCompany}
           resolving={conflictResolving}
         />
 
         <div className="flex flex-1 min-h-0 overflow-hidden">
           <section className="flex flex-col flex-1 min-w-0 bg-brand-surface">
-            {deepResearchSummary && (
+            {deepResearchSummary && !deepResearchDismissed && (
               <DeepResearchBanner
                 companyName={engagement.company_name}
-                onDismiss={() => {/* banner is informational — no dismiss needed for now */}}
+                onDismiss={() => {
+                  if (sessionId) saveDeepResearchDismissed(sessionId);
+                  setDeepResearchDismissed(true);
+                }}
               />
             )}
-            <div className="flex-1 overflow-y-auto">
+            <div
+              className="flex-1 overflow-y-auto"
+              onScroll={(e) => {
+                const el = e.currentTarget;
+                stickToBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 160;
+              }}
+            >
               <div className="max-w-3xl mx-auto w-full px-4 py-8 space-y-6">
                 {messages.length === 0 && !loading ? (
                   <div className="text-center py-8 md:py-16">
@@ -1225,6 +1888,47 @@ export const ProcurementAnalysis: React.FC = () => {
                       Attach spend data, ask questions in natural language, or run the full OPAR
                       analysis pipeline.
                     </p>
+                    <ol className="grid grid-cols-2 xl:grid-cols-4 gap-2 max-w-2xl mx-auto mb-6 text-left">
+                      {[
+                        { n: 1, title: 'Add data', body: 'Upload a spend ledger or P&L.', done: (engagementDocCount ?? 0) > 0 },
+                        { n: 2, title: 'Run analysis', body: 'Classify spend, benchmark, size savings.', done: hasAnalysis },
+                        { n: 3, title: 'Explore', body: 'Ask questions here or use the Workbench.', done: false },
+                        { n: 4, title: 'Decide', body: 'Track initiatives in the Cost Room.', done: false },
+                      ].map((step) => (
+                        <li
+                          key={step.n}
+                          className="rounded-xl border border-brand-border bg-white px-3 py-2"
+                        >
+                          <span
+                            className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold mr-2 ${
+                              step.done ? 'bg-brand-primary text-white' : 'bg-brand-surface-muted text-brand-muted'
+                            }`}
+                            aria-hidden
+                          >
+                            {step.done ? '✓' : step.n}
+                          </span>
+                          <span className="text-sm font-medium text-brand-ink">{step.title}</span>
+                          {step.done && <span className="sr-only"> (done)</span>}
+                          <p className="text-xs text-brand-muted mt-1">{step.body}</p>
+                        </li>
+                      ))}
+                    </ol>
+                    <div className="flex flex-wrap justify-center gap-2 mb-6">
+                      <button
+                        type="button"
+                        onClick={() => fileRef.current?.click()}
+                        className="text-sm px-4 py-2 rounded-lg bg-deloitte-green text-black font-medium hover:opacity-90"
+                      >
+                        Attach your data
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void handleLoadDemo()}
+                        className="text-sm px-4 py-2 rounded-lg border border-brand-border bg-white text-brand-ink hover:bg-brand-surface-muted"
+                      >
+                        Load demo engagement
+                      </button>
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-lg mx-auto mb-6">
                       {welcomePrompts.map((opt) => (
                         <button
@@ -1240,7 +1944,7 @@ export const ProcurementAnalysis: React.FC = () => {
                     <a
                       href="/api/v1/template/spend-csv"
                       download="opex_spend_template.csv"
-                      className="text-xs text-brand-muted hover:text-deloitte-green underline underline-offset-2 transition-colors"
+                      className="text-xs text-brand-muted hover:text-brand-primary underline underline-offset-2 transition-colors"
                     >
                       Download spend template ↓
                     </a>
@@ -1248,7 +1952,7 @@ export const ProcurementAnalysis: React.FC = () => {
                     <a
                       href="/api/v1/samples/spend-ledger.csv"
                       download="spend_ledger_sample.csv"
-                      className="text-xs text-brand-muted hover:text-deloitte-green underline underline-offset-2 transition-colors"
+                      className="text-xs text-brand-muted hover:text-brand-primary underline underline-offset-2 transition-colors"
                     >
                       Sample ledger CSV ↓
                     </a>
@@ -1256,7 +1960,7 @@ export const ProcurementAnalysis: React.FC = () => {
                     <a
                       href="/api/v1/samples/pnl-expense.xlsx"
                       download="pnl_expense_summary_sample.xlsx"
-                      className="text-xs text-brand-muted hover:text-deloitte-green underline underline-offset-2 transition-colors"
+                      className="text-xs text-brand-muted hover:text-brand-primary underline underline-offset-2 transition-colors"
                     >
                       Sample P&L workbook ↓
                     </a>
@@ -1265,10 +1969,14 @@ export const ProcurementAnalysis: React.FC = () => {
                   <>
                     {messages.map((msg, idx) => (
                       <StructuredChatMessage
-                        key={idx}
+                        // run_id is shared by a streaming placeholder and its final message, so state survives the swap
+                        key={msg.run_id ? `${msg.role}-${msg.run_id}` : `${msg.role}-${idx}`}
                         message={msg}
                         liveSnapshot={insightSnapshot}
                         currency={engagement.currency || 'INR'}
+                        sessionId={sessionId || undefined}
+                        engagementId={engagementId ?? engagement.engagement_id}
+                        onExportError={(msg) => setError(msg)}
                         onOptionClick={(text) => sendMessage(text)}
                         answeredProbeFamilies={answeredProbeFamilies}
                         onOpenProbes={
@@ -1279,9 +1987,16 @@ export const ProcurementAnalysis: React.FC = () => {
                       />
                     ))}
                     {loading && (
-                      <div className="flex justify-start">
-                        <div className="px-4 py-3 rounded-2xl bg-white border border-brand-border shadow-sm">
-                          <Loader label="Thinking…" />
+                      <div className="flex justify-start gap-3 max-w-[85%] w-full">
+                        <span
+                          className="w-8 h-8 rounded-full bg-black flex items-center justify-center shrink-0 text-[11px] font-bold text-white"
+                          aria-hidden
+                        >
+                          AI
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <RunStatus steps={agentSteps} onStop={stopRun} />
+                          <ThinkingBlock thinking={liveThinking} live />
                         </div>
                       </div>
                     )}
@@ -1300,6 +2015,7 @@ export const ProcurementAnalysis: React.FC = () => {
               onUploadClick={() => fileRef.current?.click()}
               onAnalyzeClick={handleAnalyze}
               onNewSessionClick={handleNewSession}
+              onStop={stopRun}
             />
           </section>
 
@@ -1329,8 +2045,14 @@ export const ProcurementAnalysis: React.FC = () => {
                     agentRunId={lastRunId}
                     agentLoading={loading}
                     agentDegraded={agentDegraded}
+                    agentFallbackReasons={agentFallbackReasons}
                     pipelineLabel={pipelineLabel}
                     onOpenCostRoom={syncEngagementFromAnalysis}
+                    onOpenProbes={
+                      insightSnapshot
+                        ? () => openSmeProbeModal(insightSnapshot, answeredProbeFamilies)
+                        : undefined
+                    }
                   />
                 </div>
               </aside>
@@ -1340,8 +2062,11 @@ export const ProcurementAnalysis: React.FC = () => {
 
         {insightsOpen && (
           <div
-            className="lg:hidden fixed inset-0 z-40 flex flex-col justify-end"
+            ref={insightsSheetRef}
+            tabIndex={-1}
+            className="lg:hidden fixed inset-0 z-40 flex flex-col justify-end outline-none"
             role="dialog"
+            aria-modal="true"
             aria-label="Session insights"
           >
             <button
@@ -1372,8 +2097,14 @@ export const ProcurementAnalysis: React.FC = () => {
                   agentRunId={lastRunId}
                   agentLoading={loading}
                   agentDegraded={agentDegraded}
+                  agentFallbackReasons={agentFallbackReasons}
                   pipelineLabel={pipelineLabel}
                   onOpenCostRoom={syncEngagementFromAnalysis}
+                  onOpenProbes={
+                    insightSnapshot
+                      ? () => openSmeProbeModal(insightSnapshot, answeredProbeFamilies)
+                      : undefined
+                  }
                 />
               </div>
             </div>
@@ -1417,7 +2148,13 @@ export const ProcurementAnalysis: React.FC = () => {
             setCheckpointId(null);
             setClarification(null);
             setPendingMessage('');
-            setError('Analysis paused — provide the requested data or resend your question when ready.');
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                content: 'Paused — provide the requested data, or resend your question when you are ready.',
+              },
+            ]);
           } else {
             resetSmeProbeState();
             setClarification(null);
@@ -1428,14 +2165,13 @@ export const ProcurementAnalysis: React.FC = () => {
       <TrustRail
         open={trustOpen}
         onClose={() => setTrustOpen(false)}
-        localAudit={[]}
+        localAudit={localAudit}
         runId={lastRunId}
         progressSteps={lastSteps}
+        degradedMode={agentDegraded}
         qualitySignals={lastSignals}
-        provenanceSources={[
-          { label: 'Uploaded spend', detail: 'Session files', kind: 'fact' },
-          { label: 'OPAR synthesis', detail: 'Model-assisted narrative', kind: 'inference' },
-        ]}
+        provenanceSources={provenanceSources}
+        narrativeTag={narrativeTag}
       />
     </MainLayout>
   );

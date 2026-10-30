@@ -13,7 +13,7 @@ Extracts peer cost-structure intelligence from public filings to support benchma
 
 ## What This Skill Does
 
-1. Accepts a peer set (from sector pack `peer_set.json`) and a list of target cost categories.
+1. Accepts a peer set (from `skills/sector-packs/<pack_id>/peer_set.json`) and a list of target cost categories.
 2. In **M1 mode**: runs keyword-regex patterns against the most-recently-indexed filing text.
 3. In **M2/M3 mode**: sends structured prompts to the LLM to extract quantitative disclosures + qualitative commentary.
 4. Returns structured `peer_disclosures` with source attribution and confidence scores.

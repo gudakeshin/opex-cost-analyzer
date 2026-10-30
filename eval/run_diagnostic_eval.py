@@ -137,24 +137,9 @@ def _run_scenario(fixture: Dict[str, Any]) -> Tuple[Optional[Dict[str, Any]], Op
         inferred = company_signals.get("inferred_industry", "")
         effective_industry = inferred if inferred else industry
 
-        _PACK_TO_BENCH: Dict[str, str] = {
-            "it_ites": "technology",
-            "bfsi_banks": "financial_services",
-            "insurance_general": "financial_services",
-            "fmcg_consumer": "retail_consumer",
-            "pharma_lifesciences": "healthcare",
-            "energy_utilities": "manufacturing",
-            "retail_organized": "retail_consumer",
-            "telecom_infra": "technology",
-            "manufacturing_diversified": "manufacturing",
-            "psu_cpse": "manufacturing",
-            "conglomerate": "manufacturing",
-            "financial_services_nonbank": "financial_services",
-            "gcc_capability_centers": "technology",
-            "healthcare_hospitals": "healthcare",
-            "hospitality_travel": "retail_consumer",
-        }
-        bench_industry = _PACK_TO_BENCH.get(effective_industry, effective_industry)
+        from app.services.benchmarks import benchmark_industry_for
+
+        bench_industry = benchmark_industry_for(effective_industry)
         revenue_inr = annual_revenue_cr * 1_00_00_000
 
         bench_resolved = resolve_benchmark_payload(industry=bench_industry, categories=[], annual_revenue=revenue_inr)
@@ -853,21 +838,15 @@ def score_dg07() -> DimensionResult:
 # ---------------------------------------------------------------------------
 
 def score_dg08() -> DimensionResult:
-    """All sector pack dirs must have a mapping in _PACK_TO_BENCH in enterprise.py."""
+    """Every sector pack dir must map to a benchmark industry in SECTOR_PACK_TO_BENCHMARK."""
 
-    # Parse _PACK_TO_BENCH from enterprise.py source
+    # The mapping lives in app/services/benchmarks.py (it moved out of enterprise.py's
+    # _PACK_TO_BENCH); read the live dict so this check cannot go stale again.
     try:
-        src = ENTERPRISE_ROUTER.read_text()
-        # Find the dict literal
-        start = src.find("_PACK_TO_BENCH: Dict[str, str] = {")
-        if start == -1:
-            start = src.find("_PACK_TO_BENCH = {")
-        end = src.find("}", start) + 1
-        dict_src = src[start:end]
-        # Extract keys using simple regex
-        import re
-        mapped_keys = set(re.findall(r'"([a-z_]+)"\s*:', dict_src))
-    except Exception as exc:
+        from app.services.benchmarks import SECTOR_PACK_TO_BENCHMARK
+
+        mapped_keys = set(SECTOR_PACK_TO_BENCHMARK)
+    except Exception:
         mapped_keys = set()
 
     discovered_packs = set()
@@ -893,7 +872,7 @@ def score_dg08() -> DimensionResult:
         passed=passed,
         evidence={
             "discovered_packs": sorted(discovered_packs),
-            "mapped_in_pack_to_bench": sorted(mapped_keys),
+            "mapped_in_sector_pack_to_benchmark": sorted(mapped_keys),
             "covered": covered,
             "missing_from_mapping": missing,
             "phantom_keys_in_dict": phantom,
@@ -906,7 +885,7 @@ def score_dg08() -> DimensionResult:
             "These sectors will silently fail benchmark lookup."
         ),
         remediation=(
-            f"Add the following to _PACK_TO_BENCH in app/routers/enterprise.py: "
+            f"Add the following to SECTOR_PACK_TO_BENCHMARK in app/services/benchmarks.py: "
             + ", ".join(f'"{p}": "<benchmark_industry>"' for p in missing)
             + ". Suggested mappings: financial_services_nonbank→financial_services, "
             "gcc_capability_centers→technology, healthcare_hospitals→healthcare, "
@@ -1331,6 +1310,11 @@ def _to_json(report: EvalReport, dimension_results: List[DimensionResult]) -> Di
     return {
         "eval_name": "Diagnostic Feature Eval",
         "eval_date": report.eval_date,
+        "score_type": "structural",
+        "scope": (
+            "Diagnostic skill wiring and output schema completeness. "
+            "Does NOT validate analytical accuracy of diagnostic outputs."
+        ),
         "platform_version": report.platform_version,
         "overall_score": report.overall_score,
         "passed": report.passed,
@@ -1377,6 +1361,9 @@ def _to_markdown(report: EvalReport, dimension_results: List[DimensionResult]) -
         f"**Date:** {report.eval_date}  |  **Version:** {report.platform_version}  "
         f"|  **Overall Score:** {report.overall_score}/10",
         f"",
+        f"> ⚠️ **SCORE TYPE: STRUCTURAL** — Measures diagnostic skill wiring and output schema "
+        f"completeness. Does NOT validate analytical accuracy. See `run_llm_judge_eval.py`.",
+        f"",
         "## Summary",
         "",
         "| Domain | Score | Weight | Status |",
@@ -1399,20 +1386,11 @@ def _to_markdown(report: EvalReport, dimension_results: List[DimensionResult]) -
 
     lines += ["", "## Known Stubs & Inconsistencies", ""]
     stubs = [
-        ("HIGH", "NPV always 0.0", "`enterprise.py:369`", "Add wacc param; compute 3-year NPV"),
-        ("HIGH", "root_causes=[] always", "`enterprise.py:340`", "Run root_cause_analyzer on synthetic profile first"),
         ("HIGH", "document_contextualizer is bag-of-words", "`profiler.py:786-811`", "Word-boundary regex; remove ambiguous ≤3-char keywords; add LLM summary"),
         ("HIGH", "URL analysis dead code when urls=[]", "`enterprise.py:261` + `profiler.py:787`", "Return structured 'no_url_provided' signal; skip contextualizer call"),
-        ("MED", "Circular benchmark derivation", "`enterprise.py:289-333`", "Rename headroom field; set percentile_band='synthetic_P50'; add profile_basis field"),
-        ("MED", "headcount hardcoded 500", "`enterprise.py:338`", "Add headcount to CompanyResearchRequest schema"),
-        ("MED", "headcount missing from request schema", "`schemas.py:203-207`", "Add headcount field to CompanyResearchRequest"),
-        ("MED", "signal_corpus / line_flags always None", "`enterprise.py:335-341`", "Build signal_corpus from synthetic profile; derive line_flags from constraints"),
-        ("MED", "category='' always in value_at_table", "`enterprise.py:365`", "Populate from matched trigger_signal category ID"),
-        ("MED", "gap_pct/gap_cr always 0", "`enterprise.py:326-328`", "Compute vs. P25 target or rename fields"),
-        ("MED", "'3-year' label without 3x multiplier", "`enterprise.py:387`", "Multiply p50_cr by 3 or rename to 'annual savings'"),
-        ("LOW", "_PACK_TO_BENCH missing sector packs", "`enterprise.py:265-277`", "Add financial_services_nonbank, gcc_capability_centers, healthcare_hospitals, hospitality_travel"),
-        ("LOW", "resolve_benchmark_payload called twice", "`enterprise.py:280+303`", "Reuse categories list from first call"),
-        ("LOW", "engagement_id not passed to lever resolver", "`enterprise.py:335-341`", "Generate engagement_id from company+timestamp for audit trail"),
+        ("MED", "peer_disclosure_miner null shells (M1)", "`strategic.py:peer_disclosure_miner`", "Integrate filing fetch or downgrade skill visibility"),
+        ("MED", "reg_watcher sample catalogue (default)", "`reg_watcher.py`", "Set REG_WATCHER_LIVE=1 when Phase 4 HTTP feeds are wired"),
+        ("LOW", "Licensed benchmark HTTP (env-gated)", "`benchmarks_india.py`", "Provision CMIE/Capitaline/CRISIL keys; verify API base URLs"),
     ]
     lines += ["| Severity | Stub | Location | Fix |", "|----------|------|----------|-----|"]
     for sev, stub, loc, fix in stubs:

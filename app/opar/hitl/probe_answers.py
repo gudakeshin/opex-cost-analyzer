@@ -2,13 +2,10 @@
 
 from __future__ import annotations
 
-import json
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Set
 
-from app.config import UPLOAD_DIR
 from app.memory import MemoryStore
-from app.storage import read_json
 
 _memory = MemoryStore()
 
@@ -18,7 +15,9 @@ def _utc_now() -> str:
 
 
 def load_probe_answers(session_id: str) -> List[Dict[str, Any]]:
-    manifest = read_json(UPLOAD_DIR / session_id / "manifest.json", {})
+    from app.routers._shared import read_manifest
+
+    manifest = read_manifest(session_id, {})
     answers = manifest.get("probe_answers")
     return answers if isinstance(answers, list) else []
 
@@ -33,8 +32,9 @@ def get_answered_family_ids(session_id: str) -> Set[str]:
 
 def apply_probe_answer(session_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
     """Append probe answer to manifest and session memory."""
-    manifest_path = UPLOAD_DIR / session_id / "manifest.json"
-    manifest = read_json(manifest_path, {"files": [], "industry": "", "annual_revenue": 0.0})
+    from app.routers._shared import read_manifest, write_manifest
+
+    manifest = read_manifest(session_id, {"files": [], "industry": "", "annual_revenue": 0.0})
     answers = manifest.get("probe_answers")
     if not isinstance(answers, list):
         answers = []
@@ -54,7 +54,7 @@ def apply_probe_answer(session_id: str, payload: Dict[str, Any]) -> Dict[str, An
     manifest["probe_answers"] = answers
 
     try:
-        manifest_path.write_text(json.dumps(manifest, indent=2))
+        write_manifest(session_id, manifest)
     except Exception:
         pass
 

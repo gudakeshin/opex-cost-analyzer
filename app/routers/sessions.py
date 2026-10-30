@@ -1,17 +1,20 @@
-from __future__ import annotations
-
+# NOTE: no `from __future__ import annotations` here — slowapi's @limiter.limit
+# wrapper cannot resolve postponed annotations (List[UploadFile] etc.) because
+# FastAPI evaluates them against the wrapper's __globals__, not this module's.
 import asyncio
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
-from fastapi import APIRouter, File, HTTPException, Request, UploadFile
+from fastapi import APIRouter, File, HTTPException, Query, Request, UploadFile
 from fastapi.responses import Response
 
-from app.config import DATA_DIR, MAX_UPLOAD_MB, UPLOAD_DIR, logger
+from app.config import MAX_UPLOAD_MB, ROOT_DIR, logger
+from app.ratelimit import RATE_LIMIT_LLM, limiter
 from app.routers._shared import (
     _memory,
+    list_session_ids,
     merge_context_into_manifest,
     progress_append,
     progress_complete,
@@ -19,12 +22,26 @@ from app.routers._shared import (
     read_manifest,
     session_dir,
     session_lock,
+    session_manifest_exists,
     validate_session_id,
     write_manifest,
 )
-from app.schemas import AnalyzeRequest, DiagnosticContextPatch, SessionCreateRequest, SessionManifestPatch
+from app.schemas import (
+    AnalyzeRequest,
+    DiagnosticContextPatch,
+    SessionAnalysisResponse,
+    SessionCreateRequest,
+    SessionManifestPatch,
+    SessionManifestResponse,
+    SessionStatusResponse,
+    SessionSummaryResponse,
+)
+from app.security.auth import current_principal, visible_to_principal
+from app.errors import ApiError
+from app.services import analysis_runs
 from app.services.analysis import load_taxonomy, run_core_pipeline
 from app.services.compliance import append_audit_event
+from app.services.pipeline_seed import seed_initiatives_from_analysis
 from app.services.engagement_sanity import apply_engagement_sanity_to_manifest
 from app.services.engagement_corpus import load_analysis_corpus
 from app.services.engagements_store import (
@@ -32,17 +49,16 @@ from app.services.engagements_store import (
     read_engagement_manifest,
     register_session_on_engagement,
 )
-from app.services.ingestion import infer_tabular_schema
 from app.skills.model_contextualizer import (
     build_workbook_manifest,
     compute_file_fingerprint,
-    maybe_interpret_workbook_on_upload,
     should_run_model_contextualizer,
 )
 
 router = APIRouter()
 
-SAMPLES_DIR = DATA_DIR / "samples"
+# Samples are committed fixtures, so they stay in the repo even when DATA_DIR is redirected.
+SAMPLES_DIR = ROOT_DIR / "data" / "samples"
 
 _SAMPLE_FILES: Dict[str, Dict[str, str]] = {
     "spend-ledger.csv": {
@@ -132,6 +148,50 @@ def _dominant_currency(lines: List[Any]) -> str | None:
     return max(totals, key=totals.__getitem__)
 
 
+def _run_summary_progress_steps(trace: List[Dict[str, Any]] | None) -> List[Dict[str, str]]:
+    rows = trace or []
+    if not rows:
+        return [
+            {"phase": "observe", "message": "Spend corpus loaded."},
+            {"phase": "act", "message": "Core analysis pipeline completed."},
+            {"phase": "reflect", "message": "Analysis complete."},
+        ]
+    out: List[Dict[str, str]] = []
+    for row in rows[:8]:
+        phase = str(row.get("phase") or "act")
+        title = str(row.get("title") or "").strip()
+        detail = str(row.get("detail") or "").strip()
+        msg = f"{title} — {detail}" if title and detail else (title or detail or "Pipeline step completed.")
+        out.append({"phase": phase, "message": msg})
+    if not out or out[-1].get("phase") != "reflect":
+        out.append({"phase": "reflect", "message": "Analysis complete."})
+    return out
+
+
+def _build_last_analysis_run(
+    analysis: Dict[str, Any],
+    *,
+    run_id: str | None,
+    pipeline_seeded: int,
+) -> Dict[str, Any]:
+    outputs = analysis.get("skill_outputs", {}) if isinstance(analysis, dict) else {}
+    spend_profiler = outputs.get("spend-profiler", {}) if isinstance(outputs, dict) else {}
+    savings = outputs.get("savings-modeler", {}) if isinstance(outputs, dict) else {}
+    initiatives = savings.get("initiatives", []) if isinstance(savings, dict) else []
+    trace = analysis.get("analysis_trace", []) if isinstance(analysis, dict) else []
+    return {
+        "run_id": run_id,
+        "status": "completed",
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "pipeline_seeded": int(pipeline_seeded or 0),
+        "trace_step_count": len(trace) if isinstance(trace, list) else 0,
+        "progress_steps": _run_summary_progress_steps(trace if isinstance(trace, list) else []),
+        "total_spend": float(spend_profiler.get("total_spend") or 0.0) if isinstance(spend_profiler, dict) else 0.0,
+        "modelled_initiatives": len(initiatives) if isinstance(initiatives, list) else 0,
+        "reporting_currency": analysis.get("reporting_currency") if isinstance(analysis, dict) else None,
+    }
+
+
 _TABULAR_SUFFIXES = {".csv", ".xlsx", ".xls", ".json"}
 
 
@@ -219,11 +279,12 @@ def download_spend_template() -> Response:
     )
 
 
-@router.post("/api/sessions")
-@router.post("/api/v1/sessions")
-def create_session(payload: SessionCreateRequest) -> Dict[str, Any]:
+@router.post("/api/sessions", response_model=SessionManifestResponse)
+@router.post("/api/v1/sessions", response_model=SessionManifestResponse)
+def create_session(request: Request, payload: SessionCreateRequest) -> Dict[str, Any]:
     session_id = str(uuid.uuid4())
     session_dir(session_id).mkdir(parents=True, exist_ok=True)
+    owner = current_principal(request)
 
     engagement_id = (payload.engagement_id or "").strip()
     if engagement_id:
@@ -244,6 +305,7 @@ def create_session(payload: SessionCreateRequest) -> Dict[str, Any]:
             annual_revenue=payload.annual_revenue,
             currency=payload.currency or "INR",
             headcount=payload.headcount,
+            owner=owner,
         )
         engagement_id = eng_manifest["engagement_id"]
         company_name = payload.company_name
@@ -255,6 +317,7 @@ def create_session(payload: SessionCreateRequest) -> Dict[str, Any]:
     manifest: Dict[str, Any] = {
         "session_id": session_id,
         "engagement_id": engagement_id,
+        "owner": owner,
         "company_name": company_name,
         "industry": industry or "",
         "annual_revenue": annual_revenue,
@@ -268,9 +331,7 @@ def create_session(payload: SessionCreateRequest) -> Dict[str, Any]:
     }
     write_manifest(session_id, manifest)
     register_session_on_engagement(engagement_id, session_id)
-    append_audit_event(
-        f"session_created session_id={session_id} engagement_id={engagement_id}"
-    )
+    append_audit_event("session_created", session_id=session_id, engagement_id=engagement_id)
     return manifest
 
 
@@ -278,74 +339,96 @@ def create_session(payload: SessionCreateRequest) -> Dict[str, Any]:
 @router.post("/api/v1/upload/{session_id}")
 async def upload_file(session_id: str, request: Request, file: UploadFile = File(...)) -> Dict[str, Any]:
     validate_session_id(session_id)
-    sdir = session_dir(session_id)
-    if not sdir.exists():
-        # Recreate if analysis data exists (session dir was wiped but memory intact).
-        analysis = _memory.get("session", session_id)
-        if analysis:
-            sdir.mkdir(parents=True, exist_ok=True)
-            recovered: Dict[str, Any] = {
-                "session_id": session_id,
-                "company_name": analysis.get("company_name", ""),
-                "industry": analysis.get("industry", ""),
-                "annual_revenue": analysis.get("annual_revenue"),
-                "currency": analysis.get("reporting_currency", "INR"),
-                "audience": "consultant",
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                "files": [],
-            }
-            write_manifest(session_id, recovered)
-        else:
-            raise HTTPException(status_code=404, detail="Session not found")
-    _max_bytes = MAX_UPLOAD_MB * 1024 * 1024
-    cl = request.headers.get("content-length")
-    if cl and int(cl) > _max_bytes:
-        raise HTTPException(status_code=413, detail=f"File exceeds {MAX_UPLOAD_MB} MB limit")
-    content = await file.read()
-    if len(content) > _max_bytes:
-        raise HTTPException(status_code=413, detail=f"File exceeds {MAX_UPLOAD_MB} MB limit")
-    safe_filename = Path(file.filename or "upload").name
-    out_path = session_dir(session_id) / safe_filename
-    out_path.write_bytes(content)
-    entry: Dict[str, Any] = {
-        "name": safe_filename,
-        "content_type": file.content_type or "application/octet-stream",
-        "size_bytes": len(content),
-        "path": str(out_path),
-    }
-    if out_path.suffix.lower() in (".csv", ".xlsx", ".xls"):
-        entry["schema"] = await asyncio.to_thread(infer_tabular_schema, out_path)
-    elif out_path.suffix.lower() == ".json":
-        entry["schema"] = {"format": "json"}
-    async with session_lock(session_id):
-        manifest = read_manifest(session_id)
-        manifest["files"].append(entry)
-        if out_path.suffix.lower() in (".xlsx", ".xls"):
-            interpreted = await asyncio.to_thread(
-                maybe_interpret_workbook_on_upload,
-                out_path,
-                manifest,
-                "",
-            )
-            if interpreted:
-                manifest["model_manifest"] = interpreted
-        apply_engagement_sanity_to_manifest(manifest)
-        write_manifest(session_id, manifest)
-    append_audit_event(f"file_uploaded session_id={session_id} file={safe_filename}")
-    sanity = read_manifest(session_id).get("engagement_sanity") or {}
-    return {
-        "uploaded": safe_filename,
-        "size_bytes": len(content),
-        "engagement_sanity": sanity,
-    }
+    raise HTTPException(
+        status_code=410,
+        detail=(
+            "Session-level uploads are deprecated. "
+            "Use POST /api/v1/engagements/{engagement_id}/documents instead."
+        ),
+    )
 
 
 @router.post("/api/analyze/{session_id}")
 @router.post("/api/v1/analyze/{session_id}")
-async def analyze_session(session_id: str, payload: AnalyzeRequest) -> Dict[str, Any]:
+@limiter.limit(RATE_LIMIT_LLM)
+async def analyze_session(request: Request, session_id: str, payload: AnalyzeRequest) -> Dict[str, Any]:
     validate_session_id(session_id)
     if not session_dir(session_id).exists():
         raise HTTPException(status_code=404, detail="Session not found")
+    run_id = payload.run_id or str(uuid.uuid4())
+    try:
+        analysis_runs.start(session_id, run_id)
+    except analysis_runs.AnalysisAlreadyRunning as exc:
+        if payload.background:
+            # Idempotent for background callers (e.g. a page reload): follow the run already in flight.
+            return {"run_id": exc.run_id, "status": "running", "already_running": True}
+        raise ApiError(
+            409, f"An analysis is already running for this session (run {exc.run_id}).", "analysis_running"
+        ) from exc
+    if payload.background:
+        task = asyncio.create_task(_execute_analysis(session_id, payload, run_id, foreground=False))
+        analysis_runs.attach_task(run_id, task)
+        return {"run_id": run_id, "status": "running"}
+    return await _execute_analysis(session_id, payload, run_id, foreground=True)
+
+
+async def _execute_analysis(
+    session_id: str, payload: AnalyzeRequest, run_id: str, *, foreground: bool
+) -> Dict[str, Any]:
+    """Run one analysis and record its outcome in the run registry."""
+    try:
+        analysis = await _analyze_session_impl(session_id, payload, run_id)
+    except analysis_runs.AnalysisCancelled:
+        analysis_runs.finish(run_id, "cancelled")
+        progress_complete(run_id, failed=True, error="cancelled")
+        append_audit_event(f"analysis_cancelled session_id={session_id} run_id={run_id}")
+        if foreground:
+            raise ApiError(409, "Analysis cancelled.", "analysis_cancelled") from None
+        return {}
+    except HTTPException as exc:
+        analysis_runs.finish(run_id, "failed", error=str(exc.detail))
+        if foreground:
+            raise
+        progress_complete(run_id, failed=True, error=str(exc.detail)[:300])
+        return {}
+    except Exception as exc:
+        logger.exception("analysis_failed session_id=%s run_id=%s", session_id, run_id)
+        analysis_runs.finish(run_id, "failed", error=str(exc)[:300])
+        if foreground:
+            raise
+        progress_complete(run_id, failed=True, error=str(exc)[:300])
+        return {}
+    analysis_runs.finish(run_id, "completed")
+    return analysis
+
+
+@router.get("/api/v1/analyze/runs/{run_id}")
+def get_analysis_run(run_id: str) -> Dict[str, Any]:
+    """Status of one analysis run: running | cancelling | completed | failed | cancelled."""
+    run = analysis_runs.get(run_id)
+    if not run:
+        raise HTTPException(status_code=404, detail="Unknown analysis run (the server may have restarted).")
+    return run.to_dict()
+
+
+@router.post("/api/v1/analyze/runs/{run_id}/cancel")
+def cancel_analysis_run(run_id: str) -> Dict[str, Any]:
+    """Cooperative cancel: the run stops at its next checkpoint (between stages)."""
+    run = analysis_runs.request_cancel(run_id)
+    if not run:
+        raise HTTPException(status_code=404, detail="Unknown analysis run.")
+    return run.to_dict()
+
+
+@router.get("/api/v1/sessions/{session_id}/analysis-run")
+def get_active_analysis_run(session_id: str) -> Dict[str, Any]:
+    """The analysis currently in flight for this session, if any (lets a reloaded page resume)."""
+    validate_session_id(session_id)
+    run = analysis_runs.active_for_session(session_id)
+    return {"run": run.to_dict() if run else None}
+
+
+async def _analyze_session_impl(session_id: str, payload: AnalyzeRequest, run_id: str) -> Dict[str, Any]:
     manifest = read_manifest(session_id)
     if should_run_model_contextualizer(manifest.get("files", []), "run analysis"):
         model_manifest = manifest.get("model_manifest") if isinstance(manifest, dict) else None
@@ -424,32 +507,47 @@ async def analyze_session(session_id: str, payload: AnalyzeRequest) -> Dict[str,
     # extension). Names let each trace step cite where its insight came from.
     source_files = _collect_source_files(manifest)
 
-    # Live progress: when the client supplies a run_id it polls
-    # GET /api/v1/chat/progress/{run_id} while the pipeline runs.
-    run_id = payload.run_id
-    progress_cb = None
-    if run_id:
-        progress_init(run_id, session_id)
-        progress_append(run_id, "observe", "Loading spend and context documents…")
-        progress_cb = lambda phase, msg: progress_append(run_id, phase, msg)  # noqa: E731
+    # Live progress: clients poll GET /api/v1/chat/progress/{run_id} while the pipeline runs.
+    # The callback is also the cancel checkpoint: it raises once a cancel was requested.
+    progress_init(run_id, session_id)
+    progress_append(run_id, "observe", "Loading spend and context documents…")
+
+    def progress_cb(phase: str, msg: str) -> None:
+        analysis_runs.check_cancel(run_id)
+        progress_append(run_id, phase, msg)
+
+    analysis_runs.check_cancel(run_id)
 
     try:
-        analysis = await asyncio.to_thread(
-            run_core_pipeline,
-            session_id=session_id,
-            lines=spend_lines,
-            docs_text=docs_text,
-            industry=payload.industry or manifest.get("industry") or "",
-            annual_revenue=payload.annual_revenue or float(manifest.get("annual_revenue") or 0.0),
-            company_name=payload.company_name or manifest.get("company_name"),
-            wacc=float(manifest.get("wacc") or payload.wacc or 0.10),
-            effective_tax_rate=float(manifest.get("effective_tax_rate") or payload.effective_tax_rate or 0.0),
-            reporting_currency=reporting_currency,
-            engagement_id=manifest.get("engagement_id"),
-            ingestion_summary=ingestion_summary or None,
-            progress_cb=progress_cb,
-            source_files=source_files,
-        )
+        from app.services.sector_packs import resolve_sector_pack_id
+
+        selected_industry = resolve_sector_pack_id(
+            payload.industry or manifest.get("industry") or ""
+        ) or (payload.industry or manifest.get("industry") or "")
+        industry_user_set = bool(manifest.get("industry_user_set")) or payload.industry is not None
+        from app.services.llm_budget import budget_scope
+        from app.services.llm_trace import trace_scope
+
+        with budget_scope(manifest.get("engagement_id") or session_id), trace_scope():
+            analysis = await asyncio.to_thread(
+                run_core_pipeline,
+                session_id=session_id,
+                lines=spend_lines,
+                docs_text=docs_text,
+                industry=selected_industry,
+                annual_revenue=payload.annual_revenue or float(manifest.get("annual_revenue") or 0.0),
+                company_name=payload.company_name or manifest.get("company_name"),
+                wacc=float(manifest.get("wacc") or payload.wacc or 0.10),
+                effective_tax_rate=float(manifest.get("effective_tax_rate") or payload.effective_tax_rate or 0.0),
+                reporting_currency=reporting_currency,
+                engagement_id=manifest.get("engagement_id"),
+                ingestion_summary=ingestion_summary or None,
+                progress_cb=progress_cb,
+                source_files=source_files,
+                run_id=run_id,
+                industry_user_set=industry_user_set,
+
+            )
     except Exception as exc:
         if run_id:
             progress_complete(run_id, failed=True, error=str(exc)[:300])
@@ -461,8 +559,15 @@ async def analyze_session(session_id: str, payload: AnalyzeRequest) -> Dict[str,
     if analysis.get("company_name") and manifest.get("company_name") != analysis["company_name"]:
         manifest["company_name"] = analysis["company_name"]
         manifest_changed = True
-    if analysis.get("industry") and manifest.get("industry") != analysis["industry"]:
-        manifest["industry"] = analysis["industry"]
+    from app.services.engagement_sanity import is_placeholder_industry
+
+    analysis_industry = str(analysis.get("industry") or "").strip()
+    if (
+        analysis_industry
+        and is_placeholder_industry(manifest.get("industry"))
+        and not manifest.get("industry_user_set")
+    ):
+        manifest["industry"] = analysis_industry
         manifest_changed = True
     if analysis.get("annual_revenue") and not manifest.get("annual_revenue"):
         manifest["annual_revenue"] = analysis["annual_revenue"]
@@ -470,18 +575,38 @@ async def analyze_session(session_id: str, payload: AnalyzeRequest) -> Dict[str,
     if manifest_changed:
         manifest.setdefault("gate_label", "Gate 2: Portfolio sign-off")
         write_manifest(session_id, manifest)
-    append_audit_event(f"analysis_completed session_id={session_id}")
+    append_audit_event("analysis_completed", session_id=session_id)
+    try:
+        user_id = (manifest.get("company_name") or "default").lower().replace(" ", "_").replace(".", "_")
+        created = seed_initiatives_from_analysis(analysis, session_id, user_id=user_id)
+        if created:
+            append_audit_event(f"pipeline_seeded session_id={session_id} initiatives={created}")
+        analysis["pipeline_seeded"] = created
+    except Exception as exc:
+        logger.warning("pipeline_seed_failed session_id=%s error=%s", session_id, exc)
+        analysis["pipeline_seeded"] = 0
+    run_summary = _build_last_analysis_run(
+        analysis,
+        run_id=run_id,
+        pipeline_seeded=int(analysis.get("pipeline_seeded") or 0),
+    )
+    analysis["last_analysis_run"] = run_summary
+    _memory.put("session", session_id, analysis)
+    meta = _memory.get("session_meta", session_id) or {}
+    if isinstance(meta, dict):
+        meta["last_analysis_run"] = run_summary
+        _memory.put("session_meta", session_id, meta)
+    manifest["last_analysis_run"] = run_summary
+    write_manifest(session_id, manifest)
     return analysis
 
 
-@router.get("/api/sessions/{session_id}/status")
-@router.get("/api/v1/sessions/{session_id}/status")
+@router.get("/api/sessions/{session_id}/status", response_model=SessionStatusResponse)
+@router.get("/api/v1/sessions/{session_id}/status", response_model=SessionStatusResponse)
 def get_session_status(session_id: str) -> Dict[str, Any]:
     """Lightweight session probe — always 200; avoids 404 noise when analysis is not ready."""
     validate_session_id(session_id)
-    sdir = session_dir(session_id)
-    manifest_path = sdir / "manifest.json"
-    has_manifest = manifest_path.is_file()
+    has_manifest = session_manifest_exists(session_id)
     meta = _memory.get("session_meta", session_id) or _memory.get("session", session_id)
     session_exists = has_manifest or bool(meta)
     analysis = _memory.get("session", session_id)
@@ -496,8 +621,8 @@ def get_session_status(session_id: str) -> Dict[str, Any]:
     }
 
 
-@router.get("/api/sessions/{session_id}")
-@router.get("/api/v1/sessions/{session_id}")
+@router.get("/api/sessions/{session_id}", response_model=SessionAnalysisResponse)
+@router.get("/api/v1/sessions/{session_id}", response_model=SessionAnalysisResponse)
 def get_session_analysis(session_id: str) -> Dict[str, Any]:
     validate_session_id(session_id)
     result = _memory.get("session", session_id)
@@ -506,8 +631,8 @@ def get_session_analysis(session_id: str) -> Dict[str, Any]:
     return result
 
 
-@router.patch("/api/sessions/{session_id}/manifest")
-@router.patch("/api/v1/sessions/{session_id}/manifest")
+@router.patch("/api/sessions/{session_id}/manifest", response_model=SessionManifestResponse)
+@router.patch("/api/v1/sessions/{session_id}/manifest", response_model=SessionManifestResponse)
 async def patch_session_manifest(session_id: str, payload: SessionManifestPatch) -> Dict[str, Any]:
     validate_session_id(session_id)
     if not session_dir(session_id).exists():
@@ -521,14 +646,16 @@ async def patch_session_manifest(session_id: str, payload: SessionManifestPatch)
             annual_revenue=payload.annual_revenue,
             currency=payload.currency,
             audience=payload.audience,
+            peer_set_name=payload.peer_set_name,
+            industry_user_set=payload.industry is not None,
         ):
             write_manifest(session_id, manifest)
     manifest.setdefault("session_id", session_id)
     return manifest
 
 
-@router.get("/api/sessions/{session_id}/manifest")
-@router.get("/api/v1/sessions/{session_id}/manifest")
+@router.get("/api/sessions/{session_id}/manifest", response_model=SessionManifestResponse)
+@router.get("/api/v1/sessions/{session_id}/manifest", response_model=SessionManifestResponse)
 def get_session_manifest(session_id: str) -> Dict[str, Any]:
     validate_session_id(session_id)
     sdir = session_dir(session_id)
@@ -568,34 +695,38 @@ def get_session_schema(session_id: str) -> Dict[str, Any]:
     return {"session_id": session_id, "schemas": schemas}
 
 
-@router.get("/api/v1/sessions")
-def list_sessions() -> List[Dict[str, Any]]:
-    """Return a summary of all sessions, newest first. Used by the History page."""
-    from app.storage import read_json as _read_json
+@router.get("/api/v1/sessions", response_model=List[SessionSummaryResponse])
+def list_sessions(
+    request: Request,
+    response: Response,
+    limit: int | None = Query(None, ge=1, le=1000, description="Max rows to return (default: all)"),
+    offset: int = Query(0, ge=0),
+) -> List[Dict[str, Any]]:
+    """Return a summary of sessions, newest first. Used by the History page.
+
+    ``limit``/``offset`` page the result; the full count is in the ``X-Total-Count`` header.
+    """
     summaries: List[Dict[str, Any]] = []
-    if not UPLOAD_DIR.exists():
-        return summaries
-    for session_path in UPLOAD_DIR.iterdir():
-        if not session_path.is_dir():
-            continue
+    for session_id in list_session_ids():
         try:
-            uuid.UUID(session_path.name, version=4)
+            uuid.UUID(session_id, version=4)
         except ValueError:
             continue
-        manifest_file = session_path / "manifest.json"
-        if not manifest_file.exists():
-            continue
         try:
-            manifest = _read_json(manifest_file, {})
-            analysis = _memory.get("session", session_path.name)
+            manifest = read_manifest(session_id, {})
+            if not manifest:
+                continue
+            if not visible_to_principal(request, manifest.get("owner")):
+                continue
+            analysis = _memory.get("session", session_id)
             top_savings = None
             if analysis and isinstance(analysis, dict):
                 top_savings = analysis.get("total_savings_opportunity")
             from app.services.engagements_store import backfill_engagement_for_session
 
-            engagement_id = backfill_engagement_for_session(session_path.name, manifest)
+            engagement_id = backfill_engagement_for_session(session_id, manifest)
             summaries.append({
-                "session_id": session_path.name,
+                "session_id": session_id,
                 "engagement_id": engagement_id,
                 "company_name": manifest.get("company_name") or "Unknown",
                 "industry": manifest.get("industry") or "",
@@ -603,17 +734,23 @@ def list_sessions() -> List[Dict[str, Any]]:
                 "annual_revenue": manifest.get("annual_revenue"),
                 "created_at": manifest.get("created_at"),
                 "file_count": len(manifest.get("files", [])),
-                "has_analysis": analysis is not None,
+                # _memory.get() returns {} (not None) for sessions without a
+                # persisted analysis, so test truthiness — otherwise every empty
+                # session falsely reports has_analysis=true. Matches the
+                # /sessions/{id}/status probe (bool(analysis)).
+                "has_analysis": bool(analysis),
                 "top_savings_estimate": top_savings,
             })
         except Exception:
             continue
     summaries.sort(key=lambda x: x.get("created_at") or "", reverse=True)
-    return summaries
+    response.headers["X-Total-Count"] = str(len(summaries))
+    return summaries[offset : offset + limit] if limit else summaries[offset:]
 
 
 @router.post("/api/v1/analyze/{session_id}/incremental")
-async def incremental_analyze(session_id: str, files: List[UploadFile] = File(default=[])) -> Dict[str, Any]:
+@limiter.limit(RATE_LIMIT_LLM)
+async def incremental_analyze(request: Request, session_id: str, files: List[UploadFile] = File(default=[])) -> Dict[str, Any]:
     """Upload additional spend files and merge into an existing session."""
     validate_session_id(session_id)
     if not session_dir(session_id).exists():
@@ -643,7 +780,7 @@ async def incremental_analyze(session_id: str, files: List[UploadFile] = File(de
         result = run_incremental_pipeline(session_id=session_id, new_lines=new_lines)
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
-    append_audit_event(f"incremental_analysis session_id={session_id} lines_added={result.get('lines_added', 0)}")
+    append_audit_event("incremental_analysis", session_id=session_id, data={"lines_added": result.get("lines_added", 0)})
     return result
 
 
@@ -655,7 +792,9 @@ def patch_diagnostic_context(session_id: str, patch: DiagnosticContextPatch) -> 
     if patch.company_name is not None:
         manifest["company_name"] = patch.company_name
     if patch.industry is not None:
-        manifest["industry"] = patch.industry
+        from app.services.sector_packs import normalize_industry_selection
+
+        manifest["industry"] = normalize_industry_selection(patch.industry) or patch.industry
     if patch.annual_revenue_cr is not None:
         manifest["annual_revenue"] = patch.annual_revenue_cr * 10_000_000  # Cr → rupees
     if patch.deep_research_summary is not None:
@@ -671,8 +810,8 @@ def patch_diagnostic_context(session_id: str, patch: DiagnosticContextPatch) -> 
     write_manifest(session_id, manifest)
     append_audit_event(
         "diagnostic_context_patched",
+        session_id=session_id,
         data={
-            "session_id": session_id,
             "has_deep_research": patch.deep_research_summary is not None,
             "has_diagnostic_result": patch.diagnostic_result is not None,
         },

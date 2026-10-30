@@ -1,0 +1,11 @@
+supplier,description,amount,currency,category,gl_code,spend_date,business_unit,country
+Infosys Finacle,Core banking platform licence & support FY25,2240000000,INR,IT & Core Banking,510010,2024-12-01,Retail Banking,India
+TCS BaNCS,Loan origination & collections platform,1360000000,INR,IT & Core Banking,510010,2024-11-15,Corporate Banking,India
+IBM India,Mainframe & middleware managed services,980000000,INR,IT & Core Banking,510011,2025-01-20,Retail Banking,India
+NCR Corporation India,ATM hardware maintenance & managed services,760000000,INR,ATM & Cash Management,520010,2024-10-10,Retail Banking,India
+CMS Info Systems,Cash replenishment & vault management,640000000,INR,ATM & Cash Management,520011,2024-09-05,Retail Banking,India
+Jones Lang LaSalle,Branch facility management,580000000,INR,Branch Operations,530010,2024-06-20,Retail Banking,India
+KPMG India,Internal audit & regulatory compliance,520000000,INR,Professional Services & Compliance,540010,2024-08-01,Corporate Banking,India
+Ogilvy India,Brand & digital marketing campaigns,680000000,INR,Marketing & Customer Acquisition,550010,2024-07-12,Digital Banking,India
+CRISIL,Credit rating & analytical services,220000000,INR,Professional Services & Compliance,540011,2025-02-01,Corporate Banking,India
+G4S Secure Solutions,Branch security & guarding,480000000,INR,Branch Operations,530011,2025-01-30,Retail Banking,India

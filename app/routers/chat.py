@@ -1,14 +1,18 @@
-from __future__ import annotations
-
+# NOTE: no `from __future__ import annotations` here — slowapi's @limiter.limit
+# wrapper cannot resolve postponed annotations (List[UploadFile] etc.) because
+# FastAPI evaluates them against the wrapper's __globals__, not this module's.
 import asyncio
+import json
 import os
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, AsyncIterator, Dict, List
 
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
+from fastapi.responses import StreamingResponse
 
 from app.config import MAX_UPLOAD_MB
+from app.ratelimit import RATE_LIMIT_LLM, limiter
 from app.opar.hitl.clarification_tool import ClarificationAnswer
 from app.opar.orchestrator import (
     CheckpointAlreadyResumedError,
@@ -22,6 +26,7 @@ from app.routers._shared import (
     session_lock,
     merge_context_into_manifest,
     progress_append,
+    progress_append_thinking,
     progress_complete,
     progress_get,
     progress_init,
@@ -37,12 +42,152 @@ from app.opar.hitl.probe_answers import (
 )
 from app.opar.probe_intelligence import synthesize_probe_answer_acknowledgment
 from app.schemas import ChatRequest, ClarificationResumeRequest, ProbeAnswerRequest, V1ChatRequest
+from app.security.auth import check_session_owner
+from app.services.llm_selection import llm_selection_context
 from app.services.compliance import append_audit_event
 from app.services.ingestion import infer_tabular_schema, parse_document
 
 router = APIRouter()
 
 _OPAR_TIMEOUT_S = int(os.getenv("OPAR_TIMEOUT_SECONDS", "120"))
+
+
+def _progress_callbacks(run_id: str) -> tuple:
+    return (
+        lambda phase, msg: progress_append(run_id, phase, msg),
+        lambda chunk: progress_append_thinking(run_id, chunk),
+    )
+
+
+def _format_sse(event: str, data: Dict[str, Any]) -> str:
+    return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+
+
+def _stream_callbacks(
+    run_id: str,
+    queue: asyncio.Queue[tuple[str, Dict[str, Any]]],
+    loop: asyncio.AbstractEventLoop,
+) -> tuple:
+    def emit(event: str, data: Dict[str, Any]) -> None:
+        loop.call_soon_threadsafe(queue.put_nowait, (event, data))
+
+    def on_progress(phase: str, msg: str) -> None:
+        progress_append(run_id, phase, msg)
+        emit("progress", {"phase": phase, "message": msg})
+
+    def on_thinking(chunk: str) -> None:
+        progress_append_thinking(run_id, chunk)
+        emit("thinking", {"chunk": chunk})
+
+    def on_token(delta: str) -> None:
+        emit("token", {"delta": delta})
+
+    return on_progress, on_thinking, on_token
+
+
+async def _chat_stream_events(
+    payload: V1ChatRequest,
+    request: Request,
+) -> AsyncIterator[str]:
+    validate_session_id(payload.session_id)
+    check_session_owner(request, payload.session_id)
+    if not session_dir(payload.session_id).exists():
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    run_id = payload.run_id or str(uuid.uuid4())
+    progress_init(run_id, payload.session_id)
+    manifest = read_manifest(payload.session_id)
+    if merge_context_into_manifest(
+        manifest,
+        company_name=payload.company_name,
+        industry=payload.industry,
+        annual_revenue=payload.annual_revenue,
+        currency=payload.currency,
+        audience=payload.audience,
+        headcount=payload.headcount,
+    ):
+        write_manifest(payload.session_id, manifest)
+
+    user_id = payload.user_id
+    if not user_id:
+        company = manifest.get("company_name") or "default"
+        user_id = company.lower().replace(" ", "_").replace(".", "_")
+
+    thinking_enabled = payload.thinking_mode == "extended"
+    queue: asyncio.Queue[tuple[str, Dict[str, Any]]] = asyncio.Queue()
+    loop = asyncio.get_running_loop()
+    progress_cb, thinking_cb, token_cb = _stream_callbacks(run_id, queue, loop)
+
+    async def run_opar() -> None:
+        try:
+            with llm_selection_context(payload.llm_model, session_id=payload.session_id):
+                result = await asyncio.wait_for(
+                    run_opar_loop(
+                        payload.message,
+                        payload.session_id,
+                        user_id,
+                        None,
+                        progress_cb,
+                        thinking_cb,
+                        token_callback=token_cb,
+                        thinking_enabled=thinking_enabled,
+                        chat_history=_serialize_chat_history(payload.chat_history),
+                        turn_id=run_id,
+                    ),
+                    timeout=float(_OPAR_TIMEOUT_S),
+                )
+            progress_complete(run_id)
+            append_audit_event(f"opar_chat_stream session_id={payload.session_id}")
+            loop.call_soon_threadsafe(
+                queue.put_nowait,
+                ("done", _opar_response(result, run_id, session_id=payload.session_id)),
+            )
+        except asyncio.TimeoutError:
+            progress_complete(run_id, failed=True, error="timeout")
+            loop.call_soon_threadsafe(
+                queue.put_nowait,
+                (
+                    "error",
+                    {
+                        "error": "analysis_timeout",
+                        "message": f"Timed out after {_OPAR_TIMEOUT_S}s",
+                    },
+                ),
+            )
+        except Exception as exc:
+            progress_complete(run_id, failed=True, error=str(exc))
+            loop.call_soon_threadsafe(
+                queue.put_nowait,
+                ("error", {"error": "opar_failed", "message": str(exc)}),
+            )
+        finally:
+            loop.call_soon_threadsafe(queue.put_nowait, ("_end", {}))
+
+    task = asyncio.create_task(run_opar())
+    yield _format_sse("run_id", {"run_id": run_id})
+    try:
+        while True:
+            event, data = await queue.get()
+            if event == "_end":
+                break
+            yield _format_sse(event, data)
+    finally:
+        await task
+
+
+@router.post("/api/v1/chat/stream")
+@limiter.limit(RATE_LIMIT_LLM)
+async def chat_v1_stream(request: Request, payload: V1ChatRequest) -> StreamingResponse:
+    """SSE stream of OPAR progress, thinking chunks, synthesis tokens, and final payload."""
+    return StreamingResponse(
+        _chat_stream_events(payload, request),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 def _opar_response(result: Any, run_id: str, session_id: str | None = None) -> Dict[str, Any]:
@@ -58,11 +203,14 @@ def _opar_response(result: Any, run_id: str, session_id: str | None = None) -> D
         "response_text": result.response_text,
         "artefacts": result.response_artefacts,
         "advisory_sections": advisory.model_dump() if advisory else {},
+        "presentation": getattr(result, "presentation", None) or {},
         "quality_signals": getattr(result, "quality_signals", {}),
         "used_llm_synthesis": getattr(result, "used_llm_synthesis", False),
         "thinking": getattr(result, "thinking_text", None),
         "degraded_mode": getattr(result, "degraded_mode", False),
         "fallback_reasons": getattr(result, "fallback_reasons", {}),
+        "narrative_provenance_tag": getattr(result, "narrative_provenance_tag", None),
+        "run_delta": getattr(result, "run_delta", None),
         "loop_complete": result.loop_complete,
         "next_loop_trigger": result.next_loop_trigger,
         "progress_steps": getattr(result, "progress_steps", []),
@@ -71,6 +219,8 @@ def _opar_response(result: Any, run_id: str, session_id: str | None = None) -> D
         "run_id": run_id,
         "hitl_required": getattr(result, "hitl_required", False),
         "checkpoint_id": getattr(result, "checkpoint_id", None),
+        "regulatory_events": getattr(result, "regulatory_events", None) or [],
+        "forced_regulatory_decision": getattr(result, "forced_regulatory_decision", False),
         "clarification": (
             result.clarification.model_dump()
             if getattr(result, "clarification", None) is not None
@@ -78,6 +228,10 @@ def _opar_response(result: Any, run_id: str, session_id: str | None = None) -> D
         ),
         "response_metadata": getattr(result, "response_metadata", None) or {},
         "charts": getattr(result, "chart_specs", None) or [],
+        "suggested_outputs": [
+            s.model_dump() if hasattr(s, "model_dump") else s
+            for s in (getattr(result, "suggested_outputs", None) or [])
+        ],
     }
 
 
@@ -100,7 +254,9 @@ def _serialize_chat_history(history: Any) -> list[dict[str, str]] | None:
 
 
 @router.post("/api/v1/chat/with-files")
+@limiter.limit(RATE_LIMIT_LLM)
 async def chat_v1_with_files(
+    request: Request,
     message: str = Form(...),
     session_id: str = Form(...),
     user_id: str | None = Form(None),
@@ -114,6 +270,7 @@ async def chat_v1_with_files(
     files: List[UploadFile] = File(default=[]),
 ) -> Dict[str, Any]:
     validate_session_id(session_id)
+    check_session_owner(request, session_id)
     if not session_dir(session_id).exists():
         raise HTTPException(status_code=404, detail="Session not found")
     run_id = run_id or str(uuid.uuid4())
@@ -203,13 +360,16 @@ async def chat_v1_with_files(
             write_manifest(session_id, manifest)
 
     try:
+        progress_cb, thinking_cb = _progress_callbacks(run_id)
         result = await asyncio.wait_for(
             run_opar_loop(
                 message,
                 session_id,
                 user_id,
                 None,
-                lambda phase, msg: progress_append(run_id, phase, msg),
+                progress_cb,
+                thinking_cb,
+                turn_id=run_id,
             ),
             timeout=float(_OPAR_TIMEOUT_S),
         )
@@ -235,8 +395,10 @@ async def chat_v1_with_files(
 
 
 @router.post("/api/v1/chat")
-async def chat_v1_opar(payload: V1ChatRequest) -> Dict[str, Any]:
+@limiter.limit(RATE_LIMIT_LLM)
+async def chat_v1_opar(request: Request, payload: V1ChatRequest) -> Dict[str, Any]:
     validate_session_id(payload.session_id)
+    check_session_owner(request, payload.session_id)
     if not session_dir(payload.session_id).exists():
         raise HTTPException(status_code=404, detail="Session not found")
     run_id = payload.run_id or str(uuid.uuid4())
@@ -257,19 +419,23 @@ async def chat_v1_opar(payload: V1ChatRequest) -> Dict[str, Any]:
         company = manifest.get("company_name") or "default"
         user_id = company.lower().replace(" ", "_").replace(".", "_")
     thinking_enabled = (payload.thinking_mode == "extended")
+    progress_cb, thinking_cb = _progress_callbacks(run_id)
     try:
-        result = await asyncio.wait_for(
-            run_opar_loop(
-                payload.message,
-                payload.session_id,
-                user_id,
-                None,
-                lambda phase, msg: progress_append(run_id, phase, msg),
-                thinking_enabled=thinking_enabled,
-                chat_history=_serialize_chat_history(payload.chat_history),
-            ),
-            timeout=float(_OPAR_TIMEOUT_S),
-        )
+        with llm_selection_context(payload.llm_model, session_id=payload.session_id):
+            result = await asyncio.wait_for(
+                run_opar_loop(
+                    payload.message,
+                    payload.session_id,
+                    user_id,
+                    None,
+                    progress_cb,
+                    thinking_cb,
+                    thinking_enabled=thinking_enabled,
+                    chat_history=_serialize_chat_history(payload.chat_history),
+                    turn_id=run_id,
+                ),
+                timeout=float(_OPAR_TIMEOUT_S),
+            )
         progress_complete(run_id)
     except asyncio.TimeoutError:
         progress_complete(run_id, failed=True, error="timeout")
@@ -285,7 +451,8 @@ async def chat_v1_opar(payload: V1ChatRequest) -> Dict[str, Any]:
 
 
 @router.post("/api/v1/chat/resume")
-async def chat_v1_resume(payload: ClarificationResumeRequest) -> Dict[str, Any]:
+@limiter.limit(RATE_LIMIT_LLM)
+async def chat_v1_resume(request: Request, payload: ClarificationResumeRequest) -> Dict[str, Any]:
     if not payload.has_answer():
         raise HTTPException(
             status_code=422,
@@ -321,16 +488,21 @@ async def chat_v1_resume(payload: ClarificationResumeRequest) -> Dict[str, Any]:
         selected_option=(payload.selected_option or "").strip() or None,
         free_text=(payload.free_text or "").strip() or None,
     )
+    progress_cb, thinking_cb = _progress_callbacks(run_id)
     try:
-        result = await asyncio.wait_for(
-            resume_opar_loop(
-                payload.checkpoint_id,
-                answer,
-                thinking_enabled=thinking_enabled,
-                chat_history=_serialize_chat_history(payload.chat_history),
-            ),
-            timeout=float(_OPAR_TIMEOUT_S),
-        )
+        with llm_selection_context(payload.llm_model, session_id=session_id):
+            result = await asyncio.wait_for(
+                resume_opar_loop(
+                    payload.checkpoint_id,
+                    answer,
+                    progress_cb,
+                    thinking_cb,
+                    thinking_enabled=thinking_enabled,
+                    chat_history=_serialize_chat_history(payload.chat_history),
+                    turn_id=run_id,
+                ),
+                timeout=float(_OPAR_TIMEOUT_S),
+            )
         progress_complete(run_id)
     except CheckpointNotFoundError:
         raise HTTPException(
@@ -371,8 +543,10 @@ async def chat_v1_resume(payload: ClarificationResumeRequest) -> Dict[str, Any]:
 
 
 @router.post("/api/v1/chat/probe-answer")
-async def chat_v1_probe_answer(payload: ProbeAnswerRequest) -> Dict[str, Any]:
+@limiter.limit(RATE_LIMIT_LLM)
+async def chat_v1_probe_answer(request: Request, payload: ProbeAnswerRequest) -> Dict[str, Any]:
     validate_session_id(payload.session_id)
+    check_session_owner(request, payload.session_id)
     if not session_dir(payload.session_id).exists():
         raise HTTPException(status_code=404, detail="Session not found")
 
@@ -451,8 +625,9 @@ def chat_v1_progress(run_id: str) -> Dict[str, Any]:
 
 
 @router.post("/api/v1/chat/plan")
-def chat_v1_plan_preview(payload: V1ChatRequest) -> Dict[str, Any]:
+def chat_v1_plan_preview(request: Request, payload: V1ChatRequest) -> Dict[str, Any]:
     validate_session_id(payload.session_id)
+    check_session_owner(request, payload.session_id)
     if not session_dir(payload.session_id).exists():
         raise HTTPException(status_code=404, detail="Session not found")
     manifest = read_manifest(payload.session_id)
@@ -475,7 +650,8 @@ def chat_v1_plan_preview(payload: V1ChatRequest) -> Dict[str, Any]:
 
 @router.post("/api/chat/{session_id}")
 @router.post("/api/v1/chat/{session_id}")
-async def chat_with_planner(session_id: str, payload: ChatRequest) -> Dict[str, Any]:
+@limiter.limit(RATE_LIMIT_LLM)
+async def chat_with_planner(request: Request, session_id: str, payload: ChatRequest) -> Dict[str, Any]:
     validate_session_id(session_id)
     if not session_dir(session_id).exists():
         raise HTTPException(status_code=404, detail="Session not found")
@@ -499,6 +675,7 @@ async def chat_with_planner(session_id: str, payload: ChatRequest) -> Dict[str, 
         "asked_question": bool(result.next_loop_trigger),
         "response_text": result.response_text,
         "advisory_sections": advisory.model_dump() if advisory else {},
+        "presentation": getattr(result, "presentation", None) or {},
         "quality_signals": getattr(result, "quality_signals", {}),
         "used_llm_synthesis": getattr(result, "used_llm_synthesis", False),
         "degraded_mode": getattr(result, "degraded_mode", False),

@@ -1,0 +1,65 @@
+gl_code,cost_center,vendor,description,amount,currency,fiscal_period,amount_type,business_unit,geo,legal_entity,source_system,source_record_id,gst_treatment,gstin,lease_treatment,related_party
+510010,CC-CONTRA-001,L&T Construction,L&T Construction services — Contract Labour & Subcontracting,205789420,INR,2023-Q2,actual,Contract,India,NECL-IN,SAP,SAP-AP-100001,itc_eligible,27AABCL4321C1Z8,,no
+510010,CC-CONTRA-001,L&T Construction,L&T Construction services — Contract Labour & Subcontracting,209905208,INR,2023-Q3,actual,Contract,India,NECL-IN,SAP,SAP-AP-100002,itc_eligible,27AABCL4321C1Z8,,no
+510010,CC-CONTRA-001,L&T Construction,L&T Construction services — Contract Labour & Subcontracting,214020996,INR,2023-Q4,actual,Contract,India,NECL-IN,SAP,SAP-AP-100003,itc_eligible,27AABCL4321C1Z8,,no
+510010,CC-CONTRA-001,L&T Construction,L&T Construction services — Contract Labour & Subcontracting,218136785,INR,2024-Q1,actual,Contract,India,NECL-IN,SAP,SAP-AP-100004,itc_eligible,27AABCL4321C1Z8,,no
+510010,CC-CONTRA-001,L&T Construction,L&T Construction services — Contract Labour & Subcontracting,222252573,INR,2024-Q2,actual,Contract,India,NECL-IN,SAP,SAP-AP-100005,itc_eligible,27AABCL4321C1Z8,,no
+510010,CC-CONTRA-001,L&T Construction,L&T Construction services — Contract Labour & Subcontracting,226368362,INR,2024-Q3,actual,Contract,India,NECL-IN,SAP,SAP-AP-100006,itc_eligible,27AABCL4321C1Z8,,no
+510010,CC-CONTRA-001,L&T Construction,L&T Construction services — Contract Labour & Subcontracting,230484150,INR,2024-Q4,actual,Contract,India,NECL-IN,SAP,SAP-AP-100007,itc_eligible,27AABCL4321C1Z8,,no
+510010,CC-CONTRA-001,L&T Construction,L&T Construction services — Contract Labour & Subcontracting,234599938,INR,2025-Q1,actual,Contract,India,NECL-IN,SAP,SAP-AP-100008,itc_eligible,27AABCL4321C1Z8,,no
+520010,CC-MATERI-001,Voltas Ltd,Voltas Ltd services — Materials & Components,171867341,INR,2023-Q2,actual,Materials,India,NECL-IN,SAP,SAP-AP-100009,itc_eligible,27AABCV5431V1Z1,,no
+520010,CC-MATERI-001,Voltas Ltd,Voltas Ltd services — Materials & Components,175304687,INR,2023-Q3,actual,Materials,India,NECL-IN,SAP,SAP-AP-100010,itc_eligible,27AABCV5431V1Z1,,no
+520010,CC-MATERI-001,Voltas Ltd,Voltas Ltd services — Materials & Components,178742034,INR,2023-Q4,actual,Materials,India,NECL-IN,SAP,SAP-AP-100011,itc_eligible,27AABCV5431V1Z1,,no
+520010,CC-MATERI-001,Voltas Ltd,Voltas Ltd services — Materials & Components,182179381,INR,2024-Q1,actual,Materials,India,NECL-IN,SAP,SAP-AP-100012,itc_eligible,27AABCV5431V1Z1,,no
+520010,CC-MATERI-001,Voltas Ltd,Voltas Ltd services — Materials & Components,185616728,INR,2024-Q2,actual,Materials,India,NECL-IN,SAP,SAP-AP-100013,itc_eligible,27AABCV5431V1Z1,,no
+520010,CC-MATERI-001,Voltas Ltd,Voltas Ltd services — Materials & Components,189054075,INR,2024-Q3,actual,Materials,India,NECL-IN,SAP,SAP-AP-100014,itc_eligible,27AABCV5431V1Z1,,no
+520010,CC-MATERI-001,Voltas Ltd,Voltas Ltd services — Materials & Components,192491421,INR,2024-Q4,actual,Materials,India,NECL-IN,SAP,SAP-AP-100015,itc_eligible,27AABCV5431V1Z1,,no
+520010,CC-MATERI-001,Voltas Ltd,Voltas Ltd services — Materials & Components,195928768,INR,2025-Q1,actual,Materials,India,NECL-IN,SAP,SAP-AP-100016,itc_eligible,27AABCV5431V1Z1,,no
+520010,CC-MATERI-001,BHEL Forge,BHEL Forge services — Materials & Components,175314569,INR,2023-Q2,actual,Materials,India,NECL-IN,SAP,SAP-AP-100017,itc_eligible,27AABCB6541F1Z4,,no
+520010,CC-MATERI-001,BHEL Forge,BHEL Forge services — Materials & Components,178820860,INR,2023-Q3,actual,Materials,India,NECL-IN,SAP,SAP-AP-100018,itc_eligible,27AABCB6541F1Z4,,no
+520010,CC-MATERI-001,BHEL Forge,BHEL Forge services — Materials & Components,182327151,INR,2023-Q4,actual,Materials,India,NECL-IN,SAP,SAP-AP-100019,itc_eligible,27AABCB6541F1Z4,,no
+520010,CC-MATERI-001,BHEL Forge,BHEL Forge services — Materials & Components,185833443,INR,2024-Q1,actual,Materials,India,NECL-IN,SAP,SAP-AP-100020,itc_eligible,27AABCB6541F1Z4,,no
+520010,CC-MATERI-001,BHEL Forge,BHEL Forge services — Materials & Components,189339734,INR,2024-Q2,actual,Materials,India,NECL-IN,SAP,SAP-AP-100021,itc_eligible,27AABCB6541F1Z4,,no
+520010,CC-MATERI-001,BHEL Forge,BHEL Forge services — Materials & Components,192846025,INR,2024-Q3,actual,Materials,India,NECL-IN,SAP,SAP-AP-100022,itc_eligible,27AABCB6541F1Z4,,no
+520010,CC-MATERI-001,BHEL Forge,BHEL Forge services — Materials & Components,196352317,INR,2024-Q4,actual,Materials,India,NECL-IN,SAP,SAP-AP-100023,itc_eligible,27AABCB6541F1Z4,,no
+520010,CC-MATERI-001,BHEL Forge,BHEL Forge services — Materials & Components,199858608,INR,2025-Q1,actual,Materials,India,NECL-IN,SAP,SAP-AP-100024,itc_eligible,27AABCB6541F1Z4,,no
+520010,CC-MATERI-001,Steel Authority of India,Steel Authority of India services — Materials & Components,266407724,INR,2023-Q2,actual,Materials,India,NECL-IN,SAP,SAP-AP-100025,itc_eligible,27AABCS7651S1Z7,,no
+520010,CC-MATERI-001,Steel Authority of India,Steel Authority of India services — Materials & Components,271735878,INR,2023-Q3,actual,Materials,India,NECL-IN,SAP,SAP-AP-100026,itc_eligible,27AABCS7651S1Z7,,no
+520010,CC-MATERI-001,Steel Authority of India,Steel Authority of India services — Materials & Components,277064032,INR,2023-Q4,actual,Materials,India,NECL-IN,SAP,SAP-AP-100027,itc_eligible,27AABCS7651S1Z7,,no
+520010,CC-MATERI-001,Steel Authority of India,Steel Authority of India services — Materials & Components,282392187,INR,2024-Q1,actual,Materials,India,NECL-IN,SAP,SAP-AP-100028,itc_eligible,27AABCS7651S1Z7,,no
+520010,CC-MATERI-001,Steel Authority of India,Steel Authority of India services — Materials & Components,287720341,INR,2024-Q2,actual,Materials,India,NECL-IN,SAP,SAP-AP-100029,itc_eligible,27AABCS7651S1Z7,,no
+520010,CC-MATERI-001,Steel Authority of India,Steel Authority of India services — Materials & Components,293048496,INR,2024-Q3,actual,Materials,India,NECL-IN,SAP,SAP-AP-100030,itc_eligible,27AABCS7651S1Z7,,no
+520010,CC-MATERI-001,Steel Authority of India,Steel Authority of India services — Materials & Components,298376650,INR,2024-Q4,actual,Materials,India,NECL-IN,SAP,SAP-AP-100031,itc_eligible,27AABCS7651S1Z7,,no
+520010,CC-MATERI-001,Steel Authority of India,Steel Authority of India services — Materials & Components,303704805,INR,2025-Q1,actual,Materials,India,NECL-IN,SAP,SAP-AP-100032,itc_eligible,27AABCS7651S1Z7,,no
+510010,CC-CONTRA-001,MSME Fabricators Consortium,MSME Fabricators Consortium services — Contract Labour & Subcontracting,369775776,INR,2023-Q2,actual,Contract,India,NECL-IN,SAP,SAP-AP-100033,itc_eligible,27AABCM8761F1Z0,,no
+510010,CC-CONTRA-001,MSME Fabricators Consortium,MSME Fabricators Consortium services — Contract Labour & Subcontracting,377171291,INR,2023-Q3,actual,Contract,India,NECL-IN,SAP,SAP-AP-100034,itc_eligible,27AABCM8761F1Z0,,no
+510010,CC-CONTRA-001,MSME Fabricators Consortium,MSME Fabricators Consortium services — Contract Labour & Subcontracting,384566807,INR,2023-Q4,actual,Contract,India,NECL-IN,SAP,SAP-AP-100035,itc_eligible,27AABCM8761F1Z0,,no
+510010,CC-CONTRA-001,MSME Fabricators Consortium,MSME Fabricators Consortium services — Contract Labour & Subcontracting,391962322,INR,2024-Q1,actual,Contract,India,NECL-IN,SAP,SAP-AP-100036,itc_eligible,27AABCM8761F1Z0,,no
+510010,CC-CONTRA-001,MSME Fabricators Consortium,MSME Fabricators Consortium services — Contract Labour & Subcontracting,399357838,INR,2024-Q2,actual,Contract,India,NECL-IN,SAP,SAP-AP-100037,itc_eligible,27AABCM8761F1Z0,,no
+510010,CC-CONTRA-001,MSME Fabricators Consortium,MSME Fabricators Consortium services — Contract Labour & Subcontracting,406753353,INR,2024-Q3,actual,Contract,India,NECL-IN,SAP,SAP-AP-100038,itc_eligible,27AABCM8761F1Z0,,no
+510010,CC-CONTRA-001,MSME Fabricators Consortium,MSME Fabricators Consortium services — Contract Labour & Subcontracting,414148869,INR,2024-Q4,actual,Contract,India,NECL-IN,SAP,SAP-AP-100039,itc_eligible,27AABCM8761F1Z0,,no
+510010,CC-CONTRA-001,MSME Fabricators Consortium,MSME Fabricators Consortium services — Contract Labour & Subcontracting,421544384,INR,2025-Q1,actual,Contract,India,NECL-IN,SAP,SAP-AP-100040,itc_eligible,27AABCM8761F1Z0,,no
+530010,CC-MAINTE-001,ABB India,ABB India services — Maintenance & Repair,172526876,INR,2023-Q2,actual,Maintenance,India,NECL-IN,SAP,SAP-AP-100041,itc_eligible,27AABCA4321B1Z7,,no
+530010,CC-MAINTE-001,ABB India,ABB India services — Maintenance & Repair,175977413,INR,2023-Q3,actual,Maintenance,India,NECL-IN,SAP,SAP-AP-100042,itc_eligible,27AABCA4321B1Z7,,no
+530010,CC-MAINTE-001,ABB India,ABB India services — Maintenance & Repair,179427951,INR,2023-Q4,actual,Maintenance,India,NECL-IN,SAP,SAP-AP-100043,itc_eligible,27AABCA4321B1Z7,,no
+530010,CC-MAINTE-001,ABB India,ABB India services — Maintenance & Repair,182878488,INR,2024-Q1,actual,Maintenance,India,NECL-IN,SAP,SAP-AP-100044,itc_eligible,27AABCA4321B1Z7,,no
+530010,CC-MAINTE-001,ABB India,ABB India services — Maintenance & Repair,186329026,INR,2024-Q2,actual,Maintenance,India,NECL-IN,SAP,SAP-AP-100045,itc_eligible,27AABCA4321B1Z7,,no
+530010,CC-MAINTE-001,ABB India,ABB India services — Maintenance & Repair,189779563,INR,2024-Q3,actual,Maintenance,India,NECL-IN,SAP,SAP-AP-100046,itc_eligible,27AABCA4321B1Z7,,no
+530010,CC-MAINTE-001,ABB India,ABB India services — Maintenance & Repair,193230101,INR,2024-Q4,actual,Maintenance,India,NECL-IN,SAP,SAP-AP-100047,itc_eligible,27AABCA4321B1Z7,,no
+530010,CC-MAINTE-001,ABB India,ABB India services — Maintenance & Repair,196680638,INR,2025-Q1,actual,Maintenance,India,NECL-IN,SAP,SAP-AP-100048,itc_eligible,27AABCA4321B1Z7,,no
+540010,CC-ENERGY-001,NTPC Power Supply,NTPC Power Supply services — Energy & Utilities,350189362,INR,2023-Q2,actual,Energy,India,NECL-IN,SAP,SAP-AP-100049,itc_eligible,27AABCN9871P1Z3,,no
+540010,CC-ENERGY-001,NTPC Power Supply,NTPC Power Supply services — Energy & Utilities,357193149,INR,2023-Q3,actual,Energy,India,NECL-IN,SAP,SAP-AP-100050,itc_eligible,27AABCN9871P1Z3,,no
+540010,CC-ENERGY-001,NTPC Power Supply,NTPC Power Supply services — Energy & Utilities,364196936,INR,2023-Q4,actual,Energy,India,NECL-IN,SAP,SAP-AP-100051,itc_eligible,27AABCN9871P1Z3,,no
+540010,CC-ENERGY-001,NTPC Power Supply,NTPC Power Supply services — Energy & Utilities,371200723,INR,2024-Q1,actual,Energy,India,NECL-IN,SAP,SAP-AP-100052,itc_eligible,27AABCN9871P1Z3,,no
+540010,CC-ENERGY-001,NTPC Power Supply,NTPC Power Supply services — Energy & Utilities,378204510,INR,2024-Q2,actual,Energy,India,NECL-IN,SAP,SAP-AP-100053,itc_eligible,27AABCN9871P1Z3,,no
+540010,CC-ENERGY-001,NTPC Power Supply,NTPC Power Supply services — Energy & Utilities,385208298,INR,2024-Q3,actual,Energy,India,NECL-IN,SAP,SAP-AP-100054,itc_eligible,27AABCN9871P1Z3,,no
+540010,CC-ENERGY-001,NTPC Power Supply,NTPC Power Supply services — Energy & Utilities,392212085,INR,2024-Q4,actual,Energy,India,NECL-IN,SAP,SAP-AP-100055,itc_eligible,27AABCN9871P1Z3,,no
+540010,CC-ENERGY-001,NTPC Power Supply,NTPC Power Supply services — Energy & Utilities,399215872,INR,2025-Q1,actual,Energy,India,NECL-IN,SAP,SAP-AP-100056,itc_eligible,27AABCN9871P1Z3,,no
+550010,CC-ADMINI-001,KPMG India,KPMG India services — Administrative & Corporate,398768199,INR,2023-Q2,actual,Administrative,India,NECL-IN,SAP,SAP-AP-100057,itc_eligible,29AABCK3201F1Z9,,no
+550010,CC-ADMINI-001,KPMG India,KPMG India services — Administrative & Corporate,406743562,INR,2023-Q3,actual,Administrative,India,NECL-IN,SAP,SAP-AP-100058,itc_eligible,29AABCK3201F1Z9,,no
+550010,CC-ADMINI-001,KPMG India,KPMG India services — Administrative & Corporate,414718926,INR,2023-Q4,actual,Administrative,India,NECL-IN,SAP,SAP-AP-100059,itc_eligible,29AABCK3201F1Z9,,no
+550010,CC-ADMINI-001,KPMG India,KPMG India services — Administrative & Corporate,422694290,INR,2024-Q1,actual,Administrative,India,NECL-IN,SAP,SAP-AP-100060,itc_eligible,29AABCK3201F1Z9,,no
+550010,CC-ADMINI-001,KPMG India,KPMG India services — Administrative & Corporate,430669654,INR,2024-Q2,actual,Administrative,India,NECL-IN,SAP,SAP-AP-100061,itc_eligible,29AABCK3201F1Z9,,no
+550010,CC-ADMINI-001,KPMG India,KPMG India services — Administrative & Corporate,438645018,INR,2024-Q3,actual,Administrative,India,NECL-IN,SAP,SAP-AP-100062,itc_eligible,29AABCK3201F1Z9,,no
+550010,CC-ADMINI-001,KPMG India,KPMG India services — Administrative & Corporate,446620382,INR,2024-Q4,actual,Administrative,India,NECL-IN,SAP,SAP-AP-100063,itc_eligible,29AABCK3201F1Z9,,no
+550010,CC-ADMINI-001,KPMG India,KPMG India services — Administrative & Corporate,454595746,INR,2025-Q1,actual,Administrative,India,NECL-IN,SAP,SAP-AP-100064,itc_eligible,29AABCK3201F1Z9,,no

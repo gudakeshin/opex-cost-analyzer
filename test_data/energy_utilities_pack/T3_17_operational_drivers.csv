@@ -1,0 +1,7 @@
+metric,business_unit,value,unit
+Plant load factor,Generation Thermal,72.4,percent
+Plant load factor,Generation Renewable,28.6,percent
+Transmission losses,Transmission,3.8,percent
+Distribution losses,Distribution,14.2,percent
+O&M cost per MW INR Lakhs,Generation Thermal,18.4,INR_lakhs
+SCADA uptime,IT & SCADA Systems,99.6,percent

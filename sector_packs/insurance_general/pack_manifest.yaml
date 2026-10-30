@@ -1,9 +1,13 @@
 pack_id: insurance_general
 sector: Insurance — General & Life (India)
-version: "0.1"
+version: "1.0"
 schema_version: "1"
-status: scaffold
-description: Scaffold pack for Indian general and life insurers. Full content deferred.
+status: full
+description: >
+  Full sector pack for Indian general, life, and health insurers and
+  reinsurers. Covers acquisition cost and EoM caps, claims and TPA operations,
+  reinsurance structures, actuarial and IRDAI compliance, and core-system
+  modernisation cost structures.
 applicable_entity_types: [general_insurer, life_insurer, health_insurer, reinsurer]
 regulatory_bodies: [IRDAI, SEBI, RBI]
 fiscal_year_end: "March 31"

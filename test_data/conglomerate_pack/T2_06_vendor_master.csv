@@ -1,0 +1,11 @@
+vendor,vendor_category,gstin,vendor_pan,msme_flag,spend_category,legal_entity,related_party
+SAP India,large,29AABCS6891K1Z2,AABCS6891K,no,Corporate IT & Shared Services,BVGL-IN,no
+Deloitte India,large,29AABCD4821F1Z5,AABCD4821F,no,Legal & Professional Services,BVGL-IN,no
+JLL India,large,27AABCJ3215P1Z8,AABCJ3215P,no,Corporate Real Estate,BVGL-IN,no
+New India Assurance,large,27AABCN1234A1Z1,AABCN1234A,no,Group Insurance & Risk,BVGL-IN,no
+Aon Hewitt India,large,27AABCA2109H1Z4,AABCA2109H,no,HR & Talent Corporate,BVGL-IN,no
+Salesforce India,large,,,no,Corporate IT & Shared Services,BVGL-SG,no
+PricewaterhouseCoopers,large,,,no,Legal & Professional Services,BVGL-SG,no
+Taj Hotels,large,27AABCT9923H1Z0,AABCT9923H,no,Travel & Entertainment,BVGL-IN,no
+Bharti Airtel,large,29AABCB3211A1Z3,AABCB3211A,no,Corporate IT & Shared Services,BVGL-IN,no
+Lemon Yellow,msme,27AABCL4432Y1Z7,AABCL4432Y,yes,Marketing & Communications,BVGL-IN,no

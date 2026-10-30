@@ -1,0 +1,11 @@
+{
+  "company": "Bharat Bazaar Retail Ltd",
+  "sector": "retail_organized",
+  "wacc": 0.14,
+  "effective_tax_rate": 0.2517,
+  "reporting_currency": "INR",
+  "annual_revenue_inr_cr": 42000,
+  "discount_rate": 0.14,
+  "execution_rate_pct": 70,
+  "notes": "WACC and tax rate per FY25 board pack for Bharat Bazaar Retail Ltd."
+}

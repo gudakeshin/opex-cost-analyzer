@@ -1,0 +1,7 @@
+plant,division,state,energy_consumption_mu,energy_cost_inr_cr,energy_cost_per_unit_inr,renewable_pct,oee_pct
+Pune Auto Plant,Auto Components,Maharashtra,184,82,4.46,35,74.2
+Nashik Casting Plant,Auto Components,Maharashtra,142,62,4.37,42,71.8
+Ahmedabad Chemicals,Specialty Chemicals,Gujarat,218,94,4.31,28,68.4
+Coimbatore Capital Goods,Capital Goods,Tamil Nadu,96,41,4.27,38,76.4
+Pune Consumer Durables,Consumer Durables,Maharashtra,68,30,4.41,45,78.2
+Hyderabad Engineering,Engineering Services,Telangana,48,21,4.38,32,72.8

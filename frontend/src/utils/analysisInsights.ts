@@ -182,6 +182,20 @@ function ingestionNoteFromManifest(manifest: SessionManifest | null | undefined)
   return `Ingested ${parts.join(', ')}${confPct}.${mappingNote}`;
 }
 
+function ingestionWarningsFromManifest(manifest: SessionManifest | null | undefined): string[] {
+  const report = manifest?.ingestion_report;
+  if (!report) return [];
+  const reports = report.files && report.files.length > 0 ? report.files : [report];
+  const out: string[] = [];
+  for (const r of reports) {
+    for (const w of r.warnings ?? []) {
+      const text = String(w).trim();
+      if (text && !out.includes(text)) out.push(text);
+    }
+  }
+  return out;
+}
+
 export function extractInsightSnapshot(
   session: SessionResponse | null,
   manifest?: SessionManifest | null,
@@ -229,6 +243,15 @@ export function extractInsightSnapshot(
   const oppCount = initiativesArr.filter(
     (i) => Number(asRecord(i.net_savings)?.total_3yr ?? 0) > 0,
   ).length;
+  const savingsSummary = asRecord(savingsModel?.summary);
+  const expectedNet = Number(savingsSummary?.total_expected_net_3yr ?? 0);
+  const fullNet = Number(savingsSummary?.total_net_3yr_full_delivery ?? 0);
+  const p10Net = Number(savingsSummary?.total_p10_net_3yr ?? 0);
+  const p90Net = Number(savingsSummary?.total_p90_net_3yr ?? 0);
+  const peerOut = asRecord(skillOutputs['peer-benchmarker']);
+  const benchWarnings = Array.isArray(peerOut?.warnings)
+    ? (peerOut!.warnings as unknown[]).map(String).filter(Boolean)
+    : [];
 
   const chartData = extractChartData(spendProfiler);
   const smeData = smeQualificationFromOutputs(skillOutputs);
@@ -275,6 +298,17 @@ export function extractInsightSnapshot(
     modelled_savings: midRaw > 0 ? formatSpendAmount(midRaw, reportingCurrency) : undefined,
     modelled_savings_raw: midRaw > 0 ? midRaw : undefined,
     savings_opportunity_count: oppCount > 0 ? oppCount : undefined,
+    expected_net_3yr: expectedNet > 0 ? expectedNet : undefined,
+    full_delivery_net_3yr: fullNet > 0 ? fullNet : undefined,
+    expected_net_p10_3yr: p10Net > 0 ? p10Net : undefined,
+    expected_net_p90_3yr: p90Net > 0 ? p90Net : undefined,
+    benchmarks_illustrative:
+      asRecord(peerOut?.benchmark_metadata)?.is_illustrative === true ? true : undefined,
+    benchmark_warnings: benchWarnings.length > 0 ? benchWarnings : undefined,
+    ingestion_warnings: (() => {
+      const w = ingestionWarningsFromManifest(manifest);
+      return w.length > 0 ? w : undefined;
+    })(),
     ingestion_note: ingestionNoteFromManifest(manifest ?? null),
     chart_data: chartData ?? undefined,
     sme_qualification: smeData.summary ?? undefined,
@@ -480,7 +514,9 @@ export function filterProbeNextOptions(
   if (!hasUnansweredProbeQuestions(snapshot, answered)) return options;
   const unanswered = collectUnansweredProbeQuestions(snapshot, answered, 5);
   const probeMessages = new Set(unanswered.map((p) => p.question));
-  const filtered = options.filter((opt) => !probeMessages.has(opt.message));
+  const filtered = options.filter(
+    (opt) => !probeMessages.has(opt.message) && opt.message !== PROBE_MODAL_TRIGGER,
+  );
   const remaining = unanswered.length;
   return [
     {
@@ -839,6 +875,8 @@ export interface AnomalyFlag {
   actual_pct_of_revenue: number;
   heuristic_target_pct: number;
   estimated_saving_amount: number;
+  severity: 'high' | 'medium' | 'low';
+  deviation_ratio: number;
 }
 
 export interface PeerGapDetail {
@@ -848,6 +886,8 @@ export interface PeerGapDetail {
   actual_pct_of_revenue: number;
   benchmark_target_pct: number;
   estimated_saving_amount: number;
+  benchmark_vintage?: string;
+  benchmark_sample_n?: number;
 }
 
 export function extractTopSavingsInitiatives(
@@ -894,13 +934,32 @@ export function anomalyRecommendation(flag: {
   category_name: string;
   actual_pct_of_revenue: number;
   heuristic_target_pct: number;
-}): string {
+  estimated_saving_amount?: number;
+}, currency = 'INR'): string {
+  const saving =
+    flag.estimated_saving_amount != null && flag.estimated_saving_amount > 0
+      ? ` Estimated opportunity: ${formatSpendAmount(flag.estimated_saving_amount, currency)} if brought to norm.`
+      : '';
   return (
     `Spend in ${flag.category_name} is ${flag.actual_pct_of_revenue.toFixed(1)}% of revenue ` +
     `vs heuristic norm ${flag.heuristic_target_pct.toFixed(1)}%. ` +
-    'Review classification accuracy, demand drivers, and whether rate or volume reduction applies.'
+    'Review classification accuracy, demand drivers, and whether rate or volume reduction applies.' +
+    saving
   );
 }
+
+function anomalySeverity(actual: number, target: number): { severity: AnomalyFlag['severity']; ratio: number } {
+  const ratio = target > 0 ? actual / target : actual > 0 ? 2 : 1;
+  if (ratio >= 2) return { severity: 'high', ratio };
+  if (ratio >= 1.5) return { severity: 'medium', ratio };
+  return { severity: 'low', ratio };
+}
+
+const ANOMALY_SEVERITY_RANK: Record<AnomalyFlag['severity'], number> = {
+  high: 3,
+  medium: 2,
+  low: 1,
+};
 
 export function extractAnomalyFlags(
   skillOutputs: Record<string, unknown> | undefined,
@@ -910,14 +969,26 @@ export function extractAnomalyFlags(
   const ha = asRecord(skillOutputs['heuristic-analyzer']);
   return (Array.isArray(ha?.heuristic_findings) ? (ha!.heuristic_findings as Array<Record<string, unknown>>) : [])
     .filter((f) => Number(f.estimated_saving_amount ?? 0) > 0)
-    .slice(0, topN)
-    .map((f) => ({
-      category_id: String(f.category_id ?? ''),
-      category_name: String(f.category_name ?? f.category_id ?? 'Unknown'),
-      actual_pct_of_revenue: Number(f.actual_pct_of_revenue ?? 0),
-      heuristic_target_pct: Number(f.heuristic_target_pct ?? 0),
-      estimated_saving_amount: Number(f.estimated_saving_amount ?? 0),
-    }));
+    .map((f) => {
+      const actual = Number(f.actual_pct_of_revenue ?? 0);
+      const target = Number(f.heuristic_target_pct ?? 0);
+      const { severity, ratio } = anomalySeverity(actual, target);
+      return {
+        category_id: String(f.category_id ?? ''),
+        category_name: String(f.category_name ?? f.category_id ?? 'Unknown'),
+        actual_pct_of_revenue: actual,
+        heuristic_target_pct: target,
+        estimated_saving_amount: Number(f.estimated_saving_amount ?? 0),
+        severity,
+        deviation_ratio: ratio,
+      };
+    })
+    .sort((a, b) => {
+      const bySeverity = ANOMALY_SEVERITY_RANK[b.severity] - ANOMALY_SEVERITY_RANK[a.severity];
+      if (bySeverity !== 0) return bySeverity;
+      return b.estimated_saving_amount - a.estimated_saving_amount;
+    })
+    .slice(0, topN);
 }
 
 export function extractPeerGapDetails(
@@ -926,6 +997,8 @@ export function extractPeerGapDetails(
 ): PeerGapDetail[] {
   if (!skillOutputs) return [];
   const pb = asRecord(skillOutputs['peer-benchmarker']);
+  const dataset = asRecord(pb?.benchmark_dataset) ?? asRecord(pb?.benchmark_metadata);
+  const vintage = String(dataset?.vintage_date ?? dataset?.vintage ?? '');
   return (Array.isArray(pb?.comparisons) ? (pb!.comparisons as Array<Record<string, unknown>>) : [])
     .filter((c) => { const b = String(c.percentile_band ?? ''); return b.includes('P75') || b.includes('P90'); })
     .sort((a, b) => Number(b.estimated_saving_amount ?? 0) - Number(a.estimated_saving_amount ?? 0))
@@ -935,7 +1008,9 @@ export function extractPeerGapDetails(
       category_name: String(c.category_name ?? c.category_id ?? 'Unknown'),
       percentile_band: String(c.percentile_band ?? ''),
       actual_pct_of_revenue: Number(c.actual_pct_of_revenue ?? 0),
-      benchmark_target_pct: Number(c.benchmark_target_pct ?? 0),
+      benchmark_target_pct: Number(c.benchmark_target_pct ?? c.benchmark_p50_pct ?? 0),
       estimated_saving_amount: Number(c.estimated_saving_amount ?? 0),
+      benchmark_vintage: vintage || undefined,
+      benchmark_sample_n: Number(c.benchmark_sample_n ?? dataset?.sample_n ?? 0) || undefined,
     }));
 }

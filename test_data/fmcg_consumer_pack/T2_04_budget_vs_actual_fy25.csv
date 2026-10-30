@@ -1,0 +1,97 @@
+category,fiscal_period,amount_type,amount,currency
+Marketing & Advertising,2024-01,budget,564044711,INR
+Marketing & Advertising,2024-01,actual,637370523,INR
+Marketing & Advertising,2024-02,budget,566850904,INR
+Marketing & Advertising,2024-02,actual,612198976,INR
+Marketing & Advertising,2024-03,budget,569657096,INR
+Marketing & Advertising,2024-03,actual,609533092,INR
+Marketing & Advertising,2024-04,budget,572463289,INR
+Marketing & Advertising,2024-04,actual,612535719,INR
+Marketing & Advertising,2024-05,budget,575269481,INR
+Marketing & Advertising,2024-05,actual,627043734,INR
+Marketing & Advertising,2024-06,budget,578075674,INR
+Marketing & Advertising,2024-06,actual,647444754,INR
+Marketing & Advertising,2024-07,budget,580881867,INR
+Marketing & Advertising,2024-07,actual,604117141,INR
+Marketing & Advertising,2024-08,budget,583688059,INR
+Marketing & Advertising,2024-08,actual,659567506,INR
+Marketing & Advertising,2024-09,budget,586494252,INR
+Marketing & Advertising,2024-09,actual,563034481,INR
+Marketing & Advertising,2024-10,budget,589300444,INR
+Marketing & Advertising,2024-10,actual,559835421,INR
+Marketing & Advertising,2024-11,budget,592106637,INR
+Marketing & Advertising,2024-11,actual,663159433,INR
+Marketing & Advertising,2024-12,budget,594912830,INR
+Marketing & Advertising,2024-12,actual,583014573,INR
+Logistics & Distribution,2024-01,budget,701751660,INR
+Logistics & Distribution,2024-01,actual,680699110,INR
+Logistics & Distribution,2024-02,budget,705242962,INR
+Logistics & Distribution,2024-02,actual,761662398,INR
+Logistics & Distribution,2024-03,budget,708734264,INR
+Logistics & Distribution,2024-03,actual,765433005,INR
+Logistics & Distribution,2024-04,budget,712225566,INR
+Logistics & Distribution,2024-04,actual,776325866,INR
+Logistics & Distribution,2024-05,budget,715716867,INR
+Logistics & Distribution,2024-05,actual,708559698,INR
+Logistics & Distribution,2024-06,budget,719208169,INR
+Logistics & Distribution,2024-06,actual,726400250,INR
+Logistics & Distribution,2024-07,budget,722699471,INR
+Logistics & Distribution,2024-07,actual,751607449,INR
+Logistics & Distribution,2024-08,budget,726190773,INR
+Logistics & Distribution,2024-08,actual,777024127,INR
+Logistics & Distribution,2024-09,budget,729682075,INR
+Logistics & Distribution,2024-09,actual,736978895,INR
+Logistics & Distribution,2024-10,budget,733173376,INR
+Logistics & Distribution,2024-10,actual,733173376,INR
+Logistics & Distribution,2024-11,budget,736664678,INR
+Logistics & Distribution,2024-11,actual,766131265,INR
+Logistics & Distribution,2024-12,budget,740155980,INR
+Logistics & Distribution,2024-12,actual,703148181,INR
+Contract Manufacturing,2024-01,budget,892521949,INR
+Contract Manufacturing,2024-01,actual,910372387,INR
+Contract Manufacturing,2024-02,budget,896962357,INR
+Contract Manufacturing,2024-02,actual,923871227,INR
+Contract Manufacturing,2024-03,budget,901402765,INR
+Contract Manufacturing,2024-03,actual,1009571096,INR
+Contract Manufacturing,2024-04,budget,905843172,INR
+Contract Manufacturing,2024-04,actual,869609445,INR
+Contract Manufacturing,2024-05,budget,910283580,INR
+Contract Manufacturing,2024-05,actual,974003430,INR
+Contract Manufacturing,2024-06,budget,914723988,INR
+Contract Manufacturing,2024-06,actual,923871227,INR
+Contract Manufacturing,2024-07,budget,919164395,INR
+Contract Manufacturing,2024-07,actual,955930970,INR
+Contract Manufacturing,2024-08,budget,923604803,INR
+Contract Manufacturing,2024-08,actual,1034437379,INR
+Contract Manufacturing,2024-09,budget,928045211,INR
+Contract Manufacturing,2024-09,actual,1011569279,INR
+Contract Manufacturing,2024-10,budget,932485619,INR
+Contract Manufacturing,2024-10,actual,969785043,INR
+Contract Manufacturing,2024-11,budget,936926026,INR
+Contract Manufacturing,2024-11,actual,1002510847,INR
+Contract Manufacturing,2024-12,budget,941366434,INR
+Contract Manufacturing,2024-12,actual,1044916741,INR
+Sales Force & Field,2024-01,budget,934947958,INR
+Sales Force & Field,2024-01,actual,897550039,INR
+Sales Force & Field,2024-02,budget,939599440,INR
+Sales Force & Field,2024-02,actual,1005371400,INR
+Sales Force & Field,2024-03,budget,944250923,INR
+Sales Force & Field,2024-03,actual,1038676015,INR
+Sales Force & Field,2024-04,budget,948902405,INR
+Sales Force & Field,2024-04,actual,920435332,INR
+Sales Force & Field,2024-05,budget,953553887,INR
+Sales Force & Field,2024-05,actual,1010767120,INR
+Sales Force & Field,2024-06,budget,958205370,INR
+Sales Force & Field,2024-06,actual,910295101,INR
+Sales Force & Field,2024-07,budget,962856852,INR
+Sales Force & Field,2024-07,actual,933971146,INR
+Sales Force & Field,2024-08,budget,967508335,INR
+Sales Force & Field,2024-08,actual,1054584085,INR
+Sales Force & Field,2024-09,budget,972159817,INR
+Sales Force & Field,2024-09,actual,1069375798,INR
+Sales Force & Field,2024-10,budget,976811299,INR
+Sales Force & Field,2024-10,actual,976811299,INR
+Sales Force & Field,2024-11,budget,981462782,INR
+Sales Force & Field,2024-11,actual,981462782,INR
+Sales Force & Field,2024-12,budget,986114264,INR
+Sales Force & Field,2024-12,actual,1005836549,INR

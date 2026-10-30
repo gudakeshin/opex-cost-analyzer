@@ -1,0 +1,13 @@
+FY23 — Project TowerGreen
+- Solar/hybrid energy at 8000 tower sites (diesel displacement): ~62 Cr saved on energy. STATUS: in baseline.
+- Managed services renegotiation (Ericsson): ~28 Cr run-rate saved.
+
+FY24 — Project NetEfficiency
+- RAN sharing agreement (passive sharing with Indus Towers): planned 42 Cr, realised 38 Cr.
+- BSS/OSS platform consolidation (Amdocs): planned 28 Cr, realised 32 Cr (exceeded via licence optimisation).
+- Roaming settlement optimisation: planned 18 Cr, realised 14 Cr (settlement disputes delayed benefit).
+- STATUS: complete; in FY25 baseline.
+
+In-flight FY25
+- 5G RAN managed services efficiency (AI-RAN): ~38 Cr targeted, ~8 Cr booked YTD.
+- Cloud migration (AWS): ~22 Cr targeted, mid-execution.

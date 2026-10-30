@@ -1,0 +1,7 @@
+molecule_class,market,api_source,api_cost_inr_cr,regulatory_status,filing_count,lead_time_months,cost_per_kg_inr
+Cardiovascular,India,Domestic India,142,CDSCO approved,12,3,8400
+Anti-infective,India,Domestic India,98,CDSCO approved,18,3,6200
+Oncology,US Export,Domestic India,184,USFDA approved,8,18,42000
+CNS,US Export,Domestic India,126,USFDA approved,6,18,38000
+Respiratory,EU Export,Domestic India,88,EMA approved,4,14,28000
+Diabetes,India + Export,Dual source,162,Multi-regulator,14,6,12400

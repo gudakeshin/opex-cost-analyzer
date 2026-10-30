@@ -33,7 +33,7 @@ export const ConfidenceBadge: React.FC<ConfidenceBadgeProps> = ({ signals, aqs, 
 
   return (
     <span
-      className={`inline-flex items-center text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded border ${tone}`}
+      className={`inline-flex items-center text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded border ${tone}`}
       title={
         grounding != null
           ? `Grounding coverage: ${Math.round(grounding * 100)}%`

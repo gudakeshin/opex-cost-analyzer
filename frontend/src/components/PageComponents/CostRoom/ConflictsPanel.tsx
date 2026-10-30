@@ -1,11 +1,8 @@
 import React from 'react';
-import { Button } from '../../Common/Button';
-import { Card } from '../../Common/Card';
 import { Loader } from '../../Common/Loader';
 import type { ConflictSummary, DataConflict } from '../../../types';
 import {
   conflictSeverityBadge,
-  conflictSeverityStyle,
   fallbackConflictDescription,
   fallbackConflictTitle,
   fallbackRecommendation,
@@ -17,10 +14,27 @@ interface ConflictsPanelProps {
   error: string | null;
   onApplyRecommendation: (conflict: DataConflict) => void;
   onFlagForReview: (conflict: DataConflict) => void;
+  onRetry?: () => void;
   actingConflictId?: string | null;
 }
 
-function ConflictCard({
+function friendlyConflictLoadError(raw: string | null): string {
+  const msg = String(raw ?? '').trim();
+  if (!msg) return 'The conflicts service is temporarily unavailable.';
+  if (/404|not found/i.test(msg)) return 'No conflict data exists for this session yet.';
+  if (/401|403|forbidden|unauthorized/i.test(msg)) return 'You do not have access to load conflict data for this session.';
+  if (/500|502|503|504|network|fetch/i.test(msg)) return 'The server could not load conflicts. Try again in a moment.';
+  if (msg.length > 120) return 'Could not load cross-source conflicts for this session.';
+  return msg;
+}
+
+function severityRail(severity: string): string {
+  if (severity === 'high') return 'bg-[var(--cr-red)]';
+  if (severity === 'low') return 'bg-[var(--cr-gray-3)]';
+  return 'bg-[var(--cr-amber)]';
+}
+
+function ConflictRow({
   conflict,
   acting,
   onApplyRecommendation,
@@ -36,84 +50,46 @@ function ConflictCard({
   const description = conflict.description ?? fallbackConflictDescription(conflict);
   const recommendation = conflict.recommendation ?? fallbackRecommendation(conflict);
   const resolved = Boolean(conflict.resolved);
-  const flagged = conflict.user_status === 'flagged_for_review';
-  const applied = conflict.user_status === 'applied';
   const canApply = Boolean(conflict.can_auto_apply) && !resolved;
-  const needsReview = Boolean(conflict.requires_manual_review) && !resolved;
 
   return (
-    <li
-      className={`rounded-lg border border-brand-border border-l-4 px-4 py-3 ${conflictSeverityStyle(severity)}`}
-    >
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h4 className="font-semibold text-sm text-brand-ink">{title}</h4>
-            <span
-              className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${conflictSeverityBadge(severity)}`}
-            >
-              {severity}
-            </span>
-            {applied && (
-              <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-green-100 text-green-800">
-                Applied
-              </span>
-            )}
-            {flagged && (
-              <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-slate-200 text-slate-800">
-                Flagged for review
-              </span>
-            )}
-            {resolved && !applied && !flagged && (
-              <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-green-100 text-green-800">
-                Resolved
-              </span>
-            )}
-          </div>
-          <p className="text-sm text-brand-ink mt-1.5">{description}</p>
+    <div className="flex gap-3 px-5 py-3.5 border-b border-[var(--cr-line-2)] last:border-b-0">
+      <div className={`w-1 rounded-sm shrink-0 ${severityRail(severity)}`} />
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-bold text-sm">{title}</span>
+          <span className={`text-[11px] font-bold uppercase px-2 py-0.5 rounded-full ${conflictSeverityBadge(severity)}`}>
+            {severity}
+          </span>
         </div>
-      </div>
-
-      <div className="mt-3 rounded-lg bg-white/80 border border-brand-border/60 px-3 py-2.5">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted">
-          Recommended action
+        <p className="text-xs text-[var(--cr-gray)] mt-1">{description}</p>
+        <p className="text-xs text-[var(--cr-gray-2)] mt-1">
+          <strong className="text-[var(--cr-ink)]">Recommended:</strong> {recommendation}
         </p>
-        <p className="text-sm text-brand-ink mt-1">{recommendation}</p>
-        {conflict.estimated_spend_impact != null && conflict.estimated_spend_impact > 0 && (
-          <p className="text-xs text-brand-muted mt-2">
-            Estimated spend base reduction if applied: ₹
-            {conflict.estimated_spend_impact.toLocaleString('en-IN', { maximumFractionDigits: 1 })} Cr
-          </p>
+        {!resolved && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {canApply && (
+              <button
+                type="button"
+                disabled={acting}
+                onClick={() => onApplyRecommendation(conflict)}
+                className="text-xs px-2.5 py-1.5 rounded-[var(--cr-r-sm)] bg-[var(--cr-green)] text-white font-semibold disabled:opacity-50"
+              >
+                {acting ? '…' : conflict.action_label ?? 'Apply recommendation'}
+              </button>
+            )}
+            <button
+              type="button"
+              disabled={acting}
+              onClick={() => onFlagForReview(conflict)}
+              className="text-xs px-2.5 py-1.5 rounded-[var(--cr-r-sm)] border border-[var(--cr-line)] bg-white font-semibold disabled:opacity-50"
+            >
+              Flag for review
+            </button>
+          </div>
         )}
       </div>
-
-      {!resolved && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {canApply && (
-            <Button
-              type="button"
-              variant="primary"
-              className="!text-xs !px-3 !py-1.5"
-              loading={acting}
-              disabled={acting}
-              onClick={() => onApplyRecommendation(conflict)}
-            >
-              {conflict.action_label ?? 'Apply recommendation'}
-            </Button>
-          )}
-          <Button
-            type="button"
-            variant={needsReview && !canApply ? 'secondary' : 'ghost'}
-            className="!text-xs !px-3 !py-1.5"
-            loading={acting}
-            disabled={acting}
-            onClick={() => onFlagForReview(conflict)}
-          >
-            Flag for manual review
-          </Button>
-        </div>
-      )}
-    </li>
+    </div>
   );
 }
 
@@ -123,40 +99,54 @@ export const ConflictsPanel: React.FC<ConflictsPanelProps> = ({
   error,
   onApplyRecommendation,
   onFlagForReview,
+  onRetry,
   actingConflictId,
 }) => {
   if (loading) return <Loader label="Loading conflicts…" />;
   if (error) {
-    return <p className="text-sm text-brand-muted">{error}</p>;
+    return (
+      <div className="cr-card p-5 border border-amber-200 bg-amber-50/60">
+        <p className="text-sm font-semibold text-[var(--cr-ink)]">Could not load data conflicts</p>
+        <p className="text-xs text-[var(--cr-gray)] mt-1">{friendlyConflictLoadError(error)}</p>
+        {onRetry && (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="mt-3 text-xs px-3 py-1.5 rounded-[var(--cr-r-sm)] border border-[var(--cr-line)] bg-white font-semibold hover:bg-gray-50"
+          >
+            Try again
+          </button>
+        )}
+      </div>
+    );
   }
   if (!summary || !summary.total) {
     return (
-      <p className="text-sm text-brand-muted">No cross-source conflicts detected for this session.</p>
+      <div className="cr-card p-5">
+        <p className="text-sm text-[var(--cr-gray-2)]">No cross-source conflicts detected for this session.</p>
+      </div>
     );
   }
 
   const rows = summary.conflicts ?? [];
   const unresolved = summary.unresolved ?? 0;
-  const needsReview = summary.requires_escalation ?? 0;
 
   return (
-    <Card className="!p-4 bg-white border-brand-border space-y-4">
-      <div>
-        <h3 className="text-sm font-semibold text-brand-ink">Data conflicts</h3>
-        <p className="text-xs text-brand-muted mt-1">
-          {unresolved} unresolved of {summary.total} total
-          {needsReview > 0 ? ` · ${needsReview} need manual review` : ''}
-        </p>
-        <p className="text-xs text-brand-muted mt-2">
-          Each item explains what disagrees across sources and what we recommend. Applying a
-          recommendation updates the underlying spend lines and re-profiles the spend base.
-          Flagging for review records your decision without changing spend.
-        </p>
+    <div className="cr-card overflow-hidden">
+      <div className="cr-card-h">
+        <h2 className="text-sm font-bold inline-flex items-center gap-2">
+          Data conflicts
+          {unresolved > 0 && (
+            <span className="text-[11px] font-bold text-[var(--cr-amber)] bg-[var(--cr-amber-soft)] border border-[#f0dcb0] px-2 py-0.5 rounded-md">
+              {unresolved} unresolved
+            </span>
+          )}
+        </h2>
+        <span className="text-[11.5px] text-[var(--cr-gray-2)]">Resolve before committing affected pools</span>
       </div>
-
-      <ul className="space-y-3">
+      <div>
         {rows.map((conflict, i) => (
-          <ConflictCard
+          <ConflictRow
             key={String(conflict.conflict_id ?? i)}
             conflict={conflict}
             acting={actingConflictId === conflict.conflict_id}
@@ -164,11 +154,7 @@ export const ConflictsPanel: React.FC<ConflictsPanelProps> = ({
             onFlagForReview={onFlagForReview}
           />
         ))}
-      </ul>
-
-      {rows.length === 0 && (
-        <p className="text-sm text-brand-muted">Conflict details are not available for this session.</p>
-      )}
-    </Card>
+      </div>
+    </div>
   );
 };

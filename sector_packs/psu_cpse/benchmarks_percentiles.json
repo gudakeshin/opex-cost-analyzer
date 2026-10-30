@@ -1,7 +1,7 @@
 {
   "sector": "psu_cpse",
   "version": "1.0",
-  "vintage_date": "2025-04-01",
+  "vintage_date": "2026-05-01",
   "confidence_overall": "public_disclosure",
   "source_metadata": {
     "primary_sources": [
@@ -49,52 +49,166 @@
       "label": "Public Sector Undertakings / CPSEs (India)",
       "categories": {
         "HR": {
-          "P25": 15.0, "P50": 22.0, "P75": 32.0, "P90": 45.0,
+          "P25": 15.0,
+          "P50": 22.0,
+          "P75": 32.0,
+          "P90": 45.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Employee costs % of revenue. HAL FY25: 23.3%, CIL FY25: 20%, BHEL FY25: 29.2%. DPE CPSE Survey: manufacturing CPSEs 20-35%, financial CPSEs 10-15%, service CPSEs 30-45%. P90 represents loss-making or infrastructure CPSEs."
         },
         "OUTSOURCED": {
-          "P25": 10.0, "P50": 20.0, "P75": 35.0, "P90": 50.0,
+          "P25": 10.0,
+          "P50": 20.0,
+          "P75": 35.0,
+          "P90": 50.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Stores, spares, contract services, raw material. CIL FY25: stores & spares ~8%, contract expenses ~12%. BHEL: materials ~50%. DPE: aggregate cost-of-goods including outsourced services."
         },
         "PLANT_MAINTENANCE": {
-          "P25": 2.0, "P50": 4.5, "P75": 8.0, "P90": 13.0,
+          "P25": 2.0,
+          "P50": 4.5,
+          "P75": 8.0,
+          "P90": 13.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "R&M and maintenance costs. CIL FY25: R&M ~3.5% of revenue. DPE survey: maintenance costs elevated in ageing PSU infrastructure. CAG performance audits frequently cite deferred maintenance as issue."
         },
         "IT": {
-          "P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5,
+          "P25": 0.3,
+          "P50": 0.8,
+          "P75": 1.5,
+          "P90": 2.5,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "IT spend. CPSEs typically underinvest in IT relative to private sector. MCA21 and e-procurement mandates driving IT investments. INTERNAL_CALIBRATION."
         },
         "FACILITIES": {
-          "P25": 0.5, "P50": 1.5, "P75": 3.0, "P90": 5.0,
+          "P25": 0.5,
+          "P50": 1.5,
+          "P75": 3.0,
+          "P90": 5.0,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "Establishment charges including township, canteen, schools. DPE CPSE Survey: township and establishment charges significant for manufacturing CPSEs with captive residential colonies."
         },
         "PROF_SVCS": {
-          "P25": 0.2, "P50": 0.6, "P75": 1.2, "P90": 2.0,
+          "P25": 0.2,
+          "P50": 0.6,
+          "P75": 1.2,
+          "P90": 2.0,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "Legal, CAG audit, Ministry consultations. CAG statutory audit is mandated; CPSEs also subject to supplementary audit. INTERNAL_CALIBRATION."
         },
         "BRSR_ESG": {
-          "P25": 0.3, "P50": 0.8, "P75": 1.5, "P90": 2.5,
+          "P25": 0.3,
+          "P50": 0.8,
+          "P75": 1.5,
+          "P90": 2.5,
           "unit": "% of revenue",
           "confidence": "public_disclosure",
           "source_note": "CSR mandatory spend (2% of PAT) + ESG reporting costs. CIL FY25: CSR ₹1,800 Cr (1.2% of revenue). Navratna CPSEs: higher CSR absolute spend. BRSR mandated by SEBI for listed PSUs."
         },
         "INSURANCE": {
-          "P25": 0.1, "P50": 0.3, "P75": 0.6, "P90": 1.0,
+          "P25": 0.1,
+          "P50": 0.3,
+          "P75": 0.6,
+          "P90": 1.0,
           "unit": "% of revenue",
           "confidence": "internal_calibration",
           "source_note": "INTERNAL_CALIBRATION — CPSEs often self-insure large assets via New India Assurance (public sector insurer) at subsidised rates."
+        },
+        "csr_mandatory_spend": {
+          "P25": 0.15,
+          "P50": 0.3,
+          "P75": 0.5,
+          "P90": 0.8,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "CSR at 2% of avg PBT per Companies Act s135; expressed as revenue share for CPSE margin profiles."
+        },
+        "govt_levy_dividends": {
+          "P25": 1.0,
+          "P50": 3.0,
+          "P75": 6.0,
+          "P90": 10.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Royalties, cesses, and levies beyond corporate tax (DIPAM dividend policy excluded from opex)."
+        },
+        "dpe_hr_perquisites": {
+          "P25": 2.0,
+          "P50": 4.0,
+          "P75": 6.0,
+          "P90": 9.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "DPE pay-scale perquisites, PRP, superannuation top-ups over base wages."
+        },
+        "cag_audit_costs": {
+          "P25": 0.05,
+          "P50": 0.15,
+          "P75": 0.3,
+          "P90": 0.5,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "CAG supplementary audit, internal audit augmentation, and audit-para remediation."
+        },
+        "township_welfare_ops": {
+          "P25": 0.5,
+          "P50": 1.2,
+          "P75": 2.5,
+          "P90": 4.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "Township O&M, schools, hospitals, and welfare amenities for legacy CPSEs."
+        },
+        "contract_labour_costs": {
+          "P25": 2.0,
+          "P50": 4.0,
+          "P75": 7.0,
+          "P90": 10.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Contract labour deployment per CLRA registers; productivity-linked rationalisation potential."
+        },
+        "project_epc_overheads": {
+          "P25": 1.0,
+          "P50": 2.5,
+          "P75": 5.0,
+          "P90": 8.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Owner engineering, PMC fees, and project establishment charged to opex."
+        },
+        "security_services_cisf": {
+          "P25": 0.3,
+          "P50": 0.7,
+          "P75": 1.2,
+          "P90": 2.0,
+          "unit": "% of revenue",
+          "confidence": "public_disclosure",
+          "source_note": "CISF deployment charges per MHA rates or private security for non-sensitive sites."
+        },
+        "legal_arbitration_claims": {
+          "P25": 0.2,
+          "P50": 0.5,
+          "P75": 1.0,
+          "P90": 2.0,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Arbitration proceedings, claims consultants, and external counsel for EPC disputes."
+        },
+        "vigilance_compliance_ops": {
+          "P25": 0.1,
+          "P50": 0.25,
+          "P75": 0.5,
+          "P90": 0.8,
+          "unit": "% of revenue",
+          "confidence": "internal_calibration",
+          "source_note": "Vigilance department, CVC referencing, and integrity pact administration."
         }
       }
     }

@@ -1,0 +1,9 @@
+Aarogya Health Network Ltd — Group Structure
+
+AHNL-IN: India parent (multi-speciality hospitals; NSE/BSE listed). ERP: Oracle Health + SAP.
+AHNL-DX: Aarogya Diagnostics Ltd (India subsidiary; diagnostic chain). ERP: SAP ECC.
+AHNL-PH: Aarogya Pharmacy Ltd (India subsidiary; pharmacy chain). ERP: SAP ECC.
+
+Entity tree: AHNL-IN > AHNL-DX (100%), AHNL-PH (80%)
+
+Intercompany: hospitals refer patients to AHNL-DX (diagnostics) and AHNL-PH (pharmacy) at group rates. IC revenue flagged related_party=yes. Eliminated on consolidation. NABH accreditation at hospital level; must maintain entity-level quality records.

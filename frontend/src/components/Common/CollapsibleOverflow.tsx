@@ -70,7 +70,7 @@ export const CollapsibleOverflow: React.FC<CollapsibleOverflowProps> = ({
       {overflows && (
         <button
           type="button"
-          className="mt-1.5 text-xs font-semibold text-brand-navy hover:text-deloitte-green"
+          className="mt-1.5 text-xs font-semibold text-brand-navy hover:text-brand-primary"
           aria-expanded={expanded}
           aria-controls={contentId}
           onClick={() => setExpanded((open) => !open)}

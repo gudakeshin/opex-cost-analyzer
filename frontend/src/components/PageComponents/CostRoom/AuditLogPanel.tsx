@@ -26,7 +26,7 @@ export const AuditLogPanel: React.FC<AuditLogPanelProps> = ({ auditLog, compact 
             </span>
             <span className="flex-1">{e.message}</span>
             {e.source && (
-              <span className="text-[10px] uppercase text-brand-muted">{e.source}</span>
+              <span className="text-[11px] uppercase text-brand-muted">{e.source}</span>
             )}
           </li>
         ))}

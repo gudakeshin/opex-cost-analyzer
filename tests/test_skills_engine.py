@@ -299,3 +299,12 @@ def test_spend_profiler_no_trend_single_period() -> None:
     result = engine.spend_profiler(lines)
     assert "trend_analysis" not in result
 
+
+def test_pushdown_handlers_are_reexported_on_engine_facade() -> None:
+    """dispatch.py calls _engine.spend_profiler_pushdown / internal_benchmarker_pushdown
+    on the DuckDB large-cap path (app/skills/dispatch.py:_should_use_pushdown). Both
+    live in submodules and must be re-exported through app/skills/engine/__init__.py's
+    facade, or those calls raise AttributeError at runtime on large-cap engagements."""
+    assert hasattr(engine, "spend_profiler_pushdown")
+    assert hasattr(engine, "internal_benchmarker_pushdown")
+

@@ -47,6 +47,7 @@ from .profiler import (
     _build_lever_entry,
     resolve_eligible_levers,
     spend_profiler,
+    spend_profiler_pushdown,
     chart_builder,
     document_contextualizer,
 )
@@ -56,6 +57,7 @@ from .benchmarking import (
     _category_pct_of_revenue,
     peer_benchmarker,
     internal_benchmarker,
+    internal_benchmarker_pushdown,
     heuristic_analyzer,
     root_cause_analyzer,
 )
@@ -104,6 +106,7 @@ from .evidence import (
     resolve_structured_indexes,
 )
 from .sme_critique import sme_critique_analyzer
+from .data_quality_gate import data_quality_gate
 
 # strategic — scenario modeler, shareholder bridge, peer disclosure miner,
 #              contract lifecycle, conflict detector, cost-to-serve, ZBB
@@ -160,12 +163,14 @@ __all__ = [
     "resolve_eligible_levers",
     # profiler skills
     "spend_profiler",
+    "spend_profiler_pushdown",
     "chart_builder",
     "document_contextualizer",
     # benchmarking
     "_category_pct_of_revenue",
     "peer_benchmarker",
     "internal_benchmarker",
+    "internal_benchmarker_pushdown",
     "heuristic_analyzer",
     "root_cause_analyzer",
     # savings
@@ -174,6 +179,7 @@ __all__ = [
     "build_raw_rows",
     "value_bridge_calculator",
     "data_validator",
+    "data_quality_gate",
     # fpa
     "bva_analyzer",
     "temporal_analyzer",

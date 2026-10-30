@@ -1,7 +1,25 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { apiGet, apiPost } from '../hooks/useApi';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { apiDelete, apiPost } from '../hooks/useApi';
+import {
+  fetchEngagementDetail,
+  fetchSessionAnalysis,
+  fetchSessionManifest,
+  fetchSessionStatus,
+  listEngagements as listEngagementsRequest,
+  setSessionManifestData,
+} from '../api/hooks/useSessionQueries';
 import { manifestAudienceToMode, useAudience } from './AudienceContext';
 import { isPlaceholderCompanyName } from '../utils/engagement';
+import { latestAnalyzedSessionId } from '../utils/sessionResolve';
 import type { EngagementMeta, EngagementSummary, SessionManifest, SessionResponse } from '../types';
 
 const STORAGE_KEY = 'opex_session_id';
@@ -12,9 +30,12 @@ interface SessionContextValue {
   engagementId: string | null;
   setSessionId: (id: string | null) => void;
   setEngagementId: (id: string | null) => void;
+  resumeSession: (id: string, engagementId?: string | null) => void;
   ensureSession: () => Promise<string>;
+  ensureSessionForEngagement: (targetEngagementId?: string) => Promise<string>;
   ensureEngagement: () => Promise<string>;
   listEngagements: () => Promise<EngagementSummary[]>;
+  deleteEngagement: (id: string) => Promise<void>;
   createEngagement: (payload?: {
     company_name?: string;
     industry?: string;
@@ -53,6 +74,7 @@ function engagementFromManifest(manifest: SessionManifest): EngagementMeta {
   );
   const revenue = manifest.annual_revenue;
   return {
+    engagement_id: manifest.engagement_id,
     company_name: manifest.company_name || defaultEngagement.company_name,
     industry: manifest.industry || defaultEngagement.industry,
     currency: manifest.currency || 'INR',
@@ -66,6 +88,7 @@ function engagementFromManifest(manifest: SessionManifest): EngagementMeta {
 }
 
 export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const queryClient = useQueryClient();
   const { setAudience } = useAudience();
   const [sessionId, setSessionIdState] = useState<string | null>(() =>
     localStorage.getItem(STORAGE_KEY),
@@ -91,16 +114,17 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     else localStorage.removeItem(ENGAGEMENT_STORAGE_KEY);
   }, [engagementId]);
 
+  // Whenever the active session changes (create/switch/delete engagement,
+  // resume, or mismatch-recreate), drop results derived from the previous
+  // session so one engagement never shows another's analysis/deep research.
+  useEffect(() => {
+    setHasAnalysis(false);
+    setSessionAnalysis(null);
+    setDeepResearchSummary(null);
+  }, [sessionId]);
+
   const refreshEngagementMeta = useCallback(async (eid: string) => {
-    const detail = await apiGet<{
-      company_name?: string;
-      industry?: string;
-      currency?: string;
-      annual_revenue?: number;
-      detected_company_name?: string;
-      detected_industry?: string;
-      detected_industry_label?: string;
-    }>(`/api/v1/engagements/${eid}`);
+    const detail = await fetchEngagementDetail(queryClient, eid);
     const revenue = detail.annual_revenue;
     setEngagement({
       company_name: detail.company_name || defaultEngagement.company_name,
@@ -114,17 +138,27 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       detected_company_name: detail.detected_company_name || undefined,
       detected_industry: detail.detected_industry || undefined,
       detected_industry_label: detail.detected_industry_label || undefined,
+      detected_annual_revenue_cr:
+        detail.detected_annual_revenue_cr != null && detail.detected_annual_revenue_cr > 0
+          ? detail.detected_annual_revenue_cr
+          : undefined,
     });
-  }, []);
+  }, [queryClient]);
 
   const refreshEngagement = useCallback(async () => {
-    if (!sessionId) return;
     setLoadingEngagement(true);
     try {
-      const status = await apiGet<{
-        session_exists?: boolean;
-        has_analysis?: boolean;
-      }>(`/api/v1/sessions/${sessionId}/status`);
+      const activeEngagementId = engagementId;
+
+      if (activeEngagementId) {
+        await refreshEngagementMeta(activeEngagementId);
+      }
+
+      if (!sessionId) {
+        return;
+      }
+
+      const status = await fetchSessionStatus(queryClient, sessionId);
       if (!status.session_exists) {
         setSessionIdState(null);
         setHasAnalysis(false);
@@ -132,33 +166,16 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
       setHasAnalysis(!!status.has_analysis);
 
-      const manifest = await apiGet<SessionManifest & { deep_research_summary?: string }>(
-        `/api/v1/sessions/${sessionId}/manifest`,
-      );
-      if (manifest.engagement_id) {
+      const manifest = await fetchSessionManifest(queryClient, sessionId);
+
+      // Never let a stale session override the user's selected engagement.
+      if (!activeEngagementId && manifest.engagement_id) {
         setEngagementIdState(manifest.engagement_id);
+        await refreshEngagementMeta(manifest.engagement_id);
+      } else if (!activeEngagementId) {
+        setEngagement(engagementFromManifest(manifest));
       }
-      setEngagement(engagementFromManifest(manifest));
-      // Merge auto-detected company/industry recommendations from the engagement
-      // manifest (the session manifest doesn't carry them) so the Diagnostic and
-      // Analysis pages can surface the "Recommended" badge.
-      if (manifest.engagement_id) {
-        try {
-          const detail = await apiGet<{
-            detected_company_name?: string;
-            detected_industry?: string;
-            detected_industry_label?: string;
-          }>(`/api/v1/engagements/${manifest.engagement_id}`);
-          setEngagement((prev) => ({
-            ...prev,
-            detected_company_name: detail.detected_company_name || undefined,
-            detected_industry: detail.detected_industry || undefined,
-            detected_industry_label: detail.detected_industry_label || undefined,
-          }));
-        } catch {
-          /* detection is best-effort; ignore */
-        }
-      }
+
       const mode = manifestAudienceToMode(manifest.audience);
       if (mode) setAudience(mode);
       setDeepResearchSummary(manifest.deep_research_summary ?? null);
@@ -170,7 +187,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } finally {
       setLoadingEngagement(false);
     }
-  }, [sessionId, setAudience]);
+  }, [sessionId, engagementId, refreshEngagementMeta, setAudience, queryClient]);
 
   const refreshAnalysisStatus = useCallback(async () => {
     if (!sessionId) {
@@ -178,10 +195,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return;
     }
     try {
-      const status = await apiGet<{
-        session_exists?: boolean;
-        has_analysis?: boolean;
-      }>(`/api/v1/sessions/${sessionId}/status`);
+      const status = await fetchSessionStatus(queryClient, sessionId);
       if (!status.session_exists) {
         setSessionIdState(null);
         setHasAnalysis(false);
@@ -191,7 +205,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } catch {
       setHasAnalysis(false);
     }
-  }, [sessionId]);
+  }, [sessionId, queryClient]);
 
   const refreshSessionAnalysis = useCallback(async (): Promise<SessionResponse | null> => {
     if (!sessionId) {
@@ -200,16 +214,13 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return null;
     }
     try {
-      const status = await apiGet<{
-        session_exists?: boolean;
-        has_analysis?: boolean;
-      }>(`/api/v1/sessions/${sessionId}/status`);
+      const status = await fetchSessionStatus(queryClient, sessionId);
       if (!status.session_exists || !status.has_analysis) {
         setSessionAnalysis(null);
         setHasAnalysis(false);
         return null;
       }
-      const analysis = await apiGet<SessionResponse>(`/api/v1/sessions/${sessionId}`);
+      const analysis = await fetchSessionAnalysis(queryClient, sessionId);
       setSessionAnalysis(analysis);
       setHasAnalysis(true);
       return analysis;
@@ -218,7 +229,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setHasAnalysis(false);
       return null;
     }
-  }, [sessionId]);
+  }, [sessionId, queryClient]);
 
   const syncEngagementFromAnalysis = useCallback(async () => {
     const analysis = await refreshSessionAnalysis();
@@ -244,17 +255,26 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     refreshAnalysisStatus();
   }, [refreshEngagement, refreshAnalysisStatus]);
 
+  useEffect(() => {
+    if (engagementId) {
+      refreshEngagementMeta(engagementId).catch(() => undefined);
+    }
+  }, [engagementId, refreshEngagementMeta]);
+
   const setSessionId = useCallback((id: string | null) => {
     setSessionIdState(id);
-    if (!id) {
-      setHasAnalysis(false);
-      setSessionAnalysis(null);
-      setDeepResearchSummary(null);
-    }
   }, []);
 
   const setEngagementId = useCallback(
     (id: string | null) => {
+      // Re-selecting the already-active engagement must not clear the session —
+      // doing so orphans the active analysis and blanks the workspace. Only a
+      // genuine switch to a different engagement resets the session.
+      if (id && id === engagementId) {
+        refreshEngagementMeta(id).catch(() => undefined);
+        return;
+      }
+      setSessionIdState(null);
       setEngagementIdState(id);
       if (id) {
         refreshEngagementMeta(id).catch(() => undefined);
@@ -262,12 +282,41 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setEngagement(defaultEngagement);
       }
     },
+    [engagementId, refreshEngagementMeta],
+  );
+
+  const resumeSession = useCallback(
+    (id: string, nextEngagementId?: string | null) => {
+      // History resume must keep session + engagement aligned in one transition.
+      // Using setEngagementId() here would clear session by design.
+      setSessionIdState(id);
+      if (nextEngagementId !== undefined) {
+        setEngagementIdState(nextEngagementId);
+        if (nextEngagementId) {
+          refreshEngagementMeta(nextEngagementId).catch(() => undefined);
+        } else {
+          setEngagement(defaultEngagement);
+        }
+      }
+    },
     [refreshEngagementMeta],
   );
 
   const listEngagements = useCallback(async () => {
-    return apiGet<EngagementSummary[]>('/api/v1/engagements');
+    return listEngagementsRequest();
   }, []);
+
+  const deleteEngagement = useCallback(
+    async (id: string) => {
+      await apiDelete(`/api/v1/engagement/${id}`);
+      if (id === engagementId) {
+        setSessionIdState(null);
+        setEngagementIdState(null);
+        setEngagement(defaultEngagement);
+      }
+    },
+    [engagementId],
+  );
 
   const createEngagement = useCallback(
     async (payload?: {
@@ -276,6 +325,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       annual_revenue?: number;
       currency?: string;
     }) => {
+      setSessionIdState(null);
       const res = await apiPost<{ engagement_id: string }>('/api/v1/engagements', {
         company_name: payload?.company_name ?? 'New engagement',
         industry: payload?.industry ?? '',
@@ -294,21 +344,102 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return createEngagement();
   }, [engagementId, createEngagement]);
 
+  // Concurrent callers (e.g. an effect re-firing because a prior call's own
+  // intermediate setSessionIdState/setEngagementIdState mutated its deps)
+  // must await the same in-flight ensure rather than each independently
+  // concluding "nothing exists yet" and creating their own session/engagement.
+  //
+  // `target` starts null and is mutated in place once the in-flight call
+  // resolves which engagement it's actually operating on. A no-arg caller
+  // always merges (it means "whatever's current"); an explicit-target caller
+  // merges as long as the in-flight call hasn't resolved its target yet, or
+  // has resolved to the same one — this matters because the in-flight call's
+  // own intermediate state updates (setEngagementIdState) can cause a fresh
+  // effect fire with an explicit target *before* our code resumes past the
+  // await that would otherwise register that target here.
+  const ensureSessionInFlightRef = useRef<{ target: string | null; promise: Promise<string> } | null>(
+    null,
+  );
+
+  const ensureSessionForEngagement = useCallback(
+    (targetEngagementId?: string): Promise<string> => {
+      const requested = targetEngagementId ?? null;
+      const inFlight = ensureSessionInFlightRef.current;
+      if (
+        inFlight &&
+        (requested === null || inFlight.target === null || inFlight.target === requested)
+      ) {
+        return inFlight.promise;
+      }
+
+      const entry: { target: string | null; promise: Promise<string> } = {
+        target: requested,
+        promise: undefined as unknown as Promise<string>,
+      };
+
+      entry.promise = (async (): Promise<string> => {
+        let target = requested ?? engagementId;
+        if (!target) {
+          target = await ensureEngagement();
+        }
+        entry.target = target;
+
+        if (sessionId) {
+          try {
+            const existing = await fetchSessionManifest(queryClient, sessionId);
+            if (existing.engagement_id === target) {
+              return sessionId;
+            }
+          } catch {
+            /* stale or missing session — create a new one below */
+          }
+          setSessionIdState(null);
+        }
+
+        // Before creating a new (empty) session, adopt the engagement's most
+        // recent analyzed session if one exists — otherwise each entry point that
+        // ensures a session spawns an empty sibling, and the workspace renders
+        // blank despite a completed analysis for this engagement.
+        const analyzedId = await latestAnalyzedSessionId(target);
+        if (analyzedId) {
+          setSessionIdState(analyzedId);
+          setEngagementIdState(target);
+          await refreshEngagementMeta(target);
+          return analyzedId;
+        }
+
+        const detail = await fetchEngagementDetail(queryClient, target);
+
+        const res = await apiPost<SessionManifest>('/api/v1/sessions', {
+          company_name: detail.company_name,
+          industry: detail.industry || '',
+          currency: detail.currency || 'INR',
+          audience: 'consultant',
+          engagement_id: target,
+        });
+        setSessionManifestData(queryClient, res.session_id, res);
+        setSessionIdState(res.session_id);
+        setEngagementIdState(target);
+        await refreshEngagementMeta(target);
+        return res.session_id;
+      })();
+
+      ensureSessionInFlightRef.current = entry;
+      entry.promise
+        .catch(() => undefined)
+        .finally(() => {
+          if (ensureSessionInFlightRef.current === entry) {
+            ensureSessionInFlightRef.current = null;
+          }
+        });
+      return entry.promise;
+    },
+    [sessionId, engagementId, ensureEngagement, refreshEngagementMeta, queryClient],
+  );
+
   const ensureSession = useCallback(async (): Promise<string> => {
-    if (sessionId) return sessionId;
-    const eid = await ensureEngagement();
-    const res = await apiPost<SessionManifest>('/api/v1/sessions', {
-      company_name: engagement.company_name,
-      industry: engagement.industry,
-      currency: engagement.currency || 'INR',
-      audience: 'consultant',
-      engagement_id: eid,
-    });
-    setSessionIdState(res.session_id);
-    if (res.engagement_id) setEngagementIdState(res.engagement_id);
-    setEngagement(engagementFromManifest(res));
-    return res.session_id;
-  }, [sessionId, ensureEngagement, engagement.company_name, engagement.industry, engagement.currency]);
+    return ensureSessionForEngagement();
+  }, [ensureSessionForEngagement]);
 
   const value = useMemo(
     () => ({
@@ -316,9 +447,12 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       engagementId,
       setSessionId,
       setEngagementId,
+      resumeSession,
       ensureSession,
+      ensureSessionForEngagement,
       ensureEngagement,
       listEngagements,
+      deleteEngagement,
       createEngagement,
       engagement,
       refreshEngagement,
@@ -336,9 +470,12 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       engagementId,
       setSessionId,
       setEngagementId,
+      resumeSession,
       ensureSession,
+      ensureSessionForEngagement,
       ensureEngagement,
       listEngagements,
+      deleteEngagement,
       createEngagement,
       engagement,
       refreshEngagement,

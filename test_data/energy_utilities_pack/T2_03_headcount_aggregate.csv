@@ -1,0 +1,46 @@
+business_unit,function,location,band,headcount
+Generation Thermal,Operations,India,Entry (B1-B2),360
+Generation Thermal,Operations,India,Mid (B3-B4),280
+Generation Thermal,Operations,India,Senior (B5-B6),120
+Generation Thermal,Finance,India,Entry (B1-B2),360
+Generation Thermal,Finance,India,Mid (B3-B4),280
+Generation Thermal,Finance,India,Senior (B5-B6),120
+Generation Thermal,HR,India,Entry (B1-B2),360
+Generation Thermal,HR,India,Mid (B3-B4),280
+Generation Thermal,HR,India,Senior (B5-B6),120
+Generation Renewable,Operations,India,Entry (B1-B2),450
+Generation Renewable,Operations,India,Mid (B3-B4),350
+Generation Renewable,Operations,India,Senior (B5-B6),150
+Generation Renewable,Finance,India,Entry (B1-B2),450
+Generation Renewable,Finance,India,Mid (B3-B4),350
+Generation Renewable,Finance,India,Senior (B5-B6),150
+Generation Renewable,HR,India,Entry (B1-B2),450
+Generation Renewable,HR,India,Mid (B3-B4),350
+Generation Renewable,HR,India,Senior (B5-B6),150
+Transmission,Operations,India,Entry (B1-B2),540
+Transmission,Operations,India,Mid (B3-B4),420
+Transmission,Operations,India,Senior (B5-B6),180
+Transmission,Finance,India,Entry (B1-B2),540
+Transmission,Finance,India,Mid (B3-B4),420
+Transmission,Finance,India,Senior (B5-B6),180
+Transmission,HR,India,Entry (B1-B2),540
+Transmission,HR,India,Mid (B3-B4),420
+Transmission,HR,India,Senior (B5-B6),180
+Distribution,Operations,India,Entry (B1-B2),630
+Distribution,Operations,India,Mid (B3-B4),489
+Distribution,Operations,India,Senior (B5-B6),210
+Distribution,Finance,India,Entry (B1-B2),630
+Distribution,Finance,India,Mid (B3-B4),489
+Distribution,Finance,India,Senior (B5-B6),210
+Distribution,HR,India,Entry (B1-B2),630
+Distribution,HR,India,Mid (B3-B4),489
+Distribution,HR,India,Senior (B5-B6),210
+Trading,Operations,India,Entry (B1-B2),720
+Trading,Operations,India,Mid (B3-B4),560
+Trading,Operations,India,Senior (B5-B6),240
+Trading,Finance,India,Entry (B1-B2),720
+Trading,Finance,India,Mid (B3-B4),560
+Trading,Finance,India,Senior (B5-B6),240
+Trading,HR,India,Entry (B1-B2),720
+Trading,HR,India,Mid (B3-B4),560
+Trading,HR,India,Senior (B5-B6),240

@@ -1,0 +1,226 @@
+{
+  "version": "1.0",
+  "_comment": "Per-lever-family business-perspective templates used by app/skills/engine/business_detail.py to enrich initiatives with owner/accountability, KPIs, change-management, contract levers and a risk-mitigation library. Keyed by lever_family (supply|process|demand|technology|finance|structure) with a _default fallback. Deterministic so depth survives when the LLM is offline.",
+  "owner_by_family": {
+    "supply": {
+      "owner_role": "Chief Procurement Officer / Category Lead",
+      "business_sponsor": "CFO",
+      "raci": {
+        "responsible": "Category Manager",
+        "accountable": "Chief Procurement Officer",
+        "consulted": "Business-unit finance, Legal/Contracts",
+        "informed": "CFO, FP&A"
+      }
+    },
+    "process": {
+      "owner_role": "Chief Operating Officer / Process Owner",
+      "business_sponsor": "COO",
+      "raci": {
+        "responsible": "Process Excellence Lead",
+        "accountable": "Chief Operating Officer",
+        "consulted": "Function heads, IT, FP&A",
+        "informed": "CFO"
+      }
+    },
+    "demand": {
+      "owner_role": "Business-Unit Head / Budget Owner",
+      "business_sponsor": "CFO",
+      "raci": {
+        "responsible": "Budget Owner",
+        "accountable": "Business-Unit Head",
+        "consulted": "Procurement, FP&A",
+        "informed": "CFO"
+      }
+    },
+    "technology": {
+      "owner_role": "Chief Information Officer / IT Finance Lead",
+      "business_sponsor": "CIO and CFO",
+      "raci": {
+        "responsible": "IT Asset / FinOps Manager",
+        "accountable": "Chief Information Officer",
+        "consulted": "Security, Procurement, Application owners",
+        "informed": "CFO, FP&A"
+      }
+    },
+    "finance": {
+      "owner_role": "Treasury / Controller",
+      "business_sponsor": "CFO",
+      "raci": {
+        "responsible": "Treasury Manager / Tax Lead",
+        "accountable": "CFO",
+        "consulted": "Accounts Payable, Procurement, Banking partners",
+        "informed": "FP&A"
+      }
+    },
+    "structure": {
+      "owner_role": "Transformation Office (PMO) with COO/CHRO",
+      "business_sponsor": "CEO and CFO",
+      "raci": {
+        "responsible": "Transformation / PMO Lead",
+        "accountable": "Chief Operating Officer",
+        "consulted": "HR, Finance, Function/Location heads",
+        "informed": "CEO, Board"
+      }
+    },
+    "_default": {
+      "owner_role": "Category / Initiative Owner",
+      "business_sponsor": "CFO",
+      "raci": {
+        "responsible": "Initiative Owner",
+        "accountable": "Function Head",
+        "consulted": "Procurement, FP&A",
+        "informed": "CFO"
+      }
+    }
+  },
+  "kpis_by_family": {
+    "supply": [
+      {"metric": "Unit cost reduction vs. baseline", "cadence": "monthly"},
+      {"metric": "Purchase price variance (PPV)", "cadence": "monthly"},
+      {"metric": "Addressable spend under contract (%)", "cadence": "quarterly"},
+      {"metric": "Active supplier count in category", "cadence": "quarterly"}
+    ],
+    "process": [
+      {"metric": "Process cycle time", "cadence": "monthly"},
+      {"metric": "Cost per transaction", "cadence": "monthly"},
+      {"metric": "Rework / error rate", "cadence": "monthly"},
+      {"metric": "Compliance to standard (%)", "cadence": "quarterly"}
+    ],
+    "demand": [
+      {"metric": "Demand volume vs. baseline", "cadence": "monthly"},
+      {"metric": "Policy compliance (%)", "cadence": "monthly"},
+      {"metric": "Maverick / off-contract spend (%)", "cadence": "monthly"},
+      {"metric": "Requisition approval cycle time", "cadence": "quarterly"}
+    ],
+    "technology": [
+      {"metric": "License / seat utilization (%)", "cadence": "monthly"},
+      {"metric": "Cloud unit cost (per workload)", "cadence": "monthly"},
+      {"metric": "Automation coverage (%)", "cadence": "quarterly"},
+      {"metric": "Cost per ticket / transaction", "cadence": "monthly"}
+    ],
+    "finance": [
+      {"metric": "Days payable outstanding (DPO)", "cadence": "monthly"},
+      {"metric": "Working capital released", "cadence": "quarterly"},
+      {"metric": "Recovery / leakage closed (%)", "cadence": "quarterly"},
+      {"metric": "Fee per transaction", "cadence": "monthly"}
+    ],
+    "structure": [
+      {"metric": "Cost-to-serve per unit", "cadence": "quarterly"},
+      {"metric": "Span of control / FTE productivity", "cadence": "quarterly"},
+      {"metric": "Footprint cost per sq. ft", "cadence": "quarterly"},
+      {"metric": "Transition milestone adherence (%)", "cadence": "monthly"}
+    ],
+    "_default": [
+      {"metric": "Realized savings vs. P50 plan", "cadence": "monthly"},
+      {"metric": "Initiative milestone adherence (%)", "cadence": "monthly"},
+      {"metric": "Run-rate savings annualized", "cadence": "quarterly"}
+    ]
+  },
+  "change_management_by_family": {
+    "supply": {
+      "stakeholders": ["Category procurement", "Business-unit budget owners", "Incumbent suppliers", "Legal / Contracts"],
+      "comms_cadence": "Bi-weekly steering committee; monthly CFO review",
+      "resistance_points": ["Entrenched incumbent-supplier relationships", "Business-unit preference for the status quo", "Switching and re-qualification effort"]
+    },
+    "process": {
+      "stakeholders": ["Operations teams", "Frontline managers", "IT", "Internal audit"],
+      "comms_cadence": "Weekly stand-ups during rollout; monthly governance review",
+      "resistance_points": ["Muscle memory of the legacy process", "Local exceptions and workarounds", "Perceived loss of autonomy"]
+    },
+    "demand": {
+      "stakeholders": ["Requisitioners", "Approvers", "Budget owners", "Procurement"],
+      "comms_cadence": "Monthly demand-board review; quarterly policy refresh",
+      "resistance_points": ["Perceived reduction in service level", "Habitual ordering patterns", "Policy circumvention"]
+    },
+    "technology": {
+      "stakeholders": ["Application owners", "End users", "Security", "Procurement"],
+      "comms_cadence": "Bi-weekly FinOps / asset review; monthly steering",
+      "resistance_points": ["Shadow IT and unsanctioned tools", "Attachment to familiar tools", "Fear of access disruption"]
+    },
+    "finance": {
+      "stakeholders": ["Accounts Payable", "Suppliers", "Banking / tax partners", "Treasury"],
+      "comms_cadence": "Monthly treasury review; quarterly supplier-terms council",
+      "resistance_points": ["Supplier pushback on extended terms", "Early-payment-discount trade-offs", "System / master-data changes"]
+    },
+    "structure": {
+      "stakeholders": ["Affected employees", "HR / unions", "Function and location heads", "Finance"],
+      "comms_cadence": "Weekly transformation PMO; monthly executive and Board update",
+      "resistance_points": ["Headcount and role anxiety", "Location / function politics", "Change fatigue"]
+    },
+    "_default": {
+      "stakeholders": ["Initiative owner", "Affected functions", "Finance / FP&A"],
+      "comms_cadence": "Monthly governance review",
+      "resistance_points": ["Competing priorities", "Adoption gaps"]
+    }
+  },
+  "contract_levers_by_family": {
+    "supply": [
+      "Re-tender or competitively benchmark against should-cost before renewal",
+      "Negotiate volume-tiered pricing and rebate / growth incentives",
+      "Insert index-linked price clauses and a price-down ratchet",
+      "Consolidate volume to fewer suppliers for leverage"
+    ],
+    "process": [
+      "Standardize statements of work and service-level definitions",
+      "Embed continuous-improvement (productivity) clauses in service contracts"
+    ],
+    "demand": [
+      "Tighten catalog / policy controls and approval thresholds",
+      "Right-size specifications and demand volumes in contractual minimums"
+    ],
+    "technology": [
+      "Right-size licenses / seats at renewal and remove shelfware",
+      "Negotiate committed-use / enterprise agreements with true-down flexibility",
+      "Add usage-based pricing and FinOps cost-allocation terms"
+    ],
+    "finance": [
+      "Extend payment terms toward category / industry DPO benchmark",
+      "Negotiate early-payment discounts and dynamic-discounting options",
+      "Recover unclaimed rebates, input tax credits, and fee leakage"
+    ],
+    "structure": [
+      "Restructure leases and shared-service / outsourcing agreements",
+      "Align contracts to a consolidated operating-model footprint"
+    ],
+    "_default": [
+      "Review contract terms, renewal windows and pricing mechanisms before commitment"
+    ]
+  },
+  "risk_library": {
+    "bounce_back_high": {
+      "risk": "Negotiated savings erode as prices, volumes or scope drift back over time",
+      "severity": "high",
+      "mitigation": "Lock index-linked / ratchet clauses, set a savings-tracking baseline, and review realization monthly in the pipeline"
+    },
+    "bounce_back_medium": {
+      "risk": "Partial leakage of savings without active governance",
+      "severity": "medium",
+      "mitigation": "Monthly run-rate tracking against the committed baseline with variance escalation"
+    },
+    "org_change_high": {
+      "risk": "High organizational change required; adoption and execution may stall",
+      "severity": "high",
+      "mitigation": "Secure executive sponsor sign-off, stand up a dedicated PMO, and stage the rollout with clear decision gates"
+    },
+    "org_change_medium": {
+      "risk": "Moderate change management needed across affected teams",
+      "severity": "medium",
+      "mitigation": "Assign change owners, communicate on a fixed cadence, and tie milestones to incentives"
+    },
+    "low_confidence": {
+      "risk": "Diagnosis rests on limited evidence; modeled savings may be over- or under-stated",
+      "severity": "medium",
+      "mitigation": "Run a targeted evidence probe (contracts, invoices, benchmarks) before committing at Gate 2"
+    },
+    "supplier_concentration": {
+      "risk": "High supplier concentration creates dependency and switching exposure",
+      "severity": "medium",
+      "mitigation": "Qualify a secondary source and dual-source critical lines before consolidating"
+    },
+    "_default": {
+      "risk": "Execution dependencies and data gaps could delay realization",
+      "severity": "low",
+      "mitigation": "Confirm condition precedents and required data fields before kickoff"
+    }
+  }
+}

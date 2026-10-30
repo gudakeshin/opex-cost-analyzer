@@ -1,0 +1,7 @@
+legal_entity,parent_entity,business_unit,segment_revenue_inr_cr,geo
+SPUL-IN,,Generation Thermal,8800,India
+SPUL-IN,,Generation Renewable,4400,India
+SPUL-IN,,Transmission,3300,India
+SPUL-IN,,Distribution,4400,India
+SPUL-IN,,Trading,1100,India
+SPTR-IN,SPUL-IN,Generation Thermal,1320,India

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { AutoCollapsibleList } from '../../Common/AutoCollapsibleList';
 import { CompactStatStrip, type StatStripItem } from '../../Common/CompactStatStrip';
 import { FactVsInferenceLabel } from '../../Common/FactVsInferenceLabel';
+import { DataCaveats } from './DataCaveats';
 import { AnalysisDataQualityPanel } from './AnalysisDataQualityPanel';
 import { SessionFilesPanel } from './SessionFilesPanel';
 import { AgentActivityPanel } from './AgentActivityPanel';
@@ -17,13 +18,14 @@ import {
   formatEvidenceUsedLine,
   formatSpendAmount,
 } from '../../../utils/analysisInsights';
+import { benchmarkVintageWarning } from '../../../utils/provenance';
 import { CollapsibleDetail } from '../../Common/CollapsibleDetail';
 import { Badge } from '../../Common/Badge';
 import {
   showZeroSpendIngestionWarning,
 } from '../../../utils/ingestionWarnings';
 import type { ManifestFileEntry } from '../../../utils/sessionFiles';
-import type { ProgressStep, SessionManifest, SessionResponse } from '../../../types';
+import type { ProgressStep, RunDelta, SessionManifest, SessionResponse } from '../../../types';
 
 interface InsightCardsProps {
   analysis: SessionResponse | null;
@@ -32,8 +34,10 @@ interface InsightCardsProps {
   agentRunId?: string;
   agentLoading?: boolean;
   agentDegraded?: boolean;
+  agentFallbackReasons?: Record<string, unknown>;
   pipelineLabel?: string;
   onOpenCostRoom?: () => void | Promise<void>;
+  onOpenProbes?: () => void;
 }
 
 function asRecord(v: unknown): Record<string, unknown> | null {
@@ -47,8 +51,10 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
   agentRunId,
   agentLoading,
   agentDegraded,
+  agentFallbackReasons,
   pipelineLabel,
   onOpenCostRoom,
+  onOpenProbes,
 }) => {
   const [showRaw, setShowRaw] = useState(false);
 
@@ -72,6 +78,8 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
       : null;
 
   const savingsHeadline = snapshot?.savings_headline ?? null;
+  const expectedNet3yr = snapshot?.expected_net_3yr ?? null;
+  const fullDeliveryNet3yr = snapshot?.full_delivery_net_3yr ?? null;
   const abovePeerCount = snapshot?.peer_gap_count ?? 0;
   const comparisonCount = snapshot?.peer_comparison_count ?? 0;
   const topCategories = snapshot?.top_categories ?? [];
@@ -130,6 +138,9 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
 
   const zeroSpendWarning = showZeroSpendIngestionWarning(manifest, analysis);
 
+  const runDelta = asRecord(analysis?.run_delta) as RunDelta | null;
+  const smeSummary = snapshot?.sme_qualification;
+
   const engagementStats = useMemo((): StatStripItem[] => {
     const stats: StatStripItem[] = [
       {
@@ -166,6 +177,24 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
         detail: 'Savings model',
       });
     }
+    if (expectedNet3yr) {
+      stats.push({
+        id: 'expected-savings',
+        label: 'Expected 3-yr net',
+        value: formatSpendAmount(expectedNet3yr, snapshot?.reporting_currency ?? 'INR'),
+        detail: [
+          'after execution risk',
+          snapshot?.expected_net_p10_3yr && snapshot?.expected_net_p90_3yr
+            ? `P10–P90 ${formatSpendAmount(snapshot.expected_net_p10_3yr, snapshot.reporting_currency ?? 'INR')} – ${formatSpendAmount(snapshot.expected_net_p90_3yr, snapshot.reporting_currency ?? 'INR')}`
+            : null,
+          fullDeliveryNet3yr
+            ? `${formatSpendAmount(fullDeliveryNet3yr, snapshot?.reporting_currency ?? 'INR')} if fully delivered`
+            : null,
+        ]
+          .filter(Boolean)
+          .join(' · '),
+      });
+    }
     return stats;
   }, [
     company,
@@ -175,6 +204,11 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
     comparisonCount,
     abovePeerCount,
     savingsHeadline,
+    expectedNet3yr,
+    fullDeliveryNet3yr,
+    snapshot?.expected_net_p10_3yr,
+    snapshot?.expected_net_p90_3yr,
+    snapshot?.reporting_currency,
   ]);
 
   const hasContent = analysis || files.length > 0 || agentSteps?.length || agentLoading;
@@ -189,6 +223,76 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
 
   return (
     <div className="space-y-5">
+      {runDelta && runDelta.delta_mid_savings != null && runDelta.delta_mid_savings !== 0 && (
+        <div className="rounded-lg border border-brand-border bg-brand-surface-muted px-3 py-2 text-xs">
+          <p className="font-semibold text-brand-ink">Since last run</p>
+          <p className="text-brand-muted mt-1">
+            Mid-case savings moved by{' '}
+            <span className="font-semibold text-brand-ink tabular-nums">
+              {formatSpendAmount(Math.abs(runDelta.delta_mid_savings), runDelta.currency ?? currency)}
+            </span>{' '}
+            {runDelta.delta_mid_savings > 0 ? 'up' : 'down'}.
+          </p>
+        </div>
+      )}
+
+      {smeSummary && (smeSummary.ready_count + smeSummary.probe_count + smeSummary.insufficient_count) > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <FactVsInferenceLabel kind="inference" />
+            <p className="text-xs font-semibold uppercase text-brand-muted">Decision readiness</p>
+          </div>
+          {(() => {
+            const total =
+              (smeSummary.savings_ready ?? 0) +
+              (smeSummary.savings_probe ?? 0) +
+              (smeSummary.savings_insufficient ?? 0);
+            const pct = (n: number) => (total > 0 ? (n / total) * 100 : 0);
+            return (
+              <>
+                <div className="flex h-3 rounded-full overflow-hidden bg-slate-100 text-[11px]">
+                  {smeSummary.savings_ready > 0 && (
+                    <div
+                      className="bg-emerald-500"
+                      style={{ width: `${pct(smeSummary.savings_ready)}%` }}
+                      title={`Ready: ${formatSpendAmount(smeSummary.savings_ready, currency)}`}
+                    />
+                  )}
+                  {smeSummary.savings_probe > 0 && (
+                    <div
+                      className="bg-amber-400"
+                      style={{ width: `${pct(smeSummary.savings_probe)}%` }}
+                      title={`Probe: ${formatSpendAmount(smeSummary.savings_probe, currency)}`}
+                    />
+                  )}
+                  {smeSummary.savings_insufficient > 0 && (
+                    <div
+                      className="bg-slate-300"
+                      style={{ width: `${pct(smeSummary.savings_insufficient)}%` }}
+                      title={`Insufficient: ${formatSpendAmount(smeSummary.savings_insufficient, currency)}`}
+                    />
+                  )}
+                </div>
+                <p className="text-xs text-brand-muted mt-1.5">
+                  Ready {smeSummary.ready_count} · Probe {smeSummary.probe_count} · Insufficient{' '}
+                  {smeSummary.insufficient_count}
+                </p>
+                {smeSummary.probe_count > 0 && onOpenProbes && (
+                  <button
+                    type="button"
+                    onClick={onOpenProbes}
+                    className="mt-2 text-xs font-semibold text-brand-navy hover:text-brand-primary"
+                  >
+                    Answer {smeSummary.probe_count} probe{smeSummary.probe_count === 1 ? '' : 's'} to unlock{' '}
+                    {formatSpendAmount(smeSummary.savings_probe, currency)}
+                  </button>
+                )}
+              </>
+            );
+          })()}
+        </div>
+      )}
+
       <SessionFilesPanel files={files} />
 
       <WorkbookIngestionPanel
@@ -198,6 +302,8 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
         industry={industry}
         lineCount={lineCount}
       />
+
+      <DataCaveats snapshot={snapshot} includeIngestion={false} />
 
       <AnalysisDataQualityPanel analysis={analysis} currency={currency} />
 
@@ -267,6 +373,17 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
             <p className="text-xs font-semibold uppercase text-brand-muted">Above peer (P75+)</p>
           </div>
           <CompactStatStrip items={peerGapStats} />
+          <ul className="mt-2 space-y-1">
+            {peerGapDetails.map((gap) => {
+              const warn = benchmarkVintageWarning(gap.benchmark_vintage, gap.benchmark_sample_n);
+              if (!warn) return null;
+              return (
+                <li key={gap.category_id} className="text-[11px] text-amber-800 bg-amber-50 rounded px-2 py-0.5">
+                  {gap.category_name}: {warn}
+                </li>
+              );
+            })}
+          </ul>
         </div>
       )}
 
@@ -341,12 +458,12 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
                     </div>
                   </div>
                   {smeCritique?.evidenceUsed && (
-                    <p className="text-[10px] text-emerald-700 leading-snug break-words">
+                    <p className="text-[11px] text-emerald-700 leading-snug break-words">
                       Evidence used: {smeCritique.evidenceUsed}
                     </p>
                   )}
                   {smeCritique?.criticalRisk && smeCritique.verdict !== 'proceed' && (
-                    <p className="text-[10px] text-amber-700 leading-snug break-words">
+                    <p className="text-[11px] text-amber-700 leading-snug break-words">
                       {smeCritique.gaps?.length ? 'Still needed: ' : ''}
                       {smeCritique.criticalRisk}
                     </p>
@@ -391,6 +508,7 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
         runId={agentRunId}
         loading={agentLoading}
         degradedMode={agentDegraded}
+        fallbackReasons={agentFallbackReasons}
         pipelineLabel={pipelineLabel}
       />
 
@@ -398,13 +516,13 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
         <Link
           to="/cost-room"
           onClick={() => void onOpenCostRoom?.()}
-          className="inline-flex text-sm font-semibold text-brand-navy hover:text-deloitte-green"
+          className="inline-flex text-sm font-semibold text-brand-navy hover:text-brand-primary"
         >
           Open Cost Room →
         </Link>
       )}
 
-      {analysis && (
+      {typeof import.meta !== 'undefined' && (import.meta as ImportMeta & { env?: { DEV?: boolean } }).env?.DEV && analysis && (
         <>
           <button
             type="button"

@@ -10,11 +10,16 @@ export default {
       colors: {
         brand: {
           green: '#86BC25',
+          'data-navy': '#16324F',
           navy: '#000000',
           'navy-light': '#53565A',
           ink: '#000000',
+          // Accessible action colour: 4.99:1 against white (the brand green is 2.27:1).
+          primary: '#4D7C0F',
+          text: '#111111',
           surface: '#FFFFFF',
           'surface-muted': '#F7F7F5',
+          'surface-elevated': '#EFEFEA',
           muted: '#53565A',
           border: '#E0E0E0',
         },

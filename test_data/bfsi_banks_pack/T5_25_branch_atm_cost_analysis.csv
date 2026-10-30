@@ -1,0 +1,9 @@
+branch_type,state,city_tier,branch_count,avg_monthly_opex_inr,atm_count,digital_txn_share_pct,footfall_daily_avg
+Metro Full-Service,Maharashtra,Tier-1,280,1850000,420,82,1580
+Metro Full-Service,Karnataka,Tier-1,195,1780000,310,79,1420
+Urban Semi-Service,Uttar Pradesh,Tier-2,340,920000,280,68,980
+Urban Semi-Service,Gujarat,Tier-2,210,940000,190,71,1020
+Semi-Urban,Rajasthan,Tier-3,380,520000,180,52,640
+Semi-Urban,Madhya Pradesh,Tier-3,290,490000,140,49,580
+Rural BC,Bihar,Tier-5,420,85000,0,38,180
+Rural BC,Odisha,Tier-5,360,82000,0,36,165

@@ -1,6 +1,7 @@
 ---
 name: sme-critique
 description: "Evaluate savings initiatives for evidence maturity, contract support, benchmark specificity, and SME probe questions. Use after savings modeling when the response should qualify initiatives before business-case or execution commitments."
+kind: quality_gate
 ---
 
 # SME Critique

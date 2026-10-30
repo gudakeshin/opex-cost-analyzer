@@ -5,13 +5,15 @@ import json
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional
 
-from app.config import LLM_PROVIDER, logger
+from app.config import logger
+from app.services.llm_selection import get_resolved_llm_provider, model_for_provider
 from app.opar.agent_runtime import ToolCall, agent_loop_available, run_tool_loop
 from app.opar.models import ActResult, ExecutionPlan, ObserveContext
 from app.opar.tools.catalog import dispatch_tool_call, get_tool_catalog
 from app.opar.tools.context import ToolSessionContext
+from app.services.spend_schema import NL_QUERY_ROUTING_EXAMPLES, compact_schema_for_agent, load_spend_schema
 
-_AGENT_SYSTEM = """You are a senior FP&A analyst embedded in an OpEx cost intelligence platform.
+_AGENT_SYSTEM_BASE = """You are a senior FP&A analyst embedded in an OpEx cost intelligence platform.
 
 Your mandate: investigate before concluding. Never surface savings opportunities from thresholds alone.
 
@@ -19,16 +21,40 @@ Workflow:
 1. Understand the user's question and what evidence is needed.
 2. Use find_skills when unsure which analysis capabilities apply.
 3. search_documents for contract/policy/supporting evidence from uploads.
-4. run_skill (or query_spend / get_benchmarks / model_savings) for deterministic numbers.
-5. get_evidence before claiming initiative readiness.
-6. assess_opportunities to pressure-test which gaps are real vs noise.
+4. natural_language_query for ad-hoc spend questions in plain English (preferred over raw SQL).
+5. run_skill (or get_benchmarks / model_savings) for deterministic analysis.
+6. run_sensitivity for what-if / NPV scenario analysis (execution rate, delays, macro shocks).
+7. get_evidence before claiming initiative readiness.
+8. assess_opportunities to pressure-test which gaps are real vs noise.
 
 Rules:
 - Deterministic skill outputs are the numeric anchor; if you adjust figures, explain why.
 - Prefer specific suppliers, categories, and mechanisms over generic advice.
 - When data is missing, say so and suggest what upload would help.
 - Finish with a concise analyst summary once you have sufficient evidence.
+
+{routing_examples}
 """
+
+# Session-independent system prompt text — used for provenance/versioning via
+# app.llm.prompts. The per-session prompt (_build_agent_system) starts from
+# this and appends the spend schema when a store is available.
+_AGENT_SYSTEM = _AGENT_SYSTEM_BASE.format(routing_examples=NL_QUERY_ROUTING_EXAMPLES)
+
+
+def _build_agent_system(session: ToolSessionContext) -> str:
+    """Inject spend schema context when a store is available."""
+    parts = [_AGENT_SYSTEM]
+    try:
+        from app.services.spend_base import open_spend_query
+
+        store = open_spend_query(session.session_id)
+        if store is not None:
+            schema = load_spend_schema(store)
+            parts.append(compact_schema_for_agent(schema))
+    except Exception:
+        pass
+    return "\n\n".join(parts)
 
 
 @dataclass
@@ -40,23 +66,51 @@ class AgentRunResult:
     thinking_text: str | None = None
     agent_trace: List[Dict[str, Any]] | None = None
     fallback_reason: str | None = None
+    # Skills the deliverable-completeness backstop ran because the agent
+    # didn't invoke them (business_case closure guarantee).
+    backstop_skills: List[str] | None = None
 
 
-def _build_transport():
-    if LLM_PROVIDER == "gemini":
-        from app.config import GEMINI_ENABLED
+# A business case must always rest on this dependency closure, however the
+# agent chose to investigate. Order matters: invoke_skill resolves upstream
+# dependencies, so listing them upstream-first avoids redundant resolution.
+_BC_REQUIRED_SKILLS: tuple[str, ...] = (
+    "spend-profiler",
+    "savings-modeler",
+    "value-bridge-calculator",
+    "business-case-builder",
+)
 
-        if GEMINI_ENABLED:
+
+def _iter_transports():
+    """Preferred LLM transport first, then cross-provider fallback."""
+    from app.config import ANTHROPIC_ENABLED, GEMINI_ENABLED
+
+    prefer_gemini = get_resolved_llm_provider() == "gemini"
+    gemini_model = model_for_provider("gemini")
+    anthropic_model = model_for_provider("anthropic")
+    transports = []
+    from app.opar.gemini_client import is_gemini_quota_exhausted
+
+    if prefer_gemini:
+        if GEMINI_ENABLED and not is_gemini_quota_exhausted():
             from app.opar.gemini_client import GeminiToolTransport
 
-            return GeminiToolTransport()
-    from app.config import ANTHROPIC_ENABLED
+            transports.append(GeminiToolTransport(model=gemini_model))
+        if ANTHROPIC_ENABLED:
+            from app.opar.claude_client import ClaudeToolTransport
 
-    if ANTHROPIC_ENABLED:
-        from app.opar.claude_client import ClaudeToolTransport
+            transports.append(ClaudeToolTransport(model=anthropic_model))
+    else:
+        if ANTHROPIC_ENABLED:
+            from app.opar.claude_client import ClaudeToolTransport
 
-        return ClaudeToolTransport()
-    return None
+            transports.append(ClaudeToolTransport(model=anthropic_model))
+        if GEMINI_ENABLED and not is_gemini_quota_exhausted():
+            from app.opar.gemini_client import GeminiToolTransport
+
+            transports.append(GeminiToolTransport(model=gemini_model))
+    return transports
 
 
 def _build_user_message(ctx: ObserveContext) -> str:
@@ -83,35 +137,55 @@ def run_agent_controller(
     ctx: ObserveContext,
     *,
     progress_callback: Callable[[str, str], None] | None = None,
+    thinking_callback: Callable[[str], None] | None = None,
     transport: Any | None = None,
 ) -> AgentRunResult:
     """Execute the agent tool loop. Returns success=False when caller should fallback."""
     if not agent_loop_available():
         return AgentRunResult(success=False, fallback_reason="agent_loop_unavailable")
 
-    active_transport = transport or _build_transport()
-    if active_transport is None:
+    transports = [transport] if transport is not None else _iter_transports()
+    if not transports:
         return AgentRunResult(success=False, fallback_reason="no_llm_transport")
 
     session = ToolSessionContext(ctx=ctx)
+    agent_system = _build_agent_system(session)
 
     def dispatch(call: ToolCall) -> Any:
         if progress_callback:
             progress_callback("act", f"Agent tool: {call.name}")
         return dispatch_tool_call(session, call)
 
-    try:
-        loop_result = run_tool_loop(
-            system=_AGENT_SYSTEM,
-            messages=[{"role": "user", "content": _build_user_message(ctx)}],
-            tools=get_tool_catalog(),
-            dispatch=dispatch,
-            transport=active_transport,
-            thinking=True,
+    last_exc: Exception | None = None
+    for active_transport in transports:
+        try:
+            loop_result = run_tool_loop(
+                system=agent_system,
+                messages=[{"role": "user", "content": _build_user_message(ctx)}],
+                tools=get_tool_catalog(),
+                dispatch=dispatch,
+                transport=active_transport,
+                thinking=True,
+                thinking_callback=thinking_callback,
+            )
+            break
+        except Exception as exc:
+            last_exc = exc
+            logger.warning(
+                '"agent_controller failed session=%s transport=%s err=%s"',
+                ctx.session_id,
+                type(active_transport).__name__,
+                exc,
+            )
+            loop_result = None
+    else:
+        return AgentRunResult(
+            success=False,
+            fallback_reason=str(last_exc)[:200] if last_exc else "all_transports_failed",
         )
-    except Exception as exc:
-        logger.warning('"agent_controller failed session=%s err=%s"', ctx.session_id, exc)
-        return AgentRunResult(success=False, fallback_reason=str(exc)[:200])
+
+    if loop_result is None:
+        return AgentRunResult(success=False, fallback_reason="agent_loop_returned_no_result")
 
     if not session.skill_outputs and not session.opportunity_assessment:
         return AgentRunResult(
@@ -127,8 +201,113 @@ def run_agent_controller(
         if opps:
             session.skill_outputs["savings-modeler"]["opportunities"] = opps
 
+    backstop_skills: List[str] = []
+    if ctx.intent_class == "business_case":
+        # Deliverable-completeness backstop: the agent owns business_case, but
+        # an under-selecting run must not ship a business case missing its
+        # numeric closure — run whatever is missing deterministically.
+        for required in _BC_REQUIRED_SKILLS:
+            if required in session.skill_outputs:
+                continue
+            try:
+                session.invoke_skill(required)
+                backstop_skills.append(required)
+            except Exception as exc:
+                session.degradation_reasons[f"backstop:{required}"] = str(exc)[:160]
+        if backstop_skills:
+            logger.info(
+                '"agent_bc_backstop session=%s skills=%s"',
+                ctx.session_id,
+                ",".join(backstop_skills),
+            )
+
     act_result = session.to_act_result()
     exec_plan = session.to_execution_plan()
+
+    return AgentRunResult(
+        success=True,
+        act_result=act_result,
+        exec_plan=exec_plan,
+        agent_summary=loop_result.final_text,
+        thinking_text=loop_result.thinking_text,
+        agent_trace=session.agent_trace,
+        backstop_skills=backstop_skills or None,
+    )
+
+
+def run_agent_chat_controller(
+    ctx: ObserveContext,
+    *,
+    seed_skill_outputs: Dict[str, Any] | None = None,
+    progress_callback: Callable[[str, str], None] | None = None,
+    thinking_callback: Callable[[str], None] | None = None,
+    tool_audit_callback: Callable[[ToolCall], None] | None = None,
+    transport: Any | None = None,
+) -> AgentRunResult:
+    """Lightweight agent loop for general_qa chat — accepts tool-only outcomes."""
+    if not agent_loop_available():
+        return AgentRunResult(success=False, fallback_reason="agent_loop_unavailable")
+
+    transports = [transport] if transport is not None else _iter_transports()
+    if not transports:
+        return AgentRunResult(success=False, fallback_reason="no_llm_transport")
+
+    session = ToolSessionContext(ctx=ctx)
+    if seed_skill_outputs:
+        session.skill_outputs.update(seed_skill_outputs)
+    agent_system = _build_agent_system(session)
+
+    def dispatch(call: ToolCall) -> Any:
+        if progress_callback:
+            progress_callback("act", f"Agent tool: {call.name}")
+        if tool_audit_callback:
+            tool_audit_callback(call)
+        return dispatch_tool_call(session, call)
+
+    last_exc: Exception | None = None
+    loop_result = None
+    for active_transport in transports:
+        try:
+            loop_result = run_tool_loop(
+                system=agent_system,
+                messages=[{"role": "user", "content": _build_user_message(ctx)}],
+                tools=get_tool_catalog(),
+                dispatch=dispatch,
+                transport=active_transport,
+                thinking=True,
+                thinking_callback=thinking_callback,
+            )
+            break
+        except Exception as exc:
+            last_exc = exc
+            logger.warning(
+                '"agent_chat_controller failed session=%s transport=%s err=%s"',
+                ctx.session_id,
+                type(active_transport).__name__,
+                exc,
+            )
+            loop_result = None
+    else:
+        return AgentRunResult(
+            success=False,
+            fallback_reason=str(last_exc)[:200] if last_exc else "all_transports_failed",
+        )
+
+    if loop_result is None:
+        return AgentRunResult(success=False, fallback_reason="agent_loop_returned_no_result")
+
+    final_text = (loop_result.final_text or "").strip()
+    has_outputs = bool(session.skill_outputs or session.opportunity_assessment)
+    if not has_outputs and not final_text:
+        return AgentRunResult(
+            success=False,
+            fallback_reason="agent_produced_no_outputs",
+            agent_summary=loop_result.final_text,
+            agent_trace=session.agent_trace,
+        )
+
+    act_result = session.to_act_result() if session.skill_outputs else None
+    exec_plan = session.to_execution_plan() if session.skills_run else None
 
     return AgentRunResult(
         success=True,
@@ -144,9 +323,16 @@ def try_agent_run(
     ctx: ObserveContext,
     *,
     progress_callback: Callable[[str, str], None] | None = None,
+    thinking_callback: Callable[[str], None] | None = None,
 ) -> Optional[AgentRunResult]:
-    """Attempt agent path; returns None to signal deterministic fallback."""
-    result = run_agent_controller(ctx, progress_callback=progress_callback)
+    """Attempt agent path. On failure returns the result with success=False and
+    fallback_reason set (act_result is None) so the caller can record why the
+    deterministic plan ran instead."""
+    result = run_agent_controller(
+        ctx,
+        progress_callback=progress_callback,
+        thinking_callback=thinking_callback,
+    )
     if result.success:
         return result
     logger.info(
@@ -154,4 +340,28 @@ def try_agent_run(
         ctx.session_id,
         result.fallback_reason,
     )
-    return None
+    return result
+
+
+def try_agent_chat_run(
+    ctx: ObserveContext,
+    *,
+    seed_skill_outputs: Dict[str, Any] | None = None,
+    progress_callback: Callable[[str, str], None] | None = None,
+    thinking_callback: Callable[[str], None] | None = None,
+) -> Optional[AgentRunResult]:
+    """Agent tool loop for bespoke chat turns; falls back to one-shot synthesis on failure."""
+    result = run_agent_chat_controller(
+        ctx,
+        seed_skill_outputs=seed_skill_outputs,
+        progress_callback=progress_callback,
+        thinking_callback=thinking_callback,
+    )
+    if result.success:
+        return result
+    logger.info(
+        '"agent_chat_fallback session=%s reason=%s"',
+        ctx.session_id,
+        result.fallback_reason,
+    )
+    return result

@@ -1,9 +1,13 @@
 pack_id: pharma_lifesciences
 sector: Pharmaceuticals & Life Sciences (India)
-version: "0.1"
+version: "1.0"
 schema_version: "1"
-status: scaffold
-description: Scaffold for Indian formulations, APIs, and medical devices companies. Full content deferred.
+status: full
+description: >
+  Full sector pack for Indian formulations, API, medical devices, and CRO/CDMO
+  companies. Covers API/KSM sourcing, field-force intensity, R&D and clinical
+  spend, GMP/quality operations, regulatory filings, cold chain, and
+  pharmacovigilance cost structures.
 applicable_entity_types: [formulations_manufacturer, api_manufacturer, medical_devices, cro_cdmo]
 regulatory_bodies: [CDSCO, USFDA, EMA, DPIIT_PLI, MoHFW]
 fiscal_year_end: "March 31"

@@ -1,0 +1,25 @@
+asset_class,fiscal_period,amount,currency,status
+Manufacturing capacity expansion,FY23-Q1,142851430,INR,actual
+Manufacturing capacity expansion,FY23-Q2,158723812,INR,actual
+Manufacturing capacity expansion,FY23-Q3,150787621,INR,actual
+Manufacturing capacity expansion,FY23-Q4,171421716,INR,actual
+Manufacturing capacity expansion,FY24-Q1,168247240,INR,actual
+Manufacturing capacity expansion,FY24-Q2,173008955,INR,actual
+Cold chain infrastructure,FY23-Q1,138533081,INR,actual
+Cold chain infrastructure,FY23-Q2,153925646,INR,actual
+Cold chain infrastructure,FY23-Q3,146229363,INR,actual
+Cold chain infrastructure,FY23-Q4,166239697,INR,actual
+Cold chain infrastructure,FY24-Q1,163161184,INR,actual
+Cold chain infrastructure,FY24-Q2,167778954,INR,actual
+D2C digital platform,FY23-Q1,247053743,INR,actual
+D2C digital platform,FY23-Q2,274504159,INR,actual
+D2C digital platform,FY23-Q3,260778951,INR,actual
+D2C digital platform,FY23-Q4,296464491,INR,actual
+D2C digital platform,FY24-Q1,290974408,INR,actual
+D2C digital platform,FY24-Q2,299209533,INR,actual
+ERP S4HANA upgrade,FY23-Q1,201423411,INR,actual
+ERP S4HANA upgrade,FY23-Q2,223803791,INR,actual
+ERP S4HANA upgrade,FY23-Q3,212613601,INR,actual
+ERP S4HANA upgrade,FY23-Q4,241708094,INR,actual
+ERP S4HANA upgrade,FY24-Q1,237232018,INR,actual
+ERP S4HANA upgrade,FY24-Q2,243946132,INR,actual

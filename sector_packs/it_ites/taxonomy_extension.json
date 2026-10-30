@@ -1,14 +1,70 @@
 {
   "base_taxonomy_version": "1.0",
   "additional_categories": [
-    {"category_id": "offshore_delivery_infra", "category_name": "Offshore Delivery Centre & Infrastructure", "gl_prefix": "ODC"},
-    {"category_id": "subcontracting_associates", "category_name": "Subcontracting & Associate Costs", "gl_prefix": "SUB"},
-    {"category_id": "visa_immigration", "category_name": "Visa, Immigration & Expat Costs", "gl_prefix": "VIS"},
-    {"category_id": "stpi_see_compliance", "category_name": "STPI / SEZ Compliance Costs", "gl_prefix": "SEZ"},
-    {"category_id": "cloud_saas_infra", "category_name": "Cloud Infrastructure & SaaS Tools", "gl_prefix": "CLD"}
+    {
+      "category_id": "offshore_delivery_infra",
+      "category_name": "Offshore Delivery Centre & Infrastructure",
+      "gl_prefix": "ODC"
+    },
+    {
+      "category_id": "subcontracting_associates",
+      "category_name": "Subcontracting & Associate Costs",
+      "gl_prefix": "SUB"
+    },
+    {
+      "category_id": "visa_immigration",
+      "category_name": "Visa, Immigration & Expat Costs",
+      "gl_prefix": "VIS"
+    },
+    {
+      "category_id": "stpi_see_compliance",
+      "category_name": "STPI / SEZ Compliance Costs",
+      "gl_prefix": "SEZ"
+    },
+    {
+      "category_id": "cloud_saas_infra",
+      "category_name": "Cloud Infrastructure & SaaS Tools",
+      "gl_prefix": "CLD"
+    },
+    {
+      "category_id": "bench_capacity_cost",
+      "category_name": "Bench & Unallocated Capacity Cost",
+      "gl_prefix": "BEN",
+      "cost_nature": "operations"
+    },
+    {
+      "category_id": "genai_tooling_platforms",
+      "category_name": "GenAI Tooling & Delivery Platforms",
+      "gl_prefix": "GAI",
+      "cost_nature": "technology"
+    },
+    {
+      "category_id": "client_site_onsite_costs",
+      "category_name": "Client-Site / Onsite Deployment Costs",
+      "gl_prefix": "ONS",
+      "cost_nature": "operations"
+    },
+    {
+      "category_id": "talent_acquisition_costs",
+      "category_name": "Talent Acquisition & Lateral Hiring",
+      "gl_prefix": "TAC",
+      "cost_nature": "operations"
+    },
+    {
+      "category_id": "delivery_excellence_quality",
+      "category_name": "Delivery Excellence, QA & Process Certification",
+      "gl_prefix": "DEQ",
+      "cost_nature": "operations"
+    }
   ],
   "overrides": [
-    {"category_id": "hr", "category_name": "Employee Costs (incl. offshore bench)"},
-    {"category_id": "travel", "category_name": "Travel, Visa & Client Engagement"}
+    {
+      "category_id": "hr",
+      "category_name": "Employee Costs (incl. offshore bench)"
+    },
+    {
+      "category_id": "travel",
+      "category_name": "Travel, Visa & Client Engagement"
+    }
   ]
 }

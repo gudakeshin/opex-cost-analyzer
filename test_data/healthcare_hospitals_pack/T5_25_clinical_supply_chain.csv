@@ -1,0 +1,7 @@
+hospital,city,beds,bed_occupancy_pct,material_cost_pct_revenue,consumables_per_surgery_inr,biomedical_uptime_pct,contract_staff_ratio_pct
+Aarogya Mumbai,Mumbai,480,78.2,36.4,23200,97.2,28
+Aarogya Bangalore,Bengaluru,420,74.8,38.8,25400,96.8,34
+Aarogya Delhi NCR,Gurugram,380,71.4,39.2,26200,96.4,32
+Aarogya Hyderabad,Hyderabad,320,72.8,37.6,24800,97.0,30
+Aarogya Chennai,Chennai,280,70.2,40.4,27400,96.2,36
+Aarogya Pune,Pune,240,68.4,41.2,28200,95.8,38
