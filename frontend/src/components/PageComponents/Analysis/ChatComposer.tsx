@@ -50,6 +50,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={handleKeyDown}
+            aria-label="Message the planning agent"
             placeholder="Ask about spend, benchmarks, or savings opportunities…"
             disabled={loading}
             className="w-full resize-none bg-transparent px-4 pt-4 pb-2 text-sm text-brand-ink placeholder:text-brand-muted focus:outline-none min-h-[52px] max-h-[160px]"

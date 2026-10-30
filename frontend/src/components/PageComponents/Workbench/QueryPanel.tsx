@@ -432,6 +432,7 @@ export const QueryPanel: React.FC<QueryPanelProps> = ({ sessionId, currency }) =
             <input
               className="rounded border border-brand-border bg-brand-surface px-2 py-1.5 text-sm"
               placeholder="Save as…"
+                  aria-label="Saved query name"
               value={saveName}
               onChange={(e) => setSaveName(e.target.value)}
             />

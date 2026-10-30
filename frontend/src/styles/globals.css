@@ -133,3 +133,21 @@
     transform: translateY(0);
   }
 }
+
+/* Respect the OS "reduce motion" setting: no animated transitions, spinners or smooth scrolling. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* A visible keyboard focus ring wherever a control does not define its own. */
+:focus-visible {
+  outline: 2px solid #4d7c0f;
+  outline-offset: 2px;
+}

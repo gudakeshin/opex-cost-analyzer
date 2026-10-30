@@ -733,6 +733,7 @@ export const SensitivityPanel: React.FC<SensitivityPanelProps> = ({
             <input
               className="rounded border border-brand-border bg-brand-surface px-2 py-1.5 text-sm"
               placeholder="Save set as…"
+                  aria-label="Scenario set name"
               value={saveName}
               onChange={(e) => setSaveName(e.target.value)}
             />

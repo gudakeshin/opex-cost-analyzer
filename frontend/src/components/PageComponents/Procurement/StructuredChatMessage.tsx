@@ -284,7 +284,7 @@ function SuggestedOutputButtons({
             className={`text-xs px-3 py-1.5 rounded-full border ${
               state === 'failed'
                 ? 'border-red-400 text-red-700 hover:bg-red-50'
-                : 'border-deloitte-green text-deloitte-green hover:bg-emerald-50'
+                : 'border-deloitte-green text-brand-primary hover:bg-emerald-50'
             } disabled:opacity-60`}
           >
             {state === 'pending' ? 'Exporting…' : state === 'failed' ? `${cta.label} — retry` : cta.label}
@@ -417,7 +417,7 @@ export const StructuredChatMessage: React.FC<StructuredChatMessageProps> = ({
               <a
                 key={url}
                 href={url.startsWith('/') ? url : url}
-                className="text-xs text-deloitte-green underline underline-offset-2"
+                className="text-xs text-brand-primary underline underline-offset-2"
                 target="_blank"
                 rel="noopener noreferrer"
               >

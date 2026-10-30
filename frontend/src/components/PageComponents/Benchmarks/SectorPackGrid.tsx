@@ -83,7 +83,7 @@ export const SectorPackGrid: React.FC<SectorPackGridProps> = ({
             </span>
             <button
               type="button"
-              className="text-deloitte-green underline"
+              className="text-brand-primary underline"
               onClick={onClearPeerSet}
             >
               Clear

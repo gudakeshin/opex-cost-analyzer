@@ -87,7 +87,7 @@ export const Sidebar: React.FC = () => {
 
         {collapsed && !isMobile && activeLink && (
           <p
-            className="px-2 py-2 text-[10px] font-semibold uppercase tracking-wider text-center text-deloitte-green border-b border-brand-border leading-tight"
+            className="px-2 py-2 text-[10px] font-semibold uppercase tracking-wider text-center text-brand-primary border-b border-brand-border leading-tight"
             title={activeLink.label}
           >
             {activeLink.label.split(' ')[0]}

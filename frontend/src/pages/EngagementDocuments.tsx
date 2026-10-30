@@ -24,6 +24,7 @@ import { formatFileSize } from '../utils/sessionFiles';
 import { useSectorOptions } from '../api/hooks/useBenchmarksQueries';
 import type { EngagementSummary } from '../types';
 import { useConfirm } from '../hooks/useConfirm';
+import { useDialogA11y } from '../hooks/useDialogA11y';
 
 const ACCEPT =
   '.csv,.xlsx,.xls,.json,.pdf,.docx,.txt,.md,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json';
@@ -85,6 +86,9 @@ export const EngagementDocuments: React.FC = () => {
   const [justCreatedId, setJustCreatedId] = useState<string | null>(null);
   // Uploads in flight and half-filled create forms are lost on navigation.
   useUnsavedGuard('engagement-documents', uploading || (showCreateModal && newName.trim().length > 0));
+  const createDialogRef = useDialogA11y<HTMLDivElement>(showCreateModal, () => {
+    if (!creating) setShowCreateModal(false);
+  });
 
   const invalidateDocuments = useCallback(
     (eid: string) => queryClient.invalidateQueries({ queryKey: procurementKeys.engagementDocuments(eid) }),
@@ -269,7 +273,7 @@ export const EngagementDocuments: React.FC = () => {
         extra={
           <Link
             to="/guidebook"
-            className="text-xs font-medium text-deloitte-green hover:underline"
+            className="text-xs font-medium text-brand-primary hover:underline"
           >
             Data guidebook
           </Link>
@@ -586,11 +590,11 @@ export const EngagementDocuments: React.FC = () => {
 
       <p className="text-xs text-brand-muted mt-4">
         Open{' '}
-        <Link to="/" className="text-deloitte-green hover:underline">
+        <Link to="/" className="text-brand-primary hover:underline">
           Analysis
         </Link>{' '}
         or{' '}
-        <Link to="/diagnostic" className="text-deloitte-green hover:underline">
+        <Link to="/diagnostic" className="text-brand-primary hover:underline">
           Diagnostic
         </Link>{' '}
         — both use documents from this engagement.
@@ -602,8 +606,15 @@ export const EngagementDocuments: React.FC = () => {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
           onClick={(e) => { if (e.target === e.currentTarget) setShowCreateModal(false); }}
         >
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
-            <h2 className="text-lg font-semibold text-brand-ink mb-1">New engagement</h2>
+          <div
+            ref={createDialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="create-engagement-title"
+            tabIndex={-1}
+            className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6 outline-none"
+          >
+            <h2 id="create-engagement-title" className="text-lg font-semibold text-brand-ink mb-1">New engagement</h2>
             <p className="text-xs text-brand-muted mb-5">
               Enter company details. You can upload documents once the engagement is created.
             </p>

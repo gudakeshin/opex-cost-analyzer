@@ -35,7 +35,7 @@ export const Markdown: React.FC<MarkdownProps> = ({ children, className }) => (
           return (
             <a
               href={href}
-              className="text-deloitte-green underline underline-offset-2 font-medium"
+              className="text-brand-primary underline underline-offset-2 font-medium"
               {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
             >
               {children}

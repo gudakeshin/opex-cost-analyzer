@@ -24,6 +24,7 @@ import {
 } from '../api/hooks/useWorkbenchQueries';
 import { workbenchKeys } from '../api/queryKeys';
 import { useConfirm } from '../hooks/useConfirm';
+import { TabList } from '../components/Common/TabList';
 import type {
   WorkbenchRun,
   WorkbenchValidation,
@@ -354,52 +355,23 @@ export const Workbench: React.FC = () => {
         <Loader label="Loading catalog…" />
       ) : (
         <>
-          <div className="flex gap-2 mb-4 border-b border-brand-border">
-            <button
-              type="button"
-              className={`px-3 py-2 text-sm border-b-2 -mb-px ${
-                workbenchTab === 'compose'
-                  ? 'border-brand-primary text-brand-primary font-medium'
-                  : 'border-transparent text-brand-muted'
-              }`}
-              onClick={() => setWorkbenchTab('compose')}
-            >
-              Compose
-            </button>
-            <button
-              type="button"
-              className={`px-3 py-2 text-sm border-b-2 -mb-px ${
-                workbenchTab === 'query'
-                  ? 'border-brand-primary text-brand-primary font-medium'
-                  : 'border-transparent text-brand-muted'
-              }`}
-              onClick={() => setWorkbenchTab('query')}
-            >
-              Query
-            </button>
-            <button
-              type="button"
-              className={`px-3 py-2 text-sm border-b-2 -mb-px ${
-                workbenchTab === 'whatif'
-                  ? 'border-brand-primary text-brand-primary font-medium'
-                  : 'border-transparent text-brand-muted'
-              }`}
-              onClick={() => setWorkbenchTab('whatif')}
-            >
-              What-if
-            </button>
-            <button
-              type="button"
-              className={`px-3 py-2 text-sm border-b-2 -mb-px ${
-                workbenchTab === 'analyst'
-                  ? 'border-brand-primary text-brand-primary font-medium'
-                  : 'border-transparent text-brand-muted'
-              }`}
-              onClick={() => setWorkbenchTab('analyst')}
-            >
-              Analyst
-            </button>
-          </div>
+          <TabList
+            label="Workbench sections"
+            tabs={[
+              { id: 'compose', label: 'Compose' },
+              { id: 'query', label: 'Query' },
+              { id: 'whatif', label: 'What-if' },
+              { id: 'analyst', label: 'Analyst' },
+            ]}
+            activeId={workbenchTab}
+            onChange={(id) => setWorkbenchTab(id as typeof workbenchTab)}
+            className="flex gap-2 mb-4 border-b border-brand-border"
+            tabClassName={(active) =>
+              `px-3 py-2 text-sm border-b-2 -mb-px ${
+                active ? 'border-brand-primary text-brand-primary font-medium' : 'border-transparent text-brand-muted'
+              }`
+            }
+          />
 
           {workbenchTab === 'query' ? (
             <Card title="Ad-hoc SQL">
@@ -431,7 +403,7 @@ export const Workbench: React.FC = () => {
           <div className="space-y-4">
             <Card title="Draft run">
               {seedName && (
-                <div className="mb-3 text-xs text-deloitte-green bg-green-50 border border-green-200 rounded px-2 py-1">
+                <div className="mb-3 text-xs text-brand-primary bg-green-50 border border-green-200 rounded px-2 py-1">
                   Chaining on top of <strong>{seedName}</strong> — pick downstream analyses to add.
                 </div>
               )}

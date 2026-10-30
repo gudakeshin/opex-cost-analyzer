@@ -28,7 +28,7 @@ export function renderChatMarkdown(text: string): React.ReactNode[] {
           <a
             key={key++}
             href={href}
-            className="text-deloitte-green underline underline-offset-2 font-medium"
+            className="text-brand-primary underline underline-offset-2 font-medium"
             {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
           >
             {linkMatch[1]}

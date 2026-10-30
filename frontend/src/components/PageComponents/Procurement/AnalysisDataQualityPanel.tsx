@@ -68,7 +68,7 @@ export const AnalysisDataQualityPanel: React.FC<AnalysisDataQualityPanelProps> =
         {openConflicts.length > 0 && (
           <Link
             to="/cost-room"
-            className="text-xs font-semibold text-brand-navy hover:text-deloitte-green"
+            className="text-xs font-semibold text-brand-navy hover:text-brand-primary"
           >
             Resolve in Cost Room →
           </Link>
@@ -92,7 +92,7 @@ export const AnalysisDataQualityPanel: React.FC<AnalysisDataQualityPanelProps> =
       {allAnomalies.length > 5 && (
         <button
           type="button"
-          className="mt-2 text-xs font-semibold text-brand-navy hover:text-deloitte-green"
+          className="mt-2 text-xs font-semibold text-brand-navy hover:text-brand-primary"
           onClick={() => setShowAllAnomalies((v) => !v)}
         >
           {showAllAnomalies ? 'Show top 5' : `Show all ${allAnomalies.length} anomalies`}

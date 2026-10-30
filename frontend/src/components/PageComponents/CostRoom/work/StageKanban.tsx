@@ -56,7 +56,16 @@ export const StageKanban: React.FC<StageKanbanProps> = ({
                       ? 'border-[var(--cr-green)] ring-2 ring-[var(--cr-green-soft)]'
                       : 'border-[var(--cr-line)]'
                   }`}
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={init.initiative_id === selectedId}
                   onClick={() => onSelect(init.initiative_id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onSelect(init.initiative_id);
+                    }
+                  }}
                 >
                   <div className="text-xs font-bold leading-snug">{init.lever || init.category}</div>
                   <div className="text-[11px] text-[var(--cr-gray-2)] mt-0.5">

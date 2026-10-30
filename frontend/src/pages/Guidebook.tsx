@@ -75,7 +75,7 @@ export const Guidebook: React.FC = () => {
         <ul className="mt-4 space-y-1.5 text-sm text-brand-muted">
           {GUIDEBOOK_ACCEPTED_FORMATS.map((line) => (
             <li key={line} className="flex gap-2">
-              <span className="text-deloitte-green shrink-0">•</span>
+              <span className="text-brand-primary shrink-0">•</span>
               <span>{line}</span>
             </li>
           ))}
@@ -134,7 +134,7 @@ export const Guidebook: React.FC = () => {
                       <p className="text-sm text-brand-ink leading-relaxed">{source.whyRequired}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-deloitte-green mb-1">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-brand-primary mb-1">
                         How it adds value
                       </p>
                       <p className="text-sm text-brand-ink leading-relaxed">{source.valueAdded}</p>

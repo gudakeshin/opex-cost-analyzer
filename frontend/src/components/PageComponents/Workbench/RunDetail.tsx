@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useDialogA11y } from '../../../hooks/useDialogA11y';
 import { Button } from '../../Common/Button';
 import { formatCr } from '../../../utils/formatInr';
 import { WorkbenchRunCharts } from './WorkbenchRunCharts';
@@ -32,6 +33,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   onPromote,
   promoting,
 }) => {
+  const panelRef = useDialogA11y<HTMLDivElement>(true, onClose);
   const [tab, setTab] = useState<Tab>('summary');
   const h = run.headline || {};
   const outputs = Object.keys(run.skill_outputs || {});
@@ -40,18 +42,23 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40" onClick={onClose}>
       <div
-        className="bg-white h-full w-full max-w-lg overflow-y-auto p-5 shadow-xl"
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="run-detail-title"
+        tabIndex={-1}
+        className="bg-white h-full w-full max-w-lg overflow-y-auto p-5 shadow-xl outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h2 className="text-lg font-bold text-brand-ink">{run.name}</h2>
+            <h2 id="run-detail-title" className="text-lg font-bold text-brand-ink">{run.name}</h2>
             <p className="text-xs text-brand-muted">
               {run.status} · {run.resolved_skills.length} analyses
               {run.parent_run_id ? ' · branched' : ''}
             </p>
           </div>
-          <button type="button" onClick={onClose} className="text-brand-muted hover:text-brand-ink text-xl">
+          <button type="button" onClick={onClose} aria-label="Close" className="text-brand-muted hover:text-brand-ink text-xl">
             ×
           </button>
         </div>

@@ -97,7 +97,7 @@ export const ChatInsightBlock: React.FC<ChatInsightBlockProps> = ({
           {snapshot.savings_headline && (
             <div className="rounded-lg border border-brand-border px-2.5 py-2">
               <p className="text-[10px] uppercase font-semibold text-brand-muted">Top savings signal</p>
-              <p className="text-sm font-bold text-deloitte-green">{snapshot.savings_headline}</p>
+              <p className="text-sm font-bold text-brand-primary">{snapshot.savings_headline}</p>
             </div>
           )}
           {snapshot.expected_net_3yr != null && (

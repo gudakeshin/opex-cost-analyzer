@@ -51,7 +51,7 @@ export const NavLink: React.FC<NavLinkProps> = ({
     >
       {icon && (
         <span
-          className={`w-5 h-5 flex-shrink-0 ${active ? 'text-deloitte-green' : 'text-[#53565a] group-hover:text-black'}`}
+          className={`w-5 h-5 flex-shrink-0 ${active ? 'text-brand-primary' : 'text-[#53565a] group-hover:text-black'}`}
         >
           {icon}
         </span>

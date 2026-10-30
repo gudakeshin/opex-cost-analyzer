@@ -62,6 +62,7 @@ import {
 } from '../utils/engagementConflict';
 import type { EngagementSanityConflict } from '../types';
 import { useConfirm } from '../hooks/useConfirm';
+import { useDialogA11y } from '../hooks/useDialogA11y';
 import { useEngagementsList } from '../api/hooks/useEngagementQueries';
 import { RunStatus } from '../components/PageComponents/Analysis/RunStatus';
 import type { ManifestFileEntry } from '../utils/sessionFiles';
@@ -314,6 +315,11 @@ export const ProcurementAnalysis: React.FC = () => {
   const [manifest, setManifest] = useState<SessionManifest | null>(null);
   // On narrow screens the insights panel is a full-screen sheet; start closed there.
   const [insightsOpen, setInsightsOpen] = useState(isDesktopViewport);
+  // Below 1024px the insights panel is a modal sheet: trap focus and close on Escape.
+  const insightsSheetRef = useDialogA11y<HTMLDivElement>(
+    insightsOpen && !isDesktopViewport(),
+    () => setInsightsOpen(false),
+  );
   const openInsightsOnDesktop = () => {
     if (isDesktopViewport()) setInsightsOpen(true);
   };
@@ -1690,7 +1696,7 @@ export const ProcurementAnalysis: React.FC = () => {
                   · {engagementDocCount > 0 ? `${engagementDocCount} doc${engagementDocCount !== 1 ? 's' : ''}` : 'no docs'}
                 </span>
               )}
-              <Link to="/documents" className="text-deloitte-green hover:underline shrink-0">
+              <Link to="/documents" className="text-brand-primary hover:underline shrink-0">
                 Manage docs
               </Link>
               {engagement.detected_company_name && (
@@ -1710,7 +1716,7 @@ export const ProcurementAnalysis: React.FC = () => {
             <div className="flex items-center gap-1.5">
               <div className="w-36 min-w-[8.5rem]">
                 <Select
-                  label=""
+                  aria-label="Sector"
                   value={currentIndustry}
                   onChange={(e) => void handleSectorChange(e.target.value)}
                   disabled={sectorUpdating || loading}
@@ -1760,7 +1766,7 @@ export const ProcurementAnalysis: React.FC = () => {
             {llmModels.length > 0 && (
               <div className="w-44 min-w-[10rem]">
                 <Select
-                  label=""
+                  aria-label="AI model"
                   value={selectedLlmModel}
                   onChange={(e) => handleLlmModelChange(e.target.value)}
                   disabled={loading}
@@ -1777,7 +1783,7 @@ export const ProcurementAnalysis: React.FC = () => {
               onClick={() => setThinkingMode((v) => !v)}
               className={`text-xs px-2 py-1 rounded-md border transition-colors ${
                 thinkingMode
-                  ? 'border-deloitte-green text-deloitte-green bg-deloitte-green/5'
+                  ? 'border-deloitte-green text-brand-primary bg-deloitte-green/5'
                   : 'border-brand-border hover:bg-brand-surface-muted'
               }`}
               title="Enable extended chain-of-thought reasoning for deeper analysis"
@@ -1902,7 +1908,7 @@ export const ProcurementAnalysis: React.FC = () => {
                     <a
                       href="/api/v1/template/spend-csv"
                       download="opex_spend_template.csv"
-                      className="text-xs text-brand-muted hover:text-deloitte-green underline underline-offset-2 transition-colors"
+                      className="text-xs text-brand-muted hover:text-brand-primary underline underline-offset-2 transition-colors"
                     >
                       Download spend template ↓
                     </a>
@@ -1910,7 +1916,7 @@ export const ProcurementAnalysis: React.FC = () => {
                     <a
                       href="/api/v1/samples/spend-ledger.csv"
                       download="spend_ledger_sample.csv"
-                      className="text-xs text-brand-muted hover:text-deloitte-green underline underline-offset-2 transition-colors"
+                      className="text-xs text-brand-muted hover:text-brand-primary underline underline-offset-2 transition-colors"
                     >
                       Sample ledger CSV ↓
                     </a>
@@ -1918,7 +1924,7 @@ export const ProcurementAnalysis: React.FC = () => {
                     <a
                       href="/api/v1/samples/pnl-expense.xlsx"
                       download="pnl_expense_summary_sample.xlsx"
-                      className="text-xs text-brand-muted hover:text-deloitte-green underline underline-offset-2 transition-colors"
+                      className="text-xs text-brand-muted hover:text-brand-primary underline underline-offset-2 transition-colors"
                     >
                       Sample P&L workbook ↓
                     </a>
@@ -2019,8 +2025,11 @@ export const ProcurementAnalysis: React.FC = () => {
 
         {insightsOpen && (
           <div
-            className="lg:hidden fixed inset-0 z-40 flex flex-col justify-end"
+            ref={insightsSheetRef}
+            tabIndex={-1}
+            className="lg:hidden fixed inset-0 z-40 flex flex-col justify-end outline-none"
             role="dialog"
+            aria-modal="true"
             aria-label="Session insights"
           >
             <button

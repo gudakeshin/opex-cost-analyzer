@@ -195,6 +195,7 @@ export const AnalystPanel: React.FC<AnalystPanelProps> = ({ sessionId, currency 
         <input
           className="flex-1 rounded border border-brand-border bg-brand-surface px-3 py-1.5 text-sm"
           placeholder="e.g. which suppliers are driving the facilities overrun, and what's the NPV if we consolidate?"
+                  aria-label="Question for the analyst"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           onKeyDown={(e) => {

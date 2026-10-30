@@ -54,7 +54,7 @@ export const ResultsBoard: React.FC<ResultsBoardProps> = ({
               <button
                 type="button"
                 onClick={() => onOpen(run)}
-                className="text-left font-semibold text-brand-ink text-sm hover:text-deloitte-green truncate"
+                className="text-left font-semibold text-brand-ink text-sm hover:text-brand-primary truncate"
                 title={run.name}
               >
                 {run.name}
@@ -128,7 +128,7 @@ export const ResultsBoard: React.FC<ResultsBoardProps> = ({
               <button
                 type="button"
                 onClick={() => onToggleCompare(run.run_id)}
-                className={`px-2 py-1 rounded ${inCompare ? 'bg-green-50 text-deloitte-green' : 'hover:bg-brand-surface-muted text-brand-ink'}`}
+                className={`px-2 py-1 rounded ${inCompare ? 'bg-green-50 text-brand-primary' : 'hover:bg-brand-surface-muted text-brand-ink'}`}
               >
                 {inCompare ? 'Comparing' : 'Compare'}
               </button>

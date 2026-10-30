@@ -116,7 +116,7 @@ export const SessionHistory: React.FC = () => {
                 {s.top_savings_estimate != null && (
                   <>
                     <span>Savings est.</span>
-                    <span className="text-deloitte-green font-semibold">
+                    <span className="text-brand-primary font-semibold">
                       {formatRevenue(s.top_savings_estimate, s.currency)}
                     </span>
                   </>
@@ -132,7 +132,7 @@ export const SessionHistory: React.FC = () => {
                   Resume →
                 </button>
                 {s.session_id === sessionId && (
-                  <span className="text-[10px] text-deloitte-green self-center font-medium">Active</span>
+                  <span className="text-[10px] text-brand-primary self-center font-medium">Active</span>
                 )}
               </div>
             </div>

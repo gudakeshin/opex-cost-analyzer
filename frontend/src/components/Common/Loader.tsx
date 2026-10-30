@@ -5,8 +5,8 @@ interface LoaderProps {
 }
 
 export const Loader: React.FC<LoaderProps> = ({ label = 'Loading…' }) => (
-  <div className="flex flex-col items-center justify-center py-8">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-deloitte-green" />
+  <div role="status" aria-live="polite" className="flex flex-col items-center justify-center py-8">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary" aria-hidden />
     <p className="mt-4 text-gray-600 dark:text-gray-400 text-sm">{label}</p>
   </div>
 );

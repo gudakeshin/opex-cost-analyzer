@@ -1,4 +1,5 @@
 import React from 'react';
+import { useDialogA11y } from '../../../hooks/useDialogA11y';
 import { formatCr } from '../../../utils/formatInr';
 import type { WorkbenchRun } from '../../../types';
 
@@ -19,6 +20,7 @@ const METRICS: MetricRow[] = [
 ];
 
 export const RunCompareView: React.FC<RunCompareViewProps> = ({ runs, currency, onClose }) => {
+  const panelRef = useDialogA11y<HTMLDivElement>(true, onClose);
   const [a, b] = runs;
 
   const fmt = (v: unknown, money: boolean): string => {
@@ -33,12 +35,17 @@ export const RunCompareView: React.FC<RunCompareViewProps> = ({ runs, currency, 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
       <div
-        className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-5"
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="run-compare-title"
+        tabIndex={-1}
+        className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-5 outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-brand-ink">Compare runs</h2>
-          <button type="button" onClick={onClose} className="text-brand-muted hover:text-brand-ink text-xl">
+          <h2 id="run-compare-title" className="text-lg font-bold text-brand-ink">Compare runs</h2>
+          <button type="button" onClick={onClose} aria-label="Close" className="text-brand-muted hover:text-brand-ink text-xl">
             ×
           </button>
         </div>

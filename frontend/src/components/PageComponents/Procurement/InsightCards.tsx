@@ -271,7 +271,7 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
                   <button
                     type="button"
                     onClick={onOpenProbes}
-                    className="mt-2 text-xs font-semibold text-brand-navy hover:text-deloitte-green"
+                    className="mt-2 text-xs font-semibold text-brand-navy hover:text-brand-primary"
                   >
                     Answer {smeSummary.probe_count} probe{smeSummary.probe_count === 1 ? '' : 's'} to unlock{' '}
                     {formatSpendAmount(smeSummary.savings_probe, currency)}
@@ -506,7 +506,7 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
         <Link
           to="/cost-room"
           onClick={() => void onOpenCostRoom?.()}
-          className="inline-flex text-sm font-semibold text-brand-navy hover:text-deloitte-green"
+          className="inline-flex text-sm font-semibold text-brand-navy hover:text-brand-primary"
         >
           Open Cost Room →
         </Link>

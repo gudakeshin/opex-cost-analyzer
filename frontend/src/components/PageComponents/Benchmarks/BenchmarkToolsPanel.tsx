@@ -276,7 +276,7 @@ export const BenchmarkToolsPanel: React.FC<BenchmarkToolsPanelProps> = ({
                 <a
                   href={BENCHMARK_TEMPLATE_URL}
                   download="benchmark_template.csv"
-                  className="text-sm text-deloitte-green underline self-center"
+                  className="text-sm text-brand-primary underline self-center"
                 >
                   Or open template URL
                 </a>

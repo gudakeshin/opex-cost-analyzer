@@ -510,7 +510,7 @@ export const SkillsManagement: React.FC = () => {
                     onClick={() => toggleInput(d.name)}
                     className={`text-xs px-2 py-1 rounded-full border ${
                       newInputs.includes(d.name)
-                        ? 'border-deloitte-green bg-emerald-50 text-deloitte-green'
+                        ? 'border-deloitte-green bg-emerald-50 text-brand-primary'
                         : 'border-brand-border text-brand-muted'
                     }`}
                   >
@@ -586,7 +586,7 @@ export const SkillsManagement: React.FC = () => {
               <ul className="mt-2 text-xs space-y-1">
                 {discoverResults.map((r) => (
                   <li key={r.name} className="flex justify-between">
-                    <button type="button" className="text-deloitte-green" onClick={() => setSelectedSkill(r.name)}>
+                    <button type="button" className="text-brand-primary" onClick={() => setSelectedSkill(r.name)}>
                       {r.name}
                     </button>
                     {r.score != null && <span className="text-brand-muted">{r.score.toFixed(3)}</span>}

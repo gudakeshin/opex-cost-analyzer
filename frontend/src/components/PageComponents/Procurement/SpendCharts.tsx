@@ -207,7 +207,7 @@ export const SpendCharts: React.FC<SpendChartsProps> = ({ chartData, currency })
           <ul className="space-y-1">
             {chartData.commentary_points.map((point, i) => (
               <li key={i} className="text-xs text-brand-ink leading-relaxed flex gap-1.5">
-                <span className="text-deloitte-green shrink-0 mt-0.5">›</span>
+                <span className="text-brand-primary shrink-0 mt-0.5">›</span>
                 <span>{point}</span>
               </li>
             ))}

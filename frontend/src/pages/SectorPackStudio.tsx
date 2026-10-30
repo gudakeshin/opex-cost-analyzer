@@ -48,6 +48,7 @@ import {
 } from '../utils/sectorPackEditors';
 import { buildManifestForm, hydrateEditorDrafts } from '../utils/sectorPackStudioState';
 import { useConfirm } from '../hooks/useConfirm';
+import { TabList } from '../components/Common/TabList';
 
 type TabId =
   | 'manifest'
@@ -487,7 +488,7 @@ export const SectorPackStudio: React.FC = () => {
         <Card className="lg:col-span-1 border-brand-border bg-white">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-medium">Packs</p>
-            <Link to="/benchmarks" className="text-xs text-deloitte-green">
+            <Link to="/benchmarks" className="text-xs text-brand-primary">
               Benchmarks view
             </Link>
           </div>
@@ -560,20 +561,18 @@ export const SectorPackStudio: React.FC = () => {
             </div>
           )}
 
-          <div className="flex flex-wrap gap-2">
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setTab(t.id)}
-                className={`text-xs px-2.5 py-1 rounded border ${
-                  tab === t.id ? 'bg-brand-ink text-white border-brand-ink' : 'border-brand-border text-brand-muted'
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
+          <TabList
+            label="Pack sections"
+            tabs={TABS.map((t) => ({ id: t.id, label: t.label }))}
+            activeId={tab}
+            onChange={(id) => setTab(id as TabId)}
+            className="flex flex-wrap gap-2"
+            tabClassName={(active) =>
+              `text-xs px-2.5 py-1 rounded border ${
+                active ? 'bg-brand-ink text-white border-brand-ink' : 'border-brand-border text-brand-muted'
+              }`
+            }
+          />
 
           <div className="flex flex-wrap gap-2">
             <Button

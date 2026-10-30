@@ -51,6 +51,7 @@ export const DraftRunCanvas: React.FC<DraftRunCanvasProps> = ({
         value={runName}
         onChange={(e) => onRunNameChange(e.target.value)}
         placeholder="Name this run (e.g. Base case, WACC 13%)"
+                  aria-label="Run name"
         className="w-full px-3 py-2 rounded-lg border border-brand-border text-sm font-medium focus:outline-none focus:ring-1 focus:ring-deloitte-green"
       />
 
@@ -128,7 +129,7 @@ export const DraftRunCanvas: React.FC<DraftRunCanvasProps> = ({
       </div>
 
       {running && progressMessage && (
-        <p className="text-xs text-deloitte-green animate-pulse">{progressMessage}</p>
+        <p className="text-xs text-brand-primary animate-pulse">{progressMessage}</p>
       )}
 
       <div className="flex items-center justify-between pt-1">

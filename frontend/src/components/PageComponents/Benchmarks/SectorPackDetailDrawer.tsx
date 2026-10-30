@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useDialogA11y } from '../../../hooks/useDialogA11y';
+import { TabList } from '../../Common/TabList';
 import { Link } from 'react-router-dom';
 import { Loader } from '../../Common/Loader';
 import { getApiErrorMessage } from '../../../hooks/useApi';
@@ -35,6 +37,7 @@ interface SectorPackDetailDrawerProps {
 }
 
 export const SectorPackDetailDrawer: React.FC<SectorPackDetailDrawerProps> = ({ pack, onClose }) => {
+  const panelRef = useDialogA11y<HTMLDivElement>(Boolean(pack), onClose);
   const [tab, setTab] = useState<TabId>('overview');
 
   useEffect(() => {
@@ -55,22 +58,27 @@ export const SectorPackDetailDrawer: React.FC<SectorPackDetailDrawerProps> = ({ 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40" onClick={onClose}>
       <div
-        className="bg-white h-full w-full max-w-3xl overflow-y-auto p-5 shadow-xl"
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="sector-pack-drawer-title"
+        tabIndex={-1}
+        className="bg-white h-full w-full max-w-3xl overflow-y-auto p-5 shadow-xl outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h2 className="text-lg font-bold text-brand-ink">{title}</h2>
+            <h2 id="sector-pack-drawer-title" className="text-lg font-bold text-brand-ink">{title}</h2>
             <p className="text-xs text-brand-muted mt-0.5">{pack.pack_id}</p>
             <Link
               to="/sector-packs"
-              className="text-xs text-deloitte-green hover:underline mt-1 inline-block"
+              className="text-xs text-brand-primary hover:underline mt-1 inline-block"
               onClick={onClose}
             >
               Edit pack in Studio →
             </Link>
           </div>
-          <button type="button" onClick={onClose} className="text-brand-muted hover:text-brand-ink text-xl">
+          <button type="button" onClick={onClose} aria-label="Close" className="text-brand-muted hover:text-brand-ink text-xl">
             ×
           </button>
         </div>
@@ -85,22 +93,18 @@ export const SectorPackDetailDrawer: React.FC<SectorPackDetailDrawerProps> = ({ 
           </p>
         )}
 
-        <div className="flex flex-wrap gap-1 mt-4 border-b border-brand-border pb-2">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTab(t.id)}
-              className={`text-xs px-2.5 py-1 rounded ${
-                tab === t.id
-                  ? 'bg-brand-ink text-white'
-                  : 'text-brand-muted hover:bg-brand-surface-muted'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
+        <TabList
+          label="Pack sections"
+          tabs={TABS.map((t) => ({ id: t.id, label: t.label }))}
+          activeId={tab}
+          onChange={(id) => setTab(id as TabId)}
+          className="flex flex-wrap gap-1 mt-4 border-b border-brand-border pb-2"
+          tabClassName={(active) =>
+            `text-xs px-2.5 py-1 rounded ${
+              active ? 'bg-brand-ink text-white' : 'text-brand-muted hover:bg-brand-surface-muted'
+            }`
+          }
+        />
 
         {loading && <Loader label="Loading sector pack…" />}
         {error && <p className="text-sm text-red-600 mt-3">{error}</p>}
@@ -411,7 +415,7 @@ function SourcesPanel({ sources }: { sources?: SectorPackDetailResponse['benchma
                 <p className="font-medium">{s.name}</p>
                 {s.sample_metric && <p className="text-brand-muted mt-0.5">{s.sample_metric}</p>}
                 {s.url && (
-                  <a href={s.url} target="_blank" rel="noreferrer" className="text-deloitte-green underline mt-1 inline-block">
+                  <a href={s.url} target="_blank" rel="noreferrer" className="text-brand-primary underline mt-1 inline-block">
                     Source link
                   </a>
                 )}

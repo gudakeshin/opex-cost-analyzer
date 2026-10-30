@@ -1,4 +1,5 @@
 import React from 'react';
+import { useDialogA11y } from '../../../hooks/useDialogA11y';
 import { Loader } from '../../Common/Loader';
 import { getApiErrorMessage } from '../../../hooks/useApi';
 import { useBenchmarkCoverage } from '../../../api/hooks/useBenchmarksQueries';
@@ -74,6 +75,7 @@ export const BenchmarkDetailDrawer: React.FC<BenchmarkDetailDrawerProps> = ({
   onClose,
   onOpenSectorPack,
 }) => {
+  const panelRef = useDialogA11y<HTMLDivElement>(Boolean(dataset), onClose);
   const coverageQuery = useBenchmarkCoverage(dataset?.dataset_id);
   const coverage = coverageQuery.data ?? null;
   const loading = coverageQuery.isLoading;
@@ -90,15 +92,20 @@ export const BenchmarkDetailDrawer: React.FC<BenchmarkDetailDrawerProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40" onClick={onClose}>
       <div
-        className="bg-white h-full w-full max-w-2xl overflow-y-auto p-5 shadow-xl"
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="benchmark-drawer-title"
+        tabIndex={-1}
+        className="bg-white h-full w-full max-w-2xl overflow-y-auto p-5 shadow-xl outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h2 className="text-lg font-bold text-brand-ink">{title}</h2>
+            <h2 id="benchmark-drawer-title" className="text-lg font-bold text-brand-ink">{title}</h2>
             <p className="text-xs text-brand-muted mt-0.5">{dataset.dataset_id}</p>
           </div>
-          <button type="button" onClick={onClose} className="text-brand-muted hover:text-brand-ink text-xl">
+          <button type="button" onClick={onClose} aria-label="Close" className="text-brand-muted hover:text-brand-ink text-xl">
             ×
           </button>
         </div>
@@ -110,7 +117,7 @@ export const BenchmarkDetailDrawer: React.FC<BenchmarkDetailDrawerProps> = ({
         {packId && onOpenSectorPack && (
           <button
             type="button"
-            className="mt-3 text-sm text-deloitte-green underline block"
+            className="mt-3 text-sm text-brand-primary underline block"
             onClick={() => onOpenSectorPack(packId)}
           >
             Open full sector pack →

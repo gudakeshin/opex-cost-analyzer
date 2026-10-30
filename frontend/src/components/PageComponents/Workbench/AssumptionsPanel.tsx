@@ -27,7 +27,7 @@ export const AssumptionsPanel: React.FC<AssumptionsPanelProps> = ({
         <span>
           Assumptions
           {editedCount > 0 && (
-            <span className="ml-2 text-xs text-deloitte-green">{editedCount} overridden</span>
+            <span className="ml-2 text-xs text-brand-primary">{editedCount} overridden</span>
           )}
         </span>
         <span className="text-brand-muted">{open ? '▾' : '▸'}</span>
