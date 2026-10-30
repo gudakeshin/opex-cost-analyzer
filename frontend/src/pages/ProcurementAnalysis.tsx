@@ -1205,6 +1205,8 @@ export const ProcurementAnalysis: React.FC = () => {
     setLoading(true);
     setError(null);
     runAbortRef.current = new AbortController();
+    // Clear the previous run's steps so the status bar does not show stale progress while planning.
+    setAgentSteps([{ phase: 'observe', message: 'Understanding your question…' }]);
     try {
       await requestPlanThenChat(trimmed);
     } catch (err) {

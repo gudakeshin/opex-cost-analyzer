@@ -232,3 +232,18 @@
   background-color: #111827;
   color: #f1f5f9;
 }
+
+/* arbitrary-colour utilities used by the sidebar and a few badges */
+.dark .bg-\[\#f7f7f5\],
+.dark .hover\:bg-\[\#f7f7f5\]:hover {
+  background-color: #1e293b;
+}
+.dark .text-\[\#53565a\] {
+  color: #a8b5c8;
+}
+.dark .group:hover .group-hover\:text-black {
+  color: #f1f5f9;
+}
+.dark .text-\[\#2f6a1e\] {
+  color: #a3d65c;
+}

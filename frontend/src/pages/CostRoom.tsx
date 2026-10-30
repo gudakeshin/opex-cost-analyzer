@@ -127,6 +127,17 @@ export default function CostRoom() {
   const [auditLog, setAuditLog] = useState<AuditLogEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [confirm, confirmDialog] = useConfirm();
+
+  // The Cost Room has its own light colour system (--cr-* tokens); the generic dark layer would clash
+  // with it, so it stays light here and the user's theme choice is restored on leaving.
+  useEffect(() => {
+    const root = document.documentElement;
+    const wasDark = root.classList.contains('dark');
+    root.classList.remove('dark');
+    return () => {
+      if (wasDark) root.classList.add('dark');
+    };
+  }, []);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [rejectTargetId, setRejectTargetId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
