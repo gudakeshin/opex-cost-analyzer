@@ -8,7 +8,14 @@ import re
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from typing import Any, Callable, Dict, List, Tuple, cast
 
-from app.config import ANTHROPIC_API_KEY, ANTHROPIC_ENABLED, GEMINI_ENABLED, logger
+from app.config import (
+    ANTHROPIC_API_KEY,
+    ANTHROPIC_ENABLED,
+    GEMINI_ENABLED,
+    LLM_TEMPERATURE,
+    LLM_TRUNCATION_RETRY_MAX_TOKENS,
+    logger,
+)
 from app.services.llm_selection import (
     get_resolved_llm_model,
     get_resolved_llm_provider,
@@ -235,32 +242,46 @@ def _call_anthropic_native(
     user_param: str | list[dict[str, Any]] = (
         user_content_blocks if user_content_blocks is not None else user_content
     )
-    try:
-        response = client.messages.create(
-            model=active_model,
-            max_tokens=max_tokens,
-            # cached_system_blocks()/user_content_blocks already match the SDK's
-            # TextBlockParam shape at runtime; cast because mypy can't line up a
-            # generic list[dict[str, Any]] against the SDK's precise TypedDicts.
-            system=cast(Any, system_param),
-            messages=[{"role": "user", "content": cast(Any, user_param)}],
-        )
-    except Exception as exc:
-        from app.opar.llm_errors import classify_anthropic_exception
+    def _create(budget: int) -> Any:
+        extra: dict[str, Any] = {"temperature": LLM_TEMPERATURE} if LLM_TEMPERATURE is not None else {}
+        try:
+            return client.messages.create(
+                model=active_model,
+                max_tokens=budget,
+                # cached_system_blocks()/user_content_blocks already match the SDK's
+                # TextBlockParam shape at runtime; cast because mypy can't line up a
+                # generic list[dict[str, Any]] against the SDK's precise TypedDicts.
+                system=cast(Any, system_param),
+                messages=[{"role": "user", "content": cast(Any, user_param)}],
+                **extra,
+            )
+        except Exception as exc:
+            from app.opar.llm_errors import classify_anthropic_exception
 
-        classified = classify_anthropic_exception(exc)
-        if classified:
-            raise classified from exc
-        raise
+            classified = classify_anthropic_exception(exc)
+            if classified:
+                raise classified from exc
+            raise
+
+    response = _create(max_tokens)
     record_anthropic_usage(getattr(response, "usage", None), active_model)
     if getattr(response, "stop_reason", None) == "max_tokens":
-        from app.config import logger as _log
-
-        _log.warning(
-            '"anthropic response truncated at max_tokens=%d model=%s — output may be unparseable"',
-            max_tokens,
-            active_model,
-        )
+        retry_budget = min(max_tokens * 2, LLM_TRUNCATION_RETRY_MAX_TOKENS)
+        if retry_budget > max_tokens:
+            logger.warning(
+                '"anthropic response truncated at max_tokens=%d model=%s — retrying once with max_tokens=%d"',
+                max_tokens,
+                active_model,
+                retry_budget,
+            )
+            response = _create(retry_budget)
+            record_anthropic_usage(getattr(response, "usage", None), active_model)
+        if getattr(response, "stop_reason", None) == "max_tokens":
+            logger.warning(
+                '"anthropic response still truncated at max_tokens=%d model=%s — output may be unparseable"',
+                retry_budget,
+                active_model,
+            )
     text = getattr(response.content[0], "text", "") if response.content else ""
     return text.strip()
 
@@ -524,7 +545,16 @@ def _extract_json(text: str) -> Dict[str, Any] | List[Any]:
         match = re.search(r"```\s*([\s\S]*?)```", text)
         if match:
             text = match.group(1).strip()
-    return json.loads(text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        # Models sometimes wrap the object in prose ("Here is the analysis: {...}").
+        # raw_decode takes the first complete value and ignores trailing text.
+        start = min((i for i in (text.find("{"), text.find("[")) if i >= 0), default=-1)
+        if start < 0:
+            raise
+        value, _ = json.JSONDecoder().raw_decode(text[start:])
+        return value
 
 
 def classify_intent_claude(msg: str) -> Tuple[str, str | None]:

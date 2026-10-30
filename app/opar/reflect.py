@@ -25,6 +25,7 @@ from app.opar.reflect_persistence import (
     record_advisory_provenance,
     _merge_with_session_cache,
 )
+from app.opar.figure_check import find_unverified_figures
 from app.opar.reflect_synthesis import (
     advisory_quality_ok,
     build_response_text,
@@ -268,6 +269,12 @@ def reflect(
     quality_signals = _compute_quality_signals(validated, failed, ctx, degradation_reasons=degradation_reasons)
     grounding_coverage = _compute_grounding_coverage(response, validated)
     quality_signals["grounding_coverage"] = grounding_coverage
+    try:
+        unverified = find_unverified_figures(response, validated)
+    except Exception:  # never let an informational check break the response
+        unverified = []
+    if unverified:
+        quality_signals["unverified_figures"] = unverified
     if grounding_coverage < 0.2 and validated:
         recs = recommendation_rows(validated, max_items=2)
         if recs:

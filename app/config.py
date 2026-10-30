@@ -114,6 +114,13 @@ OPAR_TIMEOUT_SECONDS = int(_clean_env("OPAR_TIMEOUT_SECONDS", "240") or "240")
 LLM_SYNTHESIS_TIMEOUT_SECONDS = int(_clean_env("LLM_SYNTHESIS_TIMEOUT_SECONDS", "90") or "90")
 LLM_THINKING_TIMEOUT_SECONDS = int(_clean_env("LLM_THINKING_TIMEOUT_SECONDS", "180") or "180")
 
+# Optional sampling temperature for structured LLM calls (unset = provider default).
+# Lower values make re-running the same engagement more repeatable; Anthropic offers no seed.
+_llm_temp_raw = _clean_env("LLM_TEMPERATURE", "")
+LLM_TEMPERATURE: float | None = float(_llm_temp_raw) if _llm_temp_raw else None
+# Ceiling for the automatic retry when a response is cut off at max_tokens.
+LLM_TRUNCATION_RETRY_MAX_TOKENS = int(_clean_env("LLM_TRUNCATION_RETRY_MAX_TOKENS", "8192") or "8192")
+
 # Optional external connectors; app works in local mode without these.
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 ANTHROPIC_ENABLED = bool(ANTHROPIC_API_KEY)
