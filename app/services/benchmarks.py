@@ -35,6 +35,7 @@ SECTOR_PACK_TO_BENCHMARK: Dict[str, str] = {
     "energy_utilities": "energy_utilities",
     "telecom_infra": "telecom_infra",
     "manufacturing_diversified": "manufacturing",
+    "manufacturing_cement": "manufacturing",
     "psu_cpse": "manufacturing",
     "conglomerate": "manufacturing",
 }

@@ -1,0 +1,22 @@
+{
+  "base_taxonomy_version": "1.0",
+  "additional_categories": [
+    {"category_id": "limestone_correctives", "category_name": "Limestone, Gypsum & Corrective Materials", "gl_prefix": "LCR", "cost_nature": "cogs"},
+    {"category_id": "kiln_fuel", "category_name": "Kiln Fuel (Coal, Petcoke & Conventional Fuels)", "gl_prefix": "KFL", "cost_nature": "cogs"},
+    {"category_id": "alternative_fuels_raw_materials", "category_name": "Alternative Fuels & Raw Materials (AFR)", "gl_prefix": "AFR", "cost_nature": "cogs"},
+    {"category_id": "clinker_conversion", "category_name": "Clinker & Cement Conversion Cost", "gl_prefix": "CCV", "cost_nature": "cogs"},
+    {"category_id": "plant_power_whr", "category_name": "Grid Power, Captive Power & Waste-Heat Recovery", "gl_prefix": "PWR", "cost_nature": "operations"},
+    {"category_id": "kiln_refractory_mro", "category_name": "Kiln Refractory, Maintenance & Critical Spares", "gl_prefix": "KMR", "cost_nature": "operations"},
+    {"category_id": "grinding_media_additives", "category_name": "Grinding Media, Aids & Cement Additives", "gl_prefix": "GMA", "cost_nature": "cogs"},
+    {"category_id": "cement_packaging", "category_name": "Cement Bags, Bulk Loading & Packaging", "gl_prefix": "CPK", "cost_nature": "cogs"},
+    {"category_id": "primary_secondary_freight", "category_name": "Primary & Secondary Cement Freight", "gl_prefix": "PSF", "cost_nature": "logistics"},
+    {"category_id": "rail_siding_depot", "category_name": "Rail Siding, Terminals, Depots & Warehousing", "gl_prefix": "RSD", "cost_nature": "logistics"},
+    {"category_id": "quality_lab_bis", "category_name": "Quality Laboratory, BIS Testing & Certification", "gl_prefix": "QLB", "cost_nature": "compliance"},
+    {"category_id": "environment_carbon", "category_name": "Emissions, Carbon, Water & Environmental Compliance", "gl_prefix": "ECR", "cost_nature": "compliance"}
+  ],
+  "overrides": [
+    {"category_id": "logistics", "category_name": "Cement Logistics & Distribution (Total)"},
+    {"category_id": "power_energy", "category_name": "Thermal & Electrical Energy (Total)"},
+    {"category_id": "plant_maintenance", "category_name": "Cement Plant Maintenance & Shutdowns"}
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "sector": "manufacturing_cement",
+  "currency": "INR",
+  "peers": [
+    {"name": "UltraTech Cement", "ticker": "ULTRACEMCO.NS", "exchange": "NSE", "sub_sector": "integrated_cement", "geography": "India"},
+    {"name": "Ambuja Cements", "ticker": "AMBUJACEM.NS", "exchange": "NSE", "sub_sector": "integrated_cement", "geography": "India"},
+    {"name": "ACC", "ticker": "ACC.NS", "exchange": "NSE", "sub_sector": "integrated_cement", "geography": "India"},
+    {"name": "Shree Cement", "ticker": "SHREECEM.NS", "exchange": "NSE", "sub_sector": "integrated_cement", "geography": "India"},
+    {"name": "Dalmia Bharat", "ticker": "DALBHARAT.NS", "exchange": "NSE", "sub_sector": "integrated_cement", "geography": "India"},
+    {"name": "JK Cement", "ticker": "JKCEMENT.NS", "exchange": "NSE", "sub_sector": "grey_and_white_cement", "geography": "India"},
+    {"name": "The Ramco Cements", "ticker": "RAMCOCEM.NS", "exchange": "NSE", "sub_sector": "integrated_cement", "geography": "South India"},
+    {"name": "Nuvoco Vistas", "ticker": "NUVOCO.NS", "exchange": "NSE", "sub_sector": "integrated_cement", "geography": "East and North India"},
+    {"name": "Birla Corporation", "ticker": "BIRLACORPN.NS", "exchange": "NSE", "sub_sector": "integrated_cement", "geography": "India"},
+    {"name": "India Cements", "ticker": "INDIACEM.NS", "exchange": "NSE", "sub_sector": "integrated_cement", "geography": "South India"}
+  ],
+  "benchmark_metrics": {
+    "ebitda_margin_pct": {"p25": 12.0, "p50": 18.0, "p75": 23.0},
+    "power_fuel_to_revenue_pct": {"p25": 15.0, "p50": 19.0, "p75": 23.0},
+    "freight_to_revenue_pct": {"p25": 18.0, "p50": 22.0, "p75": 26.0},
+    "specific_heat_kcal_per_kg_clinker": {"p25": 690, "p50": 730, "p75": 770},
+    "specific_power_kwh_per_t_cement": {"p25": 68, "p50": 73, "p75": 82},
+    "clinker_factor_pct": {"p25": 62.0, "p50": 68.0, "p75": 74.0}
+  },
+  "data_source": "Company annual reports and BRSR disclosures FY2024-25; IBEF, BEE/PAT and CMA public sector material; values are directional public-disclosure calibrations",
+  "refresh_date": "2026-07-16"
+}

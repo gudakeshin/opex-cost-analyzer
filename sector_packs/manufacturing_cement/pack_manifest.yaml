@@ -1,0 +1,26 @@
+pack_id: manufacturing_cement
+sector: Cement Manufacturing (India)
+version: "1.0"
+schema_version: "1"
+status: full
+description: >
+  Full sector pack for integrated cement plants, clinker units, and grinding
+  units in India. Covers limestone and corrective materials, thermal and
+  electrical energy, clinker-factor reduction, alternative fuels and raw
+  materials, waste-heat recovery, grinding efficiency, refractory and MRO,
+  packing, primary and secondary freight, quality, carbon, and environmental
+  compliance.
+applicable_entity_types:
+  - integrated_cement_manufacturer
+  - clinker_manufacturer
+  - cement_grinding_unit
+  - blended_cement_manufacturer
+regulatory_bodies: [MoEFCC, CPCB, SPCB, BEE, BIS, SEBI]
+fiscal_year_end: "March 31"
+reporting_currency: INR
+default_wacc_pct: 12.5
+default_tax_rate_pct: 25.17
+ebitda_benchmark_pct: 18.0
+created_at: "2026-07-16"
+effective_from: "2026-07-16"
+maintained_by: opex_platform_core

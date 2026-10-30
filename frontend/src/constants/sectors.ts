@@ -9,6 +9,7 @@ export const SECTOR_OPTIONS = [
   { value: 'hospitality_travel', label: 'Hospitality & Travel' },
   { value: 'insurance_general', label: 'Insurance (General)' },
   { value: 'it_ites', label: 'IT / ITES' },
+  { value: 'manufacturing_cement', label: 'Cement Manufacturing' },
   { value: 'manufacturing_diversified', label: 'Manufacturing (Diversified)' },
   { value: 'pharma_lifesciences', label: 'Pharma & Life Sciences' },
   { value: 'psu_cpse', label: 'PSU / CPSE' },
