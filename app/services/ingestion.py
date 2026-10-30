@@ -304,10 +304,9 @@ def _numeric_valid_ratio(series: pd.Series) -> float:
     """Share of cells that coerce to a finite number."""
     if series is None or len(series) == 0:
         return 0.0
-    numeric = pd.to_numeric(
-        series.astype(str).str.replace(",", "", regex=False), errors="coerce"
-    )
-    return float(numeric.notna().sum()) / max(len(series), 1)
+    sample = series.head(500).reset_index(drop=True)
+    _, unparseable, blank = _parse_amount_series(sample)
+    return float((~unparseable & ~blank).sum()) / max(len(sample), 1)
 
 
 def _column_has_negative_amount_token(col: str, has_amount_token: bool) -> bool:
@@ -433,10 +432,9 @@ def _column_amount_score(col: str, series: Optional[pd.Series] = None) -> float:
             score += 4.0
         elif valid_ratio > 0.25:
             score += 2.0
-        numeric = pd.to_numeric(
-            series.astype(str).str.replace(",", "", regex=False), errors="coerce"
-        )
-        if numeric.notna().any() and float(numeric.fillna(0).median()) > 0:
+        numeric, unparseable, blank = _parse_amount_series(series.head(500).reset_index(drop=True))
+        parsed = numeric[~unparseable & ~blank]
+        if len(parsed) and float(parsed.median()) > 0:
             score += 2.0
     return score
 
@@ -470,11 +468,40 @@ def _infer_currency_from_column_name(col_name: str) -> Optional[str]:
     return None
 
 
+_KEYWORD_PATTERN_CACHE: Dict[int, Tuple[Dict, List[Tuple[Dict, Optional["re.Pattern[str]"]]]]] = {}
+
+
+def _compiled_category_patterns(taxonomy: Dict) -> List[Tuple[Dict, Optional["re.Pattern[str]"]]]:
+    """One alternation regex per category, matching whole words (plural-tolerant).
+
+    Substring matching let short keywords fire inside unrelated words
+    ("gas" in "Vegas", "tax" in "syntax", "lab" in "elaborate").
+    """
+    cached = _KEYWORD_PATTERN_CACHE.get(id(taxonomy))
+    if cached is not None and cached[0] is taxonomy:
+        return cached[1]
+    compiled: List[Tuple[Dict, Optional["re.Pattern[str]"]]] = []
+    for cat in taxonomy.get("categories", []):
+        kws = sorted({str(k).lower().strip() for k in cat.get("keywords", []) if str(k).strip()}, key=len, reverse=True)
+        pattern = (
+            re.compile(r"(?<![a-z0-9])(?:" + "|".join(re.escape(k) for k in kws) + r")(?:s|es)?(?![a-z0-9])")
+            if kws
+            else None
+        )
+        compiled.append((cat, pattern))
+    if len(_KEYWORD_PATTERN_CACHE) >= 8:
+        _KEYWORD_PATTERN_CACHE.clear()
+    _KEYWORD_PATTERN_CACHE[id(taxonomy)] = (taxonomy, compiled)
+    return compiled
+
+
 def _classify(description: str, supplier: str, taxonomy: Dict) -> Tuple[str, str]:
     content = f"{description} {supplier}".lower()
     best = ("OTHER", "Other / Unclassified", 0)
-    for cat in taxonomy.get("categories", []):
-        hits = sum(1 for kw in cat.get("keywords", []) if kw.lower() in content)
+    for cat, pattern in _compiled_category_patterns(taxonomy):
+        if pattern is None:
+            continue
+        hits = len({m.group(0) for m in pattern.finditer(content)})
         if hits > best[2]:
             best = (cat.get("id", "OTHER"), cat.get("name", "Other / Unclassified"), hits)
     return best[0], best[1]
@@ -506,25 +533,32 @@ def _classify_by_gl(gl_code: str, taxonomy: Dict) -> Tuple[str, str] | None:
 def _derive_fiscal_period(date_str: str) -> Tuple[int | None, str | None]:
     """Return (fiscal_year, fiscal_period) from a date string.
 
-    fiscal_period format: "YYYY-Qn" for quarterly or "YYYY-MM" for monthly.
-    We prefer monthly precision when available.
+    fiscal_period format is calendar "YYYY-MM". fiscal_year follows the Indian
+    April-March year, labelled by the year it ends in (Apr 2024 - Mar 2025 = 2025,
+    i.e. "FY25").
     """
     if not date_str or date_str in ("", "nan", "NaT", "None"):
         return None, None
-    for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%d/%m/%Y", "%m/%d/%Y", "%Y-%m", "%m/%Y", "%b %Y", "%B %Y"):
+
+    def _result(dt: datetime) -> Tuple[int, str]:
+        fy = dt.year + 1 if dt.month >= 4 else dt.year
+        return fy, f"{dt.year}-{dt.month:02d}"
+
+    text = str(date_str).strip()
+    # Whole-string formats first so "September 2025" is not truncated to 10 chars.
+    for fmt in ("%b %Y", "%B %Y", "%Y-%m", "%m/%Y"):
         try:
-            dt = datetime.strptime(str(date_str).strip()[:10], fmt)
-            fy = dt.year
-            fp = f"{dt.year}-{dt.month:02d}"
-            return fy, fp
+            return _result(datetime.strptime(text, fmt))
+        except ValueError:
+            continue
+    for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%d/%m/%Y", "%m/%d/%Y"):
+        try:
+            return _result(datetime.strptime(text[:10], fmt))
         except ValueError:
             continue
     # Try pandas as fallback for exotic formats
     try:
-        dt = pd.to_datetime(date_str)
-        fy = dt.year
-        fp = f"{dt.year}-{dt.month:02d}"
-        return fy, fp
+        return _result(pd.to_datetime(date_str))
     except Exception:
         return None, None
 
@@ -758,7 +792,7 @@ def _compute_line_quality_score(
         score += 0.25
     if description and description not in ("N/A", ""):
         score += 0.20
-    if category_id and category_id not in ("uncategorized", "other", ""):
+    if category_id and category_id.lower() not in ("uncategorized", "other", ""):
         score += 0.25
     if gl_code:
         score += 0.10
@@ -997,6 +1031,66 @@ def _parse_planning_workbook(
     return out
 
 
+_AMOUNT_SCALE_WORDS = {"crore": 1e7, "crores": 1e7, "lakh": 1e5, "lakhs": 1e5, "lac": 1e5, "lacs": 1e5}
+_AMOUNT_CURRENCY_NOISE = re.compile(r"(?i)(₹|\$|€|£|\binr\b|\busd\b|\brs\.?(?=\s|\d|$))")
+_AMOUNT_BLANKS = {"", "nan", "none", "null", "nat", "-", "--", "n/a", "na"}
+
+
+def _parse_amount_text(raw: Any) -> Tuple[Optional[float], bool]:
+    """Parse one amount cell. Returns (value, is_blank).
+
+    value is None when the cell has text that cannot be read as a number.
+    Handles currency symbols, Indian/Western grouping, parenthesised and
+    trailing-minus negatives, and the words lakh/crore. Bare "Cr"/"Dr"
+    suffixes are deliberately NOT guessed (crore vs credit is ambiguous);
+    they surface as unparseable instead.
+    """
+    if raw is None:
+        return None, True
+    if isinstance(raw, (int, float)):
+        if raw != raw:  # NaN
+            return None, True
+        return float(raw), False
+    text = str(raw).strip()
+    if text.lower() in _AMOUNT_BLANKS:
+        return None, True
+    text = _AMOUNT_CURRENCY_NOISE.sub("", text).replace(",", "").replace("\u00a0", " ").strip()
+    negative = False
+    if text.startswith("(") and text.endswith(")"):
+        negative, text = True, text[1:-1].strip()
+    if text.endswith("-"):
+        negative, text = True, text[:-1].strip()
+    scale = 1.0
+    m = re.fullmatch(r"([+-]?\d*\.?\d+)\s*([A-Za-z]+)", text)
+    if m and m.group(2).lower() in _AMOUNT_SCALE_WORDS:
+        text, scale = m.group(1), _AMOUNT_SCALE_WORDS[m.group(2).lower()]
+    try:
+        value = float(text) * scale
+    except ValueError:
+        return None, False
+    return (-value if negative else value), False
+
+
+def _parse_amount_series(series: "pd.Series") -> Tuple["pd.Series", "pd.Series", "pd.Series"]:
+    """Vectorised-where-possible amount parsing.
+
+    Returns (numeric values with failures as 0.0, unparseable mask, blank mask).
+    """
+    fast = pd.to_numeric(series, errors="coerce")
+    values = fast.copy()
+    unparseable = pd.Series(False, index=series.index)
+    blank = pd.Series(False, index=series.index)
+    for idx in fast.index[fast.isna()]:
+        value, is_blank = _parse_amount_text(series.at[idx])
+        if is_blank:
+            blank.at[idx] = True
+        elif value is None:
+            unparseable.at[idx] = True
+        else:
+            values.at[idx] = value
+    return values.fillna(0.0), unparseable, blank
+
+
 def _dataframe_to_spend_lines(
     frame: pd.DataFrame,
     file_path: Path,
@@ -1005,6 +1099,7 @@ def _dataframe_to_spend_lines(
     reporting_currency: str = "INR",
     source_system_id: Optional[str] = None,
     row_id_start: int = 1,
+    stats: Optional[Dict[str, Any]] = None,
 ) -> Tuple[List[NormalizedSpendLine], Optional[str]]:
     file_hash = _compute_file_hash(file_path)
 
@@ -1112,9 +1207,17 @@ def _dataframe_to_spend_lines(
 
     # --- Vectorized pre-computation (avoids per-row Python overhead on hot paths) ---
     # Amount: pandas coerce-to-numeric is ~10x faster than per-row float() in a loop.
-    _amount_numeric = pd.to_numeric(
-        amount_s.astype(str).str.replace(",", "", regex=False), errors="coerce"
-    ).fillna(0.0)
+    _amount_numeric, _amount_unparseable, _amount_blank = _parse_amount_series(
+        amount_s.reset_index(drop=True)
+    )
+    if stats is not None:
+        stats["_rows_input"] = stats.get("_rows_input", 0) + len(frame)
+        stats["_rows_unparseable"] = stats.get("_rows_unparseable", 0) + int(_amount_unparseable.sum())
+        stats["_rows_blank"] = stats.get("_rows_blank", 0) + int(_amount_blank.sum())
+        samples = stats.setdefault("_unparseable_samples", [])
+        if len(samples) < 5 and _amount_unparseable.any():
+            for raw in amount_s.reset_index(drop=True)[_amount_unparseable].head(5 - len(samples)):
+                samples.append(str(raw)[:40])
 
     out: List[NormalizedSpendLine] = []
     for i in range(len(frame)):
@@ -1262,12 +1365,34 @@ def _enrich_ingestion_report(
     }
     if mapping_note:
         quality["column_mapping_note"] = mapping_note
-    report["quality"] = quality
+    rows_input = int(report.pop("_rows_input", 0) or 0)
+    rows_unparseable = int(report.pop("_rows_unparseable", 0) or 0)
+    rows_blank = int(report.pop("_rows_blank", 0) or 0)
+    samples = report.pop("_unparseable_samples", [])
+    warnings: List[str] = []
+    if rows_input:
+        quality["rows_input"] = rows_input
+        quality["rows_dropped"] = max(rows_input - len(lines), 0)
+        quality["rows_dropped_unparseable_amount"] = rows_unparseable
+        quality["rows_dropped_blank_amount"] = rows_blank
+        quality["rows_dropped_zero_amount"] = max(
+            quality["rows_dropped"] - rows_unparseable - rows_blank, 0
+        )
+    if rows_unparseable:
+        quality["unparseable_amount_samples"] = samples
+        warnings.append(
+            f"{rows_unparseable:,} of {rows_input:,} rows were dropped because the amount "
+            f"could not be read as a number (e.g. {', '.join(repr(x) for x in samples)}). "
+            "Totals exclude these rows."
+        )
     if quality["zero_spend_warning"]:
-        report["warnings"] = [
+        warnings.append(
             "Rows were read from the file but all parsed amounts are zero. "
             "Check that amount columns contain numbers (not only line-item labels)."
-        ]
+        )
+    report["quality"] = quality
+    if warnings:
+        report["warnings"] = warnings
     return report
 
 
@@ -1374,6 +1499,7 @@ def parse_spend_file_with_report(
             reporting_currency=reporting_currency,
             source_system_id=sid,
             row_id_start=len(all_lines) + 1,
+            stats=report,
         )
         if mapping_note:
             mapping_notes.append(mapping_note)
@@ -1430,6 +1556,7 @@ def parse_spend_file_with_report(
             default_amount_type=default_amount_type,
             reporting_currency=reporting_currency,
             source_system_id=source_system_id,
+            stats=report,
         )
         if mapping_note:
             mapping_notes.append(mapping_note)
@@ -1541,6 +1668,7 @@ def parse_spend_json_with_report(
     if not records:
         raise ValueError(f"{file_path.name}: no spend records found in JSON")
     frame = pd.DataFrame(records)
+    report: Dict[str, Any] = {"source_file": file_path.name, "format": "json"}
     lines, note = _dataframe_to_spend_lines(
         frame,
         file_path,
@@ -1548,14 +1676,15 @@ def parse_spend_json_with_report(
         default_amount_type=default_amount_type,
         reporting_currency=reporting_currency,
         source_system_id=source_system_id,
+        stats=report,
     )
-    report: Dict[str, Any] = {
-        "source_file": file_path.name,
-        "format": "json",
-        "rows_parsed": len(lines),
-        "column_mapping_note": note,
-        "_empty_parse_rows": len(frame) - len(lines),
-    }
+    report.update(
+        {
+            "rows_parsed": len(lines),
+            "column_mapping_note": note,
+            "_empty_parse_rows": len(frame) - len(lines),
+        }
+    )
     return lines, _enrich_ingestion_report(report, lines, note)
 
 
