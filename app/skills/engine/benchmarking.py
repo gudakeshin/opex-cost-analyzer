@@ -117,35 +117,65 @@ def peer_benchmarker(
     vintage_date = (selected_dataset or {}).get("vintage_date")
     specificity = float((selected_dataset or {}).get("specificity_score") or 0.5)
 
-    _ci_half = max(0.05, 0.20 / math.sqrt(max(sample_n, 1))) * (1.0 - 0.5 * specificity)
+    # A confidence interval needs a real sample. Seed/illustrative datasets carry
+    # sample_size 0, so computing one from a floor of n=1 would be false precision.
+    _ci_half: float | None = (
+        max(0.05, 0.20 / math.sqrt(sample_n)) * (1.0 - 0.5 * specificity) if sample_n > 0 else None
+    )
 
     for row in rows:
         target = row["benchmark_target_pct"]
         row["benchmark_sample_n"] = sample_n
         row["benchmark_vintage"] = vintage_date
-        row["benchmark_ci"] = {
-            "lower": round(max(target * (1 - _ci_half), 0.0), 4),
-            "upper": round(target * (1 + _ci_half), 4),
-            "half_width_pct": round(_ci_half * 100, 2),
-        }
+        row["benchmark_ci"] = (
+            {
+                "lower": round(max(target * (1 - _ci_half), 0.0), 4),
+                "upper": round(target * (1 + _ci_half), 4),
+                "half_width_pct": round(_ci_half * 100, 2),
+            }
+            if _ci_half is not None
+            else None
+        )
 
     benchmark_metadata: Dict[str, Any] = {}
     if selected_dataset:
-        is_seed = selected_dataset.get("source") == "platform_seed"
+        src = str(selected_dataset.get("source") or "")
+        is_seed = (
+            src == "platform_seed"
+            or selected_dataset.get("dataset_id") == "seed-industry-benchmarks"
+            or sample_n == 0
+        )
         benchmark_metadata = {
-            "source_name": f"{source_name} (illustrative)" if is_seed else source_name,
+            "source_name": (
+                f"{source_name} (illustrative)"
+                if is_seed and "illustrative" not in source_name.lower()
+                else source_name
+            ),
+            "is_illustrative": is_seed,
             "vintage_date": vintage_date,
             "specificity_score": specificity,
             "sample_n": sample_n,
             "data_quality_note": selected_dataset.get("data_quality_note", ""),
-            "ci_half_width_pct": round(_ci_half * 100, 2),
+            "ci_half_width_pct": round(_ci_half * 100, 2) if _ci_half is not None else None,
         }
+    warnings: List[str] = []
+    if revenue <= 0:
+        warnings.append(
+            "Annual revenue is missing or zero, so category spend cannot be expressed as % of revenue "
+            "and peer-benchmark savings are not computed. Provide revenue to enable the peer lens."
+        )
+    if benchmark_metadata.get("is_illustrative"):
+        warnings.append(
+            "Peer benchmarks are illustrative (no sample behind them); do not present peer gaps as "
+            "statistically grounded."
+        )
     return {
         "industry": industry,
         "comparisons": rows,
         "benchmark_dataset": selected_dataset or {},
         "selection_rationale": selection_rationale or {},
         "benchmark_metadata": benchmark_metadata,
+        "warnings": warnings,
     }
 
 

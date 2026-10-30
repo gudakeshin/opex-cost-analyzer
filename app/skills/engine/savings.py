@@ -91,7 +91,11 @@ def _overlap_factor(
         return float(overlap_matrix.get(key, fallback))
     key_ab = f"{family_a}:{family_b}"
     key_ba = f"{family_b}:{family_a}"
-    return float(overlap_matrix.get(key_ab) or overlap_matrix.get(key_ba) or fallback)
+    if key_ab in overlap_matrix:
+        return float(overlap_matrix[key_ab])
+    if key_ba in overlap_matrix:
+        return float(overlap_matrix[key_ba])
+    return float(fallback)
 
 
 def _category_deduped_mid(
@@ -341,12 +345,24 @@ def savings_modeler(
             },
             "payback_months": payback_months,
             "irr_pct": irr_pct,
+            # Probability-weighted view. The headline gross/net figures above assume
+            # full delivery; this is what the portfolio can expect after lever-specific
+            # execution risk (base probability x org-change haircut).
+            "risk_adjusted": {
+                "execution_probability": round(float(base_execution_probability), 2),
+                "expected_gross_3yr": round((y1 + y2 + y3) * base_execution_probability, 2),
+                "expected_net_3yr": round((ny1 + ny2 + ny3) * base_execution_probability, 2),
+                "basis": "Headline figures assume 100% delivery; multiply by execution_probability for the expected case.",
+            },
         }
         # Numeric provenance: all figures in this initiative are deterministic outputs
         # from the value-bridge gap, phasing curves, and model parameters — no LLM adjustment.
         initiative_dict["provenance"] = {
             "addressable_gap":  tag_deterministic(round(gap, 2),          field="addressable_gap"),
-            "p50":              tag_deterministic(round(y1 + y2 + y3, 2), field="p50_3yr"),
+            "p50":              tag_deterministic(
+                round((y1 + y2 + y3) * base_execution_probability, 2), field="p50_3yr"
+            ),
+            "gross_3yr_full_delivery": tag_deterministic(round(y1 + y2 + y3, 2), field="gross_3yr_full_delivery"),
             "npv_pretax":       tag_deterministic(round(npv_pretax, 2),   field="npv_pretax"),
             "npv_aftertax":     tag_deterministic(round(npv_aftertax, 2), field="npv_aftertax"),
             "cta_total":        tag_deterministic(round(cta_total, 2),    field="cta_total"),
@@ -376,8 +392,23 @@ def savings_modeler(
         for i in initiatives:
             if i["lever"] != "cost_governance":
                 i["net_savings"]["y3"] = round(i["net_savings"]["y3"] * _GOVERNANCE_Y3_UPLIFT, 2)
-                i["net_savings"]["total_3yr"] = round(
-                    i["net_savings"]["y1"] + i["net_savings"]["y2"] + i["net_savings"]["y3"], 2
+                ns = i["net_savings"]
+                ns["total_3yr"] = round(ns["y1"] + ns["y2"] + ns["y3"], 2)
+                # The uplift changes Y3, so NPV (and its provenance) must follow it.
+                npv_pre = round(
+                    ns["y1"] / (1 + discount_rate)
+                    + ns["y2"] / (1 + discount_rate) ** 2
+                    + ns["y3"] / (1 + discount_rate) ** 3,
+                    2,
+                )
+                npv_after = round(npv_pre * (1.0 - tax_rate), 2)
+                ns["npv_pretax"], ns["npv_10pct"], ns["npv_aftertax"] = npv_pre, npv_pre, npv_after
+                prov = i.get("provenance", {})
+                prov["npv_pretax"] = tag_deterministic(npv_pre, field="npv_pretax")
+                prov["npv_aftertax"] = tag_deterministic(npv_after, field="npv_aftertax")
+                prov["governance_y3_uplift_applied"] = True
+                i["risk_adjusted"]["expected_net_3yr"] = round(
+                    ns["total_3yr"] * i["risk_adjusted"]["execution_probability"], 2
                 )
 
     total_run_rate = sum(
@@ -406,6 +437,8 @@ def savings_modeler(
             "eligible_lever_count": len(eligible_levers),
             "high_bounce_back_count": sum(1 for lv in eligible_levers if lv["bounce_back_risk"] == "high"),
             "governance_y3_uplift_applied": any(i["lever"] == "cost_governance" for i in initiatives),
+            "total_expected_net_3yr": round(sum(i["risk_adjusted"]["expected_net_3yr"] for i in initiatives), 2),
+            "total_net_3yr_full_delivery": round(sum(i["net_savings"]["total_3yr"] for i in initiatives), 2),
             "portfolio_ebitda_impact_bps": (
                 round((total_run_rate / float(annual_revenue)) * 10000, 1) if annual_revenue else None
             ),
