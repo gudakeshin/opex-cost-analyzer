@@ -15,7 +15,12 @@ def _analysis(**over):
         "skill_outputs": {
             "savings-modeler": {
                 "initiatives": [],
-                "summary": {"total_expected_net_3yr": 6.0e7, "total_net_3yr_full_delivery": 8.0e7},
+                "summary": {
+                    "total_expected_net_3yr": 6.0e7,
+                    "total_net_3yr_full_delivery": 8.0e7,
+                    "total_p10_net_3yr": 4.5e7,
+                    "total_p90_net_3yr": 7.2e7,
+                },
             },
             "peer-benchmarker": {
                 "warnings": ["Annual revenue is missing or zero, so peer savings are not computed."],
@@ -32,6 +37,7 @@ def _analysis(**over):
 def test_basis_states_expected_vs_full_delivery_and_caveats():
     lines = basis_lines(basis_of_figures(_analysis()))
     assert "after execution risk" in lines[0] and "6.00 Cr" in lines[0] and "8.00 Cr" in lines[0]
+    assert any("P10–P90" in l and "4.50 Cr" in l and "7.20 Cr" in l for l in lines)
     assert any("revenue is missing" in l for l in lines)
     assert any("illustrative" in l for l in lines)
     assert any("rows were dropped" in l for l in lines)
@@ -57,3 +63,28 @@ def test_exports_include_the_basis(tmp_path, monkeypatch):
     appendix = build_evidence_appendix(analysis, company_name="Acme")
     atext = "\n".join(p.text for p in Document(export_evidence_appendix_docx(appendix, "e.docx")).paragraphs)
     assert "Basis of figures" in atext and "illustrative" in atext
+
+
+def test_business_case_and_mor_pack_include_the_basis(tmp_path, monkeypatch):
+    from app.services.business_case import build_business_case, export_docx
+    from app.services.mor_pack import build_mor_pack, export_mor_docx
+
+    monkeypatch.setattr("app.services.business_case.OUTPUT_DIR", tmp_path)
+    monkeypatch.setattr("app.services.mor_pack.OUTPUT_DIR", tmp_path)
+    analysis = _analysis()
+
+    case = build_business_case(analysis)
+    assert list(case["sections"])[0] == "basis_of_figures"
+    text = "\n".join(p.text for p in Document(export_docx(case, "bc.docx")).paragraphs)
+    assert "after execution risk" in text
+
+    mor = build_mor_pack({}, {}, basis_of_figures=basis_lines(basis_of_figures(analysis)))
+    mtext = "\n".join(p.text for p in Document(export_mor_docx(mor, "mor.docx")).paragraphs)
+    assert "Basis of figures" in mtext and "illustrative" in mtext
+
+
+def test_downside_floor_percentage_is_not_multiplied_twice():
+    from app.services.narrative_composer import _downside_floor
+
+    text = _downside_floor({"scenario-modeler": {"downside_floor": 2.57e5, "downside_floor_pct_of_base": 70.0}}, "INR")
+    assert "70% of base case" in text and "7000" not in text

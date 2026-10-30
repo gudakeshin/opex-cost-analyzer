@@ -4191,20 +4191,20 @@
       "high_factor": 1.2,
       "dedup_overlap_matrix": {
         "supply:supply": 0.85,
-        "process:process": 0.80,
+        "process:process": 0.8,
         "demand:demand": 0.75,
         "technology:technology": 0.82,
         "finance:finance": 0.78,
-        "structure:structure": 0.70,
+        "structure:structure": 0.7,
         "supply:process": 0.55,
-        "supply:demand": 0.50,
+        "supply:demand": 0.5,
         "supply:technology": 0.58,
         "supply:finance": 0.52,
         "supply:structure": 0.45,
         "process:demand": 0.65,
-        "process:technology": 0.60,
+        "process:technology": 0.6,
         "process:finance": 0.58,
-        "process:structure": 0.50,
+        "process:structure": 0.5,
         "demand:technology": 0.55,
         "demand:finance": 0.48,
         "demand:structure": 0.42,
@@ -4217,7 +4217,13 @@
       "high": 0.8,
       "medium": 0.4,
       "low": 0.15
-    }
+    },
+    "execution_spread_by_risk": {
+      "low": 0.1,
+      "medium": 0.15,
+      "high": 0.25
+    },
+    "execution_spread_note": "P10/P90 execution probability = base probability -/+ this spread (by org-change risk), clamped to [0.05, 1.0]. Model assumption, not a calibrated distribution."
   },
   "lever_family_defaults_note": "execution_playbook/diagnostic_signals/required_data_fields on each lever; seeded via scripts/seed_lever_playbooks.py"
 }

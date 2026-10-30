@@ -73,3 +73,31 @@ def test_confidence_interval_with_real_sample():
 def test_zero_revenue_warns():
     out = _peer(0.0, 0)
     assert any("revenue" in w.lower() for w in out["warnings"])
+
+
+def test_payback_uses_cumulative_net_cash():
+    from app.skills.engine.savings import _payback_months
+
+    # recovered inside year 1: CTA 20 against 100 of year-1 savings -> ~2 months
+    assert _payback_months((100, 0, 0), (20, 0, 0)) == 2
+    # not recovered in year 1 (cost 150 vs savings 100), year 2 nets +100: 50 left / 100 per year = 6 months
+    assert _payback_months((100, 100, 0), (150, 0, 0)) == 18
+    # never recovered within the model horizon
+    assert _payback_months((10, 10, 10), (500, 0, 0)) == 60
+
+
+def test_each_initiative_has_a_percentile_range_and_timeline():
+    result = _modeled()
+    for init in result["initiatives"]:
+        ra = init["risk_adjusted"]
+        assert ra["p10_net_3yr"] <= ra["p50_net_3yr"] <= ra["p90_net_3yr"] <= init["net_savings"]["total_3yr"]
+        assert ra["probability_range"][0] < ra["execution_probability"] <= ra["probability_range"][1] <= 1.0
+    s = result["summary"]
+    assert s["total_p10_net_3yr"] <= s["total_expected_net_3yr"] <= s["total_p90_net_3yr"]
+    assert "percentile_note" in s
+
+
+def test_requested_horizon_other_than_three_is_disclosed():
+    rows = [{"category_id": "IT", "category_name": "IT", "source": "peer", "estimated_saving_amount": 1e5}]
+    assert engine.savings_modeler({"raw_rows": rows}, {"root_cause_findings": []}, planning_horizon_years=5)["model_notes"]
+    assert engine.savings_modeler({"raw_rows": rows}, {"root_cause_findings": []})["model_notes"] == []

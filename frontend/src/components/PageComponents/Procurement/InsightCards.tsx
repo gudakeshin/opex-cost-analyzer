@@ -182,9 +182,17 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
         id: 'expected-savings',
         label: 'Expected 3-yr net',
         value: formatSpendAmount(expectedNet3yr, snapshot?.reporting_currency ?? 'INR'),
-        detail: fullDeliveryNet3yr
-          ? `after execution risk · ${formatSpendAmount(fullDeliveryNet3yr, snapshot?.reporting_currency ?? 'INR')} if fully delivered`
-          : 'after execution risk',
+        detail: [
+          'after execution risk',
+          snapshot?.expected_net_p10_3yr && snapshot?.expected_net_p90_3yr
+            ? `P10–P90 ${formatSpendAmount(snapshot.expected_net_p10_3yr, snapshot.reporting_currency ?? 'INR')} – ${formatSpendAmount(snapshot.expected_net_p90_3yr, snapshot.reporting_currency ?? 'INR')}`
+            : null,
+          fullDeliveryNet3yr
+            ? `${formatSpendAmount(fullDeliveryNet3yr, snapshot?.reporting_currency ?? 'INR')} if fully delivered`
+            : null,
+        ]
+          .filter(Boolean)
+          .join(' · '),
       });
     }
     return stats;
@@ -198,6 +206,8 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
     savingsHeadline,
     expectedNet3yr,
     fullDeliveryNet3yr,
+    snapshot?.expected_net_p10_3yr,
+    snapshot?.expected_net_p90_3yr,
     snapshot?.reporting_currency,
   ]);
 

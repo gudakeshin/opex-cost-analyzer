@@ -162,6 +162,9 @@ export interface AnalysisInsightSnapshot {
   expected_net_3yr?: number;
   /** Same portfolio assuming every initiative is delivered in full. */
   full_delivery_net_3yr?: number;
+  /** Per-initiative P10/P90 delivery range, summed across the portfolio. */
+  expected_net_p10_3yr?: number;
+  expected_net_p90_3yr?: number;
   /** True when peer benchmarks have no sample behind them (seed / public-disclosure data). */
   benchmarks_illustrative?: boolean;
   benchmark_warnings?: string[];

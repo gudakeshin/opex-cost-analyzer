@@ -14,6 +14,7 @@ from app.services.cfo_brief import build_cfo_brief, export_cfo_brief_docx
 from app.services.compliance import append_audit_event
 from app.services.dashboard import build_dashboard_html
 from app.services.evidence_appendix import build_evidence_appendix, export_evidence_appendix_docx
+from app.services.figure_basis import basis_lines, basis_of_figures
 from app.services.mor_pack import build_mor_pack, export_mor_docx
 from app.services.pipeline import list_initiatives, pipeline_summary
 from app.services.pipeline_seed import seed_initiatives_from_analysis
@@ -151,6 +152,7 @@ def create_mor_pack(session_id: str, user_id: str | None = None) -> Dict[str, An
         bva,
         company_name=ctx["company_name"],
         engagement_week=ctx["engagement_week"],
+        basis_of_figures=basis_lines(basis_of_figures(analysis)),
     )
     path = export_mor_docx(mor, f"{session_id}_mor_pack.docx")
     append_audit_event(f"mor_pack_generated session_id={session_id}")

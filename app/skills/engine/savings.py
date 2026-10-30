@@ -80,6 +80,24 @@ def _classify_horizon(
     return "transformational"
 
 
+def _payback_months(gross: Tuple[float, float, float], cta: Tuple[float, float, float]) -> int:
+    """Months until cumulative savings recoup cost-to-achieve (CTA).
+
+    CTA is treated as spent up front in its year and savings accrue evenly through each year.
+    Returns 60 when the cost is not recovered within the 3-year model horizon.
+    """
+    y1, y2, y3 = gross
+    n1, n2, n3 = y1 - cta[0], y2 - cta[1], y3 - cta[2]
+    if n1 > 0:
+        return max(1, int((cta[0] / y1) * 12)) if y1 > 0 else 12
+    if n1 + n2 > 0:
+        # cost still unrecovered after year 1 is -n1; year 2 then earns n2 net of its own CTA
+        return 12 + max(1, int((-n1 / n2) * 12)) if n2 > 0 else 24
+    if n1 + n2 + n3 > 0:
+        return 24 + max(1, int((-(n1 + n2) / n3) * 12)) if n3 > 0 else 36
+    return 60
+
+
 def _overlap_factor(
     family_a: str,
     family_b: str,
@@ -296,14 +314,12 @@ def savings_modeler(
         irr_cashflows = [-cta_y1 * tax_multiplier, any1, any2, any3]
         irr_pct = _compute_irr(irr_cashflows) if cta_y1 > 0 else None
 
-        payback_months = 60
-        if ny1 > 0:
-            payback_months = max(1, int((cta_y1 / y1) * 12)) if y1 > 0 else 12
-        elif (ny1 + ny2) > 0:
-            remaining = cta_y1 - ny1
-            payback_months = 12 + max(1, int((remaining / ny2) * 12)) if ny2 > 0 else 24
-        elif (ny1 + ny2 + ny3) > 0:
-            payback_months = 36
+        payback_months = _payback_months((y1, y2, y3), (cta_y1, cta_y2, cta_y3))
+
+        spread = float((defaults.get("execution_spread_by_risk") or {}).get(org_change_risk, 0.15))
+        p10_prob = max(base_execution_probability - spread, 0.05)
+        p90_prob = min(base_execution_probability + spread, 1.0)
+        net_total_3yr = ny1 + ny2 + ny3
 
         initiative_dict: Dict[str, Any] = {
             "category_id": cid,
@@ -351,9 +367,15 @@ def savings_modeler(
             "risk_adjusted": {
                 "execution_probability": round(float(base_execution_probability), 2),
                 "expected_gross_3yr": round((y1 + y2 + y3) * base_execution_probability, 2),
-                "expected_net_3yr": round((ny1 + ny2 + ny3) * base_execution_probability, 2),
+                "expected_net_3yr": round(net_total_3yr * base_execution_probability, 2),
+                # Range across plausible delivery: base probability -/+ a spread set by org-change risk.
+                "p10_net_3yr": round(net_total_3yr * p10_prob, 2),
+                "p50_net_3yr": round(net_total_3yr * base_execution_probability, 2),
+                "p90_net_3yr": round(net_total_3yr * p90_prob, 2),
+                "probability_range": [round(p10_prob, 2), round(p90_prob, 2)],
                 "basis": "Headline figures assume 100% delivery; multiply by execution_probability for the expected case.",
             },
+            "timeline_weeks": (lv_meta.get("effort_weeks") or {}).get("p50"),
         }
         # Numeric provenance: all figures in this initiative are deterministic outputs
         # from the value-bridge gap, phasing curves, and model parameters — no LLM adjustment.
@@ -407,9 +429,10 @@ def savings_modeler(
                 prov["npv_pretax"] = tag_deterministic(npv_pre, field="npv_pretax")
                 prov["npv_aftertax"] = tag_deterministic(npv_after, field="npv_aftertax")
                 prov["governance_y3_uplift_applied"] = True
-                i["risk_adjusted"]["expected_net_3yr"] = round(
-                    ns["total_3yr"] * i["risk_adjusted"]["execution_probability"], 2
-                )
+                ra = i["risk_adjusted"]
+                ra["expected_net_3yr"] = ra["p50_net_3yr"] = round(ns["total_3yr"] * ra["execution_probability"], 2)
+                ra["p10_net_3yr"] = round(ns["total_3yr"] * ra["probability_range"][0], 2)
+                ra["p90_net_3yr"] = round(ns["total_3yr"] * ra["probability_range"][1], 2)
 
     total_run_rate = sum(
         i["annualized_run_rate_savings"] for i in initiatives if i["savings_type"] in ("run_rate", "mixed")
@@ -426,6 +449,14 @@ def savings_modeler(
         "effective_tax_rate": tax_rate,
         "planning_horizon_years": planning_horizon_years,
         "initiatives": initiatives,
+        "model_notes": (
+            []
+            if planning_horizon_years == 3
+            else [
+                f"planning_horizon_years={planning_horizon_years} was requested, but phasing curves, "
+                "cost-to-achieve and NPV are modelled over 3 years; results are 3-year figures."
+            ]
+        ),
         "eligible_levers": eligible_levers,
         "summary": {
             "total_run_rate_savings": round(total_run_rate, 2),
@@ -439,6 +470,12 @@ def savings_modeler(
             "governance_y3_uplift_applied": any(i["lever"] == "cost_governance" for i in initiatives),
             "total_expected_net_3yr": round(sum(i["risk_adjusted"]["expected_net_3yr"] for i in initiatives), 2),
             "total_net_3yr_full_delivery": round(sum(i["net_savings"]["total_3yr"] for i in initiatives), 2),
+            "total_p10_net_3yr": round(sum(i["risk_adjusted"]["p10_net_3yr"] for i in initiatives), 2),
+            "total_p90_net_3yr": round(sum(i["risk_adjusted"]["p90_net_3yr"] for i in initiatives), 2),
+            "percentile_note": (
+                "Portfolio P10/P90 are sums of per-initiative values, i.e. they assume initiatives "
+                "succeed or fail together, so the true portfolio range is narrower."
+            ),
             "portfolio_ebitda_impact_bps": (
                 round((total_run_rate / float(annual_revenue)) * 10000, 1) if annual_revenue else None
             ),

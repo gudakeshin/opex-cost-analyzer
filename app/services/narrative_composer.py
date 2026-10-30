@@ -81,7 +81,8 @@ def _downside_floor(outputs: Dict[str, Any], currency: str) -> str | None:
     pct = sm.get("downside_floor_pct_of_base")
     text = f"sensitivity downside floor {_fmt(float(floor), currency)}"
     if pct is not None:
-        text += f" ({float(pct):.0%} of base case)"
+        # the scenario-modeler reports percentage points (70.0 = 70%), not a fraction
+        text += f" ({float(pct):.0f}% of base case)"
     return text
 
 

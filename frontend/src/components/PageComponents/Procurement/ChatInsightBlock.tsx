@@ -113,6 +113,12 @@ export const ChatInsightBlock: React.FC<ChatInsightBlockProps> = ({
                     vs {formatSpendAmount(snapshot.full_delivery_net_3yr, currency)} if every initiative is delivered in full
                   </span>
                 )}
+                {snapshot.expected_net_p10_3yr != null && snapshot.expected_net_p90_3yr != null && (
+                  <span className="block text-xs font-normal text-brand-muted">
+                    P10–P90 range {formatSpendAmount(snapshot.expected_net_p10_3yr, currency)} –{' '}
+                    {formatSpendAmount(snapshot.expected_net_p90_3yr, currency)} (assumes initiatives succeed or fail together)
+                  </span>
+                )}
               </p>
             </div>
           )}

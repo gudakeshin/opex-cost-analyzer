@@ -7,6 +7,7 @@ from typing import Any, Dict
 from docx import Document
 
 from app.config import OUTPUT_DIR
+from app.services.figure_basis import basis_lines, basis_of_figures
 from app.services.narrative_composer import (
     attach_citations,
     compose_deterministic_advisory,
@@ -422,6 +423,10 @@ def build_business_case(
             for c in getattr(advisory, "citations", []) or []
         ],
     }
+    basis = basis_lines(basis_of_figures(analysis))
+    if basis:
+        # Lead with what the figures assume, before any number is quoted.
+        sections = {"basis_of_figures": basis, **sections}
     return {
         "template": template,
         "generated_on": str(date.today()),

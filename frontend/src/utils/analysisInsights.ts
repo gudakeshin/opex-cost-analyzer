@@ -246,6 +246,8 @@ export function extractInsightSnapshot(
   const savingsSummary = asRecord(savingsModel?.summary);
   const expectedNet = Number(savingsSummary?.total_expected_net_3yr ?? 0);
   const fullNet = Number(savingsSummary?.total_net_3yr_full_delivery ?? 0);
+  const p10Net = Number(savingsSummary?.total_p10_net_3yr ?? 0);
+  const p90Net = Number(savingsSummary?.total_p90_net_3yr ?? 0);
   const peerOut = asRecord(skillOutputs['peer-benchmarker']);
   const benchWarnings = Array.isArray(peerOut?.warnings)
     ? (peerOut!.warnings as unknown[]).map(String).filter(Boolean)
@@ -298,6 +300,8 @@ export function extractInsightSnapshot(
     savings_opportunity_count: oppCount > 0 ? oppCount : undefined,
     expected_net_3yr: expectedNet > 0 ? expectedNet : undefined,
     full_delivery_net_3yr: fullNet > 0 ? fullNet : undefined,
+    expected_net_p10_3yr: p10Net > 0 ? p10Net : undefined,
+    expected_net_p90_3yr: p90Net > 0 ? p90Net : undefined,
     benchmarks_illustrative:
       asRecord(peerOut?.benchmark_metadata)?.is_illustrative === true ? true : undefined,
     benchmark_warnings: benchWarnings.length > 0 ? benchWarnings : undefined,

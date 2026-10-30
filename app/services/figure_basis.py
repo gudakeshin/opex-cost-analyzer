@@ -48,6 +48,8 @@ def basis_of_figures(analysis: Dict[str, Any]) -> Dict[str, Any]:
         "currency": currency,
         "expected_net_3yr": expected or None,
         "full_delivery_net_3yr": full or None,
+        "p10_net_3yr": float(summary.get("total_p10_net_3yr") or 0.0) or None,
+        "p90_net_3yr": float(summary.get("total_p90_net_3yr") or 0.0) or None,
         "caveats": caveats,
     }
 
@@ -62,6 +64,13 @@ def basis_lines(basis: Dict[str, Any]) -> List[str]:
             "Headline savings assume every initiative is delivered in full. "
             f"Expected 3-year net savings after execution risk: {format_money(expected, currency)} "
             f"(vs {format_money(full, currency)} if fully delivered)."
+        )
+    p10, p90 = basis.get("p10_net_3yr"), basis.get("p90_net_3yr")
+    if expected and p10 and p90:
+        lines.append(
+            f"Delivery range (P10–P90): {format_money(p10, currency)} to {format_money(p90, currency)}. "
+            "This sums per-initiative ranges, so it assumes initiatives succeed or fail together; "
+            "the true portfolio range is narrower."
         )
     lines.extend(basis.get("caveats") or [])
     return lines
