@@ -7,7 +7,7 @@ sizes and prioritises savings initiatives, and produces CFO-ready outputs.
 It is built as a **consultant-operated tool**: an advisory team uploads the client's ledgers,
 P&L and supporting documents, runs the analysis, and works the results with the client's
 CFO / Cost Transformation Office. Reference implementation aligned to
-`OpEx_Intelligence_Platform_PRD_v2.0.md`.
+[`docs/reference/OpEx_Intelligence_Platform_PRD_v2.0.md`](docs/reference/OpEx_Intelligence_Platform_PRD_v2.0.md).
 
 What makes it different from a generic spend-cube tool:
 
@@ -169,6 +169,6 @@ eval/           Evaluation harnesses and their latest reports
 tests/          pytest suite
 test_data/      Sample engagement packs for manual testing
 data/           Runtime state; only a few fixtures (samples/, risk register) are committed
-docs/           Architecture docs and known stubs
+docs/           Architecture, known stubs, reference (PRD), evaluations and plans, sample dashboards (see docs/README.md)
 scripts/        Local server, perf check, pack tooling
 ```
