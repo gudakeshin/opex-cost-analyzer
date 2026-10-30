@@ -223,6 +223,9 @@ def process_engagement_document(
     )
 
     parsed_dir = document_parsed_dir(engagement_id, document_id)
+    from app.services.gl_mapping import apply_to_taxonomy
+
+    taxonomy = apply_to_taxonomy(taxonomy, engagement_id)  # adds this engagement's GL ranges, if any
     try:
         column_overrides = dict(get_document_record(engagement_id, document_id).get("column_overrides") or {})
     except Exception:

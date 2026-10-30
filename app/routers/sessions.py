@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
-from fastapi import APIRouter, File, HTTPException, Request, UploadFile
+from fastapi import APIRouter, File, HTTPException, Query, Request, UploadFile
 from fastapi.responses import Response
 
 from app.config import MAX_UPLOAD_MB, ROOT_DIR, logger
@@ -37,6 +37,7 @@ from app.schemas import (
     SessionSummaryResponse,
 )
 from app.security.auth import current_principal, visible_to_principal
+from app.errors import ApiError
 from app.services import analysis_runs
 from app.services.analysis import load_taxonomy, run_core_pipeline
 from app.services.compliance import append_audit_event
@@ -361,9 +362,8 @@ async def analyze_session(request: Request, session_id: str, payload: AnalyzeReq
         if payload.background:
             # Idempotent for background callers (e.g. a page reload): follow the run already in flight.
             return {"run_id": exc.run_id, "status": "running", "already_running": True}
-        raise HTTPException(
-            status_code=409,
-            detail=f"An analysis is already running for this session (run {exc.run_id}).",
+        raise ApiError(
+            409, f"An analysis is already running for this session (run {exc.run_id}).", "analysis_running"
         ) from exc
     if payload.background:
         task = asyncio.create_task(_execute_analysis(session_id, payload, run_id, foreground=False))
@@ -383,7 +383,7 @@ async def _execute_analysis(
         progress_complete(run_id, failed=True, error="cancelled")
         append_audit_event(f"analysis_cancelled session_id={session_id} run_id={run_id}")
         if foreground:
-            raise HTTPException(status_code=409, detail="Analysis cancelled.") from None
+            raise ApiError(409, "Analysis cancelled.", "analysis_cancelled") from None
         return {}
     except HTTPException as exc:
         analysis_runs.finish(run_id, "failed", error=str(exc.detail))
@@ -526,8 +526,9 @@ async def _analyze_session_impl(session_id: str, payload: AnalyzeRequest, run_id
         ) or (payload.industry or manifest.get("industry") or "")
         industry_user_set = bool(manifest.get("industry_user_set")) or payload.industry is not None
         from app.services.llm_budget import budget_scope
+        from app.services.llm_trace import trace_scope
 
-        with budget_scope(manifest.get("engagement_id") or session_id):
+        with budget_scope(manifest.get("engagement_id") or session_id), trace_scope():
             analysis = await asyncio.to_thread(
                 run_core_pipeline,
                 session_id=session_id,
@@ -695,8 +696,16 @@ def get_session_schema(session_id: str) -> Dict[str, Any]:
 
 
 @router.get("/api/v1/sessions", response_model=List[SessionSummaryResponse])
-def list_sessions(request: Request) -> List[Dict[str, Any]]:
-    """Return a summary of all sessions, newest first. Used by the History page."""
+def list_sessions(
+    request: Request,
+    response: Response,
+    limit: int | None = Query(None, ge=1, le=1000, description="Max rows to return (default: all)"),
+    offset: int = Query(0, ge=0),
+) -> List[Dict[str, Any]]:
+    """Return a summary of sessions, newest first. Used by the History page.
+
+    ``limit``/``offset`` page the result; the full count is in the ``X-Total-Count`` header.
+    """
     summaries: List[Dict[str, Any]] = []
     for session_id in list_session_ids():
         try:
@@ -735,7 +744,8 @@ def list_sessions(request: Request) -> List[Dict[str, Any]]:
         except Exception:
             continue
     summaries.sort(key=lambda x: x.get("created_at") or "", reverse=True)
-    return summaries
+    response.headers["X-Total-Count"] = str(len(summaries))
+    return summaries[offset : offset + limit] if limit else summaries[offset:]
 
 
 @router.post("/api/v1/analyze/{session_id}/incremental")

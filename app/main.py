@@ -19,6 +19,11 @@ import uuid
 from typing import Any
 
 from fastapi import Depends, FastAPI, Request
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from app.errors import error_code
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -212,6 +217,24 @@ async def _prometheus_middleware(request: Request, call_next):  # type: ignore[n
 def prometheus_metrics() -> Response:
     from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
     return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+
+@app.exception_handler(StarletteHTTPException)
+async def _http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
+    # Same body as FastAPI's default ({"detail": ...}) plus a stable machine-readable code.
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail, "code": error_code(exc.status_code, exc)},
+        headers=getattr(exc, "headers", None),
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def _validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    return JSONResponse(
+        status_code=422,
+        content={"detail": jsonable_encoder(exc.errors()), "code": "validation_error"},
+    )
 
 
 @app.exception_handler(Exception)

@@ -315,8 +315,10 @@ def get_payment_terms(session_id: str) -> Dict[str, Any]:
 @router.get("/api/v1/exports/{filename}")
 def get_export(filename: str) -> FileResponse:
     resolved = (OUTPUT_DIR / filename).resolve()
-    if not str(resolved).startswith(str(OUTPUT_DIR.resolve())):
-        raise HTTPException(status_code=400, detail="Invalid filename")
+    try:
+        resolved.relative_to(OUTPUT_DIR.resolve())
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid filename") from None
     if not resolved.exists():
         raise HTTPException(status_code=404, detail="Export not found")
     media_type = None

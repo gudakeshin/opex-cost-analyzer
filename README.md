@@ -152,7 +152,7 @@ Stated plainly so nobody mistakes them for finished work (more detail in [docs/k
   resumed. **Stop** asks the server to cancel; it takes effect between pipeline stages, so the stage already running
   finishes first and nothing partial is saved. Chat requests are not cancellable server-side. Run state is per process.
 - **Single-node by default.** Locks are in-process unless `REDIS_URL` is set.
-- **Column mapping is automatic.** The detected mapping is not shown for confirmation; check the ingest report's dropped-row counts and warnings.
+- **Column mapping is automatic, but visible.** Documents → *Column mapping* shows how each field was matched (exact / partial / detected) and lets you override it and re-process. Partial matches raise a warning; check the ingest report's dropped-row counts too.
 - **Regulatory watcher** uses a static sample catalogue unless `REG_WATCHER_LIVE=1`.
 - **No multi-user review workflow** (comments, approvals) and no cross-engagement comparison.
 - **LLM narrative is not reproducible bit-for-bit.** Figures in it are checked against skill outputs and unmatched ones are listed

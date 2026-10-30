@@ -277,6 +277,28 @@ def _csv_read_kwargs(file_path: Path) -> Dict[str, Any]:
     return {"sep": best_sep, "encoding": encoding}
 
 
+def _guard_excel_rows(file_path: Path, sheet_name: str | None) -> None:
+    """Cheaply check an .xlsx sheet's size (read-only mode) before pandas loads it all into memory."""
+    if file_path.suffix.lower() != ".xlsx":
+        return
+    try:
+        import openpyxl
+
+        wb = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
+        try:
+            ws = wb[sheet_name] if sheet_name in wb.sheetnames else wb.worksheets[0]
+            rows = int(ws.max_row or 0)
+        finally:
+            wb.close()
+    except Exception:
+        return  # unreadable here; the normal reader will raise its own, clearer error
+    if rows > _ROW_MAX:
+        raise ValueError(
+            f"{file_path.name} has about {rows:,} rows (limit: {_ROW_MAX:,}). "
+            "Export it to CSV (CSVs are streamed) or split it by entity or fiscal year."
+        )
+
+
 def _read_tabular(
     file_path: Path,
     sheet_name: str | None = None,
@@ -285,6 +307,7 @@ def _read_tabular(
     suffix = file_path.suffix.lower()
     if suffix == ".csv":
         return pd.read_csv(file_path, **_csv_read_kwargs(file_path))
+    _guard_excel_rows(file_path, sheet_name)
     if sheet_name is not None:
         return pd.read_excel(file_path, sheet_name=sheet_name, header=header_row)
     ranked = score_workbook_sheets(file_path)
@@ -563,7 +586,36 @@ def _classify_by_gl(gl_code: str, taxonomy: Dict) -> Tuple[str, str] | None:
     return None
 
 
-def _derive_fiscal_period(date_str: str) -> Tuple[int | None, str | None]:
+_SLASH_DATE = re.compile(r"^\s*(\d{1,2})/(\d{1,2})/(\d{4})")
+
+
+def _infer_dayfirst(raw_dates: "pd.Series") -> Tuple[bool, int]:
+    """Decide day/month vs month/day for slash dates from the whole column.
+
+    One date with a first part above 12 proves day-first, a second part above 12 proves
+    month-first. Returns (dayfirst, ambiguous_count); when nothing proves it, day-first (the
+    Indian convention) is used and the ambiguous dates are counted so the report can say so.
+    """
+    first_gt12 = second_gt12 = ambiguous = 0
+    for v in raw_dates.dropna().astype(str).head(5000):
+        m = _SLASH_DATE.match(v)
+        if not m:
+            continue
+        a, b = int(m.group(1)), int(m.group(2))
+        if a > 12:
+            first_gt12 += 1
+        elif b > 12:
+            second_gt12 += 1
+        elif a != b:
+            ambiguous += 1
+    if first_gt12 and not second_gt12:
+        return True, 0
+    if second_gt12 and not first_gt12:
+        return False, 0
+    return True, ambiguous if not (first_gt12 or second_gt12) else 0
+
+
+def _derive_fiscal_period(date_str: str, dayfirst: bool = True) -> Tuple[int | None, str | None]:
     """Return (fiscal_year, fiscal_period) from a date string.
 
     fiscal_period format is calendar "YYYY-MM". fiscal_year follows the Indian
@@ -584,7 +636,8 @@ def _derive_fiscal_period(date_str: str) -> Tuple[int | None, str | None]:
             return _result(datetime.strptime(text, fmt))
         except ValueError:
             continue
-    for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%d/%m/%Y", "%m/%d/%Y"):
+    slash_formats = ("%d/%m/%Y", "%m/%d/%Y") if dayfirst else ("%m/%d/%Y", "%d/%m/%Y")
+    for fmt in ("%Y-%m-%d", "%Y/%m/%d", *slash_formats):
         try:
             return _result(datetime.strptime(text[:10], fmt))
         except ValueError:
@@ -1335,6 +1388,10 @@ def _dataframe_to_spend_lines(
             for raw in amount_s.reset_index(drop=True)[_amount_unparseable].head(5 - len(samples)):
                 samples.append(str(raw)[:40])
 
+    _dayfirst, _ambiguous_dates = _infer_dayfirst(date_s) if date_col else (True, 0)
+    if stats is not None and _ambiguous_dates:
+        stats["_ambiguous_dates"] = stats.get("_ambiguous_dates", 0) + _ambiguous_dates
+
     out: List[NormalizedSpendLine] = []
     for i in range(len(frame)):
         amount = float(_amount_numeric.iloc[i])
@@ -1365,7 +1422,7 @@ def _dataframe_to_spend_lines(
         else:
             category_id, category_name = _classify(description, supplier, taxonomy)
 
-        fiscal_year, fiscal_period = _derive_fiscal_period(date_raw)
+        fiscal_year, fiscal_period = _derive_fiscal_period(date_raw, _dayfirst)
 
         # Compute reporting amount (apply FX only when currency differs)
         if currency.upper() != reporting_currency.upper():
@@ -1489,6 +1546,7 @@ def _enrich_ingestion_report(
     rows_blank = int(report.pop("_rows_blank", 0) or 0)
     samples = report.pop("_unparseable_samples", [])
     fx_defaulted = int(report.pop("_fx_defaulted_rows", 0) or 0)
+    ambiguous_dates = int(report.pop("_ambiguous_dates", 0) or 0)
     column_mapping = report.pop("_column_mapping", None)
     available_columns = report.pop("_available_columns", None)
     unmapped_columns = report.pop("_unmapped_columns", None)
@@ -1515,6 +1573,12 @@ def _enrich_ingestion_report(
         quality["rows_dropped_blank_amount"] = rows_blank
         quality["rows_dropped_zero_amount"] = max(
             quality["rows_dropped"] - rows_unparseable - rows_blank, 0
+        )
+    if ambiguous_dates:
+        quality["ambiguous_dates"] = ambiguous_dates
+        warnings.append(
+            f"{ambiguous_dates:,} dates such as 03/04/2025 could be day/month or month/day and nothing in "
+            "the file settles it; they were read as day/month (Indian convention). Check the fiscal periods."
         )
     if fx_defaulted:
         quality["rows_fx_defaulted"] = fx_defaulted

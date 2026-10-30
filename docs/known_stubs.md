@@ -32,10 +32,11 @@ Six connectors are registered and reachable through `POST /api/v1/connectors/{ty
 `bank_mt940` and `gst_portal` read an exported file; `sap_odata` calls a live SAP S/4HANA service and needs
 credentials. The web UI does not expose them yet — they are API-only.
 
-## Per-engagement GL-code classification
+## GL-code classification
 Line classification is keyword-based (whole-word match against the spend taxonomy). GL-code ranges are
-client-specific, so the taxonomy ships without a generic `gl_code_ranges` table; a per-engagement chart-of-accounts
-mapping would be needed to classify by GL code.
+client-specific, so the taxonomy ships without a generic table. An engagement can supply its own with
+`PUT /api/v1/engagements/{id}/gl-mapping`; documents parsed (or re-processed) afterwards are classified by GL code
+first, falling back to keywords for lines without a mapped code. There is no UI for this yet (API only).
 
 ## Analytics cache
 `app/services/cache.py` falls back to a pure-Python implementation when `duckdb` is not

@@ -7,9 +7,9 @@ import uuid
 from pathlib import Path
 from typing import Any, Dict, List
 
-from fastapi import APIRouter, BackgroundTasks, File, HTTPException, Request, UploadFile
+from fastapi import APIRouter, BackgroundTasks, File, HTTPException, Query, Request, Response, UploadFile
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.config import MAX_UPLOAD_MB, logger
 from app.ratelimit import RATE_LIMIT_UPLOAD, limiter
@@ -29,6 +29,7 @@ from app.services.document_pipeline import (
     process_engagement_document,
     validate_upload_suffix,
 )
+from app.errors import ApiError
 from app.services.ingestion import MAPPABLE_FIELDS
 from app.services.jobs import enqueue_job
 from app.services.engagements_store import (
@@ -95,14 +96,22 @@ def create_engagement(request: Request, payload: EngagementCreateRequest) -> Dic
 
 
 @router.get("/api/v1/engagements")
-def get_engagements(request: Request, q: str | None = None) -> List[Dict[str, Any]]:
+def get_engagements(
+    request: Request,
+    response: Response,
+    q: str | None = None,
+    limit: int | None = Query(None, ge=1, le=1000, description="Max rows to return (default: all)"),
+    offset: int = Query(0, ge=0),
+) -> List[Dict[str, Any]]:
     rows = search_engagements(q) if q else list_engagements()
-    return [m for m in rows if visible_to_principal(request, m.get("owner"))]
+    visible = [m for m in rows if visible_to_principal(request, m.get("owner"))]
+    response.headers["X-Total-Count"] = str(len(visible))
+    return visible[offset : offset + limit] if limit else visible[offset:]
 
 
 @router.get("/api/engagements")
-def get_engagements_legacy(request: Request, q: str | None = None) -> List[Dict[str, Any]]:
-    return get_engagements(request, q=q)
+def get_engagements_legacy(request: Request, response: Response, q: str | None = None) -> List[Dict[str, Any]]:
+    return get_engagements(request, response, q=q, limit=None, offset=0)
 
 
 @router.get("/api/v1/engagements/{engagement_id}")
@@ -265,12 +274,13 @@ async def upload_document(
             if not allow_duplicate:
                 for existing in ensure_engagement_exists(engagement_id).get("documents") or []:
                     if existing.get("content_sha256") == content_sha256:
-                        raise HTTPException(
-                            status_code=409,
-                            detail=(
+                        raise ApiError(
+                            409,
+                            (
                                 f"This file was already uploaded as '{existing.get('filename')}'. "
                                 "Uploading it again would double-count its spend."
                             ),
+                            "duplicate_upload",
                         )
             record = add_document_record(
                 engagement_id,
@@ -326,6 +336,50 @@ def get_engagement_llm_usage(engagement_id: str) -> Dict[str, Any]:
     from app.services.llm_budget import status
 
     return status(engagement_id)
+
+
+class GLRange(BaseModel):
+    # inclusive account-number range -> taxonomy category id (see GET /api/v1/skills taxonomy ids)
+    from_: int = Field(alias="from")
+    to: int
+    category_id: str
+
+    model_config = {"populate_by_name": True}
+
+
+class GLMappingRequest(BaseModel):
+    ranges: List[GLRange]
+
+
+@router.get("/api/v1/engagements/{engagement_id}/gl-mapping")
+def get_gl_mapping(engagement_id: str) -> Dict[str, Any]:
+    """This engagement's GL-code ranges (empty = classify by keywords only)."""
+    validate_engagement_id(engagement_id)
+    ensure_engagement_exists(engagement_id)
+    from app.services.gl_mapping import load_ranges
+
+    return {"ranges": load_ranges(engagement_id)}
+
+
+@router.put("/api/v1/engagements/{engagement_id}/gl-mapping")
+def put_gl_mapping(engagement_id: str, payload: GLMappingRequest) -> Dict[str, Any]:
+    """Set the GL-code ranges used to classify this engagement's spend.
+
+    Applies to documents parsed from now on; re-process existing documents to apply it to them.
+    """
+    validate_engagement_id(engagement_id)
+    ensure_engagement_exists(engagement_id)
+    from app.services.analysis import load_taxonomy
+    from app.services.gl_mapping import GLMappingError, save_ranges, validate_ranges
+
+    try:
+        cleaned = validate_ranges(
+            [{"from": r.from_, "to": r.to, "category_id": r.category_id} for r in payload.ranges], load_taxonomy()
+        )
+    except GLMappingError as exc:
+        raise ApiError(422, str(exc), "invalid_gl_mapping") from exc
+    save_ranges(engagement_id, cleaned)
+    return {"ranges": cleaned, "note": "Re-process documents to apply this mapping to spend already ingested."}
 
 
 class ReprocessRequest(BaseModel):

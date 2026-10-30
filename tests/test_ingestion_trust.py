@@ -80,3 +80,37 @@ def test_foreign_currency_without_fx_rate_is_flagged(tmp_path):
     lines, report = parse_spend_file_with_report(csv, load_taxonomy())
     assert report["quality"]["rows_fx_defaulted"] == 1
     assert any("FX rate" in w for w in report["warnings"])
+
+
+def test_slash_dates_are_read_consistently_and_ambiguity_is_reported(tmp_path):
+    from app.services.ingestion import _derive_fiscal_period, _infer_dayfirst
+    import pandas as pd
+
+    assert _infer_dayfirst(pd.Series(["25/12/2025", "03/04/2025"])) == (True, 0)   # 25 proves day-first
+    assert _infer_dayfirst(pd.Series(["12/25/2025", "03/04/2025"])) == (False, 0)  # second part 25 proves month-first
+    assert _infer_dayfirst(pd.Series(["03/04/2025", "05/06/2025"])) == (True, 2)   # nothing proves it
+    assert _derive_fiscal_period("03/04/2025", dayfirst=True) == (2026, "2025-04")
+    assert _derive_fiscal_period("03/04/2025", dayfirst=False) == (2025, "2025-03")
+
+    csv = tmp_path / "d.csv"
+    csv.write_text("supplier,description,amount,date\nA,cloud hosting,100,03/04/2025\nB,cloud hosting,200,05/06/2025\n")
+    _, report = parse_spend_file_with_report(csv, load_taxonomy())
+    assert report["quality"]["ambiguous_dates"] == 2
+    assert any("day/month" in w for w in report["warnings"])
+
+
+def test_oversized_excel_is_refused_before_loading(tmp_path, monkeypatch):
+    import openpyxl
+
+    from app.services import ingestion
+
+    monkeypatch.setattr(ingestion, "_ROW_MAX", 5)
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.append(["supplier", "description", "amount"])
+    for i in range(20):
+        ws.append([f"S{i}", "cloud hosting", i + 1])
+    path = tmp_path / "big.xlsx"
+    wb.save(path)
+    with pytest.raises(ValueError, match="Export it to CSV"):
+        ingestion._read_tabular(path, sheet_name=ws.title)

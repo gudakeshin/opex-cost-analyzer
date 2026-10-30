@@ -174,6 +174,14 @@ def record_llm_narrative(
     Returns the provenance tag dict (for attaching to the response payload).
     """
     tag = build_provenance_tag(skill_outputs_used, prompt_text, model_version, seed)
+    # The configured model is not always the one that answered (provider fallback): record what ran.
+    from app.services.llm_trace import summary as llm_trace_summary
+
+    used = llm_trace_summary()
+    if used["llm_models_used"]:
+        tag["llm_models_used"] = used["llm_models_used"]
+        tag["provider_fallback"] = used["provider_fallback"]
+        metadata = {**(metadata or {}), **used}
     tagged = tag_narrative(narrative, tag)
     save_snapshot(engagement_id, turn_id, tagged, metadata=metadata)
     return tag
