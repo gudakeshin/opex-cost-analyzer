@@ -143,7 +143,7 @@ def score_workbook_sheets(file_path: Path) -> List[SheetScore]:
     suffix = file_path.suffix.lower()
     if suffix == ".csv":
         try:
-            frame = pd.read_csv(file_path, nrows=5)
+            frame = pd.read_csv(file_path, nrows=5, **_csv_read_kwargs(file_path))
             cols = [str(c) for c in frame.columns]
             hscore, has_amount, has_supplier = _header_match_score(cols)
             return [
@@ -244,6 +244,39 @@ def workbook_schema_hints(file_path: Path) -> Dict[str, Any]:
     }
 
 
+def _csv_read_kwargs(file_path: Path) -> Dict[str, Any]:
+    """Delimiter and encoding for a CSV, sniffed from its head.
+
+    ERP/Tally exports are often semicolon- or tab-separated and cp1252-encoded;
+    pandas' defaults (comma, UTF-8) would fail or collapse them into one column.
+    """
+    import csv
+
+    try:
+        with file_path.open("rb") as fh:
+            head = fh.read(1 << 20)
+    except OSError:
+        return {}
+    encoding = "utf-8-sig"
+    try:
+        head.decode(encoding)
+    except UnicodeDecodeError as exc:
+        # A multi-byte character cut by the 1 MB boundary is not an encoding problem.
+        if exc.start < len(head) - 4:
+            encoding = "cp1252"
+    text = head.decode(encoding, errors="replace")
+    first_line = text.splitlines()[0] if text else ""
+    best_sep, best_fields = ",", 1
+    for sep in (",", ";", "\t", "|"):
+        try:
+            fields = len(next(csv.reader([first_line], delimiter=sep)))
+        except (csv.Error, StopIteration):
+            continue
+        if fields > best_fields:
+            best_sep, best_fields = sep, fields
+    return {"sep": best_sep, "encoding": encoding}
+
+
 def _read_tabular(
     file_path: Path,
     sheet_name: str | None = None,
@@ -251,7 +284,7 @@ def _read_tabular(
 ) -> pd.DataFrame:
     suffix = file_path.suffix.lower()
     if suffix == ".csv":
-        return pd.read_csv(file_path)
+        return pd.read_csv(file_path, **_csv_read_kwargs(file_path))
     if sheet_name is not None:
         return pd.read_excel(file_path, sheet_name=sheet_name, header=header_row)
     ranked = score_workbook_sheets(file_path)
@@ -1254,6 +1287,9 @@ def _dataframe_to_spend_lines(
         # Compute reporting amount (apply FX only when currency differs)
         if currency.upper() != reporting_currency.upper():
             amount_reporting = amount * fx_rate
+            if fx_rate == 1.0 and stats is not None:
+                # A foreign-currency line at 1:1 almost always means the rate was missing.
+                stats["_fx_defaulted_rows"] = stats.get("_fx_defaulted_rows", 0) + 1
         else:
             amount_reporting = amount
 
@@ -1369,6 +1405,7 @@ def _enrich_ingestion_report(
     rows_unparseable = int(report.pop("_rows_unparseable", 0) or 0)
     rows_blank = int(report.pop("_rows_blank", 0) or 0)
     samples = report.pop("_unparseable_samples", [])
+    fx_defaulted = int(report.pop("_fx_defaulted_rows", 0) or 0)
     warnings: List[str] = []
     if rows_input:
         quality["rows_input"] = rows_input
@@ -1377,6 +1414,12 @@ def _enrich_ingestion_report(
         quality["rows_dropped_blank_amount"] = rows_blank
         quality["rows_dropped_zero_amount"] = max(
             quality["rows_dropped"] - rows_unparseable - rows_blank, 0
+        )
+    if fx_defaulted:
+        quality["rows_fx_defaulted"] = fx_defaulted
+        warnings.append(
+            f"{fx_defaulted:,} rows are in a currency other than the reporting currency but have no usable "
+            "FX rate; they were converted 1:1. Add an FX-rate column or correct the currency."
         )
     if rows_unparseable:
         quality["unparseable_amount_samples"] = samples
@@ -1623,7 +1666,9 @@ def iter_spend_csv_chunks(
     chunk_rows = chunk_rows or _STREAM_CHUNK_ROWS  # resolved at call time
     total_rows = 0
     row_start = 1
-    for frame in pd.read_csv(file_path, chunksize=chunk_rows):
+    for frame in pd.read_csv(
+        file_path, chunksize=chunk_rows, encoding_errors="replace", **_csv_read_kwargs(file_path)
+    ):
         total_rows += len(frame)
         if total_rows > _ROW_ABSOLUTE_MAX:
             raise ValueError(
@@ -1789,7 +1834,7 @@ def parse_document(file_path: Path, ocr_lang: str = "eng") -> str:
         return ""
     if suffix in (".csv", ".xlsx", ".xls"):
         if suffix == ".csv":
-            frame = pd.read_csv(file_path)
+            frame = pd.read_csv(file_path, **_csv_read_kwargs(file_path))
         else:
             frame = pd.read_excel(file_path)
         return frame.head(10).to_csv(index=False)

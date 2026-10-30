@@ -653,6 +653,7 @@ def add_document_record(
     size_bytes: int,
     raw_path: str,
     _already_locked: bool = False,
+    content_sha256: str | None = None,
 ) -> Dict[str, Any]:
     def _apply() -> Dict[str, Any]:
         manifest, _, parse_error = _parse_manifest_file(engagement_id)
@@ -681,6 +682,8 @@ def add_document_record(
             "text_preview": None,
             "line_count": 0,
         }
+        if content_sha256:
+            record["content_sha256"] = content_sha256
         docs = list(manifest.get("documents") or [])
         docs.append(record)
         manifest["documents"] = docs

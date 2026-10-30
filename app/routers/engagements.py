@@ -2,6 +2,7 @@
 # NOTE: no `from __future__ import annotations` here — slowapi's @limiter.limit
 # wrapper cannot resolve postponed annotations (UploadFile etc.) because
 # FastAPI evaluates them against the wrapper's __globals__, not this module's.
+import hashlib
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List
@@ -215,6 +216,7 @@ async def upload_document(
     request: Request,
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
+    allow_duplicate: bool = False,
 ) -> Dict[str, Any]:
     validate_engagement_id(engagement_id)
     manifest = ensure_engagement_exists(engagement_id)
@@ -241,9 +243,11 @@ async def upload_document(
     tmp_path = ddir.parent / f".upload-{document_id}{suffix}"
     tmp_path.parent.mkdir(parents=True, exist_ok=True)
     size_bytes = 0
+    digest = hashlib.sha256()
     try:
         with tmp_path.open("wb") as spool:
             while chunk := await file.read(1 << 20):
+                digest.update(chunk)
                 size_bytes += len(chunk)
                 if size_bytes > _max_bytes:
                     raise HTTPException(
@@ -253,7 +257,18 @@ async def upload_document(
 
         # Register manifest + sidecar meta before writing raw bytes so orphan-folder
         # repair cannot synthesize a duplicate upload.* row for the same document_id.
+        content_sha256 = digest.hexdigest()
         async with engagement_lock(engagement_id):
+            if not allow_duplicate:
+                for existing in ensure_engagement_exists(engagement_id).get("documents") or []:
+                    if existing.get("content_sha256") == content_sha256:
+                        raise HTTPException(
+                            status_code=409,
+                            detail=(
+                                f"This file was already uploaded as '{existing.get('filename')}'. "
+                                "Uploading it again would double-count its spend."
+                            ),
+                        )
             record = add_document_record(
                 engagement_id,
                 document_id=document_id,
@@ -262,6 +277,7 @@ async def upload_document(
                 size_bytes=size_bytes,
                 raw_path=str(raw_path),
                 _already_locked=True,
+                content_sha256=content_sha256,
             )
             ddir.mkdir(parents=True, exist_ok=True)
             tmp_path.replace(raw_path)

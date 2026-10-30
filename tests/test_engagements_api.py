@@ -108,3 +108,25 @@ def test_delete_engagement(client, tmp_path, monkeypatch):
 
     gone = client.get(f"/api/v1/engagements/{eid}")
     assert gone.status_code == 404
+
+
+def test_duplicate_upload_is_rejected_unless_allowed(client, tmp_path, monkeypatch):
+    _patch_engagements_dir(monkeypatch, tmp_path)
+    eid = client.post(
+        "/api/v1/engagements",
+        json={"company_name": "Dup Co", "industry": "it_ites", "annual_revenue": 1e9, "currency": "INR"},
+    ).json()["engagement_id"]
+    body = b"supplier,description,amount\nAcme,Cloud services,100000\n"
+
+    def _upload(**params):
+        return client.post(
+            f"/api/v1/engagements/{eid}/documents",
+            files={"file": ("ledger.csv", body, "text/csv")},
+            params=params,
+        )
+
+    assert _upload().status_code == 200
+    dup = _upload()
+    assert dup.status_code == 409
+    assert "already uploaded" in dup.json()["detail"]
+    assert _upload(allow_duplicate="true").status_code == 200
