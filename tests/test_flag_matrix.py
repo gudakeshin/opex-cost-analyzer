@@ -205,3 +205,14 @@ def test_flag_defaults_match_expected_production_values() -> None:
 
     # Reload to restore normal state.
     importlib.reload(cfg_mod)
+
+
+def test_health_is_a_cheap_liveness_probe():
+    """/health must not build the document index or memory adapter (that loads an embedding model)."""
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    body = TestClient(app).get("/health").json()
+    assert body["status"] == "ok"
+    assert "document_index_backend" in body["connectors"]

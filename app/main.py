@@ -234,8 +234,10 @@ async def _global_exception_handler(request: Request, exc: Exception) -> JSONRes
 @app.get("/health")
 @limiter.exempt
 def health():  # type: ignore[return]
-    mem_status = get_memory_adapter_status()
-    doc_status = get_document_index_status()
+    # Liveness must be cheap and never block on Qdrant or an embedding-model load, so report the
+    # backends' state without initialising them (use /health/ready for the dependency-aware probe).
+    mem_status = get_memory_adapter_status(initialize=False)
+    doc_status = get_document_index_status(initialize=False)
     usage = _memory_store.usage_stats()
     return {
         "status": "ok",

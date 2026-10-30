@@ -215,13 +215,15 @@ class QdrantDocumentIndex(DocumentIndexInterface):
 
             api_key = QDRANT_API_KEY or None
             self._client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT, api_key=api_key, timeout=5)
-            self._encoder = SentenceTransformer(EMBEDDING_MODEL)
+            # Probe Qdrant BEFORE loading the embedding model: without a reachable Qdrant the
+            # model (a large download on a cold machine) would be loaded for nothing.
             existing = {c.name for c in self._client.get_collections().collections}
             if DOC_CHUNKS_COLLECTION not in existing:
                 self._client.create_collection(
                     collection_name=DOC_CHUNKS_COLLECTION,
                     vectors_config=VectorParams(size=_EMBEDDING_DIM, distance=Distance.COSINE),
                 )
+            self._encoder = SentenceTransformer(EMBEDDING_MODEL)
             self._qdrant_ok = True
             logger.info('"document_index_ready host=%s port=%s"', QDRANT_HOST, QDRANT_PORT)
         except ImportError as exc:
@@ -356,9 +358,12 @@ def get_document_index() -> DocumentIndexInterface:
     return _INDEX_SINGLETON
 
 
-def get_document_index_status() -> Dict[str, Any]:
-    get_document_index()
-    return dict(_INDEX_META)
+def get_document_index_status(initialize: bool = True) -> Dict[str, Any]:
+    """Index backend status. ``initialize=False`` never builds the index (cheap liveness probes)."""
+    if initialize or _INDEX_SINGLETON is not None:
+        get_document_index()
+        return dict(_INDEX_META)
+    return {**_INDEX_META, "reason": "not_initialized_yet"}
 
 
 def retrieve_context(engagement_id: str, query: str, **kwargs: Any) -> List[str]:

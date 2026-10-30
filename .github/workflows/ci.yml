@@ -99,7 +99,10 @@ jobs:
           AUTH_ENABLED: "false"
         run: |
           PYTHONPATH=. nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 > backend.log 2>&1 &
-          npx --yes wait-on@7 http://localhost:8000/health --timeout 60000
+          if ! npx --yes wait-on@7 http://localhost:8000/health --timeout 120000; then
+            echo "::group::backend.log"; cat backend.log; echo "::endgroup::"
+            exit 1
+          fi
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
