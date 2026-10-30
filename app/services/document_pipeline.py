@@ -223,6 +223,10 @@ def process_engagement_document(
     )
 
     parsed_dir = document_parsed_dir(engagement_id, document_id)
+    try:
+        column_overrides = dict(get_document_record(engagement_id, document_id).get("column_overrides") or {})
+    except Exception:
+        column_overrides = {}
     warnings: List[str] = []
     role = "context_doc"
     parse_backend = "native"
@@ -246,7 +250,8 @@ def process_engagement_document(
 
         elif suffix in (".csv", ".xlsx", ".xls"):
             lines, report = parse_spend_file_with_report(
-                raw_path, taxonomy, reporting_currency=reporting_currency
+                raw_path, taxonomy, reporting_currency=reporting_currency,
+                column_overrides=column_overrides or None,
             )
             role = "spend_tabular"
             parse_backend = "native"
@@ -260,7 +265,8 @@ def process_engagement_document(
 
         elif suffix == ".json":
             lines, report = parse_spend_json_with_report(
-                raw_path, taxonomy, reporting_currency=reporting_currency
+                raw_path, taxonomy, reporting_currency=reporting_currency,
+                column_overrides=column_overrides or None,
             )
             role = "spend_tabular"
             parse_backend = "native"

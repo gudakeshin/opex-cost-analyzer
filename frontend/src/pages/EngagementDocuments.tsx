@@ -25,6 +25,8 @@ import { useSectorOptions } from '../api/hooks/useBenchmarksQueries';
 import type { EngagementSummary } from '../types';
 import { useConfirm } from '../hooks/useConfirm';
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import { ColumnMappingModal } from '../components/PageComponents/Documents/ColumnMappingModal';
+import type { EngagementDocument } from '../types';
 
 const ACCEPT =
   '.csv,.xlsx,.xls,.json,.pdf,.docx,.txt,.md,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json';
@@ -78,6 +80,7 @@ export const EngagementDocuments: React.FC = () => {
 
   // New engagement modal state
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [mappingDoc, setMappingDoc] = useState<EngagementDocument | null>(null);
   const [newName, setNewName] = useState('');
   const [newIndustry, setNewIndustry] = useState('manufacturing_diversified');
   const [newRevenueCr, setNewRevenueCr] = useState('5000');
@@ -564,6 +567,15 @@ export const EngagementDocuments: React.FC = () => {
                     </td>
                     <td className="py-3 align-top">
                       <div className="flex flex-wrap gap-2">
+                        {doc.role === 'spend_tabular' && doc.status === 'ready' && (
+                          <button
+                            type="button"
+                            className="text-xs text-brand-primary hover:underline"
+                            onClick={() => setMappingDoc(doc)}
+                          >
+                            Column mapping
+                          </button>
+                        )}
                         <button
                           type="button"
                           className="text-xs text-brand-muted hover:text-brand-ink"
@@ -599,6 +611,15 @@ export const EngagementDocuments: React.FC = () => {
         </Link>{' '}
         — both use documents from this engagement.
       </p>
+
+      {mappingDoc && engagementId && (
+        <ColumnMappingModal
+          engagementId={engagementId}
+          document={mappingDoc}
+          onClose={() => setMappingDoc(null)}
+          onReprocessed={() => void invalidateDocuments(engagementId)}
+        />
+      )}
 
       {/* New engagement modal */}
       {showCreateModal && (

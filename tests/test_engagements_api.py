@@ -155,3 +155,30 @@ def test_ingest_warnings_reach_the_analysis_corpus(client, tmp_path, monkeypatch
     joined = " ".join(reports[0].get("warnings") or [])
     assert "could not be read" in joined and "FX rate" in joined
     assert reports[0]["quality"]["rows_dropped_unparseable_amount"] == 1
+
+
+def test_column_mapping_is_reported_and_can_be_overridden(client, tmp_path, monkeypatch):
+    _patch_engagements_dir(monkeypatch, tmp_path)
+    eid = client.post(
+        "/api/v1/engagements",
+        json={"company_name": "Map Co", "industry": "it_ites", "annual_revenue": 1e9, "currency": "INR"},
+    ).json()["engagement_id"]
+    # "Vendor Name" matches supplier; "Notes" holds the real supplier names
+    body = b"Vendor Name,Notes,Details,Value\nV-001,Acme Cloud,cloud hosting,1000\nV-002,Beta Freight,freight charges,2000\n"
+    doc = client.post(f"/api/v1/engagements/{eid}/documents", files={"file": ("m.csv", body, "text/csv")}).json()["document"]
+    did = doc["document_id"]
+
+    q = client.get(f"/api/v1/engagements/{eid}/documents/{did}/ingestion-report").json()["report"]["quality"]
+    assert q["column_mapping"]["supplier"] == {"column": "Vendor Name", "match": "partial"}
+    assert "Notes" in q["unmapped_columns"] and "Notes" in q["available_columns"]
+    assert any("Column mapping" in w for w in client.get(
+        f"/api/v1/engagements/{eid}/documents/{did}/ingestion-report").json()["report"]["warnings"])
+
+    bad = client.post(f"/api/v1/engagements/{eid}/documents/{did}/reprocess", json={"column_overrides": {"nope": "Notes"}})
+    assert bad.status_code == 422
+
+    ok = client.post(f"/api/v1/engagements/{eid}/documents/{did}/reprocess", json={"column_overrides": {"supplier": "Notes"}})
+    assert ok.status_code == 200
+    out = client.get(f"/api/v1/engagements/{eid}/documents/{did}/ingestion-report").json()
+    assert out["column_overrides"] == {"supplier": "Notes"}
+    assert out["report"]["quality"]["column_mapping"]["supplier"] == {"column": "Notes", "match": "manual"}

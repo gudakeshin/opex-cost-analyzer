@@ -1124,6 +1124,37 @@ def _parse_amount_series(series: "pd.Series") -> Tuple["pd.Series", "pd.Series",
     return values.fillna(0.0), unparseable, blank
 
 
+# Header names each field is matched against (lower-case). Shared by matching and by the
+# exact-vs-partial classification shown to the user in the column-mapping report.
+_FIELD_CANDIDATES: Dict[str, List[str]] = {
+    "supplier": ['supplier', 'vendor', 'payee'],
+    "business_unit": ['bu', 'business unit', 'department'],
+    "geography": ['country', 'geo', 'region', 'location'],
+    "date": ['date', 'invoice date', 'month'],
+    "gl_code": ['gl code', 'gl_code', 'account', 'account code', 'gl account'],
+    "cost_center": ['cost center', 'cost_center', 'cc', 'cost centre'],
+    "currency": ['currency', 'ccy', 'curr'],
+    "fx_rate": ['fx rate', 'fx_rate', 'exchange rate'],
+    "amount_type": ['type', 'amount type', 'data type', 'scenario'],
+    "payment_terms": ['payment terms', 'payment_terms', 'terms', 'net days', 'dpo'],
+    "gst_treatment": ['gst treatment', 'gst_treatment', 'itc', 'gst type', 'tax treatment'],
+    "gstin": ['gstin', 'gst number', 'gst no', 'vendor gstin', 'supplier gstin'],
+    "lease_treatment": ['lease treatment', 'lease_treatment', 'lease type', 'ind as 116'],
+    "related_party": ['related party', 'related_party', 'intercompany', 'intra group', 'intragroup'],
+    "legal_entity": ['legal entity', 'legal_entity', 'entity', 'company code', 'co code'],
+    "source_system": ['source system', 'source_system', 'source', 'erp', 'system name'],
+    "source_record_id": ['source record id', 'source record', 'record id', 'source id', 'pk'],
+    "vendor_pan": ['vendor pan', 'pan', 'pan number', 'pan no', 'supplier pan'],
+    "msme_flag": ['msme', 'msme flag', 'vendor msme', 'sme', 'is msme'],
+    "vendor_category": ['vendor category', 'vendor_category', 'supplier category', 'vendor type'],
+    "spend_type": ['spend type', 'spend_type', 'cost type', 'opex capex', 'expenditure type'],
+}
+
+
+# Fields a user may re-map by hand (the keys of the column-mapping report).
+MAPPABLE_FIELDS = tuple(sorted({*_FIELD_CANDIDATES, "amount", "description"}))
+
+
 def _dataframe_to_spend_lines(
     frame: pd.DataFrame,
     file_path: Path,
@@ -1133,6 +1164,7 @@ def _dataframe_to_spend_lines(
     source_system_id: Optional[str] = None,
     row_id_start: int = 1,
     stats: Optional[Dict[str, Any]] = None,
+    column_overrides: Optional[Dict[str, str]] = None,
 ) -> Tuple[List[NormalizedSpendLine], Optional[str]]:
     file_hash = _compute_file_hash(file_path)
 
@@ -1154,7 +1186,7 @@ def _dataframe_to_spend_lines(
 
     cols = [str(c) for c in frame.columns]
     amount_col = _best_amount_column_match(cols, frame)
-    supplier_col = _best_column_match(cols, ["supplier", "vendor", "payee"], "")
+    supplier_col = _best_column_match(cols, _FIELD_CANDIDATES["supplier"], "")
     desc_col = _best_column_match(cols, ["description", "memo", "line item", "item"], "")
     amount_col, desc_col, pl_note = _apply_hierarchical_expense_column_mapping(
         cols, frame, amount_col, desc_col
@@ -1183,31 +1215,82 @@ def _dataframe_to_spend_lines(
             if not mapping_note:
                 mapping_note = f"Hierarchical expense layout: line items from '{label_col}'."
     amount_currency_hint = _infer_currency_from_column_name(amount_col) if amount_col else None
-    bu_col = _best_column_match(cols, ["bu", "business unit", "department"], "")
-    geo_col = _best_column_match(cols, ["country", "geo", "region", "location"], "")
-    date_col = _best_column_match(cols, ["date", "invoice date", "month"], "")
+    bu_col = _best_column_match(cols, _FIELD_CANDIDATES["business_unit"], "")
+    geo_col = _best_column_match(cols, _FIELD_CANDIDATES["geography"], "")
+    date_col = _best_column_match(cols, _FIELD_CANDIDATES["date"], "")
     # FP&A columns
-    gl_col = _best_column_match(cols, ["gl code", "gl_code", "account", "account code", "gl account"], "")
-    cc_col = _best_column_match(cols, ["cost center", "cost_center", "cc", "cost centre"], "")
-    currency_col = _best_column_match(cols, ["currency", "ccy", "curr"], "")
-    fx_col = _best_column_match(cols, ["fx rate", "fx_rate", "exchange rate"], "")
-    type_col = _best_column_match(cols, ["type", "amount type", "data type", "scenario"], "")
-    terms_col = _best_column_match(cols, ["payment terms", "payment_terms", "terms", "net days", "dpo"], "")
+    gl_col = _best_column_match(cols, _FIELD_CANDIDATES["gl_code"], "")
+    cc_col = _best_column_match(cols, _FIELD_CANDIDATES["cost_center"], "")
+    currency_col = _best_column_match(cols, _FIELD_CANDIDATES["currency"], "")
+    fx_col = _best_column_match(cols, _FIELD_CANDIDATES["fx_rate"], "")
+    type_col = _best_column_match(cols, _FIELD_CANDIDATES["amount_type"], "")
+    terms_col = _best_column_match(cols, _FIELD_CANDIDATES["payment_terms"], "")
     # India columns (v2.0)
-    gst_col = _best_column_match(cols, ["gst treatment", "gst_treatment", "itc", "gst type", "tax treatment"], "")
-    gstin_col = _best_column_match(cols, ["gstin", "gst number", "gst no", "vendor gstin", "supplier gstin"], "")
-    lease_col = _best_column_match(cols, ["lease treatment", "lease_treatment", "lease type", "ind as 116"], "")
-    rp_col = _best_column_match(cols, ["related party", "related_party", "intercompany", "intra group", "intragroup"], "")
-    entity_col = _best_column_match(cols, ["legal entity", "legal_entity", "entity", "company code", "co code"], "")
+    gst_col = _best_column_match(cols, _FIELD_CANDIDATES["gst_treatment"], "")
+    gstin_col = _best_column_match(cols, _FIELD_CANDIDATES["gstin"], "")
+    lease_col = _best_column_match(cols, _FIELD_CANDIDATES["lease_treatment"], "")
+    rp_col = _best_column_match(cols, _FIELD_CANDIDATES["related_party"], "")
+    entity_col = _best_column_match(cols, _FIELD_CANDIDATES["legal_entity"], "")
     # Source lineage columns (v2.2)
-    src_sys_col = _best_column_match(cols, ["source system", "source_system", "source", "erp", "system name"], "")
-    src_rec_col = _best_column_match(cols, ["source record id", "source record", "record id", "source id", "pk"], "")
+    src_sys_col = _best_column_match(cols, _FIELD_CANDIDATES["source_system"], "")
+    src_rec_col = _best_column_match(cols, _FIELD_CANDIDATES["source_record_id"], "")
     # Vendor master columns (v2.2)
-    pan_col = _best_column_match(cols, ["vendor pan", "pan", "pan number", "pan no", "supplier pan"], "")
-    msme_col = _best_column_match(cols, ["msme", "msme flag", "vendor msme", "sme", "is msme"], "")
-    vcat_col = _best_column_match(cols, ["vendor category", "vendor_category", "supplier category", "vendor type"], "")
+    pan_col = _best_column_match(cols, _FIELD_CANDIDATES["vendor_pan"], "")
+    msme_col = _best_column_match(cols, _FIELD_CANDIDATES["msme_flag"], "")
+    vcat_col = _best_column_match(cols, _FIELD_CANDIDATES["vendor_category"], "")
     # Spend classification column (v2.2)
-    stype_col = _best_column_match(cols, ["spend type", "spend_type", "cost type", "opex capex", "expenditure type"], "")
+    stype_col = _best_column_match(cols, _FIELD_CANDIDATES["spend_type"], "")
+
+    # Let the user correct any automatic guess (field -> column name, or "" to ignore the field),
+    # then record the final mapping so the report can show how each column was matched.
+    _auto = {
+        "amount": amount_col, "supplier": supplier_col, "description": desc_col,
+        "business_unit": bu_col, "geography": geo_col, "date": date_col, "gl_code": gl_col,
+        "cost_center": cc_col, "currency": currency_col, "fx_rate": fx_col, "amount_type": type_col,
+        "payment_terms": terms_col, "gst_treatment": gst_col, "gstin": gstin_col,
+        "lease_treatment": lease_col, "related_party": rp_col, "legal_entity": entity_col,
+        "source_system": src_sys_col, "source_record_id": src_rec_col, "vendor_pan": pan_col,
+        "msme_flag": msme_col, "vendor_category": vcat_col, "spend_type": stype_col,
+    }
+    _resolved = dict(_auto)
+    _manual: set[str] = set()
+    for _field, _target in (column_overrides or {}).items():
+        if _field in _resolved and (_target == "" or _target in cols):
+            _resolved[_field] = _target
+            _manual.add(_field)
+    amount_col, supplier_col, desc_col = _resolved["amount"], _resolved["supplier"], _resolved["description"]
+    bu_col, geo_col, date_col, gl_col = (
+        _resolved["business_unit"], _resolved["geography"], _resolved["date"], _resolved["gl_code"]
+    )
+    cc_col, currency_col, fx_col, type_col = (
+        _resolved["cost_center"], _resolved["currency"], _resolved["fx_rate"], _resolved["amount_type"]
+    )
+    terms_col, gst_col, gstin_col, lease_col = (
+        _resolved["payment_terms"], _resolved["gst_treatment"], _resolved["gstin"], _resolved["lease_treatment"]
+    )
+    rp_col, entity_col, src_sys_col, src_rec_col = (
+        _resolved["related_party"], _resolved["legal_entity"], _resolved["source_system"], _resolved["source_record_id"]
+    )
+    pan_col, msme_col, vcat_col, stype_col = (
+        _resolved["vendor_pan"], _resolved["msme_flag"], _resolved["vendor_category"], _resolved["spend_type"]
+    )
+    amount_currency_hint = _infer_currency_from_column_name(amount_col) if amount_col else None
+    if stats is not None and "_column_mapping" not in stats:
+        mapping: Dict[str, Dict[str, str]] = {}
+        for _field, _col_name in _resolved.items():
+            if not _col_name:
+                continue
+            if _field in _manual:
+                kind = "manual"
+            elif _field in ("amount", "description"):
+                kind = "inferred"
+            else:
+                kind = "exact" if _col_name.lower().strip() in _FIELD_CANDIDATES.get(_field, []) else "partial"
+            mapping[_field] = {"column": _col_name, "match": kind}
+        used = {m["column"] for m in mapping.values()}
+        stats["_column_mapping"] = mapping
+        stats["_available_columns"] = cols
+        stats["_unmapped_columns"] = [c for c in cols if c not in used]
 
     def _col(name: str, fill: str = "") -> "pd.Series":
         return frame[name].fillna(fill) if name else pd.Series([""] * len(frame))
@@ -1406,7 +1489,25 @@ def _enrich_ingestion_report(
     rows_blank = int(report.pop("_rows_blank", 0) or 0)
     samples = report.pop("_unparseable_samples", [])
     fx_defaulted = int(report.pop("_fx_defaulted_rows", 0) or 0)
+    column_mapping = report.pop("_column_mapping", None)
+    available_columns = report.pop("_available_columns", None)
+    unmapped_columns = report.pop("_unmapped_columns", None)
     warnings: List[str] = []
+    if column_mapping:
+        quality["column_mapping"] = column_mapping
+        quality["available_columns"] = available_columns or []
+        quality["unmapped_columns"] = unmapped_columns or []
+        weak = [
+            f"{info['column']!r} → {field.replace('_', ' ')}"
+            for field, info in column_mapping.items()
+            if info["match"] == "partial" and field in ("supplier", "date", "cost_center", "gl_code", "currency")
+        ]
+        if weak:
+            warnings.append(
+                "Some columns were matched by partial name — confirm them under Documents → Column mapping: "
+                + "; ".join(weak[:4])
+                + "."
+            )
     if rows_input:
         quality["rows_input"] = rows_input
         quality["rows_dropped"] = max(rows_input - len(lines), 0)
@@ -1476,6 +1577,7 @@ def parse_spend_file_with_report(
     reporting_currency: str = "INR",
     workbook_manifest: Dict[str, Any] | None = None,
     source_system_id: Optional[str] = None,
+    column_overrides: Optional[Dict[str, str]] = None,
 ) -> Tuple[List[NormalizedSpendLine], Dict[str, Any]]:
     """Parse spend file and return normalized lines plus ingestion diagnostics."""
     report: Dict[str, Any] = {
@@ -1543,6 +1645,7 @@ def parse_spend_file_with_report(
             source_system_id=sid,
             row_id_start=len(all_lines) + 1,
             stats=report,
+            column_overrides=column_overrides,
         )
         if mapping_note:
             mapping_notes.append(mapping_note)
@@ -1600,6 +1703,7 @@ def parse_spend_file_with_report(
             reporting_currency=reporting_currency,
             source_system_id=source_system_id,
             stats=report,
+            column_overrides=column_overrides,
         )
         if mapping_note:
             mapping_notes.append(mapping_note)
@@ -1708,6 +1812,7 @@ def parse_spend_json_with_report(
     default_amount_type: str = "actual",
     reporting_currency: str = "INR",
     source_system_id: Optional[str] = None,
+    column_overrides: Optional[Dict[str, str]] = None,
 ) -> Tuple[List[NormalizedSpendLine], Dict[str, Any]]:
     records = _load_json_records(file_path)
     if not records:
@@ -1722,6 +1827,7 @@ def parse_spend_json_with_report(
         reporting_currency=reporting_currency,
         source_system_id=source_system_id,
         stats=report,
+        column_overrides=column_overrides,
     )
     report.update(
         {

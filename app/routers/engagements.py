@@ -9,6 +9,7 @@ from typing import Any, Dict, List
 
 from fastapi import APIRouter, BackgroundTasks, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse
+from pydantic import BaseModel
 
 from app.config import MAX_UPLOAD_MB, logger
 from app.ratelimit import RATE_LIMIT_UPLOAD, limiter
@@ -24,9 +25,11 @@ from app.services.analysis import load_taxonomy
 from app.services.compliance import append_audit_event
 from app.services.document_pipeline import (
     _should_stream_csv,
+    load_cached_ingestion_report,
     process_engagement_document,
     validate_upload_suffix,
 )
+from app.services.ingestion import MAPPABLE_FIELDS
 from app.services.jobs import enqueue_job
 from app.services.engagements_store import (
     SUPPORTED_EXTENSIONS,
@@ -315,6 +318,27 @@ def remove_document(engagement_id: str, document_id: str) -> Dict[str, Any]:
     return {"deleted": document_id}
 
 
+class ReprocessRequest(BaseModel):
+    # field -> source column name ("" ignores the field). Omit to keep the current mapping;
+    # send {} to clear manual overrides and return to automatic matching.
+    column_overrides: Dict[str, str] | None = None
+
+
+@router.get("/api/v1/engagements/{engagement_id}/documents/{document_id}/ingestion-report")
+def get_document_ingestion_report(engagement_id: str, document_id: str) -> Dict[str, Any]:
+    """Parse-time report for a spend document: rows dropped, warnings and the column mapping."""
+    validate_engagement_id(engagement_id)
+    validate_document_id(document_id)
+    ensure_engagement_exists(engagement_id)
+    record = get_document_record(engagement_id, document_id)
+    return {
+        "document_id": document_id,
+        "filename": record.get("filename"),
+        "report": load_cached_ingestion_report(engagement_id, document_id),
+        "column_overrides": record.get("column_overrides") or {},
+    }
+
+
 @router.post("/api/v1/engagements/{engagement_id}/documents/{document_id}/reprocess")
 @limiter.limit(RATE_LIMIT_UPLOAD)
 async def reprocess_document(
@@ -322,12 +346,19 @@ async def reprocess_document(
     engagement_id: str,
     document_id: str,
     background_tasks: BackgroundTasks,
+    payload: ReprocessRequest | None = None,
 ) -> Dict[str, Any]:
     validate_engagement_id(engagement_id)
     validate_document_id(document_id)
     manifest = ensure_engagement_exists(engagement_id)
     get_document_record(engagement_id, document_id)
-    update_document_record(engagement_id, document_id, {"status": "pending", "error": None})
+    patch: Dict[str, Any] = {"status": "pending", "error": None}
+    if payload is not None and payload.column_overrides is not None:
+        unknown = sorted(set(payload.column_overrides) - set(MAPPABLE_FIELDS))
+        if unknown:
+            raise HTTPException(status_code=422, detail=f"Unknown field(s) to map: {', '.join(unknown)}")
+        patch["column_overrides"] = payload.column_overrides
+    update_document_record(engagement_id, document_id, patch)
     currency = str(manifest.get("currency") or "INR")
     background_tasks.add_task(_run_document_pipeline, engagement_id, document_id, currency)
     return {"document_id": document_id, "status": "pending"}
